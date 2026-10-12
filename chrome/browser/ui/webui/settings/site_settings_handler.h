@@ -251,7 +251,6 @@ class SiteSettingsHandler
   // TODO(crbug.com/40101962): Remove this friend class when the Persistent
   // Permissions feature flag is removed.
   friend class PersistentPermissionsSiteSettingsHandlerTest;
-  friend class SmartCardReaderPermissionsSiteSettingsHandlerTest;
 
   // Rebuilds the BrowsingDataModel. Pending requests are serviced when the
   // browsing data model is built.

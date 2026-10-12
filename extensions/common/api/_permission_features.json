@@ -302,26 +302,6 @@
   "fileSystem.requestFileSystem": {
     "platforms": ["chromeos"]
   },
-  "hid": [
-    {
-      "channel": "stable",
-      "extension_types": ["platform_app"],
-      // "desktop_android" is not supported.
-      "platforms": ["chromeos", "linux", "mac", "win"]
-    },
-    {
-      "channel": "stable",
-      "extension_types": ["extension"],
-      // "desktop_android" is not supported.
-      "platforms": ["chromeos", "linux", "mac", "win"],
-      "allowlist": [
-        "D7CD4B3956B1F6E970E4AFCBCD4094B1EF4D07B9",  // http://crbug.com/710541
-        "D4EFCCC0CC612380762758BB96C7997224BD6395",  // http://crbug.com/710541
-        "4839A26B29CD1BD021B2E126EF6D28C9CB84018B",  // http://crbug.com/710541
-        "8F44FBB4474CCDF23450B166C9E83E85BD03AE24"   // http://crbug.com/710541
-      ]
-    }
-  ],
   "idle": {
     "channel": "stable",
     "extension_types": ["extension", "legacy_packaged_app", "platform_app"]
@@ -680,22 +660,6 @@
     "extension_types": ["platform_app"],
     "platforms": ["chromeos"]
   },
-  "usbDevices": [
-    {
-      "channel": "stable",
-      "extension_types": ["platform_app"]
-    },
-    {
-      "channel": "stable",
-      "extension_types": ["extension"],
-      "allowlist": [
-        "D7CD4B3956B1F6E970E4AFCBCD4094B1EF4D07B9",  // http://crbug.com/710541
-        "D4EFCCC0CC612380762758BB96C7997224BD6395",  // http://crbug.com/710541
-        "4839A26B29CD1BD021B2E126EF6D28C9CB84018B",  // http://crbug.com/710541
-        "8F44FBB4474CCDF23450B166C9E83E85BD03AE24"   // http://crbug.com/710541
-      ]
-    }
-  ],
   "videoCapture": [
     {
       "channel": "stable",

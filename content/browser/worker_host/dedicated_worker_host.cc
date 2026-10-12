@@ -800,20 +800,6 @@ void DedicatedWorkerHost::CreateDirectSocketsService(
                                            std::move(receiver));
 }
 
-void DedicatedWorkerHost::CreateWebUsbService(
-    mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  RenderFrameHostImpl* ancestor_render_frame_host =
-      GetAncestorRenderFrameHost();
-  // The ancestor frame may have already been closed. In that case, the worker
-  // will soon be terminated too, so abort the connection.
-  if (!ancestor_render_frame_host) {
-    return;
-  }
-
-  ancestor_render_frame_host->CreateWebUsbService(std::move(receiver));
-}
-
 void DedicatedWorkerHost::CreateWebSocketConnector(
     mojo::PendingReceiver<blink::mojom::WebSocketConnector> receiver) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -974,34 +960,6 @@ void DedicatedWorkerHost::CreateCodeCacheHost(
   code_cache_host_receivers_.Add(rph->GetID(),
                                  isolation_info_.network_isolation_key(),
                                  GetWorkerStorageKey(), std::move(receiver));
-}
-
-void DedicatedWorkerHost::BindSerialService(
-    mojo::PendingReceiver<blink::mojom::SerialService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  RenderFrameHostImpl* ancestor_render_frame_host =
-      GetAncestorRenderFrameHost();
-  if (!ancestor_render_frame_host) {
-    // The ancestor frame may have already been closed. In that case, the worker
-    // will soon be terminated too, so abort the connection.
-    return;
-  }
-
-  ancestor_render_frame_host->BindSerialService(std::move(receiver));
-}
-
-void DedicatedWorkerHost::BindHidService(
-    mojo::PendingReceiver<blink::mojom::HidService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  RenderFrameHostImpl* ancestor_render_frame_host =
-      GetAncestorRenderFrameHost();
-  // The ancestor frame may have already been closed. In that case, the worker
-  // will soon be terminated too, so abort the connection.
-  if (!ancestor_render_frame_host) {
-    return;
-  }
-
-  ancestor_render_frame_host->GetHidService(std::move(receiver));
 }
 
 void DedicatedWorkerHost::CreateBucketManagerHost(

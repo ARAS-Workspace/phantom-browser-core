@@ -5567,11 +5567,6 @@
       name: "SerializeViewTransitionStateInSPA",
     },
     {
-      name: "SerialPortConnected",
-      status: {"Android": "", "default": "experimental"},
-      base_feature: "none",
-    },
-    {
       // Support for Service Worker background sync APIs in Dedicated Workers.
       // See https://chromestatus.com/feature/6497653025931264
       // See https://issues.chromium.org/issues/40364838
@@ -6908,20 +6903,6 @@
     {
       name: "WebHID",
     },
-    {
-      // It is only enabled in extension environment for now.
-      name: "WebHIDOnServiceWorkers",
-      depends_on: ["WebHID"],
-      base_feature: "none",
-      public: true,
-    },
-    {
-      // Restricts the sharing of HIDDevice instances across different V8
-      // worlds (e.g., main world and isolated worlds) to prevent cross-world
-      // leaks.
-      name: "WebHIDWorldIsolatedCache",
-      status: "stable",
-    },
     // Kill switch for making BigInt handling in WebIDL use ToBigInt.
     {
       name: "WebIDLBigIntUsesToBigInt",
@@ -6958,12 +6939,6 @@
     },
     {
       name: "WebMIDI",
-      base_feature: "none",
-    },
-    {
-      name: "WebNFC",
-      public: true,
-      status: {"Android": "stable", "iOS": "stable", "default": "test"},
       base_feature: "none",
     },
     {
@@ -7098,18 +7073,6 @@
       name: "WebUSB",
       public: true,
       base_feature: "none",
-    },
-    {
-      name: "WebUSBOnDedicatedWorkers",
-      status: "stable",
-      depends_on: ["WebUSB"],
-    },
-    {
-      // It is only enabled in extension environment for now.
-      name: "WebUSBOnServiceWorkers",
-      depends_on: ["WebUSB"],
-      base_feature: "none",
-      public: true,
     },
     {
       name: "WebViewEnvReorderFix",

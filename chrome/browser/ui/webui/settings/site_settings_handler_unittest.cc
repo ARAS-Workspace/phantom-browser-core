@@ -49,8 +49,6 @@
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/global_features.h"
-#include "chrome/browser/hid/hid_chooser_context.h"
-#include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/infobars/browser_infobar_manager.h"
 #include "chrome/browser/infobars/infobar_features.h"
@@ -62,8 +60,6 @@
 #include "chrome/browser/prefs/browser_prefs.h"
 #include "chrome/browser/privacy_sandbox/mock_privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
-#include "chrome/browser/serial/serial_chooser_context.h"
-#include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/tab_list/mock_tab_list_interface.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
@@ -72,8 +68,6 @@
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/webui/settings/site_settings_helper.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -138,11 +132,6 @@
 #include "extensions/common/extension_builder.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
-#include "services/device/public/cpp/test/fake_hid_manager.h"
-#include "services/device/public/cpp/test/fake_serial_port_manager.h"
-#include "services/device/public/cpp/test/fake_usb_device_manager.h"
-#include "services/device/public/mojom/hid.mojom.h"
-#include "services/device/public/mojom/serial.mojom.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features_generated.h"
@@ -4416,24 +4405,6 @@ class SiteSettingsHandlerChooserExceptionTest
             UnorderedElementsAre("persistent-device", "persistent-device",
                                  "ephemeral-device", "user-granted-device"));
         break;
-      case ContentSettingsType::HID_CHOOSER_DATA:
-      case ContentSettingsType::SERIAL_CHOOSER_DATA:
-        EXPECT_THAT(
-            GetExceptionDisplayNames(exceptions),
-            UnorderedElementsAre("persistent-device", "user-granted-device",
-                                 "ephemeral-device", GetAllDevicesDisplayName(),
-                                 GetDevicesFromGoogleDisplayName(),
-                                 GetDevicesFromVendor18D2DisplayName(),
-                                 GetUnknownProductDisplayName()));
-        break;
-      case ContentSettingsType::USB_CHOOSER_DATA:
-        EXPECT_THAT(
-            GetExceptionDisplayNames(exceptions),
-            UnorderedElementsAre("persistent-device", "user-granted-device",
-                                 GetAllDevicesDisplayName(),
-                                 GetDevicesFromGoogleDisplayName(),
-                                 GetDevicesFromVendor18D2DisplayName()));
-        break;
       default:
         NOTREACHED();
     }
@@ -4475,26 +4446,6 @@ class SiteSettingsHandlerChooserExceptionTest
                                    "ephemeral-device", "user-granted-device",
                                    "off-the-record-device"));
           break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre(
-                  "persistent-device", "ephemeral-device",
-                  "user-granted-device", "off-the-record-device",
-                  GetAllDevicesDisplayName(), GetDevicesFromGoogleDisplayName(),
-                  GetDevicesFromVendor18D2DisplayName(),
-                  GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "persistent-device", "user-granted-device",
-                          "off-the-record-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
-          break;
         default:
           NOTREACHED();
       }
@@ -4516,24 +4467,6 @@ class SiteSettingsHandlerChooserExceptionTest
               GetExceptionDisplayNames(exceptions),
               UnorderedElementsAre("persistent-device", "persistent-device",
                                    "ephemeral-device", "user-granted-device"));
-          break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "persistent-device", "ephemeral-device",
-                          "user-granted-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre("persistent-device", "user-granted-device",
-                                   GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName()));
           break;
         default:
           NOTREACHED();
@@ -4575,24 +4508,6 @@ class SiteSettingsHandlerChooserExceptionTest
               UnorderedElementsAre("persistent-device", "persistent-device",
                                    "ephemeral-device", "user-granted-device"));
           break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "persistent-device", "ephemeral-device",
-                          "user-granted-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre("persistent-device", "user-granted-device",
-                                   GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName()));
-          break;
         default:
           NOTREACHED();
       }
@@ -4628,24 +4543,6 @@ class SiteSettingsHandlerChooserExceptionTest
               GetExceptionDisplayNames(exceptions),
               UnorderedElementsAre("persistent-device", "ephemeral-device",
                                    "user-granted-device"));
-          break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "persistent-device", "ephemeral-device",
-                          "user-granted-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre("persistent-device", "user-granted-device",
-                                   GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName()));
           break;
         default:
           NOTREACHED();
@@ -4691,24 +4588,6 @@ class SiteSettingsHandlerChooserExceptionTest
           EXPECT_THAT(
               GetExceptionDisplayNames(exceptions),
               UnorderedElementsAre("ephemeral-device", "user-granted-device"));
-          break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre("ephemeral-device", "user-granted-device",
-                                   GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName(),
-                                   GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "user-granted-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
           break;
         default:
           NOTREACHED();
@@ -4760,23 +4639,6 @@ class SiteSettingsHandlerChooserExceptionTest
           EXPECT_THAT(GetExceptionDisplayNames(exceptions),
                       UnorderedElementsAre("ephemeral-device"));
           break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "ephemeral-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
-          break;
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre(GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName(),
-                                   GetUnknownProductDisplayName()));
-          break;
         default:
           NOTREACHED();
       }
@@ -4808,16 +4670,6 @@ class SiteSettingsHandlerChooserExceptionTest
         case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
           EXPECT_THAT(GetExceptionDisplayNames(exceptions),
                       UnorderedElementsAre("user-granted-device"));
-          break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(GetExceptionDisplayNames(exceptions),
-                      UnorderedElementsAre(
-                          "user-granted-device", GetAllDevicesDisplayName(),
-                          GetDevicesFromGoogleDisplayName(),
-                          GetDevicesFromVendor18D2DisplayName(),
-                          GetUnknownProductDisplayName()));
           break;
         default:
           NOTREACHED();
@@ -4852,16 +4704,6 @@ class SiteSettingsHandlerChooserExceptionTest
         case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
           EXPECT_TRUE(exceptions.empty());
           break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre(GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName(),
-                                   GetUnknownProductDisplayName()));
-          break;
         default:
           NOTREACHED();
       }
@@ -4889,16 +4731,6 @@ class SiteSettingsHandlerChooserExceptionTest
         case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
           EXPECT_TRUE(exceptions.empty());
           break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre(GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName(),
-                                   GetUnknownProductDisplayName()));
-          break;
         default:
           NOTREACHED();
       }
@@ -4924,16 +4756,6 @@ class SiteSettingsHandlerChooserExceptionTest
       switch (content_type()) {
         case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
           EXPECT_TRUE(exceptions.empty());
-          break;
-        case ContentSettingsType::HID_CHOOSER_DATA:
-        case ContentSettingsType::SERIAL_CHOOSER_DATA:
-        case ContentSettingsType::USB_CHOOSER_DATA:
-          EXPECT_THAT(
-              GetExceptionDisplayNames(exceptions),
-              UnorderedElementsAre(GetAllDevicesDisplayName(),
-                                   GetDevicesFromGoogleDisplayName(),
-                                   GetDevicesFromVendor18D2DisplayName(),
-                                   GetUnknownProductDisplayName()));
           break;
         default:
           NOTREACHED();
@@ -5192,640 +5014,6 @@ TEST_F(SiteSettingsHandlerBluetoothTest, HandleSetOriginPermissions) {
 }
 
 TEST_F(SiteSettingsHandlerBluetoothTest, HandleSetOriginPermissionsPolicyOnly) {
-  TestHandleSetOriginPermissionsPolicyOnly();
-}
-
-class SiteSettingsHandlerHidTest
-    : public SiteSettingsHandlerChooserExceptionTest {
- protected:
-  void SetUpChooserContext() override {
-    mojo::PendingRemote<device::mojom::HidManager> hid_manager;
-    hid_manager_.AddReceiver(hid_manager.InitWithNewPipeAndPassReceiver());
-    HidChooserContext* hid_chooser_context =
-        HidChooserContextFactory::GetForProfile(profile());
-    TestFuture<std::vector<device::mojom::HidDeviceInfoPtr>> get_devices_future;
-    hid_chooser_context->SetHidManagerForTesting(
-        std::move(hid_manager), get_devices_future.GetCallback());
-    EXPECT_TRUE(get_devices_future.Wait());
-  }
-
-  void SetUpPolicyGrantedPermissions() override {
-    auto* local_state = TestingBrowserProcess::GetGlobal()->local_state();
-    ASSERT_TRUE(local_state);
-    local_state->Set(prefs::kManagedWebHidAllowDevicesForUrls, ParseJson(R"(
-        [
-          {
-            "devices": [{ "vendor_id": 6353, "product_id": 5678 }],
-            "urls": ["https://chromium.org"]
-          }, {
-            "devices": [{ "vendor_id": 6353 }],
-            "urls": ["https://android.com"]
-          }, {
-            "devices": [{ "vendor_id": 6354 }],
-            "urls": ["https://android.com"]
-          }
-        ])"));
-    local_state->Set(prefs::kManagedWebHidAllowAllDevicesForUrls,
-                     ParseJson(R"([ "https://google.com" ])"));
-  }
-
-  void SetUpOffTheRecordChooserContext() override {
-    CreateIncognitoProfile();
-    mojo::PendingRemote<device::mojom::HidManager> hid_manager;
-    hid_manager_.AddReceiver(hid_manager.InitWithNewPipeAndPassReceiver());
-    HidChooserContext* hid_chooser_context =
-        HidChooserContextFactory::GetForProfile(incognito_profile());
-    TestFuture<std::vector<device::mojom::HidDeviceInfoPtr>> get_devices_future;
-    hid_chooser_context->SetHidManagerForTesting(
-        std::move(hid_manager), get_devices_future.GetCallback());
-    EXPECT_TRUE(get_devices_future.Wait());
-    GetChooserContext(incognito_profile())->AddObserver(&observer_);
-  }
-
-  void AddPersistentDevice() override {
-    persistent_device_ = hid_manager_.CreateAndAddDevice(
-        /*physical_device_id=*/"1", /*vendor_id=*/6353, /*product_id=*/5678,
-        /*product_name=*/"persistent-device", /*serial_number=*/"123ABC",
-        device::mojom::HidBusType::kHIDBusTypeUSB);
-  }
-
-  void AddEphemeralDevice() override {
-    ephemeral_device_ = hid_manager_.CreateAndAddDevice(
-        /*physical_device_id=*/"2", /*vendor_id=*/6354, /*product_id=*/0,
-        /*product_name=*/"ephemeral-device", /*serial_number=*/"",
-        device::mojom::HidBusType::kHIDBusTypeUSB);
-  }
-
-  void AddUserGrantedDevice() override {
-    user_granted_device_ = hid_manager_.CreateAndAddDevice(
-        /*physical_device_id=*/"3", /*vendor_id=*/6355, /*product_id=*/0,
-        /*product_name=*/"user-granted-device", /*serial_number=*/"789XYZ",
-        device::mojom::HidBusType::kHIDBusTypeUSB);
-  }
-
-  void AddOffTheRecordDevice() override {
-    off_the_record_device_ = hid_manager_.CreateAndAddDevice(
-        /*physical_device_id=*/"4", /*vendor_id=*/6353,
-        /*product_id=*/8765, /*product_name=*/"off-the-record-device",
-        /*serial_number=*/"A9B8C7", device::mojom::HidBusType::kHIDBusTypeUSB);
-  }
-
-  void SetUpUserGrantedPermissions() override {
-    const auto kAndroidOrigin = url::Origin::Create(kAndroidUrl);
-    const auto kChromiumOrigin = url::Origin::Create(kChromiumUrl);
-    const auto kGoogleOrigin = url::Origin::Create(kGoogleUrl);
-    const auto kWebUIOrigin = url::Origin::Create(kWebUIUrl);
-
-    // Add the user granted permissions for testing.
-    // These two persistent device permissions should be lumped together
-    // with the policy permissions, since they apply to the same device and
-    // URL.
-    {
-      base::RunLoop loop;
-      auto barrier_closure = base::BarrierClosure(5, loop.QuitClosure());
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::HID_GUARD},
-                                 ContentSettingsType::HID_CHOOSER_DATA))
-          .Times(5)
-          .WillRepeatedly(RunClosure(barrier_closure));
-      auto* hid_chooser_context =
-          HidChooserContextFactory::GetForProfile(profile());
-      hid_chooser_context->GrantDevicePermission(kChromiumOrigin,
-                                                 *persistent_device_);
-      hid_chooser_context->GrantDevicePermission(kGoogleOrigin,
-                                                 *persistent_device_);
-      hid_chooser_context->GrantDevicePermission(kWebUIOrigin,
-                                                 *persistent_device_);
-      hid_chooser_context->GrantDevicePermission(kAndroidOrigin,
-                                                 *ephemeral_device_);
-      hid_chooser_context->GrantDevicePermission(kAndroidOrigin,
-                                                 *user_granted_device_);
-      loop.Run();
-    }
-
-    if (off_the_record_device_) {
-      base::RunLoop loop;
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::HID_GUARD},
-                                 ContentSettingsType::HID_CHOOSER_DATA))
-          .WillOnce(RunClosure(loop.QuitClosure()));
-      HidChooserContextFactory::GetForProfile(incognito_profile())
-          ->GrantDevicePermission(kChromiumOrigin, *off_the_record_device_);
-      loop.Run();
-    }
-  }
-
-  void SetUpUserGrantedPermissionForOrigin(const url::Origin& origin) override {
-    auto* hid_chooser_context =
-        HidChooserContextFactory::GetForProfile(profile());
-    base::RunLoop loop;
-    EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                               {ContentSettingsType::HID_GUARD},
-                               ContentSettingsType::HID_CHOOSER_DATA))
-        .WillOnce(RunClosure(loop.QuitClosure()));
-    hid_chooser_context->GrantDevicePermission(origin, *user_granted_device_);
-    loop.Run();
-  }
-
-  base::Value GetPersistentDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        HidChooserContext::DeviceInfoToValue(*persistent_device_));
-  }
-
-  base::Value GetUserGrantedDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        HidChooserContext::DeviceInfoToValue(*user_granted_device_));
-  }
-
-  std::string GetAllDevicesDisplayName() override { return "Any HID device"; }
-
-  std::string GetDevicesFromGoogleDisplayName() override {
-    return "HID devices from vendor 18D1";
-  }
-
-  std::string GetDevicesFromVendor18D2DisplayName() override {
-    return "HID devices from vendor 18D2";
-  }
-
-  std::string GetUnknownProductDisplayName() override {
-    return "HID device (18D1:162E)";
-  }
-
-  permissions::ObjectPermissionContextBase* GetChooserContext(
-      Profile* profile) override {
-    return HidChooserContextFactory::GetForProfile(profile);
-  }
-
-  ContentSettingsType content_type() override {
-    return ContentSettingsType::HID_CHOOSER_DATA;
-  }
-
-  ContentSettingsType guard_type() override {
-    return ContentSettingsType::HID_GUARD;
-  }
-
-  device::FakeHidManager hid_manager_;
-  device::mojom::HidDeviceInfoPtr ephemeral_device_;
-  device::mojom::HidDeviceInfoPtr off_the_record_device_;
-  device::mojom::HidDeviceInfoPtr persistent_device_;
-  device::mojom::HidDeviceInfoPtr user_granted_device_;
-};
-
-TEST_F(SiteSettingsHandlerHidTest, HandleGetChooserExceptionList) {
-  TestHandleGetChooserExceptionList();
-}
-
-TEST_F(SiteSettingsHandlerHidTest,
-       HandleGetChooserExceptionListForOffTheRecord) {
-  TestHandleGetChooserExceptionListForOffTheRecord();
-}
-
-TEST_F(SiteSettingsHandlerHidTest, HandleResetChooserExceptionForSite) {
-  TestHandleResetChooserExceptionForSite();
-}
-
-TEST_F(SiteSettingsHandlerHidTest, HandleSetOriginPermissions) {
-  TestHandleSetOriginPermissions();
-}
-
-TEST_F(SiteSettingsHandlerHidTest, HandleSetOriginPermissionsPolicyOnly) {
-  TestHandleSetOriginPermissionsPolicyOnly();
-}
-
-class SiteSettingsHandlerSerialTest
-    : public SiteSettingsHandlerChooserExceptionTest {
- protected:
-  void SetUpChooserContext() override {
-    mojo::PendingRemote<device::mojom::SerialPortManager> serial_port_manager;
-    serial_port_manager_.AddReceiver(
-        serial_port_manager.InitWithNewPipeAndPassReceiver());
-    SerialChooserContext* serial_chooser_context =
-        SerialChooserContextFactory::GetForProfile(profile());
-    serial_chooser_context->SetPortManagerForTesting(
-        std::move(serial_port_manager));
-    base::RunLoop().RunUntilIdle();
-  }
-
-  void SetUpPolicyGrantedPermissions() override {
-    auto* local_state = TestingBrowserProcess::GetGlobal()->local_state();
-    ASSERT_TRUE(local_state);
-    local_state->Set(prefs::kManagedSerialAllowUsbDevicesForUrls, ParseJson(R"(
-        [
-          {
-            "devices": [{ "vendor_id": 6353, "product_id": 5678 }],
-            "urls": ["https://chromium.org"]
-          }, {
-            "devices": [{ "vendor_id": 6353 }],
-            "urls": ["https://android.com"]
-          }, {
-            "devices": [{ "vendor_id": 6354 }],
-            "urls": ["https://android.com"]
-          }
-        ])"));
-    local_state->Set(prefs::kManagedSerialAllowAllPortsForUrls,
-                     ParseJson(R"([ "https://google.com" ])"));
-  }
-
-  void SetUpOffTheRecordChooserContext() override {
-    CreateIncognitoProfile();
-    mojo::PendingRemote<device::mojom::SerialPortManager> serial_port_manager;
-    serial_port_manager_.AddReceiver(
-        serial_port_manager.InitWithNewPipeAndPassReceiver());
-    SerialChooserContext* serial_chooser_context =
-        SerialChooserContextFactory::GetForProfile(incognito_profile());
-    serial_chooser_context->SetPortManagerForTesting(
-        std::move(serial_port_manager));
-    base::RunLoop().RunUntilIdle();
-    GetChooserContext(incognito_profile())->AddObserver(&observer_);
-  }
-
-  void AddPersistentDevice() override {
-    persistent_port_ = device::mojom::SerialPortInfo::New();
-    persistent_port_->token = base::UnguessableToken::Create();
-    persistent_port_->display_name = "persistent-device";
-    persistent_port_->has_vendor_id = true;
-    persistent_port_->vendor_id = 6353;
-    persistent_port_->has_product_id = true;
-    persistent_port_->product_id = 5678;
-    persistent_port_->serial_number = "123ABC";
-#if BUILDFLAG(IS_MAC)
-    persistent_port_->usb_driver_name = "AppleUSBCDC";
-#endif
-    serial_port_manager_.AddPort(persistent_port_.Clone());
-  }
-
-  void AddEphemeralDevice() override {
-    ephemeral_port_ = device::mojom::SerialPortInfo::New();
-    ephemeral_port_->token = base::UnguessableToken::Create();
-    ephemeral_port_->display_name = "ephemeral-device";
-    ephemeral_port_->has_vendor_id = true;
-    ephemeral_port_->vendor_id = 6354;
-    ephemeral_port_->has_product_id = true;
-    ephemeral_port_->product_id = 0;
-#if BUILDFLAG(IS_MAC)
-    ephemeral_port_->usb_driver_name = "AppleUSBCDC";
-#endif
-    serial_port_manager_.AddPort(ephemeral_port_.Clone());
-  }
-
-  void AddUserGrantedDevice() override {
-    user_granted_port_ = device::mojom::SerialPortInfo::New();
-    user_granted_port_->token = base::UnguessableToken::Create();
-    user_granted_port_->display_name = "user-granted-device";
-    user_granted_port_->has_vendor_id = true;
-    user_granted_port_->vendor_id = 6355;
-    user_granted_port_->has_product_id = true;
-    user_granted_port_->product_id = 0;
-    user_granted_port_->serial_number = "789XYZ";
-#if BUILDFLAG(IS_MAC)
-    user_granted_port_->usb_driver_name = "AppleUSBCDC";
-#endif
-    serial_port_manager_.AddPort(user_granted_port_.Clone());
-  }
-
-  void AddOffTheRecordDevice() override {
-    off_the_record_port_ = device::mojom::SerialPortInfo::New();
-    off_the_record_port_->token = base::UnguessableToken::Create();
-    off_the_record_port_->display_name = "off-the-record-device";
-    off_the_record_port_->has_vendor_id = true;
-    off_the_record_port_->vendor_id = 6353;
-    off_the_record_port_->has_product_id = true;
-    off_the_record_port_->product_id = 8765;
-    off_the_record_port_->serial_number = "A9B8C7";
-#if BUILDFLAG(IS_MAC)
-    off_the_record_port_->usb_driver_name = "AppleUSBCDC";
-#endif
-    serial_port_manager_.AddPort(off_the_record_port_.Clone());
-  }
-
-  void SetUpUserGrantedPermissions() override {
-    const auto kAndroidOrigin = url::Origin::Create(kAndroidUrl);
-    const auto kChromiumOrigin = url::Origin::Create(kChromiumUrl);
-    const auto kGoogleOrigin = url::Origin::Create(kGoogleUrl);
-    const auto kWebUIOrigin = url::Origin::Create(kWebUIUrl);
-
-    // Add the user granted permissions for testing.
-    // These two persistent device permissions should be lumped together
-    // with the policy permissions, since they apply to the same device and
-    // URL.
-    {
-      base::RunLoop loop;
-      auto barrier_closure = base::BarrierClosure(5, loop.QuitClosure());
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::SERIAL_GUARD},
-                                 ContentSettingsType::SERIAL_CHOOSER_DATA))
-          .Times(5)
-          .WillRepeatedly(RunClosure(barrier_closure));
-      auto* serial_chooser_context =
-          SerialChooserContextFactory::GetForProfile(profile());
-      serial_chooser_context->GrantPortPermission(kChromiumOrigin,
-                                                  *persistent_port_);
-      serial_chooser_context->GrantPortPermission(kGoogleOrigin,
-                                                  *persistent_port_);
-      serial_chooser_context->GrantPortPermission(kWebUIOrigin,
-                                                  *persistent_port_);
-      serial_chooser_context->GrantPortPermission(kAndroidOrigin,
-                                                  *ephemeral_port_);
-      serial_chooser_context->GrantPortPermission(kAndroidOrigin,
-                                                  *user_granted_port_);
-      loop.Run();
-    }
-
-    if (off_the_record_port_) {
-      base::RunLoop loop;
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::SERIAL_GUARD},
-                                 ContentSettingsType::SERIAL_CHOOSER_DATA))
-          .WillOnce(RunClosure(loop.QuitClosure()));
-      SerialChooserContextFactory::GetForProfile(incognito_profile())
-          ->GrantPortPermission(kChromiumOrigin, *off_the_record_port_);
-      loop.Run();
-    }
-  }
-
-  void SetUpUserGrantedPermissionForOrigin(const url::Origin& origin) override {
-    auto* serial_chooser_context =
-        SerialChooserContextFactory::GetForProfile(profile());
-    base::RunLoop loop;
-    EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                               {ContentSettingsType::SERIAL_GUARD},
-                               ContentSettingsType::SERIAL_CHOOSER_DATA))
-        .WillOnce(RunClosure(loop.QuitClosure()));
-    serial_chooser_context->GrantPortPermission(origin, *user_granted_port_);
-    loop.Run();
-  }
-
-  base::Value GetPersistentDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        SerialChooserContext::PortInfoToValue(*persistent_port_));
-  }
-
-  base::Value GetUserGrantedDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        SerialChooserContext::PortInfoToValue(*user_granted_port_));
-  }
-
-  std::string GetAllDevicesDisplayName() override { return "Any serial port"; }
-
-  std::string GetDevicesFromGoogleDisplayName() override {
-    return "USB devices from Google Inc.";
-  }
-
-  std::string GetDevicesFromVendor18D2DisplayName() override {
-    return "USB devices from vendor 18D2";
-  }
-
-  std::string GetUnknownProductDisplayName() override {
-    return "USB device from Google Inc. (product 162E)";
-  }
-
-  permissions::ObjectPermissionContextBase* GetChooserContext(
-      Profile* profile) override {
-    return SerialChooserContextFactory::GetForProfile(profile);
-  }
-
-  ContentSettingsType content_type() override {
-    return ContentSettingsType::SERIAL_CHOOSER_DATA;
-  }
-
-  ContentSettingsType guard_type() override {
-    return ContentSettingsType::SERIAL_GUARD;
-  }
-
-  device::FakeSerialPortManager serial_port_manager_;
-  device::mojom::SerialPortInfoPtr ephemeral_port_;
-  device::mojom::SerialPortInfoPtr off_the_record_port_;
-  device::mojom::SerialPortInfoPtr persistent_port_;
-  device::mojom::SerialPortInfoPtr user_granted_port_;
-};
-
-TEST_F(SiteSettingsHandlerSerialTest, HandleGetChooserExceptionList) {
-  TestHandleGetChooserExceptionList();
-}
-
-TEST_F(SiteSettingsHandlerSerialTest,
-       HandleGetChooserExceptionListForOffTheRecord) {
-  TestHandleGetChooserExceptionListForOffTheRecord();
-}
-
-TEST_F(SiteSettingsHandlerSerialTest, HandleResetChooserExceptionForSite) {
-  TestHandleResetChooserExceptionForSite();
-}
-
-TEST_F(SiteSettingsHandlerSerialTest, HandleSetOriginPermissions) {
-  TestHandleSetOriginPermissions();
-}
-
-TEST_F(SiteSettingsHandlerSerialTest, HandleSetOriginPermissionsPolicyOnly) {
-  TestHandleSetOriginPermissionsPolicyOnly();
-}
-
-class SiteSettingsHandlerUsbTest
-    : public SiteSettingsHandlerChooserExceptionTest {
- protected:
-  void SetUpChooserContext() override {
-    mojo::PendingRemote<device::mojom::UsbDeviceManager> device_manager;
-    usb_device_manager_.AddReceiver(
-        device_manager.InitWithNewPipeAndPassReceiver());
-    UsbChooserContext* usb_chooser_context =
-        UsbChooserContextFactory::GetForProfile(profile());
-    usb_chooser_context->SetDeviceManagerForTesting(std::move(device_manager));
-    TestFuture<std::vector<device::mojom::UsbDeviceInfoPtr>> get_devices_future;
-    usb_chooser_context->GetDevices(get_devices_future.GetCallback());
-    EXPECT_TRUE(get_devices_future.Wait());
-  }
-
-  void SetUpPolicyGrantedPermissions() override {
-    profile()->GetPrefs()->Set(prefs::kManagedWebUsbAllowDevicesForUrls,
-                               ParseJson(R"(
-        [
-          {
-            "devices": [{ "vendor_id": 6353, "product_id": 5678 }],
-            "urls": ["https://chromium.org"]
-          }, {
-            "devices": [{ "vendor_id": 6353 }],
-            "urls": ["https://google.com,https://android.com"]
-          }, {
-            "devices": [{ "vendor_id": 6354 }],
-            "urls": ["https://android.com,"]
-          }, {
-            "devices": [{}],
-            "urls": ["https://google.com,https://google.com"]
-          }
-        ])"));
-  }
-
-  void SetUpOffTheRecordChooserContext() override {
-    CreateIncognitoProfile();
-    mojo::PendingRemote<device::mojom::UsbDeviceManager> device_manager;
-    usb_device_manager_.AddReceiver(
-        device_manager.InitWithNewPipeAndPassReceiver());
-    UsbChooserContext* usb_chooser_context =
-        UsbChooserContextFactory::GetForProfile(incognito_profile());
-    usb_chooser_context->SetDeviceManagerForTesting(std::move(device_manager));
-    TestFuture<std::vector<device::mojom::UsbDeviceInfoPtr>> get_devices_future;
-    usb_chooser_context->GetDevices(get_devices_future.GetCallback());
-    EXPECT_TRUE(get_devices_future.Wait());
-    GetChooserContext(incognito_profile())->AddObserver(&observer_);
-  }
-
-  void AddPersistentDevice() override {
-    persistent_device_ = usb_device_manager_.CreateAndAddDevice(
-        /*vendor_id=*/6353, /*product_id=*/5678,
-        /*manufacturer_string=*/"Google",
-        /*product_string=*/"persistent-device", /*serial_number=*/"123ABC");
-  }
-
-  void AddEphemeralDevice() override {
-    ephemeral_device_ = usb_device_manager_.CreateAndAddDevice(
-        /*vendor_id=*/6354, /*product_id=*/0,
-        /*manufacturer_string=*/"Google",
-        /*product_string=*/"ephemeral-device", /*serial_number=*/"");
-  }
-
-  void AddUserGrantedDevice() override {
-    user_granted_device_ = usb_device_manager_.CreateAndAddDevice(
-        /*vendor_id=*/6355, /*product_id=*/0,
-        /*manufacturer_string=*/"Google",
-        /*product_string=*/"user-granted-device",
-        /*serial_number=*/"789XYZ");
-  }
-
-  void AddOffTheRecordDevice() override {
-    off_the_record_device_ = usb_device_manager_.CreateAndAddDevice(
-        /*vendor_id=*/6353, /*product_id=*/8765,
-        /*manufacturer_string=*/"Google",
-        /*product_string=*/"off-the-record-device",
-        /*serial_number=*/"A9B8C7");
-  }
-
-  void SetUpUserGrantedPermissions() override {
-    const auto kAndroidOrigin = url::Origin::Create(kAndroidUrl);
-    const auto kChromiumOrigin = url::Origin::Create(kChromiumUrl);
-    const auto kGoogleOrigin = url::Origin::Create(kGoogleUrl);
-    const auto kWebUIOrigin = url::Origin::Create(kWebUIUrl);
-
-    // Add the user granted permissions for testing.
-    // These two persistent device permissions should be lumped together
-    // with the policy permissions, since they apply to the same device and
-    // URL.
-    {
-      base::RunLoop loop;
-      auto barrier_closure = base::BarrierClosure(5, loop.QuitClosure());
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::USB_GUARD},
-                                 ContentSettingsType::USB_CHOOSER_DATA))
-          .Times(5)
-          .WillRepeatedly(RunClosure(barrier_closure));
-      auto* usb_chooser_context =
-          UsbChooserContextFactory::GetForProfile(profile());
-      usb_chooser_context->GrantDevicePermission(kChromiumOrigin,
-                                                 *persistent_device_);
-      usb_chooser_context->GrantDevicePermission(kGoogleOrigin,
-                                                 *persistent_device_);
-      usb_chooser_context->GrantDevicePermission(kWebUIOrigin,
-                                                 *persistent_device_);
-      usb_chooser_context->GrantDevicePermission(kAndroidOrigin,
-                                                 *ephemeral_device_);
-      usb_chooser_context->GrantDevicePermission(kAndroidOrigin,
-                                                 *user_granted_device_);
-      loop.Run();
-    }
-
-    if (off_the_record_device_) {
-      base::RunLoop loop;
-      EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                                 {ContentSettingsType::USB_GUARD},
-                                 ContentSettingsType::USB_CHOOSER_DATA))
-          .WillOnce(RunClosure(loop.QuitClosure()));
-      UsbChooserContextFactory::GetForProfile(incognito_profile())
-          ->GrantDevicePermission(kChromiumOrigin, *off_the_record_device_);
-      loop.Run();
-    }
-  }
-
-  void SetUpUserGrantedPermissionForOrigin(const url::Origin& origin) override {
-    auto* usb_chooser_context =
-        UsbChooserContextFactory::GetForProfile(profile());
-    base::RunLoop loop;
-    EXPECT_CALL(observer_, OnObjectPermissionChanged(
-                               {ContentSettingsType::USB_GUARD},
-                               ContentSettingsType::USB_CHOOSER_DATA))
-        .WillOnce(RunClosure(loop.QuitClosure()));
-    usb_chooser_context->GrantDevicePermission(origin, *user_granted_device_);
-    loop.Run();
-  }
-
-  base::Value GetPersistentDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        UsbChooserContext::DeviceInfoToValue(*persistent_device_));
-  }
-
-  base::Value GetUserGrantedDeviceValueForOrigin(
-      const url::Origin& origin) override {
-    return base::Value(
-        UsbChooserContext::DeviceInfoToValue(*user_granted_device_));
-  }
-
-  std::string GetAllDevicesDisplayName() override {
-    return "Devices from any vendor";
-  }
-
-  std::string GetDevicesFromGoogleDisplayName() override {
-    return "Devices from Google Inc.";
-  }
-
-  std::string GetDevicesFromVendor18D2DisplayName() override {
-    return "Devices from vendor 0x18D2";
-  }
-
-  std::string GetUnknownProductDisplayName() override {
-    return "Unknown product 0x162E from Google Inc.";
-  }
-
-  permissions::ObjectPermissionContextBase* GetChooserContext(
-      Profile* profile) override {
-    return UsbChooserContextFactory::GetForProfile(profile);
-  }
-
-  ContentSettingsType content_type() override {
-    return ContentSettingsType::USB_CHOOSER_DATA;
-  }
-
-  ContentSettingsType guard_type() override {
-    return ContentSettingsType::USB_GUARD;
-  }
-
-  device::FakeUsbDeviceManager usb_device_manager_;
-  device::mojom::UsbDeviceInfoPtr ephemeral_device_;
-  device::mojom::UsbDeviceInfoPtr off_the_record_device_;
-  device::mojom::UsbDeviceInfoPtr persistent_device_;
-  device::mojom::UsbDeviceInfoPtr user_granted_device_;
-};
-
-TEST_F(SiteSettingsHandlerUsbTest, HandleGetChooserExceptionList) {
-  TestHandleGetChooserExceptionList();
-}
-
-TEST_F(SiteSettingsHandlerUsbTest,
-       HandleGetChooserExceptionListForOffTheRecord) {
-  TestHandleGetChooserExceptionListForOffTheRecord();
-}
-
-TEST_F(SiteSettingsHandlerUsbTest, HandleResetChooserExceptionForSite) {
-  TestHandleResetChooserExceptionForSite();
-}
-
-TEST_F(SiteSettingsHandlerUsbTest, HandleSetOriginPermissions) {
-  TestHandleSetOriginPermissions();
-}
-
-TEST_F(SiteSettingsHandlerUsbTest, HandleSetOriginPermissionsPolicyOnly) {
   TestHandleSetOriginPermissionsPolicyOnly();
 }
 

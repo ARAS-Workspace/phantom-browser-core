@@ -21,15 +21,11 @@
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/serial/serial_chooser_context.h"
-#include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/url_identity.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/browser/vr/vr_tab_helper.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
@@ -59,8 +55,6 @@
 #include "url/url_constants.h"
 
 #include "chrome/browser/certificate_viewer.h"
-#include "chrome/browser/hid/hid_chooser_context.h"
-#include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/infobars/infobar_spec.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_web_contents_delegate/browser_web_contents_delegate.h"
@@ -131,18 +125,15 @@ Profile* ChromePageInfoDelegate::GetProfile() const {
 permissions::ObjectPermissionContextBase*
 ChromePageInfoDelegate::GetChooserContext(ContentSettingsType type) {
   switch (type) {
-    case ContentSettingsType::USB_CHOOSER_DATA:
-      return UsbChooserContextFactory::GetForProfile(GetProfile());
     case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
       if (base::FeatureList::IsEnabled(
               features::kWebBluetoothNewPermissionsBackend)) {
         return BluetoothChooserContextFactory::GetForProfile(GetProfile());
       }
       return nullptr;
+    case ContentSettingsType::USB_CHOOSER_DATA:
     case ContentSettingsType::SERIAL_CHOOSER_DATA:
-      return SerialChooserContextFactory::GetForProfile(GetProfile());
     case ContentSettingsType::HID_CHOOSER_DATA:
-      return HidChooserContextFactory::GetForProfile(GetProfile());
     case ContentSettingsType::SMART_CARD_DATA:
       return nullptr;
     default:

@@ -80,7 +80,6 @@
 #include "chrome/browser/printing/print_job_manager.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/resource_coordinator/resource_coordinator_parts.h"
-#include "chrome/browser/serial/serial_policy_allowed_ports.h"
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/site_isolation/prefs_observer.h"
 #include "chrome/browser/ssl/secure_origin_prefs_observer.h"
@@ -165,11 +164,9 @@
 
 #include "chrome/browser/devtools/devtools_auto_opener.h"
 #include "chrome/browser/error_reporting/chrome_js_error_report_processor.h"
-#include "chrome/browser/hid/hid_system_tray_icon.h"
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/resource_coordinator/tab_manager.h"
-#include "chrome/browser/usb/usb_system_tray_icon.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "chrome/browser/webapps/webapps_client_desktop.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
@@ -211,9 +208,7 @@
 #include "chrome/browser/notifications/notification_ui_manager.h"
 #endif
 
-#include "chrome/browser/hid/hid_status_icon.h"
 #include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
-#include "chrome/browser/usb/usb_status_icon.h"
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
 
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
@@ -384,9 +379,6 @@ void BrowserProcessImpl::Init() {
   DCHECK(!webrtc_event_log_manager_);
   webrtc_event_log_manager_ = WebRtcEventLogManager::CreateSingletonInstance();
 
-  hid_system_tray_icon_ = std::make_unique<HidStatusIcon>();
-  usb_system_tray_icon_ = std::make_unique<UsbStatusIcon>();
-
   features_->PostBrowserProcessInit();
 
   // `Unretained` is safe as CallbackListSubscription does not outlive `this`.
@@ -448,12 +440,6 @@ void BrowserProcessImpl::StartTearDown() {
   if (cloud_management_controller) {
     cloud_management_controller->ShutDown();
   }
-
-  // |hid_system_tray_icon_| and |usb_system_tray_icon_| must be destroyed
-  // before |system_notification_helper_| for ChromeOS and |status_tray_| for
-  // non-ChromeOS.
-  hid_system_tray_icon_.reset();
-  usb_system_tray_icon_.reset();
 
   system_notification_helper_.reset();
 
@@ -961,37 +947,6 @@ BrowserProcessImpl::resource_coordinator_parts() {
         std::make_unique<resource_coordinator::ResourceCoordinatorParts>();
   }
   return resource_coordinator_parts_.get();
-}
-
-SerialPolicyAllowedPorts* BrowserProcessImpl::serial_policy_allowed_ports() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!serial_policy_allowed_ports_) {
-    serial_policy_allowed_ports_ =
-        std::make_unique<SerialPolicyAllowedPorts>(local_state());
-  }
-  return serial_policy_allowed_ports_.get();
-}
-
-HidSystemTrayIcon* BrowserProcessImpl::hid_system_tray_icon() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return hid_system_tray_icon_.get();
-}
-
-void BrowserProcessImpl::set_hid_system_tray_icon_for_test(
-    std::unique_ptr<HidSystemTrayIcon> icon) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  hid_system_tray_icon_ = std::move(icon);
-}
-
-UsbSystemTrayIcon* BrowserProcessImpl::usb_system_tray_icon() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return usb_system_tray_icon_.get();
-}
-
-void BrowserProcessImpl::set_usb_system_tray_icon_for_test(
-    std::unique_ptr<UsbSystemTrayIcon> icon) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  usb_system_tray_icon_ = std::move(icon);
 }
 
 os_crypt_async::OSCryptAsync* BrowserProcessImpl::os_crypt_async() {

@@ -695,10 +695,6 @@
     "META": {"sizes": {"includes": [20]}},
     "includes": [5070],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/usb_internals/resources.grd": {
-    "META": {"sizes": {"includes": [20]}},
-    "includes": [5080],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/user_education_internals/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [5090],
@@ -1490,9 +1486,6 @@
     "messages": [9520],
   },
 
-  "services/device/public/cpp/usb/resources/usb_ids_resources.grd": {
-    "includes": [9530],
-  },
   "services/services_strings.grd": {
     "messages": [9540],
   },

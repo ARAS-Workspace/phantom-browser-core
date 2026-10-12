@@ -14,7 +14,6 @@
 #include "base/location.h"
 #include "base/memory/ref_counted_memory.h"
 #include "base/observer_list.h"
-#include "base/types/optional_util.h"
 #include "base/values.h"
 #include "content/public/browser/blob_handle.h"
 #include "content/public/browser/browser_context.h"
@@ -83,14 +82,6 @@ void PrinterProviderInternalAPI::NotifyPrintResult(
     api::printer_provider::PrintError error) {
   for (auto& observer : observers_)
     observer.OnPrintResult(extension, request_id, error);
-}
-
-void PrinterProviderInternalAPI::NotifyGetUsbPrinterInfoResult(
-    const Extension* extension,
-    int request_id,
-    const api::printer_provider::PrinterInfo* printer_info) {
-  for (auto& observer : observers_)
-    observer.OnGetUsbPrinterInfoResult(extension, request_id, printer_info);
 }
 
 PrinterProviderInternalReportPrintResultFunction::
@@ -210,26 +201,6 @@ void PrinterProviderInternalGetPrintDataFunction::OnBlob(
 
   SetTransferredBlobs(std::move(blobs));
   Respond(NoArguments());
-}
-
-PrinterProviderInternalReportUsbPrinterInfoFunction::
-    PrinterProviderInternalReportUsbPrinterInfoFunction() {}
-
-PrinterProviderInternalReportUsbPrinterInfoFunction::
-    ~PrinterProviderInternalReportUsbPrinterInfoFunction() {}
-
-ExtensionFunction::ResponseAction
-PrinterProviderInternalReportUsbPrinterInfoFunction::Run() {
-  std::optional<internal_api::ReportUsbPrinterInfo::Params> params =
-      internal_api::ReportUsbPrinterInfo::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  PrinterProviderInternalAPI::GetFactoryInstance()
-      ->Get(browser_context())
-      ->NotifyGetUsbPrinterInfoResult(
-          extension(), params->request_id,
-          base::OptionalToPtr(params->printer_info));
-  return RespondNow(NoArguments());
 }
 
 }  // namespace extensions

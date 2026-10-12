@@ -496,8 +496,6 @@ third_party/libdmg-hfsplus/src/test/run_spanning_reference
 third_party/libpfm4
 third_party/libpng/contrib/oss-fuzz
 third_party/liburlpattern
-third_party/libusb/src/libusb
-third_party/libusb/src/libusb/os
 third_party/libxml/chromium
 third_party/libxml/fuzz/seed_corpus
 third_party/libxml/src
@@ -833,7 +831,6 @@ third_party/tflite_support/src/tensorflow_lite_support/python/task/core/proto
 third_party/tflite_support/src/tensorflow_lite_support/scann_ondevice
 third_party/tflite_support/src/tensorflow_lite_support/tools/ci_build/builds
 third_party/tflite_support/src/tensorflow_lite_support/tools/docs
-third_party/usb_ids/src
 third_party/utf/src/share
 third_party/webxr_test_pages
 third_party/webxr_test_pages/webxr-samples
@@ -885,7 +882,6 @@ tools/python/google
 tools/resources
 tools/rust
 tools/symsrc
-tools/usb_gadget
 tools/vim
 tools/web_bluetooth
 tools/win/RetrieveSymbols

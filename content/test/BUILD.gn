@@ -117,8 +117,6 @@ static_library("test_support") {
     "../browser/renderer_host/mock_render_widget_host.h",
     "../browser/screen_details/screen_details_test_utils.cc",
     "../browser/screen_details/screen_details_test_utils.h",
-    "../browser/serial/serial_test_utils.cc",
-    "../browser/serial/serial_test_utils.h",
     "../browser/service_worker/embedded_worker_test_helper.cc",
     "../browser/service_worker/embedded_worker_test_helper.h",
     "../browser/service_worker/fake_embedded_worker_instance_client.cc",
@@ -138,8 +136,6 @@ static_library("test_support") {
     "../browser/sms/test/mock_user_consent_handler.h",
     "../browser/tracing/test_tracing_session.cc",
     "../browser/tracing/test_tracing_session.h",
-    "../browser/usb/usb_test_utils.cc",
-    "../browser/usb/usb_test_utils.h",
     "../browser/web_package/mock_signed_exchange_handler.cc",
     "../browser/web_package/mock_signed_exchange_handler.h",
     "../browser/web_package/signed_exchange_test_utils.h",
@@ -584,7 +580,6 @@ static_library("test_support") {
     "//services/data_decoder/public/mojom",
     "//services/device:lib",
     "//services/device/public/mojom",
-    "//services/device/public/mojom:usb",
     "//services/device/time_zone_monitor:test_support",
     "//services/metrics/public/cpp:metrics_cpp",
     "//services/tracing/public/cpp/background_tracing",
@@ -653,12 +648,6 @@ static_library("test_support") {
 
   # HID support is not available without udev.
   is_linux_without_udev = is_linux && !use_udev
-  if (!is_linux_without_udev) {
-    sources += [
-      "../browser/hid/hid_test_utils.cc",
-      "../browser/hid/hid_test_utils.h",
-    ]
-  }
   if (!is_linux_without_udev) {
     sources += [
       "../browser/webauth/authenticator_test_base.cc",
@@ -1482,7 +1471,6 @@ test("content_browsertests") {
     "../browser/security/dip/document_isolation_policy_browsertest.cc",
     "../browser/security/local_network_access/local_network_access_browsertest.cc",
     "../browser/security_exploit_browsertest.cc",
-    "../browser/serial/serial_browsertest.cc",
     "../browser/service_host/observed_service_remote_browsertest.cc",
     "../browser/service_host/service_process_host_browsertest.cc",
     "../browser/service_host/utility_process_host_browsertest.cc",
@@ -1520,7 +1508,6 @@ test("content_browsertests") {
     "../browser/tracing/startup_tracing_browsertest.cc",
     "../browser/tracing/tracing_controller_browsertest.cc",
     "../browser/tracing/tracing_end_to_end_browsertest.cc",
-    "../browser/usb/usb_browsertest.cc",
     "../browser/vibration_browsertest.cc",
     "../browser/web_contents/file_chooser_impl_browsertest.cc",
     "../browser/web_contents/opened_by_dom_browsertest.cc",
@@ -1922,9 +1909,6 @@ test("content_browsertests") {
 
   # HID support is not available without udev.
   is_linux_without_udev = is_linux && !use_udev
-  if (!is_linux_without_udev) {
-    sources += [ "../browser/hid/hid_browsertest.cc" ]
-  }
   if (!is_linux_without_udev) {
     sources += [ "../browser/webauth/webauth_browsertest.cc" ]
   }
@@ -2370,7 +2354,6 @@ test("content_unittests") {
     "../browser/security/coop/cross_origin_opener_policy_status_unittest.cc",
     "../browser/security/cpsp/child_process_security_policy_unittest.cc",
     "../browser/security/dip/document_isolation_policy_reporter_unittest.cc",
-    "../browser/serial/serial_unittest.cc",
     "../browser/service_host/service_process_observer_hub_unittest.cc",
     "../browser/service_worker/embedded_worker_instance_unittest.cc",
     "../browser/service_worker/service_worker_cache_writer_unittest.cc",
@@ -2380,8 +2363,6 @@ test("content_unittests") {
     "../browser/service_worker/service_worker_context_watcher_unittest.cc",
     "../browser/service_worker/service_worker_context_wrapper_unittest.cc",
     "../browser/service_worker/service_worker_controllee_request_handler_unittest.cc",
-    "../browser/service_worker/service_worker_device_delegate_observer_unittest.cc",
-    "../browser/service_worker/service_worker_device_delegate_observer_unittest.h",
     "../browser/service_worker/service_worker_installed_scripts_sender_unittest.cc",
     "../browser/service_worker/service_worker_job_unittest.cc",
     "../browser/service_worker/service_worker_loader_helpers_unittest.cc",
@@ -2415,7 +2396,6 @@ test("content_unittests") {
     "../browser/storage_partition_impl_unittest.cc",
     "../browser/tracing/traces_internals/traces_internals_handler_unittest.cc",
     "../browser/url_loader_factory_params_helper_unittest.cc",
-    "../browser/usb/web_usb_service_impl_unittest.cc",
     "../browser/web_contents/aura/gesture_nav_simple_unittest.cc",
     "../browser/web_contents/file_chooser_impl_unittest.cc",
     "../browser/web_contents/web_contents_delegate_unittest.cc",
@@ -2937,17 +2917,10 @@ test("content_unittests") {
     "//media/mojo/mojom:speech_recognition",
   ]
 
-  # Tests for platforms that support extensions. Linux requires udev.
-  if (enable_extensions_core && (!is_linux || use_udev)) {
-    sources += [ "../browser/service_worker/service_worker_usb_delegate_observer_unittest.cc" ]
-  }
-
   # HID support is not available without udev.
   is_linux_without_udev = is_linux && !use_udev
   if (!is_linux_without_udev) {
     sources += [
-      "../browser/hid/hid_service_unittest.cc",
-      "../browser/service_worker/service_worker_hid_delegate_observer_unittest.cc",
       "../browser/webauth/authenticator_impl_pin_unittest.cc",
       "../browser/webauth/authenticator_impl_resident_key_unittest.cc",
       "../browser/webauth/authenticator_impl_unittest.cc",

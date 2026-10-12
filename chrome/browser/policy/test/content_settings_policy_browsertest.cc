@@ -18,8 +18,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
@@ -39,7 +37,6 @@
 #include "content/public/test/download_test_observer.h"
 #include "device/bluetooth/bluetooth_adapter_factory.h"
 #include "device/bluetooth/test/mock_bluetooth_adapter.h"
-#include "services/device/public/cpp/test/fake_usb_device_info.h"
 #include "services/network/public/cpp/features.h"
 #include "third_party/blink/public/common/features_generated.h"
 #include "third_party/blink/public/common/permissions/permission_utils.h"
@@ -222,73 +219,6 @@ IN_PROC_BROWSER_TEST_F(WebBluetoothPolicyTest, MAYBE_Block) {
           "  );")
           .ExtractString();
   EXPECT_THAT(rejection, testing::MatchesRegex("NotFoundError: .*policy.*"));
-}
-
-IN_PROC_BROWSER_TEST_F(PolicyTest, WebUsbDefault) {
-  const auto kTestOrigin = url::Origin::Create(GURL("https://foo.com:443"));
-
-  // Expect the default permission value to be 'ask'.
-  auto* context =
-      UsbChooserContextFactory::GetForProfile(browser()->GetProfile());
-  EXPECT_TRUE(context->CanRequestObjectPermission(kTestOrigin));
-
-  // Update policy to change the default permission value to 'block'.
-  PolicyMap policies;
-  SetPolicy(&policies, key::kDefaultWebUsbGuardSetting, base::Value(2));
-  UpdateProviderPolicy(policies);
-  EXPECT_FALSE(context->CanRequestObjectPermission(kTestOrigin));
-
-  // Update policy to change the default permission value to 'ask'.
-  SetPolicy(&policies, key::kDefaultWebUsbGuardSetting, base::Value(3));
-  UpdateProviderPolicy(policies);
-  EXPECT_TRUE(context->CanRequestObjectPermission(kTestOrigin));
-}
-
-IN_PROC_BROWSER_TEST_F(PolicyTest, WebUsbAllowDevicesForUrls) {
-  const auto kTestOrigin = url::Origin::Create(GURL("https://foo.com:443"));
-  scoped_refptr<device::FakeUsbDeviceInfo> device =
-      base::MakeRefCounted<device::FakeUsbDeviceInfo>(0, 0, "Google", "Gizmo",
-                                                      "123ABC");
-  const auto& device_info = device->GetDeviceInfo();
-
-  // Expect the default permission value to be empty.
-  auto* context =
-      UsbChooserContextFactory::GetForProfile(browser()->GetProfile());
-  EXPECT_FALSE(context->HasDevicePermission(kTestOrigin, device_info));
-
-  // Update policy to add an entry to the permission value to allow
-  // |kTestOrigin| to access the device described by |device_info|.
-  PolicyMap policies;
-
-  base::DictValue device_value;
-  device_value.Set("vendor_id", 0);
-  device_value.Set("product_id", 0);
-
-  base::ListValue devices_value;
-  devices_value.Append(std::move(device_value));
-
-  base::ListValue urls_value;
-  urls_value.Append(base::Value("https://foo.com"));
-
-  base::DictValue entry;
-  entry.Set("devices", std::move(devices_value));
-  entry.Set("urls", std::move(urls_value));
-
-  base::ListValue policy_value;
-  policy_value.Append(std::move(entry));
-
-  SetPolicy(&policies, key::kWebUsbAllowDevicesForUrls,
-            base::Value(std::move(policy_value)));
-  UpdateProviderPolicy(policies);
-
-  EXPECT_TRUE(context->HasDevicePermission(kTestOrigin, device_info));
-
-  // Remove the policy to ensure that it can be dynamically updated.
-  SetPolicy(&policies, key::kWebUsbAllowDevicesForUrls,
-            base::Value(base::Value::Type::LIST));
-  UpdateProviderPolicy(policies);
-
-  EXPECT_FALSE(context->HasDevicePermission(kTestOrigin, device_info));
 }
 
 class ScrollToTextFragmentPolicyTest

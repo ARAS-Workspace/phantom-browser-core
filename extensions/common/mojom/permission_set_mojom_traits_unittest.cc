@@ -75,7 +75,7 @@ TEST(PermissionSetMojomTraitsTest, BasicAPIPermissionSet) {
   APIPermissionSet input;
   input.insert(mojom::APIPermissionID::kAudioCapture);
   input.insert(mojom::APIPermissionID::kDns);
-  input.insert(mojom::APIPermissionID::kHid);
+  input.insert(mojom::APIPermissionID::kAlarms);
   input.insert(mojom::APIPermissionID::kPower);
   input.insert(mojom::APIPermissionID::kSerial);
   input.insert(std::move(permission));

@@ -76,8 +76,6 @@ BASE_DECLARE_FEATURE(kSecretPortalKeyProviderUseForEncryption);
 
 BASE_DECLARE_FEATURE(kTriggerNetworkDataMigration);
 
-BASE_DECLARE_FEATURE(kWebUsbDeviceDetection);
-
 BASE_DECLARE_FEATURE(kRemovalOfIWAsFromTabCapture);
 
 // WARNING: do not add new entries here. If a feature is only used in one

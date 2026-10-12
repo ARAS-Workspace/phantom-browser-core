@@ -139,10 +139,6 @@ BASE_FEATURE(kTriggerNetworkDataMigration,
              base::FEATURE_DISABLED_BY_DEFAULT
 );
 
-// Enables runtime detection of USB devices which provide a WebUSB landing page
-// descriptor.
-BASE_FEATURE(kWebUsbDeviceDetection, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // This flag enables the removal of IWAs surface captures from Chrome Tabs
 // category in getDisplayMedia() API. When disabled, IWAs surface captures
 // show both in Chrome Tabs and Windows.

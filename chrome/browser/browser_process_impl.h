@@ -196,14 +196,6 @@ class BrowserProcessImpl : public BrowserProcess,
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
 
-  SerialPolicyAllowedPorts* serial_policy_allowed_ports() override;
-  HidSystemTrayIcon* hid_system_tray_icon() override;
-  void set_hid_system_tray_icon_for_test(
-      std::unique_ptr<HidSystemTrayIcon> icon) override;
-  UsbSystemTrayIcon* usb_system_tray_icon() override;
-  void set_usb_system_tray_icon_for_test(
-      std::unique_ptr<UsbSystemTrayIcon> icon) override;
-
   os_crypt_async::OSCryptAsync* os_crypt_async() override;
 
   void set_additional_os_crypt_async_provider_for_test(
@@ -399,12 +391,8 @@ class BrowserProcessImpl : public BrowserProcess,
   std::unique_ptr<SecureOriginPrefsObserver> secure_origin_prefs_observer_;
   std::unique_ptr<SiteIsolationPrefsObserver> site_isolation_prefs_observer_;
 
-  std::unique_ptr<SerialPolicyAllowedPorts> serial_policy_allowed_ports_;
   // Called to signal the process' main message loop to exit.
   base::OnceClosure quit_closure_;
-
-  std::unique_ptr<HidSystemTrayIcon> hid_system_tray_icon_;
-  std::unique_ptr<UsbSystemTrayIcon> usb_system_tray_icon_;
 
   BuildState build_state_;
 

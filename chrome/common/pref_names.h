@@ -953,32 +953,6 @@ inline constexpr char kStaticStorageQuotaEnabled[] =
 inline constexpr char kAudioInputStreamLastTimeCreated[] =
     "media.audio_input_stream_last_time_created";
 
-// Used to store the value of the SerialAllowAllPortsForUrls policy.
-inline constexpr char kManagedSerialAllowAllPortsForUrls[] =
-    "managed.serial_allow_all_ports_for_urls";
-
-// Used to store the value of the SerialAllowUsbDevicesForUrls policy.
-inline constexpr char kManagedSerialAllowUsbDevicesForUrls[] =
-    "managed.serial_allow_usb_devices_for_urls";
-
-// Used to store the value of the WebHidAllowAllDevicesForUrls policy.
-inline constexpr char kManagedWebHidAllowAllDevicesForUrls[] =
-    "managed.web_hid_allow_all_devices_for_urls";
-
-// Used to store the value of the WebHidAllowDevicesForUrls policy.
-inline constexpr char kManagedWebHidAllowDevicesForUrls[] =
-    "managed.web_hid_allow_devices_for_urls";
-
-// Used to store the value of the DeviceLoginScreenWebHidAllowDevicesForUrls
-// policy.
-inline constexpr char kManagedWebHidAllowDevicesForUrlsOnLoginScreen[] =
-    "managed.web_hid_allow_devices_for_urls_on_login_screen";
-
-// Used to store the value of the WebHidAllowAllDevicesWithHidUsagesForUrls
-// policy.
-inline constexpr char kManagedWebHidAllowDevicesWithHidUsagesForUrls[] =
-    "managed.web_hid_allow_devices_with_hid_usages_for_urls";
-
 // Directory of the last profile used.
 inline constexpr char kProfileLastUsed[] = "profile.last_used";
 
@@ -1297,9 +1271,6 @@ inline constexpr char kSeedColorChangeCount[] =
 // Whether the NTP footer is visible.
 inline constexpr char kNtpFooterVisible[] = "NewTabPage.FooterVisible";
 
-// A private RSA key for ADB handshake.
-inline constexpr char kDevToolsAdbKey[] = "devtools.adb_key";
-
 // Defines administrator-set availability of developer tools.
 inline constexpr char kDevToolsAvailability[] = "devtools.availability";
 
@@ -1333,11 +1304,6 @@ inline constexpr char kDevToolsRemoteDebuggingEnabled[] =
 // Dictionary from background service to recording expiration time.
 inline constexpr char kDevToolsBackgroundServicesExpirationDict[] =
     "devtools.backgroundserviceexpiration";
-
-// Determines whether devtools should be discovering usb devices for
-// remote debugging at chrome://inspect.
-inline constexpr char kDevToolsDiscoverUsbDevicesEnabled[] =
-    "devtools.discover_usb_devices";
 
 // Maps of files edited locally using DevTools.
 inline constexpr char kDevToolsEditedFiles[] = "devtools.edited_files";

@@ -121,10 +121,6 @@ BASE_DECLARE_FEATURE(kComponentExtensionAllowWorkerChromeResources);
 // extensions.
 BASE_DECLARE_FEATURE(kCWSReviewPromptingNativeUI);
 
-// If enabled, <webview>s will be allowed to request permission from an
-// embedding Chrome App to request access to Human Interface Devices.
-BASE_DECLARE_FEATURE(kEnableWebHidInWebView);
-
 // If enabled, JS content scripts injected at document start will be compiled
 // in a background thread.
 BASE_DECLARE_FEATURE(kExtensionsBackgroundCompilation);

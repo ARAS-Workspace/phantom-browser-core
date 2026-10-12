@@ -21,7 +21,6 @@
 #include "device/fido/hid/fido_hid_discovery.h"
 #include "device/fido/public/fido_constants.h"
 #include "device/fido/public/fido_transport_protocol.h"
-#include "services/device/public/mojom/usb_manager.mojom.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/owned_objc.h"

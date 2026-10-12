@@ -52,7 +52,6 @@ class PrinterProviderInternalAPI : public BrowserContextKeyedAPI {
   friend class PrinterProviderInternalReportPrintersFunction;
   friend class PrinterProviderInternalReportPrinterCapabilityFunction;
   friend class PrinterProviderInternalReportPrintResultFunction;
-  friend class PrinterProviderInternalReportUsbPrinterInfoFunction;
 
   // BrowserContextKeyedAPI implementation.
   static const bool kServiceRedirectedInIncognito = true;
@@ -79,14 +78,6 @@ class PrinterProviderInternalAPI : public BrowserContextKeyedAPI {
   void NotifyPrintResult(const Extension* extension,
                          int request_id,
                          api::printer_provider::PrintError error);
-
-  // Notifies observers that a printerProvider.onGetUsbPrinterInfoRequested
-  // callback has been called. Called from
-  // `PrinterProviderInternalReportUsbPrinterInfoFunction`.
-  void NotifyGetUsbPrinterInfoResult(
-      const Extension* extension,
-      int request_id,
-      const api::printer_provider::PrinterInfo* printer_info);
 
   base::ObserverList<PrinterProviderInternalAPIObserver>::Unchecked observers_;
 };
@@ -167,25 +158,6 @@ class PrinterProviderInternalGetPrintDataFunction : public ExtensionFunction {
               std::unique_ptr<content::BlobHandle> blob);
   DECLARE_EXTENSION_FUNCTION("printerProviderInternal.getPrintData",
                              PRINTERPROVIDERINTERNAL_GETPRINTDATA)
-};
-
-class PrinterProviderInternalReportUsbPrinterInfoFunction
-    : public ExtensionFunction {
- public:
-  PrinterProviderInternalReportUsbPrinterInfoFunction();
-
-  PrinterProviderInternalReportUsbPrinterInfoFunction(
-      const PrinterProviderInternalReportUsbPrinterInfoFunction&) = delete;
-  PrinterProviderInternalReportUsbPrinterInfoFunction& operator=(
-      const PrinterProviderInternalReportUsbPrinterInfoFunction&) = delete;
-
- protected:
-  ~PrinterProviderInternalReportUsbPrinterInfoFunction() override;
-  ExtensionFunction::ResponseAction Run() override;
-
- private:
-  DECLARE_EXTENSION_FUNCTION("printerProviderInternal.reportUsbPrinterInfo",
-                             PRINTERPROVIDERINTERNAL_REPORTUSBPRINTERINFO)
 };
 
 }  // namespace extensions

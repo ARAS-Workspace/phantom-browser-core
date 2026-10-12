@@ -21,7 +21,6 @@
 #include "services/device/hid/hid_manager_impl.h"
 #include "services/device/power_monitor/power_monitor_message_broadcaster.h"
 #include "services/device/public/mojom/battery_monitor.mojom.h"
-#include "services/device/serial/serial_port_manager_impl.h"
 #include "services/device/time_zone_monitor/time_zone_monitor.h"
 #include "services/device/vibration/vibration_manager_impl.h"
 #include "services/device/wake_lock/wake_lock_provider.h"
@@ -59,23 +58,6 @@ DeviceService::DeviceService(
       wake_lock_provider_(file_task_runner_,
                           params->wake_lock_context_callback) {
   receivers_.Add(this, std::move(receiver));
-
-#if defined(IS_SERIAL_ENABLED_PLATFORM)
-#if BUILDFLAG(IS_MAC)
-  // On macOS the SerialDeviceEnumerator needs to run on the UI thread so that
-  // it has access to a CFRunLoop where it can register a notification source.
-  auto serial_port_manager_task_runner =
-      base::SingleThreadTaskRunner::GetCurrentDefault();
-#else
-  // On other platforms it must be allowed to do blocking IO.
-  auto serial_port_manager_task_runner =
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::MayBlock(), base::TaskPriority::USER_VISIBLE});
-#endif
-  serial_port_manager_.emplace(
-      std::move(serial_port_manager_task_runner), io_task_runner_,
-      base::SingleThreadTaskRunner::GetCurrentDefault());
-#endif  // defined(IS_SERIAL_ENABLED_PLATFORM)
 
 #if !BUILDFLAG(IS_IOS_TVOS)
   // Ensure that the battery backend is initialized now; otherwise it may end up
@@ -120,12 +102,6 @@ void DeviceService::OverridePressureManagerBinderForTesting(
 void DeviceService::OverrideTimeZoneMonitorBinderForTesting(
     TimeZoneMonitorBinder binder) {
   internal::GetTimeZoneMonitorBinderOverride() = std::move(binder);
-}
-
-// static
-void DeviceService::OverrideUsbDeviceManagerBinderForTesting(
-    UsbDeviceManagerBinder binder) {
-  internal::GetUsbDeviceManagerBinderOverride() = std::move(binder);
 }
 
 void DeviceService::BindBatteryMonitor(
@@ -214,16 +190,6 @@ void DeviceService::BindSensorProvider(
   sensor_provider_->Bind(std::move(receiver));
 }
 
-void DeviceService::BindSerialPortManager(
-    mojo::PendingReceiver<mojom::SerialPortManager> receiver) {
-#if defined(IS_SERIAL_ENABLED_PLATFORM)
-  serial_port_manager_.AsyncCall(&SerialPortManagerImpl::Bind, FROM_HERE)
-      .WithArgs(std::move(receiver));
-#else   // defined(IS_SERIAL_ENABLED_PLATFORM)
-  NOTREACHED() << "Serial devices not supported on this platform.";
-#endif  // defined(IS_SERIAL_ENABLED_PLATFORM)
-}
-
 void DeviceService::BindTimeZoneMonitor(
     mojo::PendingReceiver<mojom::TimeZoneMonitor> receiver) {
   const auto& binder_override = internal::GetTimeZoneMonitorBinderOverride();
@@ -240,39 +206,6 @@ void DeviceService::BindTimeZoneMonitor(
 void DeviceService::BindWakeLockProvider(
     mojo::PendingReceiver<mojom::WakeLockProvider> receiver) {
   wake_lock_provider_.AddBinding(std::move(receiver));
-}
-
-void DeviceService::BindUsbDeviceManager(
-    mojo::PendingReceiver<mojom::UsbDeviceManager> receiver) {
-  const auto& binder_override = internal::GetUsbDeviceManagerBinderOverride();
-  if (binder_override) {
-    binder_override.Run(std::move(receiver));
-    return;
-  }
-
-  // TODO(crbug.com/40141825): usb::DeviceManagerImpl depends on the
-  // permission_broker service on Chromium OS. We will need to redirect
-  // connections for LaCrOS here.
-  if (!usb_device_manager_)
-    usb_device_manager_ = std::make_unique<usb::DeviceManagerImpl>();
-
-  usb_device_manager_->AddReceiver(std::move(receiver));
-}
-
-void DeviceService::BindUsbDeviceManagerTest(
-    mojo::PendingReceiver<mojom::UsbDeviceManagerTest> receiver) {
-  // TODO(crbug.com/40141825): usb::DeviceManagerImpl depends on the
-  // permission_broker service on Chromium OS. We will need to redirect
-  // connections for LaCrOS here.
-  if (!usb_device_manager_)
-    usb_device_manager_ = std::make_unique<usb::DeviceManagerImpl>();
-
-  if (!usb_device_manager_test_) {
-    usb_device_manager_test_ = std::make_unique<usb::DeviceManagerTest>(
-        usb_device_manager_->GetUsbService());
-  }
-
-  usb_device_manager_test_->BindReceiver(std::move(receiver));
 }
 
 }  // namespace device

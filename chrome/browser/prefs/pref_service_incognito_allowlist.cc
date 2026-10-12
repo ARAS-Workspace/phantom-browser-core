@@ -43,9 +43,7 @@ const char* const kPersistentPrefNames[] = {
 
     // Devtools preferences are stored cross profiles as they are not storing
     // user data and just keep debugging environment settings.
-    prefs::kDevToolsAdbKey,
     prefs::kDevToolsAvailability,
-    prefs::kDevToolsDiscoverUsbDevicesEnabled,
     prefs::kDevToolsEditedFiles,
     prefs::kDevToolsFileSystemPaths,
     prefs::kDevToolsPortForwardingEnabled,

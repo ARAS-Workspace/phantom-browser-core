@@ -29,10 +29,7 @@
 #include "third_party/blink/public/mojom/loader/transferrable_url_loader.mojom.h"
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom-forward.h"
 #include "third_party/blink/public/mojom/security_context/insecure_request_policy.mojom-forward.h"
-#include "third_party/blink/public/mojom/usb/web_usb_service.mojom-forward.h"
 #include "ui/base/page_transition_types.h"
-
-#include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
 
 namespace content {
 
@@ -115,12 +112,7 @@ class TestRenderFrameHost : public RenderFrameHostImpl,
   int GetHeavyAdIssueCount(HeavyAdIssueType type) override;
   void SimulateManifestURLUpdate(const GURL& manifest_url) override;
   TestRenderFrameHost* AppendFencedFrame() override;
-  void CreateWebUsbServiceForTesting(
-      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) override;
   void ResetLocalFrame() override;
-
-  void CreateHidServiceForTesting(
-      mojo::PendingReceiver<blink::mojom::HidService> receiver) override;
 
   void SendNavigate(int nav_entry_id,
                     bool did_create_new_entry,

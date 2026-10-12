@@ -55,10 +55,6 @@ class ServiceWorkerQuotaClient;
 class ServiceWorkerRegistration;
 struct ServiceWorkerContextSynchronousObserverList;
 
-class ServiceWorkerHidDelegateObserver;
-
-class ServiceWorkerUsbDelegateObserver;
-
 // A smart pointer of `ServiceWorkerClient`.
 //
 // - If `CommitResponseAndRelease()` is not called, this works as a
@@ -562,19 +558,6 @@ class CONTENT_EXPORT ServiceWorkerContextCore
     test_version_observers_.RemoveObserver(observer);
   }
 
-  ServiceWorkerHidDelegateObserver* hid_delegate_observer();
-
-  void SetServiceWorkerHidDelegateObserverForTesting(
-      std::unique_ptr<ServiceWorkerHidDelegateObserver> hid_delegate_observer);
-
-  // In the service worker case, WebUSB is only available in extension service
-  // workers. Limit ServiceWorkerUsbDelegateObserver to platforms that support
-  // extensions.
-  ServiceWorkerUsbDelegateObserver* usb_delegate_observer();
-
-  void SetServiceWorkerUsbDelegateObserverForTesting(
-      std::unique_ptr<ServiceWorkerUsbDelegateObserver> usb_delegate_observer);
-
  private:
   friend class ServiceWorkerContextCoreTest;
   FRIEND_TEST_ALL_PREFIXES(ServiceWorkerContextCoreTest, FailureInfo);
@@ -689,10 +672,6 @@ class CONTENT_EXPORT ServiceWorkerContextCore
   std::deque<WarmUpRequest> warm_up_requests_;
 
   bool is_processing_warming_up_ = false;
-
-  std::unique_ptr<ServiceWorkerHidDelegateObserver> hid_delegate_observer_;
-
-  std::unique_ptr<ServiceWorkerUsbDelegateObserver> usb_delegate_observer_;
 
   base::ObserverList<TestVersionObserver> test_version_observers_;
 

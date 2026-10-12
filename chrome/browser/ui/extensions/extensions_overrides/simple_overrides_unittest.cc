@@ -87,7 +87,6 @@ constexpr const char* kDisallowedFeatures[] = {
     extensions::manifest_keys::kTrialTokens,
     extensions::manifest_keys::kTtsEngine,
     extensions::manifest_keys::kUrlHandlers,
-    extensions::manifest_keys::kUsbPrinters,
     extensions::manifest_keys::kWebview,
 
     // Compiled manifest keys.

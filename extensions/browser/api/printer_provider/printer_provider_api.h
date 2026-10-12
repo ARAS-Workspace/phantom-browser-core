@@ -11,7 +11,6 @@
 #include "base/values.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "extensions/common/extension_id.h"
-#include "services/device/public/mojom/usb_device.mojom.h"
 
 namespace content {
 class BrowserContext;
@@ -32,8 +31,6 @@ class PrinterProviderAPI : public KeyedService {
   using GetCapabilityCallback =
       base::OnceCallback<void(const base::DictValue capability)>;
   using PrintCallback = base::OnceCallback<void(const base::Value& error)>;
-  using GetPrinterInfoCallback =
-      base::OnceCallback<void(const base::DictValue printer_info)>;
 
   static std::unique_ptr<PrinterProviderAPI> Create(
       content::BrowserContext* context);
@@ -82,14 +79,6 @@ class PrinterProviderAPI : public KeyedService {
   // It should return NULL if the job for the request does not exist.
   virtual const PrinterProviderPrintJob* GetPrintJob(const Extension* extension,
                                                      int request_id) const = 0;
-
-  // Dispatches a chrome.printerProvider.getUsbPrinterInfo event requesting
-  // information about `device_id`. The event is only dispatched to the
-  // extension identified by `extension_id`.
-  virtual void DispatchGetUsbPrinterInfoRequested(
-      const ExtensionId& extension_id,
-      const device::mojom::UsbDeviceInfo& device,
-      GetPrinterInfoCallback callback) = 0;
 };
 
 }  // namespace extensions

@@ -11,7 +11,6 @@
 #include "extensions/common/api/declarative_net_request/constants.h"
 #include "extensions/common/permissions/api_permission.h"
 #include "extensions/common/permissions/socket_permission.h"
-#include "extensions/common/permissions/usb_device_permission.h"
 
 using extensions::mojom::APIPermissionID;
 
@@ -90,7 +89,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kFileSystemWrite, "fileSystem.write",
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
-    {APIPermissionID::kHid, "hid"},
     {APIPermissionID::kImeWindowEnabled, "app.window.ime"},
     {APIPermissionID::kOverrideEscFullscreen,
      "app.window.fullscreen.overrideEsc",
@@ -162,9 +160,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
     {APIPermissionID::kUserScripts, "userScripts",
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kUsb, "usb", APIPermissionInfo::kFlagNone},
-    {APIPermissionID::kUsbDevice, "usbDevices",
-     extensions::APIPermissionInfo::kFlagNone,
-     &CreateAPIPermission<UsbDevicePermission>},
     {APIPermissionID::kVideoCapture, "videoCapture",
      APIPermissionInfo::kFlagRequiresManagementUIWarning},
     {APIPermissionID::kVirtualKeyboard, "virtualKeyboard"},

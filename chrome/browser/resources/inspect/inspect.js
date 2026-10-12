@@ -774,8 +774,6 @@ function addActionLink(row, text, handler, opt_disabled, opt_title) {
 function initSettings() {
   checkboxSendsCommand(
       'remote-debugging-enabled', 'set-remote-debugging-enabled');
-  checkboxSendsCommand(
-      'discover-usb-devices-enable', 'set-discover-usb-devices-enabled');
   checkboxSendsCommand('port-forwarding-enable', 'set-port-forwarding-enabled');
   checkboxSendsCommand(
       'discover-tcp-devices-enable', 'set-discover-tcp-targets-enabled');
@@ -975,10 +973,6 @@ function updateCheckbox(id, enabled) {
   const checkbox = $(id);
   checkbox.checked = !!enabled;
   checkbox.disabled = false;
-}
-
-function updateDiscoverUsbDevicesEnabled(enabled) {
-  updateCheckbox('discover-usb-devices-enable', enabled);
 }
 
 function updatePortForwardingEnabled(enabled) {
@@ -1266,7 +1260,6 @@ function populatePortStatus(devicesStatusMap) {
 
 // Expose functions on |window| since they are called from C++ by name.
 Object.assign(window, {
-  updateDiscoverUsbDevicesEnabled,
   updatePortForwardingEnabled,
   updatePortForwardingConfig,
   updateTCPDiscoveryEnabled,

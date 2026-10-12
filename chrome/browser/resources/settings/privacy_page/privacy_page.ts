@@ -209,7 +209,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
       case 'siteSettingsFilesystemWriteDetails':
       case 'siteSettingsHandlers':
       case 'siteSettingsHandTracking':
-      case 'siteSettingsHidDevices':
       case 'siteSettingsIdleDetection':
       case 'siteSettingsImages':
       case 'siteSettingsJavascript':
@@ -229,7 +228,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
       case 'siteSettingsPopups':
       case 'siteSettingsProtectedContent':
       case 'siteSettingsSensors':
-      case 'siteSettingsSerialPorts':
       case 'siteSettingsSiteData':
       case 'siteSettingsSiteDetails':
       // <if expr="is_chromeos">
@@ -238,7 +236,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
       // </if>
       case 'siteSettingsSound':
       case 'siteSettingsStorageAccess':
-      case 'siteSettingsUsbDevices':
       case 'siteSettingsVr':
       case 'siteSettingsWindowManagement':
       case 'siteSettingsZoomLevels':

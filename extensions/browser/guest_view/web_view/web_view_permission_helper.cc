@@ -344,19 +344,6 @@ void WebViewPermissionHelper::RequestGeolocationPermission(
       requesting_frame_url, user_gesture, std::move(callback));
 }
 
-void WebViewPermissionHelper::RequestHidPermission(
-    const GURL& requesting_frame_url,
-    base::OnceCallback<void(bool)> callback) {
-  if (!base::FeatureList::IsEnabled(
-          extensions_features::kEnableWebHidInWebView)) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  web_view_permission_helper_delegate_->RequestHidPermission(
-      requesting_frame_url, std::move(callback));
-}
-
 void WebViewPermissionHelper::RequestFileSystemPermission(
     const GURL& url,
     bool allowed_by_default,

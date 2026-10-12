@@ -1167,10 +1167,6 @@ BASE_FEATURE(kWebUIJSErrorReportingExtended, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kWebUIInProcessResourceLoadingV2,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Controls whether the WebUSB API is enabled:
-// https://wicg.github.io/webusb
-BASE_FEATURE(kWebUsb, "WebUSB", base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Apply `PrefetchPriority::kHighest` for Webview Prefetch API.
 BASE_FEATURE(kWebViewPrefetchHighestPrefetchPriority,
              base::FEATURE_ENABLED_BY_DEFAULT);

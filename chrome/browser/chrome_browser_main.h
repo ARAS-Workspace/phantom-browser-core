@@ -32,7 +32,6 @@ class StartupData;
 class Profile;
 class StartupBrowserCreator;
 class ShutdownWatcherHelper;
-class WebUsbDetector;
 
 namespace apps {
 class PublisherHostFactory;
@@ -168,8 +167,6 @@ class ChromeBrowserMainParts : public content::BrowserMainParts {
   // Please keep |shutdown_watcher| as the first object constructed, and hence
   // it is destroyed last.
   std::unique_ptr<ShutdownWatcherHelper> shutdown_watcher_;
-
-  std::unique_ptr<WebUsbDetector> web_usb_detector_;
 
   // Vector of additional ChromeBrowserMainExtraParts.
   // Parts are deleted in the inverse order they are added.

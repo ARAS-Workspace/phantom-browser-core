@@ -508,12 +508,6 @@ class ExtensionsBrowserClient {
   virtual ScriptExecutor* GetScriptExecutorForTab(
       content::WebContents& web_contents);
 
-  // Return true if the USB device is allowed by policy.
-  virtual bool IsUsbDeviceAllowedByPolicy(content::BrowserContext* context,
-                                          const ExtensionId& extension_id,
-                                          int vendor_id,
-                                          int product_id) const;
-
   // Populate callback with the asynchronously retrieved cached favicon image.
   virtual void GetFavicon(
       content::BrowserContext* browser_context,

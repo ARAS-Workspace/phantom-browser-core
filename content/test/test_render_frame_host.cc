@@ -651,16 +651,6 @@ void TestRenderFrameHost::SetPrefetchedSignedExchangeCacheForTesting(
   prefetched_signed_exchange_cache_ = std::move(cache);
 }
 
-void TestRenderFrameHost::CreateHidServiceForTesting(
-    mojo::PendingReceiver<blink::mojom::HidService> receiver) {
-  RenderFrameHostImpl::GetHidService(std::move(receiver));
-}
-
-void TestRenderFrameHost::CreateWebUsbServiceForTesting(
-    mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
-  RenderFrameHostImpl::CreateWebUsbService(std::move(receiver));
-}
-
 void TestRenderFrameHost::ResetLocalFrame() {
   local_frame_.reset();
 }

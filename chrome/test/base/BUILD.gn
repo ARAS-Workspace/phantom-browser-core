@@ -382,7 +382,6 @@ source_set("testing_browser_process") {
     "//chrome/browser/prefs",
     "//chrome/browser/profiles:profile_manager",
     "//chrome/browser/resource_coordinator",
-    "//chrome/browser/serial",
     "//chrome/browser/status_icons",
     "//components/application_locale_storage",
     "//components/embedder_support/origin_trials",
@@ -397,8 +396,6 @@ source_set("testing_browser_process") {
   ]
   public_deps += [ "//chrome/browser/upgrade_detector" ]
   deps += [
-    "//chrome/browser/hid",
-    "//chrome/browser/usb",
     "//chrome/browser/web_applications/isolated_web_apps",
     "//components/component_updater",
     "//components/keep_alive_registry",

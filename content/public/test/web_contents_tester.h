@@ -184,18 +184,6 @@ class WebContentsTester {
   // Sets the last active time.
   virtual void SetLastActiveTime(base::Time last_active_time) = 0;
 
-  // Increments/decrements the number of frames with connected USB devices.
-  virtual void TestIncrementUsbActiveFrameCount() = 0;
-  virtual void TestDecrementUsbActiveFrameCount() = 0;
-
-  // Increments/decrements the number of frames with connected HID devices.
-  virtual void TestIncrementHidActiveFrameCount() = 0;
-  virtual void TestDecrementHidActiveFrameCount() = 0;
-
-  // Increments/decrements the number of frames actively using serial ports.
-  virtual void TestIncrementSerialActiveFrameCount() = 0;
-  virtual void TestDecrementSerialActiveFrameCount() = 0;
-
   // Increments/decrements the number of connected Bluetooth devices.
   virtual void TestIncrementBluetoothConnectedDeviceCount() = 0;
   virtual void TestDecrementBluetoothConnectedDeviceCount() = 0;

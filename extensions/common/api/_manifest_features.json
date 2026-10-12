@@ -563,10 +563,6 @@
     "channel": "stable",
     "extension_types": "all"
   },
-  "usb_printers": {
-    "channel": "stable",
-    "extension_types": ["platform_app"]
-  },
   "version": {
     "channel": "stable",
     "extension_types": "all"

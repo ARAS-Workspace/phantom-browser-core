@@ -20,7 +20,6 @@
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/permissions/permissions_info.h"
 #include "extensions/common/permissions/settings_override_permission.h"
-#include "extensions/common/permissions/usb_device_permission.h"
 #include "extensions/common/switches.h"
 #include "extensions/common/url_pattern_set.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -131,43 +130,6 @@ TEST_F(ChromePermissionMessageProviderUnittest,
         l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_WARNING_HISTORY_READ),
         messages.front().message());
   }
-}
-
-// Checks that when permissions are merged into a single message, their details
-// are merged as well.
-TEST_F(ChromePermissionMessageProviderUnittest,
-       WarningsAndDetailsCoalesceTogether) {
-  // kTab and kTopSites should be merged into a single message.
-  APIPermissionSet permissions;
-  permissions.insert(APIPermissionID::kTab);
-  permissions.insert(APIPermissionID::kTopSites);
-  // The USB device permission message has a non-empty details string.
-  std::unique_ptr<UsbDevicePermission> usb(
-      new UsbDevicePermission(PermissionsInfo::GetInstance()->GetByID(
-          mojom::APIPermissionID::kUsbDevice)));
-  base::Value devices_list(base::Value::Type::LIST);
-  devices_list.GetList().Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ad, 0x138c, -1, -1).ToValue()));
-  devices_list.GetList().Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ad, 0x138d, -1, -1).ToValue()));
-  ASSERT_TRUE(usb->FromValue(&devices_list, nullptr, nullptr));
-  permissions.insert(std::move(usb));
-
-  PermissionMessages messages =
-      GetMessages(permissions, Manifest::Type::kExtension);
-
-  ASSERT_EQ(2U, messages.size());
-  auto it = messages.begin();
-  const PermissionMessage& message0 = *it++;
-  EXPECT_EQ(
-      l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_WARNING_HISTORY_READ),
-      message0.message());
-  EXPECT_TRUE(message0.submessages().empty());
-  const PermissionMessage& message1 = *it++;
-  EXPECT_EQ(
-      l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_LIST),
-      message1.message());
-  EXPECT_FALSE(message1.submessages().empty());
 }
 
 // Check that if IDN domains are provided in host permissions, then those

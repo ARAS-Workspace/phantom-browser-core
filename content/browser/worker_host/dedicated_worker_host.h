@@ -45,8 +45,6 @@
 #include "third_party/blink/public/mojom/idle/idle_manager.mojom-forward.h"
 #include "third_party/blink/public/mojom/loader/code_cache.mojom.h"
 #include "third_party/blink/public/mojom/loader/content_security_notifier.mojom.h"
-#include "third_party/blink/public/mojom/serial/serial.mojom-forward.h"
-#include "third_party/blink/public/mojom/usb/web_usb_service.mojom-forward.h"
 #include "third_party/blink/public/mojom/wake_lock/wake_lock.mojom-forward.h"
 #include "third_party/blink/public/mojom/websockets/websocket_connector.mojom-forward.h"
 #include "third_party/blink/public/mojom/webtransport/web_transport_connector.mojom-forward.h"
@@ -56,7 +54,6 @@
 #include "url/origin.h"
 
 #include "third_party/blink/public/mojom/direct_sockets/direct_sockets.mojom-forward.h"
-#include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
 
 #if BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
 #include "content/browser/compute_pressure/pressure_service_for_dedicated_worker.h"
@@ -165,8 +162,6 @@ class CONTENT_EXPORT DedicatedWorkerHost final
       mojo::PendingReceiver<blink::mojom::DedicatedWorkerHostFactory> receiver);
   void CreateDirectSocketsService(
       mojo::PendingReceiver<blink::mojom::DirectSocketsService> receiver);
-  void CreateWebUsbService(
-      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver);
   void CreateWebSocketConnector(
       mojo::PendingReceiver<blink::mojom::WebSocketConnector> receiver);
   void CreateWebTransportConnector(
@@ -196,10 +191,6 @@ class CONTENT_EXPORT DedicatedWorkerHost final
   void BindPressureService(
       mojo::PendingReceiver<blink::mojom::WebPressureManager> receiver);
 #endif  // BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
-
-  void BindSerialService(
-      mojo::PendingReceiver<blink::mojom::SerialService> receiver);
-  void BindHidService(mojo::PendingReceiver<blink::mojom::HidService> receiver);
 
   void StartScriptLoad(
       const GURL& script_url,

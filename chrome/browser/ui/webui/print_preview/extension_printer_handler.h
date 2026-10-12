@@ -91,12 +91,6 @@ class ExtensionPrinterHandler : public PrinterHandler {
   void WrapGetCapabilityCallback(GetCapabilityCallback callback,
                                  base::DictValue capability);
   void WrapPrintCallback(PrintCallback callback, const base::Value& status);
-  void WrapGetPrinterInfoCallback(GetPrinterInfoCallback callback,
-                                  base::DictValue printer_info);
-
-  void OnUsbDevicesEnumerated(
-      AddedPrintersCallback callback,
-      std::vector<device::mojom::UsbDeviceInfoPtr> devices);
 
   const raw_ptr<Profile> profile_;
   GetPrintersDoneCallback done_callback_;

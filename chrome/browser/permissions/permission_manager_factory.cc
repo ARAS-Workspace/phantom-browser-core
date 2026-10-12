@@ -16,7 +16,6 @@
 #include "chrome/browser/media/webrtc/chrome_camera_pan_tilt_zoom_permission_context_delegate.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/media_stream_device_permission_context.h"
-#include "chrome/browser/nfc/chrome_nfc_permission_context_delegate.h"
 #include "chrome/browser/notifications/notification_permission_context.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
@@ -56,8 +55,6 @@ permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
   delegates.camera_pan_tilt_zoom_permission_context_delegate =
       std::make_unique<ChromeCameraPanTiltZoomPermissionContextDelegate>(
           profile);
-  delegates.nfc_permission_context_delegate =
-      std::make_unique<ChromeNfcPermissionContextDelegate>(nullptr);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   delegates.clipboard_read_write_permission_context_delegate =

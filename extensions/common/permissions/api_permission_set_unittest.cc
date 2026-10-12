@@ -16,7 +16,7 @@ TEST(APIPermissionSetTest, General) {
   APIPermissionSet apis;
   apis.insert(APIPermissionID::kAudioCapture);
   apis.insert(APIPermissionID::kDns);
-  apis.insert(APIPermissionID::kHid);
+  apis.insert(APIPermissionID::kAlarms);
   apis.insert(APIPermissionID::kPower);
   apis.insert(APIPermissionID::kSerial);
 
@@ -73,7 +73,7 @@ TEST(APIPermissionSetTest, CreateUnion) {
 
   // Now use a real second set.
   apis2.insert(APIPermissionID::kAudioCapture);
-  apis2.insert(APIPermissionID::kHid);
+  apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
   apis2.insert(APIPermissionID::kSerial);
 
@@ -88,7 +88,7 @@ TEST(APIPermissionSetTest, CreateUnion) {
   apis2.insert(std::move(permission));
 
   expected_apis.insert(APIPermissionID::kAudioCapture);
-  expected_apis.insert(APIPermissionID::kHid);
+  expected_apis.insert(APIPermissionID::kAlarms);
   expected_apis.insert(APIPermissionID::kPower);
   expected_apis.insert(APIPermissionID::kSerial);
 
@@ -156,7 +156,7 @@ TEST(APIPermissionSetTest, CreateIntersection) {
 
   // Now use a real second set.
   apis2.insert(APIPermissionID::kAudioCapture);
-  apis2.insert(APIPermissionID::kHid);
+  apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
   apis2.insert(APIPermissionID::kSerial);
   permission = permission_info->CreateAPIPermission();
@@ -224,7 +224,7 @@ TEST(APIPermissionSetTest, CreateDifference) {
 
   // Now use a real second set.
   apis2.insert(APIPermissionID::kAudioCapture);
-  apis2.insert(APIPermissionID::kHid);
+  apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
   apis2.insert(APIPermissionID::kSerial);
   permission = permission_info->CreateAPIPermission();

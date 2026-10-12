@@ -25,10 +25,5 @@ TimeZoneMonitorBinder& GetTimeZoneMonitorBinderOverride() {
   return *binder;
 }
 
-UsbDeviceManagerBinder& GetUsbDeviceManagerBinderOverride() {
-  static base::NoDestructor<UsbDeviceManagerBinder> binder;
-  return *binder;
-}
-
 }  // namespace internal
 }  // namespace device

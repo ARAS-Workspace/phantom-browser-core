@@ -11,9 +11,7 @@
 #include "content/browser/service_worker/embedded_worker_instance.h"
 #include "content/browser/service_worker/embedded_worker_test_helper.h"
 #include "content/browser/service_worker/service_worker_context_core.h"
-#include "content/browser/service_worker/service_worker_hid_delegate_observer.h"
 #include "content/browser/service_worker/service_worker_test_utils.h"
-#include "content/browser/service_worker/service_worker_usb_delegate_observer.h"
 #include "content/public/test/test_browser_context.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -57,18 +55,6 @@ void EmbeddedWorkerInstanceTestHarness::CreateAndStartWorker(
   worker_version_->set_fetch_handler_type(
       ServiceWorkerVersion::FetchHandlerType::kNotSkippable);
 
-  content::HidDelegate* hid_delegate =
-      content::GetContentClientForTesting()->browser()->GetHidDelegate();
-  worker_version_->set_has_hid_event_handlers(
-      hid_delegate && hid_delegate->IsServiceWorkerAllowedForOrigin(
-                          url::Origin::Create(origin)));
-
-  content::UsbDelegate* usb_delegate =
-      content::GetContentClientForTesting()->browser()->GetUsbDelegate();
-  worker_version_->set_has_usb_event_handlers(
-      usb_delegate && usb_delegate->IsServiceWorkerAllowedForOrigin(
-                          url::Origin::Create(origin)));
-
   worker_version_->SetStatus(ServiceWorkerVersion::Status::ACTIVATED);
   pair.first->SetActiveVersion(worker_version_);
 
@@ -89,22 +75,6 @@ void EmbeddedWorkerInstanceTestHarness::StopAndResetWorker() {
   ASSERT_EQ(worker_version_->embedded_worker()->status(),
             blink::EmbeddedWorkerStatus::kStopped);
   worker_version_.reset();
-}
-
-void EmbeddedWorkerInstanceTestHarness::BindHidServiceToWorker(
-    const GURL& origin,
-    mojo::PendingReceiver<blink::mojom::HidService> receiver) {
-  EmbeddedWorkerInstance* worker = worker_version_->embedded_worker();
-  EXPECT_NE(worker, nullptr);
-  worker->BindHidService(url::Origin::Create(origin), std::move(receiver));
-}
-
-void EmbeddedWorkerInstanceTestHarness::BindUsbServiceToWorker(
-    const GURL& origin,
-    mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
-  EmbeddedWorkerInstance* worker = worker_version_->embedded_worker();
-  EXPECT_NE(worker, nullptr);
-  worker->BindUsbService(url::Origin::Create(origin), std::move(receiver));
 }
 
 EmbeddedWorkerInstanceTestHarness::EmbeddedWorkerInstanceTestHarness(

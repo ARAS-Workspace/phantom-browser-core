@@ -165,7 +165,6 @@
 -TabRestoreTest.RestoreTabFromClosedWindowByID
 -TabStatsTrackerBrowserTest.TabSwitch
 -TranslateModelServiceBrowserTest.LanguageDetectionWithBackgroundTab
--UsbChooserBrowserTest.InvokeUi_NoDevicesBubble
 -WebContentsInteractionTestUtilTest.EvaluateString
 -WelcomeAppChooserTest.All
 -WelcomeWelcomeAppTest.All

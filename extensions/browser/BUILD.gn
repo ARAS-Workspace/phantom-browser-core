@@ -690,7 +690,6 @@ source_set("browser_sources") {
     "//extensions/common:mojom",
     "//ipc",
     "//mojo/public/cpp/bindings",
-    "//services/device/public/cpp/usb",
     "//third_party/re2",
   ]
 
@@ -784,30 +783,6 @@ source_set("browser_sources") {
     ]
 
     deps += [ "//components/web_modal" ]
-  }
-
-  # TODO(https://crbug.com/356905053): The following files don't compile cleanly
-  # with desktop-android. Either make them compile, or determine they should
-  # not be included and place them under a more appropriate if-block.
-  if (enable_extensions) {
-    sources += [
-      "api/device_permissions_manager.cc",
-      "api/device_permissions_manager.h",
-      "api/hid/hid_api.cc",
-      "api/hid/hid_api.h",
-      "api/hid/hid_connection_resource.cc",
-      "api/hid/hid_connection_resource.h",
-      "api/hid/hid_device_manager.cc",
-      "api/hid/hid_device_manager.h",
-      "api/usb/usb_device_manager.cc",
-      "api/usb/usb_device_manager.h",
-      "api/usb/usb_device_resource.cc",
-      "api/usb/usb_device_resource.h",
-      "api/usb_device_permissions_prompt.cc",
-      "api/usb_device_permissions_prompt.h",
-    ]
-
-    deps += [ "//services/device/public/cpp/hid" ]
   }
 
   if (is_mac) {

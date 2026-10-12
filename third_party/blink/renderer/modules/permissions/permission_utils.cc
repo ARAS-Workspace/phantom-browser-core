@@ -353,12 +353,8 @@ PermissionDescriptorPtr ParsePermissionDescriptor(
       return CreatePermissionDescriptor(PermissionName::SCREEN_WAKE_LOCK);
 
     case V8PermissionName::Enum::kNfc: {
-      if (!RuntimeEnabledFeatures::WebNFCEnabled(
-              ExecutionContext::From(script_state))) {
-        exception_state.ThrowTypeError("Web NFC is not enabled.");
-        return nullptr;
-      }
-      return CreatePermissionDescriptor(PermissionName::NFC);
+      exception_state.ThrowTypeError("Web NFC is not enabled.");
+      return nullptr;
     }
 
     case V8PermissionName::Enum::kDisplayCapture:

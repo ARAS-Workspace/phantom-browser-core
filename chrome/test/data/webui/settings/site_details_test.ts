@@ -142,9 +142,6 @@ suite('SiteDetails', function() {
               [createRawSiteException('https://foo.com:443')]),
           // </if>
           createContentSettingTypeToValuePair(
-              ContentSettingsTypes.SERIAL_PORTS,
-              [createRawSiteException('https://foo.com:443')]),
-          createContentSettingTypeToValuePair(
               ContentSettingsTypes.BLUETOOTH_SCANNING,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
@@ -157,9 +154,6 @@ suite('SiteDetails', function() {
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
               ContentSettingsTypes.FEDERATED_IDENTITY_API,
-              [createRawSiteException('https://foo.com:443')]),
-          createContentSettingTypeToValuePair(
-              ContentSettingsTypes.HID_DEVICES,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
               ContentSettingsTypes.BLUETOOTH_DEVICES,
@@ -202,11 +196,6 @@ suite('SiteDetails', function() {
               [createRawSiteException('https://foo.com:443')]),
         ],
         [
-          createContentSettingTypeToValuePair(
-              ContentSettingsTypes.USB_DEVICES,
-              [createRawChooserException(
-                  ChooserType.USB_DEVICES,
-                  [createRawSiteException('https://foo.com:443')])]),
           createContentSettingTypeToValuePair(
               ContentSettingsTypes.BLUETOOTH_DEVICES,
               [createRawChooserException(

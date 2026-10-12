@@ -73,9 +73,6 @@ class WebViewPermissionHelperDelegate {
       bool user_gesture,
       base::OnceCallback<void(bool)> callback) {}
 
-  virtual void RequestHidPermission(const GURL& requesting_frame_url,
-                                    base::OnceCallback<void(bool)> callback) {}
-
   virtual void RequestFileSystemPermission(
       const GURL& url,
       bool allowed_by_default,

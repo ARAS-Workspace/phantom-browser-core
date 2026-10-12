@@ -6,8 +6,6 @@ import("//build/config/features.gni")
 import("//services/device/public/cpp/compute_pressure/buildflags.gni")
 import("//testing/test.gni")
 
-is_serial_enabled_platform = (is_linux && use_udev) || is_mac
-
 source_set("lib") {
   # This should be visible only to embedders of the Device Service, and the
   # dependence should only be for the purpose of embedding the Device Service.
@@ -34,11 +32,8 @@ source_set("lib") {
     "//services/device/power_monitor",
     "//services/device/public/cpp:device_features",
     "//services/device/public/cpp/compute_pressure:buildflags",
-    "//services/device/public/mojom:usb",
-    "//services/device/public/mojom:usb_test",
     "//services/device/screen_orientation",
     "//services/device/time_zone_monitor",
-    "//services/device/usb/mojo",
     "//services/device/vibration",
     "//services/device/wake_lock",
     "//services/service_manager/public/cpp",
@@ -56,11 +51,6 @@ source_set("lib") {
 
   if (enable_compute_pressure) {
     deps += [ "//services/device/compute_pressure" ]
-  }
-
-  if (is_serial_enabled_platform) {
-    deps += [ "//services/device/serial" ]
-    defines = [ "IS_SERIAL_ENABLED_PLATFORM" ]
   }
 }
 
@@ -81,7 +71,6 @@ component("binder_overrides") {
     "//base",
     "//mojo/public/cpp/bindings",
     "//services/device/public/mojom",
-    "//services/device/public/mojom:usb",
   ]
   defines = [ "IS_DEVICE_SERVICE_BINDER_OVERRIDES_IMPL" ]
 }
@@ -172,6 +161,8 @@ source_set("tests") {
   deps += [
     "//components/variations:test_support",
     "//services/device/hid",
+    "//services/device/public/cpp:test_support",
+    "//services/device/public/cpp/hid",
   ]
 
   if (!is_linux || use_udev) {
@@ -185,86 +176,11 @@ source_set("tests") {
         "hid/hid_service_linux_unittest.cc",
         "hid/input_service_linux_unittest.cc",
       ]
+      deps += [ "//device/udev_linux:test_support" ]
     }
     sources += [ "hid/hid_service_unittest.cc" ]
     sources += [ "hid/hid_connection_unittest.cc" ]
-    deps += [
-      ":usb_test_gadget",
-      "//net:test_support",
-      "//services/device/usb",
-    ]
-  }
-
-  if (is_serial_enabled_platform) {
-    sources += [
-      "serial/bluetooth_serial_device_enumerator_unittest.cc",
-      "serial/bluetooth_serial_port_impl_unittest.cc",
-      "serial/serial_device_enumerator_unittest.cc",
-      "serial/serial_port_impl_unittest.cc",
-      "serial/serial_port_manager_impl_unittest.cc",
-    ]
-
-    if (is_linux) {
-      sources += [ "serial/serial_device_enumerator_linux_unittest.cc" ]
-    }
-
-    if (is_posix) {
-      sources += [ "serial/serial_io_handler_posix_unittest.cc" ]
-    }
-
-    if (is_linux) {
-      deps += [ "//device/udev_linux:test_support" ]
-    }
-
-    deps += [
-      "//device/bluetooth:mocks",
-      "//services/device/public/cpp/bluetooth",
-      "//services/device/serial",
-      "//services/device/serial:test_support",
-    ]
-  }
-
-  # USB does not compile on Chromium without blink.
-  if (use_blink) {
-    sources += [
-      "public/cpp/usb/usb_utils_unittest.cc",
-      "usb/mojo/device_impl_unittest.cc",
-      "usb/mojo/device_manager_impl_unittest.cc",
-      "usb/usb_descriptors_unittest.cc",
-      "usb/usb_device_handle_unittest.cc",
-      "usb/usb_service_unittest.cc",
-      "usb/webusb_descriptors_unittest.cc",
-    ]
-    deps += [
-      ":usb_test_gadget",
-      "//device/base",
-      "//mojo/public/cpp/test_support:test_utils",
-      "//net:test_support",
-      "//services/device/public/cpp:test_support",
-      "//services/device/public/cpp/usb",
-      "//services/device/public/mojom",
-      "//services/device/usb",
-      "//services/device/usb:test_support",
-      "//services/device/usb/mojo",
-      "//third_party/fuzztest",
-    ]
-
-    sources += [ "public/cpp/usb/usb_ids_unittest.cc" ]
-
-    if (is_linux) {
-      sources += [ "usb/usb_device_handle_usbfs_unittest.cc" ]
-    }
-
-    if (is_linux) {
-      sources += [ "usb/usb_interface_detach_allowlist_unittest.cc" ]
-    }
-  }
-
-  # UsbContext is a libusb-specific object.
-  # TODO(crbug.com/40136337) Remove these tests.
-  if (is_mac) {
-    sources += [ "usb/usb_context_unittest.cc" ]
-    deps += [ "//third_party/libusb" ]
+    deps += [ "//net:test_support" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -299,22 +215,6 @@ source_set("test_support") {
   if (is_linux && use_dbus) {
     deps += [ "//components/dbus" ]
   }
-}
-
-source_set("usb_test_gadget") {
-  testonly = true
-
-  sources = [
-    "test/usb_test_gadget.h",
-    "test/usb_test_gadget_impl.cc",
-  ]
-
-  deps = [
-    "//device/base",
-    "//net:test_support",
-    "//services/device/usb",
-    "//tools/usb_gadget",
-  ]
 }
 
 source_set("utility") {

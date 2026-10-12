@@ -76,8 +76,6 @@ BASE_FEATURE(kCWSReviewPromptingNativeUI,
              "CWSReviewPromptingNativeUI",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kEnableWebHidInWebView, base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kExtensionAutoRejectIncognitoConnectability,
              base::FEATURE_ENABLED_BY_DEFAULT);
 

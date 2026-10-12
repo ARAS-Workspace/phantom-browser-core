@@ -332,7 +332,6 @@ CONTENT_EXPORT extern const base::FeatureParam<bool>
     kWebUIBundledCodeCacheGenerateResourceMap;
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kWebUIJSErrorReportingExtended);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kWebUIInProcessResourceLoadingV2);
-CONTENT_EXPORT BASE_DECLARE_FEATURE(kWebUsb);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kWebViewPrefetchHighestPrefetchPriority);
 CONTENT_EXPORT extern const base::FeatureParam<size_t>
     kWebViewPrefetchHighestPrefetchPriorityBurstLimit;

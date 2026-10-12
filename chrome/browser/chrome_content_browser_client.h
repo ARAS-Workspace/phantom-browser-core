@@ -106,11 +106,8 @@ enum class Channel;
 }  // namespace version_info
 
 class ChromeDirectSocketsDelegate;
-class ChromeHidDelegate;
 class ChromeSensorDelegate;
-class ChromeSerialDelegate;
 class ChromeBluetoothDelegate;
-class ChromeUsbDelegate;
 class ChromeWebAuthenticationDelegateBase;
 class HttpAuthCoordinator;
 class MainThreadStackSamplingProfiler;
@@ -677,13 +674,10 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
                                    const GURL& url,
                                    const std::string& mime_type) override;
   content::BluetoothDelegate* GetBluetoothDelegate() override;
-  content::UsbDelegate* GetUsbDelegate() override;
-  content::SerialDelegate* GetSerialDelegate() override;
   bool IsSecurityLevelAcceptableForWebAuthn(
       content::RenderFrameHost* rfh,
       const url::Origin& caller_origin) override;
   content::WebAuthenticationDelegate* GetWebAuthenticationDelegate() override;
-  content::HidDelegate* GetHidDelegate() override;
   void CreateDeviceInfoService(
       content::RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<blink::mojom::DeviceAPIService> receiver) override;
@@ -1137,12 +1131,9 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
 
   std::unique_ptr<ChromeWebAuthenticationDelegateBase>
       web_authentication_delegate_;
-  std::unique_ptr<ChromeHidDelegate> hid_delegate_;
   std::unique_ptr<ChromeDirectSocketsDelegate> direct_sockets_delegate_;
   std::unique_ptr<ChromeSensorDelegate> sensor_delegate_;
   std::unique_ptr<ChromeBluetoothDelegate> bluetooth_delegate_;
-  std::unique_ptr<ChromeUsbDelegate> usb_delegate_;
-  std::unique_ptr<ChromeSerialDelegate> serial_delegate_;
 
 #if BUILDFLAG(ENABLE_VR)
   std::unique_ptr<vr::ChromeXrIntegrationClient> xr_integration_client_;

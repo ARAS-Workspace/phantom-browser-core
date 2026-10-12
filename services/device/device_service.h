@@ -24,14 +24,9 @@
 #include "services/device/public/mojom/power_monitor.mojom.h"
 #include "services/device/public/mojom/screen_orientation.mojom.h"
 #include "services/device/public/mojom/sensor_provider.mojom.h"
-#include "services/device/public/mojom/serial.mojom.h"
 #include "services/device/public/mojom/time_zone_monitor.mojom.h"
-#include "services/device/public/mojom/usb_manager.mojom.h"
-#include "services/device/public/mojom/usb_manager_test.mojom.h"
 #include "services/device/public/mojom/vibration_manager.mojom.h"
 #include "services/device/public/mojom/wake_lock_provider.mojom.h"
-#include "services/device/usb/mojo/device_manager_impl.h"
-#include "services/device/usb/mojo/device_manager_test.h"
 #include "services/device/wake_lock/wake_lock_context.h"
 #include "services/device/wake_lock/wake_lock_provider.h"
 #include "services/service_manager/public/cpp/interface_provider.h"
@@ -54,10 +49,6 @@ namespace device {
 
 #if BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
 class PressureManagerImpl;
-#endif
-
-#if defined(IS_SERIAL_ENABLED_PLATFORM)
-class SerialPortManagerImpl;
 #endif
 
 class DeviceService;
@@ -116,12 +107,6 @@ class DeviceService : public mojom::DeviceService {
   static void OverrideTimeZoneMonitorBinderForTesting(
       TimeZoneMonitorBinder binder);
 
-  // Supports global override of UsbDeviceManager binding within the service.
-  using UsbDeviceManagerBinder = base::RepeatingCallback<void(
-      mojo::PendingReceiver<mojom::UsbDeviceManager>)>;
-  static void OverrideUsbDeviceManagerBinderForTesting(
-      UsbDeviceManagerBinder binder);
-
  private:
   // mojom::DeviceService implementation:
   void BindFingerprint(
@@ -159,28 +144,17 @@ class DeviceService : public mojom::DeviceService {
   void BindSensorProvider(
       mojo::PendingReceiver<mojom::SensorProvider> receiver) override;
 
-  void BindSerialPortManager(
-      mojo::PendingReceiver<mojom::SerialPortManager> receiver) override;
-
   void BindTimeZoneMonitor(
       mojo::PendingReceiver<mojom::TimeZoneMonitor> receiver) override;
 
   void BindWakeLockProvider(
       mojo::PendingReceiver<mojom::WakeLockProvider> receiver) override;
 
-  void BindUsbDeviceManager(
-      mojo::PendingReceiver<mojom::UsbDeviceManager> receiver) override;
-
-  void BindUsbDeviceManagerTest(
-      mojo::PendingReceiver<mojom::UsbDeviceManagerTest> receiver) override;
-
   mojo::ReceiverSet<mojom::DeviceService> receivers_;
   std::unique_ptr<PowerMonitorMessageBroadcaster>
       power_monitor_message_broadcaster_;
   std::unique_ptr<SensorProviderImpl> sensor_provider_;
   std::unique_ptr<TimeZoneMonitor> time_zone_monitor_;
-  std::unique_ptr<usb::DeviceManagerImpl> usb_device_manager_;
-  std::unique_ptr<usb::DeviceManagerTest> usb_device_manager_test_;
   scoped_refptr<base::SingleThreadTaskRunner> file_task_runner_;
   scoped_refptr<base::SingleThreadTaskRunner> io_task_runner_;
   WakeLockContextCallback wake_lock_context_callback_;
@@ -190,10 +164,6 @@ class DeviceService : public mojom::DeviceService {
 #if BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
   std::unique_ptr<PressureManagerImpl> pressure_manager_;
 #endif
-
-#if defined(IS_SERIAL_ENABLED_PLATFORM)
-  base::SequenceBound<SerialPortManagerImpl> serial_port_manager_;
-#endif  // defined(IS_SERIAL_ENABLED_PLATFORM)
 
 };
 

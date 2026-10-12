@@ -17,7 +17,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_info.h"
-#include "extensions/common/permissions/usb_device_permission.h"
 #include "extensions/common/url_pattern_set.h"
 #include "extensions/common/user_script.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -457,50 +456,6 @@ TEST(PermissionsApiHelpersTest, Unpack_FileSchemes_Specific) {
         GetPatternsAsStrings(unpack_result->restricted_file_scheme_patterns),
         testing::IsEmpty());
   }
-}
-
-// Tests that unpacking a UsbDevicePermission with a list of USB device IDs
-// preserves the device list in the result object.
-TEST(PermissionsApiHelpersTest, Unpack_UsbDevicePermission) {
-  constexpr char kDeviceListJson[] = R"([{"productId":2,"vendorId":1}])";
-  constexpr char kUsbDevicesPermissionJson[] =
-      R"(usbDevices|[{"productId":2,"vendorId":1}])";
-
-  auto device_list = base::JSONReader::Read(
-      kDeviceListJson, base::JSON_PARSE_CHROMIUM_EXTENSIONS);
-  ASSERT_TRUE(device_list) << "Failed to parse device list JSON.";
-
-  auto usb_device_permission = std::make_unique<UsbDevicePermission>(
-      PermissionsInfo::GetInstance()->GetByID(
-          mojom::APIPermissionID::kUsbDevice));
-  std::string error;
-  std::vector<std::string> unhandled_permissions;
-  bool from_value_result = usb_device_permission->FromValue(
-      &device_list.value(), &error, &unhandled_permissions);
-  ASSERT_TRUE(from_value_result);
-  EXPECT_TRUE(unhandled_permissions.empty());
-
-  APIPermissionSet api_permission_set;
-  api_permission_set.insert(usb_device_permission->Clone());
-  PermissionSet optional_permissions(std::move(api_permission_set),
-                                     ManifestPermissionSet(), URLPatternSet(),
-                                     URLPatternSet());
-
-  Permissions permissions_object;
-  permissions_object.permissions =
-      std::vector<std::string>({kUsbDevicesPermissionJson});
-  constexpr bool kHasFileAccess = false;
-  std::unique_ptr<UnpackPermissionSetResult> unpack_result =
-      UnpackPermissionSet(permissions_object, PermissionSet(),
-                          optional_permissions, kHasFileAccess, &error);
-
-  ASSERT_TRUE(unpack_result) << error;
-
-  ASSERT_EQ(1U, unpack_result->optional_apis.size());
-  EXPECT_EQ(mojom::APIPermissionID::kUsbDevice,
-            unpack_result->optional_apis.begin()->id());
-  EXPECT_TRUE(unpack_result->optional_apis.begin()->Contains(
-      usb_device_permission.get()));
 }
 
 }  // namespace extensions

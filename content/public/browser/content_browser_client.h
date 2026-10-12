@@ -231,7 +231,6 @@ class DirectSocketsDelegate;
 class FeatureObserverClient;
 class FontAccessDelegate;
 class GuestPageHolder;
-class HidDelegate;
 class IdentityRequestDialogController;
 class NativeIdpFetcher;
 class LoginDelegate;
@@ -250,7 +249,6 @@ class RenderProcessHost;
 class ResponsivenessCalculatorDelegate;
 class SecurityPrincipal;
 class SensorDelegate;
-class SerialDelegate;
 class ServiceWorkerContext;
 class SiteInstance;
 class SpeechRecognitionManagerDelegate;
@@ -258,7 +256,6 @@ class StoragePartition;
 class TracingDelegate;
 class TtsPlatform;
 class URLLoaderRequestInterceptor;
-class UsbDelegate;
 class VideoOverlayWindow;
 class VideoPictureInPictureWindowController;
 class WebAuthenticationDelegate;
@@ -2078,17 +2075,8 @@ class CONTENT_EXPORT ContentBrowserClient {
       mojo::PendingReceiver<blink::mojom::ManagedConfigurationService>
           receiver);
 
-  // Allows the embedder to provide an implementation of the Serial API.
-  virtual SerialDelegate* GetSerialDelegate();
-
-  // Allows the embedder to provide an implementation of the WebHID API.
-  virtual HidDelegate* GetHidDelegate();
-
   // Allows the embedder to provide an implementation of the Web Bluetooth API.
   virtual BluetoothDelegate* GetBluetoothDelegate();
-
-  // Allows the embedder to provide an implementation of the WebUSB API.
-  virtual UsbDelegate* GetUsbDelegate();
 
   // Allows the embedder to provide an implementation of the Generic Sensor API.
   virtual SensorDelegate* GetSensorDelegate();

@@ -167,13 +167,6 @@ class TestingBrowserProcess
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
-  SerialPolicyAllowedPorts* serial_policy_allowed_ports() override;
-  HidSystemTrayIcon* hid_system_tray_icon() override;
-  void set_hid_system_tray_icon_for_test(
-      std::unique_ptr<HidSystemTrayIcon> icon) override;
-  UsbSystemTrayIcon* usb_system_tray_icon() override;
-  void set_usb_system_tray_icon_for_test(
-      std::unique_ptr<UsbSystemTrayIcon> icon) override;
   os_crypt_async::OSCryptAsync* os_crypt_async() override;
   void set_additional_os_crypt_async_provider_for_test(
       size_t precedence,
@@ -311,10 +304,7 @@ class TestingBrowserProcess
   std::unique_ptr<resource_coordinator::ResourceCoordinatorParts>
       resource_coordinator_parts_;
 
-  std::unique_ptr<SerialPolicyAllowedPorts> serial_policy_allowed_ports_;
   std::unique_ptr<activity_reporter::ActivityReporter> activity_reporter_;
-  std::unique_ptr<HidSystemTrayIcon> hid_system_tray_icon_;
-  std::unique_ptr<UsbSystemTrayIcon> usb_system_tray_icon_;
   std::unique_ptr<component_updater::ComponentUpdateService> component_updater_;
   BuildState build_state_;
 

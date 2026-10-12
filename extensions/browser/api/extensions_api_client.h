@@ -63,7 +63,6 @@ class NativeMessagePort;
 class NativeMessagePortDispatcher;
 class NonNativeFileSystemDelegate;
 class RulesCacheDelegate;
-class UsbDevicePermissionsPrompt;
 class ValueStoreCache;
 class VirtualKeyboardDelegate;
 class WebstorePrivateAPIDelegate;
@@ -170,10 +169,6 @@ class ExtensionsAPIClient {
   virtual scoped_refptr<ContentRulesRegistry> CreateContentRulesRegistry(
       content::BrowserContext* browser_context,
       RulesCacheDelegate* cache_delegate) const;
-
-  // Creates a UsbDevicePermissionsPrompt appropriate for the embedder.
-  virtual std::unique_ptr<UsbDevicePermissionsPrompt>
-  CreateUsbDevicePermissionsPrompt(content::WebContents* web_contents) const;
 
   // Creates a delegate for handling the management extension api.
   virtual ManagementAPIDelegate* CreateManagementAPIDelegate() const;

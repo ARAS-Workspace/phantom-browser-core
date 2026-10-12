@@ -17,7 +17,6 @@
 #include "chrome/browser/ui/views/apps/app_info_dialog/app_info_label.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/grit/generated_resources.h"
-#include "extensions/browser/api/device_permissions_manager.h"
 #include "extensions/browser/api/file_system/saved_file_entry.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permissions_data.h"
@@ -175,8 +174,7 @@ void AppInfoPermissionsPanel::CreatePermissionsList() {
       l10n_util::GetStringUTF16(IDS_APPLICATION_INFO_APP_PERMISSIONS_TITLE));
   AddChildView(std::move(permissions_heading));
 
-  if (!HasActivePermissionMessages() && GetRetainedDeviceCount() == 0 &&
-      GetRetainedFileCount() == 0) {
+  if (!HasActivePermissionMessages() && GetRetainedFileCount() == 0) {
     auto no_permissions_text =
         std::make_unique<AppInfoLabel>(l10n_util::GetStringUTF16(
             app_->is_extension()
@@ -193,14 +191,6 @@ void AppInfoPermissionsPanel::CreatePermissionsList() {
     permissions_list->AddPermissionBullets(
         message.message(), message.submessages(), gfx::ELIDE_MIDDLE,
         base::RepeatingClosure());
-  }
-
-  // Add USB devices, if the app has any.
-  if (GetRetainedDeviceCount() > 0) {
-    permissions_list->AddPermissionBullets(
-        GetRetainedDeviceHeading(), GetRetainedDevices(), gfx::ELIDE_TAIL,
-        base::BindRepeating(&AppInfoPermissionsPanel::RevokeDevicePermissions,
-                            base::Unretained(this)));
   }
 
   // Add retained files, if the app has any.
@@ -266,30 +256,6 @@ void AppInfoPermissionsPanel::RevokeFilePermissions() {
   if (service) {
     service->ClearQueue(app_);
   }
-  apps::AppLoadService::Get(profile_)->RestartApplicationIfRunning(app_->id());
-
-  Close();
-}
-
-int AppInfoPermissionsPanel::GetRetainedDeviceCount() const {
-  return extensions::DevicePermissionsManager::Get(profile_)
-      ->GetPermissionMessageStrings(app_->id())
-      .size();
-}
-
-std::u16string AppInfoPermissionsPanel::GetRetainedDeviceHeading() const {
-  return l10n_util::GetPluralStringFUTF16(IDS_APPLICATION_INFO_RETAINED_DEVICES,
-                                          GetRetainedDeviceCount());
-}
-
-std::vector<std::u16string> AppInfoPermissionsPanel::GetRetainedDevices()
-    const {
-  return extensions::DevicePermissionsManager::Get(profile_)
-      ->GetPermissionMessageStrings(app_->id());
-}
-
-void AppInfoPermissionsPanel::RevokeDevicePermissions() {
-  extensions::DevicePermissionsManager::Get(profile_)->Clear(app_->id());
   apps::AppLoadService::Get(profile_)->RestartApplicationIfRunning(app_->id());
 
   Close();

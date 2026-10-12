@@ -21,7 +21,6 @@
 #include "content/browser/devtools/network_service_devtools_observer.h"
 #include "content/browser/devtools/service_worker_devtools_agent_host.h"
 #include "content/browser/devtools/service_worker_devtools_manager.h"
-#include "content/browser/hid/hid_service.h"
 #include "content/browser/loader/url_loader_factory_utils.h"
 #include "content/browser/network/cross_origin_embedder_policy_reporter.h"
 #include "content/browser/process_lock.h"
@@ -35,14 +34,11 @@
 #include "content/browser/service_worker/service_worker_script_loader_factory.h"
 #include "content/browser/storage_partition_impl.h"
 #include "content/browser/url_loader_factory_params_helper.h"
-#include "content/browser/usb/web_usb_service_impl.h"
 #include "content/common/content_switches_internal.h"
 #include "content/common/url_schemes.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/child_process_host.h"
-#include "content/public/browser/hid_delegate.h"
-#include "content/public/browser/usb_delegate.h"
 #include "content/public/common/child_process_id_util.h"
 #include "content/public/common/content_client.h"
 #include "content/public/common/content_switches.h"
@@ -807,34 +803,6 @@ void EmbeddedWorkerInstance::BindCacheStorage(
   pending_cache_storage_requests_.emplace_back(std::move(receiver),
                                                bucket_locator);
   BindCacheStorageInternal();
-}
-
-void EmbeddedWorkerInstance::BindHidService(
-    const url::Origin& origin,
-    mojo::PendingReceiver<blink::mojom::HidService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  HidDelegate* hid_delegate = GetContentClient()->browser()->GetHidDelegate();
-  if (!hid_delegate) {
-    return;
-  }
-  if (hid_delegate->IsServiceWorkerAllowedForOrigin(origin)) {
-    HidService::Create(owner_version_->GetWeakPtr(), origin,
-                       std::move(receiver));
-  }
-}
-
-void EmbeddedWorkerInstance::BindUsbService(
-    const url::Origin& origin,
-    mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  UsbDelegate* usb_delegate = GetContentClient()->browser()->GetUsbDelegate();
-  if (!usb_delegate) {
-    return;
-  }
-  if (usb_delegate->IsServiceWorkerAllowedForOrigin(origin)) {
-    WebUsbServiceImpl::Create(owner_version_->GetWeakPtr(), origin,
-                              std::move(receiver));
-  }
 }
 
 base::WeakPtr<EmbeddedWorkerInstance> EmbeddedWorkerInstance::AsWeakPtr() {

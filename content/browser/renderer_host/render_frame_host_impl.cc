@@ -106,7 +106,6 @@
 #include "content/browser/generic_sensor/frame_sensor_provider_proxy.h"
 #include "content/browser/geolocation/geolocation_service_impl.h"
 #include "content/browser/guest_page_holder_impl.h"
-#include "content/browser/hid/hid_service.h"
 #include "content/browser/idle/idle_manager_impl.h"
 #include "content/browser/loader/file_url_loader_factory.h"
 #include "content/browser/loader/keep_alive_url_loader_service.h"
@@ -170,7 +169,6 @@
 #include "content/browser/scoped_active_url.h"
 #include "content/browser/security/coop/cross_origin_opener_policy_reporter.h"
 #include "content/browser/security/cpsp/child_process_security_policy_impl.h"
-#include "content/browser/serial/serial_service.h"
 #include "content/browser/service_worker/service_worker_client.h"
 #include "content/browser/site_info.h"
 #include "content/browser/sms/webotp_service.h"
@@ -178,7 +176,6 @@
 #include "content/browser/storage_access/storage_access_handle.h"
 #include "content/browser/storage_partition_impl.h"
 #include "content/browser/url_loader_factory_params_helper.h"
-#include "content/browser/usb/web_usb_service_impl.h"
 #include "content/browser/web_exposed_isolation_info.h"
 #include "content/browser/web_package/prefetched_signed_exchange_cache.h"
 #include "content/browser/webauth/authenticator_impl.h"
@@ -14548,27 +14545,6 @@ void RenderFrameHostImpl::CopyAXTreeUpdate(const ui::AXTreeUpdate& snapshot,
   }
 }
 
-void RenderFrameHostImpl::CreateWebUsbService(
-    mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
-  if (!base::FeatureList::IsEnabled(features::kWebUsb)) {
-    return;
-  }
-  if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kUsb)) {
-    mojo::ReportBadMessage("Permissions policy blocks access to USB.");
-    return;
-  }
-  if (GetOutermostMainFrame()->GetLastCommittedOrigin().opaque()) {
-    mojo::ReportBadMessage(
-        "WebUSB is not allowed when the top-level document has an opaque "
-        "origin.");
-    return;
-  }
-  BackForwardCache::DisableForRenderFrameHost(
-      this, BackForwardCacheDisable::DisabledReason(
-                BackForwardCacheDisable::DisabledReasonId::kWebUSB));
-  WebUsbServiceImpl::Create(*this, std::move(receiver));
-}
-
 void RenderFrameHostImpl::ResetPermissionsPolicy(
     const network::ParsedPermissionsPolicy& header_policy) {
   if (IsFencedFrameRoot()) {
@@ -14969,42 +14945,9 @@ void RenderFrameHostImpl::CreateDedicatedWorkerHostFactory(
       /*creator_coep_reporter=*/coep_reporter, GetNetworkRestrictionsID());
 }
 
-void RenderFrameHostImpl::BindSerialService(
-    mojo::PendingReceiver<blink::mojom::SerialService> receiver) {
-  if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kSerial)) {
-    mojo::ReportBadMessage("Permissions policy blocks access to Serial.");
-    return;
-  }
-
-  // Powerful features like Serial API for FencedFrames are blocked by
-  // PermissionsPolicy. But as the interface is still exposed to the renderer,
-  // still good to have a secondary check per-API basis to handle compromised
-  // renderers. Ignore the request and mark it as bad to kill the initiating
-  // renderer if it happened for some reason.
-  if (IsNestedWithinFencedFrame()) {
-    mojo::ReportBadMessage("Web Serial is not allowed in fences frames.");
-    return;
-  }
-
-  // Rejects using Serial API when the top-level document has an opaque origin.
-  if (GetOutermostMainFrame()->GetLastCommittedOrigin().opaque()) {
-    mojo::ReportBadMessage(
-        "Web Serial is not allowed when the top-level document has an opaque "
-        "origin.");
-    return;
-  }
-
-  SerialService::GetOrCreateForCurrentDocument(this)->Bind(std::move(receiver));
-}
-
 void RenderFrameHostImpl::BindModelContextHost(
     mojo::PendingReceiver<blink::mojom::ModelContextHost> receiver) {
   ModelContextUserData::Bind(this, std::move(receiver));
-}
-
-void RenderFrameHostImpl::GetHidService(
-    mojo::PendingReceiver<blink::mojom::HidService> receiver) {
-  HidService::Create(this, std::move(receiver));
 }
 
 IdleManagerImpl* RenderFrameHostImpl::GetIdleManager() {

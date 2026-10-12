@@ -28,7 +28,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/constrained_window/constrained_window_views.h"
 #include "components/permissions/fake_bluetooth_chooser_controller.h"
-#include "components/permissions/fake_usb_chooser_controller.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -65,44 +64,6 @@ void ShowChooser(const std::string& test_name,
 }
 
 }  // namespace
-
-// Invokes a dialog allowing the user to select a USB device for a web page or
-// extension.
-class UsbChooserBrowserTest : public DialogBrowserTest {
- public:
-  UsbChooserBrowserTest() = default;
-
-  UsbChooserBrowserTest(const UsbChooserBrowserTest&) = delete;
-  UsbChooserBrowserTest& operator=(const UsbChooserBrowserTest&) = delete;
-
-  // DialogBrowserTest:
-  void ShowUi(const std::string& name) override {
-    ShowChooser(name, browser(),
-                std::make_unique<FakeUsbChooserController>(device_count_));
-  }
-
- protected:
-  // Number of devices to show in the chooser.
-  int device_count_ = 0;
-};
-
-IN_PROC_BROWSER_TEST_F(UsbChooserBrowserTest, InvokeUi_NoDevicesBubble) {
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(UsbChooserBrowserTest, InvokeUi_NoDevicesModal) {
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(UsbChooserBrowserTest, InvokeUi_WithDevicesBubble) {
-  device_count_ = 5;
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(UsbChooserBrowserTest, InvokeUi_WithDevicesModal) {
-  device_count_ = 5;
-  ShowAndVerifyUi();
-}
 
 // Invokes a dialog allowing the user to select a Bluetooth device for a web
 // page or extension.
@@ -290,7 +251,8 @@ IN_PROC_BROWSER_TEST_F(DeviceChooserBubbleTest,
   EXPECT_FALSE(
       contents_container_views[1]->contents_outline_view()->is_highlighted());
 
-  ShowChooserBubble(browser(), std::make_unique<FakeUsbChooserController>(0));
+  ShowChooserBubble(browser(),
+                    std::make_unique<permissions::FakeBluetoothChooserController>());
 
   EXPECT_TRUE(
       contents_container_views[0]->contents_outline_view()->is_highlighted());
@@ -302,7 +264,8 @@ IN_PROC_BROWSER_TEST_F(DeviceChooserBubbleTest,
                        ChooserBubblePreventsFullscreen) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetURL("example.com")));
 
-  ShowChooserBubble(browser(), std::make_unique<FakeUsbChooserController>(0));
+  ShowChooserBubble(browser(),
+                    std::make_unique<permissions::FakeBluetoothChooserController>());
 
   content::WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();

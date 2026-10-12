@@ -1303,8 +1303,6 @@ void ChromeContentRendererClient::
 
   if (IsStandaloneContentExtensionProcess()) {
     // These Web API features are exposed in extensions.
-    blink::WebRuntimeFeatures::EnableWebUSBOnServiceWorkers(true);
-    blink::WebRuntimeFeatures::EnableWebHIDOnServiceWorkers(true);
     blink::WebRuntimeFeatures::EnableAIPromptAPIForWorkers(true);
     blink::WebRuntimeFeatures::EnableAIPromptAPILegacyIdentifiers(true);
     blink::WebRuntimeFeatures::EnableAIPromptAPILegacyParams(true);

@@ -180,7 +180,6 @@
 #include "third_party/blink/public/mojom/render_accessibility.mojom.h"
 #include "third_party/blink/public/mojom/security_context/insecure_request_policy.mojom-forward.h"
 #include "third_party/blink/public/mojom/sensor/web_sensor_provider.mojom-forward.h"
-#include "third_party/blink/public/mojom/serial/serial.mojom-forward.h"
 #include "third_party/blink/public/mojom/sms/webotp_service.mojom-forward.h"
 #include "third_party/blink/public/mojom/speech/speech_synthesis.mojom-forward.h"
 #include "third_party/blink/public/mojom/webaudio/audio_context_manager.mojom-forward.h"
@@ -204,8 +203,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/gurl.h"
 
-#include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
-
 namespace blink {
 class AssociatedInterfaceRegistry;
 class DocumentPolicy;
@@ -218,7 +215,6 @@ class CacheStorage;
 class DeviceAPIService;
 class GeolocationService;
 class ManagedConfigurationService;
-class WebUsbService;
 }  // namespace mojom
 }  // namespace blink
 
@@ -2094,10 +2090,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void GetFileSystemAccessManager(
       mojo::PendingReceiver<blink::mojom::FileSystemAccessManager> receiver);
 
-  void GetHidService(mojo::PendingReceiver<blink::mojom::HidService> receiver);
-
-  void BindSerialService(
-      mojo::PendingReceiver<blink::mojom::SerialService> receiver);
   void BindModelContextHost(
       mojo::PendingReceiver<blink::mojom::ModelContextHost> receiver);
 
@@ -2192,10 +2184,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
   // 3. This frame's origin must be potentially trustworthy.
   void BindTrustTokenQueryAnswerer(
       mojo::PendingReceiver<network::mojom::TrustTokenQueryAnswerer> receiver);
-
-  // Creates connections to WebUSB interfaces bound to this frame.
-  void CreateWebUsbService(
-      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver);
 
   void CreateWebSocketConnector(
       mojo::PendingReceiver<blink::mojom::WebSocketConnector> receiver);

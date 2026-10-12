@@ -143,7 +143,6 @@ class FindRequestManager;
 class JavaScriptDialogDismissNotifier;
 class MediaSession;
 class MediaWebContentsObserver;
-class NFCHost;
 class PreloadingAttempt;
 class RenderFrameHost;
 class RenderFrameHostImpl;
@@ -1370,16 +1369,6 @@ class CONTENT_EXPORT WebContentsImpl
   void IncrementBluetoothScanningSessionsCount();
   void DecrementBluetoothScanningSessionsCount();
 
-  // Modify the counter of frames in this WebContents actively using serial
-  // ports.
-  void IncrementSerialActiveFrameCount();
-  void DecrementSerialActiveFrameCount();
-
-  // Modify the counter of frames in this WebContents actively using HID
-  // devices.
-  void IncrementHidActiveFrameCount();
-  void DecrementHidActiveFrameCount();
-
   // Modify the counter of frames in this WebContents actively using
   // geolocation.
   void IncrementGeolocationActiveFrameCount();
@@ -1390,11 +1379,6 @@ class CONTENT_EXPORT WebContentsImpl
   void OnCapabilityTypesChanged(
       WebContentsCapabilityType device_capability_type,
       bool used);
-
-  // Modify the counter of frames in this WebContents actively using USB
-  // devices.
-  void IncrementUsbActiveFrameCount();
-  void DecrementUsbActiveFrameCount();
 
   // Modify the counter of File System Access handles for this WebContents.
   void IncrementFileSystemAccessHandleCount();
@@ -2561,9 +2545,6 @@ class CONTENT_EXPORT WebContentsImpl
 
   size_t bluetooth_connected_device_count_ = 0;
   size_t bluetooth_scanning_sessions_count_ = 0;
-  size_t serial_active_frame_count_ = 0;
-  size_t hid_active_frame_count_ = 0;
-  size_t usb_active_frame_count_ = 0;
   size_t geolocation_active_frame_count_ = 0;
 
   size_t file_system_access_handle_count_ = 0;

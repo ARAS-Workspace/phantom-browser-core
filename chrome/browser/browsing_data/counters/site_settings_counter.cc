@@ -75,10 +75,6 @@ void SiteSettingsCounter::Count() {
     iterate_content_settings_list(type, map_->GetSettingsForOneType(type));
   }
 
-  iterate_content_settings_list(
-      ContentSettingsType::USB_CHOOSER_DATA,
-      map_->GetSettingsForOneType(ContentSettingsType::USB_CHOOSER_DATA));
-
   for (const auto& zoom_level : zoom_map_->GetAllZoomLevels()) {
     // zoom_level with non-empty scheme are only used for some internal
     // features and not stored in preferences. They are not counted.

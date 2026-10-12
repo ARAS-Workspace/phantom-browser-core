@@ -16,14 +16,12 @@
 #include "content/browser/browser_interface_binders.h"
 #include "content/browser/generic_sensor/frame_sensor_provider_proxy.h"
 #include "content/browser/generic_sensor/web_contents_sensor_provider_proxy.h"
-#include "content/browser/hid/hid_test_utils.h"
 #include "content/browser/presentation/presentation_test_utils.h"
 #include "content/browser/renderer_host/media/media_devices_dispatcher_host.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/browser/worker_host/dedicated_worker_hosts_for_document.h"
 #include "content/public/browser/disallow_activation_reason.h"
-#include "content/public/browser/hid_delegate.h"
 #include "content/public/browser/media_session.h"
 #include "content/public/test/back_forward_cache_util.h"
 #include "content/public/test/browser_test.h"
@@ -41,7 +39,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "net/test/embedded_test_server/install_default_websocket_handlers.h"
 #include "net/test/test_data_directory.h"
-#include "services/device/public/cpp/test/fake_hid_manager.h"
 #include "services/device/public/cpp/test/fake_sensor_and_provider.h"
 #include "services/device/public/cpp/test/scoped_geolocation_overrider.h"
 #include "services/device/public/mojom/vibration_manager.mojom.h"
@@ -1311,135 +1308,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, CacheIfWebGL) {
 
   // 3) Go back.
   ASSERT_TRUE(HistoryGoBack(web_contents()));
-  ExpectRestored(FROM_HERE);
-}
-
-class HidBrowserTestContentBrowserClient
-    : public ContentBrowserTestContentBrowserClient {
- public:
-  MockHidDelegate& delegate() { return delegate_; }
-
-  // ContentBrowserClient:
-  HidDelegate* GetHidDelegate() override { return &delegate_; }
-
- private:
-  testing::NiceMock<MockHidDelegate> delegate_;
-};
-
-class BackForwardCacheWebHidTest : public BackForwardCacheBrowserTest {
- public:
-  void SetUpOnMainThread() override {
-    BackForwardCacheBrowserTest::SetUpOnMainThread();
-    test_client_ = std::make_unique<HidBrowserTestContentBrowserClient>();
-    ON_CALL(delegate(), GetHidManager).WillByDefault(Return(&hid_manager_));
-  }
-
-  void TearDownOnMainThread() override {
-    BackForwardCacheBrowserTest::TearDownOnMainThread();
-    test_client_.reset();
-  }
-
-  MockHidDelegate& delegate() { return test_client_->delegate(); }
-  device::FakeHidManager* hid_manager() { return &hid_manager_; }
-
- private:
-  std::unique_ptr<HidBrowserTestContentBrowserClient> test_client_;
-  device::FakeHidManager hid_manager_;
-};
-
-IN_PROC_BROWSER_TEST_F(BackForwardCacheWebHidTest,
-                       DoesNotCacheIfGetDevicesWasCalled) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Navigate to an empty page.
-  ASSERT_TRUE(
-      NavigateToURL(shell(), embedded_test_server()->GetURL("/title1.html")));
-  RenderFrameHostWrapper rfh_wrapper(current_frame_host());
-
-  // Call getDevices to get a list of devices the page is allowed to access.
-  EXPECT_EQ("success", EvalJs(current_frame_host(), R"(
-    new Promise(resolve => {
-      navigator.hid.getDevices()
-        .then(m => { resolve("success"); })
-        .catch(() => { resolve("error"); });
-    });
-  )"));
-  EXPECT_TRUE(current_frame_host()->GetBackForwardCacheDisablingFeatures().Has(
-      blink::scheduler::WebSchedulerTrackedFeature::kWebHID));
-
-  // Navigate away.
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("b.com", "/title1.html")));
-
-  // The page called a WebHID method so it should be deleted.
-  EXPECT_TRUE(rfh_wrapper.WaitUntilRenderFrameDeleted());
-
-  // Go back.
-  ASSERT_TRUE(HistoryGoBack(web_contents()));
-  ExpectNotRestored({NotRestoredReason::kBlocklistedFeatures},
-                    {blink::scheduler::WebSchedulerTrackedFeature::kWebHID}, {},
-                    {}, {}, FROM_HERE);
-}
-
-IN_PROC_BROWSER_TEST_F(BackForwardCacheWebHidTest,
-                       DoesNotCacheIfRequestDeviceWasCalled) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Navigate to an empty page.
-  ASSERT_TRUE(
-      NavigateToURL(shell(), embedded_test_server()->GetURL("/title1.html")));
-  RenderFrameHostWrapper rfh_wrapper(current_frame_host());
-
-  // Call requestDevice to open a permission request dialog. Simulate closing
-  // the dialog without selecting a device.
-  EXPECT_CALL(delegate(), CanRequestDevicePermission).WillOnce(Return(true));
-  EXPECT_CALL(delegate(), RunChooserInternal).WillOnce([]() {
-    return std::vector<device::mojom::HidDeviceInfoPtr>();
-  });
-  EXPECT_TRUE(ExecJs(current_frame_host(),
-                     "navigator.hid.requestDevice({filters: []})"));
-  EXPECT_TRUE(current_frame_host()->GetBackForwardCacheDisablingFeatures().Has(
-      blink::scheduler::WebSchedulerTrackedFeature::kWebHID));
-
-  // Navigate away.
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("b.com", "/title1.html")));
-
-  // The page called a WebHID method so it should be deleted.
-  EXPECT_TRUE(rfh_wrapper.WaitUntilRenderFrameDeleted());
-
-  // Go back.
-  ASSERT_TRUE(HistoryGoBack(web_contents()));
-  ExpectNotRestored({NotRestoredReason::kBlocklistedFeatures},
-                    {blink::scheduler::WebSchedulerTrackedFeature::kWebHID}, {},
-                    {}, {}, FROM_HERE);
-}
-
-IN_PROC_BROWSER_TEST_F(BackForwardCacheWebHidTest,
-                       DoesCacheIfHidAttributeWasAccessed) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Navigate to an empty page.
-  ASSERT_TRUE(
-      NavigateToURL(shell(), embedded_test_server()->GetURL("/title1.html")));
-  RenderFrameHostWrapper rfh_a(current_frame_host());
-
-  // Access navigator.hid without invoking any WebHID API methods.
-  EXPECT_TRUE(ExecJs(current_frame_host(), "navigator.hid"));
-  EXPECT_FALSE(current_frame_host()->GetBackForwardCacheDisablingFeatures().Has(
-      blink::scheduler::WebSchedulerTrackedFeature::kWebHID));
-
-  // Navigate away.
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("b.com", "/title1.html")));
-  EXPECT_TRUE(WaitForLoadStop(shell()->web_contents()));
-  ASSERT_TRUE(!rfh_a.IsDestroyed());
-  EXPECT_TRUE(
-      static_cast<RenderFrameHostImpl*>(rfh_a.get())->IsInBackForwardCache());
-
-  // Go back.
-  ASSERT_TRUE(HistoryGoBack(web_contents()));
-  EXPECT_EQ(current_frame_host(), rfh_a.get());
   ExpectRestored(FROM_HERE);
 }
 
@@ -3835,134 +3703,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheWebBluetoothTest,
   EXPECT_EQ(current_frame_host(), rfh_a.get());
   ExpectRestored(FROM_HERE);
 }
-
-enum class SerialContext {
-  kDocument,
-  kWorker,
-  kNestedWorker,
-};
-
-enum class SerialType {
-  kSerial,
-  kWebUsb,
-};
-
-class BackForwardCacheBrowserWebUsbTest
-    : public BackForwardCacheBrowserTest,
-      public ::testing::WithParamInterface<
-          std::tuple<SerialContext, SerialType>> {
- public:
-  std::string GetJsToUseSerial(SerialContext context, SerialType serial_type) {
-    switch (serial_type) {
-      case SerialType::kSerial:
-        switch (context) {
-          case SerialContext::kDocument:
-            return R"(
-              new Promise(async resolve => {
-                let ports = await navigator.serial.getPorts();
-                resolve("Found " + ports.length + " ports");
-              });
-            )";
-          case SerialContext::kWorker:
-            return R"(
-              new Promise(async resolve => {
-                const worker = new Worker(
-                    "/back_forward_cache/serial/worker.js");
-                worker.onmessage = message => resolve(message.data);
-                worker.postMessage("Run");
-              });
-            )";
-          case SerialContext::kNestedWorker:
-            return R"(
-              new Promise(async resolve => {
-                const worker = new Worker(
-                  "/back_forward_cache/serial/nested-worker.js");
-                worker.onmessage = message => resolve(message.data);
-                worker.postMessage("Run");
-              });
-            )";
-        }
-      case SerialType::kWebUsb:
-        switch (context) {
-          case SerialContext::kDocument:
-            return R"(
-              new Promise(async resolve => {
-                let devices = await navigator.usb.getDevices();
-                resolve("Found " + devices.length + " devices");
-              });
-            )";
-          case SerialContext::kWorker:
-            return R"(
-              new Promise(async resolve => {
-                const worker = new Worker(
-                    "/back_forward_cache/webusb/worker.js");
-                worker.onmessage = message => resolve(message.data);
-                worker.postMessage("Run");
-              });
-            )";
-          case SerialContext::kNestedWorker:
-            return R"(
-              new Promise(async resolve => {
-                const worker = new Worker(
-                  "/back_forward_cache/webusb/nested-worker.js");
-                worker.onmessage = message => resolve(message.data);
-                worker.postMessage("Run");
-              });
-            )";
-        }
-    }
-  }
-};
-
-// Check the BackForwardCache is disabled when the WebUSB feature is used.
-// TODO(crbug.com/40849874): Consider testing in a subframe. This will
-// require adjustments to Permissions Policy.
-IN_PROC_BROWSER_TEST_P(BackForwardCacheBrowserWebUsbTest, Serials) {
-  // WebUSB requires HTTPS.
-  ASSERT_TRUE(CreateHttpsServer()->Start());
-
-  SerialContext context;
-  SerialType serial_type;
-  std::tie(context, serial_type) = GetParam();
-
-  content::BackForwardCacheDisabledTester tester;
-  GURL url(https_server()->GetURL(
-      "a.test", "/cross_site_iframe_factory.html?a.test(a.test)"));
-
-  ASSERT_TRUE(NavigateToURL(shell(), url));
-
-  // Check that the frames we care about are cacheable.
-  RenderFrameHostImplWrapper main_rfh(current_frame_host());
-  RenderFrameHostImplWrapper sub_rfh(
-      current_frame_host()->child_at(0)->current_frame_host());
-  ASSERT_FALSE(main_rfh->IsBackForwardCacheDisabled());
-  ASSERT_FALSE(sub_rfh->IsBackForwardCacheDisabled());
-
-  // Execute script to use WebUSB.
-  ASSERT_EQ(
-      serial_type == SerialType::kSerial ? "Found 0 ports" : "Found 0 devices",
-      content::EvalJs(main_rfh.get(), GetJsToUseSerial(context, serial_type)));
-
-  // Verify that the correct frames are now uncacheable.
-  EXPECT_TRUE(main_rfh->IsBackForwardCacheDisabled());
-  EXPECT_FALSE(sub_rfh->IsBackForwardCacheDisabled());
-  auto expected_reason =
-      serial_type == SerialType::kSerial
-          ? BackForwardCacheDisable::DisabledReasonId::kSerial
-          : BackForwardCacheDisable::DisabledReasonId::kWebUSB;
-  EXPECT_TRUE(tester.IsDisabledForFrameWithReason(
-      main_rfh->GetProcess()->GetDeprecatedID(), main_rfh->GetRoutingID(),
-      BackForwardCacheDisable::DisabledReason(expected_reason)));
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    BackForwardCacheBrowserWebUsbTest,
-    testing::Combine(testing::Values(SerialContext::kDocument,
-                                     SerialContext::kWorker,
-                                     SerialContext::kNestedWorker),
-                     testing::Values(SerialType::kWebUsb,
-                                     SerialType::kSerial)));
 
 // Check that an audio suspends when the page goes to the cache and can resume
 // after restored.

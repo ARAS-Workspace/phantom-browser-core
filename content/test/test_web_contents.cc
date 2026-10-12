@@ -459,30 +459,6 @@ void TestWebContents::SetLastActiveTime(base::Time last_active_time) {
   last_active_time_ = last_active_time;
 }
 
-void TestWebContents::TestIncrementUsbActiveFrameCount() {
-  IncrementUsbActiveFrameCount();
-}
-
-void TestWebContents::TestDecrementUsbActiveFrameCount() {
-  DecrementUsbActiveFrameCount();
-}
-
-void TestWebContents::TestIncrementHidActiveFrameCount() {
-  IncrementHidActiveFrameCount();
-}
-
-void TestWebContents::TestDecrementHidActiveFrameCount() {
-  DecrementHidActiveFrameCount();
-}
-
-void TestWebContents::TestIncrementSerialActiveFrameCount() {
-  IncrementSerialActiveFrameCount();
-}
-
-void TestWebContents::TestDecrementSerialActiveFrameCount() {
-  DecrementSerialActiveFrameCount();
-}
-
 void TestWebContents::TestIncrementBluetoothConnectedDeviceCount() {
   IncrementBluetoothConnectedDeviceCount();
 }

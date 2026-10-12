@@ -42,8 +42,6 @@
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_features.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
-#include "chrome/browser/hid/hid_chooser_context.h"
-#include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/infobars/browser_infobar_manager.h"
 #include "chrome/browser/infobars/infobar_features.h"
 #include "chrome/browser/media/unified_autoplay_config.h"
@@ -52,8 +50,6 @@
 #include "chrome/browser/permissions/system/system_permission_settings.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
-#include "chrome/browser/serial/serial_chooser_context.h"
-#include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/page_info/page_info_infobar_delegate.h"
 #include "chrome/browser/ui/tab_contents/tab_contents_iterator.h"
@@ -61,8 +57,6 @@
 #include "chrome/browser/ui/url_identity.h"
 #include "chrome/browser/ui/webui/settings/recent_site_settings_helper.h"
 #include "chrome/browser/ui/webui/settings/site_settings_helper.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_filter.h"
@@ -162,9 +156,6 @@ constexpr uint16_t kHttpsDefaultPort = 443;
 // Content types for chooser data.
 constexpr ContentSettingsType kChooserDataContentSettingsTypes[] = {
     ContentSettingsType::BLUETOOTH_CHOOSER_DATA,
-    ContentSettingsType::HID_CHOOSER_DATA,
-    ContentSettingsType::SERIAL_CHOOSER_DATA,
-    ContentSettingsType::USB_CHOOSER_DATA,
 };
 
 // Content types related to the double-patterned storage access settings.
@@ -2242,21 +2233,6 @@ void SiteSettingsHandler::ObserveSourcesForProfile(Profile* profile) {
     observations_.AddObservation(map);
   }
 
-  auto* usb_context = UsbChooserContextFactory::GetForProfile(profile);
-  if (!chooser_observations_.IsObservingSource(usb_context)) {
-    chooser_observations_.AddObservation(usb_context);
-  }
-
-  auto* serial_context = SerialChooserContextFactory::GetForProfile(profile);
-  if (!chooser_observations_.IsObservingSource(serial_context)) {
-    chooser_observations_.AddObservation(serial_context);
-  }
-
-  auto* hid_context = HidChooserContextFactory::GetForProfile(profile);
-  if (!chooser_observations_.IsObservingSource(hid_context)) {
-    chooser_observations_.AddObservation(hid_context);
-  }
-
   if (base::FeatureList::IsEnabled(
           features::kWebBluetoothNewPermissionsBackend)) {
     auto* bluetooth_context =
@@ -2284,21 +2260,6 @@ void SiteSettingsHandler::StopObservingSourcesForProfile(Profile* profile) {
   auto* map = HostContentSettingsMapFactory::GetForProfile(profile);
   if (observations_.IsObservingSource(map)) {
     observations_.RemoveObservation(map);
-  }
-
-  auto* usb_context = UsbChooserContextFactory::GetForProfile(profile);
-  if (chooser_observations_.IsObservingSource(usb_context)) {
-    chooser_observations_.RemoveObservation(usb_context);
-  }
-
-  auto* serial_context = SerialChooserContextFactory::GetForProfile(profile);
-  if (chooser_observations_.IsObservingSource(serial_context)) {
-    chooser_observations_.RemoveObservation(serial_context);
-  }
-
-  auto* hid_context = HidChooserContextFactory::GetForProfile(profile);
-  if (chooser_observations_.IsObservingSource(hid_context)) {
-    chooser_observations_.RemoveObservation(hid_context);
   }
 
   if (base::FeatureList::IsEnabled(

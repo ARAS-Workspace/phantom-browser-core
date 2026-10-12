@@ -10,7 +10,6 @@
 #include "components/permissions/contexts/camera_pan_tilt_zoom_permission_context.h"
 #include "components/permissions/contexts/clipboard_permission_context_delegate.h"
 #include "components/permissions/contexts/geolocation_permission_context.h"
-#include "components/permissions/contexts/nfc_permission_context.h"
 #include "components/permissions/permission_manager.h"
 
 namespace content {
@@ -36,8 +35,6 @@ struct PermissionContextDelegates {
   std::unique_ptr<permissions::GeolocationPermissionContext::Delegate>
       geolocation_permission_context_delegate;
   raw_ptr<webrtc::MediaStreamDeviceEnumerator> media_stream_device_enumerator;
-  std::unique_ptr<permissions::NfcPermissionContext::Delegate>
-      nfc_permission_context_delegate;
 
   std::unique_ptr<permissions::ClipboardPermissionContextDelegate>
       clipboard_read_write_permission_context_delegate;

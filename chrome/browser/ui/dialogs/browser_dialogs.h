@@ -133,7 +133,6 @@ void HideTaskManagerViews();
 base::OnceClosure ShowDeviceChooserDialog(
     content::RenderFrameHost* owner,
     std::unique_ptr<permissions::ChooserController> controller);
-bool IsDeviceChooserShowingForTesting(Browser* browser);
 #endif
 
 // Show the prompt to set a window name for browser's window, optionally with

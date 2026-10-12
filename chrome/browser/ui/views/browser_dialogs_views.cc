@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "build/build_config.h"
-#include "chrome/browser/extensions/api/chrome_device_permissions_prompt.h"
 #include "chrome/browser/media/webrtc/select_audio_output_picker.h"
 #include "chrome/browser/task_manager/task_manager_metrics_recorder.h"
 #include "chrome/browser/ui/browser.h"
@@ -35,10 +34,6 @@ void BookmarkEditor::Show(gfx::NativeWindow parent_window,
       profile, details, configuration, std::move(on_save_callback));
   editor->Show(parent_window);
   editor.release();  // BookmarkEditorView is self-deleting
-}
-
-void ChromeUsbDevicePermissionsPrompt::ShowDialog() {
-  ShowDialogViews();
 }
 
 std::unique_ptr<SelectAudioOutputPicker> SelectAudioOutputPicker::Create(

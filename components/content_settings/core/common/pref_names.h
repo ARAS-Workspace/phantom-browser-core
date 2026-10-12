@@ -52,20 +52,14 @@ inline constexpr char kManagedDefaultSensorsSetting[] =
     "profile.managed_default_content_settings.sensors";
 inline constexpr char kManagedDefaultWebBluetoothGuardSetting[] =
     "profile.managed_default_content_settings.web_bluetooth_guard";
-inline constexpr char kManagedDefaultWebUsbGuardSetting[] =
-    "profile.managed_default_content_settings.web_usb_guard";
 inline constexpr char kManagedDefaultFileSystemReadGuardSetting[] =
     "profile.managed_default_content_settings.file_system_read_guard";
 inline constexpr char kManagedDefaultFileSystemWriteGuardSetting[] =
     "profile.managed_default_content_settings.file_system_write_guard";
-inline constexpr char kManagedDefaultSerialGuardSetting[] =
-    "profile.managed_default_content_settings.serial_guard";
 inline constexpr char kManagedDefaultJavaScriptJitSetting[] =
     "profile.managed_default_content_settings.javascript_jit";
 inline constexpr char kManagedDefaultJavaScriptOptimizerSetting[] =
     "profile.managed_default_content_settings.javascript_optimizer";
-inline constexpr char kManagedDefaultWebHidGuardSetting[] =
-    "profile.managed_default_content_settings.web_hid_guard";
 inline constexpr char kManagedDefaultWindowManagementSetting[] =
     "profile.managed_default_content_settings.window_management";
 inline constexpr char kManagedDefaultLocalFontsSetting[] =
@@ -142,12 +136,6 @@ inline constexpr char kManagedSensorsAllowedForUrls[] =
     "profile.managed_sensors_allowed_for_urls";
 inline constexpr char kManagedSensorsBlockedForUrls[] =
     "profile.managed_sensors_blocked_for_urls";
-inline constexpr char kManagedWebUsbAllowDevicesForUrls[] =
-    "profile.managed_web_usb_allow_devices_for_urls";
-inline constexpr char kManagedWebUsbAskForUrls[] =
-    "profile.managed_web_usb_ask_for_urls";
-inline constexpr char kManagedWebUsbBlockedForUrls[] =
-    "profile.managed_web_usb_blocked_for_urls";
 inline constexpr char kManagedFileSystemReadAskForUrls[] =
     "profile.managed_file_system_read_ask_for_urls";
 inline constexpr char kManagedFileSystemReadBlockedForUrls[] =
@@ -158,10 +146,6 @@ inline constexpr char kManagedFileSystemWriteBlockedForUrls[] =
     "profile.managed_file_system_write_blocked_for_urls";
 inline constexpr char kManagedLegacyCookieAccessAllowedForDomains[] =
     "profile.managed_legacy_cookie_access_allowed_for_domains";
-inline constexpr char kManagedSerialAskForUrls[] =
-    "profile.managed_serial_ask_for_urls";
-inline constexpr char kManagedSerialBlockedForUrls[] =
-    "profile.managed_serial_blocked_for_urls";
 inline constexpr char kManagedJavaScriptJitAllowedForSites[] =
     "profile.managed_javascript_jit_allowed_for_sites";
 inline constexpr char kManagedJavaScriptJitBlockedForSites[] =
@@ -170,10 +154,6 @@ inline constexpr char kManagedJavaScriptOptimizerAllowedForSites[] =
     "profile.managed_javascript_optimizer_allowed_for_sites";
 inline constexpr char kManagedJavaScriptOptimizerBlockedForSites[] =
     "profile.managed_javascript_optimizer_blocked_for_sites";
-inline constexpr char kManagedWebHidAskForUrls[] =
-    "profile.managed_web_hid_ask_for_urls";
-inline constexpr char kManagedWebHidBlockedForUrls[] =
-    "profile.managed_web_hid_blocked_for_urls";
 inline constexpr char kManagedWindowManagementAllowedForUrls[] =
     "profile.managed_window_management_allowed_for_urls";
 inline constexpr char kManagedWindowManagementBlockedForUrls[] =

@@ -165,17 +165,6 @@ TEST_F(SiteSettingsCounterTest, OnlyCountContentSettings) {
   EXPECT_EQ(1, GetResult());
 }
 
-// Tests that the counter counts WebUSB settings
-TEST_F(SiteSettingsCounterTest, CountWebUsbSettings) {
-  map()->SetWebsiteSettingDefaultScope(GURL("http://www.google.com"),
-                                       GURL("http://www.google.com"),
-                                       ContentSettingsType::USB_CHOOSER_DATA,
-                                       base::Value(base::Value::Type::DICT));
-
-  counter()->Restart();
-  EXPECT_EQ(1, GetResult());
-}
-
 // Tests that the counter counts approximate Geolocation settings
 TEST_F(SiteSettingsCounterTest, CountGeolocationSettings) {
   map()->SetPermissionSettingDefaultScope(

@@ -36,8 +36,6 @@ namespace extensions {
 namespace api {
 class BluetoothSocketApiFunction;
 class BluetoothSocketEventDispatcher;
-class SerialConnectFunction;
-class SerialPortManager;
 class TCPServerSocketEventDispatcher;
 class TCPSocketEventDispatcher;
 class UDPSocketEventDispatcher;
@@ -177,8 +175,6 @@ class ApiResourceManager : public BrowserContextKeyedAPI,
   friend class BluetoothAPI;
   friend class api::BluetoothSocketApiFunction;
   friend class api::BluetoothSocketEventDispatcher;
-  friend class api::SerialConnectFunction;
-  friend class api::SerialPortManager;
   friend class api::TCPServerSocketEventDispatcher;
   friend class api::TCPSocketEventDispatcher;
   friend class api::UDPSocketEventDispatcher;

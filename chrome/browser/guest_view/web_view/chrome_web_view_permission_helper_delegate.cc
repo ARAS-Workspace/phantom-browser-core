@@ -421,45 +421,6 @@ void ChromeWebViewPermissionHelperDelegate::OnGeolocationPermissionResponse(
                                  blink::PermissionType::GEOLOCATION);
 }
 
-void ChromeWebViewPermissionHelperDelegate::RequestHidPermission(
-    const GURL& requesting_frame_url,
-    base::OnceCallback<void(bool)> callback) {
-  // Controlled Frame embedders have permissions policy. Permission can
-  // only be granted if the embedder's permissions policy allows for both the
-  // requesting origin and the embedder origin.
-  if (web_view_guest()->IsOwnedByControlledFrameEmbedder()) {
-    if (!web_view_guest()->attached()) {
-      std::move(callback).Run(false);
-      return;
-    }
-    if (!IsFeatureEnabledByEmbedderPermissionsPolicy(
-            web_view_guest(), network::mojom::PermissionsPolicyFeature::kHid,
-            url::Origin::Create(requesting_frame_url))) {
-      std::move(callback).Run(false);
-      return;
-    }
-  }
-
-  auto request_info =
-      base::DictValue().Set(guest_view::kUrl, requesting_frame_url.spec());
-
-  WebViewPermissionHelper::PermissionResponseCallback permission_callback =
-      base::BindOnce(
-          &ChromeWebViewPermissionHelperDelegate::OnHidPermissionResponse,
-          weak_factory_.GetWeakPtr(), std::move(callback));
-  web_view_permission_helper()->RequestPermission(
-      WEB_VIEW_PERMISSION_TYPE_HID, std::move(request_info),
-      std::move(permission_callback), false /* allowed_by_default */);
-}
-
-void ChromeWebViewPermissionHelperDelegate::OnHidPermissionResponse(
-    base::OnceCallback<void(bool)> callback,
-    bool allow,
-    const std::string& user_input) {
-
-  std::move(callback).Run(allow && web_view_guest()->attached());
-}
-
 void ChromeWebViewPermissionHelperDelegate::RequestFileSystemPermission(
     const GURL& url,
     bool allowed_by_default,

@@ -155,7 +155,6 @@
 #include "chrome/browser/resource_coordinator/tab_manager.h"
 #include "chrome/browser/ui/uma_browsing_activity_observer.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
-#include "chrome/browser/usb/web_usb_detector.h"
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "sql/database.h"
@@ -1364,14 +1363,6 @@ void ChromeBrowserMainParts::PostBrowserStart() {
       base::BindOnce(&WebRtcLogUtil::DeleteOldWebRtcLogFilesForAllProfiles),
       base::Minutes(1));
 
-  if (base::FeatureList::IsEnabled(features::kWebUsb)) {
-    web_usb_detector_ = std::make_unique<WebUsbDetector>();
-    content::GetUIThreadTaskRunner({base::TaskPriority::BEST_EFFORT})
-        ->PostTask(FROM_HERE,
-                   base::BindOnce(&WebUsbDetector::Initialize,
-                                  base::Unretained(web_usb_detector_.get())));
-  }
-
   if (base::FeatureList::IsEnabled(features::kImprovedStartupBestEffortDelay)) {
     first_idle_ref_ = AfterStartupTaskUtils::RegisterStartupInProgressRef(
         StartupIsCompleteReason::kFirstIdle);
@@ -1763,8 +1754,6 @@ void ChromeBrowserMainParts::PostMainMessageLoopRun() {
     shutdown_watcher_ = std::make_unique<ShutdownWatcherHelper>();
     shutdown_watcher_->Arm(kShutdownHangDelay);
   }
-
-  web_usb_detector_.reset();
 
   for (auto& chrome_extra_part : chrome_extra_parts_) {
     chrome_extra_part->PostMainMessageLoopRun();

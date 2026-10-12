@@ -94,7 +94,6 @@ if (!is_ios) {
       "//media/midi:mojo_js_data_deps",
       "//services/device/public/mojom:generic_sensor_js_data_deps",
       "//services/device/public/mojom:mojom_js_data_deps",
-      "//services/device/public/mojom:usb_js_data_deps",
       "//services/shape_detection/public/mojom:mojom_js_data_deps",
       "//skia/public/mojom:mojom_js_data_deps",
       "//third_party/blink/public/mojom:mojom_platform_js_data_deps",

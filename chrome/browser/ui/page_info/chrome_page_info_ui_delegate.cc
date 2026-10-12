@@ -73,10 +73,7 @@ bool ChromePageInfoUiDelegate::ShouldShowAllow(ContentSettingsType type) {
     case ContentSettingsType::MEDIASTREAM_CAMERA:
       return network::IsUrlPotentiallyTrustworthy(site_url_);
     // Chooser permissions do not support CONTENT_SETTING_ALLOW.
-    case ContentSettingsType::SERIAL_GUARD:
-    case ContentSettingsType::USB_GUARD:
     case ContentSettingsType::BLUETOOTH_GUARD:
-    case ContentSettingsType::HID_GUARD:
     // Bluetooth scanning does not support CONTENT_SETTING_ALLOW.
     case ContentSettingsType::BLUETOOTH_SCANNING:
     // File system write does not support CONTENT_SETTING_ALLOW.

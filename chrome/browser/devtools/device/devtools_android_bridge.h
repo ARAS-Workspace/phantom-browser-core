@@ -24,7 +24,6 @@
 #include "components/prefs/pref_change_registrar.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/devtools_agent_host.h"
-#include "mojo/public/cpp/bindings/pending_remote.h"
 
 
 namespace content {
@@ -85,16 +84,6 @@ class DevToolsAndroidBridge : public KeyedService {
   void AddDeviceListListener(DeviceListListener* listener);
   void RemoveDeviceListListener(DeviceListListener* listener);
 
-  class DeviceCountListener {
-   public:
-    virtual void DeviceCountChanged(int count) = 0;
-   protected:
-    virtual ~DeviceCountListener() = default;
-  };
-
-  void AddDeviceCountListener(DeviceCountListener* listener);
-  void RemoveDeviceCountListener(DeviceCountListener* listener);
-
   using PortStatus = int;
   using PortStatusMap = std::map<int, PortStatus>;
   using BrowserStatus = std::pair<scoped_refptr<RemoteBrowser>, PortStatusMap>;
@@ -137,8 +126,6 @@ class DevToolsAndroidBridge : public KeyedService {
   using TCPProviderCallback =
       base::RepeatingCallback<void(scoped_refptr<TCPDeviceProvider>)>;
   void set_tcp_provider_callback_for_test(TCPProviderCallback callback);
-  void set_usb_device_manager_for_test(
-      mojo::PendingRemote<device::mojom::UsbDeviceManager> fake_usb_manager);
 
   void Shutdown() override;
 
@@ -153,11 +140,6 @@ class DevToolsAndroidBridge : public KeyedService {
   bool NeedsDeviceListPolling();
 
   void ReceivedDeviceList(const CompleteDevices& complete_devices);
-
-  void StartDeviceCountPolling();
-  void StopDeviceCountPolling();
-  void RequestDeviceCount(base::RepeatingCallback<void(int)> callback);
-  void ReceivedDeviceCount(int count);
 
   void CreateDeviceProviders();
 
@@ -176,10 +158,6 @@ class DevToolsAndroidBridge : public KeyedService {
       std::vector<raw_ptr<DeviceListListener, VectorExperimental>>;
   DeviceListListeners device_list_listeners_;
 
-  using DeviceCountListeners =
-      std::vector<raw_ptr<DeviceCountListener, VectorExperimental>>;
-  DeviceCountListeners device_count_listeners_;
-  base::CancelableRepeatingCallback<void(int)> device_count_callback_;
   base::RepeatingCallback<void(base::OnceClosure)> task_scheduler_;
 
   using PortForwardingListeners =

@@ -94,7 +94,6 @@
 #include "chrome/browser/favicon/favicon_utils.h"
 #include "chrome/browser/font_family_cache.h"
 #include "chrome/browser/headless/headless_mode_util.h"
-#include "chrome/browser/hid/chrome_hid_delegate.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/loader/keep_alive_request_tracker.h"
@@ -153,7 +152,6 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sensor/chrome_sensor_delegate.h"
-#include "chrome/browser/serial/chrome_serial_delegate.h"
 #include "chrome/browser/signin/chrome_signin_proxying_url_loader_factory.h"
 #include "chrome/browser/signin/chrome_signin_url_loader_throttle.h"
 #include "chrome/browser/signin/header_modification_delegate_impl.h"
@@ -183,7 +181,6 @@
 #include "chrome/browser/ui/webui/internal_debug_pages_disabled/internal_debug_pages_disabled_ui.h"
 #include "chrome/browser/ui/webui/log_web_ui_url.h"
 #include "chrome/browser/universal_web_contents_observers.h"
-#include "chrome/browser/usb/chrome_usb_delegate.h"
 #include "chrome/browser/vr/vr_tab_helper.h"
 #include "chrome/browser/webauthn/chrome_web_authentication_delegate_base.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
@@ -5321,20 +5318,6 @@ content::BluetoothDelegate* ChromeContentBrowserClient::GetBluetoothDelegate() {
   return bluetooth_delegate_.get();
 }
 
-content::UsbDelegate* ChromeContentBrowserClient::GetUsbDelegate() {
-  if (!usb_delegate_) {
-    usb_delegate_ = std::make_unique<ChromeUsbDelegate>();
-  }
-  return usb_delegate_.get();
-}
-
-content::SerialDelegate* ChromeContentBrowserClient::GetSerialDelegate() {
-  if (!serial_delegate_) {
-    serial_delegate_ = std::make_unique<ChromeSerialDelegate>();
-  }
-  return serial_delegate_.get();
-}
-
 bool ChromeContentBrowserClient::IsSecurityLevelAcceptableForWebAuthn(
     content::RenderFrameHost* rfh,
     const url::Origin& caller_origin) {
@@ -5392,13 +5375,6 @@ ChromeContentBrowserClient::GetWebAuthenticationDelegate() {
         std::make_unique<ChromeWebAuthenticationDelegate>();
   }
   return web_authentication_delegate_.get();
-}
-
-content::HidDelegate* ChromeContentBrowserClient::GetHidDelegate() {
-  if (!hid_delegate_) {
-    hid_delegate_ = std::make_unique<ChromeHidDelegate>();
-  }
-  return hid_delegate_.get();
 }
 
 void ChromeContentBrowserClient::CreateDeviceInfoService(

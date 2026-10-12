@@ -2093,15 +2093,6 @@ _CONFIG = [
     },
     {
         'paths': [
-            'third_party/blink/renderer/modules/nfc/nfc_parser_ios.mm',
-        ],
-        'allowed': [
-            'base::apple::NSDataToSpan',
-            'device::MapCoreNFCFormat',
-        ]
-    },
-    {
-        'paths': [
             'third_party/blink/renderer/modules/imagecapture/',
         ],
         'allowed': [

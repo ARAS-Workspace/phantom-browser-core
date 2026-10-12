@@ -210,74 +210,6 @@ class HostListFormatter : public ChromePermissionMessageFormatter {
   int message_id_for_many_hosts_;
 };
 
-class USBDevicesFormatter : public ChromePermissionMessageFormatter {
- public:
-  USBDevicesFormatter() = default;
-
-  USBDevicesFormatter(const USBDevicesFormatter&) = delete;
-  USBDevicesFormatter& operator=(const USBDevicesFormatter&) = delete;
-
-  ~USBDevicesFormatter() override = default;
-
-  PermissionMessage GetPermissionMessage(
-      const PermissionIDSet& permissions) const override {
-    DCHECK(permissions.size() > 0);
-    return permissions.size() == 1 ? GetItemMessage(permissions)
-                                   : GetMultiItemMessage(permissions);
-  }
-
- private:
-  PermissionMessage GetItemMessage(const PermissionIDSet& permissions) const {
-    DCHECK(permissions.size() == 1);
-    const PermissionID& permission = *permissions.begin();
-    std::u16string msg;
-    switch (permission.id()) {
-      case APIPermissionID::kUsbDevice:
-        msg = l10n_util::GetStringFUTF16(
-            IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE, permission.parameter());
-        break;
-      case APIPermissionID::kUsbDeviceUnknownProduct:
-        msg = l10n_util::GetStringFUTF16(
-            IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_UNKNOWN_PRODUCT,
-            permission.parameter());
-        break;
-      case APIPermissionID::kUsbDeviceUnknownVendor:
-        msg = l10n_util::GetStringUTF16(
-            IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_UNKNOWN_VENDOR);
-        break;
-      default:
-        NOTREACHED();
-    }
-    return PermissionMessage(msg, permissions);
-  }
-
-  PermissionMessage GetMultiItemMessage(
-      const PermissionIDSet& permissions) const {
-    DCHECK(permissions.size() > 1);
-    // Put all the individual items into submessages.
-    std::vector<std::u16string> submessages =
-        permissions.GetAllPermissionsWithID(APIPermissionID::kUsbDevice)
-            .GetAllPermissionParameters();
-    std::vector<std::u16string> vendors =
-        permissions
-            .GetAllPermissionsWithID(APIPermissionID::kUsbDeviceUnknownProduct)
-            .GetAllPermissionParameters();
-    for (const std::u16string& vendor : vendors) {
-      submessages.push_back(l10n_util::GetStringFUTF16(
-          IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_LIST_ITEM_UNKNOWN_PRODUCT,
-          vendor));
-    }
-    if (permissions.ContainsID(APIPermissionID::kUsbDeviceUnknownVendor)) {
-      submessages.push_back(l10n_util::GetStringUTF16(
-          IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_LIST_ITEM_UNKNOWN_VENDOR));
-    }
-
-    return PermissionMessage(
-        l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_WARNING_USB_DEVICE_LIST),
-        permissions, submessages);
-  }
-};
-
 int GetEnterpriseReportingPrivatePermissionMessageId() {
 #if BUILDFLAG(IS_LINUX) or BUILDFLAG(IS_MAC)
   return IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_REPORTING_PRIVATE_ENABLED_LINUX_AND_MACOS;
@@ -513,19 +445,6 @@ ChromePermissionMessageRule::GetAllRules() {
        {}},
 
       // Devices-related messages.
-      // USB Device Permission rules. Think of these three rules as a single one
-      // that applies when any of the three kUsb* IDs is there, and pulls them
-      // all into a single formatter.
-      {std::make_unique<USBDevicesFormatter>(),
-       {APIPermissionID::kUsbDevice},
-       {APIPermissionID::kUsbDeviceUnknownProduct,
-        APIPermissionID::kUsbDeviceUnknownVendor}},
-      {std::make_unique<USBDevicesFormatter>(),
-       {APIPermissionID::kUsbDeviceUnknownProduct},
-       {APIPermissionID::kUsbDeviceUnknownVendor}},
-      {std::make_unique<USBDevicesFormatter>(),
-       {APIPermissionID::kUsbDeviceUnknownVendor},
-       {}},
       // Access to users' devices should provide a single warning message
       // specifying the transport method used; serial and/or Bluetooth.
       {IDS_EXTENSION_PROMPT_WARNING_BLUETOOTH_SERIAL,

@@ -153,15 +153,6 @@ class TestWebContents : public WebContentsImpl, public WebContentsTester {
   void SetLastActiveTimeTicks(base::TimeTicks last_active_time_ticks) override;
   void SetLastActiveTime(base::Time last_active_time) override;
 
-  void TestIncrementUsbActiveFrameCount() override;
-  void TestDecrementUsbActiveFrameCount() override;
-
-  void TestIncrementHidActiveFrameCount() override;
-  void TestDecrementHidActiveFrameCount() override;
-
-  void TestIncrementSerialActiveFrameCount() override;
-  void TestDecrementSerialActiveFrameCount() override;
-
   void TestIncrementBluetoothConnectedDeviceCount() override;
   void TestDecrementBluetoothConnectedDeviceCount() override;
 

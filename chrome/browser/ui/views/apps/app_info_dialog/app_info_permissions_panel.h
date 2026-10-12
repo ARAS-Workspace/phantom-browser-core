@@ -53,11 +53,6 @@ class AppInfoPermissionsPanel : public AppInfoPanel {
   std::u16string GetRetainedFileHeading() const;
   std::vector<std::u16string> GetRetainedFilePaths() const;
   void RevokeFilePermissions();
-
-  int GetRetainedDeviceCount() const;
-  std::u16string GetRetainedDeviceHeading() const;
-  std::vector<std::u16string> GetRetainedDevices() const;
-  void RevokeDevicePermissions();
 };
 
 BEGIN_VIEW_BUILDER(/* no export */, AppInfoPermissionsPanel, AppInfoPanel)

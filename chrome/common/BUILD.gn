@@ -286,7 +286,6 @@ static_library("common_lib") {
         "//chrome/common/extensions/api:extensions_features",
         "//extensions/common/api",
         "//extensions/strings",
-        "//services/device/public/cpp/usb",
       ]
     }
   }

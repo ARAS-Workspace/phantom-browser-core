@@ -30,8 +30,6 @@
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_delegate.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_ui_delegate.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
@@ -72,8 +70,6 @@
 #include "net/test/cert_test_util.h"
 #include "net/test/test_certificate_data.h"
 #include "net/test/test_data_directory.h"
-#include "services/device/public/cpp/test/fake_usb_device_manager.h"
-#include "services/device/public/mojom/usb_device.mojom.h"
 #include "services/media_session/public/mojom/media_session.mojom.h"
 #include "services/network/public/cpp/features.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -880,37 +876,6 @@ TEST_F(PageInfoTest, OnPermissionsChanged) {
                                        /*setting=*/std::nullopt,
                                        /*requesting_origin=*/std::nullopt,
                                        /*is_one_time=*/false);
-}
-
-TEST_F(PageInfoTest, OnChosenObjectDeleted) {
-  // Connect the UsbChooserContext with FakeUsbDeviceManager.
-  device::FakeUsbDeviceManager usb_device_manager;
-  mojo::PendingRemote<device::mojom::UsbDeviceManager> device_manager;
-  usb_device_manager.AddReceiver(
-      device_manager.InitWithNewPipeAndPassReceiver());
-  UsbChooserContext* store = UsbChooserContextFactory::GetForProfile(profile());
-  store->SetDeviceManagerForTesting(std::move(device_manager));
-
-  auto device_info = usb_device_manager.CreateAndAddDevice(
-      0, 0, "Google", "Gizmo", "1234567890");
-  store->GrantDevicePermission(origin(), *device_info);
-
-  EXPECT_CALL(*mock_ui(), SetIdentityInfo(_));
-  ExpectInitialSetCookieInfoCall(mock_ui());
-
-  // Access PageInfo so that SetPermissionInfo is called once to populate
-  // |last_chosen_object_info_|. It will be called again by
-  // OnSiteChosenObjectDeleted.
-  EXPECT_CALL(*mock_ui(), SetPermissionInfoStub()).Times(2);
-  page_info();
-
-  ASSERT_EQ(1u, last_chosen_object_info().size());
-  const PageInfoUI::ChosenObjectInfo* info = last_chosen_object_info()[0].get();
-  page_info()->OnSiteChosenObjectDeleted(
-      *info->ui_info, base::Value(info->chooser_object->value.Clone()));
-
-  EXPECT_FALSE(store->HasDevicePermission(origin(), *device_info));
-  EXPECT_EQ(0u, last_chosen_object_info().size());
 }
 
 // Tests that the Safety Tip info of the visible security state reaches the

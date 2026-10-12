@@ -25,26 +25,17 @@
 #include "components/cloud_devices/common/printer_description.h"
 #include "components/device_event_log/device_event_log.h"
 #include "components/prefs/pref_service.h"
-#include "extensions/browser/api/device_permissions_manager.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api_factory.h"
 #include "extensions/browser/api/printer_provider/printer_provider_print_job.h"
-#include "extensions/browser/api/usb/usb_device_manager.h"
 #include "extensions/browser/extension_registry.h"
-#include "extensions/common/api/printer_provider/usb_printer_manifest_data.h"
 #include "extensions/common/permissions/permissions_data.h"
-#include "extensions/common/permissions/usb_device_permission.h"
-#include "extensions/common/permissions/usb_device_permission_data.h"
 #include "printing/print_job_constants.h"
 #include "printing/pwg_raster_settings.h"
-#include "services/device/public/mojom/usb_device.mojom.h"
 #include "ui/gfx/geometry/size.h"
 
-using extensions::DevicePermissionsManager;
 using extensions::Extension;
 using extensions::ExtensionRegistry;
-using extensions::UsbDeviceManager;
-using extensions::UsbPrinterManifestData;
 
 namespace printing {
 
@@ -57,8 +48,6 @@ const char kContentTypeAll[] = "*/*";
 const char kInvalidDataPrintError[] = "INVALID_DATA";
 const char kInvalidTicketPrintError[] = "INVALID_TICKET";
 
-const char kProvisionalUsbLabel[] = "provisional-usb";
-
 // Updates |job| with raster data. Returns the updated print job.
 void UpdateJobFileInfo(std::unique_ptr<extensions::PrinterProviderPrintJob> job,
                        ExtensionPrinterHandler::PrintJobCallback callback,
@@ -69,33 +58,6 @@ void UpdateJobFileInfo(std::unique_ptr<extensions::PrinterProviderPrintJob> job,
     job->document_bytes = data;
   }
   std::move(callback).Run(std::move(job));
-}
-
-bool HasUsbPrinterProviderPermissions(const Extension* extension) {
-  return false;
-}
-
-std::string GenerateProvisionalUsbPrinterId(
-    const Extension* extension,
-    const device::mojom::UsbDeviceInfo& device) {
-  return base::StringPrintf("%s:%s:%s", kProvisionalUsbLabel,
-                            extension->id().c_str(), device.guid.c_str());
-}
-
-struct ProvisionalUsbPrinter {
-  std::string extension_id;
-  std::string device_guid;
-};
-
-std::optional<ProvisionalUsbPrinter> ParseProvisionalUsbPrinterId(
-    const std::string& printer_id) {
-  std::vector<std::string> components = base::SplitString(
-      printer_id, ":", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
-  if (components.size() != 3 || components[0] != kProvisionalUsbLabel) {
-    return std::nullopt;
-  }
-  return ProvisionalUsbPrinter{.extension_id = std::move(components[1]),
-                               .device_guid = std::move(components[2])};
 }
 
 extensions::PrinterProviderAPI* GetPrinterProviderAPI(Profile* profile) {
@@ -158,27 +120,6 @@ void ExtensionPrinterHandler::StartGetPrinters(
   done_callback_ = std::move(done_callback);
   PRINTER_LOG(EVENT) << "ExtensionPrinterHandler::StartGetPrinters() called";
 
-  bool extension_supports_usb_printers = false;
-  ExtensionRegistry* registry = ExtensionRegistry::Get(profile_);
-  for (const auto& extension : registry->enabled_extensions()) {
-    if (UsbPrinterManifestData::Get(extension.get()) &&
-        HasUsbPrinterProviderPermissions(extension.get())) {
-      extension_supports_usb_printers = true;
-      break;
-    }
-  }
-
-  if (extension_supports_usb_printers) {
-    PRINTER_LOG(EVENT) << "ExtensionPrinterHandler::StartGetPrinters() - "
-                       << "usb printers detected";
-    pending_enumeration_count_++;
-    UsbDeviceManager* usb_manager = UsbDeviceManager::Get(profile_);
-    DCHECK(usb_manager);
-    usb_manager->GetDevices(
-        base::BindOnce(&ExtensionPrinterHandler::OnUsbDevicesEnumerated,
-                       weak_ptr_factory_.GetWeakPtr(), callback));
-  }
-
   GetPrinterProviderAPI(profile_)->DispatchGetPrintersRequested(
       base::BindRepeating(&ExtensionPrinterHandler::WrapGetPrintersCallback,
                           weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
@@ -239,29 +180,7 @@ void ExtensionPrinterHandler::StartPrint(
 void ExtensionPrinterHandler::StartGrantPrinterAccess(
     const std::string& printer_id,
     GetPrinterInfoCallback callback) {
-  std::optional<ProvisionalUsbPrinter> printer =
-      ParseProvisionalUsbPrinterId(printer_id);
-  if (!printer.has_value()) {
-    std::move(callback).Run(base::DictValue());
-    return;
-  }
-
-  const device::mojom::UsbDeviceInfo* device =
-      UsbDeviceManager::Get(profile_)->GetDeviceInfo(
-          printer.value().device_guid);
-  if (!device) {
-    std::move(callback).Run(base::DictValue());
-    return;
-  }
-
-  DevicePermissionsManager* permissions_manager =
-      DevicePermissionsManager::Get(profile_);
-  permissions_manager->AllowUsbDevice(printer.value().extension_id, *device);
-
-  GetPrinterProviderAPI(profile_)->DispatchGetUsbPrinterInfoRequested(
-      printer.value().extension_id, *device,
-      base::BindOnce(&ExtensionPrinterHandler::WrapGetPrinterInfoCallback,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
+  std::move(callback).Run(base::DictValue());
 }
 
 void ExtensionPrinterHandler::SetPwgRasterConverterForTesting(
@@ -350,72 +269,6 @@ void ExtensionPrinterHandler::WrapGetCapabilityCallback(
 void ExtensionPrinterHandler::WrapPrintCallback(PrintCallback callback,
                                                 const base::Value& status) {
   std::move(callback).Run(status);
-}
-
-void ExtensionPrinterHandler::WrapGetPrinterInfoCallback(
-    GetPrinterInfoCallback callback,
-    base::DictValue printer_info) {
-  std::move(callback).Run(std::move(printer_info));
-}
-
-void ExtensionPrinterHandler::OnUsbDevicesEnumerated(
-    AddedPrintersCallback callback,
-    std::vector<device::mojom::UsbDeviceInfoPtr> devices) {
-  PRINTER_LOG(EVENT) << "ExtensionPrinterHandler::OnUsbDevicesEnumerated() "
-                     << " called";
-  ExtensionRegistry* registry = ExtensionRegistry::Get(profile_);
-  DevicePermissionsManager* permissions_manager =
-      DevicePermissionsManager::Get(profile_);
-
-  base::ListValue printer_list;
-
-  for (const auto& extension : registry->enabled_extensions()) {
-    const UsbPrinterManifestData* manifest_data =
-        UsbPrinterManifestData::Get(extension.get());
-    if (!manifest_data || !HasUsbPrinterProviderPermissions(extension.get())) {
-      continue;
-    }
-
-    const extensions::DevicePermissions* device_permissions =
-        permissions_manager->GetForExtension(extension->id());
-    for (const auto& device : devices) {
-      if (manifest_data->SupportsDevice(*device)) {
-        std::unique_ptr<extensions::UsbDevicePermission::CheckParam> param =
-            extensions::UsbDevicePermission::CheckParam::ForUsbDevice(
-                extension.get(), *device);
-        if (device_permissions->FindUsbDeviceEntry(*device) ||
-            extension->permissions_data()->CheckAPIPermissionWithParam(
-                extensions::mojom::APIPermissionID::kUsbDevice, param.get())) {
-          // Skip devices the extension already has permission to access.
-          continue;
-        }
-
-        printer_list.Append(
-            base::DictValue()
-                .Set("id",
-                     GenerateProvisionalUsbPrinterId(extension.get(), *device))
-                .Set("name",
-                     DevicePermissionsManager::GetPermissionMessage(
-                         device->vendor_id, device->product_id,
-                         device->manufacturer_name.value_or(std::u16string()),
-                         device->product_name.value_or(std::u16string()),
-                         std::u16string(), false))
-                .Set("extensionId", extension->id())
-                .Set("extensionName", extension->name())
-                .Set("provisional", true));
-      }
-    }
-  }
-
-  DCHECK_GT(pending_enumeration_count_, 0);
-  pending_enumeration_count_--;
-  base::ListValue list = std::move(printer_list);
-  if (!list.empty()) {
-    callback.Run(std::move(list));
-  }
-  if (pending_enumeration_count_ == 0) {
-    std::move(done_callback_).Run();
-  }
 }
 
 }  // namespace printing

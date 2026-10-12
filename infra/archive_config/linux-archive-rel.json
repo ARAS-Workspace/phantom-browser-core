@@ -108,7 +108,6 @@
                 "gen/services/device/public/mojom/nfc.mojom.m.js",
                 "gen/services/device/public/mojom/pressure_manager.mojom.m.js",
                 "gen/services/device/public/mojom/pressure_update.mojom.m.js",
-                "gen/services/device/public/mojom/serial.mojom.m.js",
                 "gen/services/viz/public/mojom/compositing/internal/singleplanar_format.mojom.m.js",
                 "gen/services/viz/public/mojom/compositing/shared_image_format.mojom.m.js",
                 "gen/skia/public/mojom/bitmap.mojom.m.js",
@@ -118,9 +117,7 @@
                 "gen/third_party/blink/public/mojom/contacts/contacts_manager.mojom.m.js",
                 "gen/third_party/blink/public/mojom/content_index/content_index.mojom.m.js",
                 "gen/third_party/blink/public/mojom/idle/idle_manager.mojom.m.js",
-                "gen/third_party/blink/public/mojom/serial/serial.mojom.m.js",
                 "gen/third_party/blink/public/mojom/sms/webotp_service.mojom.m.js",
-                "gen/third_party/blink/public/mojom/usb/web_usb_service.mojom.m.js",
                 "gen/ui/display/mojom/display.mojom.m.js",
                 "gen/ui/gfx/geometry/mojom/geometry.mojom.m.js",
                 "gen/url/mojom/origin.mojom.m.js",
@@ -129,7 +126,6 @@
             "file_globs": [
                 "gen/gpu/ipc/common/mailbox*.mojom.m.js",
                 "gen/mojo/public/mojom/base/*.mojom.m.js",
-                "gen/services/device/public/mojom/usb_*.mojom.m.js",
                 "gen/services/shape_detection/public/mojom/*.mojom.m.js",
                 "gen/ui/gfx/mojom/*.mojom.m.js"
             ],

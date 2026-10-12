@@ -178,9 +178,7 @@ component("fido") {
 
     deps += [
       "//services/device/public/cpp/hid",
-      "//services/device/public/cpp/usb",
       "//services/device/public/mojom",
-      "//services/device/public/mojom:usb",
     ]
 
     if (is_mac) {

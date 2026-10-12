@@ -434,24 +434,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                          ? vector_icons::kSensorsIcon
                          : vector_icons::kSensorsChromeRefreshOldIcon);
       break;
-    case ContentSettingsType::USB_GUARD:
-      icon = show_blocked_badge
-                 ? &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kUsbOffIcon
-                         : vector_icons::kUsbOffChromeRefreshOldIcon)
-                 : &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kUsbIcon
-                         : vector_icons::kUsbChromeRefreshOldIcon);
-      break;
-    case ContentSettingsType::SERIAL_GUARD:
-      icon = show_blocked_badge
-                 ? &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kDeveloperBoardOffIcon
-                         : vector_icons::kSerialPortOffChromeRefreshOldIcon)
-                 : &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kDeveloperBoardIcon
-                         : vector_icons::kSerialPortChromeRefreshOldIcon);
-      break;
     case ContentSettingsType::BLUETOOTH_GUARD:
       icon = show_blocked_badge
                  ? &(features::IsRoundedIconsEnabled()
@@ -522,15 +504,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                  : &(features::IsRoundedIconsEnabled()
                          ? vector_icons::kFontDownloadIcon
                          : vector_icons::kFontDownloadChromeRefreshOldIcon);
-      break;
-    case ContentSettingsType::HID_GUARD:
-      icon = show_blocked_badge
-                 ? &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kVideogameAssetOffIcon
-                         : vector_icons::kVideogameAssetOffChromeRefreshOldIcon)
-                 : &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kVideogameAssetIcon
-                         : vector_icons::kVideogameAssetChromeRefreshOldIcon);
       break;
     case ContentSettingsType::IDLE_DETECTION:
       icon = show_blocked_badge ? &(features::IsRoundedIconsEnabled()
@@ -689,15 +662,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
           &(features::IsRoundedIconsEnabled() ? vector_icons::kSensorsIcon
                                               : vector_icons::kSensorsOldIcon);
       break;
-    case ContentSettingsType::USB_GUARD:
-      icon = &(features::IsRoundedIconsEnabled() ? vector_icons::kUsbIcon
-                                                 : vector_icons::kUsbOldIcon);
-      break;
-    case ContentSettingsType::SERIAL_GUARD:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kDeveloperBoardIcon
-                   : vector_icons::kSerialPortOldIcon);
-      break;
     case ContentSettingsType::BLUETOOTH_GUARD:
       icon = &(features::IsRoundedIconsEnabled()
                    ? vector_icons::kBluetoothIcon
@@ -732,11 +696,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
       icon = &(features::IsRoundedIconsEnabled()
                    ? vector_icons::kFontDownloadIcon
                    : vector_icons::kFontDownloadOldIcon);
-      break;
-    case ContentSettingsType::HID_GUARD:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kVideogameAssetFilledIcon
-                   : vector_icons::kVideogameAssetOldIcon);
       break;
     case ContentSettingsType::IDLE_DETECTION:
       icon =
@@ -798,29 +757,10 @@ const ui::ImageModel PageInfoViewFactory::GetChosenObjectIcon(
   // change the icon to one that reflects that status.
   const gfx::VectorIcon* icon = &gfx::VectorIcon::EmptyIcon();
   switch (object.ui_info->content_settings_type) {
-    case ContentSettingsType::USB_CHOOSER_DATA:
-      icon = &(features::IsRoundedIconsEnabled() ? vector_icons::kUsbIcon
-                                                 : vector_icons::kUsbOldIcon);
-      break;
-    case ContentSettingsType::SERIAL_CHOOSER_DATA:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kDeveloperBoardIcon
-                   : vector_icons::kSerialPortOldIcon);
-      break;
     case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
       icon = &(features::IsRoundedIconsEnabled()
                    ? vector_icons::kBluetoothIcon
                    : vector_icons::kBluetoothOldIcon);
-      break;
-    case ContentSettingsType::HID_CHOOSER_DATA:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kVideogameAssetFilledIcon
-                   : vector_icons::kVideogameAssetOldIcon);
-      break;
-    case ContentSettingsType::SMART_CARD_DATA:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kSmartCardReaderIcon
-                   : vector_icons::kSmartCardReaderOldIcon);
       break;
     default:
       // All other content settings types do not represent chosen object

@@ -175,14 +175,6 @@ ScriptExecutor* ExtensionsBrowserClient::GetScriptExecutorForTab(
   return nullptr;
 }
 
-bool ExtensionsBrowserClient::IsUsbDeviceAllowedByPolicy(
-    content::BrowserContext* context,
-    const ExtensionId& extension_id,
-    int vendor_id,
-    int product_id) const {
-  return false;
-}
-
 void ExtensionsBrowserClient::GetFavicon(
     content::BrowserContext* browser_context,
     const Extension* extension,

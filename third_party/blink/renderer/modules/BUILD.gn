@@ -100,7 +100,6 @@ component("modules") {
     "//third_party/blink/renderer/modules/file_system_access",
     "//third_party/blink/renderer/modules/font_access",
     "//third_party/blink/renderer/modules/handwriting",
-    "//third_party/blink/renderer/modules/hid",
     "//third_party/blink/renderer/modules/idle",
     "//third_party/blink/renderer/modules/imagecapture",
     "//third_party/blink/renderer/modules/image_downloader",
@@ -122,7 +121,6 @@ component("modules") {
     "//third_party/blink/renderer/modules/ml",
     "//third_party/blink/renderer/modules/navigatorcontentutils",
     "//third_party/blink/renderer/modules/netinfo",
-    "//third_party/blink/renderer/modules/nfc",
     "//third_party/blink/renderer/modules/notifications",
     "//third_party/blink/renderer/modules/peerconnection",
     "//third_party/blink/renderer/modules/permissions",
@@ -134,7 +132,6 @@ component("modules") {
     "//third_party/blink/renderer/modules/screen_details",
     "//third_party/blink/renderer/modules/screen_orientation",
     "//third_party/blink/renderer/modules/sensor",
-    "//third_party/blink/renderer/modules/serial",
     "//third_party/blink/renderer/modules/service_worker",
     "//third_party/blink/renderer/modules/shapedetection",
     "//third_party/blink/renderer/modules/shared_storage",
@@ -157,7 +154,6 @@ component("modules") {
     "//third_party/blink/renderer/modules/webshare",
     "//third_party/blink/renderer/modules/websockets",
     "//third_party/blink/renderer/modules/webtransport",
-    "//third_party/blink/renderer/modules/webusb",
     "//third_party/blink/renderer/modules/window_controls_overlay",
     "//third_party/blink/renderer/modules/worklet",
     "//third_party/blink/renderer/modules/xr",
@@ -175,7 +171,6 @@ component("modules") {
     sub_modules += [
       "//third_party/blink/renderer/modules/direct_sockets",
       "//third_party/blink/renderer/modules/printing",
-      "//third_party/blink/renderer/modules/smart_card",
     ]
   }
   if (!is_ios && !target_os_is_android) {
@@ -303,7 +298,6 @@ group("make_modules_generated") {
     "//services/device/public/mojom:generic_sensor_headers",
     "//services/device/public/mojom:geoposition_blink_headers",
     "//services/device/public/mojom:mojom_blink_headers",
-    "//services/device/public/mojom:usb_blink_headers",
     "//services/shape_detection/public/mojom:mojom_blink_headers",
     "//services/webnn/public/mojom:mojom_blink_headers",
     "//third_party/blink/public/mojom:mojom_modules_blink_headers",
@@ -536,7 +530,6 @@ source_set("unit_tests") {
     "mediastream/web_media_player_ms_compositor_test.cc",
     "mediastream/web_media_player_ms_test.cc",
     "mediastream/webaudio_media_stream_audio_sink_test.cc",
-    "nfc/nfc_proxy_test.cc",
     "notifications/notification_data_test.cc",
     "notifications/notification_resources_loader_test.cc",
     "peerconnection/media_stream_remote_video_source_test.cc",
@@ -712,7 +705,6 @@ source_set("unit_tests") {
     "//third_party/blink/renderer/modules/breakout_box:unit_tests",
     "//third_party/blink/renderer/modules/clipboard:unit_tests",
     "//third_party/blink/renderer/modules/file_system_access:unit_tests",
-    "//third_party/blink/renderer/modules/hid:unit_tests",
     "//third_party/blink/renderer/modules/idle:unit_tests",
     "//third_party/blink/renderer/modules/indexeddb:unit_tests",
     "//third_party/blink/renderer/modules/mediastream:test_support",
@@ -746,11 +738,7 @@ source_set("unit_tests") {
   # we need to compile in the same way as would happen when
   # current_os="android".
   if (!target_os_is_android) {
-    deps += [
-      "//third_party/blink/renderer/modules/direct_sockets:unit_tests",
-      "//third_party/blink/renderer/modules/serial:unit_tests",
-      "//third_party/blink/renderer/modules/smart_card:unit_tests",
-    ]
+    deps += [ "//third_party/blink/renderer/modules/direct_sockets:unit_tests" ]
   }
 
   data_deps = [

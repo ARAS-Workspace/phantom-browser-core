@@ -114,12 +114,6 @@ ExtensionsAPIClient::CreateContentRulesRegistry(
   return nullptr;
 }
 
-std::unique_ptr<UsbDevicePermissionsPrompt>
-ExtensionsAPIClient::CreateUsbDevicePermissionsPrompt(
-    content::WebContents* web_contents) const {
-  return nullptr;
-}
-
 ManagementAPIDelegate* ExtensionsAPIClient::CreateManagementAPIDelegate()
     const {
   return nullptr;

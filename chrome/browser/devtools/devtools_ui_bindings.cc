@@ -1599,8 +1599,6 @@ void DevToolsUIBindings::SetDevicesDiscoveryConfig(
   if (!parsed_network || !parsed_network->is_list()) {
     return;
   }
-  profile_->GetPrefs()->SetBoolean(prefs::kDevToolsDiscoverUsbDevicesEnabled,
-                                   discover_usb_devices);
   profile_->GetPrefs()->SetBoolean(prefs::kDevToolsPortForwardingEnabled,
                                    port_forwarding_enabled);
   profile_->GetPrefs()->Set(prefs::kDevToolsPortForwardingConfig,
@@ -1613,11 +1611,7 @@ void DevToolsUIBindings::SetDevicesDiscoveryConfig(
 
 void DevToolsUIBindings::DevicesDiscoveryConfigUpdated() {
   base::DictValue config;
-  config.Set(kConfigDiscoverUsbDevices,
-             profile_->GetPrefs()
-                 ->FindPreference(prefs::kDevToolsDiscoverUsbDevicesEnabled)
-                 ->GetValue()
-                 ->Clone());
+  config.Set(kConfigDiscoverUsbDevices, false);
   config.Set(kConfigPortForwardingEnabled,
              profile_->GetPrefs()
                  ->FindPreference(prefs::kDevToolsPortForwardingEnabled)
@@ -1658,10 +1652,6 @@ void DevToolsUIBindings::SetDevicesUpdatesEnabled(bool enabled) {
                             base::Unretained(this)),
         profile_);
     pref_change_registrar_.Init(profile_->GetPrefs());
-    pref_change_registrar_.Add(
-        prefs::kDevToolsDiscoverUsbDevicesEnabled,
-        base::BindRepeating(&DevToolsUIBindings::DevicesDiscoveryConfigUpdated,
-                            base::Unretained(this)));
     pref_change_registrar_.Add(
         prefs::kDevToolsPortForwardingEnabled,
         base::BindRepeating(&DevToolsUIBindings::DevicesDiscoveryConfigUpdated,
@@ -2563,10 +2553,6 @@ void DevToolsUIBindings::RecordFunctionCall(const FunctionCallEvent& event) {
           .SetContext(event.context)
           .SetTimeSinceSessionStart(GetTimeSinceSessionStart().InMilliseconds())
           .SetSessionId(session_id_for_logging_.GetLowForSerialization()));
-}
-
-void DevToolsUIBindings::DeviceCountChanged(int count) {
-  CallClientMethod("DevToolsAPI", "deviceCountUpdated", base::Value(count));
 }
 
 void DevToolsUIBindings::DevicesUpdated(const std::string& source,

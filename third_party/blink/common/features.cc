@@ -2420,14 +2420,6 @@ BASE_FEATURE(kWebRtcUseMinMaxVEADimensions,
 BASE_FEATURE(kWebRtcAllowDataChannelRecordingInWebrtcInternals,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Kill switch for https://crbug.com/338955051.
-BASE_FEATURE(kWebUSBTransferSizeLimit, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Restricts the sharing of USBDevice instances across different V8
-// worlds (e.g., main world and isolated worlds) to prevent cross-world
-// leaks.
-BASE_FEATURE(kWebUSBWorldIsolatedCache, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables small accelerated canvases for webview (crbug.com/1004304)
 BASE_FEATURE(kWebviewAccelerateSmallCanvases,
              base::FEATURE_DISABLED_BY_DEFAULT);

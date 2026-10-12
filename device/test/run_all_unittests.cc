@@ -40,11 +40,6 @@ class DeviceTestSuite : public base::TestSuite {
         path.Append(FILE_PATH_LITERAL("bluetooth_test_strings.pak"));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
         bluetooth_test_strings, ui::kScaleFactorNone);
-
-    base::FilePath usb_ids_resources =
-        path.Append(FILE_PATH_LITERAL("usb_ids_resources.pak"));
-    ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
-        usb_ids_resources, ui::kScaleFactorNone);
   }
 
   void Shutdown() override {

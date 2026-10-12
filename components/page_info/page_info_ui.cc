@@ -93,10 +93,6 @@ base::span<const PageInfoUI::PermissionUIInfo> GetContentSettingsUIInfo() {
               ? IDS_SITE_SETTINGS_TYPE_MOTION_AND_LIGHT_SENSORS_MID_SENTENCE
               : IDS_SITE_SETTINGS_TYPE_MOTION_SENSORS_MID_SENTENCE,
       },
-      {ContentSettingsType::USB_GUARD, IDS_SITE_SETTINGS_TYPE_USB_DEVICES,
-       IDS_SITE_SETTINGS_TYPE_USB_DEVICES_MID_SENTENCE},
-      {ContentSettingsType::SERIAL_GUARD, IDS_SITE_SETTINGS_TYPE_SERIAL_PORTS,
-       IDS_SITE_SETTINGS_TYPE_SERIAL_PORTS_MID_SENTENCE},
       {ContentSettingsType::BLUETOOTH_GUARD,
        IDS_SITE_SETTINGS_TYPE_BLUETOOTH_DEVICES,
        IDS_SITE_SETTINGS_TYPE_BLUETOOTH_DEVICES_MID_SENTENCE},
@@ -148,8 +144,6 @@ base::span<const PageInfoUI::PermissionUIInfo> GetContentSettingsUIInfo() {
        IDS_SITE_SETTINGS_TYPE_KEYBOARD_LOCK_MID_SENTENCE},
       {ContentSettingsType::LOCAL_FONTS, IDS_SITE_SETTINGS_TYPE_FONT_ACCESS,
        IDS_SITE_SETTINGS_TYPE_FONT_ACCESS_MID_SENTENCE},
-      {ContentSettingsType::HID_GUARD, IDS_SITE_SETTINGS_TYPE_HID_DEVICES,
-       IDS_SITE_SETTINGS_TYPE_HID_DEVICES_MID_SENTENCE},
       {ContentSettingsType::IMAGES, IDS_SITE_SETTINGS_TYPE_IMAGES,
        IDS_SITE_SETTINGS_TYPE_IMAGES_MID_SENTENCE},
       {ContentSettingsType::POINTER_LOCK, IDS_SITE_SETTINGS_TYPE_POINTER_LOCK,
@@ -294,15 +288,6 @@ std::u16string GetPermissionAskStateString(ContentSettingsType type) {
       message_id = IDS_PAGE_INFO_STATE_TEXT_LOOPBACK_NETWORK_ASK;
       break;
     // Guard content settings:
-    case ContentSettingsType::USB_GUARD:
-      message_id = IDS_PAGE_INFO_STATE_TEXT_USB_ASK;
-      break;
-    case ContentSettingsType::HID_GUARD:
-      message_id = IDS_PAGE_INFO_STATE_TEXT_HID_DEVICES_ASK;
-      break;
-    case ContentSettingsType::SERIAL_GUARD:
-      message_id = IDS_PAGE_INFO_STATE_TEXT_SERIAL_ASK;
-      break;
     case ContentSettingsType::BLUETOOTH_GUARD:
       message_id = IDS_PAGE_INFO_STATE_TEXT_BLUETOOTH_DEVICES_ASK;
       break;

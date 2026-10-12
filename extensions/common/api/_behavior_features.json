@@ -17,11 +17,6 @@
       "CBCC42ABED43A4B58FE3810E62AFFA010EB0349F"   // https://crbug.com/538252
     ]
   },
-  "allow_usb_devices_permission_interface_class": {
-    "channel": "stable",
-    "extension_types": ["platform_app"],
-    "session_types": ["kiosk"]
-  },
   "signin_screen": [ {
     "channel": "canary",
     "component_extensions_auto_granted": false,

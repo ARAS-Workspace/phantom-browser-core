@@ -236,7 +236,6 @@ source_set("browser") {
     "//services/device/public/cpp/compute_pressure:buildflags",
     "//services/device/public/cpp/generic_sensor",
     "//services/device/public/cpp/geolocation",
-    "//services/device/public/cpp/hid",
     "//services/device/public/mojom",
     "//services/device/public/mojom:device_service",
     "//services/device/public/mojom:generic_sensor",
@@ -1061,8 +1060,6 @@ source_set("browser") {
     "handwriting/handwriting_recognition_service_impl.h",
     "handwriting/handwriting_recognizer_impl.cc",
     "handwriting/handwriting_recognizer_impl.h",
-    "hid/hid_service.cc",
-    "hid/hid_service.h",
     "host_zoom_level_context.cc",
     "host_zoom_level_context.h",
     "host_zoom_map_impl.cc",
@@ -1878,8 +1875,6 @@ source_set("browser") {
     "security/cpsp/child_process_security_policy_impl.h",
     "security/dip/document_isolation_policy_reporter.cc",
     "security/dip/document_isolation_policy_reporter.h",
-    "serial/serial_service.cc",
-    "serial/serial_service.h",
     "service_host/service_process_host_impl.cc",
     "service_host/service_process_tracker.cc",
     "service_host/service_process_tracker.h",
@@ -1915,8 +1910,6 @@ source_set("browser") {
     "service_worker/service_worker_context_wrapper.h",
     "service_worker/service_worker_controllee_request_handler.cc",
     "service_worker/service_worker_controllee_request_handler.h",
-    "service_worker/service_worker_device_delegate_observer.cc",
-    "service_worker/service_worker_device_delegate_observer.h",
     "service_worker/service_worker_fetch_dispatcher.cc",
     "service_worker/service_worker_fetch_dispatcher.h",
     "service_worker/service_worker_host.cc",
@@ -2070,8 +2063,6 @@ source_set("browser") {
     "url_info.h",
     "url_loader_factory_params_helper.cc",
     "url_loader_factory_params_helper.h",
-    "usb/web_usb_service_impl.cc",
-    "usb/web_usb_service_impl.h",
     "video_capture_service_impl.cc",
     "wake_lock/wake_lock_context_host.cc",
     "wake_lock/wake_lock_context_host.h",
@@ -2713,10 +2704,6 @@ source_set("browser") {
     "network_sandbox.cc",
     "network_sandbox.h",
 
-    # WebHID is not supported in service workers on Android
-    "service_worker/service_worker_hid_delegate_observer.cc",
-    "service_worker/service_worker_hid_delegate_observer.h",
-
     # Most speech code is non-Android.
     "tracing/tracing_ui.cc",
     "tracing/tracing_ui.h",
@@ -2757,16 +2744,6 @@ source_set("browser") {
   ]
 
   deps += [ "//components/crash/content/browser/error_reporting" ]
-
-  # For platforms that support extension service workers.
-  # NOTE: Fuchsia depends on this class, but probably shouldn't, as it doesn't
-  # support extensions.
-  if (is_apple || is_linux) {
-    sources += [
-      "service_worker/service_worker_usb_delegate_observer.cc",
-      "service_worker/service_worker_usb_delegate_observer.h",
-    ]
-  }
 
   if (enable_devtools_frontend) {
     sources += [

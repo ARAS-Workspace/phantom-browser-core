@@ -629,7 +629,6 @@ source_set("extensions") {
     deps += [ "//chrome/browser/mac" ]
   }
   sources += [
-    "api/chrome_extensions_api_client_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.h",
   ]
@@ -678,7 +677,6 @@ source_set("extensions") {
       "api/automation_internal/chrome_automation_internal_api_delegate.h",
       "api/bookmark_manager_private/bookmark_manager_private_api.cc",
       "api/bookmark_manager_private/bookmark_manager_private_api.h",
-      "api/chrome_device_permissions_prompt.h",
       "api/enterprise_reporting_private/conversion_utils.cc",
       "api/enterprise_reporting_private/conversion_utils.h",
       "api/enterprise_reporting_private/enterprise_reporting_private_api.cc",
@@ -750,8 +748,6 @@ source_set("extensions") {
       "chrome_app_sorting.h",
       "chrome_process_manager_delegate.cc",
       "chrome_process_manager_delegate.h",
-      "device_permissions_dialog_controller.cc",
-      "device_permissions_dialog_controller.h",
       "extension_disabled_ui_desktop.cc",
       "extension_error_ui_desktop.cc",
       "extension_error_ui_desktop.h",
@@ -1299,7 +1295,6 @@ source_set("chrome_extensions_browser_client") {
     "//chrome/browser/ui",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
-    "//chrome/browser/usb",
     "//components/content_settings/core/browser",
     "//components/embedder_support:user_agent",
     "//components/privacy_sandbox:privacy_sandbox_prefs",
@@ -1556,7 +1551,6 @@ source_set("unit_tests") {
 
   if (enable_extensions) {
     sources += [
-      "api/device_permissions_manager_unittest.cc",
       "api/enterprise_reporting_private/enterprise_reporting_private_unittest.cc",
       "api/file_system/file_system_api_unittest.cc",
       "api/identity/gaia_remote_consent_flow_unittest.cc",
@@ -1974,7 +1968,6 @@ source_set("browser_tests") {
       "api/extension_action/page_action_browsertest.cc",
       "api/feedback_private/feedback_browsertest.cc",
       "api/feedback_private/feedback_private_apitest.cc",
-      "api/hid/hid_apitest.cc",
       "api/identity/gaia_remote_consent_flow_browsertest.cc",
       "api/image_writer_private/extractor_browsertest.cc",
       "api/image_writer_private/image_writer_private_apitest.cc",
@@ -2129,14 +2122,12 @@ source_set("browser_tests") {
       "//chrome/browser/extensions/api/messaging:browser_tests",
       "//chrome/browser/extensions/api/messaging:test_support",
       "//chrome/browser/extensions/api/mime_handlers:browser_tests",
-      "//chrome/browser/hid",
       "//chrome/browser/password_manager",
       "//chrome/browser/password_manager:test_support",
       "//chrome/browser/pdf:pdf_extension_test_utils",
       "//chrome/browser/prefetch",
       "//chrome/browser/tab_list",
       "//chrome/browser/ui/global_error:test_support",
-      "//chrome/browser/ui/hid",
       "//chrome/browser/ui/javascript_dialogs",
       "//chrome/browser/ui/search:test_support_ui",
       "//chrome/browser/ui/side_panel:side_panel_views_dependent",
@@ -2148,7 +2139,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/views:file_system_access_test_support",
       "//chrome/browser/ui/webui/bookmarks",
       "//chrome/browser/ui/webui/extensions_zero_state_promo",
-      "//chrome/browser/usb",
       "//chrome/browser/user_education",
       "//chrome/browser/web_applications/extensions",
       "//chrome/browser/web_applications/isolated_web_apps/window_management",
@@ -2214,12 +2204,6 @@ source_set("browser_tests") {
     if (use_ozone) {
       deps += [ "//ui/ozone" ]
     }
-
-    # TODO(417228688): Remove when the following tests get modularized:
-    # - chrome_serial_browsertest.cc
-    # - controlled_frame_disabled_permission_browsertest.cc
-    # - web_view_browsertest.cc
-    deps += [ "//chrome/browser/serial" ]
 
     data += [
       "//chrome/test/data/extensions/",

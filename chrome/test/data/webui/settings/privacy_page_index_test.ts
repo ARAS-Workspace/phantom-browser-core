@@ -228,11 +228,6 @@ suite('PrivacyPageIndex', function() {
           parentViewId: 'privacy',
         },
         {
-          route: routes.SITE_SETTINGS_HID_DEVICES,
-          viewId: 'siteSettingsHidDevices',
-          parentViewId: 'privacy',
-        },
-        {
           route: routes.SITE_SETTINGS_JAVASCRIPT,
           viewId: 'siteSettingsJavascript',
           parentViewId: 'privacy',
@@ -288,11 +283,6 @@ suite('PrivacyPageIndex', function() {
           parentViewId: 'privacy',
         },
         {
-          route: routes.SITE_SETTINGS_SERIAL_PORTS,
-          viewId: 'siteSettingsSerialPorts',
-          parentViewId: 'privacy',
-        },
-        {
           route: routes.SITE_SETTINGS_SITE_DATA,
           viewId: 'siteSettingsSiteData',
           parentViewId: 'privacy',
@@ -310,11 +300,6 @@ suite('PrivacyPageIndex', function() {
         {
           route: routes.SITE_SETTINGS_STORAGE_ACCESS,
           viewId: 'siteSettingsStorageAccess',
-          parentViewId: 'privacy',
-        },
-        {
-          route: routes.SITE_SETTINGS_USB_DEVICES,
-          viewId: 'siteSettingsUsbDevices',
           parentViewId: 'privacy',
         },
         {

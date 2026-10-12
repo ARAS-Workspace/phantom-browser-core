@@ -232,15 +232,6 @@
   </template>
 
   <template is="dom-if" if="[[renderView_(
-      routes_.SITE_SETTINGS_HID_DEVICES, currentRoute, inSearchMode)]]"
-      update-when-false>
-    <settings-hid-devices-page slot="view" id="siteSettingsHidDevices"
-        route-path$="[[routes_.SITE_SETTINGS_HID_DEVICES.path]]"
-        data-parent-view-id="privacy">
-    </settings-hid-devices-page>
-  </template>
-
-  <template is="dom-if" if="[[renderView_(
       routes_.SITE_SETTINGS_IDLE_DETECTION, currentRoute, inSearchMode)]]"
       update-when-false>
     <settings-idle-detection-page slot="view" id="siteSettingsIdleDetection"
@@ -409,15 +400,6 @@
     </settings-sensors-page>
   </template>
 
-  <template is="dom-if" if="[[renderView_(
-      routes_.SITE_SETTINGS_SERIAL_PORTS, currentRoute, inSearchMode)]]"
-      update-when-false>
-    <settings-serial-ports-page slot="view"
-        id="siteSettingsSerialPorts" data-parent-view-id="privacy"
-        route-path$="[[routes_.SITE_SETTINGS_SERIAL_PORTS.path]]">
-    </settings-serial-ports-page>
-  </template>
-
 <if expr="is_chromeos">
   <template is="dom-if" if="[[enableSmartCardReadersContentSetting_]]">
     <template is="dom-if" if="[[renderView_(
@@ -476,15 +458,6 @@
         data-parent-view-id="privacy"
         route-path$="[[routes_.SITE_SETTINGS_STORAGE_ACCESS.path]]">
     </settings-storage-access-page>
-  </template>
-
-  <template is="dom-if" if="[[renderView_(
-      routes_.SITE_SETTINGS_USB_DEVICES, currentRoute, inSearchMode)]]"
-      update-when-false>
-    <settings-usb-devices-page slot="view" id="siteSettingsUsbDevices"
-        route-path$="[[routes_.SITE_SETTINGS_USB_DEVICES.path]]"
-        data-parent-view-id="privacy">
-    </settings-usb-devices-page>
   </template>
 
   <template is="dom-if" if="[[renderView_(

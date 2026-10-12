@@ -29,7 +29,6 @@ source_set("printer_provider") {
     "//extensions/browser:browser_sources",
     "//extensions/common",
     "//extensions/common/api",
-    "//services/device/public/mojom:usb",
   ]
 
   deps = [

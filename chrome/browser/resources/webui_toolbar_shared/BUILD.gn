@@ -60,8 +60,6 @@ build_webui("build") {
     "rhs_icons/screen_record.svg",
     "rhs_icons/sensors_chrome_refresh.svg",
     "rhs_icons/sensors_off_chrome_refresh.svg",
-    "rhs_icons/smart_card_reader_off.svg",
-    "rhs_icons/smart_card_reader.svg",
     "rhs_icons/star_active_chrome_refresh.svg",
     "rhs_icons/star_chrome_refresh.svg",
     "rhs_icons/stop_circle.svg",

@@ -33,8 +33,6 @@
 #include "extensions/browser/api/api_resource_manager.h"
 #include "extensions/browser/api/audio/audio_api.h"
 #include "extensions/browser/api/feedback_private/feedback_private_api.h"
-#include "extensions/browser/api/hid/hid_connection_resource.h"
-#include "extensions/browser/api/hid/hid_device_manager.h"
 #include "extensions/browser/api/networking_private/networking_private_event_router_factory.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api_factory.h"
 #include "extensions/browser/api/protocol_handlers/protocol_handlers_manager.h"
@@ -46,8 +44,6 @@
 #include "extensions/browser/api/sockets_tcp_server/tcp_server_socket_event_dispatcher.h"
 #include "extensions/browser/api/sockets_udp/udp_socket_event_dispatcher.h"
 #include "extensions/browser/api/system_info/system_info_api.h"
-#include "extensions/browser/api/usb/usb_device_manager.h"
-#include "extensions/browser/api/usb/usb_device_resource.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 namespace extensions {
@@ -75,24 +71,20 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
 // The following are not supported in the experimental desktop-android build.
 // TODO(https://crbug.com/356905053): Enable these APIs on desktop-android.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-  ApiResourceManager<HidConnectionResource>::GetFactoryInstance();
   ApiResourceManager<ResumableTCPServerSocket>::GetFactoryInstance();
   ApiResourceManager<ResumableTCPSocket>::GetFactoryInstance();
   ApiResourceManager<ResumableUDPSocket>::GetFactoryInstance();
   ApiResourceManager<Socket>::GetFactoryInstance();
-  ApiResourceManager<UsbDeviceResource>::GetFactoryInstance();
   api::TCPServerSocketEventDispatcher::GetFactoryInstance();
   api::TCPSocketEventDispatcher::GetFactoryInstance();
   api::UDPSocketEventDispatcher::GetFactoryInstance();
   AudioAPI::GetFactoryInstance();
   FeedbackPrivateAPI::GetFactoryInstance();
-  HidDeviceManager::GetFactoryInstance();
 #if BUILDFLAG(IS_LINUX)
   NetworkingPrivateEventRouterFactory::GetInstance();
 #endif
   PrinterProviderAPIFactory::GetInstance();
   SystemInfoAPI::GetFactoryInstance();
-  UsbDeviceManager::GetFactoryInstance();
   ProtocolHandlersManager::GetFactoryInstance();
   WriteQuotaChecker::GetFactoryInstance();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)

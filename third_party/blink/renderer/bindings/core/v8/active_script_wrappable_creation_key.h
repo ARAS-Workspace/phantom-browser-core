@@ -47,7 +47,6 @@ class ActiveScriptWrappableCreationKey final {
   template <typename NativeFrameType>
   friend class FrameQueueUnderlyingSource;
   friend class Geolocation;
-  friend class HIDDevice;
   friend class HTMLImageElement;
   friend class HTMLInputElement;
   friend class HTMLMediaElement;
@@ -76,7 +75,6 @@ class ActiveScriptWrappableCreationKey final {
   friend class MojoWatcher;
   friend class MutationObserver;
   friend class NavigatorManagedData;
-  friend class NDEFReader;
   friend class NetworkInformation;
   friend class Notification;
   friend class PerformanceObserver;
@@ -93,12 +91,9 @@ class ActiveScriptWrappableCreationKey final {
   friend class RTCPeerConnection;
   friend class ScriptProcessorNode;
   friend class Sensor;
-  friend class SerialPort;
   friend class ServiceWorker;
   friend class ServiceWorkerRegistration;
   friend class SharedWorker;
-  friend class SmartCardReader;
-  friend class SmartCardReaderPresenceObserver;
   friend class SourceBuffer;
   friend class SpeechRecognition;
   friend class SVGImageElement;

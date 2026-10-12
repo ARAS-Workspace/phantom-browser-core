@@ -29,16 +29,10 @@
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_features.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
-#include "chrome/browser/hid/hid_chooser_context.h"
-#include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/serial/serial_chooser_context.h"
-#include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/url_identity.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_filter.h"
@@ -454,21 +448,6 @@ SiteSettingSource GetSourceForChooserException(Profile* profile,
   return calculated_source;
 }
 
-permissions::ObjectPermissionContextBase* GetUsbChooserContext(
-    Profile* profile) {
-  return UsbChooserContextFactory::GetForProfile(profile);
-}
-
-permissions::ObjectPermissionContextBase* GetSerialChooserContext(
-    Profile* profile) {
-  return SerialChooserContextFactory::GetForProfile(profile);
-}
-
-permissions::ObjectPermissionContextBase* GetHidChooserContext(
-    Profile* profile) {
-  return HidChooserContextFactory::GetForProfile(profile);
-}
-
 // The BluetoothChooserContext is only available when the
 // WebBluetoothNewPermissionsBackend flag is enabled.
 // TODO(crbug.com/40458188): Remove the feature check when it is enabled
@@ -483,9 +462,6 @@ permissions::ObjectPermissionContextBase* GetBluetoothChooserContext(
 }
 
 const ChooserTypeNameEntry kChooserTypeGroupNames[] = {
-    {&GetUsbChooserContext, kUsbChooserDataGroupType},
-    {&GetSerialChooserContext, kSerialChooserDataGroupType},
-    {&GetHidChooserContext, kHidChooserDataGroupType},
     {&GetBluetoothChooserContext, kBluetoothChooserDataGroupType},
 };
 
@@ -564,7 +540,6 @@ std::vector<ContentSettingsType> GetVisiblePermissionCategories(
       ContentSettingsType::CLIPBOARD_READ_WRITE,
       ContentSettingsType::FILE_SYSTEM_WRITE_GUARD,
       ContentSettingsType::GEOLOCATION,
-      ContentSettingsType::HID_GUARD,
       ContentSettingsType::IDLE_DETECTION,
       ContentSettingsType::IMAGES,
       ContentSettingsType::JAVASCRIPT,
@@ -578,11 +553,9 @@ std::vector<ContentSettingsType> GetVisiblePermissionCategories(
       ContentSettingsType::NOTIFICATIONS,
       ContentSettingsType::POPUPS,
       ContentSettingsType::SENSORS,
-      ContentSettingsType::SERIAL_GUARD,
       ContentSettingsType::SOUND,
       ContentSettingsType::STORAGE_ACCESS,
       ContentSettingsType::TOP_LEVEL_STORAGE_ACCESS,
-      ContentSettingsType::USB_GUARD,
       ContentSettingsType::VR,
       ContentSettingsType::WINDOW_MANAGEMENT,
   }};

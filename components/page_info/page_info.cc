@@ -113,9 +113,6 @@ ContentSettingsType kPermissionType[] = {
     ContentSettingsType::AUTOMATIC_DOWNLOADS,
     ContentSettingsType::MIDI_SYSEX,
     ContentSettingsType::CLIPBOARD_READ_WRITE,
-    ContentSettingsType::USB_GUARD,
-    ContentSettingsType::HID_GUARD,
-    ContentSettingsType::SERIAL_GUARD,
     ContentSettingsType::FILE_SYSTEM_WRITE_GUARD,
     ContentSettingsType::LOCAL_FONTS,
     ContentSettingsType::BLUETOOTH_GUARD,
@@ -196,18 +193,6 @@ void ReportAnyInsecureContent(
 // Settings UI. THE ORDER OF THESE ITEMS IS IMPORTANT. To propose changing it,
 // email security-dev@chromium.org.
 const PageInfo::ChooserUIInfo kChooserUIInfo[] = {
-    {ContentSettingsType::USB_CHOOSER_DATA,
-     IDS_PAGE_INFO_USB_DEVICE_SECONDARY_LABEL,
-     IDS_PAGE_INFO_USB_DEVICE_ALLOWED_BY_POLICY_LABEL,
-     IDS_PAGE_INFO_DELETE_USB_DEVICE_WITH_NAME},
-    {ContentSettingsType::HID_CHOOSER_DATA,
-     IDS_PAGE_INFO_HID_DEVICE_SECONDARY_LABEL,
-     IDS_PAGE_INFO_HID_DEVICE_ALLOWED_BY_POLICY_LABEL,
-     IDS_PAGE_INFO_DELETE_HID_DEVICE_WITH_NAME},
-    {ContentSettingsType::SERIAL_CHOOSER_DATA,
-     IDS_PAGE_INFO_SERIAL_PORT_SECONDARY_LABEL,
-     IDS_PAGE_INFO_SERIAL_PORT_ALLOWED_BY_POLICY_LABEL,
-     IDS_PAGE_INFO_DELETE_SERIAL_PORT_WITH_NAME},
     {ContentSettingsType::BLUETOOTH_CHOOSER_DATA,
      IDS_PAGE_INFO_BLUETOOTH_DEVICE_SECONDARY_LABEL,
      /*allowed_by_policy_description_string_id=*/-1,
@@ -1169,10 +1154,6 @@ bool PageInfo::ShouldShowPermission(
 
   const bool is_incognito =
       web_contents_->GetBrowserContext()->IsOffTheRecord();
-  // NFC is Android-only at the moment.
-  if (info.type == ContentSettingsType::NFC) {
-    return false;
-  }
 
   // Hide camera if camera PTZ is granted or blocked. `CAMERA_PAN_TILT_ZOOM` can
   // be used only if `MEDIASTREAM_CAMERA` were previously granted but we don't

@@ -22,8 +22,6 @@
 #include "third_party/blink/public/common/input/synthetic_web_input_event_builders.h"
 #include "third_party/blink/public/common/input/web_input_event.h"
 #include "third_party/blink/public/mojom/fenced_frame/fenced_frame.mojom.h"
-#include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
-#include "third_party/blink/public/mojom/usb/web_usb_service.mojom-forward.h"
 #include "ui/base/page_transition_types.h"
 
 #if defined(USE_AURA)
@@ -152,14 +150,6 @@ class RenderFrameHostTester {
 
   // Creates and appends a fenced frame.
   virtual RenderFrameHost* AppendFencedFrame() = 0;
-
-  // Creates the HidService and binds `receiver`.
-  virtual void CreateHidServiceForTesting(
-      mojo::PendingReceiver<blink::mojom::HidService> receiever) = 0;
-
-  // Creates the WebUsbService and binds `receiver`.
-  virtual void CreateWebUsbServiceForTesting(
-      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) = 0;
 
   // Detaches the LocalFrame mojo connection to the renderer. This is useful
   // when tests override the creation logic for the LocalFrame and need the

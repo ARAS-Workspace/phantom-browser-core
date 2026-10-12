@@ -97,8 +97,6 @@ const char kInspectUiPauseCommand[] = "pause";
 const char kInspectUiInspectBrowser[] = "inspect-browser";
 const char kInspectUiLocalHost[] = "localhost";
 
-const char kInspectUiDiscoverUsbDevicesEnabledCommand[] =
-    "set-discover-usb-devices-enabled";
 const char kInspectUiPortForwardingEnabledCommand[] =
     "set-port-forwarding-enabled";
 const char kInspectUiPortForwardingConfigCommand[] =
@@ -282,11 +280,6 @@ void InspectMessageHandler::RegisterMessages() {
       kInspectUiPauseCommand,
       base::BindRepeating(&InspectMessageHandler::HandlePauseCommand,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      kInspectUiDiscoverUsbDevicesEnabledCommand,
-      base::BindRepeating(&InspectMessageHandler::HandleBooleanPrefChanged,
-                          base::Unretained(this),
-                          &prefs::kDevToolsDiscoverUsbDevicesEnabled[0]));
   web_ui()->RegisterMessageCallback(
       kInspectUiPortForwardingEnabledCommand,
       base::BindRepeating(&InspectMessageHandler::HandleBooleanPrefChanged,
@@ -597,7 +590,6 @@ void InspectUI::InitUI() {
   SetHostVersion(version_info::GetVersion().GetString());
   SetPortForwardingDefaults();
   StartListeningNotifications();
-  UpdateDiscoverUsbDevicesEnabled();
   UpdatePortForwardingEnabled();
   UpdatePortForwardingConfig();
   UpdateTCPDiscoveryEnabled();
@@ -788,10 +780,6 @@ void InspectUI::StartListeningNotifications() {
 
   pref_change_registrar_.Init(profile->GetPrefs());
   pref_change_registrar_.Add(
-      prefs::kDevToolsDiscoverUsbDevicesEnabled,
-      base::BindRepeating(&InspectUI::UpdateDiscoverUsbDevicesEnabled,
-                          base::Unretained(this)));
-  pref_change_registrar_.Add(
       prefs::kDevToolsPortForwardingEnabled,
       base::BindRepeating(&InspectUI::UpdatePortForwardingEnabled,
                           base::Unretained(this)));
@@ -819,12 +807,6 @@ void InspectUI::StopListeningNotifications() {
   port_status_serializer_.reset();
 
   pref_change_registrar_.RemoveAll();
-}
-
-void InspectUI::UpdateDiscoverUsbDevicesEnabled() {
-  web_ui()->CallJavascriptFunctionUnsafe(
-      "updateDiscoverUsbDevicesEnabled",
-      *GetPrefValue(prefs::kDevToolsDiscoverUsbDevicesEnabled));
 }
 
 void InspectUI::UpdatePortForwardingEnabled() {

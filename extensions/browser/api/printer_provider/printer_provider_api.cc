@@ -30,14 +30,12 @@
 #include "extensions/browser/api/printer_provider/printer_provider_internal_api.h"
 #include "extensions/browser/api/printer_provider/printer_provider_internal_api_observer.h"
 #include "extensions/browser/api/printer_provider/printer_provider_print_job.h"
-#include "extensions/browser/api/usb/usb_device_manager.h"
 #include "extensions/browser/event_router.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_registry_observer.h"
 #include "extensions/browser/unloaded_extension_reason.h"
 #include "extensions/common/api/printer_provider.h"
 #include "extensions/common/api/printer_provider_internal.h"
-#include "extensions/common/api/usb.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/mojom/context_type.mojom.h"
@@ -227,30 +225,6 @@ class PendingPrintRequests {
   std::map<int, PrintRequest> pending_requests_;
 };
 
-// Keeps track of pending chrome.printerProvider.onGetUsbPrinterInfoRequested
-// requests for an extension.
-class PendingUsbPrinterInfoRequests {
- public:
-  PendingUsbPrinterInfoRequests();
-  ~PendingUsbPrinterInfoRequests();
-
-  // Adds a new request to the set. Only information needed is the callback
-  // associated with the request. Returns the id assigned to the request.
-  int Add(PrinterProviderAPI::GetPrinterInfoCallback callback);
-
-  // Completes the request with the provided request id. It runs the request
-  // callback and removes the request from the set.
-  void Complete(int request_id, base::DictValue printer_info);
-
-  // Runs all pending callbacks with empty capability value and clears the
-  // set of pending requests.
-  void FailAll();
-
- private:
-  int last_request_id_ = 0;
-  std::map<int, PrinterProviderAPI::GetPrinterInfoCallback> pending_requests_;
-};
-
 // Implements chrome.printerProvider API events.
 class PrinterProviderAPIImpl : public PrinterProviderAPI,
                                public PrinterProviderInternalAPIObserver,
@@ -271,10 +245,6 @@ class PrinterProviderAPIImpl : public PrinterProviderAPI,
                               PrintCallback callback) override;
   const PrinterProviderPrintJob* GetPrintJob(const Extension* extension,
                                              int request_id) const override;
-  void DispatchGetUsbPrinterInfoRequested(
-      const ExtensionId& extension_id,
-      const device::mojom::UsbDeviceInfo& device,
-      GetPrinterInfoCallback callback) override;
 
   // PrinterProviderInternalAPIObserver implementation:
   void OnGetPrintersResult(
@@ -288,10 +258,6 @@ class PrinterProviderAPIImpl : public PrinterProviderAPI,
   void OnPrintResult(const Extension* extension,
                      int request_id,
                      api::printer_provider::PrintError error) override;
-  void OnGetUsbPrinterInfoResult(
-      const Extension* extension,
-      int request_id,
-      const api::printer_provider::PrinterInfo* printer_info) override;
 
   // ExtensionRegistryObserver implementation:
   void OnExtensionUnloaded(content::BrowserContext* browser_context,
@@ -321,9 +287,6 @@ class PrinterProviderAPIImpl : public PrinterProviderAPI,
 
   std::map<std::string, PendingGetCapabilityRequests>
       pending_capability_requests_;
-
-  std::map<std::string, PendingUsbPrinterInfoRequests>
-      pending_usb_printer_info_requests_;
 
   base::ScopedObservation<PrinterProviderInternalAPI,
                           PrinterProviderInternalAPIObserver>
@@ -496,37 +459,6 @@ void PendingPrintRequests::FailAll() {
   pending_requests_.clear();
 }
 
-PendingUsbPrinterInfoRequests::PendingUsbPrinterInfoRequests() {
-}
-
-PendingUsbPrinterInfoRequests::~PendingUsbPrinterInfoRequests() {
-}
-
-int PendingUsbPrinterInfoRequests::Add(
-    PrinterProviderAPI::GetPrinterInfoCallback callback) {
-  pending_requests_[++last_request_id_] = std::move(callback);
-  return last_request_id_;
-}
-
-void PendingUsbPrinterInfoRequests::Complete(int request_id,
-                                             base::DictValue printer_info) {
-  auto it = pending_requests_.find(request_id);
-  if (it == pending_requests_.end())
-    return;
-
-  PrinterProviderAPI::GetPrinterInfoCallback callback = std::move(it->second);
-  pending_requests_.erase(it);
-
-  std::move(callback).Run(std::move(printer_info));
-}
-
-void PendingUsbPrinterInfoRequests::FailAll() {
-  for (auto& request : pending_requests_) {
-    std::move(request.second).Run(base::DictValue());
-  }
-  pending_requests_.clear();
-}
-
 PrinterProviderAPIImpl::PrinterProviderAPIImpl(
     content::BrowserContext* browser_context)
     : browser_context_(browser_context) {
@@ -661,35 +593,6 @@ const PrinterProviderPrintJob* PrinterProviderAPIImpl::GetPrintJob(
   return it->second.GetPrintJob(request_id);
 }
 
-void PrinterProviderAPIImpl::DispatchGetUsbPrinterInfoRequested(
-    const ExtensionId& extension_id,
-    const device::mojom::UsbDeviceInfo& device,
-    GetPrinterInfoCallback callback) {
-  EventRouter* event_router = EventRouter::Get(browser_context_);
-  if (!event_router->ExtensionHasEventListener(
-          extension_id,
-          api::printer_provider::OnGetUsbPrinterInfoRequested::kEventName)) {
-    std::move(callback).Run(base::DictValue());
-    return;
-  }
-
-  int request_id =
-      pending_usb_printer_info_requests_[extension_id].Add(std::move(callback));
-  api::usb::Device api_device;
-  UsbDeviceManager::Get(browser_context_)->GetApiDevice(device, &api_device);
-
-  base::ListValue internal_args;
-  // Request id is not part of the public API and it will be massaged out in
-  // custom bindings.
-  internal_args.Append(request_id);
-  internal_args.Append(api_device.ToValue());
-  auto event = std::make_unique<Event>(
-      events::PRINTER_PROVIDER_ON_GET_USB_PRINTER_INFO_REQUESTED,
-      api::printer_provider::OnGetUsbPrinterInfoRequested::kEventName,
-      std::move(internal_args));
-  event_router->DispatchEventToExtension(extension_id, std::move(event));
-}
-
 void PrinterProviderAPIImpl::OnGetPrintersResult(
     const Extension* extension,
     int request_id,
@@ -733,27 +636,6 @@ void PrinterProviderAPIImpl::OnPrintResult(
   pending_print_requests_[extension->id()].Complete(request_id, error);
 }
 
-void PrinterProviderAPIImpl::OnGetUsbPrinterInfoResult(
-    const Extension* extension,
-    int request_id,
-    const api::printer_provider::PrinterInfo* result) {
-  if (result) {
-    base::DictValue printer(result->ToValue());
-    UpdatePrinterWithExtensionInfo(&printer, extension);
-    PRINTER_LOG(DEBUG) << "Notifying extensionID=" << extension->id()
-                       << " from request=" << request_id << " that "
-                       << result->name << " is a USB connected printer";
-    pending_usb_printer_info_requests_[extension->id()].Complete(
-        request_id, std::move(printer));
-  } else {
-    PRINTER_LOG(DEBUG) << "Notifying extensionID=" << extension->id()
-                       << " from request=" << request_id
-                       << " that there are no USB connected printers";
-    pending_usb_printer_info_requests_[extension->id()].Complete(
-        request_id, base::DictValue());
-  }
-}
-
 void PrinterProviderAPIImpl::OnExtensionUnloaded(
     content::BrowserContext* browser_context,
     const Extension* extension,
@@ -774,12 +656,6 @@ void PrinterProviderAPIImpl::OnExtensionUnloaded(
   if (capability_it != pending_capability_requests_.end()) {
     capability_it->second.FailAll();
     pending_capability_requests_.erase(capability_it);
-  }
-
-  auto usb_it = pending_usb_printer_info_requests_.find(extension->id());
-  if (usb_it != pending_usb_printer_info_requests_.end()) {
-    usb_it->second.FailAll();
-    pending_usb_printer_info_requests_.erase(usb_it);
   }
 }
 

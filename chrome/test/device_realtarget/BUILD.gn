@@ -11,9 +11,6 @@ if (is_linux || is_mac) {
     deps = [
       "//chrome:packed_resources",
       "//chrome/browser/bluetooth:device_realtarget_browsertests",
-      "//chrome/browser/hid:device_realtarget_browsertests",
-      "//chrome/browser/serial:device_realtarget_browsertests",
-      "//chrome/browser/usb:device_realtarget_browsertests",
       "//chrome/test:browser_tests_runner",
       "//chrome/test:test_support",
     ]

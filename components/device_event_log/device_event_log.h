@@ -46,12 +46,6 @@
 #define BLUETOOTH_LOG(level)                         \
   DEVICE_LOG(::device_event_log::LOG_TYPE_BLUETOOTH, \
              ::device_event_log::LOG_LEVEL_##level)
-#define USB_LOG(level)                         \
-  DEVICE_LOG(::device_event_log::LOG_TYPE_USB, \
-             ::device_event_log::LOG_LEVEL_##level)
-#define USB_PLOG(level)                         \
-  DEVICE_PLOG(::device_event_log::LOG_TYPE_USB, \
-              ::device_event_log::LOG_LEVEL_##level)
 #define HID_LOG(level)                         \
   DEVICE_LOG(::device_event_log::LOG_TYPE_HID, \
              ::device_event_log::LOG_LEVEL_##level)
@@ -64,12 +58,6 @@
 #define PRINTER_LOG(level)                         \
   DEVICE_LOG(::device_event_log::LOG_TYPE_PRINTER, \
              ::device_event_log::LOG_LEVEL_##level)
-#define SERIAL_LOG(level)                         \
-  DEVICE_LOG(::device_event_log::LOG_TYPE_SERIAL, \
-             ::device_event_log::LOG_LEVEL_##level)
-#define SERIAL_PLOG(level)                         \
-  DEVICE_PLOG(::device_event_log::LOG_TYPE_SERIAL, \
-              ::device_event_log::LOG_LEVEL_##level)
 #define CAMERA_LOG(level)                         \
   DEVICE_LOG(::device_event_log::LOG_TYPE_CAMERA, \
              ::device_event_log::LOG_LEVEL_##level)

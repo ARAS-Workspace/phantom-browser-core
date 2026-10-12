@@ -76,7 +76,6 @@ if (enable_extensions) {
     "automation_internal.webidl",
     "feedback_private.webidl",
     "file_system.idl",
-    "hid.idl",
     "mime_handler.webidl",
     "networking_private.webidl",
     "printer_provider_internal.webidl",
@@ -96,10 +95,6 @@ if (enable_extensions) {
     "mojo_private.webidl",
     "scripts_internal.webidl",
   ]
-
-  # On non-ChromeOS platforms the USB API is not supported but the types are
-  # still used by other APIs (e.g. printerProvider).
-  extensions_types_only_schema_files_ += [ "usb.webidl" ]
 }
 
 # In the experimental desktop-android configuration, we still need to compile

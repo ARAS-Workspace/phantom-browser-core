@@ -25,8 +25,7 @@
 #include "base/task/thread_pool.h"
 #include "base/threading/thread.h"
 #include "base/time/time.h"
-#include "chrome/browser/devtools/device/usb/usb_device_manager_helper.h"
-#include "chrome/browser/devtools/device/usb/usb_device_provider.h"
+#include "base/timer/timer.h"
 #include "content/public/browser/browser_thread.h"
 #include "net/base/io_buffer.h"
 #include "net/base/ip_endpoint.h"
@@ -391,11 +390,6 @@ class DevicesRequest : public base::RefCountedThreadSafe<DevicesRequest> {
   std::unique_ptr<DeviceDescriptors> descriptors_;
 };
 
-void OnCountDevices(base::OnceCallback<void(int)> callback, int device_count) {
-  content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE, base::BindOnce(std::move(callback), device_count));
-}
-
 }  // namespace
 
 AndroidDeviceManager::BrowserInfo::BrowserInfo()
@@ -572,24 +566,6 @@ void AndroidDeviceManager::QueryDevices(DevicesCallback callback) {
       handler_thread_->message_loop(), providers_,
       base::BindOnce(&AndroidDeviceManager::UpdateDevices,
                      weak_factory_.GetWeakPtr(), std::move(callback)));
-}
-
-void AndroidDeviceManager::CountDevices(
-    base::OnceCallback<void(int)> callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  handler_thread_->message_loop()->PostTask(
-      FROM_HERE,
-      base::BindOnce(&UsbDeviceManagerHelper::CountDevices,
-                     base::BindOnce(&OnCountDevices, std::move(callback))));
-}
-
-void AndroidDeviceManager::set_usb_device_manager_for_test(
-    mojo::PendingRemote<device::mojom::UsbDeviceManager> fake_usb_manager) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  handler_thread_->message_loop()->PostTask(
-      FROM_HERE,
-      base::BindOnce(&UsbDeviceManagerHelper::SetUsbManagerForTesting,
-                     std::move(fake_usb_manager)));
 }
 
 AndroidDeviceManager::AndroidDeviceManager()

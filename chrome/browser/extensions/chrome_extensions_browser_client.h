@@ -224,10 +224,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
                     content::WebContents** web_contents) const override;
   ScriptExecutor* GetScriptExecutorForTab(
       content::WebContents& web_contents) override;
-  bool IsUsbDeviceAllowedByPolicy(content::BrowserContext* context,
-                                  const ExtensionId& extension_id,
-                                  int vendor_id,
-                                  int product_id) const override;
   void GetFavicon(content::BrowserContext* browser_context,
                   const Extension* extension,
                   const GURL& url,

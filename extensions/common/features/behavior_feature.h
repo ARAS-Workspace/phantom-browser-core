@@ -12,7 +12,6 @@ namespace extensions {
 namespace behavior_feature {
 
 extern const char kZoomWithoutBubble[];
-extern const char kAllowUsbDevicesPermissionInterfaceClass[];
 extern const char kSigninScreen[];
 extern const char kAllowSecondaryKioskAppEnabledOnLaunch[];
 extern const char kKeyPermissionsInLoginScreen[];

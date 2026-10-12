@@ -1132,8 +1132,7 @@
                   'chrome/browser/ui/cocoa/permission_bubble/chooser_bubble_|'\
                   'chrome/browser/ui/views/device_chooser_|'\
                   'chrome/browser/ui/views/extensions/chooser_dialog_|'\
-                  'chrome/browser/ui/views/permission_bubble/chooser_bubble_|'\
-                  'chrome/browser/usb/usb_chooser_',
+                  'chrome/browser/ui/views/permission_bubble/chooser_bubble_',
     },
     'devtools': {
       'filepath': 'devtools',
@@ -1728,10 +1727,6 @@
     },
     'network_service': {
       'filepath': 'services/network/',
-    },
-    'nfc': {
-      'filepath': 'services/device/nfc/|'\
-                  'third_party/blink/renderer/modules/nfc/'
     },
     'notifications': {
       'filepath': 'chrome/browser/extensions/api/notifications/|'\
@@ -3098,8 +3093,6 @@
     'netinfo': ['jkarlin+watch@chromium.org'],
     'network_context': ['fenced-frames-reviews@chromium.org'],
     'network_service': ['network-service-reviews@chromium.org'],
-    'nfc': ['mattreynolds+watch@chromium.org',
-            'rijubrata.bhaumik@intel.com'],
     'notifications': ['peter@chromium.org', 'dibyapal+watch-webapps@chromium.org'],
     'nqe': ['tbansal+watch-nqe@chromium.org'],
     'ntp_snippets': ['ntp-dev+reviews@chromium.org'],

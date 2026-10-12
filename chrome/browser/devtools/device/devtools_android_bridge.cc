@@ -31,7 +31,6 @@
 #include "chrome/browser/devtools/device/adb/adb_device_provider.h"
 #include "chrome/browser/devtools/device/port_forwarding_controller.h"
 #include "chrome/browser/devtools/device/tcp_device_provider.h"
-#include "chrome/browser/devtools/device/usb/usb_device_provider.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/remote_debugging_server.h"
 #include "chrome/browser/profiles/profile.h"
@@ -161,10 +160,6 @@ DevToolsAndroidBridge::DevToolsAndroidBridge(Profile* profile)
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   pref_change_registrar_.Init(profile_->GetPrefs());
   pref_change_registrar_.Add(
-      prefs::kDevToolsDiscoverUsbDevicesEnabled,
-      base::BindRepeating(&DevToolsAndroidBridge::CreateDeviceProviders,
-                          base::Unretained(this)));
-  pref_change_registrar_.Add(
       prefs::kDevToolsTCPDiscoveryConfig,
       base::BindRepeating(&DevToolsAndroidBridge::CreateDeviceProviders,
                           base::Unretained(this)));
@@ -200,23 +195,6 @@ void DevToolsAndroidBridge::RemoveDeviceListListener(
     StopDeviceListPolling();
 }
 
-void DevToolsAndroidBridge::AddDeviceCountListener(
-    DeviceCountListener* listener) {
-  device_count_listeners_.push_back(listener);
-  if (device_count_listeners_.size() == 1)
-    StartDeviceCountPolling();
-}
-
-void DevToolsAndroidBridge::RemoveDeviceCountListener(
-    DeviceCountListener* listener) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  auto it = std::ranges::find(device_count_listeners_, listener);
-  CHECK(it != device_count_listeners_.end());
-  device_count_listeners_.erase(it);
-  if (device_count_listeners_.empty())
-    StopDeviceCountPolling();
-}
-
 void DevToolsAndroidBridge::AddPortForwardingListener(
     PortForwardingListener* listener) {
   bool polling_was_off = !NeedsDeviceListPolling();
@@ -237,7 +215,6 @@ void DevToolsAndroidBridge::RemovePortForwardingListener(
 DevToolsAndroidBridge::~DevToolsAndroidBridge() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DCHECK(device_list_listeners_.empty());
-  DCHECK(device_count_listeners_.empty());
   DCHECK(port_forwarding_listeners_.empty());
 }
 
@@ -283,42 +260,6 @@ void DevToolsAndroidBridge::ReceivedDeviceList(
        forwarding_listeners) {
     listener->PortStatusChanged(status);
   }
-}
-
-void DevToolsAndroidBridge::StartDeviceCountPolling() {
-  device_count_callback_.Reset(base::BindRepeating(
-      &DevToolsAndroidBridge::ReceivedDeviceCount, AsWeakPtr()));
-  RequestDeviceCount(device_count_callback_.callback());
-}
-
-void DevToolsAndroidBridge::StopDeviceCountPolling() {
-  device_count_callback_.Cancel();
-}
-
-void DevToolsAndroidBridge::RequestDeviceCount(
-    base::RepeatingCallback<void(int)> callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  if (device_count_listeners_.empty() || callback.IsCancelled())
-    return;
-
-  device_manager_->CountDevices(std::move(callback));
-}
-
-void DevToolsAndroidBridge::ReceivedDeviceCount(int count) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  DeviceCountListeners copy(device_count_listeners_);
-  for (DevToolsAndroidBridge::DeviceCountListener* listener : copy) {
-    listener->DeviceCountChanged(count);
-  }
-
-  if (device_count_listeners_.empty())
-    return;
-
-  task_scheduler_.Run(base::BindOnce(&DevToolsAndroidBridge::RequestDeviceCount,
-                                     AsWeakPtr(),
-                                     device_count_callback_.callback()));
 }
 
 static std::set<net::HostPortPair> ParseTargetDiscoveryPreferenceValue(
@@ -381,14 +322,6 @@ void DevToolsAndroidBridge::CreateDeviceProviders() {
 
   device_providers.push_back(new AdbDeviceProvider());
 
-  const PrefService::Preference* pref =
-      service->FindPreference(prefs::kDevToolsDiscoverUsbDevicesEnabled);
-  const base::Value* pref_value = pref->GetValue();
-
-  if (pref_value->is_bool() && pref_value->GetBool()) {
-    device_providers.push_back(new UsbDeviceProvider(profile_));
-  }
-
   device_manager_->SetDeviceProviders(device_providers);
   if (NeedsDeviceListPolling()) {
     StopDeviceListPolling();
@@ -400,9 +333,4 @@ void DevToolsAndroidBridge::set_tcp_provider_callback_for_test(
     TCPProviderCallback callback) {
   tcp_provider_callback_ = std::move(callback);
   CreateDeviceProviders();
-}
-
-void DevToolsAndroidBridge::set_usb_device_manager_for_test(
-    mojo::PendingRemote<device::mojom::UsbDeviceManager> fake_usb_manager) {
-  device_manager_->set_usb_device_manager_for_test(std::move(fake_usb_manager));
 }

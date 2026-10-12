@@ -103,7 +103,6 @@ export class TestSiteSettingsBrowserProxy extends TestBrowserProxy implements
       ContentSettingsTypes.FEDERATED_IDENTITY_API,
       ContentSettingsTypes.FILE_SYSTEM_WRITE,
       ContentSettingsTypes.GEOLOCATION,
-      ContentSettingsTypes.HID_DEVICES,
       ContentSettingsTypes.IDLE_DETECTION,
       ContentSettingsTypes.IMAGES,
       ContentSettingsTypes.JAVASCRIPT,
@@ -117,9 +116,7 @@ export class TestSiteSettingsBrowserProxy extends TestBrowserProxy implements
       ContentSettingsTypes.POPUPS,
       ContentSettingsTypes.PROTECTED_CONTENT,
       ContentSettingsTypes.SENSORS,
-      ContentSettingsTypes.SERIAL_PORTS,
       ContentSettingsTypes.SOUND,
-      ContentSettingsTypes.USB_DEVICES,
       ContentSettingsTypes.VR,
       ContentSettingsTypes.WINDOW_MANAGEMENT,
     ];

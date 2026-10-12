@@ -36,7 +36,7 @@
 #include "components/blocked_content/popup_blocker_tab_helper.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
-#include "components/permissions/fake_usb_chooser_controller.h"
+#include "components/permissions/fake_bluetooth_chooser_controller.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/permissions/test/mock_permission_request.h"
 #include "components/permissions/test/permission_request_observer.h"
@@ -892,7 +892,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
   // Trigger a chooser bubble, which should exit fullscreen.
   base::OnceClosure close_chooser = chrome::ShowDeviceChooserDialog(
       web_contents->GetPrimaryMainFrame(),
-      std::make_unique<FakeUsbChooserController>(/*device_count=*/1));
+      std::make_unique<permissions::FakeBluetoothChooserController>());
 
   ui_test_utils::FullscreenWaiter(browser(), {.tab_fullscreen = false}).Wait();
   EXPECT_FALSE(fullscreen_controller->IsTabFullscreen());

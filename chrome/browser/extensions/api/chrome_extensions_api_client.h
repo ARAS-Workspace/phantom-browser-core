@@ -84,8 +84,6 @@ class ChromeExtensionsAPIClient : public ExtensionsAPIClient {
   scoped_refptr<ContentRulesRegistry> CreateContentRulesRegistry(
       content::BrowserContext* browser_context,
       RulesCacheDelegate* cache_delegate) const override;
-  std::unique_ptr<UsbDevicePermissionsPrompt> CreateUsbDevicePermissionsPrompt(
-      content::WebContents* web_contents) const override;
   ManagementAPIDelegate* CreateManagementAPIDelegate() const override;
   std::unique_ptr<DisplayInfoProvider> CreateDisplayInfoProvider()
       const override;

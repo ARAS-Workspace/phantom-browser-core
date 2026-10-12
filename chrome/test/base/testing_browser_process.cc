@@ -30,7 +30,6 @@
 #include "chrome/browser/printing/print_job_manager.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/resource_coordinator/resource_coordinator_parts.h"
-#include "chrome/browser/serial/serial_policy_allowed_ports.h"
 #include "chrome/browser/status_icons/status_tray.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/testing_browser_process_platform_part.h"
@@ -74,8 +73,6 @@
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
 #endif
 
-#include "chrome/browser/hid/hid_status_icon.h"
-#include "chrome/browser/usb/usb_status_icon.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "components/component_updater/component_updater_service.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
@@ -164,7 +161,6 @@ TestingBrowserProcess::~TestingBrowserProcess() {
   }
 
   // Destroy objects in the same way as BrowserProcessImpl does.
-  serial_policy_allowed_ports_.reset();
   testing_local_state_.reset();
   browser_policy_connector_.reset();
 
@@ -262,8 +258,6 @@ void TestingBrowserProcess::Init() {
   web_app::InitializeIsolatedWebAppRuntime(
       base::PassKey<TestingBrowserProcess>());
   KeepAliveRegistry::GetInstance()->SetIsShuttingDown(false);
-  hid_system_tray_icon_ = std::make_unique<HidStatusIcon>();
-  usb_system_tray_icon_ = std::make_unique<UsbStatusIcon>();
 }
 
 void TestingBrowserProcess::EndSession() {}
@@ -545,32 +539,6 @@ TestingBrowserProcess::resource_coordinator_parts() {
         std::make_unique<resource_coordinator::ResourceCoordinatorParts>();
   }
   return resource_coordinator_parts_.get();
-}
-
-SerialPolicyAllowedPorts* TestingBrowserProcess::serial_policy_allowed_ports() {
-  if (!serial_policy_allowed_ports_) {
-    serial_policy_allowed_ports_ =
-        std::make_unique<SerialPolicyAllowedPorts>(local_state());
-  }
-  return serial_policy_allowed_ports_.get();
-}
-
-HidSystemTrayIcon* TestingBrowserProcess::hid_system_tray_icon() {
-  return hid_system_tray_icon_.get();
-}
-
-void TestingBrowserProcess::set_hid_system_tray_icon_for_test(
-    std::unique_ptr<HidSystemTrayIcon> icon) {
-  hid_system_tray_icon_ = std::move(icon);
-}
-
-UsbSystemTrayIcon* TestingBrowserProcess::usb_system_tray_icon() {
-  return usb_system_tray_icon_.get();
-}
-
-void TestingBrowserProcess::set_usb_system_tray_icon_for_test(
-    std::unique_ptr<UsbSystemTrayIcon> icon) {
-  usb_system_tray_icon_ = std::move(icon);
 }
 
 os_crypt_async::OSCryptAsync* TestingBrowserProcess::os_crypt_async() {

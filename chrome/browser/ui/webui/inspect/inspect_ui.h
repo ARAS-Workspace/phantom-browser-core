@@ -76,7 +76,6 @@ class InspectUI : public content::WebUIController,
   // content::WebContentsObserver:
   void WebContentsDestroyed() override;
 
-  void UpdateDiscoverUsbDevicesEnabled();
   void UpdatePortForwardingEnabled();
   void UpdatePortForwardingConfig();
   void UpdateTCPDiscoveryEnabled();

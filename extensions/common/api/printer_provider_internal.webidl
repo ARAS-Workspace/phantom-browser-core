@@ -30,13 +30,6 @@ interface PrinterProviderInternal {
   static undefined reportPrinters(
       long requestId, optional sequence<PrinterProviderPrinterInfo> printers);
 
-  // Runs callback to printerProvider.onUsbAccessGranted event.
-  // |requestId|: Parameter identifying the event instance for which the
-  //     callback is run.
-  // |printerInfo|: Printer information reported by the extension.
-  static undefined reportUsbPrinterInfo(
-      long requestId, optional PrinterProviderPrinterInfo printerInfo);
-
   // Runs callback to printerProvider.onGetCapabilityRequested event.
   // |requestId|: Parameter identifying the event instance for which the
   //     callback is run.

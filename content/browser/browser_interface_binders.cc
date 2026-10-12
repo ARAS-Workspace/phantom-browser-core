@@ -180,13 +180,11 @@
 #include "third_party/blink/public/mojom/presentation/presentation.mojom.h"
 #include "third_party/blink/public/mojom/quota/quota_manager_host.mojom.h"
 #include "third_party/blink/public/mojom/sensor/web_sensor_provider.mojom.h"
-#include "third_party/blink/public/mojom/serial/serial.mojom.h"
 #include "third_party/blink/public/mojom/sms/webotp_service.mojom.h"
 #include "third_party/blink/public/mojom/speculation_rules/speculation_rules.mojom.h"
 #include "third_party/blink/public/mojom/speech/speech_synthesis.mojom.h"
 #include "third_party/blink/public/mojom/storage_access/storage_access_handle.mojom.h"
 #include "third_party/blink/public/mojom/timing/declarative_performance_observer.mojom.h"
-#include "third_party/blink/public/mojom/usb/web_usb_service.mojom.h"
 #include "third_party/blink/public/mojom/wake_lock/wake_lock.mojom.h"
 #include "third_party/blink/public/mojom/web_install/web_install.mojom.h"
 #include "third_party/blink/public/mojom/webaudio/audio_context_manager.mojom.h"
@@ -203,7 +201,6 @@
 #include "content/browser/direct_sockets/direct_sockets_service_impl.h"
 #include "media/mojo/mojom/renderer_extensions.mojom.h"
 #include "media/mojo/mojom/speech_recognition.mojom.h"  // nogncheck
-#include "third_party/blink/public/mojom/hid/hid.mojom.h"
 
 #if BUILDFLAG(IS_P2P_ENABLED)
 #include "services/network/public/mojom/p2p.mojom.h"
@@ -1007,9 +1004,6 @@ void PopulateBinderMapWithContext(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::GetManagedConfigurationService>);
 
-  map->Add<blink::mojom::WebUsbService>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::CreateWebUsbService>);
-
   map->Add<blink::mojom::WebSocketConnector>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::CreateWebSocketConnector>);
 
@@ -1187,12 +1181,6 @@ void PopulateBinderMapWithContext(
             &RenderFrameHostImpl::BindInputInjectorReceiver>);
   }
 
-  map->Add<blink::mojom::HidService>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetHidService>);
-
-  map->Add<blink::mojom::SerialService>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindSerialService>);
-
   map->Add<blink::mojom::ModelContextHost>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindModelContextHost>);
 
@@ -1365,8 +1353,6 @@ void PopulateDedicatedWorkerBinders(DedicatedWorkerHost* host,
   map->Add<blink::mojom::DirectSocketsService>(
       base::BindRepeating(&DedicatedWorkerHost::CreateDirectSocketsService,
                           base::Unretained(host)));
-  map->Add<blink::mojom::WebUsbService>(base::BindRepeating(
-      &DedicatedWorkerHost::CreateWebUsbService, base::Unretained(host)));
   map->Add<blink::mojom::WebSocketConnector>(base::BindRepeating(
       &DedicatedWorkerHost::CreateWebSocketConnector, base::Unretained(host)));
   map->Add<blink::mojom::WebTransportConnector>(
@@ -1389,10 +1375,6 @@ void PopulateDedicatedWorkerBinders(DedicatedWorkerHost* host,
                           base::Unretained(host)));
   map->Add<blink::mojom::ReportingServiceProxy>(base::BindRepeating(
       &CreateReportingServiceProxyForDedicatedWorker, base::Unretained(host)));
-  map->Add<blink::mojom::SerialService>(base::BindRepeating(
-      &DedicatedWorkerHost::BindSerialService, base::Unretained(host)));
-  map->Add<blink::mojom::HidService>(base::BindRepeating(
-      &DedicatedWorkerHost::BindHidService, base::Unretained(host)));
   map->Add<blink::mojom::BucketManagerHost>(base::BindRepeating(
       &DedicatedWorkerHost::CreateBucketManagerHost, base::Unretained(host)));
   map->Add<blink::mojom::FileSystemAccessManager>(
@@ -1628,12 +1610,8 @@ void PopulateServiceWorkerBinders(ServiceWorkerHost* host,
                                                          std::move(receiver));
       },
       base::Unretained(host)));
-  map->Add<blink::mojom::HidService>(base::BindRepeating(
-      &ServiceWorkerHost::BindHidService, base::Unretained(host)));
   map->Add<blink::mojom::BucketManagerHost>(base::BindRepeating(
       &ServiceWorkerHost::CreateBucketManagerHost, base::Unretained(host)));
-  map->Add<blink::mojom::WebUsbService>(base::BindRepeating(
-      &ServiceWorkerHost::BindUsbService, base::Unretained(host)));
   map->Add<blink::mojom::AIManager>(base::BindRepeating(
       &ServiceWorkerHost::BindAIManager, base::Unretained(host)));
 

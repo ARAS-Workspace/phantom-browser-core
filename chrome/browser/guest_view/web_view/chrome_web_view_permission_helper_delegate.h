@@ -73,8 +73,6 @@ class ChromeWebViewPermissionHelperDelegate
       const GURL& requesting_frame,
       bool user_gesture,
       base::OnceCallback<void(bool)> callback) override;
-  void RequestHidPermission(const GURL& requesting_frame_url,
-                            base::OnceCallback<void(bool)> callback) override;
   void RequestFileSystemPermission(
       const GURL& url,
       bool allowed_by_default,
@@ -132,10 +130,6 @@ class ChromeWebViewPermissionHelperDelegate
       base::OnceCallback<void(content::PermissionResult)> callback,
       bool allow,
       const std::string& user_input);
-
-  void OnHidPermissionResponse(base::OnceCallback<void(bool)> callback,
-                               bool allow,
-                               const std::string& user_input);
 
   void OnFileSystemPermissionResponse(base::OnceCallback<void(bool)> callback,
                                       bool allow,

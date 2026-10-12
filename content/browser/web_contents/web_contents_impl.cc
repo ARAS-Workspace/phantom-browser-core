@@ -2716,11 +2716,9 @@ bool WebContentsImpl::IsCapabilityActive(
     case WebContentsCapabilityType::kBluetoothScanning:
       return bluetooth_scanning_sessions_count_ > 0;
     case WebContentsCapabilityType::kSerial:
-      return serial_active_frame_count_ > 0;
     case WebContentsCapabilityType::kHID:
-      return hid_active_frame_count_ > 0;
     case WebContentsCapabilityType::kUSB:
-      return usb_active_frame_count_ > 0;
+      return false;
     case WebContentsCapabilityType::kGeolocation:
       return geolocation_active_frame_count_ > 0;
   }
@@ -11200,75 +11198,6 @@ void WebContentsImpl::DecrementBluetoothScanningSessionsCount() {
   }
 }
 
-void WebContentsImpl::IncrementSerialActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::IncrementSerialActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the state changes.
-  serial_active_frame_count_++;
-  if (serial_active_frame_count_ == 1) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kSerial, /*used=*/true);
-  }
-}
-
-void WebContentsImpl::DecrementSerialActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::DecrementSerialActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the state changes.
-  DCHECK_NE(0u, serial_active_frame_count_);
-  serial_active_frame_count_--;
-  if (serial_active_frame_count_ == 0) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kSerial,
-                             /*used=*/false);
-  }
-}
-
-void WebContentsImpl::IncrementHidActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::IncrementHidActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the active frame count transitions from zero to
-  // non-zero.
-  hid_active_frame_count_++;
-  if (hid_active_frame_count_ == 1) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kHID, /*used=*/true);
-  }
-}
-
-void WebContentsImpl::DecrementHidActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::DecrementHidActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the active frame count transitions from non-zero
-  // to zero.
-  DCHECK_NE(0u, hid_active_frame_count_);
-  hid_active_frame_count_--;
-  if (hid_active_frame_count_ == 0) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kHID, /*used=*/false);
-  }
-}
-
 void WebContentsImpl::IncrementGeolocationActiveFrameCount() {
   OPTIONAL_TRACE_EVENT0(
       "content", "WebContentsImpl::IncrementGeolocationActiveFrameCount");
@@ -11313,41 +11242,6 @@ void WebContentsImpl::OnCapabilityTypesChanged(
   NotifyNavigationStateChanged(INVALIDATE_TYPE_TAB);
   observers_.NotifyObservers(&WebContentsObserver::OnCapabilityTypesChanged,
                              capability_type, used);
-}
-
-void WebContentsImpl::IncrementUsbActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::IncrementUsbActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the active frame count transitions from zero to
-  // non-zero.
-  usb_active_frame_count_++;
-  if (usb_active_frame_count_ == 1) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kUSB, /*used=*/true);
-  }
-}
-
-void WebContentsImpl::DecrementUsbActiveFrameCount() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::DecrementUsbActiveFrameCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the active frame count transitions from non-zero
-  // to zero.
-  DCHECK_NE(0u, usb_active_frame_count_);
-  usb_active_frame_count_--;
-  if (usb_active_frame_count_ == 0) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kUSB, /*used=*/false);
-  }
 }
 
 void WebContentsImpl::IncrementFileSystemAccessHandleCount() {

@@ -18,7 +18,6 @@
 #include "components/permissions/contexts/loopback_network_permission_context.h"
 #include "components/permissions/contexts/midi_permission_context.h"
 #include "components/permissions/contexts/midi_sysex_permission_context.h"
-#include "components/permissions/contexts/nfc_permission_context.h"
 #include "components/permissions/contexts/payment_handler_permission_context.h"
 #include "components/permissions/contexts/pointer_lock_permission_context.h"
 #include "components/permissions/contexts/sensor_permission_context.h"
@@ -52,7 +51,6 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
   DCHECK(delegates.camera_pan_tilt_zoom_permission_context_delegate);
   DCHECK(delegates.geolocation_permission_context_delegate);
   DCHECK(delegates.media_stream_device_enumerator);
-  DCHECK(delegates.nfc_permission_context_delegate);
 
   permission_contexts[ContentSettingsType::AR] =
       std::make_unique<permissions::WebXrPermissionContext>(
@@ -106,10 +104,6 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
   permission_contexts[ContentSettingsType::MIDI_SYSEX] =
       std::make_unique<permissions::MidiSysexPermissionContext>(
           browser_context);
-  permission_contexts[ContentSettingsType::NFC] =
-      std::make_unique<permissions::NfcPermissionContext>(
-          browser_context,
-          std::move(delegates.nfc_permission_context_delegate));
   permission_contexts[ContentSettingsType::PAYMENT_HANDLER] =
       std::make_unique<payments::PaymentHandlerPermissionContext>(
           browser_context);

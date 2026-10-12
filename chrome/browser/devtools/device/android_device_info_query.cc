@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #include <array>
+#include <set>
 #include <string_view>
 
 #include "base/functional/bind.h"

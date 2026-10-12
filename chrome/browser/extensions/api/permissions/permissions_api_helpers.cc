@@ -18,7 +18,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_info.h"
-#include "extensions/common/permissions/usb_device_permission.h"
 #include "extensions/common/url_pattern_set.h"
 #include "extensions/common/user_script.h"
 
@@ -31,49 +30,10 @@ namespace permissions_api_helpers {
 namespace {
 
 const char kDelimiter[] = "|";
-const char kInvalidParameter[] = "Invalid argument for permission '*'.";
 const char kInvalidOrigin[] = "Invalid value for origin pattern *: *";
 const char kUnknownPermissionError[] = "'*' is not a recognized permission.";
 const char kUnsupportedPermissionId[] =
     "Only the usbDevices permission supports arguments.";
-
-// Extracts an API permission that supports arguments. In practice, this is
-// restricted to the UsbDevicePermission.
-std::unique_ptr<APIPermission> UnpackPermissionWithArguments(
-    std::string_view permission_name,
-    std::string_view permission_arg,
-    const std::string& permission_str,
-    std::string* error) {
-  std::optional<base::Value> permission_json = base::JSONReader::Read(
-      permission_arg, base::JSON_PARSE_CHROMIUM_EXTENSIONS);
-  if (!permission_json) {
-    *error = ErrorUtils::FormatErrorMessage(kInvalidParameter, permission_str);
-    return nullptr;
-  }
-
-  std::unique_ptr<APIPermission> permission;
-
-  // Explicitly check the permissions that accept arguments until
-  // https://crbug.com/40294655 is fixed.
-  const APIPermissionInfo* usb_device_permission_info =
-      PermissionsInfo::GetInstance()->GetByID(
-          mojom::APIPermissionID::kUsbDevice);
-  if (permission_name == usb_device_permission_info->name()) {
-    permission =
-        std::make_unique<UsbDevicePermission>(usb_device_permission_info);
-  } else {
-    *error = kUnsupportedPermissionId;
-    return nullptr;
-  }
-
-  CHECK(permission);
-  if (!permission->FromValue(&permission_json.value(), nullptr, nullptr)) {
-    *error = ErrorUtils::FormatErrorMessage(kInvalidParameter, permission_str);
-    return nullptr;
-  }
-
-  return permission;
-}
 
 // A helper method to unpack API permissions from the list in
 // |permissions_input|, and populate the appropriate fields of |result|.
@@ -93,15 +53,8 @@ bool UnpackAPIPermissions(const std::vector<std::string>& permissions_input,
     // http://code.google.com/p/chromium/issues/detail?id=162042
     size_t delimiter = permission_str.find(kDelimiter);
     if (delimiter != std::string::npos) {
-      std::string_view permission_piece(permission_str);
-      std::unique_ptr<APIPermission> permission = UnpackPermissionWithArguments(
-          permission_piece.substr(0, delimiter),
-          permission_piece.substr(delimiter + 1), permission_str, error);
-      if (!permission) {
-        return false;
-      }
-
-      apis.insert(std::move(permission));
+      *error = kUnsupportedPermissionId;
+      return false;
     } else {
       const APIPermissionInfo* permission_info =
           info->GetByName(permission_str);

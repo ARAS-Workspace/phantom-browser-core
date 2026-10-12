@@ -27,8 +27,6 @@
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/permissions/permissions_info.h"
-#include "extensions/common/permissions/usb_device_permission.h"
-#include "extensions/common/permissions/usb_device_permission_data.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -245,113 +243,6 @@ TEST_F(PermissionMessagesUnittest,
   EXPECT_EQ(l10n_util::GetStringUTF16(
                 IDS_EXTENSION_PROMPT_WARNING_HISTORY_READ_ON_ALL_DEVICES),
             active_permissions()[0]);
-}
-
-class USBDevicePermissionMessagesTest : public testing::Test {
- public:
-  USBDevicePermissionMessagesTest()
-      : message_provider_(new ChromePermissionMessageProvider()) {}
-  ~USBDevicePermissionMessagesTest() override = default;
-
-  PermissionMessages GetMessages(const PermissionIDSet& permissions) {
-    return message_provider_->GetPermissionMessages(permissions);
-  }
-
- private:
-  std::unique_ptr<ChromePermissionMessageProvider> message_provider_;
-};
-
-TEST_F(USBDevicePermissionMessagesTest, SingleDevice) {
-  {
-    const char16_t kMessage[] =
-        u"Access any PVR Mass Storage from HUMAX Co., Ltd. via USB";
-
-    auto permission_list =
-        base::ListValue().Append(base::Value::FromUniquePtrValue(
-            UsbDevicePermissionData(0x02ad, 0x138c, -1, -1).ToValue()));
-    base::Value permission_value = base::Value(std::move(permission_list));
-
-    UsbDevicePermission permission(
-        PermissionsInfo::GetInstance()->GetByID(APIPermissionID::kUsbDevice));
-    ASSERT_TRUE(permission.FromValue(&permission_value, nullptr, nullptr));
-
-    PermissionMessages messages = GetMessages(permission.GetPermissions());
-    ASSERT_EQ(1U, messages.size());
-    EXPECT_EQ(kMessage, messages.front().message());
-  }
-  {
-    const char16_t kMessage[] = u"Access USB devices from HUMAX Co., Ltd.";
-
-    base::ListValue permission_list;
-    permission_list.Append(base::Value::FromUniquePtrValue(
-        UsbDevicePermissionData(0x02ad, 0x138d, -1, -1).ToValue()));
-    base::Value permission_value = base::Value(std::move(permission_list));
-
-    UsbDevicePermission permission(
-        PermissionsInfo::GetInstance()->GetByID(APIPermissionID::kUsbDevice));
-    ASSERT_TRUE(permission.FromValue(&permission_value, nullptr, nullptr));
-
-    PermissionMessages messages = GetMessages(permission.GetPermissions());
-    ASSERT_EQ(1U, messages.size());
-    EXPECT_EQ(kMessage, messages.front().message());
-  }
-  {
-    const char16_t kMessage[] = u"Access USB devices from an unknown vendor";
-
-    base::ListValue permission_list;
-    permission_list.Append(base::Value::FromUniquePtrValue(
-        UsbDevicePermissionData(0x02ae, 0x138d, -1, -1).ToValue()));
-    base::Value permission_value = base::Value(std::move(permission_list));
-
-    UsbDevicePermission permission(
-        PermissionsInfo::GetInstance()->GetByID(APIPermissionID::kUsbDevice));
-    ASSERT_TRUE(permission.FromValue(&permission_value, nullptr, nullptr));
-
-    PermissionMessages messages = GetMessages(permission.GetPermissions());
-    ASSERT_EQ(1U, messages.size());
-    EXPECT_EQ(kMessage, messages.front().message());
-  }
-}
-
-TEST_F(USBDevicePermissionMessagesTest, MultipleDevice) {
-  const char16_t kMessage[] = u"Access any of these USB devices";
-  auto kDetails = std::to_array<const char*>({
-      "PVR Mass Storage from HUMAX Co., Ltd.",
-      "unknown devices from HUMAX Co., Ltd.",
-      "devices from an unknown vendor",
-  });
-
-  // Prepare data set
-  base::ListValue permission_list;
-  permission_list.Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ad, 0x138c, -1, -1).ToValue()));
-  // This device's product ID is not in Chrome's database.
-  permission_list.Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ad, 0x138d, -1, -1).ToValue()));
-  // This additional unknown product will be collapsed into the entry above.
-  permission_list.Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ad, 0x138e, -1, -1).ToValue()));
-  // This device's vendor ID is not in Chrome's database.
-  permission_list.Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02ae, 0x138d, -1, -1).ToValue()));
-  // This additional unknown vendor will be collapsed into the entry above.
-  permission_list.Append(base::Value::FromUniquePtrValue(
-      UsbDevicePermissionData(0x02af, 0x138d, -1, -1).ToValue()));
-
-  base::Value permission_value = base::Value(std::move(permission_list));
-
-  UsbDevicePermission permission(
-      PermissionsInfo::GetInstance()->GetByID(APIPermissionID::kUsbDevice));
-  ASSERT_TRUE(permission.FromValue(&permission_value, nullptr, nullptr));
-
-  PermissionMessages messages = GetMessages(permission.GetPermissions());
-  ASSERT_EQ(1U, messages.size());
-  EXPECT_EQ(kMessage, messages.front().message());
-  const std::vector<std::u16string>& submessages =
-      messages.front().submessages();
-  ASSERT_EQ(std::size(kDetails), submessages.size());
-  for (size_t i = 0; i < submessages.size(); i++)
-    EXPECT_EQ(base::ASCIIToUTF16(kDetails[i]), submessages[i]);
 }
 
 }  // namespace extensions

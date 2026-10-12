@@ -27,23 +27,18 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/version_info/version_info.h"
 #include "content/public/test/test_utils.h"
-#include "extensions/browser/api/device_permissions_manager.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api_factory.h"
 #include "extensions/browser/api/printer_provider/printer_provider_print_job.h"
-#include "extensions/browser/api/usb/usb_device_manager.h"
 #include "extensions/common/extension.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "printing/pdf_render_settings.h"
 #include "printing/print_job_constants.h"
 #include "printing/pwg_raster_settings.h"
 #include "printing/units.h"
-#include "services/device/public/cpp/test/fake_usb_device_manager.h"
-#include "services/device/public/mojom/usb_device.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/geometry/size.h"
 
-using device::mojom::UsbDeviceInfoPtr;
 using extensions::Extension;
 using extensions::PrinterProviderAPI;
 using extensions::PrinterProviderPrintJob;
@@ -87,24 +82,6 @@ const char kPrintTicketWithDuplex[] =
     "  \"version\": \"1.0\","
     "  \"print\": {"
     "    \"duplex\": {\"type\": \"LONG_EDGE\"}"
-    "  }"
-    "}";
-
-// An extension with permission for none of the printers it supports.
-const char kExtension2[] =
-    "{"
-    "  \"name\": \"Provider 2\","
-    "  \"app\": {"
-    "    \"background\": {"
-    "      \"scripts\": [\"background.js\"]"
-    "    }"
-    "  },"
-    "  \"permissions\": [ \"printerProvider\", \"usb\" ],"
-    "  \"usb_printers\": {"
-    "    \"filters\": ["
-    "      { \"vendorId\": 0, \"productId\": 0 },"
-    "      { \"vendorId\": 0, \"productId\": 1 }"
-    "    ]"
     "  }"
     "}";
 
@@ -251,15 +228,6 @@ void RecordPrintResult(size_t* call_count,
   *status_out = status_str;
 }
 
-// Used as a callback to StartGrantPrinterAccess in tests.
-// Increases |*call_count| and records the value returned.
-void RecordPrinterInfo(size_t* call_count,
-                       base::DictValue* printer_info_out,
-                       const base::DictValue& printer_info) {
-  ++(*call_count);
-  *printer_info_out = printer_info.Clone();
-}
-
 std::string RefCountedMemoryToString(
     scoped_refptr<base::RefCountedMemory> memory) {
   return std::string(base::as_string_view(*memory));
@@ -356,15 +324,6 @@ class FakePrinterProviderAPI : public PrinterProviderAPI {
     pending_print_requests_.push(std::move(request_info));
   }
 
-  void DispatchGetUsbPrinterInfoRequested(
-      const std::string& extension_id,
-      const device::mojom::UsbDeviceInfo& device,
-      PrinterProviderAPI::GetPrinterInfoCallback callback) override {
-    EXPECT_EQ("fake extension id", extension_id);
-    EXPECT_FALSE(device.guid.empty());
-    pending_usb_info_callbacks_.push(std::move(callback));
-  }
-
   size_t pending_get_printers_count() const {
     return pending_printers_callbacks_.size();
   }
@@ -412,24 +371,12 @@ class FakePrinterProviderAPI : public PrinterProviderAPI {
     pending_print_requests_.pop();
   }
 
-  size_t pending_usb_info_count() const {
-    return pending_usb_info_callbacks_.size();
-  }
-
-  void TriggerNextUsbPrinterInfoCallback(base::DictValue printer_info) {
-    ASSERT_GT(pending_usb_info_count(), 0u);
-    std::move(pending_usb_info_callbacks_.front()).Run(std::move(printer_info));
-    pending_usb_info_callbacks_.pop();
-  }
-
  private:
   base::queue<PrinterProviderAPI::GetPrintersCallback>
       pending_printers_callbacks_;
   base::queue<PrinterProviderAPI::GetCapabilityCallback>
       pending_capability_callbacks_;
   base::queue<PrintRequestInfo> pending_print_requests_;
-  base::queue<PrinterProviderAPI::GetPrinterInfoCallback>
-      pending_usb_info_callbacks_;
 };
 
 std::unique_ptr<KeyedService> BuildTestingPrinterProviderAPI(
@@ -460,12 +407,6 @@ class ExtensionPrinterHandlerTest : public testing::Test {
     extension_printer_handler_->SetPwgRasterConverterForTesting(
         std::move(pwg_raster_converter));
 
-    // Set fake USB device manager for extensions::UsbDeviceManager.
-    mojo::PendingRemote<device::mojom::UsbDeviceManager> usb_manager;
-    fake_usb_manager_.AddReceiver(usb_manager.InitWithNewPipeAndPassReceiver());
-    extensions::UsbDeviceManager::Get(env_.profile())
-        ->SetDeviceManagerForTesting(std::move(usb_manager));
-    base::RunLoop().RunUntilIdle();
   }
 
  protected:
@@ -475,7 +416,6 @@ class ExtensionPrinterHandlerTest : public testing::Test {
             ->GetForBrowserContext(env_.profile()));
   }
 
-  device::FakeUsbDeviceManager fake_usb_manager_;
   TestExtensionEnvironment env_;
   std::unique_ptr<ExtensionPrinterHandler> extension_printer_handler_;
 
@@ -533,38 +473,6 @@ TEST_F(ExtensionPrinterHandlerTest, GetPrintersReset) {
 
   fake_api->TriggerNextGetPrintersCallback(original_printers.GetList().Clone(),
                                            /*done=*/true);
-
-  EXPECT_EQ(0u, call_count);
-}
-
-TEST_F(ExtensionPrinterHandlerTest, GetUsbPrinters) {
-  UsbDeviceInfoPtr device0 =
-      fake_usb_manager_.CreateAndAddDevice(0, 0, "Google", "USB Printer", "");
-  UsbDeviceInfoPtr device1 =
-      fake_usb_manager_.CreateAndAddDevice(0, 1, "Google", "USB Printer", "");
-  base::RunLoop().RunUntilIdle();
-
-  const Extension* extension_2 =
-      env_.MakeExtension(base::test::ParseJsonDict(kExtension2),
-                         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-
-  extensions::DevicePermissionsManager* permissions_manager =
-      extensions::DevicePermissionsManager::Get(env_.profile());
-  permissions_manager->AllowUsbDevice(extension_2->id(), *device0);
-
-  size_t call_count = 0;
-  base::ListValue printers;
-  bool is_done = false;
-  extension_printer_handler_->StartGetPrinters(
-      base::BindRepeating(&RecordPrinterList, std::ref(call_count),
-                          std::ref(printers)),
-      base::BindOnce(&RecordPrintersDone, &is_done));
-
-  base::RunLoop().RunUntilIdle();
-
-  FakePrinterProviderAPI* fake_api = GetPrinterProviderAPI();
-  ASSERT_TRUE(fake_api);
-  ASSERT_EQ(1u, fake_api->pending_get_printers_count());
 
   EXPECT_EQ(0u, call_count);
 }
@@ -909,65 +817,6 @@ TEST_F(ExtensionPrinterHandlerTest, PrintPwgFailedConversion) {
 
   EXPECT_FALSE(success);
   EXPECT_EQ("INVALID_DATA", status);
-}
-
-TEST_F(ExtensionPrinterHandlerTest, GrantUsbPrinterAccess) {
-  UsbDeviceInfoPtr device =
-      fake_usb_manager_.CreateAndAddDevice(0, 0, "Google", "USB Printer", "");
-  base::RunLoop().RunUntilIdle();
-
-  size_t call_count = 0;
-  base::DictValue printer_info;
-
-  std::string printer_id = base::StringPrintf(
-      "provisional-usb:fake extension id:%s", device->guid.c_str());
-  extension_printer_handler_->StartGrantPrinterAccess(
-      printer_id,
-      base::BindOnce(&RecordPrinterInfo, &call_count, &printer_info));
-
-  EXPECT_TRUE(printer_info.empty());
-  FakePrinterProviderAPI* fake_api = GetPrinterProviderAPI();
-  ASSERT_TRUE(fake_api);
-  ASSERT_EQ(1u, fake_api->pending_usb_info_count());
-
-  base::DictValue original_printer_info =
-      base::DictValue().Set("id", "printer1").Set("name", "Printer 1");
-
-  fake_api->TriggerNextUsbPrinterInfoCallback(original_printer_info.Clone());
-
-  EXPECT_EQ(1u, call_count);
-  EXPECT_FALSE(printer_info.empty());
-  EXPECT_EQ(printer_info, original_printer_info)
-      << printer_info << ", expected: " << original_printer_info;
-}
-
-TEST_F(ExtensionPrinterHandlerTest, GrantUsbPrinterAccessReset) {
-  UsbDeviceInfoPtr device =
-      fake_usb_manager_.CreateAndAddDevice(0, 0, "Google", "USB Printer", "");
-  base::RunLoop().RunUntilIdle();
-
-  size_t call_count = 0;
-  base::DictValue printer_info;
-
-  extension_printer_handler_->StartGrantPrinterAccess(
-      base::StringPrintf("provisional-usb:fake extension id:%s",
-                         device->guid.c_str()),
-      base::BindOnce(&RecordPrinterInfo, &call_count, &printer_info));
-
-  EXPECT_TRUE(printer_info.empty());
-  FakePrinterProviderAPI* fake_api = GetPrinterProviderAPI();
-  ASSERT_TRUE(fake_api);
-  ASSERT_EQ(1u, fake_api->pending_usb_info_count());
-
-  extension_printer_handler_->Reset();
-
-  base::DictValue original_printer_info =
-      base::DictValue().Set("id", "printer1").Set("name", "Printer 1");
-
-  fake_api->TriggerNextUsbPrinterInfoCallback(std::move(original_printer_info));
-
-  EXPECT_EQ(0u, call_count);
-  EXPECT_TRUE(printer_info.empty());
 }
 
 }  // namespace printing

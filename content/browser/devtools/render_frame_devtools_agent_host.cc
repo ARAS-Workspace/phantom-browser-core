@@ -84,10 +84,6 @@
 
 #include "content/browser/devtools/protocol/webauthn_handler.h"
 
-#ifdef ENABLE_SMART_CARD
-#include "content/browser/devtools/protocol/smart_card_emulation_handler.h"
-#endif
-
 #if BUILDFLAG(USE_VIZ_DEBUGGER)
 #include "content/browser/devtools/protocol/visual_debugger_handler.h"
 #endif
@@ -413,12 +409,6 @@ bool RenderFrameDevToolsAgentHost::AttachSession(DevToolsSession* session) {
   session->CreateAndAddHandler<protocol::InspectorHandler>();
   session->CreateAndAddHandler<protocol::IOHandler>(GetIOContext());
   session->CreateAndAddHandler<protocol::MemoryHandler>();
-#ifdef ENABLE_SMART_CARD
-  if (is_main_frame) {
-    session->CreateAndAddHandler<protocol::SmartCardEmulationHandler>(
-        content::WebContents::FromRenderFrameHost(frame_host_));
-  }
-#endif
 #if BUILDFLAG(USE_VIZ_DEBUGGER)
   session->CreateAndAddHandler<protocol::VisualDebuggerHandler>();
 #endif

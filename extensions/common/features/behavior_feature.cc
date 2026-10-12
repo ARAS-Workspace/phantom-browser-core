@@ -10,9 +10,6 @@ namespace behavior_feature {
 
 const char kZoomWithoutBubble[] = "zoom_without_bubble";
 
-const char kAllowUsbDevicesPermissionInterfaceClass[] =
-    "allow_usb_devices_permission_interface_class";
-
 const char kSigninScreen[] = "signin_screen";
 
 const char kAllowSecondaryKioskAppEnabledOnLaunch[] =

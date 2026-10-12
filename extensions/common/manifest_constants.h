@@ -163,7 +163,6 @@ inline constexpr char kTtsVoicesVoiceName[] = "voice_name";
 inline constexpr char kUpdateURL[] = "update_url";
 inline constexpr char kUrlHandlers[] = "url_handlers";
 inline constexpr char kUrlHandlerTitle[] = "title";
-inline constexpr char kUsbPrinters[] = "usb_printers";
 inline constexpr char kVersion[] = "version";
 inline constexpr char kVersionName[] = "version_name";
 inline constexpr char kWebURLs[] = "app.urls";

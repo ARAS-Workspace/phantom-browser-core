@@ -11,10 +11,7 @@ import "services/device/public/mojom/hid.mojom";
 import "services/device/public/mojom/power_monitor.mojom";
 import "services/device/public/mojom/screen_orientation.mojom";
 import "services/device/public/mojom/sensor_provider.mojom";
-import "services/device/public/mojom/serial.mojom";
 import "services/device/public/mojom/time_zone_monitor.mojom";
-import "services/device/public/mojom/usb_manager.mojom";
-import "services/device/public/mojom/usb_manager_test.mojom";
 import "services/device/public/mojom/vibration_manager.mojom";
 import "services/device/public/mojom/wake_lock_provider.mojom";
 
@@ -75,18 +72,9 @@ interface DeviceService {
   // Binds a SensorProvider endpoint.
   BindSensorProvider(pending_receiver<SensorProvider> receiver);
 
-  // binds a SerialPortManager endpoint.
-  BindSerialPortManager(pending_receiver<SerialPortManager> receiver);
-
   // Binds a TimeZoneMonitor endpoint.
   BindTimeZoneMonitor(pending_receiver<TimeZoneMonitor> receiver);
 
   // Binds a WakeLockProvider endpoint.
   BindWakeLockProvider(pending_receiver<WakeLockProvider> receiver);
-
-  // Binds a UsbDeviceManager endpoint.
-  BindUsbDeviceManager(pending_receiver<UsbDeviceManager> receiver);
-
-  // Binds a UsbDeviceManagerTest endpoint.
-  BindUsbDeviceManagerTest(pending_receiver<UsbDeviceManagerTest> receiver);
 };

@@ -90,7 +90,4 @@ specific_include_rules = {
   r"settings_window_manager_chromeos\.cc": [
     "+ash/wm/window_properties.h",
   ],
-  r"hid_chooser_controller_unittest\.cc": [
-    "+services/device/hid",
-  ],
 }

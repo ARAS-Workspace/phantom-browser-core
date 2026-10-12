@@ -35,12 +35,9 @@
 #include "third_party/blink/public/mojom/service_worker/service_worker_container.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_container_type.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_provider.mojom.h"
-#include "third_party/blink/public/mojom/usb/web_usb_service.mojom-forward.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 #include "third_party/blink/public/mojom/webtransport/web_transport_connector.mojom.h"
 #include "url/origin.h"
-
-#include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
 
 namespace content {
 
@@ -92,11 +89,6 @@ class CONTENT_EXPORT ServiceWorkerHost : public BucketContext,
   // setup for eager cache storage has failed.
   void BindCacheStorage(
       mojo::PendingReceiver<blink::mojom::CacheStorage> receiver);
-
-  void BindHidService(mojo::PendingReceiver<blink::mojom::HidService> receiver);
-
-  void BindUsbService(
-      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver);
 
   ServiceWorkerContainerHostForServiceWorker* container_host() {
     return container_host_.get();

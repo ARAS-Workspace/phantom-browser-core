@@ -23,8 +23,6 @@ mojom("mojom") {
     "pressure_update.mojom",
     "screen_orientation.mojom",
     "screen_orientation_lock_types.mojom",
-    "serial.mojom",
-    "smart_card.mojom",
     "time_zone_monitor.mojom",
     "vibration_manager.mojom",
     "wake_lock.mojom",
@@ -87,8 +85,6 @@ mojom("device_service") {
   public_deps = [
     ":generic_sensor",
     ":mojom",
-    ":usb",
-    ":usb_test",
   ]
 }
 
@@ -142,54 +138,6 @@ mojom("generic_sensor") {
   ]
 
   public_deps = [ "//mojo/public/mojom/base" ]
-}
-
-mojom("usb") {
-  sources = [
-    "usb_device.mojom",
-    "usb_enumeration_options.mojom",
-    "usb_manager.mojom",
-    "usb_manager_client.mojom",
-  ]
-
-  public_deps = [
-    "//mojo/public/mojom/base",
-    "//url/mojom:url_mojom_gurl",
-  ]
-
-  # USB Mojom interfaces are exposed publicly to layout tests which use
-  # prepackaged redistributable JS bindings. It is therefore not desirable to
-  # scramble these messages.
-  scramble_message_ids = false
-
-  if (use_blink) {
-    # The blink variant of the usb mojom is depended on by the blink platform
-    # target. All blink variant mojoms use WTF types, which are part of the
-    # blink platform component. In order to avoid a dependency cycle, these
-    # targets must be part of that component.
-    export_class_attribute_blink = "BLINK_PLATFORM_EXPORT"
-    export_define_blink = "BLINK_PLATFORM_IMPLEMENTATION=1"
-    export_header_blink = "third_party/blink/public/platform/web_common.h"
-
-    visibility_blink = [
-      ":*",
-      "//third_party/blink/public/mojom/usb:usb_blink",
-      "//third_party/blink/renderer/modules/webusb",
-      "//chrome/browser/ui/webui/usb_internals:mojo_bindings_blink",
-    ]
-  }
-
-  webui_module_path = "/"
-
-  # Generate legacy JS bindings in addition to WebUI TS bindings for Blink Web
-  # Tests.
-  generate_legacy_js_bindings = true
-}
-
-mojom("usb_test") {
-  sources = [ "usb_manager_test.mojom" ]
-  public_deps = [ "//url/mojom:url_mojom_gurl" ]
-  webui_module_path = "/"
 }
 
 mojom("geoposition") {

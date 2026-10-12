@@ -114,7 +114,3 @@ handleEvent('onGetCapabilityRequested',
 handleEvent('onPrintRequested',
             createPrintRequestBlobArguments,
             printerProviderInternal.reportPrintResult);
-
-handleEvent('onGetUsbPrinterInfoRequested',
-            function(args, callback) { callback(true); },
-            printerProviderInternal.reportUsbPrinterInfo);

@@ -84,8 +84,6 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/simple_message_box.h"
 #include "chrome/browser/ui/webui/chrome_web_ui_controller_factory.h"
-#include "chrome/browser/usb/usb_chooser_context.h"
-#include "chrome/browser/usb/usb_chooser_context_factory.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -785,23 +783,6 @@ ScriptExecutor* ChromeExtensionsBrowserClient::GetScriptExecutorForTab(
     content::WebContents& web_contents) {
   TabHelper* tab_helper = TabHelper::FromWebContents(&web_contents);
   return tab_helper ? tab_helper->script_executor() : nullptr;
-}
-
-bool ChromeExtensionsBrowserClient::IsUsbDeviceAllowedByPolicy(
-    content::BrowserContext* context,
-    const ExtensionId& extension_id,
-    int vendor_id,
-    int product_id) const {
-  url::Origin origin = Extension::CreateOriginFromExtensionId(extension_id);
-
-  UsbChooserContext* usb_chooser_context =
-      UsbChooserContextFactory::GetForProfile(static_cast<Profile*>(context));
-  // This will never be null as even incognito mode has its own instance.
-  DCHECK(usb_chooser_context);
-
-  // Check against WebUsbAllowDevicesForUrls.
-  return usb_chooser_context->usb_policy_allowed_devices().IsDeviceAllowed(
-      origin, {vendor_id, product_id});
 }
 
 void ChromeExtensionsBrowserClient::GetFavicon(

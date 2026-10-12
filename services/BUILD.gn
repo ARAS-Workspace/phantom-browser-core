@@ -29,7 +29,6 @@ test("services_unittests") {
   ]
 
   fuzztests = [
-    "UsbIdsTest.NameLookupsReturnValidStrings",
     "TrustTokenKeyCommitmentFuzzer.ParsesOneIssuerCorrectly",
     "TrustTokenKeyCommitmentFuzzer.ParsesMultipleIssuersCorrectly",
     "HitTestStructTraitsFuzzTest.AggregatedHitTestRegionFuzz",

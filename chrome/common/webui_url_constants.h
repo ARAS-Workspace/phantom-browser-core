@@ -300,7 +300,6 @@ inline constexpr char kChromeUIUntrustedThemeURL[] =
     "chrome-untrusted://theme/";
 inline constexpr char kChromeUIUntrustedWebUITestURL[] =
     "chrome-untrusted://webui-test/";
-inline constexpr char kChromeUIUsbInternalsHost[] = "usb-internals";
 inline constexpr char kChromeUIUserActionsHost[] = "user-actions";
 inline constexpr char kChromeUIUserEducationInternalsHost[] =
     "user-education-internals";

@@ -126,7 +126,6 @@ source_set("browser_tests") {
   deps = [ "//chrome/browser/ui/views/frame:test_with_browser_view" ]
 
   sources += [
-    "device_chooser_extension_browsertest.cc",
     "extension_install_dialog_view_browsertest.cc",
     "extension_post_install_dialog_view_utils_browsertest.cc",
     "extensions_menu_entry_browsertest.cc",

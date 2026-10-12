@@ -292,10 +292,6 @@
       "platforms": ["chromeos", "linux", "mac", "win"]
     }
   ],
-  "hid": {
-    "dependencies": ["permission:hid"],
-    "contexts": ["privileged_extension"]
-  },
   "i18n": {
     "channel": "stable",
     "extension_types": ["extension", "legacy_packaged_app", "platform_app",
