@@ -78,7 +78,6 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE(kKillOnUnexpectedOriginHeader);
 #if BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnableDevToolsJsErrorReporting);
 #endif  // BUILDFLAG(IS_LINUX)
-CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnforceGamepadPermissionsPolicy);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnforceSameDocumentOriginInvariants);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEmbeddingRequiresOptIn);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kExperimentalContentSecurityPolicyFeatures);

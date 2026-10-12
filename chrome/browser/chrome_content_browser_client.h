@@ -44,7 +44,6 @@
 #include "net/base/network_handle.h"
 #include "net/cookies/cookie_setting_override.h"
 #include "pdf/buildflags.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy_declaration.h"
 #include "services/network/public/mojom/network_context.mojom.h"
@@ -416,12 +415,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   scoped_refptr<network::SharedURLLoaderFactory>
   GetSystemSharedURLLoaderFactory() override;
   network::mojom::NetworkContext* GetSystemNetworkContext() override;
-  std::string GetGeolocationApiKey() override;
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  device::GeolocationSystemPermissionManager*
-  GetGeolocationSystemPermissionManager() override;
-#endif
 
   content::GeneratedCodeCacheSettings GetGeneratedCodeCacheSettings(
       content::BrowserContext* context) override;

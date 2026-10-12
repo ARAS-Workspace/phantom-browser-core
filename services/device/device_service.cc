@@ -18,8 +18,6 @@
 #include "services/device/generic_sensor/platform_sensor_provider.h"
 #include "services/device/generic_sensor/sensor_provider_impl.h"
 #include "services/device/geolocation/geolocation_context.h"
-#include "services/device/geolocation/public_ip_address_geolocator.h"
-#include "services/device/geolocation/public_ip_address_location_notifier.h"
 #include "services/device/hid/hid_manager_impl.h"
 #include "services/device/power_monitor/power_monitor_message_broadcaster.h"
 #include "services/device/public/mojom/battery_monitor.mojom.h"
@@ -27,7 +25,6 @@
 #include "services/device/time_zone_monitor/time_zone_monitor.h"
 #include "services/device/vibration/vibration_manager_impl.h"
 #include "services/device/wake_lock/wake_lock_provider.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
 
 #include "services/device/battery/battery_monitor_impl.h"
 #include "services/device/battery/battery_status_service.h"
@@ -49,11 +46,6 @@ DeviceServiceParams::~DeviceServiceParams() = default;
 std::unique_ptr<DeviceService> CreateDeviceService(
     std::unique_ptr<DeviceServiceParams> params,
     mojo::PendingReceiver<mojom::DeviceService> receiver) {
-  GeolocationProviderImpl::SetGeolocationConfiguration(
-      params->url_loader_factory, params->geolocation_api_key,
-      params->custom_location_provider_callback,
-      params->geolocation_system_permission_manager,
-      params->use_gms_core_location_provider);
   return std::make_unique<DeviceService>(std::move(params),
                                          std::move(receiver));
 }
@@ -63,9 +55,6 @@ DeviceService::DeviceService(
     mojo::PendingReceiver<mojom::DeviceService> receiver)
     : file_task_runner_(std::move(params->file_task_runner)),
       io_task_runner_(std::move(params->io_task_runner)),
-      url_loader_factory_(std::move(params->url_loader_factory)),
-      network_connection_tracker_(params->network_connection_tracker),
-      geolocation_api_key_(params->geolocation_api_key),
       wake_lock_context_callback_(params->wake_lock_context_callback),
       wake_lock_provider_(file_task_runner_,
                           params->wake_lock_context_callback) {
@@ -200,18 +189,6 @@ void DeviceService::BindGeolocationContext(
   GeolocationContext::Create(std::move(receiver));
 }
 
-void DeviceService::BindGeolocationControl(
-    mojo::PendingReceiver<mojom::GeolocationControl> receiver) {
-  GeolocationProviderImpl::GetInstance()->BindGeolocationControlReceiver(
-      std::move(receiver));
-}
-
-void DeviceService::BindGeolocationInternals(
-    mojo::PendingReceiver<mojom::GeolocationInternals> receiver) {
-  GeolocationProviderImpl::GetInstance()->BindGeolocationInternalsReceiver(
-      std::move(receiver));
-}
-
 void DeviceService::BindPowerMonitor(
     mojo::PendingReceiver<mojom::PowerMonitor> receiver) {
   if (!power_monitor_message_broadcaster_) {
@@ -219,17 +196,6 @@ void DeviceService::BindPowerMonitor(
         std::make_unique<PowerMonitorMessageBroadcaster>();
   }
   power_monitor_message_broadcaster_->Bind(std::move(receiver));
-}
-
-void DeviceService::BindPublicIpAddressGeolocationProvider(
-    mojo::PendingReceiver<mojom::PublicIpAddressGeolocationProvider> receiver) {
-  if (!public_ip_address_geolocation_provider_) {
-    public_ip_address_geolocation_provider_ =
-        std::make_unique<PublicIpAddressGeolocationProvider>(
-            url_loader_factory_, network_connection_tracker_,
-            geolocation_api_key_);
-  }
-  public_ip_address_geolocation_provider_->Bind(std::move(receiver));
 }
 
 void DeviceService::BindScreenOrientationListener(

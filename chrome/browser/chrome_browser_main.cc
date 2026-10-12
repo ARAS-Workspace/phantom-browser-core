@@ -99,10 +99,8 @@
 #include "components/embedder_support/origin_trials/origin_trials_settings_storage.h"
 #include "components/heap_profiling/in_process/heap_profiler_controller.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
-#include "components/language/content/browser/geo_language_provider.h"
 #include "components/language/core/browser/language_usage_metrics.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/language/core/common/language_util.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/metrics/expired_histogram_util.h"
 #include "components/metrics/metrics_service.h"
@@ -1506,12 +1504,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
 #endif
 
   // Post-profile init ---------------------------------------------------------
-
-  if (language::GetOverrideLanguageModel() ==
-      language::OverrideLanguageModel::GEO) {
-    language::GeoLanguageProvider::GetInstance()->StartUp(
-        browser_process_->local_state());
-  }
 
   // Needs to be done before PostProfileInit, to allow connecting DevTools
   // before WebUI for the CrOS login that can be called inside PostProfileInit

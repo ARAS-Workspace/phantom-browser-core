@@ -19,8 +19,6 @@ include_rules = [
   "+components/password_manager/core/browser/password_manager_switches.h",
   "+components/policy",
   "+components/prefs",
-  "+services/device/public/cpp/test/fake_geolocation_system_permission_manager.h",
-  "+services/device/public/cpp/geolocation/geolocation_system_permission_manager.h",
   "+tools/v8_context_snapshot/buildflags.h",
 ]
 specific_include_rules = {

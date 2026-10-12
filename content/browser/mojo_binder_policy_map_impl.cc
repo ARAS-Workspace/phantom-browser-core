@@ -13,7 +13,6 @@
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/mojo_binder_policy_map.h"
 #include "content/public/common/content_client.h"
-#include "device/gamepad/public/mojom/gamepad.mojom.h"
 #include "media/mojo/mojom/media_player.mojom.h"
 #include "media/mojo/mojom/webrtc_video_perf.mojom.h"
 #include "services/network/public/mojom/restricted_cookie_manager.mojom.h"
@@ -55,11 +54,6 @@ void RegisterNonAssociatedPolicies(MojoBinderPolicyMap& map) {
   // `GetCancelledInterfaceType()` in
   // content/browser/preloading/prerender/prerender_metrics.h once you add a new
   // kCancel interface.
-
-  map.SetNonAssociatedPolicy<device::mojom::GamepadHapticsManager>(
-      MojoBinderNonAssociatedPolicy::kCancel);
-  map.SetNonAssociatedPolicy<device::mojom::GamepadMonitor>(
-      MojoBinderNonAssociatedPolicy::kCancel);
 
   // ClipboardHost has sync messages, so it cannot be kDefer. However, the
   // renderer is not expected to request the interface; prerendering documents

@@ -15,17 +15,12 @@
 #include "build/build_config.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver_set.h"
-#include "services/device/geolocation/geolocation_provider.h"
-#include "services/device/geolocation/geolocation_provider_impl.h"
-#include "services/device/geolocation/public_ip_address_geolocation_provider.h"
 #include "services/device/public/cpp/compute_pressure/buildflags.h"
 #include "services/device/public/mojom/battery_monitor.mojom.h"
 #include "services/device/public/mojom/device_service.mojom.h"
 #include "services/device/public/mojom/fingerprint.mojom.h"
 #include "services/device/public/mojom/geolocation.mojom.h"
 #include "services/device/public/mojom/geolocation_context.mojom.h"
-#include "services/device/public/mojom/geolocation_control.mojom.h"
-#include "services/device/public/mojom/geolocation_internals.mojom.h"
 #include "services/device/public/mojom/power_monitor.mojom.h"
 #include "services/device/public/mojom/screen_orientation.mojom.h"
 #include "services/device/public/mojom/sensor_provider.mojom.h"
@@ -55,11 +50,6 @@ namespace base {
 class SingleThreadTaskRunner;
 }
 
-namespace network {
-class NetworkConnectionTracker;
-class SharedURLLoaderFactory;
-}  // namespace network
-
 namespace device {
 
 #if BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
@@ -71,15 +61,12 @@ class SerialPortManagerImpl;
 #endif
 
 class DeviceService;
-class GeolocationSystemPermissionManager;
 class HidManagerImpl;
 class PowerMonitorMessageBroadcaster;
-class PublicIpAddressLocationNotifier;
 class SensorProviderImpl;
 class TimeZoneMonitor;
 
-// NOTE: See the comments on the definitions of PublicIpAddressLocationNotifier,
-// |WakeLockContextCallback|, |CustomLocationProviderCallback| and
+// NOTE: See the comments on the definition of |WakeLockContextCallback| and
 // NFCDelegate.java to understand the semantics and usage of these parameters.
 struct DeviceServiceParams {
   DeviceServiceParams();
@@ -87,14 +74,6 @@ struct DeviceServiceParams {
 
   scoped_refptr<base::SingleThreadTaskRunner> file_task_runner;
   scoped_refptr<base::SingleThreadTaskRunner> io_task_runner;
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory;
-  raw_ptr<network::NetworkConnectionTracker> network_connection_tracker =
-      nullptr;
-  std::string geolocation_api_key;
-  CustomLocationProviderCallback custom_location_provider_callback;
-  bool use_gms_core_location_provider = false;
-  raw_ptr<GeolocationSystemPermissionManager>
-      geolocation_system_permission_manager = nullptr;
   WakeLockContextCallback wake_lock_context_callback;
 };
 
@@ -149,10 +128,6 @@ class DeviceService : public mojom::DeviceService {
       mojo::PendingReceiver<mojom::Fingerprint> receiver) override;
   void BindGeolocationContext(
       mojo::PendingReceiver<mojom::GeolocationContext> receiver) override;
-  void BindGeolocationControl(
-      mojo::PendingReceiver<mojom::GeolocationControl> receiver) override;
-  void BindGeolocationInternals(
-      mojo::PendingReceiver<mojom::GeolocationInternals> receiver) override;
 
 #if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   void BindInputDeviceManager(
@@ -176,10 +151,6 @@ class DeviceService : public mojom::DeviceService {
 
   void BindPowerMonitor(
       mojo::PendingReceiver<mojom::PowerMonitor> receiver) override;
-
-  void BindPublicIpAddressGeolocationProvider(
-      mojo::PendingReceiver<mojom::PublicIpAddressGeolocationProvider> receiver)
-      override;
 
   void BindScreenOrientationListener(
       mojo::PendingReceiver<mojom::ScreenOrientationListener> receiver)
@@ -206,18 +177,12 @@ class DeviceService : public mojom::DeviceService {
   mojo::ReceiverSet<mojom::DeviceService> receivers_;
   std::unique_ptr<PowerMonitorMessageBroadcaster>
       power_monitor_message_broadcaster_;
-  std::unique_ptr<PublicIpAddressGeolocationProvider>
-      public_ip_address_geolocation_provider_;
   std::unique_ptr<SensorProviderImpl> sensor_provider_;
   std::unique_ptr<TimeZoneMonitor> time_zone_monitor_;
   std::unique_ptr<usb::DeviceManagerImpl> usb_device_manager_;
   std::unique_ptr<usb::DeviceManagerTest> usb_device_manager_test_;
   scoped_refptr<base::SingleThreadTaskRunner> file_task_runner_;
   scoped_refptr<base::SingleThreadTaskRunner> io_task_runner_;
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
-  raw_ptr<network::NetworkConnectionTracker> network_connection_tracker_;
-
-  const std::string geolocation_api_key_;
   WakeLockContextCallback wake_lock_context_callback_;
   WakeLockProvider wake_lock_provider_;
   std::unique_ptr<HidManagerImpl> hid_manager_;

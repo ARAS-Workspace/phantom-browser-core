@@ -36,7 +36,6 @@ enum WrappablePointerTag : uint16_t {
   kDomAutomationController,          // content::DomAutomationController
   kEventEmitter,                     // extensions::EventEmitter
   kEventSenderBindings,              // content::EventSenderBindings
-  kGamepadControllerBindings,        // content::GameControllerBindings
   kGCController,                     // content::GCController
   kGinJavaBridgeObject,              // content::GinJavaBridgeObject
   kGinPerContextData,                // gin::PerContextData

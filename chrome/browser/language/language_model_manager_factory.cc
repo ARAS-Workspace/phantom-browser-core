@@ -13,15 +13,12 @@
 #include "chrome/browser/language/url_language_histogram_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/language/content/browser/geo_language_model.h"
-#include "components/language/content/browser/geo_language_provider.h"
 #include "components/language/core/browser/language_model_manager.h"
 #include "components/language/core/browser/language_prefs.h"
 #include "components/language/core/browser/locale_util.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/language/core/browser/ulp_metrics_logger.h"
 #include "components/language/core/browser/url_language_histogram.h"
-#include "components/language/core/common/language_util.h"
 #include "components/language/core/language_model/fluent_language_model.h"
 #include "components/language/core/language_model/ulp_language_model.h"
 #include "components/pref_registry/pref_registry_syncable.h"
@@ -31,20 +28,10 @@ namespace {
 
 void PrepareLanguageModels(Profile* const profile,
                            language::LanguageModelManager* const manager) {
-  // Use the GeoLanguageModel as the primary Language Model if its experiment is
-  // enabled, and the FluentLanguageModel otherwise.
-  if (language::GetOverrideLanguageModel() ==
-      language::OverrideLanguageModel::GEO) {
-    manager->AddModel(language::LanguageModelManager::ModelType::GEO,
-                      std::make_unique<language::GeoLanguageModel>(
-                          language::GeoLanguageProvider::GetInstance()));
-    manager->SetPrimaryModel(language::LanguageModelManager::ModelType::GEO);
-  } else {
-    manager->AddModel(
-        language::LanguageModelManager::ModelType::FLUENT,
-        std::make_unique<language::FluentLanguageModel>(profile->GetPrefs()));
-    manager->SetPrimaryModel(language::LanguageModelManager::ModelType::FLUENT);
-  }
+  manager->AddModel(
+      language::LanguageModelManager::ModelType::FLUENT,
+      std::make_unique<language::FluentLanguageModel>(profile->GetPrefs()));
+  manager->SetPrimaryModel(language::LanguageModelManager::ModelType::FLUENT);
 }
 
 }  // namespace

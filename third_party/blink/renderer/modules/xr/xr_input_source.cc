@@ -85,10 +85,6 @@ XRInputSource* XRInputSource::CreateOrUpdateFrom(
     updated_source = MakeGarbageCollected<XRInputSource>(*other);
   }
 
-  if (updated_source->state_.is_visible) {
-    updated_source->UpdateGamepad(state->gamepad);
-  }
-
   // Update the input source's description if this state update includes them.
   if (state->description) {
     const device::mojom::blink::XRInputSourceDescriptionPtr& desc =
@@ -138,7 +134,6 @@ XRInputSource::XRInputSource(const XRInputSource& other)
       target_ray_space_(
           MakeGarbageCollected<XRTargetRaySpace>(other.session_, this)),
       grip_space_(MakeGarbageCollected<XRGripSpace>(other.session_, this)),
-      gamepad_(other.gamepad_),
       hand_(other.hand_),
       profiles_(MakeGarbageCollected<FrozenArray<IDLString>>(
           other.profiles_->AsVector())),
@@ -187,10 +182,6 @@ XRSpace* XRInputSource::gripSpace() const {
 
 bool XRInputSource::InvalidatesSameObject(
     const device::mojom::blink::XRInputSourceStatePtr& state) {
-  if ((state->gamepad && !gamepad_) || (!state->gamepad && gamepad_)) {
-    return true;
-  }
-
   if (state->description) {
     if (state->description->handedness != state_.handedness) {
       return true;
@@ -223,28 +214,6 @@ void XRInputSource::SetInputFromPointer(
     const gfx::Transform* input_from_pointer) {
   if (state_.is_visible) {
     input_from_pointer_ = TryGetTransform(input_from_pointer);
-  }
-}
-
-void XRInputSource::SetGamepadConnected(bool state) {
-  if (gamepad_)
-    gamepad_->SetConnected(state);
-}
-
-void XRInputSource::UpdateGamepad(
-    const std::optional<device::Gamepad>& gamepad) {
-  if (gamepad) {
-    if (!gamepad_) {
-      gamepad_ = MakeGarbageCollected<Gamepad>(this, -1, state_.base_timestamp,
-                                               base::TimeTicks::Now());
-    }
-
-    LocalDOMWindow* window = session_->xr()->DomWindow();
-    bool cross_origin_isolated_capability =
-        window ? window->CrossOriginIsolatedCapability() : false;
-    gamepad_->UpdateFromDeviceState(*gamepad, cross_origin_isolated_capability);
-  } else {
-    gamepad_ = nullptr;
   }
 }
 
@@ -646,8 +615,6 @@ void XRInputSource::OnRemoved() {
     // Ensure the frame cannot be used outside of the event handler.
     event->frame()->Deactivate();
   }
-
-  SetGamepadConnected(false);
 }
 
 XRInputSourceEvent* XRInputSource::CreateInputSourceEvent(
@@ -660,7 +627,6 @@ void XRInputSource::Trace(Visitor* visitor) const {
   visitor->Trace(session_);
   visitor->Trace(target_ray_space_);
   visitor->Trace(grip_space_);
-  visitor->Trace(gamepad_);
   visitor->Trace(hand_);
   visitor->Trace(profiles_);
   ScriptWrappable::Trace(visitor);

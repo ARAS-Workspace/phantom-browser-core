@@ -1919,17 +1919,6 @@ source_set("browser_tests") {
 
   data_deps = []
 
-  if (is_mac) {
-    sources += [
-      "api/networking_private/networking_private_apitest.cc",
-      "api/networking_private/networking_private_service_client_apitest.cc",
-    ]
-    deps += [
-      "//components/onc",
-      "//components/wifi:test_support",
-    ]
-  }
-
   if (is_mac || is_linux) {
     sources += [
       "api/image_writer_private/image_writer_utility_client_browsertest.cc",
@@ -1944,7 +1933,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/views/location_bar",
     "//chrome/browser/ui/webui/history_clusters:browser_tests",
     "//chrome/browser/ui/webui/interstitials:browser_tests",
-    "//chrome/browser/ui/webui/location_internals:browser_tests",
     "//chrome/browser/ui/webui/policy:browser_tests",
     "//components/keep_alive_registry",
     "//components/webapps/isolated_web_apps/test_support",

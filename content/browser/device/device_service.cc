@@ -4,6 +4,7 @@
 
 #include "content/public/browser/device_service.h"
 
+#include "base/functional/bind.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/task/thread_pool.h"
@@ -11,65 +12,12 @@
 #include "build/build_config.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
-#include "content/public/browser/content_browser_client.h"
-#include "content/public/browser/network_service_instance.h"
-#include "content/public/common/content_client.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "services/device/device_service.h"
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#include "services/network/public/cpp/cross_thread_pending_shared_url_loader_factory.h"
-#include "services/network/public/mojom/network_service_test.mojom.h"
-#include "services/network/public/mojom/url_loader.mojom.h"
 
 namespace content {
 
 namespace {
-
-// SharedURLLoaderFactory for device service, backed by
-// GetContentClient()->browser()->GetSystemSharedURLLoaderFactory().
-class DeviceServiceURLLoaderFactory : public network::SharedURLLoaderFactory {
- public:
-  DeviceServiceURLLoaderFactory() = default;
-
-  DeviceServiceURLLoaderFactory(const DeviceServiceURLLoaderFactory&) = delete;
-  DeviceServiceURLLoaderFactory& operator=(
-      const DeviceServiceURLLoaderFactory&) = delete;
-
-  // mojom::URLLoaderFactory implementation:
-  void CreateLoaderAndStart(
-      mojo::PendingReceiver<network::mojom::URLLoader> receiver,
-      int32_t request_id,
-      uint32_t options,
-      const network::ResourceRequest& url_request,
-      mojo::PendingRemote<network::mojom::URLLoaderClient> client,
-      const net::MutableNetworkTrafficAnnotationTag& traffic_annotation)
-      override {
-    auto factory =
-        GetContentClient()->browser()->GetSystemSharedURLLoaderFactory();
-    if (!factory)
-      return;
-
-    factory->CreateLoaderAndStart(std::move(receiver), request_id, options,
-                                  url_request, std::move(client),
-                                  traffic_annotation);
-  }
-
-  // SharedURLLoaderFactory implementation:
-  void Clone(mojo::PendingReceiver<network::mojom::URLLoaderFactory> receiver)
-      override {
-    GetContentClient()->browser()->GetSystemSharedURLLoaderFactory()->Clone(
-        std::move(receiver));
-  }
-
-  std::unique_ptr<network::PendingSharedURLLoaderFactory> Clone() override {
-    return std::make_unique<network::CrossThreadPendingSharedURLLoaderFactory>(
-        this);
-  }
-
- private:
-  friend class base::RefCounted<DeviceServiceURLLoaderFactory>;
-  ~DeviceServiceURLLoaderFactory() override = default;
-};
 
 void BindDeviceServiceReceiver(
     mojo::PendingReceiver<device::mojom::DeviceService> receiver) {
@@ -94,16 +42,6 @@ void BindDeviceServiceReceiver(
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT});
 
   params->io_task_runner = GetIOThreadTaskRunner({});
-  params->url_loader_factory =
-      base::MakeRefCounted<DeviceServiceURLLoaderFactory>();
-  params->network_connection_tracker = content::GetNetworkConnectionTracker();
-  params->geolocation_api_key =
-      GetContentClient()->browser()->GetGeolocationApiKey();
-  params->custom_location_provider_callback =
-      base::BindRepeating(&ContentBrowserClient::OverrideSystemLocationProvider,
-                          base::Unretained(GetContentClient()->browser()));
-  params->geolocation_system_permission_manager =
-      GetContentClient()->browser()->GetGeolocationSystemPermissionManager();
 
   service = device::CreateDeviceService(std::move(params), std::move(receiver));
 }

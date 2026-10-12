@@ -2543,10 +2543,8 @@ void XRSession::OnInputStateChangeInternal(
                  << input_state->source_id;
       }
 
-      // If we previously had a stored_input_source, disconnect its gamepad
-      // and mark that it was removed.
+      // If we previously had a stored_input_source, mark that it was removed.
       if (stored_input_source) {
-        stored_input_source->SetGamepadConnected(false);
         DVLOG(2) << __func__ << ": REMOVED stored_input_source";
         removed.push_back(stored_input_source);
       }
@@ -2555,7 +2553,7 @@ void XRSession::OnInputStateChangeInternal(
     input_source->setActiveFrameId(frame_id);
   }
 
-  // Remove any input sources that are inactive, and disconnect their gamepad.
+  // Remove any input sources that are inactive.
   // Note that this is done in two passes because HeapHashMap makes no
   // guarantees about iterators on removal.
   // We use a separate array of inactive sources here rather than just

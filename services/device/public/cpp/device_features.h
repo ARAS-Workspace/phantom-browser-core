@@ -13,7 +13,6 @@
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
 #include "services/device/public/cpp/device_features_export.h"
-#include "services/device/public/mojom/geolocation_internals.mojom-shared.h"
 
 namespace features {
 
@@ -34,23 +33,10 @@ DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(
     kWebUsbEnforceStandardRequestAllowlist);
 DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(
     kWebHidAttributeAllowsBackForwardCache);
-DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kLocationProviderManager);
 
 DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kSecurityKeyHidInterfacesAreFido);
 
 DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kWebHidRecursiveFiltering);
-
-extern const DEVICE_FEATURES_EXPORT
-    base::FeatureParam<device::mojom::LocationProviderManagerMode>
-        kLocationProviderManagerParam;
-
-DEVICE_FEATURES_EXPORT bool IsOsLevelGeolocationPermissionSupportEnabled();
-
-// Returns the mode `LocationProviderManager` should operate in. This is
-// normally `kLocationProviderManagerParam`, but platforms that cannot support
-// the platform location provider are forced to `kNetworkOnly`.
-DEVICE_FEATURES_EXPORT device::mojom::LocationProviderManagerMode
-GetLocationProviderManagerMode();
 
 #if BUILDFLAG(IS_LINUX)
 DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kAutomaticUsbDetach);
@@ -65,12 +51,6 @@ DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kSerialSplitDtrAndRts);
 #if BUILDFLAG(IS_MAC)
 DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kHidReportRequestExactLength);
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_APPLE) && BUILDFLAG(USE_BLINK)
-// Controls whether to use the ellipsoidal altitude from Core Location
-// instead of the default altitude attribute.
-DEVICE_FEATURES_EXPORT BASE_DECLARE_FEATURE(kEllipsoidalAltitude);
-#endif  // BUILDFLAG(IS_APPLE) && BUILDFLAG(USE_BLINK)
 
 }  // namespace features
 

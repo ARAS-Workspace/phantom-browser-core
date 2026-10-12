@@ -4,7 +4,6 @@
 
 import("//build/config/features.gni")
 import("//services/device/public/cpp/compute_pressure/buildflags.gni")
-import("//services/device/public/cpp/geolocation/buildflags.gni")
 import("//testing/test.gni")
 
 is_serial_enabled_platform = (is_linux && use_udev) || is_mac
@@ -35,7 +34,6 @@ source_set("lib") {
     "//services/device/power_monitor",
     "//services/device/public/cpp:device_features",
     "//services/device/public/cpp/compute_pressure:buildflags",
-    "//services/device/public/mojom:geolocation_internals",
     "//services/device/public/mojom:usb",
     "//services/device/public/mojom:usb_test",
     "//services/device/screen_orientation",
@@ -88,22 +86,6 @@ component("binder_overrides") {
   defines = [ "IS_DEVICE_SERVICE_BINDER_OVERRIDES_IMPL" ]
 }
 
-source_set("perftests") {
-  testonly = true
-
-  sources = [ "geolocation/position_cache_impl_perftest.cc" ]
-
-  deps = [
-    ":test_support",
-    "//base",
-    "//base/test:test_support",
-    "//services/device/geolocation",
-    "//services/device/geolocation:test_support",
-    "//testing/gtest",
-    "//testing/perf",
-  ]
-}
-
 source_set("tests") {
   testonly = true
 
@@ -126,15 +108,6 @@ source_set("tests") {
     "generic_sensor/relative_orientation_euler_angles_fusion_algorithm_using_accelerometer_and_gyroscope_unittest.cc",
     "generic_sensor/relative_orientation_euler_angles_fusion_algorithm_using_accelerometer_unittest.cc",
     "generic_sensor/sensor_fusion_algorithm_using_accelerometer_unittest.cc",
-    "geolocation/geolocation_impl_unittest.cc",
-    "geolocation/geolocation_provider_impl_unittest.cc",
-    "geolocation/location_provider_manager_unittest.cc",
-    "geolocation/network_location_provider_unittest.cc",
-    "geolocation/position_cache_impl_unittest.cc",
-    "geolocation/public_ip_address_geolocator_unittest.cc",
-    "geolocation/public_ip_address_location_notifier_unittest.cc",
-    "geolocation/wifi_data_provider_common_unittest.cc",
-    "geolocation/wifi_polling_policy_unittest.cc",
     "power_monitor/power_monitor_message_broadcaster_unittest.cc",
     "public/cpp/power_monitor/power_monitor_broadcast_source_unittest.cc",
     "vibration/vibration_manager_impl_unittest.cc",
@@ -155,12 +128,10 @@ source_set("tests") {
     "//net:test_support",
     "//services/device/generic_sensor",
     "//services/device/geolocation",
-    "//services/device/geolocation:test_support",
     "//services/device/power_monitor",
     "//services/device/public/cpp:device_features",
     "//services/device/public/cpp/power_monitor",
     "//services/device/public/mojom",
-    "//services/device/public/mojom:geolocation_internals",
     "//services/device/vibration",
     "//services/device/wake_lock",
     "//services/network:test_support",
@@ -177,21 +148,13 @@ source_set("tests") {
     deps += [ "//services/device/compute_pressure" ]
   }
 
-  if (os_level_geolocation_permission_supported) {
-    sources += [ "public/cpp/geolocation/geolocation_system_permission_manager_unittest.cc" ]
-  }
-
   if (is_linux && use_udev) {
     sources +=
         [ "generic_sensor/platform_sensor_and_provider_unittest_linux.cc" ]
   }
 
   if (is_linux && use_dbus) {
-    sources += [
-      "battery/battery_status_manager_linux_unittest.cc",
-      "geolocation/location_provider_linux_portal_unittest.cc",
-      "geolocation/wifi_data_provider_linux_unittest.cc",
-    ]
+    sources += [ "battery/battery_status_manager_linux_unittest.cc" ]
     deps += [
       "//components/dbus",
       "//dbus:test_support",
@@ -294,24 +257,6 @@ source_set("tests") {
 
     if (is_linux) {
       sources += [ "usb/usb_interface_detach_allowlist_unittest.cc" ]
-    }
-  }
-
-  if (is_apple) {
-    sources += [
-      "geolocation/core_location_provider_unittest.cc",
-      "public/cpp/geolocation/system_geolocation_source_apple_unittest.mm",
-    ]
-    deps += [
-      "//services/device/public/cpp/geolocation",
-      "//third_party/ocmock",
-    ]
-    frameworks = [
-      "CoreLocation.framework",
-      "Foundation.framework",
-    ]
-    if (is_mac) {
-      frameworks += [ "CoreWLAN.framework" ]
     }
   }
 

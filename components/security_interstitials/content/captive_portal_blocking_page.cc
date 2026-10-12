@@ -19,7 +19,6 @@
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/url_formatter/url_formatter.h"
-#include "components/wifi/wifi_service.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/ssl_status.h"
 #include "content/public/browser/web_contents.h"
@@ -84,18 +83,9 @@ std::string CaptivePortalBlockingPage::GetWiFiSSID() const {
   if (is_wifi_info_overridden_for_testing_)
     return wifi_ssid_for_testing_;
 
-  // On Windows and Mac, |WiFiService| provides an easy to use API to get the
-  // currently associated WiFi access point. |WiFiService| isn't available on
-  // Linux so |net::GetWifiSSID| is used instead.
+  // |net::GetWifiSSID| is used on Linux.
   std::string ssid;
-#if BUILDFLAG(IS_APPLE)
-  std::unique_ptr<wifi::WiFiService> wifi_service(wifi::WiFiService::Create());
-  wifi_service->Initialize(nullptr);
-  std::string error;
-  wifi_service->GetConnectedNetworkSSID(&ssid, &error);
-  if (!error.empty())
-    return std::string();
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   ssid = net::GetWifiSSID();
 #endif
   // TODO(meacer): Handle non UTF8 SSIDs.

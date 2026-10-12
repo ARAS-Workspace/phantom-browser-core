@@ -70,16 +70,10 @@
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/test_utils.h"
 #include "content/public/test/web_contents_tester.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/permissions/permission_utils.h"
 #include "third_party/blink/public/mojom/permissions/permission.mojom.h"
 #include "url/origin.h"
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "components/permissions/contexts/geolocation_permission_context_system.h"
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 using content::MockRenderProcessHost;
 
@@ -187,11 +181,6 @@ class GeolocationPermissionContextTestsBase
   std::vector<std::unique_ptr<content::WebContents>> extra_tabs_;
   std::vector<std::unique_ptr<MockPermissionPromptFactory>>
       mock_permission_prompt_factories_;
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  raw_ptr<device::FakeGeolocationSystemPermissionManager>
-      fake_geolocation_system_permission_manager_;
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
   // A map between renderer child id and a pair represending the bridge id and
   // whether the requested permission was allowed.
@@ -385,21 +374,8 @@ void GeolocationPermissionContextTestsBase::SetUp() {
       browser_context());
   delegate_ = delegate.get();
 
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  auto fake_geolocation_system_permission_manager =
-      std::make_unique<device::FakeGeolocationSystemPermissionManager>();
-  fake_geolocation_system_permission_manager_ =
-      fake_geolocation_system_permission_manager.get();
-  fake_geolocation_system_permission_manager->SetSystemPermission(
-      device::LocationSystemPermissionStatus::kAllowed);
-  device::FakeGeolocationSystemPermissionManager::SetInstance(
-      std::move(fake_geolocation_system_permission_manager));
-  auto context = std::make_unique<GeolocationPermissionContextSystem>(
-      browser_context(), std::move(delegate));
-#else
   auto context = std::make_unique<GeolocationPermissionContext>(
       browser_context(), std::move(delegate));
-#endif
   SetupRequestManager(web_contents());
 
   geolocation_permission_context_ = context.get();
@@ -735,74 +711,6 @@ TEST_P(GeolocationPermissionContextTests, TabDestroyed) {
   ASSERT_TRUE(HasActivePrompt());
   ExpectGeolocationPermissionSettingAsk(requesting_frame, requesting_frame);
 }
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-TEST_P(GeolocationPermissionContextTests,
-       AllSystemAndSitePermissionCombinations) {
-  GURL requesting_frame("https://www.example.com/geolocation");
-
-  const struct {
-    const LocationSystemPermissionStatus system_permission;
-    const ContentSetting site_permission;
-    const PermissionStatus expected_effective_site_permission;
-  } kTestCases[] = {
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kDenied),
-       ContentSetting(CONTENT_SETTING_ASK), PermissionStatus::ASK},
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kDenied),
-       ContentSetting(CONTENT_SETTING_BLOCK), PermissionStatus::DENIED},
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kDenied),
-       ContentSetting(CONTENT_SETTING_ALLOW), PermissionStatus::DENIED},
-      {LocationSystemPermissionStatus(
-           LocationSystemPermissionStatus::kNotDetermined),
-       ContentSetting(CONTENT_SETTING_ASK), PermissionStatus::ASK},
-      {LocationSystemPermissionStatus(
-           LocationSystemPermissionStatus::kNotDetermined),
-       ContentSetting(CONTENT_SETTING_BLOCK), PermissionStatus::DENIED},
-      {LocationSystemPermissionStatus(
-           LocationSystemPermissionStatus::kNotDetermined),
-       ContentSetting(CONTENT_SETTING_ALLOW), PermissionStatus::ASK},
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kAllowed),
-       ContentSetting(CONTENT_SETTING_ASK), PermissionStatus::ASK},
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kAllowed),
-       ContentSetting(CONTENT_SETTING_BLOCK), PermissionStatus::DENIED},
-      {LocationSystemPermissionStatus(LocationSystemPermissionStatus::kAllowed),
-       ContentSetting(CONTENT_SETTING_ALLOW), PermissionStatus::GRANTED},
-  };
-
-  for (auto test_case : kTestCases) {
-    SetGeolocationContentSetting(requesting_frame, requesting_frame,
-                                 test_case.site_permission);
-    fake_geolocation_system_permission_manager_->SetSystemPermission(
-        test_case.system_permission);
-    base::RunLoop().RunUntilIdle();
-    ASSERT_EQ(test_case.expected_effective_site_permission,
-              GetPermissionStatus(blink::PermissionType::GEOLOCATION,
-                                  requesting_frame));
-  }
-}
-
-TEST_P(GeolocationPermissionContextTests, SystemPermissionUpdates) {
-  GURL requesting_frame("https://www.example.com/geolocation");
-  ContentSettingsPattern primary_pattern =
-      ContentSettingsPattern::FromURLNoWildcard(requesting_frame);
-  ContentSettingsPattern secondary_pattern = ContentSettingsPattern::Wildcard();
-
-  geolocation_permission_context_->AddObserver(this);
-  expected_primary_pattern_ = &primary_pattern;
-  expected_secondary_pattern_ = &secondary_pattern;
-  SetGeolocationContentSetting(requesting_frame, requesting_frame,
-                               CONTENT_SETTING_ALLOW);
-  ASSERT_EQ(1, num_permission_updates_);
-  primary_pattern = ContentSettingsPattern::Wildcard();
-  fake_geolocation_system_permission_manager_->SetSystemPermission(
-      LocationSystemPermissionStatus::kDenied);
-  fake_geolocation_system_permission_manager_->SetSystemPermission(
-      LocationSystemPermissionStatus::kAllowed);
-  base::RunLoop().RunUntilIdle();
-  ASSERT_EQ(3, num_permission_updates_);
-  geolocation_permission_context_->RemoveObserver(this);
-}
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 TEST_P(GeolocationPermissionContextTests, DecisionEventOrder) {
   GURL requesting_frame("https://www.example.com/geolocation");

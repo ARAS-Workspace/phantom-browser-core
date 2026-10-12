@@ -9,21 +9,12 @@
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
 #include "mojo/public/cpp/bindings/remote.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "services/device/public/mojom/device_service.mojom.h"
-#include "services/network/test/test_network_connection_tracker.h"
-#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 namespace device {
 
 class DeviceService;
-
-const char kTestGeolocationApiKey[] = "FakeApiKeyForTest";
 
 // Base class responsible to setup Device Service for test.
 class DeviceServiceTestBase : public testing::Test {
@@ -58,16 +49,7 @@ class DeviceServiceTestBase : public testing::Test {
   scoped_refptr<base::SingleThreadTaskRunner> file_task_runner_;
   scoped_refptr<base::SingleThreadTaskRunner> io_task_runner_;
 
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  raw_ptr<FakeGeolocationSystemPermissionManager>
-      fake_geolocation_system_permission_manager_;
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-
-  network::TestURLLoaderFactory test_url_loader_factory_;
-
  private:
-  std::unique_ptr<network::TestNetworkConnectionTracker>
-      network_connection_tracker_;
   std::unique_ptr<DeviceService> service_;
   mojo::Remote<mojom::DeviceService> service_remote_;
 };

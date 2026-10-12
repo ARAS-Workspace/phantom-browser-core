@@ -11,16 +11,12 @@
 #include "base/time/time.h"
 #include "device/vr/public/mojom/vr_service.mojom-blink.h"
 #include "third_party/blink/renderer/bindings/core/v8/idl_types.h"
-#include "third_party/blink/renderer/modules/gamepad/gamepad.h"
 #include "third_party/blink/renderer/platform/bindings/script_wrappable.h"
 #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
+#include "third_party/blink/renderer/platform/heap/member.h"
 #include "third_party/blink/renderer/platform/wtf/forward.h"
 #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
 #include "ui/gfx/geometry/transform.h"
-
-namespace device {
-class Gamepad;
-}
 
 namespace blink {
 
@@ -37,7 +33,7 @@ class XRTargetRaySpace;
 template <typename IDLType>
 class FrozenArray;
 
-class XRInputSource : public ScriptWrappable, public Gamepad::Client {
+class XRInputSource : public ScriptWrappable {
   DEFINE_WRAPPERTYPEINFO();
 
  public:
@@ -67,23 +63,12 @@ class XRInputSource : public ScriptWrappable, public Gamepad::Client {
   bool emulatedPosition() const { return state_.emulated_position; }
   XRSpace* targetRaySpace() const;
   XRSpace* gripSpace() const;
-  Gamepad* gamepad() const { return gamepad_.Get(); }
   XRHand* hand() const { return hand_.Get(); }
   const FrozenArray<IDLString>& profiles() const { return *profiles_.Get(); }
 
   uint32_t source_id() const { return state_.source_id; }
 
   void SetInputFromPointer(const gfx::Transform*);
-  void SetGamepadConnected(bool state);
-
-  // Gamepad::Client
-  GamepadHapticActuator* GetVibrationActuatorForGamepad(
-      const Gamepad&) override {
-    // TODO(https://crbug.com/955097): XRInputSource implementation of
-    // Gamepad::Client must manage vibration actuator state in a similar way to
-    // NavigatorGamepad.
-    return nullptr;
-  }
 
   device::mojom::XRTargetRayMode TargetRayMode() const {
     return state_.target_ray_mode;
@@ -157,10 +142,6 @@ class XRInputSource : public ScriptWrappable, public Gamepad::Client {
   bool InvalidatesSameObject(
       const device::mojom::blink::XRInputSourceStatePtr& state);
 
-  // Note that UpdateGamepad should only be called after a check/recreation
-  // from InvalidatesSameObject
-  void UpdateGamepad(const std::optional<device::Gamepad>& gamepad);
-
   void UpdateHand(
       const device::mojom::blink::XRHandTrackingData* hand_joint_data);
 
@@ -173,7 +154,6 @@ class XRInputSource : public ScriptWrappable, public Gamepad::Client {
   const Member<XRSession> session_;
   Member<XRTargetRaySpace> target_ray_space_;
   Member<XRGripSpace> grip_space_;
-  Member<Gamepad> gamepad_;
   Member<XRHand> hand_;
   Member<FrozenArray<IDLString>> profiles_;
 

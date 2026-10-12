@@ -12,7 +12,6 @@
 #include "base/mac/mac_util.h"
 #include "base/notreached.h"
 #include "base/task/thread_pool.h"
-#include "chrome/browser/permissions/system/geolocation_observation.h"
 #include "chrome/browser/permissions/system/platform_handle.h"
 #include "chrome/browser/permissions/system/system_media_capture_permissions_mac.h"
 #include "chrome/browser/permissions/system/system_media_permission_cache.h"
@@ -21,7 +20,6 @@
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
 
 static_assert(BUILDFLAG(IS_MAC));
 
@@ -130,8 +128,8 @@ class PlatformHandleImpl : public PlatformHandle {
         return;
       }
       case ContentSettingsType::GEOLOCATION: {
-        device::GeolocationSystemPermissionManager::GetInstance()
-            ->OpenSystemPermissionSetting();
+        base::mac::OpenSystemSettingsPane(
+            base::mac::SystemSettingsPane::kPrivacySecurity_LocationServices);
         return;
       }
       case ContentSettingsType::CLIPBOARD_READ_WRITE: {
@@ -183,7 +181,7 @@ class PlatformHandleImpl : public PlatformHandle {
 
   std::unique_ptr<ScopedObservation> Observe(
       SystemPermissionChangedCallback observer) override {
-    return std::make_unique<GeolocationObservation>(std::move(observer));
+    return nullptr;
   }
 
  private:
@@ -193,23 +191,7 @@ class PlatformHandleImpl : public PlatformHandle {
     media_cache_.RefreshSystemPermissionSettings(std::move(callback));
   }
 
-  void OnSystemPermissionUpdated(ContentSettingsType content_type,
-                                 bool /*is_blocked*/) {
-    CHECK(content_type == ContentSettingsType::GEOLOCATION);
-    observation_.reset();
-    FlushGeolocationCallbacks();
-  }
-
-  void FlushGeolocationCallbacks() {
-    auto callbacks = std::move(geolocation_callbacks_);
-    for (auto& cb : callbacks) {
-      std::move(cb).Run();
-    }
-  }
-
   SystemMediaPermissionCache media_cache_;
-  std::vector<SystemPermissionResponseCallback> geolocation_callbacks_;
-  std::unique_ptr<ScopedObservation> observation_;
   base::WeakPtrFactory<PlatformHandleImpl> weak_factory_{this};
 };
 

@@ -74,7 +74,6 @@
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/switches.h"
 #include "services/cert_verifier/public/mojom/cert_verifier_service_factory.mojom.h"
-#include "services/device/public/cpp/geolocation/location_provider.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "services/network/public/cpp/features.h"
 #include "services/network/public/cpp/resource_request.h"
@@ -725,11 +724,6 @@ base::OnceClosure ContentBrowserClient::SelectClientCertificate(
   return base::OnceClosure();
 }
 
-std::unique_ptr<device::LocationProvider>
-ContentBrowserClient::OverrideSystemLocationProvider() {
-  return nullptr;
-}
-
 scoped_refptr<network::SharedURLLoaderFactory>
 ContentBrowserClient::GetSystemSharedURLLoaderFactory() {
   return nullptr;
@@ -737,15 +731,6 @@ ContentBrowserClient::GetSystemSharedURLLoaderFactory() {
 
 network::mojom::NetworkContext*
 ContentBrowserClient::GetSystemNetworkContext() {
-  return nullptr;
-}
-
-std::string ContentBrowserClient::GetGeolocationApiKey() {
-  return std::string();
-}
-
-device::GeolocationSystemPermissionManager*
-ContentBrowserClient::GetGeolocationSystemPermissionManager() {
   return nullptr;
 }
 

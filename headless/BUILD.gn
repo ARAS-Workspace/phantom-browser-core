@@ -684,10 +684,6 @@ test("headless_browsertests") {
     "//ui/shell_dialogs",
   ]
 
-  if (is_mac) {
-    deps += [ "//services/device/public/cpp:test_support" ]
-  }
-
   deps += [
     "//third_party/crashpad/crashpad/client",
     "//third_party/crashpad/crashpad/handler:common",

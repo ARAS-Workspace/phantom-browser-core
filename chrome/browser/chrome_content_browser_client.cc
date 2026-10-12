@@ -348,7 +348,6 @@
 #include "extensions/common/extension_features.h"
 #include "extensions/common/switches.h"
 #include "google_apis/gaia/gaia_urls.h"
-#include "google_apis/google_api_keys.h"
 #include "gpu/config/gpu_switches.h"
 #include "ipc/ipc_channel_proxy.h"
 #include "media/base/media_switches.h"
@@ -563,11 +562,6 @@
 #if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 #include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
 #endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
@@ -3214,17 +3208,6 @@ ChromeContentBrowserClient::GetSystemNetworkContext() {
   DCHECK(g_browser_process->system_network_context_manager());
   return g_browser_process->system_network_context_manager()->GetContext();
 }
-
-std::string ChromeContentBrowserClient::GetGeolocationApiKey() {
-  return google_apis::GetAPIKey();
-}
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-device::GeolocationSystemPermissionManager*
-ChromeContentBrowserClient::GetGeolocationSystemPermissionManager() {
-  return device::GeolocationSystemPermissionManager::GetInstance();
-}
-#endif
 
 content::GeneratedCodeCacheSettings
 ChromeContentBrowserClient::GetGeneratedCodeCacheSettings(

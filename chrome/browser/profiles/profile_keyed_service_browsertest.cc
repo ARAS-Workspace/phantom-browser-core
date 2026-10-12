@@ -583,7 +583,9 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "MenuManager",
 
     "NavigationPredictorKeyedService",
+#if BUILDFLAG(IS_LINUX)
     "NetworkingPrivateEventRouter",
+#endif  // BUILDFLAG(IS_LINUX)
     "NotificationDisplayService",
     "NtpBackgroundService",
     "NtpCustomBackgroundService",

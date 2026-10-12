@@ -44,17 +44,3 @@ component("shared_typemap_traits") {
     "//device/gamepad/public/mojom:mojom_shared",
   ]
 }
-
-component("switches") {
-  public = [
-    "gamepad_features.h",
-    "gamepad_switches.h",
-  ]
-  sources = [
-    "gamepad_features.cc",
-    "gamepad_features_export.h",
-    "gamepad_switches.cc",
-  ]
-  public_deps = [ "//base" ]
-  defines = [ "GAMEPAD_FEATURES_IMPLEMENTATION" ]
-}

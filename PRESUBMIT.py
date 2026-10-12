@@ -1069,7 +1069,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
             r'chrome/services/sharing/nearby/platform/input_file.h',
             r'chrome/services/sharing/nearby/platform/output_file.cc',
             r'chrome/services/sharing/nearby/platform/output_file.h',
-            r'components/cross_device/nearby/system_clock.cc',
             _THIRD_PARTY_EXCEPT_BLINK  # Not an error in third_party folders.
         ],
     ),
@@ -2675,7 +2674,6 @@ _GENERIC_PYDEPS_FILES = [
     'components/cronet/tools/check_combined_proguard_file.pydeps',
     'components/cronet/tools/generate_proguard_file.pydeps',
     'components/cronet/tools/jar_src.pydeps',
-    'components/language/content/browser/ulp_language_code_locator/ulp_serialized_to_static_c.pydeps',
     'components/module_installer/android/module_desc_java.pydeps',
     'components/policy/tools/template_writers/template_formatter.pydeps',
     'content/public/android/generate_child_service.pydeps',

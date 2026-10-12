@@ -50,7 +50,6 @@
 #include "content/public/test/web_contents_tester.h"
 #include "net/cookies/cookie_options.h"
 #include "services/device/public/cpp/device_features.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "testing/gmock/include/gmock/gmock-actions.h"
 #include "testing/gmock/include/gmock/gmock-matchers.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -58,11 +57,6 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/color_palette.h"
 #include "ui/gfx/paint_vector_icon.h"
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "chrome/browser/permissions/system/mock_platform_handle.h"
-#include "chrome/browser/permissions/system/system_permission_settings.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 using content_settings::PageSpecificContentSettings;
 using testing::_;
@@ -378,122 +372,6 @@ TEST_F(ContentSettingImageModelTest, SensorUnavailable) {
                              /*is_visible=*/false,
                              /*tooltip_empty=*/true);
 }
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-// Test the correct ContentSettingImageModel for various permutations of site
-// and system level Geolocation permissions
-TEST_F(ContentSettingImageModelTest, GeolocationAccessPermissionsChanged) {
-  system_permission_settings::MockPlatformHandle mock_platform_handle;
-  system_permission_settings::SetInstanceForTesting(&mock_platform_handle);
-  EXPECT_CALL(mock_platform_handle, IsAllowed(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(false));
-  EXPECT_CALL(mock_platform_handle, CanPrompt(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(false));
-
-  PageSpecificContentSettings::CreateForWebContents(
-      web_contents(),
-      std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-  GURL requesting_origin = GURL("https://www.example.com");
-  NavigateAndCommit(requesting_origin);
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents()->GetPrimaryMainFrame());
-  HostContentSettingsMap* settings_map =
-      HostContentSettingsMapFactory::GetForProfile(profile());
-
-  auto content_setting_image_model =
-      ContentSettingImageModel::CreateForContentType(
-          ContentSettingImageModel::ImageType::kGeolocation);
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_TRUE(content_setting_image_model->get_tooltip().empty());
-
-  EXPECT_CALL(mock_platform_handle, IsAllowed(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(true));
-
-  settings_map->SetDefaultContentSetting(ContentSettingsType::GEOLOCATION,
-                                         CONTENT_SETTING_ALLOW);
-  content_settings->OnContentAllowed(ContentSettingsType::GEOLOCATION);
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_ALLOWED_GEOLOCATION_MESSAGE,
-      /* explanatory_string_id = */ 0);
-
-  settings_map->SetDefaultContentSetting(ContentSettingsType::GEOLOCATION,
-                                         CONTENT_SETTING_BLOCK);
-  content_settings->OnContentBlocked(ContentSettingsType::GEOLOCATION);
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_BLOCKED_GEOLOCATION_MESSAGE,
-      /* explanatory_string_id = */ 0);
-
-  EXPECT_CALL(mock_platform_handle, IsAllowed(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(false));
-
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_BLOCKED_GEOLOCATION_MESSAGE,
-      /* explanatory_string_id = */ 0);
-
-  content_settings->OnContentAllowed(ContentSettingsType::GEOLOCATION);
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_BLOCKED_GEOLOCATION_MESSAGE,
-      IDS_GEOLOCATION_TURNED_OFF);
-}
-
-#if BUILDFLAG(IS_MAC)
-// This test verifies the UI behavior when OS-level geolocation permission is
-// undetermined. This state is only applicable on macOS.
-TEST_F(ContentSettingImageModelTest, GeolocationAccessPermissionsUndetermined) {
-  system_permission_settings::MockPlatformHandle mock_platform_handle;
-  system_permission_settings::SetInstanceForTesting(&mock_platform_handle);
-  EXPECT_CALL(mock_platform_handle, IsAllowed(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(false));
-  EXPECT_CALL(mock_platform_handle, CanPrompt(ContentSettingsType::GEOLOCATION))
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(mock_platform_handle,
-              Request(ContentSettingsType::GEOLOCATION, _))
-      .Times(1);
-
-  PageSpecificContentSettings::CreateForWebContents(
-      web_contents(),
-      std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-  GURL requesting_origin = GURL("https://www.example.com");
-  NavigateAndCommit(requesting_origin);
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents()->GetPrimaryMainFrame());
-  HostContentSettingsMap* settings_map =
-      HostContentSettingsMapFactory::GetForProfile(profile());
-
-  auto content_setting_image_model =
-      ContentSettingImageModel::CreateForContentType(
-          ContentSettingImageModel::ImageType::kGeolocation);
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_TRUE(content_setting_image_model->get_tooltip().empty());
-
-  // When OS level permission is not determined the UI should show as if it is
-  // blocked. However, the explanatory string is not displayed since we aren't
-  // completely sure yet.
-  settings_map->SetDefaultContentSetting(ContentSettingsType::GEOLOCATION,
-                                         CONTENT_SETTING_ALLOW);
-  content_settings->OnContentAllowed(ContentSettingsType::GEOLOCATION);
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_BLOCKED_GEOLOCATION_MESSAGE, 0);
-
-  // When site permission is blocked it should not make any difference what the
-  // OS level permission is.
-  settings_map->SetDefaultContentSetting(ContentSettingsType::GEOLOCATION,
-                                         CONTENT_SETTING_BLOCK);
-  content_settings->OnContentBlocked(ContentSettingsType::GEOLOCATION);
-  UpdateModelAndVerifyStates(
-      content_setting_image_model.get(), /* is_visible = */ true,
-      /* tooltip_empty = */ false, IDS_BLOCKED_GEOLOCATION_MESSAGE, 0);
-}
-#endif  // BUILDFLAG(IS_MAC)
-
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 // Regression test for https://crbug.com/41454392
 // See also: ContentSettingBubbleModelTest.SensorAccessPermissionsChanged

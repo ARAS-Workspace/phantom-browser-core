@@ -472,10 +472,6 @@
    "META": {"sizes": {"includes": [10]}},
     "includes": [4160],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/location_internals/resources.grd": {
-    "META": {"sizes": {"includes": [10],}},
-    "includes": [4260],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/management/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [4280],

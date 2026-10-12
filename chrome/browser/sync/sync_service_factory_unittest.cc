@@ -177,15 +177,6 @@ class SyncServiceFactoryTest : public testing::Test {
       datatypes.Put(syncer::ENCRYPTED_TAB_CONTEXT_ITEM);
     }
 
-    if (base::FeatureList::IsEnabled(syncer::kSyncThemesIos)) {
-      datatypes.Put(syncer::THEMES_IOS);
-    }
-
-    if (base::FeatureList::IsEnabled(
-            syncer::kNewTabPageCustomizationThemeSync)) {
-      datatypes.Put(syncer::THEMES_ANDROID);
-    }
-
     if (base::FeatureList::IsEnabled(syncer::kSyncNotebook)) {
       datatypes.Put(syncer::NOTEBOOK);
     }
@@ -232,30 +223,4 @@ TEST_F(SyncServiceFactoryTest, CreateSyncServiceImplDefault) {
     EXPECT_TRUE(types.Has(type))
         << syncer::DataTypeToDebugString(type) << " not found in datatypes map";
   }
-}
-
-class SyncServiceFactoryTestWithCrossDeviceThemeFeatures
-    : public SyncServiceFactoryTest {
- public:
-  SyncServiceFactoryTestWithCrossDeviceThemeFeatures() {
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/{syncer::kSyncThemesIos,
-                              syncer::kNewTabPageCustomizationThemeSync},
-        /*disabled_features=*/{});
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(SyncServiceFactoryTestWithCrossDeviceThemeFeatures,
-       CreateSyncServiceImpl) {
-  syncer::SyncServiceImpl* sync_service =
-      SyncServiceFactory::GetAsSyncServiceImplForProfileForTesting(profile());
-  syncer::DataTypeSet types = sync_service->GetRegisteredDataTypesForTest();
-
-  EXPECT_TRUE(types.Has(syncer::THEMES_IOS));
-  // THEMES_ANDROID is registered on desktop (via CrossDeviceThemeTracker).
-  EXPECT_TRUE(types.Has(syncer::THEMES_ANDROID));
-  EXPECT_TRUE(types.Has(syncer::THEMES));
 }

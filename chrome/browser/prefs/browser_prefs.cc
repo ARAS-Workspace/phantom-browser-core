@@ -120,8 +120,6 @@
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
-#include "components/language/content/browser/geo_language_provider.h"
-#include "components/language/content/browser/ulp_language_code_locator/ulp_language_code_locator.h"
 #include "components/language/core/browser/language_prefs.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
 #include "components/media_device_salt/media_device_id_salt.h"
@@ -1008,8 +1006,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   flags_ui::PrefServiceFlagsStorage::RegisterPrefs(registry);
   GpuModeManager::RegisterPrefs(registry);
   signin::IdentityManager::RegisterLocalStatePrefs(registry);
-  language::GeoLanguageProvider::RegisterLocalStatePrefs(registry);
-  language::UlpLanguageCodeLocator::RegisterLocalStatePrefs(registry);
   memory::EnterpriseMemoryLimitPrefObserver::RegisterPrefs(registry);
   metrics::RegisterDemographicsLocalStatePrefs(registry);
   metrics::TabStatsTracker::RegisterPrefs(registry);

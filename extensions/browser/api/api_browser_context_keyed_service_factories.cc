@@ -87,7 +87,7 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   AudioAPI::GetFactoryInstance();
   FeedbackPrivateAPI::GetFactoryInstance();
   HidDeviceManager::GetFactoryInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX)
   NetworkingPrivateEventRouterFactory::GetInstance();
 #endif
   PrinterProviderAPIFactory::GetInstance();

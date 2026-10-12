@@ -218,8 +218,6 @@ target(link_target_type, "renderer") {
     "//content/public/common:buildflags",
     "//crypto",
     "//device/base/synchronization",
-    "//device/gamepad/public/cpp:shared_with_blink",
-    "//device/gamepad/public/mojom",
     "//gin",
     "//gpu/command_buffer/client:gles2_interface",
     "//gpu/command_buffer/client:raster_interface",

@@ -65,10 +65,6 @@
 #include "content/public/browser/network_service_util.h"
 #endif
 
-#if BUILDFLAG(IS_MAC)
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "components/printing/browser/headless/headless_print_manager.h"
 #endif  // defined(ENABLE_PRINTING)
@@ -469,15 +465,6 @@ bool HeadlessContentBrowserClient::CanAcceptUntrustedExchangesIfNeeded() {
   // in the user's regular profile.
   return base::CommandLine::ForCurrentProcess()->HasSwitch(
       switches::kUserDataDir);
-}
-
-device::GeolocationSystemPermissionManager*
-HeadlessContentBrowserClient::GetGeolocationSystemPermissionManager() {
-#if BUILDFLAG(IS_MAC)
-  return device::GeolocationSystemPermissionManager::GetInstance();
-#else
-  return nullptr;
-#endif
 }
 
 void HeadlessContentBrowserClient::OnNetworkServiceCreated(

@@ -28,7 +28,6 @@
 #include "chrome/browser/ui/views/permissions/chip/permission_dashboard_controller.h"
 #include "components/permissions/permission_prompt.h"
 #include "components/security_state/core/security_state.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/metadata/metadata_header_macros.h"
@@ -46,10 +45,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "components/webapps/common/web_app_id.h"
 #endif
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 class Browser;
 class BrowserWindowInterface;
@@ -96,9 +91,6 @@ class LocationBarView
       public IconLabelBubbleView::Delegate,
       public LocationIconView::Delegate,
       public ContentSettingImageViewDelegate,
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-      public device::GeolocationSystemPermissionManager::PermissionObserver,
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
       public OmniboxPopupPresenterDelegate {
   METADATA_HEADER(LocationBarView, views::View)
 
@@ -250,13 +242,6 @@ class LocationBarView
   content::WebContents* GetContentSettingWebContents() override;
   ContentSettingBubbleModelDelegate* GetContentSettingBubbleModelDelegate()
       override;
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  // GeolocationSystemPermissionManager::PermissionObserver:
-  void OnSystemPermissionUpdated(
-      device::LocationSystemPermissionStatus new_status) override;
-  void OnPermissionManagerShuttingDown() override;
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
   // OmniboxPopupPresenterDelegate:
   views::Widget* GetLocationBarWidget() override;
@@ -466,15 +451,6 @@ class LocationBarView
   // to system level notification permissions.
   base::CallbackListSubscription app_shim_observation_;
 #endif
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  // Manage a subscription to GeolocationSystemPermissionManager, which may
-  // outlive this object.
-  base::ScopedObservation<
-      device::GeolocationSystemPermissionManager,
-      device::GeolocationSystemPermissionManager::PermissionObserver>
-      geolocation_permission_observation_{this};
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
   // The Browser this LocationBarView is in.  Note that at least
   // SimpleWebViewDialog uses a LocationBarView outside any browser

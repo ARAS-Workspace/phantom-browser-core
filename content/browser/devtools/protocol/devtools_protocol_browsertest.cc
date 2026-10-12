@@ -4587,41 +4587,6 @@ IN_PROC_BROWSER_TEST_F(NetworkResponseProtocolECHTest,
 
 IN_PROC_BROWSER_TEST_F(
     PrerenderDevToolsProtocolTest,
-    PrerenderStatusUpdatedReportsFailureWithDisallowedMojoInterface) {
-  base::HistogramTester histogram_tester;
-  ASSERT_TRUE(embedded_test_server()->Start());
-  const GURL kInitialUrl = GetUrl("/empty.html");
-  const GURL kPrerenderingUrl = GetUrl("/empty.html?prerender");
-
-  // Navigate to an initial page.
-  ASSERT_TRUE(NavigateToURL(shell(), kInitialUrl));
-
-  // Make a prerendered page.
-  PrerenderHostId host_id = AddPrerender(kPrerenderingUrl);
-  auto* prerender_render_frame_host = GetPrerenderedMainFrameHost(host_id);
-  Attach();
-  SendCommandSync("Preload.enable");
-
-  // Executing `navigator.getGamepads()` to start binding the GamepadMonitor
-  // interface, and this is expected to cause prerender cancellation because
-  // the API is disallowed.
-  ExecuteScriptAsyncWithoutUserGesture(prerender_render_frame_host,
-                                       "navigator.getGamepads()");
-
-  base::DictValue result;
-  while (true) {
-    result = WaitForNotification("Preload.prerenderStatusUpdated", true);
-    if (*result.FindString("status") == "Failure") {
-      break;
-    }
-  }
-
-  EXPECT_THAT(*result.FindString("disallowedMojoInterface"),
-              Eq("device.mojom.GamepadMonitor"));
-}
-
-IN_PROC_BROWSER_TEST_F(
-    PrerenderDevToolsProtocolTest,
     PrerenderStatusUpdatedReportsFailureWithPrerenderMismatchedHeaders) {
   const std::string user_agent_override = "foo";
   ASSERT_TRUE(embedded_test_server()->Start());

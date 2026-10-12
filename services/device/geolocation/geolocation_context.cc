@@ -4,6 +4,7 @@
 
 #include "services/device/geolocation/geolocation_context.h"
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 

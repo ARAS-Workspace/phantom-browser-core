@@ -144,7 +144,6 @@ test("components_unittests") {
     "//components/country_codes:unit_tests",
     "//components/crash/core/common:unit_tests",
     "//components/critical_actions/core/browser:unit_tests",
-    "//components/cross_device/logging:unit_tests",
     "//components/crx_file:unit_tests",
     "//components/data_sharing:unit_tests",
     "//components/data_sharing/data_sharing_internals/webui:unit_tests",
@@ -366,7 +365,6 @@ test("components_unittests") {
       "//components/javascript_dialogs:unit_tests",
       "//components/js_injection/common:unit_tests",
       "//components/keyed_service/content:unit_tests",
-      "//components/language/content/browser:unit_tests",
       "//components/link_header_util:unit_tests",
       "//components/media_device_salt:unit_tests",
       "//components/media_effects:unit_tests",
@@ -563,7 +561,6 @@ test("components_unittests") {
       "//components/enterprise/platform_auth:unit_tests",
       "//components/remote_cocoa/app_shim:unit_tests",
       "//components/remote_cocoa/common:unit_tests",
-      "//components/wifi:unit_tests",
     ]
   }
 

@@ -135,11 +135,6 @@ class StorageKey;
 class URLLoaderThrottle;
 }  // namespace blink
 
-namespace device {
-class GeolocationSystemPermissionManager;
-class LocationProvider;
-}  // namespace device
-
 namespace gfx {
 class ImageSkia;
 }  // namespace gfx
@@ -1111,13 +1106,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Notification that a new SCT auditing report has been sent.
   virtual void OnNewSCTAuditingReportSent(BrowserContext* browser_context) {}
 
-  // Allows the embedder to override the LocationProvider implementation.
-  // Return nullptr to indicate the default one for the platform should be
-  // created. This is used by Qt, see
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=725057#c7
-  virtual std::unique_ptr<device::LocationProvider>
-  OverrideSystemLocationProvider();
-
   // Returns a SharedURLLoaderFactory attached to the system network context.
   // Must be called on the UI thread. The default implementation returns
   // nullptr.
@@ -1128,20 +1116,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // URLLoaderFactory, instead use GetSystemSharedURLLoaderFactory(). Must be
   // called on the UI thread. The default implementation returns nullptr.
   virtual network::mojom::NetworkContext* GetSystemNetworkContext();
-
-  // Allows an embedder to provide a Google API Key to use for network
-  // geolocation queries.
-  // * May be called from any thread.
-  // * Default implementation returns empty string, meaning send no API key.
-  virtual std::string GetGeolocationApiKey();
-
-  // Returns the global BrowserProcessPlatformParts'
-  // GeolocationSystemPermissionManager on supported operating systems and
-  // returns nullptr otherwise. For tests this should return a
-  // FakeGeolocationSystemPermissionManager with the
-  // LocationSystemPermissionStatus set to allow.
-  virtual device::GeolocationSystemPermissionManager*
-  GetGeolocationSystemPermissionManager();
 
   // Allows the embedder to provide a storage partition configuration for a
   // site. A storage partition configuration includes a domain of the embedder's

@@ -13,7 +13,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_browser_application_mac.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#include "services/device/public/cpp/geolocation/system_geolocation_source_apple.h"
 
 BrowserProcessPlatformPart::BrowserProcessPlatformPart() = default;
 
@@ -66,14 +65,6 @@ void BrowserProcessPlatformPart::PreMainMessageLoopRun() {
   // domain socket will cause the just-created socket to be unlinked.
   DCHECK(!app_shim_listener_.get());
   app_shim_listener_ = new AppShimListener;
-
-  // Workaround for https://crbug.com/40155239: This needs to be created at
-  // browser startup.
-  if (!device::GeolocationSystemPermissionManager::GetInstance()) {
-    device::GeolocationSystemPermissionManager::SetInstance(
-        device::SystemGeolocationSourceApple::
-            CreateGeolocationSystemPermissionManager());
-  }
 }
 
 void BrowserProcessPlatformPart::PostDestroyThreads() {

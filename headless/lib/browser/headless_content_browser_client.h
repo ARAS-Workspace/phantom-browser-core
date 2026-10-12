@@ -99,8 +99,6 @@ class HeadlessContentBrowserClient : public content::ContentBrowserClient {
   blink::UserAgentMetadata GetUserAgentMetadata() override;
 
   bool CanAcceptUntrustedExchangesIfNeeded() override;
-  device::GeolocationSystemPermissionManager*
-  GetGeolocationSystemPermissionManager() override;
 
   void OnNetworkServiceCreated(
       ::network::mojom::NetworkService* network_service) override;

@@ -95,7 +95,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_features.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
-#include "services/device/public/cpp/device_features.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/test/test_network_connection_tracker.h"
 #include "ui/base/mojom/window_show_state.mojom-forward.h"
@@ -107,10 +106,6 @@
 #include "chrome/test/base/scoped_bundle_swizzler_mac.h"
 #include "components/os_crypt/common/os_crypt_switches.h"
 #endif
-
-#if BUILDFLAG(IS_MAC)
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 #include "components/captive_portal/content/captive_portal_service.h"
@@ -138,39 +133,6 @@
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
-
-#if BUILDFLAG(IS_MAC)
-class ChromeBrowserMainExtraPartsBrowserProcessInjection
-    : public ChromeBrowserMainExtraParts {
- public:
-  ChromeBrowserMainExtraPartsBrowserProcessInjection() = default;
-
-  // ChromeBrowserMainExtraParts implementation
-  void PreCreateMainMessageLoop() override {
-    if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-      // Tests should not depend on the current state of the system-level
-      // location permission on platforms where the permission cannot be
-      // programmatically changed by tests. Insert a fake
-      // GeolocationSystemPermissionManager and simulate a granted system-level
-      // location permission.
-      //
-      // On ChromeOS, preserve the real manager so that tests can enable or
-      // disable the system preference.
-      auto fake_geolocation_system_permission_manager =
-          std::make_unique<device::FakeGeolocationSystemPermissionManager>();
-      fake_geolocation_system_permission_manager->SetSystemPermission(
-          device::LocationSystemPermissionStatus::kAllowed);
-      device::GeolocationSystemPermissionManager::SetInstance(
-          std::move(fake_geolocation_system_permission_manager));
-    }
-  }
-
-  ChromeBrowserMainExtraPartsBrowserProcessInjection(
-      const ChromeBrowserMainExtraPartsBrowserProcessInjection&) = delete;
-  ChromeBrowserMainExtraPartsBrowserProcessInjection& operator=(
-      const ChromeBrowserMainExtraPartsBrowserProcessInjection&) = delete;
-};
-#endif  // BUILDFLAG(IS_MAC)
 
 // This extra parts adds a test key provider to make sure that async
 // initialization of OSCrypt Async always happens during browser_tests, but
@@ -467,10 +429,6 @@ size_t InProcessBrowserTest::GetTestPreCount() {
 void InProcessBrowserTest::CreatedBrowserMainParts(
     content::BrowserMainParts* parts) {
   BrowserTestBase::CreatedBrowserMainParts(parts);
-#if BUILDFLAG(IS_MAC)
-  static_cast<ChromeBrowserMainParts*>(parts)->AddParts(
-      std::make_unique<ChromeBrowserMainExtraPartsBrowserProcessInjection>());
-#endif  // BUILDFLAG(IS_MAC)
   static_cast<ChromeBrowserMainParts*>(parts)->AddParts(
       std::make_unique<OSCryptAsyncExtraSetUp>());
 }

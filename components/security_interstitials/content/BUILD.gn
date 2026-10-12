@@ -104,10 +104,6 @@ static_library("security_interstitial_page") {
     deps += [ "//components/captive_portal/content" ]
   }
 
-  if (is_mac) {
-    deps += [ "//components/wifi" ]
-  }
-
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
   }

@@ -198,7 +198,6 @@ source_set("browser") {
     "//device/bluetooth",
     "//device/bluetooth/public/cpp",
     "//device/fido",
-    "//device/gamepad",
     "//device/vr/public/mojom:isolated_xr_service",
     "//google_apis",
     "//gpu/command_buffer/client:gles2_implementation",

@@ -322,9 +322,7 @@ after discussions on the right group.
   </group>
   <group name="Location">
     <sender name="Location">
-      <annotation id="geo_language_provider"/>
       <annotation id="lib_address_input"/>
-      <annotation id="network_location_provider"/>
     </sender>
     <sender name="RLZ Ping">
       <annotation id="rlz_ping"/>

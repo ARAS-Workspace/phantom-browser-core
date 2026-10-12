@@ -127,8 +127,6 @@ class ShellContentBrowserClient : public ContentBrowserClient {
       int child_process_id,
       content::PosixFileDescriptorInfo* mappings) override;
 #endif  // BUILDFLAG(IS_LINUX)
-  device::GeolocationSystemPermissionManager*
-  GetGeolocationSystemPermissionManager() override;
   void OnNetworkServiceCreated(
       network::mojom::NetworkService* network_service) override;
   void ConfigureNetworkContextParams(

@@ -883,7 +883,6 @@
                   'ash/webui/common/resources/hotspot/|'\
                   'ash/webui/common/resources/network/|'\
                   'chrome/browser/ash/net/|'\
-                  'chrome/browser/extensions/api/networking_private/|'\
                   'chrome/browser/resources/chromeos/internet_config_dialog/|'\
                   'chrome/browser/resources/chromeos/internet_detail_dialog/|'\
                   'chrome/browser/resources/chromeos/network_ui/|'\
@@ -1276,9 +1275,6 @@
                   'agents/skills/fuzzing/|' \
                   'build/config/sanitizers/|' \
                   'third_party/libprotobuf-mutator/(?!src)',
-    },
-    'gamepad': {
-      'filepath': 'gamepad',
     },
     'gcm': {
       'filepath': 'chrome/browser/gcm/|'\
@@ -2949,7 +2945,6 @@
                 'titouan+watch@chromium.org'],
     'fuzzing_core': ['aakallam+watch@chromium.org',
                      'ortuno+watch-core@chromium.org'],
-    'gamepad': ['mattreynolds+watch@chromium.org'],
     'gcm': ['peter@chromium.org', 'dibyapal+watch-webapps@chromium.org'],
     'gemini_app': ['dmblack+watch@google.com',
                    'xiaohuic+watch@chromium.org'],

@@ -240,8 +240,6 @@ group("web_test_renderer_public_deps") {
     "//content/public/renderer",  # For component builds.
     "//content/renderer:for_content_tests",  # For non-component builds.
     "//content/shell:content_shell_lib",
-    "//device/gamepad/public/cpp:shared_with_blink",
-    "//device/gamepad/public/mojom",
     "//gin",
     "//mojo/public/cpp/bindings",
     "//services/device/public/mojom",
@@ -300,8 +298,6 @@ static_library("web_test_renderer") {
     "renderer/event_sender.h",
     "renderer/fake_screen_orientation_impl.cc",
     "renderer/fake_screen_orientation_impl.h",
-    "renderer/gamepad_controller.cc",
-    "renderer/gamepad_controller.h",
     "renderer/gc_controller.cc",
     "renderer/gc_controller.h",
     "renderer/layout_dump.cc",

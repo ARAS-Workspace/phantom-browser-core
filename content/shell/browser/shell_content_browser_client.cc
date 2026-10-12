@@ -83,7 +83,6 @@
 #include "net/dns/public/insecure_dns_mode.h"
 #include "net/dns/public/secure_dns_mode.h"
 #include "net/ssl/client_cert_identity.h"
-#include "services/device/public/cpp/geolocation/location_system_permission_status.h"
 #include "services/network/public/cpp/features.h"
 #include "services/network/public/cpp/network_service_buildflags.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy_declaration.h"
@@ -101,10 +100,6 @@
 #include "url/origin.h"
 #include "url/url_canon.h"
 #include "url/url_constants.h"
-
-#if BUILDFLAG(IS_MAC)
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crash_switches.h"
@@ -210,19 +205,7 @@ base::flat_set<url::Origin> GetIsolatedContextOriginSetFromFlag() {
 // to be created (actually, ContentBrowserTestContentBrowserClient). Any state
 // needed should be added here so that it's shared between the instances.
 struct SharedState {
-  SharedState() {
-#if BUILDFLAG(IS_MAC)
-    location_manager =
-        std::make_unique<device::FakeGeolocationSystemPermissionManager>();
-    location_manager->SetSystemPermission(
-        device::LocationSystemPermissionStatus::kAllowed);
-#endif
-  }
-
-#if BUILDFLAG(IS_MAC)
-  std::unique_ptr<device::FakeGeolocationSystemPermissionManager>
-      location_manager;
-#endif
+  SharedState() = default;
 
   // Owned by content::BrowserMainLoop.
   raw_ptr<ShellBrowserMainParts, DanglingUntriaged> shell_browser_main_parts =
@@ -437,15 +420,6 @@ void ShellContentBrowserClient::AppendExtraCommandLineSwitches(
     command_line->AppendSwitch(switches::kEnableIsolatedWebAppsInRenderer);
   }
 
-}
-
-device::GeolocationSystemPermissionManager*
-ShellContentBrowserClient::GetGeolocationSystemPermissionManager() {
-#if BUILDFLAG(IS_MAC)
-  return GetSharedState().location_manager.get();
-#else
-  return nullptr;
-#endif
 }
 
 std::string ShellContentBrowserClient::GetAcceptLangs(BrowserContext* context) {

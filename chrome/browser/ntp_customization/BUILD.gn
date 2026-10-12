@@ -237,7 +237,6 @@ generate_jni("jni_headers") {
 java_cpp_enum("cross_device_theme_enums") {
   sources = [
     "//chrome/browser/sync/cross_device_theme_tracker_android.h",
-    "//components/themes/cross_device/cross_device_theme_tracker.h",
   ]
 }
 

@@ -27,11 +27,6 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "services/network/public/cpp/features.h"
 
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "components/permissions/contexts/geolocation_permission_context_system.h"
-#include "services/device/public/cpp/device_features.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
 #endif
@@ -82,24 +77,10 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
               delegates.clipboard_sanitized_write_permission_context_delegate));
   ContentSettingsType location_context_key =
       content_settings::GeolocationContentSettingsType();
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-    permission_contexts[location_context_key] =
-        std::make_unique<permissions::GeolocationPermissionContextSystem>(
-            browser_context,
-            std::move(delegates.geolocation_permission_context_delegate));
-  } else {
-    permission_contexts[location_context_key] =
-        std::make_unique<permissions::GeolocationPermissionContext>(
-            browser_context,
-            std::move(delegates.geolocation_permission_context_delegate));
-  }
-#else
   permission_contexts[location_context_key] =
       std::make_unique<permissions::GeolocationPermissionContext>(
           browser_context,
           std::move(delegates.geolocation_permission_context_delegate));
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 #if BUILDFLAG(ENABLE_VR)
   if (device::features::IsHandTrackingEnabled()) {
     permission_contexts[ContentSettingsType::HAND_TRACKING] =

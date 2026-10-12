@@ -43,12 +43,6 @@ ChromeSyncControllerBuilder::ChromeSyncControllerBuilder() = default;
 
 ChromeSyncControllerBuilder::~ChromeSyncControllerBuilder() = default;
 
-void ChromeSyncControllerBuilder::SetCrossDeviceThemeTracker(
-    themes::CrossDeviceThemeTracker<LocalThemeSpecifics>*
-        cross_device_theme_tracker) {
-  cross_device_theme_tracker_.Set(cross_device_theme_tracker);
-}
-
 void ChromeSyncControllerBuilder::SetDataTypeStoreService(
     syncer::DataTypeStoreService* data_type_store_service) {
   data_type_store_service_.Set(data_type_store_service);
@@ -169,42 +163,6 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
                   theme_service_.value()->GetThemeSyncableService())));
     }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
-
-
-    if (auto tracker = cross_device_theme_tracker_.value()) {
-      if (base::FeatureList::IsEnabled(
-              syncer::kNewTabPageCustomizationThemeSync)) {
-        // On Desktop, track THEMES_ANDROID.
-        syncer::DataTypeControllerDelegate* android_delegate =
-            tracker->GetSyncDelegateForType(syncer::THEMES_ANDROID).get();
-        if (android_delegate) {
-          controllers.push_back(std::make_unique<syncer::DataTypeController>(
-              syncer::THEMES_ANDROID,
-              /*delegate_for_full_sync_mode=*/
-              std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  android_delegate),
-              /*delegate_for_transport_mode=*/
-              std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  android_delegate)));
-        }
-      }
-
-      if (base::FeatureList::IsEnabled(syncer::kSyncThemesIos)) {
-        syncer::DataTypeControllerDelegate* ios_delegate =
-            tracker->GetSyncDelegateForType(syncer::THEMES_IOS).get();
-        if (ios_delegate) {
-          controllers.push_back(std::make_unique<syncer::DataTypeController>(
-              syncer::THEMES_IOS,
-              /*delegate_for_full_sync_mode=*/
-              std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  ios_delegate),
-              /*delegate_for_transport_mode=*/
-              std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  ios_delegate)));
-        }
-      }
-    }
 
     return controllers;
 }

@@ -29,11 +29,6 @@
 #include "ui/gl/gl_switches.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_MAC)
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "components/password_manager/core/browser/password_manager_switches.h"
 #endif
@@ -125,20 +120,6 @@ void HeadlessBrowserTest::PostRunTestOnMainThread() {
   // Pump tasks produced during shutdown.
   base::RunLoop().RunUntilIdle();
 }
-
-#if BUILDFLAG(IS_MAC)
-void HeadlessBrowserTest::CreatedBrowserMainParts(
-    content::BrowserMainParts* parts) {
-  auto fake_geolocation_system_permission_manager =
-      std::make_unique<device::FakeGeolocationSystemPermissionManager>();
-  fake_geolocation_system_permission_manager->SetSystemPermission(
-      device::LocationSystemPermissionStatus::kAllowed);
-
-  CHECK(!device::GeolocationSystemPermissionManager::GetInstance());
-  device::GeolocationSystemPermissionManager::SetInstance(
-      std::move(fake_geolocation_system_permission_manager));
-}
-#endif
 
 HeadlessBrowser* HeadlessBrowserTest::browser() const {
   return HeadlessContentMainDelegate::GetInstance()->browser();

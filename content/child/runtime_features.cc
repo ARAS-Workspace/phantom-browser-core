@@ -27,7 +27,6 @@
 #include "content/public/common/content_switches.h"
 #include "device/base/features.h"
 #include "device/fido/public/features.h"
-#include "device/gamepad/public/cpp/gamepad_features.h"
 #include "device/vr/buildflags/buildflags.h"
 #include "gpu/config/gpu_finch_features.h"
 #include "gpu/config/gpu_switches.h"
@@ -156,11 +155,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
            raw_ref(features::kFedCmNavigationInterception), kDefault},
           {wf::EnableFedCmNavigationInterception,
            raw_ref(features::kFedCmEmbedderInitiatedLogin), kDefault},
-          {wf::EnableGamepadMultitouch,
-           raw_ref(features::kEnableGamepadMultitouch)},
-          {wf::EnableGamepadRawInputChangeEvent,
-           raw_ref(features::kGamepadRawInputChangeEvent),
-           kSetOnlyIfOverridden},
           {wf::EnableFencedFrames,
            raw_ref(features::kPrivacySandboxAdsAPIsOverride),
            kSetOnlyIfOverridden},

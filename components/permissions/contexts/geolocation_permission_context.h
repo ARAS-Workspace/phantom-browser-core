@@ -13,8 +13,6 @@
 #include "components/permissions/permission_context_base.h"
 #include "components/permissions/permission_request_data.h"
 #include "content/public/browser/browser_context.h"
-#include "mojo/public/cpp/bindings/remote.h"
-#include "services/device/public/mojom/geolocation_control.mojom.h"
 
 class PrefService;
 
@@ -88,10 +86,6 @@ class GeolocationPermissionContext : public PermissionContextBase {
 
   void UpdateTabContext(const PermissionRequestData& request_data,
                         bool allowed) override;
-
-  device::mojom::GeolocationControl* GetGeolocationControl();
-
-  mojo::Remote<device::mojom::GeolocationControl> geolocation_control_;
 
   base::WeakPtrFactory<GeolocationPermissionContext> weak_factory_{this};
 };

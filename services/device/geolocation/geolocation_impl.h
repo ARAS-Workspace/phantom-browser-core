@@ -7,7 +7,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "mojo/public/cpp/bindings/receiver.h"
-#include "services/device/geolocation/geolocation_provider_impl.h"
 #include "services/device/public/mojom/geolocation.mojom.h"
 #include "services/device/public/mojom/geolocation_client_id.mojom.h"
 #include "services/device/public/mojom/geolocation_context.mojom.h"
@@ -15,7 +14,6 @@
 
 namespace device {
 
-class GeolocationProvider;
 class GeolocationContext;
 
 // Implements the Geolocation Mojo interface.

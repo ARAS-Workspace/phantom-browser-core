@@ -36,9 +36,6 @@ class HeadlessBrowserTest : public content::BrowserTestBase {
   void SetUpCommandLine(base::CommandLine* command_line) override;
   void PreRunTestOnMainThread() override;
   void PostRunTestOnMainThread() override;
-#if BUILDFLAG(IS_MAC)
-  void CreatedBrowserMainParts(content::BrowserMainParts* parts) override;
-#endif
 
   // Run an asynchronous test in a nested run loop. The caller should call
   // FinishAsynchronousTest() to notify that the test should finish.

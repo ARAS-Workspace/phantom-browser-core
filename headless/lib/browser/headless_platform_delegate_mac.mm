@@ -12,7 +12,6 @@
 #include "content/public/browser/web_contents.h"
 #include "headless/lib/browser/headless_screen_mac.h"
 #include "headless/lib/browser/headless_web_contents_impl.h"
-#include "services/device/public/cpp/geolocation/system_geolocation_source_apple.h"
 #import "ui/base/cocoa/base_view.h"
 #include "ui/display/screen.h"
 #import "ui/gfx/mac/coordinate_conversion.h"
@@ -28,21 +27,10 @@ const NSActivityOptions kActivityOptions =
     ~(NSActivitySuddenTerminationDisabled |
       NSActivityAutomaticTerminationDisabled);
 
-void SetGeolocationSystemPermissionManagerInstance() {
-  // GeolocationSystemPermissionManager instance may be already set in tests.
-  if (!device::GeolocationSystemPermissionManager::GetInstance()) {
-    device::GeolocationSystemPermissionManager::SetInstance(
-        device::SystemGeolocationSourceApple::
-            CreateGeolocationSystemPermissionManager());
-  }
-}
-
 }  // namespace
 
 void HeadlessPlatformDelegate::Initialize(
     const HeadlessBrowser::Options& options) {
-  SetGeolocationSystemPermissionManagerInstance();
-
   HeadlessScreen* screen =
       HeadlessScreenMac::Create(options.window_size, options.screen_info_spec);
   display::Screen::SetScreenInstance(screen);

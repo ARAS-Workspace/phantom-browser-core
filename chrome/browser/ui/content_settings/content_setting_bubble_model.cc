@@ -1423,25 +1423,6 @@ void ContentSettingGeolocationBubbleModel::CommitChanges() {
 
 void ContentSettingGeolocationBubbleModel::
     InitializeSystemGeolocationPermissionBubble() {
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#if BUILDFLAG(IS_MAC)
-  set_title(l10n_util::GetStringUTF16(IDS_GEOLOCATION_TURNED_OFF_IN_OS));
-#else
-  // The system-level location permission is not supported on Linux.
-  NOTREACHED();
-#endif
-
-  clear_message();
-  AddListItem(ContentSettingBubbleModel::ListItem(
-      &(features::IsRoundedIconsEnabled() ? vector_icons::kLocationOnIcon
-                                          : vector_icons::kLocationOnOldIcon),
-      l10n_util::GetStringUTF16(IDS_GEOLOCATION),
-      l10n_util::GetStringUTF16(IDS_TURNED_OFF), false, true, 0));
-  set_manage_text_style(ContentSettingBubbleModel::ManageTextStyle::kNone);
-  set_done_button_text(l10n_util::GetStringUTF16(IDS_OPEN_SETTINGS_LINK));
-  set_radio_group(RadioGroup());
-  show_system_geolocation_bubble_ = true;
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 }
 
 void ContentSettingGeolocationBubbleModel::SetCustomLink() {

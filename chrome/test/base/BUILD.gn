@@ -6,7 +6,6 @@ import("//chrome/common/features.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//services/device/public/cpp/geolocation/buildflags.gni")
 import("//ui/views/features.gni")
 
 source_set("test_switches") {
@@ -394,16 +393,8 @@ source_set("testing_browser_process") {
     "//components/policy/core/browser",
     "//components/prefs:test_support",
     "//components/subresource_filter/content/browser",
-    "//services/device/public/cpp/geolocation:buildflags",
     "//services/network:test_support",
   ]
-  if (os_level_geolocation_permission_supported) {
-    deps += [
-      "//services/device/public/cpp:device_features",
-      "//services/device/public/cpp:test_support",
-      "//services/device/public/cpp/geolocation",
-    ]
-  }
   public_deps += [ "//chrome/browser/upgrade_detector" ]
   deps += [
     "//chrome/browser/hid",

@@ -107,7 +107,6 @@
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
-#include "services/device/public/cpp/device_features.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/accessibility/ax_enums.mojom.h"
@@ -208,13 +207,6 @@ LocationBarView::LocationBarView(Browser* browser,
         }));
     views::FocusRing::Get(this)->SetOutsetFocusRingDisabled(true);
     views::InstallPillHighlightPathGenerator(this);
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-    if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-      geolocation_permission_observation_.Observe(
-          device::GeolocationSystemPermissionManager::GetInstance());
-    }
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
   }
 #if BUILDFLAG(IS_MAC)
   app_shim_observation_ =
@@ -1087,17 +1079,6 @@ ContentSettingBubbleModelDelegate*
 LocationBarView::GetContentSettingBubbleModelDelegate() {
   return delegate_->GetContentSettingBubbleModelDelegate();
 }
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-void LocationBarView::OnSystemPermissionUpdated(
-    device::LocationSystemPermissionStatus new_status) {
-  UpdateContentSettingsIcons();
-}
-
-void LocationBarView::OnPermissionManagerShuttingDown() {
-  geolocation_permission_observation_.Reset();
-}
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
 views::Widget* LocationBarView::GetLocationBarWidget() {
   return GetWidget();

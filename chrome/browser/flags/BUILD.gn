@@ -119,7 +119,6 @@ static_library("flags_android_impl") {
     "//components/sync_preferences:features",
     "//components/sync_sessions",
     "//components/tab_groups",
-    "//components/themes/cross_device:features",
     "//components/visited_url_ranking/public",
     "//components/viz/common",
     "//components/webapps/browser",

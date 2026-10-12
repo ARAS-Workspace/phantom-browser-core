@@ -42,7 +42,6 @@
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/chrome_sync_client.h"
 #include "chrome/browser/sync/chrome_sync_controller_builder.h"
-#include "chrome/browser/sync/cross_device_theme_tracker_factory.h"
 #include "chrome/browser/sync/data_type_store_service_factory.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
 #include "chrome/browser/sync/glue/extensions_activity_monitor.h"
@@ -234,10 +233,6 @@ syncer::DataTypeController::TypeVector CreateChromeControllers(
   builder.SetThemeService(ThemeServiceFactory::GetForProfile(profile));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-
-  builder.SetCrossDeviceThemeTracker(
-      CrossDeviceThemeTrackerFactory::GetForProfile(profile));
-
   return builder.Build(sync_service);
 }
 
@@ -415,7 +410,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(browser_sync::UserEventServiceFactory::GetInstance());
   DependsOn(collaboration::CollaborationServiceFactory::GetInstance());
   DependsOn(ConsentAuditorFactory::GetInstance());
-  DependsOn(CrossDeviceThemeTrackerFactory::GetInstance());
   DependsOn(DataTypeStoreServiceFactory::GetInstance());
   DependsOn(DeviceInfoSyncServiceFactory::GetInstance());
   DependsOn(data_sharing::DataSharingServiceFactory::GetInstance());

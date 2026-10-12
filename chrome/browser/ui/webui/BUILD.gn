@@ -67,7 +67,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/internal_debug_pages_disabled",
     "//chrome/browser/ui/webui/interstitials",
     "//chrome/browser/ui/webui/local_state",
-    "//chrome/browser/ui/webui/location_internals",
     "//chrome/browser/ui/webui/media",
     "//chrome/browser/ui/webui/metrics_internals",
     "//chrome/browser/ui/webui/net_internals",

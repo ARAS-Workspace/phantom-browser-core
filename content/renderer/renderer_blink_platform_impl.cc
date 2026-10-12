@@ -65,7 +65,6 @@
 #include "content/renderer/webgraphicscontext3d_provider_impl.h"
 #include "content/renderer/worker/dedicated_worker_host_factory_client.h"
 #include "content/renderer/worker/worker_thread_registry.h"
-#include "device/gamepad/public/cpp/gamepads.h"
 #include "gin/array_buffer.h"  // TODO(crbug.com/40837434) remove import once resolved.
 #include "gpu/command_buffer/client/gles2_interface.h"
 #include "gpu/config/gpu_driver_bug_workarounds.h"

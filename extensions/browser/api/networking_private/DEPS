@@ -5,7 +5,6 @@ include_rules = [
   "+components/proxy_config",
   "+components/session_manager",
   "+components/user_manager",
-  "+components/wifi",
   "+chromeos",
   "+dbus",
   "+third_party/cros_system_api"

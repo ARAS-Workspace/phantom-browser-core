@@ -59,7 +59,6 @@
 #include "content/public/test/web_contents_tester.h"
 #include "net/base/schemeful_site.h"
 #include "services/device/public/cpp/device_features.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -631,51 +630,6 @@ TEST_F(ContentSettingBubbleModelTest, Geolocation) {
   settings_map->SetDefaultContentSetting(ContentSettingsType::GEOLOCATION,
                                          CONTENT_SETTING_ALLOW);
   content_settings->OnContentAllowed(ContentSettingsType::GEOLOCATION);
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  // System-level geolocation permission is blocked.
-  {
-    auto content_setting_bubble_model =
-        std::make_unique<ContentSettingGeolocationBubbleModel>(nullptr, page());
-    std::unique_ptr<FakeOwner> owner =
-        FakeOwner::Create(*content_setting_bubble_model, 0);
-    const auto& bubble_content = content_setting_bubble_model->bubble_content();
-
-#if BUILDFLAG(IS_MAC)
-    EXPECT_EQ(bubble_content.title,
-              u"Location is turned off in system settings");
-#endif
-    EXPECT_TRUE(bubble_content.message.empty());
-    EXPECT_EQ(bubble_content.radio_group.radio_items.size(), 0U);
-
-    // This should be a no-op.
-    content_setting_bubble_model->CommitChanges();
-  }
-
-  // System-level geolocation permission is blocked, but allowed while the
-  // bubble is visible. The displayed message should not change.
-  {
-    auto content_setting_bubble_model =
-        std::make_unique<ContentSettingGeolocationBubbleModel>(nullptr, page());
-    std::unique_ptr<FakeOwner> owner =
-        FakeOwner::Create(*content_setting_bubble_model, 0);
-    const auto& bubble_content = content_setting_bubble_model->bubble_content();
-
-    EXPECT_CALL(mock_platform_handle,
-                IsAllowed(ContentSettingsType::GEOLOCATION))
-        .WillRepeatedly(Return(true));
-
-#if BUILDFLAG(IS_MAC)
-    EXPECT_EQ(bubble_content.title,
-              u"Location is turned off in system settings");
-#endif
-    EXPECT_TRUE(bubble_content.message.empty());
-    EXPECT_EQ(bubble_content.radio_group.radio_items.size(), 0U);
-
-    // This should be a no-op.
-    content_setting_bubble_model->CommitChanges();
-  }
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
   // Go from allow by default to block by default to allow by default.
   {

@@ -81,7 +81,6 @@ target(link_target_type, "child") {
     "//content/common/memory_coordinator/mojom",
     "//content/public/common:common_sources",
     "//device/base",
-    "//device/gamepad/public/cpp:switches",
     "//device/vr/buildflags",
     "//gpu/command_buffer/client",
     "//media",

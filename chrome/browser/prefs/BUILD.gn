@@ -136,8 +136,6 @@ source_set("impl") {
     "//components/feature_engagement/public:prefs",
     "//components/history_clusters/core",
     "//components/image_fetcher/core/cache",
-    "//components/language/content/browser",
-    "//components/language/content/browser/ulp_language_code_locator",
     "//components/language/core/browser",
     "//components/live_caption:constants",
     "//components/lookalikes/core",

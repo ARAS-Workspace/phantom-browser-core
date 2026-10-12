@@ -40,12 +40,7 @@ enum HeaderMismatchType : uint32_t {
 
 PrerenderCancelledInterface GetCancelledInterfaceType(
     const std::string& interface_name) {
-  if (interface_name == "device.mojom.GamepadHapticsManager") {
-    return PrerenderCancelledInterface::kGamepadHapticsManager;
-  } else if (interface_name == "device.mojom.GamepadMonitor") {
-    return PrerenderCancelledInterface::kGamepadMonitor;
-  } else if (interface_name ==
-             "chrome.mojom.TrustedVaultEncryptionKeysExtension") {
+  if (interface_name == "chrome.mojom.TrustedVaultEncryptionKeysExtension") {
     return PrerenderCancelledInterface::kTrustedVaultEncryptionKeys;
   }
   return PrerenderCancelledInterface::kUnknown;

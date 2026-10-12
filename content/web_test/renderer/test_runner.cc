@@ -2727,7 +2727,6 @@ void TestRunner::Install(WebFrameTestProxy* frame,
                               IsWebPlatformTestsMode(), is_main_test_window);
   fake_screen_orientation_impl_.OverrideAssociatedInterfaceProviderForFrame(
       frame->GetWebFrame());
-  gamepad_controller_.Install(frame);
   frame->GetWebFrame()->View()->SetScreenOrientationOverrideForTesting(
       fake_screen_orientation_impl_.CurrentOrientationType());
 }
@@ -2736,7 +2735,6 @@ void TestRunner::Reset() {
   loading_frames_.clear();
   web_test_runtime_flags_.Reset();
   fake_screen_orientation_impl_.ResetData();
-  gamepad_controller_.Reset();
   drag_image_.reset();
 
   blink::WebTestingSupport::ResetRuntimeFeatures();

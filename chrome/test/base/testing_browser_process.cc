@@ -50,17 +50,10 @@
 #include "extensions/buildflags/buildflags.h"
 #include "media/media_buildflags.h"
 #include "printing/buildflags/buildflags.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/test/test_network_connection_tracker.h"
 #include "services/network/test/test_network_quality_tracker.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "services/device/public/cpp/device_features.h"  // nogncheck
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"  // nogncheck
-#include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 #include "chrome/browser/background/extensions/background_mode_manager.h"
@@ -118,17 +111,6 @@ void TestingBrowserProcess::CreateInstance() {
   // ChromeExtensionsBrowserClient).
   g_browser_process = process;
   process->Init();
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-    auto fake_geolocation_system_permission_manager =
-        std::make_unique<device::FakeGeolocationSystemPermissionManager>();
-    fake_geolocation_system_permission_manager->SetSystemPermission(
-        device::LocationSystemPermissionStatus::kAllowed);
-    device::GeolocationSystemPermissionManager::SetInstance(
-        std::move(fake_geolocation_system_permission_manager));
-  }
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 }
 
 // static
@@ -176,12 +158,6 @@ TestingBrowserProcess::~TestingBrowserProcess() {
   extensions::ExtensionsBrowserClient::Set(nullptr);
   extensions::AppWindowClient::Set(nullptr);
 #endif
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-    device::GeolocationSystemPermissionManager::SetInstance(nullptr);
-  }
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
   if (test_network_connection_tracker_) {
     content::SetNetworkConnectionTrackerForTesting(nullptr);

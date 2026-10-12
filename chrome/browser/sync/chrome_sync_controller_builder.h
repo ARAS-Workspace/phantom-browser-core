@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 #include "components/prefs/pref_service.h"
-#include "components/themes/cross_device/cross_device_theme_tracker.h"
 #include "extensions/buildflags/buildflags.h"
 
 class Profile;
@@ -62,13 +61,8 @@ class ChromeSyncControllerBuilder {
   ChromeSyncControllerBuilder();
   ~ChromeSyncControllerBuilder();
 
-  using LocalThemeSpecifics = themes::LocalThemeSpecifics;
-
   // Setters to inject dependencies. Each of these setters must be invoked
   // before invoking `Build()`. In some cases it is allowed to inject nullptr.
-  void SetCrossDeviceThemeTracker(
-      themes::CrossDeviceThemeTracker<LocalThemeSpecifics>*
-          cross_device_theme_tracker);
   void SetDataTypeStoreService(
       syncer::DataTypeStoreService* data_type_store_service);
   void SetSecurityEventRecorder(SecurityEventRecorder* security_event_recorder);
@@ -116,8 +110,6 @@ class ChromeSyncControllerBuilder {
 
   // For all above, nullopt indicates the corresponding setter wasn't invoked.
   // nullptr indicates the setter was invoked with nullptr.
-  SafeOptional<raw_ptr<themes::CrossDeviceThemeTracker<LocalThemeSpecifics>>>
-      cross_device_theme_tracker_;
   SafeOptional<raw_ptr<syncer::DataTypeStoreService>> data_type_store_service_;
   SafeOptional<raw_ptr<SecurityEventRecorder>> security_event_recorder_;
 

@@ -55,7 +55,6 @@ include_rules = [
   "+content/public/browser",
   "+device/base/synchronization",
   "+device/bluetooth",
-  "+device/gamepad", # For gamepad API
   "+device/nfc",
   "+device/vr/public", # For WebXR API
   "+device/vr/buildflags/buildflags.h",  # For WebXR API

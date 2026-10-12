@@ -653,60 +653,6 @@ TEST_F(PageInfoTest, StorageAccessGrantsDisplayedWhenDefaultBlocked) {
                            last_permission_info_list());
 }
 
-// TODO(crbug.com/40145057): Remove deprecated RWS API including these tests.
-class PageInfoRelatedWebsiteSetsTest : public PageInfoTest {
- public:
-  ~PageInfoRelatedWebsiteSetsTest() override = default;
-
-  void SetUp() override {
-    PageInfoTest::SetUp();
-    // Explicitly enable Related Website Sets.
-    profile()->GetPrefs()->SetBoolean(
-        prefs::kPrivacySandboxRelatedWebsiteSetsEnabled, true);
-  }
-};
-
-TEST_F(PageInfoRelatedWebsiteSetsTest, ShowAutograntedRWSPermissions) {
-  std::set<ContentSettingsType> expected_visible_permissions;
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      permissions::features::kShowRelatedWebsiteSetsPermissionGrants);
-  SetURL("https://firstparty.com");
-  constexpr char kToplevelURL[] = "https://firstparty.com";
-  constexpr char kEmbeddedURL[] = "https://embedded.com";
-  auto* map = HostContentSettingsMapFactory::GetForProfile(profile());
-  content_settings::ContentSettingConstraints constraint;
-  constraint.set_session_model(content_settings::mojom::SessionModel::DURABLE);
-  constraint.set_decided_by_related_website_sets(true);
-  map->SetContentSettingDefaultScope(GURL(kEmbeddedURL), GURL(kToplevelURL),
-                                     ContentSettingsType::STORAGE_ACCESS,
-                                     CONTENT_SETTING_BLOCK, constraint);
-  page_info()->PresentSitePermissionsForTesting();
-  expected_visible_permissions.insert(ContentSettingsType::STORAGE_ACCESS);
-  ExpectPermissionInfoList(expected_visible_permissions,
-                           last_permission_info_list());
-}
-
-TEST_F(PageInfoRelatedWebsiteSetsTest, HideAutograntedRWSPermissions) {
-  std::set<ContentSettingsType> expected_visible_permissions;
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndDisableFeature(
-      permissions::features::kShowRelatedWebsiteSetsPermissionGrants);
-  SetURL("https://firstparty.com");
-  constexpr char kToplevelURL[] = "https://firstparty.com";
-  constexpr char kEmbeddedURL[] = "https://embedded.com";
-  auto* map = HostContentSettingsMapFactory::GetForProfile(profile());
-  content_settings::ContentSettingConstraints constraint;
-  constraint.set_session_model(content_settings::mojom::SessionModel::DURABLE);
-  constraint.set_decided_by_related_website_sets(true);
-  map->SetContentSettingDefaultScope(GURL(kEmbeddedURL), GURL(kToplevelURL),
-                                     ContentSettingsType::STORAGE_ACCESS,
-                                     CONTENT_SETTING_ALLOW, constraint);
-  page_info()->PresentSitePermissionsForTesting();
-  ExpectPermissionInfoList(expected_visible_permissions,
-                           last_permission_info_list());
-}
-
 // TODO(https://crbug.com/421606013): Enable test for Android once the
 // permission is available for that platform.
 TEST_F(PageInfoTest, AutoPictureInPicturePermissionShownOnChange) {

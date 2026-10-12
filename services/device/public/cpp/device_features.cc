@@ -5,7 +5,6 @@
 #include "services/device/public/cpp/device_features.h"
 
 #include "build/build_config.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
 
 namespace features {
 
@@ -63,15 +62,6 @@ BASE_FEATURE(kWebUsbHardenEndpointAliasing, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kWebHidAttributeAllowsBackForwardCache,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Enables usage of the location provider manager to select between
-// the operating system's location API or our network-based provider
-// as the source of location data for Geolocation API.
-#if BUILDFLAG(IS_MAC)
-BASE_FEATURE(kLocationProviderManager, base::FEATURE_ENABLED_BY_DEFAULT);
-#else
-BASE_FEATURE(kLocationProviderManager, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_MAC)
-
 // Modifies the internal allowlist behavior that enables privileged extensions
 // to bypass the HID blocklist when accessing FIDO devices. When enabled,
 // privileged extensions can access non-FIDO interfaces on known security keys.
@@ -81,48 +71,6 @@ BASE_FEATURE(kSecurityKeyHidInterfacesAreFido,
 // Enables recursive filtering of nested HID collections to prevent WebHID
 // security bypasses (e.g., nested keyboards or FIDO keys).
 BASE_FEATURE(kWebHidRecursiveFiltering, base::FEATURE_ENABLED_BY_DEFAULT);
-
-const base::FeatureParam<device::mojom::LocationProviderManagerMode>::Option
-    location_provider_manager_mode_options[] = {
-        {device::mojom::LocationProviderManagerMode::kNetworkOnly,
-         "NetworkOnly"},
-        {device::mojom::LocationProviderManagerMode::kPlatformOnly,
-         "PlatformOnly"},
-        {device::mojom::LocationProviderManagerMode::kHybridPlatform,
-         "HybridPlatform"},
-        {device::mojom::LocationProviderManagerMode::kHybridPlatform2,
-         "HybridPlatform2"},
-};
-
-#if BUILDFLAG(IS_MAC)
-const base::FeatureParam<device::mojom::LocationProviderManagerMode>
-    kLocationProviderManagerParam{
-        &kLocationProviderManager, "LocationProviderManagerMode",
-        device::mojom::LocationProviderManagerMode::kHybridPlatform,
-        &location_provider_manager_mode_options};
-#else
-const base::FeatureParam<device::mojom::LocationProviderManagerMode>
-    kLocationProviderManagerParam{
-        &kLocationProviderManager, "LocationProviderManagerMode",
-        device::mojom::LocationProviderManagerMode::kNetworkOnly,
-        &location_provider_manager_mode_options};
-#endif  // BUILDFLAG(IS_MAC)
-
-namespace {
-
-}  // namespace
-
-bool IsOsLevelGeolocationPermissionSupportEnabled() {
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  return true;
-#else
-  return false;
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-}
-
-device::mojom::LocationProviderManagerMode GetLocationProviderManagerMode() {
-  return kLocationProviderManagerParam.Get();
-}
 
 // Controls whether Chrome will try to automatically detach kernel drivers when
 // a USB interface is busy.
@@ -143,11 +91,5 @@ BASE_FEATURE(kSerialSplitDtrAndRts, base::FEATURE_ENABLED_BY_DEFAULT);
 #if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kHidReportRequestExactLength, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_APPLE) && BUILDFLAG(USE_BLINK)
-// Controls whether to use the ellipsoidal altitude from Core Location
-// instead of the default altitude attribute.
-BASE_FEATURE(kEllipsoidalAltitude, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_APPLE) && BUILDFLAG(USE_BLINK)
 
 }  // namespace features

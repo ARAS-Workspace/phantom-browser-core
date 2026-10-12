@@ -25,7 +25,6 @@
 #include "content/web_test/common/web_test_constants.h"
 #include "content/web_test/common/web_test_runtime_flags.h"
 #include "content/web_test/renderer/fake_screen_orientation_impl.h"
-#include "content/web_test/renderer/gamepad_controller.h"
 #include "content/web_test/renderer/layout_dump.h"
 #include "content/web_test/renderer/web_test_content_settings_client.h"
 #include "printing/buildflags/buildflags.h"
@@ -602,7 +601,6 @@ class TestRunner {
   bool did_notify_done_ = false;
 
   FakeScreenOrientationImpl fake_screen_orientation_impl_;
-  GamepadController gamepad_controller_;
 
   // Captured drag image.
   SkBitmap drag_image_;

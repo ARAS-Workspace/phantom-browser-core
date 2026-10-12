@@ -23,7 +23,6 @@
 #include "components/permissions/permissions_client.h"
 #include "components/permissions/resolvers/geolocation_permission_resolver.h"
 #include "content/public/browser/browser_thread.h"
-#include "content/public/browser/device_service.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
@@ -88,20 +87,6 @@ void GeolocationPermissionContext::UpdateTabContext(
       content_settings->OnContentBlocked(content_settings_type());
     }
   }
-
-  if (allowed) {
-    GetGeolocationControl()->UserDidOptIntoLocationServices();
-  }
-}
-
-device::mojom::GeolocationControl*
-GeolocationPermissionContext::GetGeolocationControl() {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  if (!geolocation_control_) {
-    content::GetDeviceService().BindGeolocationControl(
-        geolocation_control_.BindNewPipeAndPassReceiver());
-  }
-  return geolocation_control_.get();
 }
 
 }  // namespace permissions

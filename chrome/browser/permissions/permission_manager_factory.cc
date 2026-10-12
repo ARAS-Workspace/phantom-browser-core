@@ -43,13 +43,6 @@
 #include "chrome/browser/clipboard/chrome_clipboard_permission_context_delegate.h"
 #endif
 
-#include "services/device/public/cpp/device_features.h"
-#include "services/device/public/cpp/geolocation/buildflags.h"
-
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-
 namespace {
 
 permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
@@ -58,13 +51,6 @@ permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
 
   delegates.geolocation_permission_context_delegate =
       std::make_unique<GeolocationPermissionContextDelegate>(profile);
-#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-  if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
-    delegates.geolocation_system_permission_manager =
-        device::GeolocationSystemPermissionManager::GetInstance();
-    DCHECK(delegates.geolocation_system_permission_manager);
-  }
-#endif
   delegates.media_stream_device_enumerator =
       MediaCaptureDevicesDispatcher::GetInstance();
   delegates.camera_pan_tilt_zoom_permission_context_delegate =

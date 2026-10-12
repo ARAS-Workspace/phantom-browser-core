@@ -52,13 +52,6 @@ source_set("networking_private") {
       "//components/dbus",
       "//dbus",
     ]
-  } else if (is_mac) {
-    sources = default_sources + [
-                "networking_private_event_router_nonchromeos.cc",
-                "networking_private_service_client.cc",
-                "networking_private_service_client.h",
-              ]
-    deps += [ "//components/wifi" ]
   } else {
     not_needed([ "default_sources" ])
     sources = [ "networking_private_stubs.cc" ]
