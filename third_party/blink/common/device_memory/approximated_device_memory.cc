@@ -13,11 +13,17 @@
 namespace blink {
 
 // static
-float ApproximatedDeviceMemory::approximated_device_memory_gb_ = 8.0;
+float ApproximatedDeviceMemory::approximated_device_memory_gb_ = 0.0;
 int64_t ApproximatedDeviceMemory::physical_memory_mb_ = 0;
 
 // static
-void ApproximatedDeviceMemory::Initialize() {}
+void ApproximatedDeviceMemory::Initialize() {
+  if (approximated_device_memory_gb_ > 0.0)
+    return;
+  DCHECK_EQ(0, physical_memory_mb_);
+  physical_memory_mb_ = ::base::SysInfo::AmountOfTotalPhysicalMemory().InMiB();
+  CalculateAndSetApproximatedDeviceMemory();
+}
 
 // static
 float ApproximatedDeviceMemory::GetApproximatedDeviceMemory() {

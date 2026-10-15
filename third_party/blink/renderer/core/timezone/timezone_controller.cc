@@ -40,8 +40,6 @@ namespace {
 // no later than January 2025.
 BASE_FEATURE(kLazyBlinkTimezoneInit, base::FEATURE_DISABLED_BY_DEFAULT);
 
-constexpr char kFixedTimeZoneId[] = "UTC";
-
 // Notify V8 that the date/time configuration of the system might have changed.
 void NotifyTimezoneChangeToV8(v8::Isolate* isolate) {
   DCHECK(isolate);
@@ -58,8 +56,16 @@ void NotifyTimezoneChangeOnWorkerThread(WorkerThread* worker_thread) {
   }
 }
 
+String GetTimezoneId(const icu::TimeZone& timezone) {
+  icu::UnicodeString unicode_timezone_id;
+  timezone.getID(unicode_timezone_id);
+  return String(unicode::ToSpan(unicode_timezone_id));
+}
+
 String GetCurrentTimezoneId() {
-  return String(kFixedTimeZoneId);
+  std::unique_ptr<icu::TimeZone> timezone(icu::TimeZone::createDefault());
+  CHECK(timezone);
+  return GetTimezoneId(*timezone.get());
 }
 
 void DispatchTimeZoneChangeEventToFrames() {
@@ -220,7 +226,7 @@ void TimeZoneController::ChangeTimeZoneOverride(const String& timezone_id) {
 bool TimeZoneController::SetIcuTimeZoneAndNotifyV8(const String& timezone_id) {
   DCHECK(!timezone_id.empty());
   std::unique_ptr<icu::TimeZone> timezone(icu::TimeZone::createTimeZone(
-      icu::UnicodeString(kFixedTimeZoneId, -1, US_INV)));
+      icu::UnicodeString(timezone_id.Ascii().data(), -1, US_INV)));
   CHECK(timezone);
 
   if (*timezone == icu::TimeZone::getUnknown()) {

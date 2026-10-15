@@ -39,6 +39,10 @@
 #include <sys/utsname.h>
 #endif
 
+#if BUILDFLAG(IS_MAC)
+#include "base/mac/mac_util.h"
+#endif
+
 namespace embedder_support {
 
 namespace {
@@ -222,9 +226,11 @@ std::string GetOSVersion(IncludeAndroidBuildNumber include_android_build_number,
   // A significant amount of web content breaks if the reported "Mac
   // OS X" major version number is greater than 10. Continue to report
   // this as 10_15_7, the last dot release for that macOS version.
-  os_major_version = 10;
-  os_minor_version = 15;
-  os_bugfix_version = 7;
+  if (os_major_version > 10) {
+    os_major_version = 10;
+    os_minor_version = 15;
+    os_bugfix_version = 7;
+  }
 #endif
 
 #endif
@@ -385,8 +391,6 @@ bool GetMobileBitForUAMetadata() {
 std::string GetPlatformVersion() {
 #if BUILDFLAG(IS_LINUX)
   return std::string();
-#elif BUILDFLAG(IS_MAC)
-  return "10.15.7";
 #else
 
   int32_t major, minor, bugfix = 0;
@@ -462,7 +466,13 @@ std::string GetUnifiedPlatformForTesting() {
 // on Android or if unknown.
 std::string GetCpuArchitecture() {
 #if BUILDFLAG(IS_MAC)
-  return "x86";
+  base::mac::CPUType cpu_type = base::mac::GetCPUType();
+  if (cpu_type == base::mac::CPUType::kIntel) {
+    return "x86";
+  } else if (cpu_type == base::mac::CPUType::kArm ||
+             cpu_type == base::mac::CPUType::kTranslatedIntel) {
+    return "arm";
+  }
 #elif BUILDFLAG(IS_POSIX)
   std::string cpu_info = BuildCpuInfo();
   if (base::StartsWith(cpu_info, "arm") ||

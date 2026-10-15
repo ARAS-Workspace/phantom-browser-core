@@ -30,6 +30,7 @@
 
 Navigator includes NavigatorConcurrentHardware;
 Navigator includes NavigatorCookies;
+Navigator includes NavigatorDeviceMemory;
 Navigator includes NavigatorID;
 Navigator includes NavigatorLanguage;
 Navigator includes NavigatorOnLine;
