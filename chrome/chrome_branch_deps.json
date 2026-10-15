@@ -10,7 +10,6 @@
   "src:src/third_party/devtools-frontend/src": "refs/heads/chromium/8010",
   "src:src/third_party/instrumented_libs": "refs/heads/chromium/8010",
   "src:src/third_party/litert/src": "refs/heads/chromium/8010",
-  "src:src/third_party/openscreen/src": "refs/heads/chromium/8010",
   "src:src/third_party/pdfium": "refs/heads/chromium/8010",
   "src:src/third_party/ruy/src": "refs/heads/chromium/8010",
   "src:src/third_party/skia": "refs/heads/chrome/m153",

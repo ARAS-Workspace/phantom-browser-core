@@ -3,8 +3,6 @@
 ./v8,v8
 ./media/cdm/api,CDM
 ./third_party/webgl/src,WebGL
-./third_party/openscreen/src,openscreen
-./third_party/openscreen/src/third_party/tinycbor/src,openscreen
 ./third_party/swiftshader,swiftshader
 ./third_party/webgpu-cts/src,webgpu
 ./third_party/breakpad/breakpad,breakpad

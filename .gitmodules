@@ -434,9 +434,6 @@
 [submodule "third_party/openh264/src"]
 	path = third_party/openh264/src
 	url = https://chromium.googlesource.com/external/github.com/cisco/openh264
-[submodule "third_party/openscreen/src"]
-	path = third_party/openscreen/src
-	url = https://chromium.googlesource.com/openscreen
 [submodule "third_party/openxr/src"]
 	path = third_party/openxr/src
 	url = https://chromium.googlesource.com/external/github.com/KhronosGroup/OpenXR-SDK
