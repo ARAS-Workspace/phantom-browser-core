@@ -37,7 +37,6 @@ import("//tools/grit/grit_rule.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/webui/webui_features.gni")
 
-
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
   # true to use the Google-internal file containing official API keys
@@ -982,7 +981,6 @@ source_set("core") {
     deps += [ "//chrome/browser/background/extensions" ]
   }
 
-
   if (is_mac) {
     sources += [
       "app_controller_mac.mm",
@@ -1895,9 +1893,7 @@ source_set("browser") {
   ]
 
   #!is_android
-  public_deps += [
-    "//ui/base/mojom:ui_base_types",
-  ]
+  public_deps += [ "//ui/base/mojom:ui_base_types" ]
 
   #!is_android
   deps += [

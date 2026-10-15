@@ -23,8 +23,8 @@ source_set("session_proto_db") {
 
   deps = [
     ":core",
-    "//base",
     ":persisted_state_db_content_proto",
+    "//base",
     "//components/keyed_service/core",
     "//components/leveldb_proto",
     "//third_party/leveldatabase",
@@ -40,11 +40,11 @@ if (use_blink) {
 
     deps = [
       ":core",
+      ":persisted_state_db_content_proto",
       ":session_proto_db",
       ":session_proto_db_test_proto",
       "//base",
       "//base/test:test_support",
-      ":persisted_state_db_content_proto",
       "//components/leveldb_proto:test_support",
       "//content/test:test_support",
       "//testing/gmock",

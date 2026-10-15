@@ -68,9 +68,7 @@ source_set("password_manager") {
     # move this back to /password_change.
     "password_change/password_change_actuator.h",
   ]
-  public_deps += [
-    "//chrome/browser/password_manager/password_change",
-  ]
+  public_deps += [ "//chrome/browser/password_manager/password_change" ]
 
   if (enable_dice_support) {
     public += [ "multi_profile_credentials_filter.h" ]

@@ -285,12 +285,8 @@ template("chrome_extra_paks") {
     }
 
     if (is_mac || is_linux) {
-      sources += [
-        "$root_gen_dir/chrome/browser_switch_resources.pak",
-      ]
-      deps += [
-        "//chrome/browser/resources/browser_switch:resources",
-      ]
+      sources += [ "$root_gen_dir/chrome/browser_switch_resources.pak" ]
+      deps += [ "//chrome/browser/resources/browser_switch:resources" ]
     }
 
     if (enable_dice_support) {

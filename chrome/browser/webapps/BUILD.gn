@@ -3,9 +3,7 @@
 # found in the LICENSE file.
 
 source_set("webapps") {
-  sources = [
-    "chrome_webapps_client.h",
-  ]
+  sources = [ "chrome_webapps_client.h" ]
 
   public_deps = [
     "//components/webapps/browser",
@@ -16,9 +14,7 @@ source_set("webapps") {
 }
 
 source_set("impl") {
-  sources = [
-    "chrome_webapps_client.cc",
-  ]
+  sources = [ "chrome_webapps_client.cc" ]
 
   deps = [
     ":webapps",

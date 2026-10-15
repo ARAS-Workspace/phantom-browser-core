@@ -8,7 +8,6 @@ import("//media/media_options.gni")
 source_set("clients") {
   visibility = [
     ":test_support",
-
     "//content/renderer:*",
 
     # TODO(xhwang): Only allow //media/mojo/services:unit_tests

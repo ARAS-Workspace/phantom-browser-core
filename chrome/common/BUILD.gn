@@ -21,7 +21,6 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
-
 fuzzer_test("ini_parser_fuzzer") {
   sources = [ "ini_parser_fuzzer.cc" ]
   deps = [

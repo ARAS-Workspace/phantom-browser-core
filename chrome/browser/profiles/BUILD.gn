@@ -322,9 +322,7 @@ source_set("profile") {
     "refcounted_profile_keyed_service_factory.cc",
   ]
 
-  public_deps = [
-    "//base",
-  ]
+  public_deps = [ "//base" ]
 
   # Cannot depend on //chrome/browser:browser.
   deps = [
@@ -953,12 +951,12 @@ source_set("browser_tests") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search_engines",
     "//chrome/browser/ui",
-    "//chrome/browser/ui/zoom",
     "//chrome/browser/ui:chrome_pages",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/browser_window:create_browser_window",
     "//chrome/browser/ui/find_bar",
     "//chrome/browser/ui/startup",
+    "//chrome/browser/ui/zoom",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/universal_optout:features",

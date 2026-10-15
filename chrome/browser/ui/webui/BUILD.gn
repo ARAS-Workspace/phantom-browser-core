@@ -37,9 +37,7 @@ source_set("configs") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  public_deps = [
-    "//chrome/browser/ui/tabs/tab_group_home",
-  ]
+  public_deps = [ "//chrome/browser/ui/tabs/tab_group_home" ]
 
   deps = [
     ":memory_internals_ui",
@@ -112,9 +110,7 @@ source_set("configs") {
     "//chrome/browser/ui/webui_browser",
   ]
 
-  deps += [
-    "//chrome/browser/ui/webui/default_browser:default_browser_modal",
-  ]
+  deps += [ "//chrome/browser/ui/webui/default_browser:default_browser_modal" ]
 
   if (is_mac || is_linux) {
     deps += [
@@ -163,9 +159,7 @@ source_set("configs") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/ui/webui/browser_switch",
-    ]
+    deps += [ "//chrome/browser/ui/webui/browser_switch" ]
   }
 
   if (enable_extensions_core) {

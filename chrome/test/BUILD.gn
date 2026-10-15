@@ -43,7 +43,6 @@ import("//ui/views/features.gni")
 import("//ui/webui/webui_features.gni")
 import("//v8/gni/v8.gni")
 
-
 # This target exists to reference other test executables to bring these files
 # into the build.
 group("test") {
@@ -837,7 +836,6 @@ test("browser_tests") {
     "//base/test:test_support",
     "//build:branding_buildflags",
     "//build/config/coverage:buildflags",
-    "//chrome/browser/ui/zoom",
     "//chrome:packed_resources",
     "//chrome:resources",
     "//chrome:strings",
@@ -1262,6 +1260,7 @@ test("browser_tests") {
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
     "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/ui/window_feature_controller",
+    "//chrome/browser/ui/zoom",
     "//chrome/browser/unified_consent",
     "//chrome/browser/unified_consent:browser_tests",
     "//chrome/browser/updater",
@@ -1862,9 +1861,7 @@ test("browser_tests") {
     "batch_triage_suspect_only=1",
   ]
 
-  public_deps = [
-    "//chrome/browser/ui/tabs:tab_strip",
-  ]
+  public_deps = [ "//chrome/browser/ui/tabs:tab_strip" ]
 
   if (use_aura) {
     sources += [ "../browser/ui/overscroll_pref_manager_browsertest.cc" ]
@@ -2442,9 +2439,7 @@ test("browser_tests") {
       "../browser/ui/views/profiles/profile_picker_view_browsertest.cc",
     ]
 
-    deps += [
-      "//chrome/browser:main_extra_parts",
-    ]
+    deps += [ "//chrome/browser:main_extra_parts" ]
   }
 
   if (enterprise_data_controls) {
@@ -3484,9 +3479,7 @@ test("unit_tests") {
   }
 
   if (enable_dice_support) {
-    sources += [
-      "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_unittest.cc",
-    ]
+    sources += [ "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_unittest.cc" ]
     deps += [
       "//chrome/browser/ui/signin:unit_tests",
       "//chrome/browser/ui/views/profiles/feature_showcase:unit_tests",
@@ -3941,9 +3934,8 @@ test("unit_tests") {
       ]
     }
 
-    allow_circular_includes_from = [
-      "//chrome/browser/web_applications:web_applications_unit_tests",
-    ]
+    allow_circular_includes_from =
+        [ "//chrome/browser/web_applications:web_applications_unit_tests" ]
 
     deps += [
       "//chrome/browser/affiliations",
@@ -4710,9 +4702,7 @@ static_library("test_support_ui") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/ui/sharing_hub:test_support_ui",
-    ]
+    deps += [ "//chrome/browser/ui/sharing_hub:test_support_ui" ]
   }
 
   if (use_ozone) {
@@ -5433,9 +5423,7 @@ test("interactive_ui_tests") {
   }
 
   if (enable_print_preview) {
-    deps += [
-      "//chrome/browser/window_management:interactive_ui_tests",
-    ]
+    deps += [ "//chrome/browser/window_management:interactive_ui_tests" ]
   }
 
   if (enterprise_data_controls) {

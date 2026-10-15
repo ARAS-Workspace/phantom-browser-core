@@ -247,9 +247,7 @@ source_set("model_execution") {
       "//google_apis",
       "//services/network/public/cpp",
     ]
-    deps += [
-      "//components/variations",
-    ]
+    deps += [ "//components/variations" ]
   }
 }
 

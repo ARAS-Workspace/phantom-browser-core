@@ -61,9 +61,7 @@ source_set("impl") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "managed_configuration_service_unittest.cc",
-  ]
+  sources = [ "managed_configuration_service_unittest.cc" ]
   deps = [
     ":device_api",
     "//base/test:test_config",

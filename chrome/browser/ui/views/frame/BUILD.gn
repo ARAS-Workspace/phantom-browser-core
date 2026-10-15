@@ -31,9 +31,7 @@ if (toolkit_views) {
       "test_with_browser_view.h",
     ]
 
-    public_deps = [
-      "//chrome/test:test_support",
-    ]
+    public_deps = [ "//chrome/test:test_support" ]
 
     deps = [
       "//base",

@@ -146,9 +146,7 @@ source_set("browser_tests") {
   }
 
   if (is_mac || is_linux) {
-    sources += [
-      "whats_new/whats_new_browsertest.cc",
-    ]
+    sources += [ "whats_new/whats_new_browsertest.cc" ]
   }
 
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
@@ -536,12 +534,8 @@ generate_grd("build_grd") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "whats_new:build_grdp",
-    ]
-    grdp_files += [
-      "$target_gen_dir/whats_new/resources.grdp",
-    ]
+    deps += [ "whats_new:build_grdp" ]
+    grdp_files += [ "$target_gen_dir/whats_new/resources.grdp" ]
   }
 
   deps += [ "signin:build_grdp" ]

@@ -78,9 +78,7 @@ source_set("startup") {
   }
 
   if (is_mac || is_linux) {
-    sources += [
-      "first_run_service.h",
-    ]
+    sources += [ "first_run_service.h" ]
 
     public_deps += [
       "//chrome/browser/profiles:profile",
@@ -264,12 +262,8 @@ source_set("impl") {
   }
 
   if (is_mac || is_linux) {
-    sources += [
-      "first_run_service.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/startup/default_browser_prompt",
-    ]
+    sources += [ "first_run_service.cc" ]
+    deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 
   deps += [ "//chrome/browser/ui:browser_tab_strip_tracker" ]

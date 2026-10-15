@@ -76,15 +76,11 @@ group("resources") {
     "//components/browser_apis/tab_strip/resources",
   ]
   if (is_chrome_branded) {
-    public_deps += [
-      ":preinstalled_web_apps_resources",
-    ]
+    public_deps += [ ":preinstalled_web_apps_resources" ]
   }
 
   if (enable_extensions) {
-    public_deps += [
-      "extensions_zero_state_promo:resources",
-    ]
+    public_deps += [ "extensions_zero_state_promo:resources" ]
   }
 
   if (is_mac) {
@@ -104,9 +100,7 @@ group("resources") {
   }
 
   if (is_mac || is_linux) {
-    public_deps += [
-      "browser_switch:resources",
-    ]
+    public_deps += [ "browser_switch:resources" ]
   }
 
   public_deps += [

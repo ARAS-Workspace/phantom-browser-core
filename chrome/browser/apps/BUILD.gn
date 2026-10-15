@@ -29,9 +29,7 @@ source_set("user_type_filter") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "user_type_filter_unittest.cc",
-  ]
+  sources = [ "user_type_filter_unittest.cc" ]
   deps = [
     ":user_type_filter",
     "//base",

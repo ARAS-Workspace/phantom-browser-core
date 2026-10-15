@@ -52,9 +52,7 @@ build_webui("build") {
     "power_bookmarks_edit_dialog.css",
   ]
 
-  icons_html_files = [
-    "icons.html",
-  ]
+  icons_html_files = [ "icons.html" ]
 
   mojo_files_deps = [ "//chrome/browser/ui/webui/side_panel/bookmarks:mojo_bindings_ts__generator" ]
   mojo_files = [ "$root_gen_dir/chrome/browser/ui/webui/side_panel/bookmarks/bookmarks.mojom-webui.ts" ]

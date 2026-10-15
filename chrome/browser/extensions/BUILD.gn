@@ -632,9 +632,7 @@ source_set("extensions") {
     "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.h",
   ]
-  public_deps += [
-    "//chrome/browser/ui/tabs:utils",
-  ]
+  public_deps += [ "//chrome/browser/ui/tabs:utils" ]
   deps += [
     "//chrome/browser/ui/interaction",
     "//chrome/browser/ui/user_education",
@@ -2060,9 +2058,8 @@ source_set("browser_tests") {
       "//chrome/browser/ui/extensions/settings_overridden_dialog_browsertest.cc",
     ]
 
-    public_deps += [
-      "//chrome/browser/ui/extensions:extension_enable_flow_delegate",
-    ]
+    public_deps +=
+        [ "//chrome/browser/ui/extensions:extension_enable_flow_delegate" ]
 
     data += [
       "//chrome/test/data/controlled_frame/resources/expected_properties.json",
@@ -2098,9 +2095,7 @@ source_set("browser_tests") {
     }
 
     if (is_linux || is_mac) {
-      deps += [
-        "//components/device_signals/core/browser",
-      ]
+      deps += [ "//components/device_signals/core/browser" ]
     }
 
     deps += [
