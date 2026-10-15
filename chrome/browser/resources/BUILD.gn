@@ -4,7 +4,6 @@
 
 import("//chrome/browser/buildflags.gni")
 import("//chrome/common/features.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//content/browser/devtools/features.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
@@ -126,10 +125,6 @@ group("resources") {
 
   if (enable_webui_certificate_viewer) {
     public_deps += [ "certificate_viewer:resources" ]
-  }
-
-  if (enterprise_watermark) {
-    public_deps += [ "watermark:resources" ]
   }
 }
 

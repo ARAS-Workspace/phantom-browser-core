@@ -52,14 +52,10 @@ source_set("enterprise") {
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
-    "//components/enterprise/content",
     "//components/enterprise/core",
-    "//components/enterprise/data_controls/core/browser",
-    "//components/enterprise/data_protection",
     "//components/enterprise/encryption/cache",
     "//components/enterprise/isolated_mode",
     "//components/enterprise/net",
-    "//components/enterprise/watermarking",
     "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//components/os_crypt/async/browser",
@@ -91,7 +87,6 @@ source_set("enterprise") {
     "//ui/views",
   ]
   public += [
-    "data_protection/data_protection_ui_controller.h",
     "reporting/browser_report_generator_desktop.h",
     "reporting/report_generator_desktop.h",
     "reporting/report_scheduler_desktop.h",
@@ -139,28 +134,6 @@ source_set("enterprise") {
       "platform_auth/extensible_enterprise_sso_provider_mac.h",
       "platform_auth/platform_auth_proxying_url_loader_factory.h",
       "signals/device_info_fetcher_mac.h",
-    ]
-  }
-
-  if (enterprise_watermark && toolkit_views) {
-    public_deps += [
-      "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
-    ]
-  }
-
-  if (enterprise_data_controls) {
-    public += [
-      "data_controls/chrome_clipboard_context.h",
-      "data_protection/data_protection_clipboard_utils.h",
-      "data_protection/data_protection_features.h",
-      "data_protection/data_protection_navigation_controller.h",
-      "data_protection/data_protection_navigation_observer.h",
-      "data_protection/data_protection_page_user_data.h",
-    ]
-
-    public += [
-      "data_protection/clipboard_toast_tracker.h",
-      "data_protection/paste_allowed_request.h",
     ]
   }
 
@@ -228,8 +201,6 @@ source_set("enterprise") {
       "signin/token_managed_profile_creation_delegate.h",
       "signin/user_policy_oidc_signin_service.h",
       "signin/user_policy_oidc_signin_service_factory.h",
-      "webstore/chrome_web_store_navigation_throttle.h",
-      "webstore/features.h",
     ]
   }
 
@@ -274,10 +245,6 @@ source_set("impl") {
     "browser_management/management_service_factory.cc",
     "chrome_browser_main_extra_parts_enterprise.cc",
     "core/dependency_factory_impl.cc",
-    "data_protection/data_protection_features.cc",
-    "data_protection/data_protection_navigation_controller.cc",
-    "data_protection/data_protection_navigation_observer.cc",
-    "data_protection/data_protection_page_user_data.cc",
     "encryption/cache_encryption_provider_impl.cc",
     "identifiers/profile_id_delegate_impl.cc",
     "identifiers/profile_id_service_factory.cc",
@@ -340,15 +307,12 @@ source_set("impl") {
     "//components/device_event_log",
     "//components/device_signals/core/browser",
     "//components/device_signals/core/common",
-    "//components/dom_distiller/core",
     "//components/enterprise",
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:extensions_workflow_events_proto",
-    "//components/enterprise/content",
     "//components/enterprise/core",
-    "//components/enterprise/data_protection",
     "//components/enterprise/device_trust/core:device_trust_service",
     "//components/enterprise/encryption/cache",
     "//components/enterprise/net",
@@ -365,7 +329,6 @@ source_set("impl") {
   ]
 
   sources += [
-    "data_protection/data_protection_ui_controller.cc",
     "reporting/browser_report_generator_desktop.cc",
     "reporting/report_generator_desktop.cc",
     "reporting/report_scheduler_desktop.cc",
@@ -417,29 +380,6 @@ source_set("impl") {
     deps += [
       "//components/device_signals/core/browser/mac",
       "//components/enterprise/platform_auth:enterprise_platform_auth",
-    ]
-  }
-
-  if (enterprise_watermark) {
-    deps += [
-      "//components/enterprise/watermarking",
-      "//components/enterprise/watermarking/content",
-    ]
-  }
-
-  if (enterprise_data_controls) {
-    sources += [
-      "data_controls/chrome_clipboard_context.cc",
-      "data_protection/data_protection_clipboard_utils.cc",
-    ]
-    deps += [ "//chrome/browser/enterprise/data_controls" ]
-    sources += [
-      "data_protection/clipboard_toast_tracker.cc",
-      "data_protection/paste_allowed_request.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/ui/toasts/api:toasts",
     ]
   }
 
@@ -515,8 +455,6 @@ source_set("impl") {
       "signin/token_managed_profile_creation_delegate.cc",
       "signin/user_policy_oidc_signin_service.cc",
       "signin/user_policy_oidc_signin_service_factory.cc",
-      "webstore/chrome_web_store_navigation_throttle.cc",
-      "webstore/features.cc",
     ]
 
     deps += [

@@ -247,10 +247,6 @@ source_set("impl") {
     ]
   }
 
-  if (enterprise_data_controls) {
-    deps += [ "//components/enterprise/data_controls/core/browser" ]
-  }
-
   if (enterprise_client_certificates) {
     deps += [ "//components/enterprise/client_certificates/core" ]
   }

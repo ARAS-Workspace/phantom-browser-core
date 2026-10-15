@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/enterprise/buildflags/buildflags.gni")
-
 static_library("browser") {
   sources = [
     "print_composite_client.cc",
@@ -33,8 +31,4 @@ static_library("browser") {
     "//ui/base",
     "//ui/gfx/geometry",
   ]
-
-  if (enterprise_watermark) {
-    deps += [ "//components/enterprise/watermarking/content" ]
-  }
 }

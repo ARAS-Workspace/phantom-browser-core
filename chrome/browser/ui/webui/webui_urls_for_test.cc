@@ -186,7 +186,6 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
       "chrome://sync-confirmation",
       "chrome://tab-group-home",
       "chrome://view-cert",
-      "chrome://watermark",
       "chrome://webui-browser",
       "chrome://webui-toolbar.top-chrome",
   };

@@ -914,10 +914,6 @@ source_set("impl") {
     ]
   }
 
-  if (enterprise_watermark) {
-    deps += [ "//components/enterprise/watermarking:watermarking_handler" ]
-  }
-
   # These targets back browser (machine) scope provisioning via Chrome Browser
   # Cloud Management (BrowserDMTokenStorage / BrowserCloudManagementDelegate),
   # which does not exist on ChromeOS even though enterprise_client_certificates

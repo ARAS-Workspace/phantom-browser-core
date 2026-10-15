@@ -108,8 +108,6 @@
 #include "chrome/browser/enterprise/profile_management/oidc_auth_response_capture_navigation_throttle.h"
 #include "chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.h"
 #include "chrome/browser/enterprise/signin/managed_profile_required_navigation_throttle.h"
-#include "chrome/browser/enterprise/webstore/chrome_web_store_navigation_throttle.h"
-#include "chrome/browser/enterprise/webstore/features.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_MAC)
@@ -125,7 +123,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/enterprise/incognito/incognito_navigation_throttle.h"
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
 #include "chrome/browser/extensions/user_script_listener.h"
 #include "extensions/browser/extension_navigation_throttle.h"
@@ -331,13 +328,6 @@ void CreateAndAddChromeThrottlesForNavigation(
       MaybeCreateAndAdd(registry);
 
   ManagedProfileRequiredNavigationThrottle::MaybeCreateAndAdd(registry);
-
-  if (base::FeatureList::IsEnabled(
-          enterprise::webstore::kChromeWebStoreNavigationThrottle)) {
-    registry.AddThrottle(
-        std::make_unique<enterprise_webstore::ChromeWebStoreNavigationThrottle>(
-            registry));
-  }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
@@ -393,13 +383,6 @@ void CreateAndAddChromeThrottlesForNavigation(
         registry);
   }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  if (profile && profile->IsIncognitoProfile() && profile->IsOffTheRecord()) {
-    enterprise_incognito::IncognitoNavigationThrottle::MaybeCreateAndAdd(
-        registry);
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
   MaybeCreateAndAddVisitedLinkNavigationThrottle(registry);
 

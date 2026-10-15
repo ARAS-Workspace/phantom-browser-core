@@ -19,7 +19,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/common/buildflags.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "content/public/common/url_constants.h"
 #include "media/media_buildflags.h"
@@ -420,11 +419,6 @@ inline constexpr char kChromeUIPrintHost[] = "print";
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 inline constexpr char kChromeUISessionServiceInternalsPath[] =
     "session-service";
-#endif
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-inline constexpr char kChromeUIWatermarkHost[] = "watermark";
-inline constexpr char kChromeUIWatermarkURL[] = "chrome://watermark/";
 #endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)

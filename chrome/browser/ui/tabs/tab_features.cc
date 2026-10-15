@@ -11,7 +11,6 @@
 #include "base/no_destructor.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
 #include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_observer.h"
 #include "chrome/browser/multistep_filter/chrome_filter_navigation_observer.h"
@@ -264,9 +263,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
           profile, &tab, side_panel_registry_.get());
 
   tab_dialog_manager_ = std::make_unique<TabDialogManager>(&tab);
-
-  data_protection_tab_controller_ = std::make_unique<
-      enterprise_data_protection::DataProtectionNavigationController>(&tab);
 
   // Create the HttpAuthCacheStatus to start observing resource load
   // completions.

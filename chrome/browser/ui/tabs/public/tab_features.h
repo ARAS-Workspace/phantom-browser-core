@@ -72,10 +72,6 @@ class WalletReminderNoticeBubbleController;
 class WalletReminderNoticePageActionController;
 }  // namespace autofill
 
-namespace enterprise_data_protection {
-class DataProtectionNavigationController;
-}  // namespace enterprise_data_protection
-
 namespace content {
 class WebContents;
 }  // namespace content
@@ -154,11 +150,6 @@ class TabFeatures {
 
   TabFeatures(const TabFeatures&) = delete;
   TabFeatures& operator=(const TabFeatures&) = delete;
-
-  enterprise_data_protection::DataProtectionNavigationController*
-  data_protection_controller() {
-    return data_protection_tab_controller_.get();
-  }
 
   permissions::PermissionIndicatorsTabData* permission_indicators_tab_data() {
     return permission_indicators_tab_data_.get();
@@ -314,10 +305,6 @@ class TabFeatures {
 
   // Manages various tab modal dialogs.
   std::unique_ptr<TabDialogManager> tab_dialog_manager_;
-
-  std::unique_ptr<
-      enterprise_data_protection::DataProtectionNavigationController>
-      data_protection_tab_controller_;
 
   // Holds subscriptions for TabInterface callbacks.
   std::vector<base::CallbackListSubscription> tab_subscriptions_;

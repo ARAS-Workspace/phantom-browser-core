@@ -1028,9 +1028,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::KeepAliveRequestTracker::IsContextDetachedCallback
           is_context_detached_callback) override;
 
-  std::optional<std::vector<std::u16string>> GetClipboardTypesIfPolicyApplied(
-      const ui::ClipboardSequenceNumberToken& seqno) override;
-
   bool UsePrefetchPrerenderIntegration() override;
 
   std::optional<int> GetCpuPerformanceTierOverride(

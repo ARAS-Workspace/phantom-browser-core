@@ -4,7 +4,6 @@
 
 import("//chrome/common/features.gni")
 import("//chrome/test/include_js_tests.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/signin/features.gni")
 import("//content/browser/devtools/features.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -122,13 +121,6 @@ source_set("configs") {
     deps += [
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/whats_new",
-    ]
-  }
-
-  if (enterprise_watermark) {
-    deps += [
-      "//chrome/browser/enterprise/watermark:watermark_lib",
-      "//chrome/browser/ui/webui/watermark",
     ]
   }
 

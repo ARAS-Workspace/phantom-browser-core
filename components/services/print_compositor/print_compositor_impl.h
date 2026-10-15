@@ -17,7 +17,6 @@
 #include "base/memory/read_only_shared_memory_region.h"
 #include "base/memory/ref_counted_memory.h"
 #include "base/memory/scoped_refptr.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/services/print_compositor/public/cpp/print_service_mojo_types.h"
 #include "components/services/print_compositor/public/mojom/print_compositor.mojom.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -42,10 +41,6 @@ class ClientDiscardableSharedMemoryManager;
 }
 
 namespace printing {
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-class PrintWatermark;
-#endif
 
 class PrintCompositorImpl : public mojom::PrintCompositor {
  public:
@@ -78,10 +73,6 @@ class PrintCompositorImpl : public mojom::PrintCompositor {
 
   void SetAddonForTesting(std::unique_ptr<Addon> addon);
 
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  PrintWatermark* watermark_for_testing() { return watermark_for_testing_; }
-#endif
-
   // mojom::PrintCompositor
   void NotifyUnavailableSubframe(uint64_t frame_guid) override;
   void AddSubframeContent(
@@ -113,10 +104,6 @@ class PrintCompositorImpl : public mojom::PrintCompositor {
   void SetGenerateDocumentOutline(
       mojom::GenerateDocumentOutline generate_document_outline) override;
   void SetTitle(const std::string& title) override;
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  void SetWatermarkBlock(
-      watermark::mojom::WatermarkBlockPtr watermark_block) override;
-#endif
 
  protected:
   // This is the uniform underlying type for both
@@ -307,11 +294,6 @@ class PrintCompositorImpl : public mojom::PrintCompositor {
   // demand for multiple addons, this can be easily modified to accommodate
   // that.
   std::unique_ptr<Addon> addon_;
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  // Points at `addon_` if `addon_` is a PrintWatermark.
-  raw_ptr<PrintWatermark> watermark_for_testing_ = nullptr;
-#endif
 };
 
 }  // namespace printing

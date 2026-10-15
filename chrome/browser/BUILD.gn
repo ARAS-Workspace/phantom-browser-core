@@ -776,8 +776,6 @@ source_set("core") {
     "//components/embedder_support",
     "//components/embedder_support:content_settings",
     "//components/embedder_support:user_agent",
-    "//components/enterprise/data_controls/content/browser",
-    "//components/enterprise/data_controls/core/browser:features",
     "//components/enterprise/net",
     "//components/enterprise/network_header_injection/core",
     "//components/error_page/content/browser",
@@ -962,10 +960,6 @@ source_set("core") {
   }
 
   deps += [ "//chrome/browser/ui/webui/discards" ]
-
-  if (enterprise_watermark) {
-    deps += [ "//chrome/browser/ui/webui/watermark" ]
-  }
 
   if (chrome_root_store_cert_management_ui) {
     deps += [ "//chrome/browser/ui/webui/certificate_manager" ]
@@ -1171,7 +1165,6 @@ source_set("core") {
 
   if (enable_extensions_core) {
     deps += [
-      "//chrome/browser/enterprise/incognito",
       "//chrome/browser/extensions",
       "//chrome/browser/extensions:chrome_extensions_browser_client",
       "//chrome/browser/guest_view",
@@ -1600,7 +1593,6 @@ source_set("browser") {
     "//components/enterprise",
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion",
-    "//components/enterprise/content",
     "//components/enterprise/net",
     "//components/error_page/content/browser",
     "//components/favicon/content",
@@ -2094,10 +2086,6 @@ source_set("browser") {
       "//ui/views",
       "//ui/views/controls/webview",
     ]
-  }
-
-  if (enterprise_data_controls) {
-    deps += [ "//chrome/browser/enterprise/data_controls" ]
   }
 
   if (enterprise_client_certificates) {
@@ -2922,7 +2910,6 @@ source_set("core_browser_tests") {
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/embedder_support",
-    "//components/enterprise/data_controls/core/browser:test_support",
     "//components/javascript_dialogs",
     "//components/privacy_sandbox/privacy_sandbox_attestations:test_support",
     "//components/site_isolation",

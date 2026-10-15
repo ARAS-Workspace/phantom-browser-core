@@ -7,7 +7,6 @@ import("//build/config/features.gni")
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
 import("//chrome/common/features.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//content/browser/devtools/features.gni")
 import("//content/public/common/features.gni")
@@ -1061,13 +1060,6 @@ source_set("extensions") {
       deps += [
         "//chrome/browser/ui/aura/accessibility",
         "//ui/aura",
-      ]
-    }
-
-    if (enterprise_data_controls) {
-      deps += [
-        "//components/enterprise/buildflags",
-        "//components/enterprise/data_controls/core/browser",
       ]
     }
 

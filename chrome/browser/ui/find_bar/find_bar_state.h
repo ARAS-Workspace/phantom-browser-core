@@ -5,13 +5,11 @@
 #ifndef CHROME_BROWSER_UI_FIND_BAR_FIND_BAR_STATE_H_
 #define CHROME_BROWSER_UI_FIND_BAR_FIND_BAR_STATE_H_
 
-#include <optional>
 #include <string>
 
 #include "base/memory/raw_ptr.h"
 #include "components/find_in_page/find_tab_helper.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "ui/base/data_transfer_policy/data_transfer_endpoint.h"
 
 class Profile;
 
@@ -48,7 +46,6 @@ class FindBarState : public KeyedService,
  private:
   raw_ptr<Profile> profile_;
   std::u16string last_prepopulate_text_;
-  std::optional<ui::DataTransferEndpoint> last_prepopulate_source_dte_;
 };
 
 #endif  // CHROME_BROWSER_UI_FIND_BAR_FIND_BAR_STATE_H_

@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "components/crash/core/common/crash_key.h"
 #include "components/discardable_memory/client/client_discardable_shared_memory_manager.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/services/print_compositor/public/cpp/print_service_mojo_types.h"
 #include "content/public/utility/utility_thread.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -34,10 +33,6 @@
 #include "third_party/skia/include/core/SkFontMgr.h"
 #elif BUILDFLAG(IS_POSIX)
 #include "third_party/blink/public/platform/platform.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-#include "components/services/print_compositor/print_watermark.h"
 #endif
 
 using MojoDiscardableSharedMemoryManager =
@@ -533,20 +528,5 @@ void PrintCompositorImpl::SetGenerateDocumentOutline(
 void PrintCompositorImpl::SetTitle(const std::string& title) {
   title_ = title;
 }
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-void PrintCompositorImpl::SetWatermarkBlock(
-    watermark::mojom::WatermarkBlockPtr watermark_block) {
-  if (watermark_block) {
-    auto watermark =
-        std::make_unique<PrintWatermark>(std::move(watermark_block));
-    watermark_for_testing_ = watermark.get();
-    addon_ = std::move(watermark);
-  } else {
-    watermark_for_testing_ = nullptr;
-    addon_.reset();
-  }
-}
-#endif
 
 }  // namespace printing

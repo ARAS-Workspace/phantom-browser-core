@@ -6,7 +6,6 @@ import("//base/debug/debug.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/features.gni")
 import("//build/config/ui.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_contents/common/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/optimization_guide/features.gni")
@@ -456,7 +455,6 @@ test("components_unittests") {
   deps += [
     "//components/crash/content/browser:unit_tests",
     "//components/crash/core/app:unit_tests",
-    "//components/enterprise/content:unit_tests",
     "//components/history_embeddings/content:unit_tests",
     "//components/page_content_annotations/content:unit_tests",
   ]
@@ -518,10 +516,6 @@ test("components_unittests") {
 
   if (is_linux) {
     deps += [ "//components/services/font_data:unit_tests" ]
-  }
-
-  if (enterprise_watermark) {
-    deps += [ "//components/enterprise/watermarking:unit_tests" ]
   }
 
   if (enable_printing) {

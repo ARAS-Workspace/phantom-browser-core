@@ -293,9 +293,6 @@ class RenderViewContextMenu
   // Helper function for checking policies.
   bool IsSaveAsItemAllowedByPolicy(const GURL& item_url) const;
 
-  // Helper functions for checking policies.
-  bool IsSearchAllowedByPolicy() const;
-
   // Command enabled query functions.
   bool IsReloadEnabled() const;
   bool IsViewSourceEnabled() const;
@@ -330,7 +327,6 @@ class RenderViewContextMenu
   void ExecControls();
   void ExecSaveVideoFrameAs();
   void ExecCopyVideoFrame();
-  void ExecSearchForVideoFrame(int event_flags);
   void ExecRotateCW();
   void ExecRotateCCW();
   void ExecReloadPackagedApp();
@@ -344,12 +340,6 @@ class RenderViewContextMenu
   void MediaPlayerAction(const blink::mojom::MediaPlayerAction& action);
   void PluginActionAt(const gfx::Point& location,
                       blink::mojom::PluginActionType plugin_action);
-
-  // Returns the WebContents used for data control policy checks. This usually
-  // returns the source WebContents, but if the context menu is shown in a
-  // Reading Mode side panel or immersive view, it returns the WebContents of
-  // the original page being distilled.
-  content::WebContents* GetWebContentsForDataControls() const;
 
   // Returns a list of registered ProtocolHandlers that can handle the clicked
   // on URL.
@@ -444,8 +434,6 @@ class RenderViewContextMenu
       send_tab_to_self_submenu_delegate_;
 
   std::unique_ptr<ui::SimpleMenuModel> split_layout_submenu_;
-
-  base::WeakPtrFactory<RenderViewContextMenu> weak_pointer_factory_{this};
 };
 
 #endif  // CHROME_BROWSER_RENDERER_CONTEXT_MENU_RENDER_VIEW_CONTEXT_MENU_H_

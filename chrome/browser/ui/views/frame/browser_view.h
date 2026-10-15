@@ -39,7 +39,6 @@
 #include "chrome/browser/ui/views/tabs/tab.h"
 #include "chrome/browser/ui/webui/tab_search/tab_search.mojom.h"
 #include "chrome/common/buildflags.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/infobars/core/infobar_container.h"
 #include "components/user_education/common/feature_promo/feature_promo_handle.h"
 #include "components/viz/common/frame_timing_details.h"
@@ -759,10 +758,6 @@ class BrowserView : public BrowserWindow,
   // FrameView to get the correct offset. See
   // ThemedBackground::PaintThemeCustomImage for details.
   gfx::Point GetThemeOffsetFromBrowserView() const;
-
-#if BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
-  void ApplyScreenshotSettings(bool allow);
-#endif
 
   // Clipboard commands.
   void Cut();

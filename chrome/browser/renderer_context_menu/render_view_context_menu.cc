@@ -57,7 +57,6 @@
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_stats.h"
-#include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_features.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
@@ -1781,10 +1780,6 @@ void RenderViewContextMenu::AppendSearchWebForImageItems() {
     return;
   }
 
-  if (!IsSearchAllowedByPolicy()) {
-    return;
-  }
-
   const auto* provider = GetImageSearchProvider();
   if (!provider) {
     return;
@@ -2089,10 +2084,6 @@ void RenderViewContextMenu::AppendRotationItems() {
 
 void RenderViewContextMenu::AppendSearchProvider() {
   DCHECK(browser_context_);
-
-  if (!IsSearchAllowedByPolicy()) {
-    return;
-  }
 
   if (features::IsMenuSimplificationEnabled() &&
       (IsPasswordField() || params_.form_control_type ==
@@ -2442,7 +2433,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
 
     case IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS:
     case IDC_CONTENT_CONTEXT_COPYVIDEOFRAME:
-    case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
       return IsVideoFrameItemEnabled(id);
 
     case IDC_CONTENT_CONTEXT_COPYAVLOCATION:
@@ -2793,13 +2783,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       ExecCopyVideoFrame();
       break;
 
-    case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
-      enterprise_data_protection::ShouldAllowSearchWith(
-          GetWebContentsForDataControls(), /*selection_size=*/0,
-          base::BindOnce(&RenderViewContextMenu::ExecSearchForVideoFrame,
-                         weak_pointer_factory_.GetWeakPtr(), event_flags));
-      break;
-
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE:
       ExecSearchWebForImage();
       break;
@@ -2994,18 +2977,8 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
           /*initiator=*/{}, disposition, ui::PAGE_TRANSITION_LINK,
           /*extra_headers=*/std::string(), /*started_from_context_menu=*/true);
 
-      enterprise_data_protection::ShouldAllowSearchWith(
-          GetWebContentsForDataControls(), params_.selection_text.size(),
-          base::BindOnce(
-              [](base::WeakPtr<content::WebContents> web_contents,
-                 content::OpenURLParams params) {
-                if (!web_contents) {
-                  return;
-                }
-                web_contents->OpenURL(params,
-                                      /*navigation_handle_callback=*/{});
-              },
-              source_web_contents_->GetWeakPtr(), std::move(open_url_params)));
+      source_web_contents_->OpenURL(open_url_params,
+                                    /*navigation_handle_callback=*/{});
       break;
     }
     case IDC_CONTENT_CONTEXT_GOTOURL: {
@@ -3152,11 +3125,6 @@ bool RenderViewContextMenu::IsSaveAsItemAllowedByPolicy(
   }
 
   return true;
-}
-
-bool RenderViewContextMenu::IsSearchAllowedByPolicy() const {
-  return enterprise_data_protection::IsSearchWithAllowed(
-      GetWebContentsForDataControls());
 }
 
 // Controller functions --------------------------------------------------------
@@ -3327,12 +3295,7 @@ bool RenderViewContextMenu::IsVideoFrameItemEnabled(int id) const {
     return false;
   }
 
-  switch (id) {
-    case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
-      return IsSearchAllowedByPolicy();
-    default:
-      return true;
-  }
+  return true;
 }
 
 // Returns true if the item was appended.
@@ -3746,9 +3709,7 @@ void RenderViewContextMenu::ExecCopyImageAt() {
 
   frame_host->CopyImageAt(params_.x, params_.y);
 
-  if (enterprise_data_protection::IsClipboardCopyAllowedByPolicyForUI(
-          GetWebContentsForDataControls()) &&
-      toast_features::IsEnabled(toast_features::kImageCopiedToast)) {
+  if (toast_features::IsEnabled(toast_features::kImageCopiedToast)) {
     auto* const toast_controller = GetToastController();
     if (toast_controller) {
       toast_controller->MaybeShowToast(ToastParams(ToastId::kImageCopied));
@@ -3807,26 +3768,13 @@ void RenderViewContextMenu::ExecCopyVideoFrame() {
   MediaPlayerAction(blink::mojom::MediaPlayerAction(
       blink::mojom::MediaPlayerActionType::kCopyVideoFrame,
       /*enable=*/true));
-  if (enterprise_data_protection::IsClipboardCopyAllowedByPolicyForUI(
-          GetWebContentsForDataControls()) &&
-      toast_features::IsEnabled(toast_features::kVideoFrameCopiedToast)) {
+  if (toast_features::IsEnabled(toast_features::kVideoFrameCopiedToast)) {
     auto* const toast_controller = GetToastController();
     if (toast_controller) {
       toast_controller->MaybeShowToast(ToastParams(ToastId::kVideoFrameCopied));
     }
   }
 }
-
-void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags) {
-  base::RecordAction(UserMetricsAction("MediaContextMenu_SearchForVideoFrame"));
-
-  RenderFrameHost* frame_host = GetRenderFrameHost();
-  if (!frame_host) {
-    return;
-  }
-
-}
-
 
 void RenderViewContextMenu::ExecRotateCW() {
   base::RecordAction(UserMetricsAction("PluginContextMenu_RotateClockwise"));
@@ -3947,11 +3895,6 @@ void RenderViewContextMenu::PluginActionAt(
   if (execute_plugin_action_callback_) {
     std::move(execute_plugin_action_callback_).Run(plugin_rfh, plugin_action);
   }
-}
-
-content::WebContents* RenderViewContextMenu::GetWebContentsForDataControls()
-    const {
-  return source_web_contents_;
 }
 
 BrowserWindowInterface* RenderViewContextMenu::GetBrowser() const {

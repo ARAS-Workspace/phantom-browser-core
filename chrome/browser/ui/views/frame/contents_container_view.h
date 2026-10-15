@@ -37,10 +37,6 @@ namespace views {
 class WebView;
 }  // namespace views
 
-namespace enterprise_data_protection {
-class DataProtectionOverlayView;
-}  // namespace enterprise_data_protection
-
 // ContentsContainerView holds the ContentsWebView and the outlines and
 // minitoolbar when in split view.
 class ContentsContainerView : public views::View,
@@ -81,10 +77,6 @@ class ContentsContainerView : public views::View,
   ContentsCaptureBorderView* capture_contents_border_view() {
     return capture_contents_border_view_;
   }
-  enterprise_data_protection::DataProtectionOverlayView*
-  data_protection_overlay_view() {
-    return data_protection_overlay_view_;
-  }
   const ContentsContainerOutline* contents_outline_view() const {
     return container_outline_;
   }
@@ -100,11 +92,6 @@ class ContentsContainerView : public views::View,
   DevToolsContentsResizingStrategy& contents_resizing_strategy() {
     return strategy_;
   }
-
-  void ApplyWatermarkSettings(const std::string& watermark_text,
-                              SkColor fill_color,
-                              SkColor outline_color,
-                              int font_size);
 
   void UpdateBorderAndOverlay(bool is_in_split,
                               bool is_active,
@@ -178,10 +165,6 @@ class ContentsContainerView : public views::View,
   raw_ptr<new_tab_footer::NewTabFooterWebView> new_tab_footer_view_ = nullptr;
   // Separator between the web contents and the Footer.
   raw_ptr<views::View> new_tab_footer_view_separator_ = nullptr;
-
-  // The view that overlays the contents container.
-  raw_ptr<enterprise_data_protection::DataProtectionOverlayView>
-      data_protection_overlay_view_ = nullptr;
 
   // The overlay dialog view that is displayed on top of the web contents.
 

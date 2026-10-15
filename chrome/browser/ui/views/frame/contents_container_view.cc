@@ -10,7 +10,6 @@
 
 #include "base/i18n/rtl.h"
 #include "chrome/browser/devtools/devtools_contents_resizing_strategy.h"
-#include "chrome/browser/enterprise/data_protection/data_protection_overlay_view.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/view_ids.h"
@@ -89,10 +88,6 @@ ContentsContainerView::ContentsContainerView(BrowserView* browser_view)
             browser_view->browser()));
     new_tab_footer_view_->SetVisible(false);
   }
-
-  data_protection_overlay_view_ =
-      AddChildView(std::make_unique<
-                   enterprise_data_protection::DataProtectionOverlayView>());
 
   contents_scrim_view_ = AddChildView(std::make_unique<ScrimView>());
   contents_scrim_view_->layer()->SetName("ContentsScrimView");
@@ -256,15 +251,6 @@ void ContentsContainerView::SetContentsResizingStrategy(
 
   strategy_.CopyFrom(strategy);
   InvalidateLayout();
-}
-
-void ContentsContainerView::ApplyWatermarkSettings(
-    const std::string& watermark_text,
-    SkColor fill_color,
-    SkColor outline_color,
-    int font_size) {
-  data_protection_overlay_view_->SetWatermarkText(watermark_text, fill_color,
-                                                  outline_color, font_size);
 }
 
 void ContentsContainerView::UpdateDevToolsDockedPlacement() {
@@ -439,11 +425,6 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
   layouts.child_layouts.emplace_back(contents_scrim_view_.get(),
                                      contents_scrim_view_->GetVisible(),
                                      full_contents_bounds);
-
-  CHECK(data_protection_overlay_view_);
-  layouts.child_layouts.emplace_back(
-      data_protection_overlay_view_.get(),
-      data_protection_overlay_view_->GetVisible(), full_contents_bounds);
 
   if (mini_toolbar_) {
     // |mini_toolbar_| should be offset in the bottom right corner, overlapping

@@ -114,7 +114,6 @@
 #include "components/enterprise/isolated_mode/prefs.h"
 #include "components/enterprise/net/core/prefs.h"
 #include "components/enterprise/network_header_injection/core/network_header_injection_prefs.h"
-#include "components/enterprise/watermarking/watermark_prefs.h"
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
@@ -317,11 +316,6 @@
 #if BUILDFLAG(IS_LINUX)
 #include "ui/color/system_theme.h"
 #endif
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-#include "components/enterprise/data_controls/core/browser/prefs.h"
-#endif
-
 
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 #include "components/enterprise/client_certificates/core/prefs.h"
@@ -1175,7 +1169,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   cross_device::RegisterProfilePrefs(registry);
   enterprise::RegisterIdentifiersProfilePrefs(registry);
   enterprise_connectors::RegisterDeviceTrustConnectorProfilePrefs(registry);
-  enterprise_connectors::RegisterWatermarkProfilePrefs(registry);
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
   client_certificates::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
@@ -1440,10 +1433,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 
   registry->RegisterBooleanPref(
       prefs::kManagedLocalNetworkAccessRestrictionsTemporaryOptOut, false);
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  data_controls::RegisterProfilePrefs(registry);
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 
   registry->RegisterIntegerPref(prefs::kChromeDataRegionSetting, 0);
 

@@ -917,11 +917,8 @@ test("browser_tests") {
     "//chrome/browser/enterprise:browser_tests",
     "//chrome/browser/enterprise/browser_management:browser_tests",
     "//chrome/browser/enterprise/browser_management:management_identity",
-    "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
-    "//chrome/browser/enterprise/incognito",
     "//chrome/browser/enterprise/platform_auth:browser_tests",
     "//chrome/browser/enterprise/signals:browser_tests",
-    "//chrome/browser/enterprise/watermark:browser_tests",
     "//chrome/browser/error_reporting:browser_tests",
     "//chrome/browser/error_reporting:test_support",
     "//chrome/browser/extensions",
@@ -1255,7 +1252,6 @@ test("browser_tests") {
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/browser/ui/webui/top_chrome:browser_tests",
     "//chrome/browser/ui/webui/top_chrome:test_support",
-    "//chrome/browser/ui/webui/watermark",
     "//chrome/browser/ui/webui/webui_toolbar:browser_tests",
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
     "//chrome/browser/ui/webui/whats_new",
@@ -1335,7 +1331,6 @@ test("browser_tests") {
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion",
     "//components/enterprise/common/proto:connectors_proto",
-    "//components/enterprise/data_protection",
     "//components/enterprise/encryption/core:features",
     "//components/error_page/content/browser",
     "//components/favicon/content",
@@ -2441,11 +2436,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser:main_extra_parts" ]
   }
 
-  if (enterprise_data_controls) {
-    sources += [ "//chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_browsertest.cc" ]
-    deps += [ "//chrome/browser/enterprise/data_controls:test_support" ]
-  }
-
   deps += [
     "//chrome/browser/page_load_metrics/integration_tests:browser_tests",
     "//chrome/browser/page_load_metrics/observers:browser_tests",
@@ -2847,7 +2837,6 @@ test("unit_tests") {
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/enterprise:unit_tests",
     "//chrome/browser/enterprise/core:unit_tests",
-    "//chrome/browser/enterprise/data_protection:unit_tests",
     "//chrome/browser/enterprise/encryption:unit_tests",
     "//chrome/browser/enterprise/identifiers:unit_tests",
     "//chrome/browser/enterprise/idle:unit_tests",
@@ -2858,7 +2847,6 @@ test("unit_tests") {
     "//chrome/browser/enterprise/reporting/test:test_support",
     "//chrome/browser/enterprise/signals:unit_tests",
     "//chrome/browser/enterprise/signin:unit_tests",
-    "//chrome/browser/enterprise/webstore:unit_tests",
     "//chrome/browser/external_protocol",
     "//chrome/browser/external_protocol:unit_tests",
     "//chrome/browser/favicon",
@@ -3920,16 +3908,6 @@ test("unit_tests") {
   # //chrome/browser/extensions/BUILD.gn.
   # TODO(crbug.com/1229899): Clean up and move this to a separate target.
   if (enable_extensions) {
-    if (enterprise_data_controls) {
-      sources += [ "../../components/enterprise/data_controls/core/browser/data_controls_policy_handler_unittest.cc" ]
-      deps += [
-        "//chrome/browser/enterprise/data_controls",
-        "//chrome/browser/enterprise/data_controls:test_support",
-        "//components/enterprise/data_controls/content/browser:unit_tests",
-        "//components/enterprise/data_controls/core/browser",
-      ]
-    }
-
     allow_circular_includes_from =
         [ "//chrome/browser/web_applications:web_applications_unit_tests" ]
 
@@ -4161,7 +4139,6 @@ test("unit_tests") {
 
   if (toolkit_views) {
     deps += [
-      "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
       "//chrome/browser/ui:test_support",
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/actions:actions_headers",
@@ -4219,7 +4196,6 @@ test("unit_tests") {
       "//components/app_constants",
       "//components/constrained_window",
       "//components/enterprise/common/proto:browser_events_proto_gen",
-      "//components/enterprise/data_protection",
       "//components/global_media_controls",
       "//components/media_message_center",
       "//components/omnibox/browser:vector_icons",
@@ -4367,13 +4343,6 @@ test("unit_tests") {
     ]
   }
 
-  if (enterprise_data_controls) {
-    deps += [
-      "//chrome/browser/enterprise/data_controls:unit_tests",
-      "//components/enterprise/data_controls/core/browser:features",
-      "//components/enterprise/data_controls/core/browser:test_support",
-    ]
-  }
   deps += [ "//chrome/browser/desktop_to_mobile_promos:unit_tests" ]
 
   if (is_mac || is_linux) {
@@ -5416,23 +5385,6 @@ test("interactive_ui_tests") {
 
   if (enable_print_preview) {
     deps += [ "//chrome/browser/window_management:interactive_ui_tests" ]
-  }
-
-  if (enterprise_data_controls) {
-    sources += [ "//chrome/browser/enterprise/data_protection/clipboard_interactive_uitest.cc" ]
-
-    deps += [
-      "//chrome/browser/enterprise/data_controls:test_support",
-      "//components/enterprise/data_controls/core/browser",
-    ]
-
-    if (enable_print_preview) {
-      deps += [
-        "//chrome/browser/printing:test_support",
-        "//chrome/browser/ui/webui/print_preview",
-        "//printing:test_support",
-      ]
-    }
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

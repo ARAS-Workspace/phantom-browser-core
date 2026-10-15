@@ -60,9 +60,6 @@
 -CrComponentsSearchboxTest.SearchboxFocusTest
 -CrComponentsSearchboxTest.SearchboxFocusTest__SearchboxFocusTest_tabbing_with_inline_autocompletion
 
-# Flaky on Linux: crbug.com/483855024
--DataProtectionClipboardBrowserTest.ChromePrintReportsInitiator
-
 # Flaky on multiple bots: crbug.com/476255536
 -DefaultIsolation/TaskManagerOOPIFBrowserTest.LeavePageWithCrossSiteIframes/0
 

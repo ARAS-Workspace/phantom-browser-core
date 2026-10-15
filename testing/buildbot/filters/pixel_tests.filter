@@ -39,7 +39,6 @@ CookieControlsBubbleViewPixelTest.*
 *CreatePopupRowViewTest.*
 *CreatePopupRowViewWithNoUserEducationRateLimitTest.*
 CryptoModulePasswordDialogTest.*
-*DataControlsDialogUiTest.*
 DashboardKombuchaInteractiveUITest.*
 DeepScanningFailureModalDialogTest.*
 DiscountBubbleViewBrowserTest.*
@@ -168,9 +167,6 @@ TabSearchBubbleUIBrowserTest.*
 TranslateBubbleVisualTest.InvokeUi_*
 UpdateRecommendedDialogTest.*
 VerticalTabStripTopContainerInteractiveUiTest.PixelTest*
-*WatermarkBrowserTest.*
-*WatermarkTestPageBrowserTest.*
-*WatermarkTestPageDynamicBrowserTest.*
 WebAppUpdateReviewDialog.*
 WebUIToolbarPixelInteractiveUiTest.*
 ZoomBubbleDialogTest.*

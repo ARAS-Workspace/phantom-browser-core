@@ -357,13 +357,6 @@ inline constexpr char kNetworkPredictionOptions[] =
 inline constexpr char kPreinstalledExtensionsInstallState[] =
     "default_apps_install_state";
 
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-// A list of extensions ids that have to be allowed to run in Incognito by the
-// user in order to use Incognito mode.
-inline constexpr char kMandatoryExtensionsForIncognitoNavigation[] =
-    "mandatory_extensions_for_incognito_navigation";
-#endif
-
 // A boolean pref set to true if a Home button to open the Home pages should be
 // visible on the toolbar.
 inline constexpr char kShowHomeButton[] = "browser.show_home_button";

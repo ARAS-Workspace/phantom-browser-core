@@ -240,7 +240,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // default, however their creation is still possible.
     "AutocompleteControllerEmitter",
     "AutofillInternalsService",
-    "DataControlsRulesService",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -248,7 +247,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
 #endif
     "PasswordManagerInternalsService",
     "PasswordRequirementsServiceFactory",
-    "PolicyClipboardRestriction",
     "WebDataService",
 
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
@@ -289,13 +287,11 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // components/. These services are not created for the System Profile by
     // default, however their creation is still possible.
     "AutocompleteControllerEmitter",
-    "DataControlsRulesService",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "PasswordManagerBlocklist",
 #endif
-    "PolicyClipboardRestriction",
 
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
     // which does not yet have an implementation using `ProfileSelections`.

@@ -45,9 +45,6 @@
 #include "chrome/browser/desktop_to_mobile_promos/promos_utils.h"
 #include "chrome/browser/devtools/devtools_ui_controller.h"
 #include "chrome/browser/devtools/devtools_window.h"
-#include "chrome/browser/enterprise/data_protection/data_protection_navigation_observer.h"
-#include "chrome/browser/enterprise/data_protection/data_protection_overlay_view.h"
-#include "chrome/browser/enterprise/watermark/settings.h"
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
@@ -239,7 +236,6 @@
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/collaboration/public/messaging/message.h"
 #include "components/content_settings/core/common/features.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/tracker.h"
@@ -5564,12 +5560,6 @@ void BrowserView::OnFirstPresentation(
         frame_timing_details.presentation_feedback.timestamp);
   }
 }
-
-#if BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
-void BrowserView::ApplyScreenshotSettings(bool allow) {
-  GetWidget()->SetAllowScreenshots(allow);
-}
-#endif  // BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
 
 BEGIN_METADATA(BrowserView)
 ADD_READONLY_PROPERTY_METADATA(gfx::Rect, FindBarBoundingBox)

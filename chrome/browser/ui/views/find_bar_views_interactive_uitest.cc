@@ -31,8 +31,6 @@
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/test/bookmark_test_helpers.h"
-#include "components/enterprise/data_controls/content/browser/last_replaced_clipboard_data.h"
-#include "components/enterprise/data_controls/core/browser/test_utils.h"
 #include "components/find_in_page/find_notification_details.h"
 #include "components/find_in_page/find_tab_helper.h"
 #include "components/find_in_page/find_types.h"
@@ -90,10 +88,6 @@ DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kTabId);
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kTabBId);
 DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ui::test::PollingStateObserver<bool>,
                                     kTextCopiedState);
-DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ui::test::PollingStateObserver<bool>,
-                                    kTextSelectedState);
-DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ui::test::PollingStateObserver<bool>,
-                                    kReplacedDataUpdatedState);
 const ui::Accelerator ctrl_c_accelerator(ui::VKEY_C, ui::EF_CONTROL_DOWN);
 const ui::Accelerator ctrl_v_accelerator(ui::VKEY_V, ui::EF_CONTROL_DOWN);
 }  // namespace
@@ -217,8 +211,7 @@ class LegacyFindInPageTest : public InProcessBrowserTest {
   }
 };
 
-class FindBarViewsUiTest : public InteractiveBrowserTest,
-                           public ::testing::WithParamInterface<bool> {
+class FindBarViewsUiTest : public InteractiveBrowserTest {
  public:
   FindBarViewsUiTest() {
     feature_list_.InitAndDisableFeature(features::kNonBlockingOsClipboardReads);
@@ -1059,73 +1052,6 @@ IN_PROC_BROWSER_TEST_F(FindBarViewsUiTest, MatchOrdinalStableWhileTyping) {
       WaitForState(kFindResultState, []() { return FindResultState(1, 3); }));
 }
 
-INSTANTIATE_TEST_SUITE_P(, FindBarViewsUiTest, ::testing::Bool());
-
-IN_PROC_BROWSER_TEST_P(FindBarViewsUiTest, SelectionDuringFindPolicy) {
-  const bool clipboard_restricted_by_policy = GetParam();
-  if (clipboard_restricted_by_policy) {
-    data_controls::SetDataControls(browser()->GetProfile()->GetPrefs(), {R"({
-                                   "name": "rule_name",
-                                   "rule_id": "rule_id",
-                                   "destinations": {
-                                     "os_clipboard": true
-                                   },
-                                   "restrictions": [
-                                     {"class": "CLIPBOARD", "level": "BLOCK"}
-                                   ]
-                                 })"});
-  }
-  const std::u16string kExpectedText = u"This is some text with a link.";
-  const std::u16string text =
-      clipboard_restricted_by_policy ? u"42" : kExpectedText;
-
-  const GURL page_url = embedded_test_server()->GetURL("/a.html");
-
-  RunTestSequence(
-      Init(page_url), WaitForWebContentsReady(kTabId),
-
-      CheckJsResult(kTabId, "() => document.body.innerText",
-                    testing::HasSubstr(base::UTF16ToUTF8(kExpectedText))),
-
-      ShowFindBar(), EnterText(FindBarView::kTextField, u"42"), HideFindBar(),
-      Focus(ContentsWebView::kContentsWebViewElementId),
-
-      // Select all text.
-      Do([this]() {
-        browser()->tab_strip_model()->GetActiveWebContents()->SelectAll();
-      }),
-
-      // Verify the selection in the renderer.
-      WaitForJsResult(kTabId, "() => window.getSelection().toString()",
-                      base::UTF16ToUTF8(kExpectedText)),
-
-      // Wait for the browser to be aware of the selection.
-      PollState(kTextSelectedState,
-                [this, kExpectedText]() {
-                  WebContents* web_contents =
-                      browser()->tab_strip_model()->GetActiveWebContents();
-                  if (!web_contents) {
-                    return false;
-                  }
-                  auto* host_view = web_contents->GetRenderWidgetHostView();
-                  if (!host_view) {
-                    return false;
-                  }
-                  if (host_view->GetSelectedText() != kExpectedText) {
-                    return false;
-                  }
-                  return true;
-                }),
-      WaitForState(kTextSelectedState, true),
-
-      // Show the Find bar.
-      ShowFindBar(), WaitForShow(FindBarView::kTextField),
-      // Verify the text in the find bar.
-      WithView(FindBarView::kTextField, [text](views::Textfield* textfield) {
-        EXPECT_EQ(textfield->GetText(), text);
-      }));
-}
-
 // Verifies that the find bar widget is not activatable.
 //
 // The original fix for crbug.com/40616214 added Activatable::kYes to the
@@ -1284,73 +1210,4 @@ IN_PROC_BROWSER_TEST_F(FindBarViewsUiTest, BookmarkShortcutWithFindBarFocus) {
       // without the fix, Cmd+D would be consumed by the text field and the
       // bubble would never appear.
       WaitForShow(kBookmarkNameFieldId));
-}
-
-// TODO(crbug.com/496762907): Deflake and reenable it.
-IN_PROC_BROWSER_TEST_P(FindBarViewsUiTest, DISABLED_CopyBlockedByPolicy) {
-  const bool clipboard_restricted_by_policy = GetParam();
-  if (clipboard_restricted_by_policy) {
-    data_controls::SetDataControls(browser()->GetProfile()->GetPrefs(), {R"({
-                                   "name": "rule_name",
-                                   "rule_id": "rule_id",
-                                   "destinations": {
-                                     "os_clipboard": true
-                                   },
-                                   "restrictions": [
-                                     {"class": "CLIPBOARD", "level": "BLOCK"}
-                                   ]
-                                 })"});
-  }
-  const std::string kExpectedText =
-      clipboard_restricted_by_policy
-          ? l10n_util::GetStringUTF8(
-                IDS_ENTERPRISE_DATA_CONTROLS_COPY_PREVENTION_WARNING_MESSAGE)
-          : "text";
-
-  RunTestSequence(
-      Init(embedded_test_server()->GetURL("/a.html")),
-      WaitForWebContentsReady(kTabId), ShowFindBar(),
-      WaitForShow(FindBarView::kTextField),
-      EnterText(FindBarView::kTextField, u"some text"),
-      WithView(FindBarView::kTextField,
-               [](views::Textfield* textfield) {
-                 textfield->SelectWord();
-                 EXPECT_EQ(textfield->GetSelectedText(), u"text");
-                 textfield->ExecuteCommand(
-                     std::to_underlying(ui::TouchEditable::MenuCommands::kCopy),
-                     0);
-               }),
-      PollState(
-          kTextCopiedState,
-          [&]() {
-            ui::Clipboard* clipboard = ui::Clipboard::GetForCurrentThread();
-            std::u16string clipboard_text = ui::clipboard_test_util::ReadText(
-                clipboard, ui::ClipboardBuffer::kCopyPaste,
-                /* data_dst = */ nullptr);
-            return base::EqualsASCII(clipboard_text, kExpectedText);
-          }),
-      WaitForState(kTextCopiedState, true),
-      // When copying to the clipboard is restricted, we have to wait for the
-      // internal data tracking to identify the sequence number that will need
-      // to be replaced before pasting.
-      PollState(
-          kReplacedDataUpdatedState,
-          [&]() {
-            return !clipboard_restricted_by_policy ||
-                   ui::Clipboard::GetForCurrentThread()->GetSequenceNumber(
-                       ui::ClipboardBuffer::kCopyPaste) ==
-                       data_controls::GetLastReplacedClipboardData().seqno;
-          }),
-      WaitForState(kReplacedDataUpdatedState, true),
-      // Regardless of whether the copied data made it to the clipboard, pasting
-      // it back into the FindBar will result in getting the original text back
-      // as the current policy doesn't block it.
-      WithView(
-          FindBarView::kTextField,
-          [](views::Textfield* textfield) {
-            textfield->ExecuteCommand(
-                std::to_underlying(ui::TouchEditable::MenuCommands::kPaste), 0);
-          }),
-      WaitForViewProperty(FindBarView::kTextField, views::Textfield, Text,
-                          u"some text"));
 }

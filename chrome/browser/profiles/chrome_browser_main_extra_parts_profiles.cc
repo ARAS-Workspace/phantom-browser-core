@@ -245,7 +245,6 @@
 #include "components/captive_portal/core/buildflags.h"
 #include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/enterprise/buildflags/buildflags.h"
-#include "components/enterprise/content/clipboard_restriction_service.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/password_manager/content/browser/password_manager_log_router_factory.h"
 #include "components/password_manager/content/browser/password_requirements_service_factory.h"
@@ -417,11 +416,6 @@
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
 #endif
 
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-#include "chrome/browser/enterprise/data_controls/chrome_rules_service.h"
-#endif
-
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/bookmarks/bookmark_expanded_state_tracker_factory.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
@@ -560,7 +554,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   client_certificates::CertificateStoreFactory::GetInstance();
 #endif
   ClientHintsFactory::GetInstance();
-  ClipboardRestrictionServiceFactory::GetInstance();
   collaboration::CollaborationServiceFactory::GetInstance();
   collaboration::comments::CommentsServiceFactory::GetInstance();
   collaboration::messaging::MessagingBackendServiceFactory::GetInstance();
@@ -577,9 +570,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   critical_actions::CriticalActionFactory::GetInstance();
   CrossDevicePrefTrackerFactory::GetInstance();
   DataTypeStoreServiceFactory::GetInstance();
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  data_controls::ChromeRulesServiceFactory::GetInstance();
-#endif
   data_sharing::DataSharingServiceFactory::GetInstance();
   data_sharing::personal_collaboration_data::
       PersonalCollaborationDataServiceFactory::GetInstance();

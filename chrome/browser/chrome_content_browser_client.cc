@@ -225,11 +225,7 @@
 #include "components/embedder_support/origin_trials/origin_trials_settings_storage.h"
 #include "components/embedder_support/switches.h"
 #include "components/embedder_support/user_agent_utils.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/common/proto/connectors.pb.h"
-#include "components/enterprise/content/clipboard_restriction_service.h"
-#include "components/enterprise/content/pref_names.h"
-#include "components/enterprise/data_controls/content/browser/last_replaced_clipboard_data.h"
 #include "components/enterprise/net/content/enterprise_proxy_navigation_error_data.h"
 #include "components/enterprise/net/core/enterprise_proxy_error_data.h"
 #include "components/enterprise/net/core/enterprise_proxy_error_service.h"
@@ -547,14 +543,6 @@
 #include "chrome/browser/signin/bound_session_credentials/bound_session_request_throttled_handler_browser_impl.h"
 #include "chrome/common/bound_session_request_throttled_handler.h"
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-#include "chrome/browser/enterprise/data_protection/paste_allowed_request.h"
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-#include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
@@ -1234,8 +1222,6 @@ void ChromeContentBrowserClient::RegisterProfilePrefs(
   registry->RegisterBooleanPref(prefs::kCorsNonWildcardRequestHeadersSupport,
                                 true);
   registry->RegisterBooleanPref(prefs::kIPv6ReachabilityOverrideEnabled, false);
-  registry->RegisterDictionaryPref(
-      enterprise::content::kCopyPreventionSettings);
   registry->RegisterBooleanPref(prefs::kOriginAgentClusterDefaultEnabled, true);
 
   registry->RegisterBooleanPref(
@@ -1267,10 +1253,6 @@ void ChromeContentBrowserClient::RegisterProfilePrefs(
 
   registry->RegisterBooleanPref(
       policy::policy_prefs::kForcePermissionPolicyUnloadDefaultEnabled, false);
-
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  registry->RegisterListPref(prefs::kMandatoryExtensionsForIncognitoNavigation);
-#endif
 
   registry->RegisterBooleanPref(prefs::kWebAudioOutputBufferingEnabled, false);
   registry->RegisterBooleanPref(prefs::kSharedWorkerBlobURLFixEnabled, true);
@@ -5984,13 +5966,7 @@ void ChromeContentBrowserClient::IsClipboardPasteAllowedByPolicy(
     IsClipboardPasteAllowedCallback callback) {
   // TODO(b/508693696): Add copy and paste support on AL.
 
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  enterprise_data_protection::PasteAllowedRequest::StartPasteAllowedRequest(
-      source, destination, metadata, std::move(clipboard_paste_data),
-      std::move(callback));
-#else
   std::move(callback).Run(std::move(clipboard_paste_data));
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 }
 
 void ChromeContentBrowserClient::IsClipboardCopyAllowedByPolicy(
@@ -5998,37 +5974,13 @@ void ChromeContentBrowserClient::IsClipboardCopyAllowedByPolicy(
     const ui::ClipboardMetadata& metadata,
     const ClipboardPasteData& data,
     IsClipboardCopyAllowedCallback callback) {
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  enterprise_data_protection::IsClipboardCopyAllowedByPolicy(
-      source, metadata, data, std::move(callback));
-#else
-  std::u16string replacement_data;
-  ClipboardRestrictionService* service =
-      ClipboardRestrictionServiceFactory::GetInstance()->GetForBrowserContext(
-          source.browser_context());
-  GURL url = source.data_transfer_endpoint() &&
-                     source.data_transfer_endpoint()->IsUrlType() &&
-                     source.data_transfer_endpoint()->GetURL()
-                 ? *source.data_transfer_endpoint()->GetURL()
-                 : GURL();
-  if (service->IsUrlAllowedToCopy(std::move(url), metadata.size.value_or(0),
-                                  &replacement_data)) {
-    std::move(callback).Run(metadata.format_type, data, std::nullopt);
-  } else {
-    std::move(callback).Run(metadata.format_type, data,
-                            std::move(replacement_data));
-  }
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
+  std::move(callback).Run(metadata.format_type, data, std::nullopt);
 }
 
 bool ChromeContentBrowserClient::IsDragAllowedByPolicy(
     const content::ClipboardEndpoint& source,
     const content::DropData& drop_data) {
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  return enterprise_data_protection::IsDragAllowedByPolicy(source, drop_data);
-#else
   return true;
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 }
 
 #if BUILDFLAG(ENABLE_VR)
@@ -7105,19 +7057,6 @@ ChromeContentBrowserClient::MaybeCreateKeepAliveRequestTracker(
     trackers.push_back(std::move(search_tracker));
   }
   return trackers;
-}
-
-std::optional<std::vector<std::u16string>>
-ChromeContentBrowserClient::GetClipboardTypesIfPolicyApplied(
-    const ui::ClipboardSequenceNumberToken& seqno) {
-  const data_controls::LastReplacedClipboardData& last_replaced_data =
-      data_controls::GetLastReplacedClipboardData();
-
-  if (last_replaced_data.seqno == seqno) {
-    return last_replaced_data.GetAvailableTypes();
-  }
-
-  return std::nullopt;
 }
 
 bool ChromeContentBrowserClient::UsePrefetchPrerenderIntegration() {

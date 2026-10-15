@@ -1162,12 +1162,7 @@
                   'third_party/widevine/cdm/'
     },
     'enterprise_data_protection': {
-      'filepath': 'chrome/browser/enterprise/connectors/|' \
-                  'chrome/browser/enterprise/data_controls/|' \
-                  'chrome/browser/enterprise/data_protection/|' \
-                  'chrome/browser/enterprise/watermark/|' \
-                  'components/enterprise/common/|' \
-                  'components/enterprise/data_controls/'
+      'filepath': 'components/enterprise/common/'
     },
     'exo': {
       'filepath': 'components/exo',

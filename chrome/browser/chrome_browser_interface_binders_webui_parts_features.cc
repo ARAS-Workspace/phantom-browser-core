@@ -5,7 +5,6 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "content/public/browser/web_ui_browser_interface_broker_registry.h"
 #include "content/public/browser/web_ui_controller_interface_binder.h"
@@ -34,10 +33,6 @@
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/ui/webui/tab_strip_internals/tab_strip_internals_ui.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-#include "chrome/browser/ui/webui/watermark/watermark_ui.h"
 #endif
 
 namespace chrome::internal {
@@ -75,12 +70,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
   RegisterWebUIControllerInterfaceBinder<
       tab_strip_internals::mojom::PageHandlerFactory, TabStripInternalsUI>(map);
 #endif
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  RegisterWebUIControllerInterfaceBinder<watermark::mojom::PageHandlerFactory,
-                                         WatermarkUI>(map);
-#endif
-
 }
 
 }  // namespace chrome::internal

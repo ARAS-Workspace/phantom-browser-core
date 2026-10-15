@@ -70,10 +70,6 @@
 #include "components/enterprise/browser/reporting/cloud_reporting_policy_handler.h"
 #include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/enterprise/buildflags/buildflags.h"
-#include "components/enterprise/content/copy_prevention_settings_policy_handler.h"
-#include "components/enterprise/content/pref_names.h"
-#include "components/enterprise/data_controls/core/browser/data_controls_policy_handler.h"
-#include "components/enterprise/data_controls/core/browser/prefs.h"
 #include "components/enterprise/device_trust/prefs.h"
 #include "components/enterprise/encryption/cache/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
@@ -193,10 +189,6 @@
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 #include "components/enterprise/client_certificates/core/prefs.h"
 #endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-#include "components/enterprise/watermarking/watermark_style_policy_handler.h"  // nogncheck crbug.com/40147906
-#endif  // BUILDFLAG(ENTERPRISE_WATERMARK)
 
 namespace policy {
 namespace {
@@ -784,11 +776,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kGeolocationBlockedForUrls,
     prefs::kManagedGeolocationBlockedForUrls,
     base::Value::Type::LIST },
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  { key::kMandatoryExtensionsForIncognitoNavigation,
-    prefs::kMandatoryExtensionsForIncognitoNavigation,
-    base::Value::Type::LIST },
-#endif // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   { key::kRequireOnlineRevocationChecksForLocalAnchors,
     prefs::kCertRevocationCheckingRequiredLocalAnchors,
@@ -1412,11 +1399,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::make_unique<NTPShortcutsPolicyHandler>(chrome_schema));
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  handlers->AddHandler(
-      std::make_unique<WatermarkStylePolicyHandler>(chrome_schema));
-#endif  // BUILDFLAG(ENTERPRISE_WATERMARK)
-
   handlers->AddHandler(
       std::make_unique<SimpleJsonStringSchemaValidatingPolicyHandler>(
           key::kAutoSelectCertificateForUrls,
@@ -1429,9 +1411,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(std::make_unique<BrowsingDataLifetimePolicyHandler>(
       key::kClearBrowsingDataOnExitList,
       browsing_data::prefs::kClearBrowsingDataOnExitList, chrome_schema));
-  handlers->AddHandler(std::make_unique<CopyPreventionSettingsPolicyHandler>(
-      key::kCopyPreventionSettings,
-      enterprise::content::kCopyPreventionSettings, chrome_schema));
   handlers->AddHandler(std::make_unique<DefaultDownloadDirPolicyHandler>());
   handlers->AddHandler(std::make_unique<DownloadDirPolicyHandler>());
   handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
@@ -1769,13 +1748,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       prefs::kAllHttpAuthSchemesAllowedForOrigins));
 
   handlers->AddHandler(std::make_unique<PrivacySandboxPolicyHandler>());
-
-#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-  handlers->AddHandler(
-      std::make_unique<data_controls::DataControlsPolicyHandler>(
-          key::kDataControlsRules, data_controls::kDataControlsRulesPref,
-          chrome_schema));
-#endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 
   handlers->AddHandler(std::make_unique<BatterySaverPolicyHandler>());
 

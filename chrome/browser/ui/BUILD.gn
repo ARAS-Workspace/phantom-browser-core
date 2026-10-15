@@ -1081,10 +1081,6 @@ static_library("ui") {
     "//chrome/browser/ui/color:mixers",
   ]
 
-  if (enterprise_data_controls) {
-    deps += [ "//chrome/browser/enterprise/data_controls" ]
-  }
-
   # !is_android
   sources += [
     # This file physically lives in //chrome/browser but is compiled here so

@@ -40,7 +40,6 @@
 #include "chrome/browser/ui/webui/subresource_filter/subresource_filter_internals_ui.h"
 #include "chrome/browser/ui/webui/sync_internals/sync_internals_ui.h"
 #include "chrome/browser/ui/webui/version/version_ui.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/security_interstitials/content/connection_help_ui.h"
 #include "components/security_interstitials/content/known_interception_disclosure_ui.h"
 #include "components/webui/user_actions/user_actions_ui.h"
@@ -140,10 +139,6 @@
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_email_confirmation_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_error_ui.h"
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-#include "chrome/browser/ui/webui/watermark/watermark_ui.h"
-#endif
 
 void RegisterChromeWebUIConfigs() {
 
@@ -288,9 +283,4 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<ProfilePickerUIConfig>());
   map.AddWebUIConfig(std::make_unique<SigninErrorUIConfig>());
   map.AddWebUIConfig(std::make_unique<SigninEmailConfirmationUIConfig>());
-
-#if BUILDFLAG(ENTERPRISE_WATERMARK)
-  map.AddWebUIConfig(std::make_unique<WatermarkUIConfig>());
-#endif
-
 }
