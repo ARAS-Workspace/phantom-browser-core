@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//chrome/common/features.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//rlz/buildflags/buildflags.gni")
@@ -129,8 +128,6 @@ source_set("impl") {
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion:prefs",
     "//components/enterprise/device_trust",
-    "//components/enterprise/net",
-    "//components/enterprise/network_header_injection/core",
     "//components/feature_engagement/public:prefs",
     "//components/history_clusters/core",
     "//components/image_fetcher/core/cache",
@@ -245,10 +242,6 @@ source_set("impl") {
       "//chrome/browser/extensions",
       "//extensions/browser",
     ]
-  }
-
-  if (enterprise_client_certificates) {
-    deps += [ "//components/enterprise/client_certificates/core" ]
   }
 
   if (enable_pdf) {

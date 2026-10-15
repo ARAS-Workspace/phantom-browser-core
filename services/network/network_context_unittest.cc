@@ -60,7 +60,6 @@
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/network_session_configurator/browser/network_session_configurator.h"
 #include "components/network_session_configurator/common/network_switches.h"
 #include "components/prefs/testing_pref_service.h"
@@ -2880,32 +2879,6 @@ TEST_F(NetworkContextTestWithMockTime, LogicalInvalidationStartupBatchSaves) {
   EXPECT_TRUE(LoadFiltersFromStore(network_context->logical_invalidation_store())
                   .empty());
 }
-
-#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
-// Verifies that the simple backend is always used when encrypting the cache.
-TEST_F(NetworkContextTest, EncryptedHttpCacheForcesSimpleBackend) {
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  context_params->file_paths = mojom::NetworkContextFilePaths::New();
-  context_params->http_cache_enabled = true;
-
-  // Enable the encryption flag.
-  context_params->enable_encrypted_http_cache = true;
-
-  base::ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-  context_params->file_paths->http_cache_directory = temp_dir.GetPath();
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  disk_cache::Backend* backend = WaitForCacheBackend(*network_context);
-  ASSERT_TRUE(backend);
-
-  EXPECT_EQ(net::URLRequestContextBuilder::HttpCacheParams::DISK_SIMPLE,
-            GetBackendType(backend));
-}
-#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
 
 TEST_F(NetworkContextTest, NotifyExternalCacheHit) {
   const std::vector<GURL> kUrls = {

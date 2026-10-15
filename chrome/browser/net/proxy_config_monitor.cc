@@ -13,15 +13,10 @@
 #include "chrome/browser/net/proxy_service_factory.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/proxy_config/pref_proxy_config_tracker_impl.h"
 #include "content/public/browser/browser_thread.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "services/network/public/mojom/network_context.mojom.h"
-
-#if BUILDFLAG(ENTERPRISE_PROXY)
-#include "chrome/browser/enterprise/net/enterprise_proxy_service_factory.h"
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/api/proxy/proxy_api.h"
@@ -38,16 +33,10 @@ ProxyConfigMonitor::ProxyConfigMonitor(Profile* profile) {
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
   if (!pref_proxy_config_tracker_) {
-    enterprise_net::EnterpriseProxyService* enterprise_proxy_service = nullptr;
-#if BUILDFLAG(ENTERPRISE_PROXY)
-    enterprise_proxy_service =
-        EnterpriseProxyServiceFactory::GetForProfile(profile);
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
     pref_proxy_config_tracker_ =
         ProxyServiceFactory::CreatePrefProxyConfigTrackerOfProfile(
             profile->GetPrefs(), g_browser_process->local_state(),
-            profile->GetProfilePolicyConnector()->policy_service(),
-            enterprise_proxy_service);
+            profile->GetProfilePolicyConnector()->policy_service());
   }
 
   proxy_config_service_ = ProxyServiceFactory::CreateProxyConfigService(

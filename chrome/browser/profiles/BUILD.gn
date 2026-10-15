@@ -763,11 +763,7 @@ source_set("profiles_extra_parts_impl") {
   ]
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/enterprise/network_header_injection",
-      "//chrome/browser/multistep_filter",
-      "//components/enterprise/network_header_injection/core",
-    ]
+    deps += [ "//chrome/browser/multistep_filter" ]
   }
 
   if (is_mac || is_linux) {

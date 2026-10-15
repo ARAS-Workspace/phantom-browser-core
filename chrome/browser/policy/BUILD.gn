@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
@@ -720,10 +719,6 @@ source_set("policy") {
     ]
   }
 
-  if (enterprise_client_certificates) {
-    public_deps += [ "//components/enterprise/client_certificates/core" ]
-  }
-
   public += [ "managed_account_policy_handler.h" ]
   public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
@@ -873,8 +868,6 @@ source_set("impl") {
     "//components/embedder_support:user_agent",
     "//components/enterprise/browser/data_region",
     "//components/enterprise/buildflags",
-    "//components/enterprise/net",
-    "//components/enterprise/network_header_injection/core:policy",
     "//components/feed/core/shared_prefs:feed_shared_prefs",
     "//components/history/core/common",
     "//components/history_clusters/core",
@@ -911,16 +904,6 @@ source_set("impl") {
       "//chrome/browser/extensions/api/messaging",
       "//extensions/buildflags",
       "//extensions/strings",
-    ]
-  }
-
-  # These targets back browser (machine) scope provisioning via Chrome Browser
-  # Cloud Management (BrowserDMTokenStorage / BrowserCloudManagementDelegate),
-  # which does not exist on ChromeOS even though enterprise_client_certificates
-  # is enabled there.
-  if (enterprise_client_certificates) {
-    deps += [
-      "//components/enterprise/client_certificates/core:management_delegate",
     ]
   }
 

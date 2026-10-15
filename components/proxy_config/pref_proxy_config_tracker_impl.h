@@ -13,17 +13,11 @@
 #include "base/memory/weak_ptr.h"
 #include "base/observer_list.h"
 #include "base/threading/thread_checker.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/proxy_config/pref_proxy_config_tracker.h"
 #include "components/proxy_config/proxy_config_dictionary.h"
 #include "net/proxy_resolution/proxy_config_service.h"
 #include "net/proxy_resolution/proxy_config_with_annotation.h"
-
-#if BUILDFLAG(ENTERPRISE_PROXY)
-#include "base/scoped_observation.h"
-#include "components/enterprise/net/core/enterprise_proxy_service.h"
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
 
 class PrefService;
 class PrefRegistrySimple;
@@ -106,12 +100,7 @@ class ProxyConfigServiceImpl : public net::ProxyConfigService,
 // to net::ProxyConfig and pushes the result over to
 // ProxyConfigServiceImpl::UpdateProxyConfig.
 class PROXY_CONFIG_EXPORT PrefProxyConfigTrackerImpl
-    : public PrefProxyConfigTracker
-#if BUILDFLAG(ENTERPRISE_PROXY)
-    ,
-      public enterprise_net::EnterpriseProxyService::Observer
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
-{
+    : public PrefProxyConfigTracker {
  public:
   // |proxy_config_service_task_runner| is the thread the ProxyConfigService
   // will live on. Use nullptr if it lives on the current thread.
@@ -121,15 +110,6 @@ class PROXY_CONFIG_EXPORT PrefProxyConfigTrackerImpl
                              scoped_refptr<base::SingleThreadTaskRunner>
                                  proxy_config_service_task_runner,
                              policy::PolicyService* policy_service = nullptr);
-
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  PrefProxyConfigTrackerImpl(
-      PrefService* pref_service,
-      scoped_refptr<base::SingleThreadTaskRunner>
-          proxy_config_service_task_runner,
-      policy::PolicyService* policy_service,
-      enterprise_net::EnterpriseProxyService* enterprise_proxy_service);
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
 
   PrefProxyConfigTrackerImpl(const PrefProxyConfigTrackerImpl&) = delete;
   PrefProxyConfigTrackerImpl& operator=(const PrefProxyConfigTrackerImpl&) =
@@ -186,12 +166,6 @@ class PROXY_CONFIG_EXPORT PrefProxyConfigTrackerImpl
       net::ProxyConfigWithAnnotation* config,
       policy::PolicyService* policy_service);
 
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  // enterprise_net::EnterpriseProxyService::Observer implementation:
-  void OnDynamicProxyConfigsStatusChanged() override;
-  void OnEnterpriseProxyServiceDestroyed() override;
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
-
  protected:
   // Get the proxy configuration currently defined by preferences.
   // Status is indicated in the return value.
@@ -236,11 +210,6 @@ class PROXY_CONFIG_EXPORT PrefProxyConfigTrackerImpl
 
   base::ThreadChecker thread_checker_;
 
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  base::ScopedObservation<enterprise_net::EnterpriseProxyService,
-                          enterprise_net::EnterpriseProxyService::Observer>
-      enterprise_proxy_observation_{this};
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
   // Caches the active PvD dynamic routing rules so that dynamic routing updates
   // persist across preference changes.
   net::ProxyConfig::DynamicRoutingConfig active_dynamic_routing_config_;

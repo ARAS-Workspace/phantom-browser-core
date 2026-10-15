@@ -69,11 +69,8 @@
 #include "components/enterprise/browser/reporting/cloud_reporting_frequency_policy_handler.h"
 #include "components/enterprise/browser/reporting/cloud_reporting_policy_handler.h"
 #include "components/enterprise/browser/reporting/common_pref_names.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/device_trust/prefs.h"
-#include "components/enterprise/encryption/cache/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
-#include "components/enterprise/net/core/prefs.h"
 #include "components/feed/core/shared_prefs/pref_names.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
@@ -181,14 +178,6 @@
 #include "components/device_signals/core/browser/pref_names.h"  // nogncheck due to crbug.com/40147906
 #include "components/proxy_config/proxy_config_pref_names.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "components/enterprise/network_header_injection/core/http_header_injection_policy_handler.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-#include "components/enterprise/client_certificates/core/prefs.h"
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 
 namespace policy {
 namespace {
@@ -1214,22 +1203,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kCAPlatformIntegrationEnabled,
     base::Value::Type::BOOLEAN },
 
-// The per-user policy is available on ChromeOS (declared `future_on:
-// chrome_os`), but the per-browser policy is not (it is `chrome.*`, i.e.
-// win/mac/linux only). As a result the per-browser `key::` constant is only
-// generated in non-ChromeOS builds, so its entry must be guarded accordingly.
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-  { key::kProvisionManagedClientCertificateForUser,
-    client_certificates::prefs::kProvisionManagedClientCertificateForUserPrefs,
-    base::Value::Type::INTEGER },
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-  { key::kProvisionManagedClientCertificateForBrowser,
-    client_certificates::prefs::kProvisionManagedClientCertificateForBrowserPrefs,
-    base::Value::Type::INTEGER },
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-
 #if BUILDFLAG(IS_MAC)
   { key::kAdHocCodeSigningForPWAsEnabled,
     prefs::kWebAppsUseAdHocCodeSigningForAppShims,
@@ -1462,12 +1435,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SCHEMA_ALLOW_UNKNOWN,
       SimpleSchemaValidatingPolicyHandler::RECOMMENDED_ALLOWED,
       SimpleSchemaValidatingPolicyHandler::MANDATORY_PROHIBITED));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_custom_headers::HttpHeaderInjectionPolicyHandler>(
-          chrome_schema));
-#endif
   handlers->AddHandler(std::make_unique<SimpleSchemaValidatingPolicyHandler>(
       key::kRelaunchWindow, prefs::kRelaunchWindow, chrome_schema,
       SCHEMA_ALLOW_UNKNOWN,
@@ -1807,14 +1774,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           key::kTabGroupSharingSettings,
           collaboration::prefs::kSharedTabGroupsManagedAccountSetting,
           base::Value::Type::INTEGER)));
-
-#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kCacheEncryptionEnabled,
-          enterprise_connectors::kCacheEncryptionEnabledPref,
-          base::Value::Type::BOOLEAN)));
-#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
 
   return handlers;
 }

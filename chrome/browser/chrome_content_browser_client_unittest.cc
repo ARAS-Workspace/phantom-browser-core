@@ -34,8 +34,6 @@
 #include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/enterprise/net/enterprise_proxy_error_service_factory.h"
-#include "chrome/browser/enterprise/net/enterprise_proxy_service_factory.h"
 #include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/media/prefs/capture_device_ranking.h"
@@ -60,13 +58,6 @@
 #include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/enterprise/net/content/enterprise_proxy_navigation_error_data.h"
-#include "components/enterprise/net/core/enterprise_proxy_error_data.h"
-#include "components/enterprise/net/core/enterprise_proxy_service.h"
-#include "components/enterprise/net/core/features.h"
-#include "components/enterprise/net/core/mock_enterprise_proxy_service.h"
-#include "components/error_page/common/error_page_switches.h"
-#include "components/error_page/common/localized_error.h"
 #include "components/file_access/scoped_file_access.h"
 #include "components/file_access/test/mock_scoped_file_access_delegate.h"
 #include "components/guest_view/buildflags/buildflags.h"
@@ -93,7 +84,6 @@
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui_controller.h"
-#include "content/public/common/alternative_error_page_override_info.mojom.h"
 #include "content/public/common/child_process_id.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"
@@ -448,91 +438,6 @@ TEST_F(ChromeContentBrowserClientTest, AutomaticBeaconCredentials) {
       static_cast<int>(content_settings::CookieControlsMode::kBlockThirdParty));
   EXPECT_FALSE(client.AreDeprecatedAutomaticBeaconCredentialsAllowed(
       profile(), GURL("a.test"), url::Origin::Create(GURL("c.test"))));
-}
-
-using TestEnterpriseProxyService = enterprise_net::MockEnterpriseProxyService;
-
-TEST_F(ChromeContentBrowserClientTest,
-       GetAlternativeErrorPageOverrideInfo_EnterpriseProxyError) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {enterprise_net::kEnableDynamicRouteFetching,
-       enterprise_net::kEnterpriseProxyErrorHandling},
-      {});
-
-  EnterpriseProxyServiceFactory::GetInstance()->SetTestingFactory(
-      profile(), base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-        return std::make_unique<TestEnterpriseProxyService>();
-      }));
-  EnterpriseProxyErrorServiceFactory::GetInstance()->SetTestingFactory(
-      profile(), base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-        Profile* p = Profile::FromBrowserContext(context);
-        return std::make_unique<enterprise_net::EnterpriseProxyErrorService>(
-            EnterpriseProxyServiceFactory::GetForProfile(p));
-      }));
-
-  ChromeContentBrowserClient client;
-  content::MockNavigationHandle navigation_handle(
-      GURL("https://target.example.com/test"), /*render_frame_host=*/nullptr);
-
-  // Without EnterpriseProxyNavigationErrorData attached, returns nullptr.
-  EXPECT_FALSE(client.GetAlternativeErrorPageOverrideInfo(
-      navigation_handle, /*render_frame_host=*/nullptr, profile(),
-      net::ERR_PROXY_AUTH_REQUESTED));
-
-  // Attach EnterpriseProxyNavigationErrorData.
-  enterprise_net::EnterpriseProxyErrorDataDelegate delegate(&navigation_handle);
-  delegate.AttachDisguisedErrorData(enterprise_net::EnterpriseProxyErrorData(
-      GURL("https://target.example.com/test"),
-      GURL("https://proxy.example.com:443"), 403));
-
-  auto info = client.GetAlternativeErrorPageOverrideInfo(
-      navigation_handle, /*render_frame_host=*/nullptr, profile(),
-      net::ERR_PROXY_AUTH_REQUESTED);
-
-  ASSERT_TRUE(info);
-  auto override_param = info->alternative_error_page_params.FindBool(
-      error_page::kOverrideErrorPage);
-  ASSERT_TRUE(override_param.has_value());
-  EXPECT_TRUE(*override_param);
-
-  auto is_enterprise_error =
-      info->alternative_error_page_params.FindBool("is_enterprise_proxy_error");
-  ASSERT_TRUE(is_enterprise_error.has_value());
-  EXPECT_TRUE(*is_enterprise_error);
-
-  const auto* html_content =
-      info->alternative_error_page_params.FindString("error_page_html");
-  ASSERT_TRUE(html_content);
-  EXPECT_NE(html_content->find("https://target.example.com/test"),
-            std::string::npos);
-  EXPECT_NE(html_content->find("https://proxy.example.com/"),
-            std::string::npos);
-  EXPECT_NE(html_content->find("403"), std::string::npos);
-}
-
-TEST_F(
-    ChromeContentBrowserClientTest,
-    GetAlternativeErrorPageOverrideInfo_EnterpriseProxyError_FeatureDisabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {enterprise_net::kEnableDynamicRouteFetching},
-      {enterprise_net::kEnterpriseProxyErrorHandling});
-
-  ChromeContentBrowserClient client;
-  content::MockNavigationHandle navigation_handle(
-      GURL("https://target.example.com/test"), /*render_frame_host=*/nullptr);
-
-  enterprise_net::EnterpriseProxyErrorDataDelegate delegate(&navigation_handle);
-  delegate.AttachDisguisedErrorData(enterprise_net::EnterpriseProxyErrorData(
-      GURL("https://target.example.com/test"),
-      GURL("https://proxy.example.com:443"), 403));
-
-  EXPECT_FALSE(client.GetAlternativeErrorPageOverrideInfo(
-      navigation_handle, /*render_frame_host=*/nullptr, profile(),
-      net::ERR_PROXY_AUTH_REQUESTED));
 }
 
 TEST_F(ChromeContentBrowserClientTestWithWebContents,

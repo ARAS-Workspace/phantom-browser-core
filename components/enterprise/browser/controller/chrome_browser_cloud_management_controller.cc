@@ -29,7 +29,6 @@
 #include "components/enterprise/browser/reporting/reporting_features.h"
 #include "components/enterprise/browser/reporting/saas_usage/saas_usage_report_scheduler.h"
 #include "components/enterprise/browser/reporting/saas_usage/saas_usage_reporting_delegate_factory.h"
-#include "components/enterprise/client_certificates/core/certificate_provisioning_service.h"
 #include "components/enterprise/device_trust/core/device_trust_key_manager.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/cloud/client_data_delegate.h"
@@ -57,12 +56,6 @@ const base::FilePath::CharType
 std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
 ChromeBrowserCloudManagementController::Delegate::
     CreateDeviceTrustKeyManager() {
-  return nullptr;
-}
-
-std::unique_ptr<client_certificates::CertificateProvisioningService>
-ChromeBrowserCloudManagementController::Delegate::
-    CreateCertificateProvisioningService() {
   return nullptr;
 }
 
@@ -450,16 +443,6 @@ ChromeBrowserCloudManagementController::GetDeviceTrustKeyManager() {
     device_trust_key_manager_ = delegate_->CreateDeviceTrustKeyManager();
   }
   return device_trust_key_manager_.get();
-}
-
-client_certificates::CertificateProvisioningService*
-ChromeBrowserCloudManagementController::GetCertificateProvisioningService() {
-  if (!certificate_provisioning_service_) {
-    certificate_provisioning_service_ =
-        delegate_->CreateCertificateProvisioningService();
-  }
-
-  return certificate_provisioning_service_.get();
 }
 
 void ChromeBrowserCloudManagementController::NotifyPolicyRegisterFinished(

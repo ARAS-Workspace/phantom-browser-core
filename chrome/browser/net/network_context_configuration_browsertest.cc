@@ -741,7 +741,7 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
             content_settings::CookieControlsMode::kBlockThirdParty));
   }
   SetCookie(CookieType::kFirstParty, CookiePersistenceType::kPersistent,
-            embedded_test_server());
+            &https_server);
 
   std::unique_ptr<network::ResourceRequest> request =
       std::make_unique<network::ResourceRequest>();
@@ -768,6 +768,9 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 std::unique_ptr<net::test_server::HttpResponse> EchoCookieHeader(
     const net::test_server::HttpRequest& request) {
+  if (request.relative_url != "/echocookieheader") {
+    return nullptr;
+  }
   auto response = std::make_unique<net::test_server::BasicHttpResponse>();
   auto it = request.headers.find("Cookie");
   if (it != request.headers.end())
@@ -800,7 +803,7 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
       prefs::kCookieControlsMode,
       static_cast<int>(content_settings::CookieControlsMode::kBlockThirdParty));
   SetCookie(CookieType::kFirstParty, CookiePersistenceType::kPersistent,
-            embedded_test_server());
+            &test_server);
 
   extensions::TestExtensionDir extension_dir;
   extension_dir.WriteManifest(R"({

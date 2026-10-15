@@ -42,10 +42,6 @@ class SaasUsageReportScheduler;
 class SaasUsageReportingDelegateFactory;
 }  // namespace enterprise_reporting
 
-namespace client_certificates {
-class CertificateProvisioningService;
-}  // namespace client_certificates
-
 namespace policy {
 class ChromeBrowserCloudManagementRegistrar;
 class ClientDataDelegate;
@@ -163,11 +159,6 @@ class ChromeBrowserCloudManagementController
     virtual std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
     CreateDeviceTrustKeyManager();
 
-    // Creates a platform-specific client certificate provisioning service
-    // instance.
-    virtual std::unique_ptr<client_certificates::CertificateProvisioningService>
-    CreateCertificateProvisioningService();
-
     // Returns true if the cloud policy manager can be created rightaway of if
     // it should be deferred for some reason depending on the platform (e.g. on
     // Android it should wait for PolicyService initialization).
@@ -281,10 +272,6 @@ class ChromeBrowserCloudManagementController
   // feature flag isn't enabled.
   enterprise_connectors::DeviceTrustKeyManager* GetDeviceTrustKeyManager();
 
-  // Returns a client certificate provisioning service.
-  client_certificates::CertificateProvisioningService*
-  GetCertificateProvisioningService();
-
   enterprise_reporting::ReportScheduler* report_scheduler() {
     return report_scheduler_.get();
   }
@@ -350,9 +337,6 @@ class ChromeBrowserCloudManagementController
 
   std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
       device_trust_key_manager_;
-
-  std::unique_ptr<client_certificates::CertificateProvisioningService>
-      certificate_provisioning_service_;
 
   base::WeakPtrFactory<ChromeBrowserCloudManagementController> weak_factory_{
       this};

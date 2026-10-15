@@ -478,24 +478,6 @@ PrefProxyConfigTrackerImpl::PrefProxyConfigTrackerImpl(
   }
 }
 
-#if BUILDFLAG(ENTERPRISE_PROXY)
-PrefProxyConfigTrackerImpl::PrefProxyConfigTrackerImpl(
-    PrefService* pref_service,
-    scoped_refptr<base::SingleThreadTaskRunner>
-        proxy_config_service_task_runner,
-    policy::PolicyService* policy_service,
-    enterprise_net::EnterpriseProxyService* enterprise_proxy_service)
-    : PrefProxyConfigTrackerImpl(pref_service,
-                                 proxy_config_service_task_runner,
-                                 policy_service) {
-  if (enterprise_proxy_service) {
-    enterprise_proxy_observation_.Observe(enterprise_proxy_service);
-    active_dynamic_routing_config_ =
-        enterprise_proxy_observation_.GetSource()->GetDynamicRoutingConfig();
-  }
-}
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
-
 PrefProxyConfigTrackerImpl::~PrefProxyConfigTrackerImpl() {
   DCHECK(pref_service_ == nullptr);
 }
@@ -519,9 +501,6 @@ void PrefProxyConfigTrackerImpl::DetachFromPrefService() {
   proxy_prefs_.RemoveAll();
   pref_service_ = nullptr;
   proxy_config_service_impl_ = nullptr;
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  enterprise_proxy_observation_.Reset();
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
 }
 
 // static
@@ -716,23 +695,6 @@ void PrefProxyConfigTrackerImpl::OnProxyConfigChanged(
                                 proxy_config_service_impl_, config_state,
                                 config_with_dynamic_routes));
 }
-
-#if BUILDFLAG(ENTERPRISE_PROXY)
-void PrefProxyConfigTrackerImpl::OnDynamicProxyConfigsStatusChanged() {
-  if (!enterprise_proxy_observation_.GetSource()) {
-    return;
-  }
-  active_dynamic_routing_config_ =
-      enterprise_proxy_observation_.GetSource()->GetDynamicRoutingConfig();
-  net::ProxyConfigWithAnnotation config;
-  ProxyPrefs::ConfigState config_state = GetProxyConfig(&config);
-  OnProxyConfigChanged(config_state, config);
-}
-
-void PrefProxyConfigTrackerImpl::OnEnterpriseProxyServiceDestroyed() {
-  enterprise_proxy_observation_.Reset();
-}
-#endif  // BUILDFLAG(ENTERPRISE_PROXY)
 
 bool PrefProxyConfigTrackerImpl::PrefConfigToNetConfig(
     const ProxyConfigDictionary& proxy_dict,

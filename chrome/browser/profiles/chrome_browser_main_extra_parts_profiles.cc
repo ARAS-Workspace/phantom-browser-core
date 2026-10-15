@@ -75,9 +75,6 @@
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
-#include "chrome/browser/enterprise/net/enterprise_network_auth_service_factory.h"
-#include "chrome/browser/enterprise/net/enterprise_proxy_error_service_factory.h"
-#include "chrome/browser/enterprise/net/enterprise_proxy_service_factory.h"
 #include "chrome/browser/enterprise/remote_commands/user_remote_commands_service_factory.h"
 #include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service_factory.h"
 #include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_service.h"
@@ -244,7 +241,6 @@
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
 #include "components/captive_portal/core/buildflags.h"
 #include "components/session_proto_db/persisted_state_db_content.pb.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/password_manager/content/browser/password_manager_log_router_factory.h"
 #include "components/password_manager/content/browser/password_requirements_service_factory.h"
@@ -265,10 +261,6 @@
 #include "third_party/blink/public/common/features_generated.h"
 #include "ui/base/device_form_factor.h"
 #include "ui/webui/buildflags.h"
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "components/enterprise/network_header_injection/core/features.h"  // nogncheck
-#endif
 
 // Per-platform #include blocks, in alphabetical order.
 
@@ -313,11 +305,6 @@
 #include "chrome/browser/ui/startup/first_run_service.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper.h"
 
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-#include "chrome/browser/enterprise/client_certificates/certificate_provisioning_service_factory.h"
-#include "chrome/browser/enterprise/client_certificates/certificate_store_factory.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/idle/idle_service_factory.h"
 #endif
@@ -329,7 +316,6 @@
 #include "chrome/browser/profiles/gaia_info_update_service_factory.h"
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/network_header_injection/http_header_injection_service_factory.h"  // nogncheck
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer_factory.h"
 #endif
 
@@ -549,10 +535,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ChromePolicyBlocklistServiceFactory::GetInstance();
   ChromeSigninClientFactory::GetInstance();
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-  client_certificates::CertificateProvisioningServiceFactory::GetInstance();
-  client_certificates::CertificateStoreFactory::GetInstance();
-#endif
   ClientHintsFactory::GetInstance();
   collaboration::CollaborationServiceFactory::GetInstance();
   collaboration::comments::CommentsServiceFactory::GetInstance();
@@ -589,19 +571,11 @@ void ChromeBrowserMainExtraPartsProfiles::
   DownloadCoreServiceFactory::GetInstance();
   enterprise::ProfileIdServiceFactory::GetInstance();
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  if (enterprise_custom_headers::IsHttpHeaderInjectionEnabled()) {
-    enterprise_custom_headers::HttpHeaderInjectionServiceFactory::GetInstance();
-  }
-#endif
   enterprise_groups::EnterpriseGroupsProfileHandlerFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_idle::IdleServiceFactory::GetInstance();
 #endif
   enterprise_signals::SignalsAggregatorFactory::GetInstance();
-  EnterpriseNetworkAuthServiceFactory::GetInstance();
-  EnterpriseProxyErrorServiceFactory::GetInstance();
-  EnterpriseProxyServiceFactory::GetInstance();
   enterprise_reporting::CloudProfileReportingServiceFactory::GetInstance();
   enterprise_reporting::LegacyTechServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

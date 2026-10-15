@@ -43,11 +43,10 @@ std::unique_ptr<PrefProxyConfigTracker>
 ProxyServiceFactory::CreatePrefProxyConfigTrackerOfProfile(
     PrefService* profile_prefs,
     PrefService* local_state_prefs,
-    policy::PolicyService* policy_service,
-    enterprise_net::EnterpriseProxyService* enterprise_proxy_service) {
+    policy::PolicyService* policy_service) {
   return std::make_unique<PrefProxyConfigTrackerImpl>(
       profile_prefs, /*proxy_config_service_task_runner=*/nullptr,
-      policy_service, enterprise_proxy_service);
+      policy_service);
 }
 
 // static

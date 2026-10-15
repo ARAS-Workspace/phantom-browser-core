@@ -12,7 +12,6 @@
 
 #include "base/task/single_thread_task_runner.h"
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#include "components/enterprise/client_certificates/core/prefs_certificate_store.h"
 #include "extensions/buildflags/buildflags.h"
 
 namespace policy {
@@ -62,16 +61,10 @@ class ChromeBrowserCloudManagementControllerDesktop
   bool ReadyToCreatePolicyManager() override;
   bool ReadyToInit() override;
   std::unique_ptr<ClientDataDelegate> CreateClientDataDelegate() override;
-  std::unique_ptr<client_certificates::CertificateProvisioningService>
-  CreateCertificateProvisioningService() override;
 
  private:
   std::unique_ptr<ChromeBrowserCloudManagementRegisterWatcher>
       cloud_management_register_watcher_;
-
-  // Responsible for storing and retrieving browser-level managed identities.
-  std::unique_ptr<client_certificates::CertificateStore> certificate_store_;
-
 };
 
 }  // namespace policy

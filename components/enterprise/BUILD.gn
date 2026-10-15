@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/enterprise/buildflags/buildflags.gni")
-
 config("extra_warnings") {
   cflags = [ "-Wshadow-field" ]
 }
@@ -140,10 +138,6 @@ static_library("enterprise") {
     "//third_party/abseil-cpp:absl",
   ]
 
-  if (enterprise_client_certificates) {
-    public_deps += [ "//components/enterprise/client_certificates/core" ]
-  }
-
   deps += [ "//components/signin/public/identity_manager" ]
 }
 
@@ -246,18 +240,4 @@ source_set("unit_tests") {
     "//components/signin/public/identity_manager",
     "//components/signin/public/identity_manager:test_support",
   ]
-
-  if (enterprise_client_certificates) {
-    deps += [ "//components/enterprise/client_certificates:unit_tests" ]
-  }
-
-  if (is_linux || is_mac) {
-    deps +=
-        [ "//components/enterprise/network_header_injection/core:unit_tests" ]
-  }
-
-  if (enterprise_proxy) {
-    deps += [ "//components/enterprise/net/core:unit_tests" ]
-    deps += [ "//components/enterprise/net/content:unit_tests" ]
-  }
 }

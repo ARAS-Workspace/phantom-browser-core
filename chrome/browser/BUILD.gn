@@ -15,7 +15,6 @@ import("//chrome/browser/buildflags.gni")
 import("//chrome/browser/downgrade/buildflags.gni")
 import("//chrome/common/features.gni")
 import("//components/captive_portal/core/features.gni")
-import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
@@ -776,8 +775,6 @@ source_set("core") {
     "//components/embedder_support",
     "//components/embedder_support:content_settings",
     "//components/embedder_support:user_agent",
-    "//components/enterprise/net",
-    "//components/enterprise/network_header_injection/core",
     "//components/error_page/content/browser",
     "//components/feature_engagement/public:feature_constants",
     "//components/feed:feature_list",
@@ -932,7 +929,6 @@ source_set("core") {
   if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/captive_portal",
-      "//chrome/browser/enterprise/network_header_injection",
       "//chrome/browser/headless:headless_extra_parts",
       "//chrome/browser/printing",
       "//chrome/browser/record_replay:impl",
@@ -1593,7 +1589,6 @@ source_set("browser") {
     "//components/enterprise",
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion",
-    "//components/enterprise/net",
     "//components/error_page/content/browser",
     "//components/favicon/content",
     "//components/favicon/core",
@@ -2086,10 +2081,6 @@ source_set("browser") {
       "//ui/views",
       "//ui/views/controls/webview",
     ]
-  }
-
-  if (enterprise_client_certificates) {
-    deps += [ "//components/enterprise/client_certificates/core" ]
   }
 
   if (is_linux || is_mac) {

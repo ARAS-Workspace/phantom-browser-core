@@ -49,7 +49,6 @@
 #include "build/build_config.h"
 #include "components/cookie_config/cookie_store_util.h"
 #include "components/domain_reliability/monitor.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/network_session_configurator/browser/network_session_configurator.h"
 #include "components/network_session_configurator/common/network_switches.h"
 #include "components/os_crypt/async/common/encryptor.h"
@@ -119,8 +118,6 @@
 #include "services/network/data_remover_util.h"
 #include "services/network/device_bound_session_manager.h"
 #include "services/network/disk_cache/mojo_backend_file_operations_factory.h"
-#include "services/network/enterprise/encryption/encrypted_backend_file_operations_factory.h"
-#include "services/network/enterprise/encryption/os_crypt_cache_encryption_delegate.h"
 #include "services/network/host_resolver.h"
 #include "services/network/http_auth_cache_proxy_copier.h"
 #include "services/network/http_server_properties_pref_delegate.h"
@@ -2882,34 +2879,7 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
       }
 
       if (params_->enable_encrypted_http_cache) {
-#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
-        // For enterprise users, we always use simple backend when encryption is
-        // enabled.
-        cache_params.type =
-            net::URLRequestContextBuilder::HttpCacheParams::DISK_SIMPLE;
-
-        // For enterprise users, we wrap `BackendFileOperations` to intercept
-        // file I/O with encryption ops, and create and pass in a
-        // `CacheEncryptionDelegate` to encrypt/decrypt cache entries on disk.
-        if (params_->encryption_provider) {
-          std::unique_ptr<net::CacheEncryptionDelegate>
-              cache_encryption_delegate = std::make_unique<
-                  enterprise_encryption::OSCryptCacheEncryptionDelegate>(
-                  std::move(params_->encryption_provider));
-          if (!cache_params.file_operations_factory) {
-            // Since it's the fallback later anyways, explicitly created here to
-            // wrap. EncryptedBackendFileOperationsFactory will wrap this later
-            // when os_crypt_cache_encryption_delegate is created and
-            // initialized.
-            cache_params.file_operations_factory = base::MakeRefCounted<
-                disk_cache::TrivialFileOperationsFactory>();
-          }
-          builder.set_cache_encryption_delegate(
-              std::move(cache_encryption_delegate));
-        }
-#else
         NOTREACHED();
-#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
       }
     }
     cache_params.reset_cache = params_->reset_http_cache_backend;

@@ -84,7 +84,6 @@
 #include "chrome/browser/download/chrome_download_manager_delegate.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/net/enterprise_proxy_error_service_factory.h"
 #include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_service.h"
 #include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
@@ -226,12 +225,6 @@
 #include "components/embedder_support/switches.h"
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/enterprise/common/proto/connectors.pb.h"
-#include "components/enterprise/net/content/enterprise_proxy_navigation_error_data.h"
-#include "components/enterprise/net/core/enterprise_proxy_error_data.h"
-#include "components/enterprise/net/core/enterprise_proxy_error_service.h"
-#include "components/enterprise/net/core/features.h"
-#include "components/enterprise/network_header_injection/core/features.h"
-#include "components/enterprise/network_header_injection/core/http_header_injection_service.h"
 #include "components/error_page/common/error.h"
 #include "components/error_page/common/error_page_switches.h"
 #include "components/error_page/common/localized_error.h"
@@ -456,8 +449,6 @@
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/network_header_injection/http_header_injection_proxying_url_loader_factory.h"
-#include "chrome/browser/enterprise/network_header_injection/http_header_injection_utils.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
@@ -4967,12 +4958,6 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   }
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // Install the HTTP Header Injection proxying factory.
-  enterprise_custom_headers::HttpHeaderInjectionProxyingURLLoaderFactory::
-      MaybeProxyRequest(browser_context, factory_builder);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
   signin::ProxyingURLLoaderFactory::MaybeProxyRequest(
       frame, type == URLLoaderFactoryType::kNavigation, request_initiator,
       isolation_info, factory_builder);
@@ -5007,16 +4992,6 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
 
   MaybeSetTargetNetwork(GetBoundNetworkFromRenderFrameHost(frame),
                         factory_builder, is_for_network_service);
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // WARNING: This must be the last wrapper in the chain for
-  // TrustedURLLoaderHeaderClient. This ensures that our client is the outermost
-  // wrapper of `header_client`, allowing us to apply enterprise headers AFTER
-  // any extensions or other handlers have made their modifications,
-  // guaranteeing enterprise header injection precedence over extensions.
-  enterprise_custom_headers::MaybeWrapTrustedURLLoaderHeaderClient(
-      browser_context, header_client);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 std::vector<std::unique_ptr<content::URLLoaderRequestInterceptor>>
@@ -5113,12 +5088,6 @@ ChromeContentBrowserClient::GetWebSocketOptions(
   content::ContentBrowserClient::WebSocketOptions options;
   options.options = network::mojom::kWebSocketOptionNone;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  if (frame) {
-    enterprise_custom_headers::MaybeCreateWebSocketHeaderClient(
-        frame->GetBrowserContext(), &options.header_client);
-  }
-#endif
   return options;
 }
 
@@ -6414,28 +6383,6 @@ ChromeContentBrowserClient::GetAlternativeErrorPageOverrideInfo(
     content::BrowserContext* browser_context,
     int32_t error_code) {
   const GURL& url = navigation_handle.GetURL();
-  Profile* profile = Profile::FromBrowserContext(browser_context);
-  if (enterprise_net::IsEnterpriseProxyErrorHandlingEnabled() && profile) {
-    auto* error_service =
-        EnterpriseProxyErrorServiceFactory::GetForProfile(profile);
-    if (error_service) {
-      enterprise_net::EnterpriseProxyErrorDataDelegate delegate(
-          &navigation_handle);
-      std::string html_content = error_service->GetErrorPageHTML(&delegate);
-      if (!html_content.empty()) {
-        auto alternative_error_page_override_info =
-            content::mojom::AlternativeErrorPageOverrideInfo::New();
-        alternative_error_page_override_info->alternative_error_page_params.Set(
-            error_page::kOverrideErrorPage, base::Value(true));
-        alternative_error_page_override_info->alternative_error_page_params.Set(
-            "error_page_html", base::Value(std::move(html_content)));
-        alternative_error_page_override_info->alternative_error_page_params.Set(
-            "is_enterprise_proxy_error", base::Value(true));
-        return alternative_error_page_override_info;
-      }
-    }
-  }
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (content::AreIsolatedWebAppsEnabled(browser_context) &&
       IsIsolatedWebAppUrl(url)) {

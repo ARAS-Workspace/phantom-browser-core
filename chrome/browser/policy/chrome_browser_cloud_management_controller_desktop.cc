@@ -49,13 +49,7 @@
 #endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/client_certificates/browser_context_delegate.h"
-#include "chrome/browser/enterprise/client_certificates/cert_utils.h"
 #include "components/enterprise/browser/reporting/saas_usage/saas_usage_reporting_delegate_factory.h"
-#include "components/enterprise/client_certificates/core/browser_cloud_management_delegate.h"
-#include "components/enterprise/client_certificates/core/certificate_provisioning_service.h"
-#include "components/enterprise/client_certificates/core/dm_server_client.h"
-#include "components/enterprise/client_certificates/core/key_upload_client.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace policy {
@@ -217,25 +211,6 @@ bool ChromeBrowserCloudManagementControllerDesktop::ReadyToInit() {
 std::unique_ptr<ClientDataDelegate>
 ChromeBrowserCloudManagementControllerDesktop::CreateClientDataDelegate() {
   return std::make_unique<ClientDataDelegateDesktop>();
-}
-
-std::unique_ptr<client_certificates::CertificateProvisioningService>
-ChromeBrowserCloudManagementControllerDesktop::
-    CreateCertificateProvisioningService() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  if (!certificate_store_) {
-    certificate_store_ =
-        std::make_unique<client_certificates::PrefsCertificateStore>(
-            g_browser_process->local_state(),
-            client_certificates::CreatePrivateKeyFactory());
-  }
-
-  return client_certificates::CreateBrowserCertificateProvisioningService(
-      g_browser_process->local_state(), certificate_store_.get(),
-      GetDeviceManagementService(), GetSharedURLLoaderFactory());
-#else
-  return nullptr;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 }  // namespace policy

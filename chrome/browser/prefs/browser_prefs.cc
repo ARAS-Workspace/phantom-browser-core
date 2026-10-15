@@ -109,11 +109,8 @@
 #include "components/enterprise/browser/groups/groups_prefs.h"
 #include "components/enterprise/browser/identifiers/identifiers_prefs.h"
 #include "components/enterprise/browser/promotion/promotion_prefs.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/device_trust/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
-#include "components/enterprise/net/core/prefs.h"
-#include "components/enterprise/network_header_injection/core/network_header_injection_prefs.h"
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
@@ -316,14 +313,6 @@
 #if BUILDFLAG(IS_LINUX)
 #include "ui/color/system_theme.h"
 #endif
-
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-#include "components/enterprise/client_certificates/core/prefs.h"
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-
-#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
-#include "components/enterprise/encryption/cache/prefs.h"
-#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "chrome/browser/chrome_for_testing/prefs.h"
@@ -984,9 +973,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 #endif
   chrome_urls::RegisterPrefs(registry);
   ChromeMetricsServiceClient::RegisterPrefs(registry);
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-  client_certificates::RegisterLocalStatePrefs(registry);
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
   enterprise_groups::RegisterLocalStatePrefs(registry);
   enterprise_util::RegisterLocalStatePrefs(registry);
   component_updater::RegisterPrefs(registry);
@@ -1169,16 +1155,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   cross_device::RegisterProfilePrefs(registry);
   enterprise::RegisterIdentifiersProfilePrefs(registry);
   enterprise_connectors::RegisterDeviceTrustConnectorProfilePrefs(registry);
-#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-  client_certificates::RegisterProfilePrefs(registry);
-#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
-  enterprise_connectors::RegisterCacheEncryptionProfilePrefs(registry);
-#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
   enterprise_isolated_mode::RegisterProfilePrefs(registry);
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  enterprise_net::RegisterProfilePrefs(registry);
-#endif
   enterprise_promotion::RegisterProfilePrefs(registry);
   enterprise_reporting::RegisterProfilePrefs(registry);
   dom_distiller::DistilledPagePrefs::RegisterProfilePrefs(registry);
@@ -1403,8 +1380,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterDictionaryPref(prefs::kContextMenuAnimationState);
   registry->RegisterListPref(
       webauthn::pref_names::kRemoteDesktopAllowedOrigins);
-
-  enterprise_custom_headers::RegisterProfilePrefs(registry);
 
   registry->RegisterBooleanPref(
       webauthn::pref_names::kRemoteProxiedRequestsAllowed, false);
