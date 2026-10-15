@@ -29,10 +29,6 @@ namespace net {
 class X509Certificate;
 }
 
-namespace permissions {
-class ObjectPermissionContextBase;
-}
-
 namespace ui {
 class Event;
 }
@@ -103,13 +99,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
     USER_CERT_DECISIONS_NOT_REVOKED = 0,
     USER_CERT_DECISIONS_REVOKED = 1,
     END_OF_SSL_CERTIFICATE_DECISIONS_DID_REVOKE_ENUM
-  };
-
-  struct ChooserUIInfo {
-    ContentSettingsType content_settings_type;
-    int description_string_id;
-    int allowed_by_policy_description_string_id;
-    int delete_tooltip_string_id;
   };
 
   // |PermissionInfo| contains information about a single permission |type| for

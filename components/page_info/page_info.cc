@@ -1186,7 +1186,6 @@ bool PageInfo::ShouldShowPermission(
 
 void PageInfo::PresentSitePermissions() {
   PermissionInfoList permission_info_list;
-  ChosenObjectInfoList chosen_object_info_list;
 
   HostContentSettingsMap* content_settings = GetContentSettings();
   DCHECK(web_contents_);
@@ -1233,8 +1232,7 @@ void PageInfo::PresentSitePermissions() {
     }
   }
 
-  ui_->SetPermissionInfo(permission_info_list,
-                         std::move(chosen_object_info_list));
+  ui_->SetPermissionInfo(permission_info_list);
 }
 
 std::set<net::SchemefulSite> PageInfo::GetTwoSitePermissionRequesters(

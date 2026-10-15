@@ -558,7 +558,6 @@ group("all_rust") {
   deps = [
     ":rust_build_tests",
     "//base:base_unittests",  # There is rust stuff in here.
-    "//third_party/cloud_authenticator/processor",
   ]
 
   deps += [ "//testing/rust_gtest_interop:rust_gtest_interop_unittests" ]

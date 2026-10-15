@@ -22,7 +22,7 @@ use_small_heuristics = "Max"
 # Third party code is formatted upstream.
 # Please use negative pattern (!path) for any path you do want to format.
 ignore = [
-  # Ignore third-party code - e.g. `third_party/cloud_authenticator`.
+  # Ignore third-party code.
   "third_party/**",
 
   # Un-ignore Rust sources in Blink.

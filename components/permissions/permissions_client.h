@@ -39,7 +39,6 @@ class CookieSettings;
 }
 
 namespace permissions {
-class ObjectPermissionContextBase;
 class PermissionActionsHistory;
 class PermissionDecisionAutoBlocker;
 class PermissionPromptAndroid;
@@ -88,13 +87,6 @@ class PermissionsClient {
   // pointer has the same lifetime as |browser_context|.
   virtual PermissionDecisionAutoBlocker* GetPermissionDecisionAutoBlocker(
       content::BrowserContext* browser_context) = 0;
-
-  // Gets the ObjectPermissionContextBase for the given type and context, which
-  // must be a
-  // *_CHOOSER_DATA value. May return null if the context does not exist.
-  virtual ObjectPermissionContextBase* GetChooserContext(
-      content::BrowserContext* browser_context,
-      ContentSettingsType type) = 0;
 
   // Gets the embedder defined engagement score for this |origin|.
   virtual double GetSiteEngagementScore(

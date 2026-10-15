@@ -67,12 +67,6 @@ TestPermissionsClient::GetPermissionDecisionAutoBlocker(
   return &autoblocker_;
 }
 
-ObjectPermissionContextBase* TestPermissionsClient::GetChooserContext(
-    content::BrowserContext* browser_context,
-    ContentSettingsType type) {
-  return nullptr;
-}
-
 void TestPermissionsClient::GetUkmSourceId(
     ContentSettingsType permission_type,
     content::BrowserContext* browser_context,

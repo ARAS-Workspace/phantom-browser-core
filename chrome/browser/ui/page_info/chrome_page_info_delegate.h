@@ -23,7 +23,6 @@ class PageSpecificContentSettings;
 }
 
 namespace permissions {
-class ObjectPermissionContextBase;
 class PermissionDecisionAutoBlocker;
 class PermissionActionsHistory;
 }  // namespace permissions

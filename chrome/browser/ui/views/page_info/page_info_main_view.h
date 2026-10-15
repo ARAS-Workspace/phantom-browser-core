@@ -69,8 +69,8 @@ class PageInfoMainView : public views::View,
   ~PageInfoMainView() override;
 
   // PageInfoUI implementations.
-  void SetPermissionInfo(const PermissionInfoList& permission_info_list,
-                         ChosenObjectInfoList chosen_object_info_list) override;
+  void SetPermissionInfo(
+      const PermissionInfoList& permission_info_list) override;
   void SetIdentityInfo(const IdentityInfo& identity_info) override;
   void SetPageFeatureInfo(const PageFeatureInfo& info) override;
   void SetCookieInfo(const CookiesInfo& cookie_info) override;

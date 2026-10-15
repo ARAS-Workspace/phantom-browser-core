@@ -209,13 +209,6 @@ bool ChromePermissionsClient::IsSubresourceFilterActivated(
       ->GetSiteActivationFromMetadata(url);
 }
 
-permissions::ObjectPermissionContextBase*
-ChromePermissionsClient::GetChooserContext(
-    content::BrowserContext* browser_context,
-    ContentSettingsType type) {
-  NOTREACHED();
-}
-
 permissions::OriginKeyedPermissionActionService*
 ChromePermissionsClient::GetOriginKeyedPermissionActionService(
     content::BrowserContext* browser_context) {

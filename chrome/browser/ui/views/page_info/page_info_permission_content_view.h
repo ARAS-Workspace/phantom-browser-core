@@ -65,8 +65,8 @@ class PageInfoPermissionContentView
   ~PageInfoPermissionContentView() override;
 
   // PageInfoUI implementations.
-  void SetPermissionInfo(const PermissionInfoList& permission_info_list,
-                         ChosenObjectInfoList chosen_object_info_list) override;
+  void SetPermissionInfo(
+      const PermissionInfoList& permission_info_list) override;
 
   const raw_ptr<views::ToggleButton> GetToggleButtonForTesting() const {
     return toggle_button_;

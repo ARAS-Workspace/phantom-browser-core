@@ -9,13 +9,11 @@
 #include <string>
 #include <vector>
 
-#include "base/memory/raw_ref.h"
 #include "build/build_config.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/cookie_controls_state.h"
 #include "components/page_info/page_info.h"
-#include "components/permissions/object_permission_context_base.h"
 #include "ui/base/models/image_model.h"
 
 #include "ui/gfx/image/image_skia.h"
@@ -99,21 +97,6 @@ class PageInfoUI {
     bool is_incognito = false;
   };
 
-  // |ChosenObjectInfo| contains information about a single |chooser_object| of
-  // a chooser |type| that the current website has been granted access to.
-  struct ChosenObjectInfo {
-    ChosenObjectInfo(
-        const PageInfo::ChooserUIInfo& ui_info,
-        std::unique_ptr<permissions::ObjectPermissionContextBase::Object>
-            chooser_object);
-    ~ChosenObjectInfo();
-    // |ui_info| for this chosen object type.
-    const raw_ref<const PageInfo::ChooserUIInfo> ui_info;
-    // The opaque |chooser_object| representing the thing the user selected.
-    std::unique_ptr<permissions::ObjectPermissionContextBase::Object>
-        chooser_object;
-  };
-
   // |IdentityInfo| contains information about the site's identity and
   // connection.
   struct IdentityInfo {
@@ -160,9 +143,7 @@ class PageInfoUI {
     int string_id_mid_sentence;
   };
 
-
   using PermissionInfoList = std::vector<PageInfo::PermissionInfo>;
-  using ChosenObjectInfoList = std::vector<std::unique_ptr<ChosenObjectInfo>>;
 
   virtual ~PageInfoUI();
 
@@ -219,9 +200,8 @@ class PageInfoUI {
   virtual void SetCookieInfo(const CookiesInfo& cookie_info) {}
 
   // Sets permission information.
-  virtual void SetPermissionInfo(const PermissionInfoList& permission_info_list,
-                                 ChosenObjectInfoList chosen_object_info_list) {
-  }
+  virtual void SetPermissionInfo(
+      const PermissionInfoList& permission_info_list) {}
 
   // Sets site identity information.
   virtual void SetIdentityInfo(const IdentityInfo& identity_info) {}
@@ -236,6 +216,5 @@ class PageInfoUI {
 };
 
 typedef PageInfoUI::PermissionInfoList PermissionInfoList;
-typedef PageInfoUI::ChosenObjectInfoList ChosenObjectInfoList;
 
 #endif  // COMPONENTS_PAGE_INFO_PAGE_INFO_UI_H_

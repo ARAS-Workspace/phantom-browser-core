@@ -137,12 +137,6 @@ class TestPermissionsClient : public permissions::PermissionsClient {
       content::BrowserContext* browser_context) override {
     return nullptr;
   }
-
-  permissions::ObjectPermissionContextBase* GetChooserContext(
-      content::BrowserContext* browser_context,
-      ContentSettingsType type) override {
-    return nullptr;
-  }
 };
 
 class MockPermissionController : public content::MockPermissionController {

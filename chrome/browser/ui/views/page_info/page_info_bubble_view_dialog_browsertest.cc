@@ -269,7 +269,6 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
         permissions_list.push_back(info);
       }
 
-      ChosenObjectInfoList chosen_object_list;
       PageInfo* presenter = GetPresenter();
       EXPECT_TRUE(presenter);
       EXPECT_TRUE(presenter->ui_for_testing());
@@ -285,8 +284,7 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
       main_page->toggle_rows_.clear();
       main_page->permissions_view_->RemoveAllChildViews();
 
-      current_ui->SetPermissionInfo(permissions_list,
-                                    std::move(chosen_object_list));
+      current_ui->SetPermissionInfo(permissions_list);
     }
 
     if (name == kSecureSubpage || name == kEvSecureSubpage) {

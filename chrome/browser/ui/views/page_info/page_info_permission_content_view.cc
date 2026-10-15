@@ -224,8 +224,7 @@ PageInfoPermissionContentView::~PageInfoPermissionContentView() {
 }
 
 void PageInfoPermissionContentView::SetPermissionInfo(
-    const PermissionInfoList& permission_info_list,
-    ChosenObjectInfoList chosen_object_info_list) {
+    const PermissionInfoList& permission_info_list) {
   auto permission_it = std::ranges::find(permission_info_list, type_,
                                          &PageInfo::PermissionInfo::type);
 

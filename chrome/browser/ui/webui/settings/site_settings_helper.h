@@ -28,10 +28,6 @@ namespace content {
 class WebUI;
 }
 
-namespace permissions {
-class ObjectPermissionContextBase;
-}
-
 namespace web_app {
 class IsolatedWebAppUrlInfo;
 }  // namespace web_app

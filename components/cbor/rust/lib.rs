@@ -5,8 +5,8 @@
 //! `cbor` implements the subset of CBOR used in [CTAP2][1], with optional
 //! extensions to support Chromium-specific requirements.
 //!
-//! Note: The core of this parser was originally imported from
-//! `//third_party/cloud_authenticator/cbor`. It was subsequently modified
+//! Note: The core of this parser was originally imported from the cloud
+//! authenticator CBOR code. It was subsequently modified
 //! to support Chromium CBOR requirements. It will be wrapped in FFI and
 //! eventually replace the current C++ parser.
 //!

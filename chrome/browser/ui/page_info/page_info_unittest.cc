@@ -122,17 +122,14 @@ class MockPageInfoUI : public PageInfoUI {
   MOCK_METHOD(void, SetPageFeatureInfo, (const PageFeatureInfo& info));
 
   void SetPermissionInfo(
-      const PermissionInfoList& permission_info_list,
-      ChosenObjectInfoList chosen_object_info_list) override {
+      const PermissionInfoList& permission_info_list) override {
     SetPermissionInfoStub();
     if (set_permission_info_callback_) {
-      set_permission_info_callback_.Run(permission_info_list,
-                                        std::move(chosen_object_info_list));
+      set_permission_info_callback_.Run(permission_info_list);
     }
   }
 
-  base::RepeatingCallback<void(const PermissionInfoList& permission_info_list,
-                               ChosenObjectInfoList chosen_object_info_list)>
+  base::RepeatingCallback<void(const PermissionInfoList& permission_info_list)>
       set_permission_info_callback_;
 };
 
@@ -199,12 +196,7 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
     origin_ = url::Origin::Create(url_);
   }
 
-  void SetPermissionInfo(const PermissionInfoList& permission_info_list,
-                         ChosenObjectInfoList chosen_object_info_list) {
-    last_chosen_object_info_.clear();
-    for (auto& chosen_object_info : chosen_object_info_list) {
-      last_chosen_object_info_.push_back(std::move(chosen_object_info));
-    }
+  void SetPermissionInfo(const PermissionInfoList& permission_info_list) {
     last_permission_info_list_ = permission_info_list;
   }
 
@@ -228,10 +220,6 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
   const url::Origin& origin() const { return origin_; }
   scoped_refptr<net::X509Certificate> cert() { return cert_; }
   MockPageInfoUI* mock_ui() { return mock_ui_.get(); }
-  const std::vector<std::unique_ptr<PageInfoUI::ChosenObjectInfo>>&
-  last_chosen_object_info() {
-    return last_chosen_object_info_;
-  }
   const PermissionInfoList& last_permission_info_list() {
     return last_permission_info_list_;
   }
@@ -315,8 +303,6 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
   scoped_refptr<net::X509Certificate> cert_;
   GURL url_;
   url::Origin origin_;
-  std::vector<std::unique_ptr<PageInfoUI::ChosenObjectInfo>>
-      last_chosen_object_info_;
   PermissionInfoList last_permission_info_list_;
   base::test::ScopedFeatureList scoped_feature_list_;
 };

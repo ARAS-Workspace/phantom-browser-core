@@ -332,14 +332,6 @@ PageInfoUI::CookiesRwsInfo::CookiesRwsInfo(const std::u16string& owner_name)
 
 PageInfoUI::CookiesRwsInfo::~CookiesRwsInfo() = default;
 
-PageInfoUI::ChosenObjectInfo::ChosenObjectInfo(
-    const PageInfo::ChooserUIInfo& ui_info,
-    std::unique_ptr<permissions::ObjectPermissionContextBase::Object>
-        chooser_object)
-    : ui_info(ui_info), chooser_object(std::move(chooser_object)) {}
-
-PageInfoUI::ChosenObjectInfo::~ChosenObjectInfo() = default;
-
 PageInfoUI::IdentityInfo::IdentityInfo()
     : identity_status(PageInfo::SITE_IDENTITY_STATUS_UNKNOWN),
       safety_tip_info({security_state::SafetyTipStatus::kUnknown, GURL()}),

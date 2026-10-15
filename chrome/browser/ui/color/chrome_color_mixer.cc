@@ -545,9 +545,6 @@ void AddChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorOmniboxIntentChipBackground] = {
       ui::kColorSysBaseContainerElevated};
   mixer[kColorOmniboxIntentChipIcon] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorPageInfoChosenObjectDeleteButtonIcon] = {ui::kColorIcon};
-  mixer[kColorPageInfoChosenObjectDeleteButtonIconDisabled] = {
-      ui::kColorIconDisabled};
   mixer[kColorParentAccessViewLocalWebApprovalBackground] = {
       // The background needs to match a custom static color used in Google Kids
       // Ui server.
