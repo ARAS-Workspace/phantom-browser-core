@@ -8,9 +8,11 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "base/check.h"
+#include "base/containers/fixed_flat_set.h"
 #include "base/feature_list.h"
 #include "base/files/file_util.h"
 #include "base/functional/bind.h"
@@ -101,6 +103,76 @@ DefaultDownloadDirectory& GetDefaultDownloadDirectorySingleton() {
   return *instance;
 }
 
+// File types that are disallowed from being opened automatically on macOS,
+// the DISALLOW_AUTO_OPEN entries of the download file type policies.
+constexpr auto kDisallowedAutoOpenExtensions =
+    base::MakeFixedFlatSet<std::string_view>({"action",
+                                              "applescript",
+                                              "as",
+                                              "atloc",
+                                              "bash",
+                                              "caction",
+                                              "cdr",
+                                              "class",
+                                              "command",
+                                              "configprofile",
+                                              "cpgz",
+                                              "csh",
+                                              "dart",
+                                              "dc42",
+                                              "definition",
+                                              "diskcopy42",
+                                              "dmg",
+                                              "dmgpart",
+                                              "dvdr",
+                                              "dylib",
+                                              "efi",
+                                              "fileloc",
+                                              "ftploc",
+                                              "img",
+                                              "imgpart",
+                                              "inetloc",
+                                              "internetconnect",
+                                              "jar",
+                                              "jnlp",
+                                              "ksh",
+                                              "mobileconfig",
+                                              "mpkg",
+                                              "ndif",
+                                              "networkconnect",
+                                              "osas",
+                                              "osax",
+                                              "oxt",
+                                              "pax",
+                                              "pkg",
+                                              "pl",
+                                              "py",
+                                              "pyc",
+                                              "pyd",
+                                              "pyo",
+                                              "pyw",
+                                              "pyz",
+                                              "pyzw",
+                                              "rb",
+                                              "scpt",
+                                              "scptd",
+                                              "seplugin",
+                                              "service",
+                                              "sh",
+                                              "shar",
+                                              "smi",
+                                              "sparsebundle",
+                                              "sparseimage",
+                                              "spl",
+                                              "swf",
+                                              "tcsh",
+                                              "toast",
+                                              "udif",
+                                              "webloc",
+                                              "wflow",
+                                              "workflow",
+                                              "xip"});
+
 }  // namespace
 
 DownloadPrefs::DownloadPrefs(Profile* profile) : profile_(profile) {
@@ -175,6 +247,19 @@ DownloadPrefs::DownloadPrefs(Profile* profile) : profile_(profile) {
     // next time SaveAutoOpenState() is called.
     if (extension.empty() ||
         *extension.begin() == base::FilePath::kExtensionSeparator) {
+      continue;
+    }
+    // Construct something like ".<extension>", since
+    // IsAllowedToOpenAutomatically() needs a filename.
+    base::FilePath filename_with_extension = base::FilePath(
+        base::FilePath::StringType(1, base::FilePath::kExtensionSeparator) +
+        extension);
+
+    // Note that the list of file types that are not allowed to open
+    // automatically can change in the future. When the list is tightened, it is
+    // expected that some entries in the users' auto open list will get dropped
+    // permanently as a result.
+    if (!IsAllowedToOpenAutomatically(filename_with_extension)) {
       continue;
     }
     auto_open_by_user_.insert(extension);
@@ -320,8 +405,26 @@ bool DownloadPrefs::IsAutoOpenByPolicy(const GURL& url,
          !auto_open_allowed_by_urls_->IsURLBlocked(fixed_url);
 }
 
+// static
+bool DownloadPrefs::IsAllowedToOpenAutomatically(const base::FilePath& file) {
+  // Remove trailing space and period characters from the file name.
+  base::FilePath::StringType basename = file.BaseName().value();
+  base::FilePath::StringViewType trimmed =
+      base::TrimString(basename, FILE_PATH_LITERAL(". "), base::TRIM_TRAILING);
+  std::string extension = base::ToLowerASCII(
+      base::FilePath(base::FilePath(trimmed).FinalExtension()).MaybeAsASCII());
+  if (!extension.empty() && extension[0] == '.') {
+    extension.erase(0, 1);
+  }
+  return !extension.empty() &&
+         !kDisallowedAutoOpenExtensions.contains(extension);
+}
+
 bool DownloadPrefs::EnableAutoOpenByUserBasedOnExtension(
     const base::FilePath& file_name) {
+  if (!IsAllowedToOpenAutomatically(file_name)) {
+    return false;
+  }
   base::FilePath::StringType extension = file_name.Extension();
   if (extension[0] != base::FilePath::kExtensionSeparator) {
     return false;

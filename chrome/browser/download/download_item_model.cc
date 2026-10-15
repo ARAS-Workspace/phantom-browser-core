@@ -519,6 +519,8 @@ bool DownloadItemModel::IsCommandEnabled(
       // filename. Don't base an "Always open" decision based on it. Also
       // exclude extensions.
       return download_->CanOpenDownload() &&
+             DownloadPrefs::IsAllowedToOpenAutomatically(
+                 download_->GetTargetFilePath()) &&
              !IsExtensionDownload();
     case DownloadCommands::PAUSE:
       return !download_->IsSavePackageDownload() &&

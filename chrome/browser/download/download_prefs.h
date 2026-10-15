@@ -103,6 +103,10 @@ class DownloadPrefs {
   // latter.
   bool EnableAutoOpenByUserBasedOnExtension(const base::FilePath& file_name);
 
+  // Returns false for a file without an extension and for the file types
+  // that are disallowed from being opened automatically.
+  static bool IsAllowedToOpenAutomatically(const base::FilePath& file);
+
   // Disables auto-open based on file extension.
   void DisableAutoOpenByUserBasedOnExtension(const base::FilePath& file_name);
 
