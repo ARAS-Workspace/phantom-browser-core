@@ -117,7 +117,7 @@ TEST_F(CookieSettingsFactoryTest, IncognitoBehaviorOfBlockingEverything) {
       net::CookieSettingOverrides(), /*cookie_partition_key=*/std::nullopt));
 }
 
-// Tests that cookie blocking is not enabled by default for guest profiles.
+// Tests that cookie blocking is enabled by default for guest profiles.
 TEST_F(CookieSettingsFactoryTest, GuestProfile) {
   TestingProfile::Builder guest_profile_builder;
   guest_profile_builder.SetGuestSession();
@@ -126,9 +126,9 @@ TEST_F(CookieSettingsFactoryTest, GuestProfile) {
       guest_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
   scoped_refptr<content_settings::CookieSettings> guest_settings =
       CookieSettingsFactory::GetForProfile(profile_to_use);
-  EXPECT_FALSE(guest_settings->ShouldBlockThirdPartyCookies());
+  EXPECT_TRUE(guest_settings->ShouldBlockThirdPartyCookies());
 
-  // OTOH, cookie blocking is default for an incognito profile.
+  // Cookie blocking is also default for an incognito profile.
   EXPECT_TRUE(CookieSettingsFactory::GetForProfile(
                   profile_.GetPrimaryOTRProfile(/*create_if_needed=*/true))
                   ->ShouldBlockThirdPartyCookies());

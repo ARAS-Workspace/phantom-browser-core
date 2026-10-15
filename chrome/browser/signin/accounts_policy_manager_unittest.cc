@@ -4,10 +4,12 @@
 
 #include "chrome/browser/signin/accounts_policy_manager.h"
 
+#include "base/auto_reset.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "build/buildflag.h"
 #include "chrome/browser/profiles/profile_manager.h"
+#include "chrome/browser/profiles/profiles_state.h"
 #include "chrome/browser/signin/accounts_policy_manager_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
@@ -97,6 +99,10 @@ class AccountsPolicyManagerTest : public testing::Test {
 
  private:
   content::BrowserTaskEnvironment task_environment_;
+  // Profile deletion returns before Profile::Wipe(); see
+  // profiles::DisableBrowsingDataRemovalForTesting().
+  base::AutoReset<bool> browsing_data_removal_disabled_ =
+      profiles::DisableBrowsingDataRemovalForTesting();
   TestingProfileManager profile_manager_;
   base::WeakPtr<Profile> profile_ = nullptr;
   std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>

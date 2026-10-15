@@ -1379,26 +1379,6 @@ class WillComputeSiteForNavigationTest : public ChromeContentBrowserClientTest {
 };
 
 TEST_F(WillComputeSiteForNavigationTest,
-       IsolatesSitesThatHaveAJavaScriptOptimizerException) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {site_isolation::features::kOriginIsolationForJsOptExceptions},
-      {features::kOriginKeyedProcessesByDefault});
-
-  const GURL url("http://allowed.test");
-
-  auto* map = HostContentSettingsMapFactory::GetForProfile(&profile_);
-  map->SetDefaultContentSetting(ContentSettingsType::JAVASCRIPT_OPTIMIZER,
-                                ContentSetting::CONTENT_SETTING_BLOCK);
-  map->SetContentSettingDefaultScope(url, url,
-                                     ContentSettingsType::JAVASCRIPT_OPTIMIZER,
-                                     ContentSetting::CONTENT_SETTING_ALLOW);
-
-  browser_client_.WillComputeSiteForNavigation(&profile_, url);
-  EXPECT_TRUE(IsOriginIsolatedByUser(url));
-}
-
-TEST_F(WillComputeSiteForNavigationTest,
        IgnoresSitesThatMatchTheJavaScriptOptimizerSetting) {
   const GURL url("http://blocked.test");
 

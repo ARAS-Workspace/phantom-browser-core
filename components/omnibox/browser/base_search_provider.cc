@@ -374,17 +374,13 @@ bool BaseSearchProvider::CanSendSuggestRequest(
     return false;
   }
 
-  // Don't make a suggest request if in incognito mode; unless for the Lens
-  // searchboxes.
-  if (client->IsOffTheRecord() &&
-      !omnibox::IsLensSearchbox(page_classification)) {
+  // Don't make a suggest request if in incognito mode.
+  if (client->IsOffTheRecord()) {
     return false;
   }
 
-  // Don't make a suggest request if suggest is not enabled; unless for the Lens
-  // searchboxes.
-  if (!client->SearchSuggestEnabled() &&
-      !omnibox::IsLensSearchbox(page_classification)) {
+  // Don't make a suggest request if suggest is not enabled.
+  if (!client->SearchSuggestEnabled()) {
     return false;
   }
 
@@ -435,10 +431,9 @@ bool BaseSearchProvider::CanSendSuggestRequestWithPageURL(
 
   // Forbid sending the current page URL to the suggest endpoint if
   // URL data collection is off; unless the current page is the provider's
-  // Search Results Page; or for the Lens searchboxes.
+  // Search Results Page.
   if (!client->IsUrlDataCollectionActive() &&
-      !template_url->IsSearchURL(current_page_url, search_terms_data) &&
-      !omnibox::IsLensSearchbox(page_classification)) {
+      !template_url->IsSearchURL(current_page_url, search_terms_data)) {
     return false;
   }
 

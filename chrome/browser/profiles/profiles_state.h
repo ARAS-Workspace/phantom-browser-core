@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include "base/auto_reset.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 
@@ -103,6 +104,11 @@ void UpdateGaiaProfileInfoIfNeeded(Profile* profile);
 // If the profile given by |profile_path| is loaded in the ProfileManager, use
 // a BrowsingDataRemover to delete all the Profile's data.
 void RemoveBrowsingDataForProfile(const base::FilePath& profile_path);
+
+// While the returned object lives, RemoveBrowsingDataForProfile() returns
+// before Profile::Wipe(). Unit test profiles lack the services that the
+// browsing data removal reaches.
+[[nodiscard]] base::AutoReset<bool> DisableBrowsingDataRemovalForTesting();
 
 // Returns true if the current session is a Demo session.
 bool IsDemoSession();

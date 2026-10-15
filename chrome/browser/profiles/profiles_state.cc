@@ -46,6 +46,12 @@
 
 namespace profiles {
 
+namespace {
+
+bool g_browsing_data_removal_disabled_for_testing = false;
+
+}  // namespace
+
 bool IsMultipleProfilesEnabled() {
   return true;
 }
@@ -261,6 +267,10 @@ void UpdateGaiaProfileInfoIfNeeded(Profile* profile) {
 }
 
 void RemoveBrowsingDataForProfile(const base::FilePath& profile_path) {
+  if (g_browsing_data_removal_disabled_for_testing) {
+    return;
+  }
+
   Profile* profile =
       g_browser_process->profile_manager()->GetProfileByPath(profile_path);
   if (!profile)
@@ -271,6 +281,11 @@ void RemoveBrowsingDataForProfile(const base::FilePath& profile_path) {
     profile = profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
 
   profile->Wipe();
+}
+
+base::AutoReset<bool> DisableBrowsingDataRemovalForTesting() {
+  return base::AutoReset<bool>(&g_browsing_data_removal_disabled_for_testing,
+                               true);
 }
 
 bool IsDemoSession() {

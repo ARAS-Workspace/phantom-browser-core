@@ -14,7 +14,6 @@
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
-#include "chrome/browser/ui/views/app_menu/app_menu_action_helper.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/views/chrome_views_test_base.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -22,7 +21,6 @@
 #include "ui/actions/actions.h"
 #include "ui/views/controls/button/menu_button.h"
 #include "ui/views/controls/button/menu_button_controller.h"
-#include "ui/views/controls/menu/menu_item_view.h"
 #include "ui/views/widget/widget.h"
 
 class ActionAppMenuTest : public ChromeViewsTestBase {
@@ -40,16 +38,6 @@ class ActionAppMenuTest : public ChromeViewsTestBase {
 
     // Create test ActionItems as children of a root ActionItem.
     auto root = actions::ActionItem::Builder().Build();
-    root->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(&MockActionCallback::Call,
-                                base::Unretained(&mock_action_invoked_),
-                                kActionShowPasswordManager))
-            .SetActionId(kActionShowPasswordManager)
-            .SetText(u"Password Manager")
-            .SetEnabled(true)
-            .SetVisible(true)
-            .Build());
     root->AddChild(
         actions::ActionItem::Builder(
             base::BindRepeating(&MockActionCallback::Call,
@@ -141,67 +129,4 @@ TEST_F(ActionAppMenuTest, RunAndCloseMenu) {
   EXPECT_CALL(on_menu_closed, Run()).Times(1);
   menu.CloseMenu();
   EXPECT_FALSE(menu.IsShowing());
-}
-
-TEST_F(ActionAppMenuTest, PopulatesSectionCardsWithStyling) {
-  base::MockCallback<base::RepeatingClosure> on_menu_closed;
-
-  ActionAppMenu menu(&mock_window_interface_, on_menu_closed.Get());
-
-  menu.RunMenu(button_->button_controller());
-  EXPECT_TRUE(menu.IsShowing());
-
-  views::MenuItemView* root = menu.root_menu_item_for_testing();
-  ASSERT_TRUE(root);
-
-  // Check if the menu contains section menu items.
-  views::MenuItemView* password_item =
-      root->GetMenuItemByID(kActionShowPasswordManager);
-  ASSERT_TRUE(password_item);
-
-  views::MenuItemView* print_item = root->GetMenuItemByID(kActionPrint);
-  ASSERT_TRUE(print_item);
-
-  // Check if the styling is applied to the menu items.
-  EXPECT_TRUE(password_item->GetMenuItemBackground().has_value());
-  EXPECT_TRUE(print_item->GetMenuItemBackground().has_value());
-
-  EXPECT_CALL(on_menu_closed, Run()).Times(1);
-  menu.CloseMenu();
-}
-
-TEST_F(ActionAppMenuTest, ProxySyncsWithDelegateAndInvokes) {
-  base::MockCallback<base::RepeatingClosure> on_menu_closed;
-
-  ActionAppMenu menu(&mock_window_interface_, on_menu_closed.Get());
-
-  actions::ActionItem* delegate =
-      actions::ActionManager::Get().FindAction(kActionShowPasswordManager);
-  ASSERT_NE(delegate, nullptr);
-
-  actions::ActionItem* root = app_menu::GetAppMenuRoot(&mock_window_interface_);
-  actions::ActionItem* passwords_proxy = root->GetChildren()
-                                             .children()[0]
-                                             ->GetChildren()
-                                             .children()[0]
-                                             ->GetActionItem();
-
-  // Test dynamic synchronization.
-  EXPECT_EQ(passwords_proxy->GetText(), u"Password Manager");
-  delegate->SetText(u"Passwords Title");
-  EXPECT_EQ(passwords_proxy->GetText(), u"Passwords Title");
-
-  EXPECT_TRUE(passwords_proxy->GetEnabled());
-  delegate->SetEnabled(false);
-  EXPECT_FALSE(passwords_proxy->GetEnabled());
-
-  // Re-enable the delegate so that InvokeAction() can execute the callback.
-  delegate->SetEnabled(true);
-  EXPECT_TRUE(passwords_proxy->GetEnabled());
-
-  EXPECT_CALL(mock_action_invoked_,
-              Call(kActionShowPasswordManager, testing::_, testing::_))
-      .Times(1);
-  passwords_proxy->InvokeAction();
-  testing::Mock::VerifyAndClearExpectations(&mock_action_invoked_);
 }

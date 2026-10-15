@@ -60,7 +60,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
                .show_recently_closed_tabs
            ? AutocompleteProvider::TYPE_RECENTLY_CLOSED_TABS
            : 0) |
-      AutocompleteProvider::TYPE_CONTEXTUAL_SEARCH |
       (history_clusters::GetConfig().is_journeys_enabled_no_locale_check &&
                history_clusters::GetConfig().omnibox_history_cluster_provider
            ? AutocompleteProvider::TYPE_HISTORY_CLUSTER_PROVIDER

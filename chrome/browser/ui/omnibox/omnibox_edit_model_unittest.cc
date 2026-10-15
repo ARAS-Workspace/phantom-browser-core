@@ -698,10 +698,10 @@ TEST_F(OmniboxEditModelPopupTest,
   ASSERT_TRUE(nonfeatured_turl);
 
   // Create matches
-  AutocompleteMatch gemini_match(nullptr, 0, false,
-                                 AutocompleteMatchType::STARTER_PACK);
-  gemini_match.keyword = u"@gemini";
-  gemini_match.associated_keyword = u"@gemini";
+  AutocompleteMatch bookmarks_match(nullptr, 0, false,
+                                    AutocompleteMatchType::STARTER_PACK);
+  bookmarks_match.keyword = u"@bookmarks";
+  bookmarks_match.associated_keyword = u"@bookmarks";
 
   AutocompleteMatch sitesearch_featured_match(
       nullptr, 0, false, AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH);
@@ -715,7 +715,7 @@ TEST_F(OmniboxEditModelPopupTest,
 
   // Create a result with matches.
   ACMatches matches;
-  matches.push_back(gemini_match);
+  matches.push_back(bookmarks_match);
   matches.push_back(sitesearch_featured_match);
   matches.push_back(sitesearch_nonfeatured_match);
   AutocompleteResult* result = &AutocompleteControllerPublishedResult();
@@ -727,7 +727,7 @@ TEST_F(OmniboxEditModelPopupTest,
     std::u16string input_text;
     std::u16string expected_label;
   } test_cases[] = {
-      {0, u"@gemini", u"@gemini, Ask Gemini"},
+      {0, u"@bookmarks", u"@bookmarks, Search Bookmarks"},
       {1, u"@sitesearch", u"@sitesearch, Search SiteSearch"},
       {2, u"sitesearch", u"Search SiteSearch"},
   };

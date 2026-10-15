@@ -334,10 +334,6 @@ class AutocompleteController : public AutocompleteProviderListener,
                            NoActionsAttachedToNtpComposeboxMatches);
   FRIEND_TEST_ALL_PREFIXES(AutocompleteControllerTest,
                            ContextualQueryAppendsSearchboxStats);
-  FRIEND_TEST_ALL_PREFIXES(AutocompleteControllerTest,
-                           ContextualSearchActionAttachedPageKeywordMode);
-  FRIEND_TEST_ALL_PREFIXES(AutocompleteControllerTest,
-                           ContextualSearchActionAttachedInZeroSuggest);
   FRIEND_TEST_ALL_PREFIXES(AutocompleteProviderTest,
                            RedundantKeywordsIgnoredInResult);
   FRIEND_TEST_ALL_PREFIXES(AutocompleteProviderTest, UpdateSearchboxStats);

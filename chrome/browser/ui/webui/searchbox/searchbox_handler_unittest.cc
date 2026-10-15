@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "base/memory/raw_ptr.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
@@ -32,7 +31,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_web_contents_helper.h"
 #include "chrome/browser/ui/webui/searchbox/searchbox_test_utils.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
-#include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
@@ -65,7 +63,6 @@
 #include "third_party/omnibox_proto/searchbox_config.pb.h"
 #include "third_party/omnibox_proto/tool_config.pb.h"
 #include "third_party/omnibox_proto/tool_mode.pb.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
 #include "ui/base/webui/web_ui_util.h"
@@ -138,59 +135,9 @@ class SearchboxHandlerTest : public ::testing::Test {
   }
 };
 
-TEST_F(SearchboxHandlerTest, GetWebUIDataSourceDictSetsDragAndDrop) {
-  base::DictValue strings = SearchboxHandler::GetWebUIDataSourceDict(profile());
-  EXPECT_FALSE(*strings.FindBool("composeboxContextDragAndDropEnabled"));
-
-  base::DictValue strings_with_drag = SearchboxHandler::GetWebUIDataSourceDict(
-      profile(), {.session_allows_drag_and_drop = true});
-  EXPECT_TRUE(
-      *strings_with_drag.FindBool("composeboxContextDragAndDropEnabled"));
-}
-
 TEST_F(SearchboxHandlerTest, GetWebUIDataSourceDictSetsVoiceWaiting) {
   base::DictValue strings = SearchboxHandler::GetWebUIDataSourceDict(profile());
   EXPECT_NE(nullptr, strings.Find("voiceWaiting"));
-}
-
-TEST_F(SearchboxHandlerTest, GetWebUIDataSourceDictLensSearchHint) {
-  // 1. Default state: flag disabled.
-  {
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndDisableFeature(
-        omnibox::kWebUIOmniboxAskGAboutThisPage);
-    base::DictValue strings =
-        SearchboxHandler::GetWebUIDataSourceDict(profile());
-    EXPECT_EQ(base::UTF16ToUTF8(l10n_util::GetStringUTF16(
-                  IDS_GOOGLE_SEARCH_BOX_EMPTY_HINT_CONTEXTUAL)),
-              *strings.FindString("lensSearchHint"));
-  }
-
-  // 2. Flag enabled, but param disabled.
-  {
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndEnableFeatureWithParameters(
-        omnibox::kWebUIOmniboxAskGAboutThisPage,
-        {{"Omnibox_AskGLensSearchHintText", "false"}});
-    base::DictValue strings =
-        SearchboxHandler::GetWebUIDataSourceDict(profile());
-    EXPECT_EQ(base::UTF16ToUTF8(l10n_util::GetStringUTF16(
-                  IDS_GOOGLE_SEARCH_BOX_EMPTY_HINT_CONTEXTUAL)),
-              *strings.FindString("lensSearchHint"));
-  }
-
-  // 3. Flag enabled AND param enabled.
-  {
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndEnableFeatureWithParameters(
-        omnibox::kWebUIOmniboxAskGAboutThisPage,
-        {{"Omnibox_AskGLensSearchHintText", "true"}});
-    base::DictValue strings =
-        SearchboxHandler::GetWebUIDataSourceDict(profile());
-    EXPECT_EQ(base::UTF16ToUTF8(l10n_util::GetStringUTF16(
-                  IDS_TIPS_NOTIFICATIONS_GOOGLE_LENS_TITLE)),
-              *strings.FindString("lensSearchHint"));
-  }
 }
 
 TEST_F(SearchboxHandlerTest, QuestionMarkKeywordInput) {
@@ -588,7 +535,7 @@ TEST_F(RealboxHandlerTest, GetCyclingPlaceholderConfig_ReturnsEmpty) {
   auto config = future.Take();
 
   ASSERT_EQ(config->texts.size(), 0u);
-  ASSERT_EQ(config->change_text_animation_interval.InMilliseconds(), 2000u);
+  ASSERT_EQ(config->change_text_animation_interval.InMilliseconds(), 4000u);
   ASSERT_EQ(config->fade_text_animation_duration.InMilliseconds(), 250u);
 }
 

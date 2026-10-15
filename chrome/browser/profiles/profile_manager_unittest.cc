@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 
+#include "base/auto_reset.h"
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/files/file_path_watcher.h"
@@ -246,6 +247,11 @@ class ProfileManagerTestBase : public testing::Test {
 
   content::BrowserTaskEnvironment task_environment_;
 
+ private:
+  // Profile deletion returns before Profile::Wipe(); see
+  // profiles::DisableBrowsingDataRemovalForTesting().
+  base::AutoReset<bool> browsing_data_removal_disabled_ =
+      profiles::DisableBrowsingDataRemovalForTesting();
 };
 
 class ProfileManagerTest : public base::test::WithFeatureOverride,

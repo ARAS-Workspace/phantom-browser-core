@@ -19,7 +19,6 @@ CommonCrossDevicePrefProvider::GetProfilePrefs() const {
   static const base::NoDestructor<base::flat_set<std::string_view>>
       kProfilePrefs({
           // go/keep-sorted start
-          "home.module.price_tracking.enabled",
           ntp_tiles::prefs::kMagicStackHomeModuleEnabled,
           ntp_tiles::prefs::kMostVisitedHomeModuleEnabled,
           ntp_tiles::prefs::kTabResumptionHomeModuleEnabled,

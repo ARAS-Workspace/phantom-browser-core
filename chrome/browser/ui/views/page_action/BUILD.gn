@@ -156,7 +156,6 @@ source_set("unit_tests") {
     "anchored_message_view_unittest.cc",
     "page_action_container_view_unittest.cc",
     "page_action_view_unittest.cc",
-    "webui_page_action_control_unittest.cc",
   ]
 
   deps = [

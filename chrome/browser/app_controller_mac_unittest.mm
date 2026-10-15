@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "base/apple/scoped_objc_class_swizzler.h"
+#include "base/auto_reset.h"
 #include "base/files/file_path.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
@@ -20,6 +21,7 @@
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_metrics.h"
+#include "chrome/browser/profiles/profiles_state.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -83,6 +85,10 @@ class AppControllerTest : public PlatformTest {
   }
 
   content::BrowserTaskEnvironment task_environment_;
+  // Profile deletion returns before Profile::Wipe(); see
+  // profiles::DisableBrowsingDataRemovalForTesting().
+  base::AutoReset<bool> browsing_data_removal_disabled_ =
+      profiles::DisableBrowsingDataRemovalForTesting();
   TestingProfileManager profile_manager_;
   raw_ptr<TestingProfile, DanglingUntriaged> profile_;
 };

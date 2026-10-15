@@ -80,8 +80,10 @@ class LoadingPredictorTabHelperTest : public ChromeRenderViewHostTestHarness,
   void TearDown() override;
 
   SessionID GetTabID();
-  void NavigateAndCommitInFrame(const std::string& url,
-                                content::RenderFrameHost* rfh);
+  // Returns the frame that committed the navigation.
+  content::RenderFrameHost* NavigateAndCommitInFrame(
+      const std::string& url,
+      content::RenderFrameHost* rfh);
   void NavigateAndCommitInMainFrameAndVerifyMetrics(const std::string& url);
 
  protected:
@@ -161,7 +163,8 @@ SessionID LoadingPredictorTabHelperTest::GetTabID() {
   return sessions::SessionTabHelper::IdForTab(web_contents());
 }
 
-void LoadingPredictorTabHelperTest::NavigateAndCommitInFrame(
+content::RenderFrameHost*
+LoadingPredictorTabHelperTest::NavigateAndCommitInFrame(
     const std::string& url,
     content::RenderFrameHost* rfh) {
   auto navigation =
@@ -174,6 +177,7 @@ void LoadingPredictorTabHelperTest::NavigateAndCommitInFrame(
   EXPECT_TRUE(base::test::RunUntil(
       [&]() { return tab_helper_->IsPrepareForPageloadCalledForTesting(); }));
   navigation->Commit();
+  return navigation->GetFinalRenderFrameHost();
 }
 
 // Tests that a main frame navigation is correctly recorded by the
@@ -292,7 +296,7 @@ TEST_P(LoadingPredictorTabHelperTest, ResourceLoadCompleteInSubFrame) {
 
   auto* subframe =
       content::RenderFrameHostTester::For(main_rfh())->AppendChild("subframe");
-  NavigateAndCommitInFrame("http://sub.test.org", subframe);
+  subframe = NavigateAndCommitInFrame("http://sub.test.org", subframe);
 
   // Resource loaded in subframe shouldn't be recorded.
   auto resource_load_info =

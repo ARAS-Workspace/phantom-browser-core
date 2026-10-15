@@ -39,7 +39,6 @@
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
@@ -135,6 +134,12 @@ class TestAutocompleteProviderClient : public ChromeAutocompleteProviderClient {
     is_url_data_collection_active_ = is_url_data_collection_active;
   }
 
+  bool SearchSuggestEnabled() const override { return search_suggest_enabled_; }
+
+  void set_search_suggest_enabled(bool search_suggest_enabled) {
+    search_suggest_enabled_ = search_suggest_enabled;
+  }
+
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory()
       override {
     return shared_factory_;
@@ -142,6 +147,7 @@ class TestAutocompleteProviderClient : public ChromeAutocompleteProviderClient {
 
  private:
   bool is_url_data_collection_active_ = true;
+  bool search_suggest_enabled_ = true;
   scoped_refptr<network::SharedURLLoaderFactory> shared_factory_;
 };
 
@@ -3745,17 +3751,17 @@ TEST_F(SearchProviderTest, CanSendRequestWithURL) {
   EXPECT_TRUE(test_srp(&google_template_url, client_.get()));
 
   // Disable Suggest.
-  profile_->GetPrefs()->SetBoolean(prefs::kSearchSuggestEnabled, false);
+  client_->set_search_suggest_enabled(false);
 
-  // Does not require Suggest to be enabled.
-  EXPECT_TRUE(test_lens(&google_template_url, client_.get()));
+  // Requires Suggest to be enabled.
+  EXPECT_FALSE(test_lens(&google_template_url, client_.get()));
   // Requires Suggest to be enabled.
   EXPECT_FALSE(test_other(&google_template_url, client_.get()));
   // Requires Suggest to be enabled.
   EXPECT_FALSE(test_srp(&google_template_url, client_.get()));
 
   // Re-enable Suggest.
-  profile_->GetPrefs()->SetBoolean(prefs::kSearchSuggestEnabled, true);
+  client_->set_search_suggest_enabled(true);
 
   // Ensure the state is properly reset.
   EXPECT_TRUE(test_lens(&google_template_url, client_.get()));
@@ -3765,8 +3771,8 @@ TEST_F(SearchProviderTest, CanSendRequestWithURL) {
   // Disable personalized URL data collection.
   client_->set_is_url_data_collection_active(false);
 
-  // Does not require personalized URL data collection to be enabled.
-  EXPECT_TRUE(test_lens(&google_template_url, client_.get()));
+  // Requires personalized URL data collection to be enabled.
+  EXPECT_FALSE(test_lens(&google_template_url, client_.get()));
   // Requires personalized URL data collection to be enabled.
   EXPECT_FALSE(test_other(&google_template_url, client_.get()));
   // Does not require personalized URL data collection to be enabled.
@@ -3784,8 +3790,8 @@ TEST_F(SearchProviderTest, CanSendRequestWithURL) {
   ChromeAutocompleteProviderClient incognito_client(
       profile_->GetPrimaryOTRProfile(/*create_if_needed=*/false));
 
-  // Can make Suggest requests in incognito mode.
-  EXPECT_TRUE(test_lens(&google_template_url, &incognito_client));
+  // Don't make Suggest requests in incognito mode.
+  EXPECT_FALSE(test_lens(&google_template_url, &incognito_client));
   // Don't make Suggest requests in incognito mode.
   EXPECT_FALSE(test_other(&google_template_url, &incognito_client));
   // Don't make Suggest requests in incognito mode.
@@ -4256,6 +4262,9 @@ TEST_F(SearchProviderRequestTest, NoRequestWithAimToolMode) {
 }
 
 TEST_F(SearchProviderRequestTest, LensContextualSearchboxNoSuggestRequest) {
+  // Disable Suggest.
+  client_->set_search_suggest_enabled(false);
+
   // Start a query.
   AutocompleteInput input(u"foo",
                           metrics::OmniboxEventProto::CONTEXTUAL_SEARCHBOX,
@@ -4263,10 +4272,9 @@ TEST_F(SearchProviderRequestTest, LensContextualSearchboxNoSuggestRequest) {
   provider_->Start(input, false);
 
   // Make sure the default provider's suggest endpoint is not queried for
-  // contextual searchboxes.
+  // contextual searchboxes while Suggest is disabled.
   base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(test_url_loader_factory_.IsPending(
-      "https://www.google.com/suggest?q=foo&client=chrome-contextual"));
+  EXPECT_EQ(0, test_url_loader_factory_.NumPending());
   EXPECT_TRUE(provider_->done());
 }
 
@@ -4362,36 +4370,6 @@ TEST_F(SearchProviderOTRTest, DoesNotSendZeroSuggestRequest) {
   base::RunLoop().RunUntilIdle();
   EXPECT_TRUE(zero_suggest_provider_->done());
   EXPECT_TRUE(test_url_loader_factory_.pending_requests()->empty());
-}
-
-TEST_F(SearchProviderOTRTest, SendSuggestRequestForLens) {
-  // Start a query.
-  AutocompleteInput input(u"foo",
-                          metrics::OmniboxEventProto::LENS_SIDE_PANEL_SEARCHBOX,
-                          ChromeAutocompleteSchemeClassifier(profile_.get()));
-  provider_->Start(input, false);
-
-  // Make sure the provdier was run and the default search engine's suggest
-  // endpoint was queried.
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(provider_->done());
-  EXPECT_TRUE(test_url_loader_factory_.IsPending(
-      "https://www.google.com/suggest?q=foo&client=chrome-multimodal"));
-}
-
-TEST_F(SearchProviderOTRTest, SendZeroSuggestRequestForLens) {
-  // Start a zero-prefix query.
-  AutocompleteInput input(u"", metrics::OmniboxEventProto::CONTEXTUAL_SEARCHBOX,
-                          ChromeAutocompleteSchemeClassifier(profile_.get()));
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  zero_suggest_provider_->Start(input, false);
-
-  // Make sure the provdier was run and the default search engine's suggest
-  // endpoint was queried.
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(zero_suggest_provider_->done());
-  EXPECT_TRUE(test_url_loader_factory_.IsPending(
-      "https://www.google.com/suggest?q=&client=chrome-contextual"));
 }
 
 // SearchProviderCommandLineOverrideTest -------------------------------------

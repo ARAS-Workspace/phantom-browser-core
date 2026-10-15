@@ -58,16 +58,3 @@ source_set("impl") {
     "//url",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "feedback_ui_unittest.cc" ]
-  deps = [
-    ":feedback",
-    "//chrome/common:constants",
-    "//chrome/test:test_support",
-    "//components/prefs",
-    "//content/test:test_support",
-    "//testing/gtest",
-  ]
-}

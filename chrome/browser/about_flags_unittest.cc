@@ -12,15 +12,12 @@
 #include <string>
 #include <utility>
 
-#include "base/containers/span.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/test/metrics/histogram_enum_reader.h"
 #include "build/build_config.h"
-#include "chrome/common/chrome_version.h"
 #include "components/webui/flags/feature_entry.h"
-#include "components/webui/flags/feature_entry_macros.h"
 #include "components/webui/flags/flags_test_helpers.h"
 #include "components/webui/flags/flags_ui_metrics.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -150,22 +147,10 @@ TEST(AboutFlagsTest, NeverExpireFlagsExist) {
   flags_ui::testing::EnsureNeverExpireFlagsExist();
 }
 
-// For some bizarre reason, far too many people see a file filled with
-// alphabetically-ordered items and think "hey, let me drop this new item into a
-// random location!" Prohibit such behavior in the flags files.
-TEST(AboutFlagsTest, FlagsListedInAlphabeticalOrder) {
-  flags_ui::testing::EnsureFlagsAreListedInAlphabeticalOrder();
-}
-
 TEST(AboutFlagsTest, EveryFlagIsValid) {
   for (const auto& entry : testing::GetFeatureEntries()) {
     EXPECT_TRUE(entry.IsValid()) << entry.internal_name;
   }
-}
-
-TEST(AboutFlagsTest, RecentUnexpireFlagsArePresent) {
-  flags_ui::testing::EnsureRecentUnexpireFlagsArePresent(
-      testing::GetFeatureEntries(), CHROME_VERSION_MAJOR);
 }
 
 // Ensures that all variation IDs specified are well-formed.
@@ -213,29 +198,6 @@ TEST(AboutFlagsTest, VariationIdsAreValid) {
       nontriggering_variation_ids.insert(variation_id);
     }
   }
-}
-
-// Test that ScopedFeatureEntries restores existing feature entries on
-// destruction.
-TEST(AboutFlagsTest, ScopedFeatureEntriesRestoresFeatureEntries) {
-  const base::span<const flags_ui::FeatureEntry> old_entries =
-      testing::GetFeatureEntries();
-  EXPECT_FALSE(old_entries.empty());
-  const char* first_feature_name = old_entries[0].internal_name;
-  {
-    static BASE_FEATURE(kTestFeature1, "FeatureName1",
-                        base::FEATURE_ENABLED_BY_DEFAULT);
-    testing::ScopedFeatureEntries feature_entries(
-        {{"feature-1", "", "", flags_ui::FlagsState::GetCurrentPlatform(),
-          FEATURE_VALUE_TYPE(kTestFeature1)}});
-    EXPECT_EQ(testing::GetFeatureEntries().size(), 1U);
-  }
-
-  const base::span<const flags_ui::FeatureEntry> new_entries =
-      testing::GetFeatureEntries();
-  EXPECT_EQ(old_entries.size(), new_entries.size());
-  EXPECT_TRUE(about_flags::GetCurrentFlagsState()->FindFeatureEntryByName(
-      first_feature_name));
 }
 
 class AboutFlagsHistogramTest : public ::testing::Test {

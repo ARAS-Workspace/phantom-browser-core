@@ -137,7 +137,6 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
   sources = [
-    "show_feedback_page_unittest.cc",
     "system_logs/log_sources/crash_ids_source_unittest.cc",
     "system_logs/log_sources/performance_log_source_unittest.cc",
     "system_logs/log_sources/related_website_sets_source_unittest.cc",

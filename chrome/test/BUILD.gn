@@ -3515,7 +3515,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/browser_command:unit_tests",
     "//chrome/browser/ui/webui/data_sharing:unit_tests",
-    "//chrome/browser/ui/webui/feedback:unit_tests",
     "//chrome/browser/ui/webui/flags:unit_tests",
     "//chrome/browser/ui/webui/history:unit_tests",
     "//chrome/browser/ui/webui/image:unit_tests",

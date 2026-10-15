@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/test/scoped_feature_list.h"
@@ -15,6 +16,7 @@
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/webui/searchbox/searchbox_test_utils.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
+#include "chrome/test/base/testing_profile.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"
 #include "components/search_engines/template_url_service.h"
@@ -52,6 +54,12 @@ class OmniboxEverywhereHandlerTest : public ChromeRenderViewHostTestHarness {
     feature_list_.InitAndEnableFeature(omnibox::kOmniboxEverywhere);
   }
   ~OmniboxEverywhereHandlerTest() override = default;
+
+  TestingProfile::TestingFactories GetTestingFactories() const override {
+    return TestingProfile::TestingFactory{
+        TemplateURLServiceFactory::GetInstance(),
+        base::BindRepeating(&TemplateURLServiceFactory::BuildInstanceFor)};
+  }
 
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();

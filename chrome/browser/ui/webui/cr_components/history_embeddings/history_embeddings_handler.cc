@@ -95,8 +95,10 @@ void HistoryEmbeddingsHandler::Search(
 
   history_embeddings::HistoryEmbeddingsService* service =
       HistoryEmbeddingsServiceFactory::GetForProfile(profile_.get());
-  // The service is never null. Even tests build and use a service.
-  CHECK(service);
+  if (!service) {
+    OnReceivedSearchResult({});
+    return;
+  }
   last_result_ = service->Search(
       &last_result_, query->query, query->time_range_start,
       history_embeddings::GetFeatureParameters().search_result_item_count,

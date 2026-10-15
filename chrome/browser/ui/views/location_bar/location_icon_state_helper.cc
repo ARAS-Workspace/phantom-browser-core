@@ -34,6 +34,10 @@ std::u16string GetSecurityChipText(const LocationBarModel* model,
     return std::u16string();
   }
 
+  if (model->GetURL().SchemeIs(content::kChromeUIScheme)) {
+    return l10n_util::GetStringUTF16(IDS_SHORT_PRODUCT_NAME);
+  }
+
   if (model->GetURL().SchemeIs(url::kFileScheme)) {
     return l10n_util::GetStringUTF16(IDS_OMNIBOX_FILE);
   }
