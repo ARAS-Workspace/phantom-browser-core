@@ -3,7 +3,6 @@ include_rules = [
   "+cc/test/pixel_test_utils.h",
   "+components/crash/core/common/crash_key.h",
   "+components/discardable_memory/client",
-  "+components/enterprise/buildflags",
   "+content/public/child",  # Windows direct write proxy access.
   "+content/public/common",
   "+content/public/utility",

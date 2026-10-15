@@ -31,7 +31,6 @@ source_set("password_manager") {
     "//components/autofill/core/common",
     "//components/credential_management:browser",
     "//components/critical_actions/core/browser",
-    "//components/enterprise/buildflags",
     "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//components/password_manager/content/browser",

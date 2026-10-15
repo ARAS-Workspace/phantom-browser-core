@@ -18,7 +18,6 @@ static_library("browser") {
     "//base",
     "//components/crash/core/common",
     "//components/discardable_memory/service",
-    "//components/enterprise/buildflags",
     "//components/printing/common",
     "//components/printing/common:mojo_interfaces",
     "//components/services/print_compositor/public/cpp",

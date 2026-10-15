@@ -21,7 +21,6 @@ source_set("enterprise") {
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:profile_util",
     "//chrome/browser/signin",
-    "//components/enterprise/buildflags",
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:legacy_tech_events_proto",

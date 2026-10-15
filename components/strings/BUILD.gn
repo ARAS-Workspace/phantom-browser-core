@@ -37,7 +37,6 @@ grit_strings("components_strings") {
     "../crash_strings.grdp",
     "../dialog_strings.grdp",
     "../dom_distiller_strings.grdp",
-    "../enterprise_strings.grdp",
     "../error_page_strings.grdp",
     "../external_intents_strings.grdp",
     "../find_in_page_strings.grdp",

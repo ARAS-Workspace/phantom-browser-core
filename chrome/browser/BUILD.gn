@@ -112,7 +112,6 @@ source_set("flags") {
     "//build:branding_buildflags",
     "//build:buildflag_header_h",
     "//chrome/common:buildflags",
-    "//components/enterprise/buildflags",
     "//components/paint_preview/buildflags",
     "//components/signin/public/base:signin_buildflags",
     "//components/webui/flags",
@@ -274,7 +273,6 @@ source_set("file_select_helper") {
   deps = [
     "//base",
     "//chrome/browser/enterprise",
-    "//components/enterprise/buildflags",
     "//components/enterprise/common:files_scan_data",
     "//content/public/browser",
     "//net",
@@ -2371,7 +2369,6 @@ group("browser_public_dependencies") {
     "//components/account_id",
     "//components/autofill/content/browser",
     "//components/autofill/core/browser",
-    "//components/enterprise/buildflags",
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
     "//components/input",

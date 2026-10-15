@@ -883,7 +883,6 @@ source_set("extensions") {
       "//components/dom_distiller/core",
       "//components/download/public/common:public",
       "//components/embedder_support:user_agent",
-      "//components/enterprise/buildflags",
       "//components/favicon/content",
       "//components/feedback",
       "//components/history/core/browser",

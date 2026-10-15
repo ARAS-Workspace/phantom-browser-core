@@ -12,7 +12,6 @@ components/components_settings_strings.grdp
 components/crash_strings.grdp
 components/dialog_strings.grdp
 components/dom_distiller_strings.grdp
-components/enterprise_strings.grdp
 components/error_page_strings.grdp
 components/external_intents_strings.grdp
 components/find_in_page_strings.grdp

@@ -60,7 +60,6 @@ source_set("unit_tests") {
     ":proxy_config",
     "//base",
     "//base/test:test_support",
-    "//components/enterprise/buildflags",
     "//components/policy:generated",
     "//components/policy/core/browser",
     "//components/policy/core/browser:test_support",

@@ -68,7 +68,6 @@ source_set("net") {
     "//chrome/common:mojo_bindings",
     "//components/content_settings/core/browser",
     "//components/content_settings/core/browser:cookie_settings",
-    "//components/enterprise/buildflags",
     "//components/error_page/common",
     "//components/keyed_service/core",
     "//components/network_time",

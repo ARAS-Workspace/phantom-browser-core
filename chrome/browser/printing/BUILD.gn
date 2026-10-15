@@ -24,7 +24,6 @@ if (enable_printing) {
       "//base",
       "//build:chromeos_buildflags",
       "//chrome/services/printing/public/mojom",
-      "//components/enterprise/buildflags",
       "//components/prefs",
       "//components/printing/browser",
       "//components/printing/browser/print_to_pdf",

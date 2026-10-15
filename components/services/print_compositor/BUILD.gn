@@ -14,7 +14,6 @@ static_library("print_compositor") {
     "//base",
     "//components/crash/core/common:crash_key",
     "//components/discardable_memory/client",
-    "//components/enterprise/buildflags",
     "//content/public/utility",
     "//printing/common",
     "//printing/mojom",
@@ -27,7 +26,6 @@ static_library("print_compositor") {
   }
 
   public_deps = [
-    "//components/enterprise/buildflags",
     "//components/services/print_compositor/public/cpp",
     "//components/services/print_compositor/public/mojom",
     "//printing/buildflags",
@@ -45,7 +43,6 @@ if (enable_printing) {
       "//base/test:test_support",
       "//cc:test_support",
       "//components/crash/core/common:crash_key",
-      "//components/enterprise/buildflags",
       "//components/services/print_compositor/public/cpp",
       "//testing/gmock",
       "//testing/gtest",

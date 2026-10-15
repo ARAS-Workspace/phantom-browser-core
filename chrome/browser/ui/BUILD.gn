@@ -2827,7 +2827,6 @@ group("ui_public_dependencies") {
   visibility = [ "//chrome/browser:browser_public_dependencies" ]
   public_deps = [
     "//components/dom_distiller/core",
-    "//components/enterprise/buildflags",
     "//components/paint_preview/buildflags",
     "//components/segmentation_platform/public",
     "//components/sync",

@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/enterprise/buildflags/buildflags.gni")
-
 source_set("internal") {
   visibility = [
     ":for_tests",
@@ -60,7 +58,6 @@ source_set("internal") {
   ]
 
   public_deps = [
-    "//components/enterprise/buildflags",
     "//components/services/quarantine/public/mojom",
     "//mojo/public/cpp/bindings",
     "//services/network/public/mojom",

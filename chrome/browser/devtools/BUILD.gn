@@ -137,7 +137,6 @@ static_library("devtools") {
     "//chrome/browser/ui/navigator",
     "//components/autofill/content/browser",
     "//components/autofill/core/browser",
-    "//components/enterprise/buildflags",
     "//components/paint_preview/buildflags",
     "//components/variations/service",
     "//components/vector_icons",

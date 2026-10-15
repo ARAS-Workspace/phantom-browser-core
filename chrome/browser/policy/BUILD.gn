@@ -815,7 +815,6 @@ source_set("impl") {
     "//components/domain_reliability:prefs",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
-    "//components/enterprise/buildflags",
     "//components/feed/core/shared_prefs:feed_shared_prefs",
     "//components/history/core/common",
     "//components/history_clusters/core",

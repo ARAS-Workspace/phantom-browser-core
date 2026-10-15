@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/enterprise/buildflags/buildflags.h",
   "+components/policy",
   "+components/policy/core/browser",
   "+components/policy/core/common",
