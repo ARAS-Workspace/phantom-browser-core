@@ -18,7 +18,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/supports_user_data.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/profile_management/profile_management_features.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profiles_state.h"
@@ -95,12 +94,7 @@ CookiesMover::CookiesMover(base::WeakPtr<Profile> source_profile,
 CookiesMover::~CookiesMover() = default;
 
 void CookiesMover::StartMovingCookies() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  bool allow_cookies_to_be_moved = base::FeatureList::IsEnabled(
-      profile_management::features::kThirdPartyProfileManagement);
-#else
   bool allow_cookies_to_be_moved = false;
-#endif
   if (!allow_cookies_to_be_moved || url_.is_empty() || !url_.is_valid()) {
     std::move(callback_).Run();
     return;
@@ -149,15 +143,7 @@ void CookiesMover::OnCookiesMoved() {
 }
 
 bool IsForceSigninEnabled() {
-  if (g_is_force_signin_enabled_cache == NOT_CACHED) {
-    PrefService* prefs = g_browser_process->local_state();
-    if (prefs) {
-      SetForceSigninPolicy(prefs->GetBoolean(prefs::kForceBrowserSignin));
-    } else {
-      return false;
-    }
-  }
-  return (g_is_force_signin_enabled_cache == ENABLE);
+  return g_is_force_signin_enabled_cache == ENABLE;
 }
 
 void SetForceSigninForTesting(bool enable) {

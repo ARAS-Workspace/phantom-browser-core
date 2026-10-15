@@ -243,8 +243,6 @@ class DiceWebSigninInterceptor : public KeyedService,
       InterceptBubbleWithAccountPreviewDataDelayedCallbackAfterReset);
   FRIEND_TEST_ALL_PREFIXES(DiceWebSigninInterceptorTest,
                            MultiUserInterceptionPrimaryNotConnectedSameName);
-  FRIEND_TEST_ALL_PREFIXES(ManagedProfileRequiredNavigationThrottleTest,
-                           CancelsWithInterstitialWhenForcedInterception);
 
   // Profile presets that will be passed from the previous profile to the newly
   // created one during sign in intercept.
@@ -449,8 +447,6 @@ class DiceWebSigninInterceptor : public KeyedService,
     // no value is set, then we have not yet received the policy value.
     std::optional<policy::ProfileSeparationPolicies>
         intercepted_account_profile_separation_policies_;
-
-    base::ScopedClosureRunner disable_management_disclaimer_until_reset_;
 
     std::vector<CoreAccountId> secondary_accounts_;
     bool dice_signin_session_complete_ = false;

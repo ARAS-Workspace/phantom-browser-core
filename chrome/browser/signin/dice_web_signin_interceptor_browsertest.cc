@@ -20,8 +20,6 @@
 #include "base/time/time.h"
 #include "base/version.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_init_params.h"
@@ -2121,88 +2119,6 @@ IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorBrowserTest,
 
   CheckHistograms(histogram_tester,
                   SigninInterceptionHeuristicOutcome::kInterceptEnterprise);
-}
-
-// Tests the complete interception flow including profile and browser creation.
-IN_PROC_BROWSER_TEST_F(
-    DiceWebSigninInterceptorBrowserTest,
-    ForcedEnterpriseInterceptionWhileManagementDisclaimerActive) {
-  auto* profile_management_disclaimer_service =
-      ProfileManagementDisclaimerServiceFactory::GetForProfile(GetProfile());
-  base::HistogramTester histogram_tester;
-  AccountInfo primary_account_info =
-      MakeAccountInfoAvailableAndUpdate("bob@example.com", "example.com");
-
-  IdentityManagerFactory::GetForProfile(GetProfile())
-      ->GetPrimaryAccountMutator()
-      ->SetPrimaryAccount(primary_account_info.account_id,
-                          signin::ConsentLevel::kSignin,
-                          signin_metrics::AccessPoint::kStartPage);
-  profile_management_disclaimer_service->EnsureManagedProfileForAccount(
-      primary_account_info.account_id, signin_metrics::AccessPoint::kWebSignin,
-      base::DoNothing());
-  SetupGaiaResponses();
-  ASSERT_EQ(profile_management_disclaimer_service
-                ->GetAccountBeingConsideredForManagementIfAny(),
-            primary_account_info.account_id);
-
-  // Add a tab.
-  GURL intercepted_url = embedded_test_server()->GetURL("/defaultresponse");
-  content::WebContents* web_contents = AddTab(intercepted_url);
-  int original_tab_count = browser()->tab_strip_model()->count();
-
-  // Start the management disclaimer.
-  profile_management_disclaimer_service->EnsureManagedProfileForAccount(
-      primary_account_info.account_id, signin_metrics::AccessPoint::kWebSignin,
-      base::DoNothing());
-
-  ASSERT_EQ(profile_management_disclaimer_service
-                ->GetAccountBeingConsideredForManagementIfAny(),
-            primary_account_info.account_id);
-
-  // Do the signin interception.
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1u);
-
-  // Start the interception.
-  DiceWebSigninInterceptor* interceptor =
-      DiceWebSigninInterceptorFactory::GetForProfile(GetProfile());
-
-  // Enforce enterprise profile separation.
-  interceptor->SetInterceptedAccountProfileSeparationPoliciesForTesting(
-      policy::ProfileSeparationPolicies(
-          policy::ProfileSeparationSettings::ENFORCED, std::nullopt));
-
-  interceptor->MaybeInterceptWebSignin(
-      web_contents, primary_account_info.account_id,
-      signin_metrics::AccessPoint::kWebSignin,
-      /*is_new_account=*/false,
-      /*is_sync_signin=*/false,
-      /*primary_is_connected=*/signin::Tribool::kUnknown);
-  ASSERT_EQ(profile_management_disclaimer_service
-                ->GetAccountBeingConsideredForManagementIfAny(),
-            primary_account_info.account_id);
-  base::RunLoop run_loop;
-  run_loop.RunUntilIdle();
-
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(GetProfile());
-  EXPECT_FALSE(enterprise_util::UserAcceptedAccountManagement(GetProfile()));
-  EXPECT_FALSE(
-      GetInterceptorDelegate(GetProfile())->intercept_bubble_destroyed());
-  EXPECT_TRUE(identity_manager->HasAccountWithRefreshToken(
-      primary_account_info.account_id));
-  EXPECT_TRUE(
-      identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-
-  ASSERT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1u);
-  EXPECT_EQ(browser()->tab_strip_model()->count(), original_tab_count);
-  EXPECT_EQ(
-      browser()->tab_strip_model()->GetActiveWebContents()->GetVisibleURL(),
-      intercepted_url);
-
-  CheckHistograms(
-      histogram_tester,
-      SigninInterceptionHeuristicOutcome::kAbortDisclaimerServiceInProgress);
 }
 
 // Tests the complete interception flow including profile and browser creation.

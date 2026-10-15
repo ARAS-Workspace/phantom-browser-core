@@ -104,12 +104,6 @@
 #include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #endif  // BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/profile_management/oidc_auth_response_capture_navigation_throttle.h"
-#include "chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.h"
-#include "chrome/browser/enterprise/signin/managed_profile_required_navigation_throttle.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/mac/auth_session_request.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -117,10 +111,6 @@
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
 #include "chrome/browser/offline_pages/offline_page_navigation_throttle.h"
 #endif  // BUILDFLAG(ENABLE_OFFLINE_PAGES)
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
@@ -321,15 +311,6 @@ void CreateAndAddChromeThrottlesForNavigation(
     TypedNavigationUpgradeThrottle::MaybeCreateAndAdd(registry);
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  profile_management::ProfileManagementNavigationThrottle::MaybeCreateAndAdd(
-      registry);
-  profile_management::OidcAuthResponseCaptureNavigationThrottle::
-      MaybeCreateAndAdd(registry);
-
-  ManagedProfileRequiredNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
   DevToolsWindow::MaybeCreateAndAddNavigationThrottle(registry);
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
@@ -375,14 +356,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   }
 
   MaybeCreateAndAddWebViewSidePanelThrottle(registry);
-
-#if BUILDFLAG(IS_MAC)
-  // Don't perform platform authentication in incognito and guest profiles.
-  if (profile && !profile->IsOffTheRecord()) {
-    enterprise_auth::PlatformAuthNavigationThrottle::MaybeCreateAndAdd(
-        registry);
-  }
-#endif  // BUILDFLAG(IS_MAC)
 
   MaybeCreateAndAddVisitedLinkNavigationThrottle(registry);
 

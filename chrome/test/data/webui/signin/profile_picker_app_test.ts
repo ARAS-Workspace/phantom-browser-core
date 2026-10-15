@@ -86,19 +86,6 @@ suite('ProfilePickerAppTest', function() {
     verifyProfileCreationViewStyle(choice);
   });
 
-  test('SignInPromoSignIn', async function() {
-    await resetTestElement(Routes.NEW_PROFILE);
-    await waitForProfileCreationLoad();
-    const choice = testElement.shadowRoot.querySelector('profile-type-choice');
-    assertTrue(!!choice);
-    choice.$.signInButton.click();
-    await microtasksFinished();
-    assertTrue(choice.$.signInButton.disabled);
-    assertTrue(choice.$.notNowButton.disabled);
-    assertTrue(choice.$.backButton.disabled);
-    return browserProxy.whenCalled('selectNewAccount');
-  });
-
   test('ProfileCreationNotAllowed', async function() {
     loadTimeData.overrideValues({
       isProfileCreationAllowed: false,
@@ -109,20 +96,6 @@ suite('ProfilePickerAppTest', function() {
     const mainView =
         testElement.shadowRoot.querySelector('profile-picker-main-view')!;
     await whenCheck(mainView, () => mainView.classList.contains('active'));
-  });
-
-  test('ForceSignInEnabled', async function() {
-    loadTimeData.overrideValues({
-      isProfileCreationAllowed: true,
-      isForceSigninEnabled: true,
-    });
-    await resetTestElement(Routes.NEW_PROFILE);
-    assertEquals(
-        testElement.shadowRoot.querySelectorAll('[slot=view]').length, 1);
-    const mainView =
-        testElement.shadowRoot.querySelector('profile-picker-main-view')!;
-    await whenCheck(mainView, () => mainView.classList.contains('active'));
-    await browserProxy.whenCalled('selectNewAccount');
   });
 
   test('CreateLocalProfile', async function() {
@@ -143,7 +116,6 @@ suite('ProfilePickerAppTest', function() {
     assertEquals(args[0], browserProxy.profileThemeInfo.color);
     assertTrue(testElement.profileCreationInProgress);
     assertTrue(choice.profileCreationInProgress);
-    assertTrue(choice.$.signInButton.disabled);
     assertTrue(choice.$.notNowButton.disabled);
     assertTrue(choice.$.backButton.disabled);
   });

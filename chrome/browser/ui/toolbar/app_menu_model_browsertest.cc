@@ -331,7 +331,7 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DoNotShowShareSubMenuItem) {
           .value());
   ASSERT_NE(submenu, nullptr);
 
-  size_t expected_item_count = 7;
+  size_t expected_item_count = 3;
   if (!sharing_hub::SharingIsDisabledByPolicy(browser()->GetProfile()) ||
       sharing_hub::DesktopScreenshotsFeatureEnabled(browser()->GetProfile())) {
     expected_item_count += 2;

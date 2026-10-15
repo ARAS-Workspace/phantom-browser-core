@@ -1,6 +1,6 @@
 [
   {
-    "note": "complex mapping, see //components/enterprise/idle/idle_timeout_policy_handler_unittest.cc for more tests",
+    "reason_for_missing_test": "This policy has no pref in Phantom: the idle timeout prefs were removed.",
     "os": [
       "android",
       "linux",

@@ -57,12 +57,6 @@ class WithProfilePickerTestHelpers {
 
   // Gets the picker's web contents.
   content::WebContents* web_contents();
-
-  // Gets signin_chrome_sync_dice with appropriate parameters appended:
-  // if in dark mode, "color_scheme=dark", and always "flow=promo".
-  GURL GetSigninChromeSyncDiceUrl(const std::string& email = std::string());
-
-  GURL GetChromeReauthURL(const std::string& email);
 };
 
 class ProfilePickerTestBase : public InProcessBrowserTest,

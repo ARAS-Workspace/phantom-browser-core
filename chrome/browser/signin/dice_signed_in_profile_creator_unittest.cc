@@ -17,7 +17,6 @@
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_file_util.h"
-#include "chrome/browser/enterprise/profile_management/profile_management_features.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_avatar_icon_util.h"
@@ -122,10 +121,6 @@ class DiceSignedInProfileCreatorTest
       public ProfileManagerObserver {
  public:
   DiceSignedInProfileCreatorTest() {
-    scoped_feature_list_.InitWithFeatureState(
-        profile_management::features::kThirdPartyProfileManagement,
-        enable_third_party_management_feature());
-
     auto profile_manager_unique = std::make_unique<UnittestProfileManager>(
         base::CreateUniqueTempDirectoryScopedToTest());
     profile_manager_ = profile_manager_unique.get();
@@ -141,9 +136,7 @@ class DiceSignedInProfileCreatorTest
 
   ~DiceSignedInProfileCreatorTest() override { DeleteProfiles(); }
 
-  bool enable_third_party_management_feature() {
-    return std::get<0>(GetParam());
-  }
+  bool enable_third_party_management_feature() { return false; }
 
   bool setup_cookies_to_move() { return std::get<1>(GetParam()); }
 

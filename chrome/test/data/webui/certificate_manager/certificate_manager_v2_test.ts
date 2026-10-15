@@ -35,19 +35,17 @@ suite('CertificateManagerV2Test', () => {
     document.body.appendChild(certManager);
   }
 
-  // <if expr="not (is_win or is_macosx or is_linux)">
   test('provisioned client certs not present', async () => {
     initializeElement();
     await microtasksFinished();
 
     const parentElement =
         certManager.shadowRoot.querySelector('#provisionedClientCerts');
-    // The provisioned client certs section should not be present on other OSes.
+    // The provisioned client certs section is not present.
     assertFalse(
         !!parentElement,
         'provisionedClientCerts element was unexpectedly found');
   });
-  // </if>
 
   // <if expr="is_win or is_macosx">
   test('Open native client certificate management', async () => {

@@ -257,14 +257,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
       kColorFeaturePromoBubbleBackground};
   mixer[kColorFeaturePromoBubbleForeground] = {ui::kColorSysOnPrimary};
 
-  // Feature Showcase colors.
-  mixer[kColorFeatureShowcaseStepperCheck] = {ui::kColorSysPrimary};
-  mixer[kColorFeatureShowcaseStepperDot] = {ui::kColorSysPrimary};
-  mixer[kColorFeatureShowcaseThemePickerWrapperBackground] = {
-      ui::kColorSysSurface5};
-  mixer[kColorFeatureShowcaseThemePickerBackground] = {ui::kColorSysSurface};
-  mixer[kColorFeatureShowcaseThemeColorBorder] = {ui::kColorSysPrimary};
-
   // WebAuthn modal dialog colors.
   mixer[kColorWebAuthnBackArrowButtonIcon] = {ui::kColorSysPrimary};
   mixer[kColorWebAuthnBackArrowButtonIconDisabled] = {

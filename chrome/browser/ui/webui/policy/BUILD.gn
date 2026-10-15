@@ -28,7 +28,6 @@ source_set("policy") {
     "//chrome/common",
     "//components/crx_file",
     "//components/embedder_support:user_agent",
-    "//components/enterprise/browser/promotion",
     "//components/policy/core/browser",
     "//components/policy/core/common",
     "//components/policy/resources/webui:resources",

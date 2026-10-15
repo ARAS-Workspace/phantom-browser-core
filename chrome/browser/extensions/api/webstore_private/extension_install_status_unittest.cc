@@ -18,7 +18,6 @@
 #include "chrome/browser/policy/cloud/extension_install_policy_service.h"
 #include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/policy/cloud/mock_extension_install_policy_service.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/policy/core/common/cloud/cloud_policy_client_types.h"
 #include "components/policy/core/common/features.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
@@ -123,18 +122,6 @@ class ExtensionInstallStatusTest : public ExtensionServiceTestWithInstall {
                  std::unique_ptr<base::Value> value) {
     testing_profile()->GetTestingPrefService()->SetManagedPref(
         pref_name, std::move(value));
-  }
-
-  void SetPendingList(const std::vector<ExtensionId>& ids) {
-    base::DictValue id_values;
-    for (const auto& id : ids) {
-      base::DictValue request_data;
-      request_data.Set(extension_misc::kExtensionRequestTimestamp,
-                       ::base::TimeToValue(base::Time::Now()));
-      id_values.Set(id, std::move(request_data));
-    }
-    testing_profile()->GetTestingPrefService()->SetDict(
-        enterprise_reporting::kCloudExtensionRequestIds, std::move(id_values));
   }
 
   // Synchronous wrapper around GetWebstoreExtensionInstallStatus() to avoid
@@ -274,74 +261,6 @@ TEST_F(ExtensionInstallStatusTest, ExtensionBlockedWithCustomMessage) {
                 Manifest::Type::kExtension, PermissionSet()));
 }
 
-TEST_F(ExtensionInstallStatusTest,
-       ExtensionBlockByUpdateUrlWithRequestEnabled) {
-  EXPECT_EQ(ExtensionInstallStatus::kInstallable,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  SetExtensionSettings(kExtensionSettingsWithUpdateUrlBlocking);
-  EXPECT_EQ(ExtensionInstallStatus::kCanRequest,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
-TEST_F(ExtensionInstallStatusTest, ExtensionBlockByWildcardWithRequestEnabled) {
-  EXPECT_EQ(ExtensionInstallStatus::kInstallable,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  SetExtensionSettings(kExtensionSettingsWithWildcardBlocking);
-  EXPECT_EQ(ExtensionInstallStatus::kCanRequest,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
-TEST_F(ExtensionInstallStatusTest, ExtensionBlockByIdWithRequestEnabled) {
-  EXPECT_EQ(ExtensionInstallStatus::kInstallable,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  // An extension that is blocked by its ID can't be requested anymore.
-  SetExtensionSettings(kExtensionSettingsWithIdBlocked);
-  EXPECT_EQ(ExtensionInstallStatus::kBlockedByPolicy,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
-TEST_F(ExtensionInstallStatusTest, PendingExtensionIsWaitingToBeReviewed) {
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  std::vector<ExtensionId> ids = {kExtensionId};
-  SetPendingList(ids);
-
-  // The extension is blocked by wildcard and pending approval.
-  SetExtensionSettings(kExtensionSettingsWithWildcardBlocking);
-  EXPECT_EQ(ExtensionInstallStatus::kRequestPending,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
-TEST_F(ExtensionInstallStatusTest, PendingExtensionIsApproved) {
-  // Extension is approved but not installed, returns as INSTALLABLE.
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  std::vector<ExtensionId> ids = {kExtensionId};
-  SetExtensionSettings(R"({
-    "abcdefghijklmnopabcdefghijklmnop": {
-      "installation_mode": "allowed"
-    }
-  })");
-  EXPECT_EQ(ExtensionInstallStatus::kInstallable,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
-TEST_F(ExtensionInstallStatusTest, PendingExtensionIsRejected) {
-  // Extension is rejected, it should be moved from the pending list soon.
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  std::vector<ExtensionId> ids = {kExtensionId};
-  SetExtensionSettings(kExtensionSettingsWithIdBlocked);
-  EXPECT_EQ(ExtensionInstallStatus::kBlockedByPolicy,
-            GetWebstoreExtensionInstallStatus(kExtensionId, profile()));
-}
-
 // If an existing, installed extension is disabled due to reason
 // DISABLE_CUSTODIAN_APPROVAL_REQUIRED, then GetWebstoreExtensionInstallStatus()
 // should return kCustodianApprovalRequired.
@@ -374,17 +293,6 @@ TEST_F(ExtensionInstallStatusTest, ExtensionBlockedByManifestType) {
       ExtensionInstallStatus::kInstallable,
       GetInstallStatusSynchronously(kExtensionId, profile(), base::Version(),
                                     Manifest::Type::kTheme, PermissionSet()));
-
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  EXPECT_EQ(ExtensionInstallStatus::kCanRequest,
-            GetInstallStatusSynchronously(
-                kExtensionId, profile(), base::Version(),
-                Manifest::Type::kExtension, PermissionSet()));
-  EXPECT_EQ(ExtensionInstallStatus::kCanRequest,
-            GetInstallStatusSynchronously(
-                kExtensionId, profile(), base::Version(),
-                Manifest::Type::kHostedApp, PermissionSet()));
 
   // Request has been approved. Note that currently, manifest type blocking
   // actually overrides per-id setup. We will find the right priority with
@@ -487,16 +395,6 @@ TEST_F(ExtensionInstallStatusTest, ExtensionBlockedByPermissions) {
           PermissionSet(api_permissions.Clone(), ManifestPermissionSet(),
                         URLPatternSet(), URLPatternSet())));
 
-  // And they can be requested,
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  EXPECT_EQ(
-      ExtensionInstallStatus::kCanRequest,
-      GetInstallStatusSynchronously(
-          kExtensionId, profile(), base::Version(), Manifest::Type::kExtension,
-          PermissionSet(api_permissions.Clone(), ManifestPermissionSet(),
-                        URLPatternSet(), URLPatternSet())));
-
   // Request has been approved.
   SetExtensionSettings(R"({
     "*": {
@@ -563,16 +461,6 @@ TEST_F(ExtensionInstallStatusTest, ExtensionBlockedByPermissionsWithUpdateUrl) {
   api_permissions.insert(APIPermissionID::kDownloads);
   EXPECT_EQ(
       ExtensionInstallStatus::kBlockedByPolicy,
-      GetInstallStatusSynchronously(
-          kExtensionId, profile(), base::Version(), Manifest::Type::kExtension,
-          PermissionSet(api_permissions.Clone(), ManifestPermissionSet(),
-                        URLPatternSet(), URLPatternSet())));
-
-  // And they can be requested,
-  SetPolicy(enterprise_reporting::kCloudExtensionRequestEnabled,
-            std::make_unique<base::Value>(true));
-  EXPECT_EQ(
-      ExtensionInstallStatus::kCanRequest,
       GetInstallStatusSynchronously(
           kExtensionId, profile(), base::Version(), Manifest::Type::kExtension,
           PermissionSet(api_permissions.Clone(), ManifestPermissionSet(),

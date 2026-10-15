@@ -293,8 +293,6 @@ source_set("policy_specific_browser_tests") {
     "//components/autofill/content/browser:test_support",
     "//components/autofill/core/browser",
     "//components/bookmarks/common",
-    "//components/enterprise",
-    "//components/enterprise:test_support",
     "//components/policy:chrome_settings_proto_generated_compile",
     "//components/policy/core/browser",
     "//components/policy/core/common:common_constants",
@@ -349,8 +347,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui:ui_features",
     "//chrome/common",
     "//chrome/test:test_support",
-    "//components/enterprise",
-    "//components/enterprise:test_support",
     "//components/keyed_service/core",
     "//components/policy:chrome_settings_proto_generated_compile",
     "//components/policy/core/browser",
@@ -397,13 +393,6 @@ source_set("browser_tests") {
     sources += [ "test/audio_sandbox_enabled_browsertest.cc" ]
   }
 
-  if (is_mac) {
-    sources += [
-      "cloud/chrome_browser_cloud_management_browsertest_mac_util.h",
-      "cloud/chrome_browser_cloud_management_browsertest_mac_util.mm",
-    ]
-  }
-
   if (is_linux) {
     sources += [ "test/network_service_sandbox_enabled_browsertest.cc" ]
   }
@@ -413,8 +402,6 @@ source_set("browser_tests") {
   deps += [ "//chrome/test:test_support" ]
 
   sources += [
-    "cloud/chrome_browser_cloud_management_browsertest_delegate_desktop.cc",
-    "cloud/chrome_browser_cloud_management_browsertest_delegate_desktop.h",
     "test/hardware_acceleration_mode_enabled_browsertest.cc",
 
     # Chrome OS does not support this policy.
@@ -441,11 +428,6 @@ source_set("browser_tests") {
       deps += [ "//chrome/browser/apps/app_service" ]
     }
   }
-
-  sources += [
-    "cloud/chrome_browser_cloud_management_browsertest.cc",
-    "cloud/chrome_browser_cloud_management_browsertest_delegate.h",
-  ]
 
   deps += [ "//components/signin/public/identity_manager" ]
 
@@ -480,11 +462,6 @@ source_set("browser_tests") {
     "//components/collaboration/public:prefs",
     "//components/history_clusters/core",
   ]
-
-  if (enable_extensions_core) {
-    sources += [ "cloud/extension_install_policy_service_browsertest.cc" ]
-    deps += [ "//extensions/strings" ]
-  }
 }
 
 source_set("android_browsertests") {
@@ -518,7 +495,6 @@ source_set("platform_browser_tests") {
     ":test_support",
     "//base",
     "//chrome/test:test_support",
-    "//components/enterprise:test_support",
     "//components/history/core/common",
     "//components/policy/core/browser",
     "//components/policy/core/browser:pref_mapping_test_support",
@@ -571,7 +547,6 @@ source_set("unit_tests") {
     "//chrome/browser/prefs",
     "//chrome/test:test_support",
     "//components/account_id:test_support",
-    "//components/enterprise:test_support",
     "//components/policy/core/browser:test_support",
     "//components/policy/core/common:test_support",
     "//components/reporting/client:test_support",
@@ -587,10 +562,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  sources += [
-    "cloud/user_policy_signin_service_unittest.cc",
-    "cloud/user_policy_signin_service_util_unittest.cc",
-  ]
+  sources += [ "cloud/user_policy_signin_service_unittest.cc" ]
 
   sources += [
     "developer_tools_availability_list_policy_handler_unittest.cc",
@@ -605,20 +577,11 @@ source_set("unit_tests") {
   }
 
   sources += [
-    "chrome_browser_cloud_management_register_watcher_unittest.cc",
     "client_data_delegate_desktop_unittest.cc",
     "file_selection_dialogs_policy_handler_unittest.cc",
   ]
 
   sources += [ "developer_tools_policy_handler_unittest.cc" ]
-
-  if (is_linux) {
-    sources += [ "browser_dm_token_storage_linux_unittest.cc" ]
-  }
-
-  if (is_mac) {
-    sources += [ "browser_dm_token_storage_mac_unittest.cc" ]
-  }
 
   if (enable_printing) {
     sources += [ "printing_restrictions_policy_handler_unittest.cc" ]
@@ -685,7 +648,6 @@ source_set("policy") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles:profile_util",
     "//chrome/common:constants",
-    "//components/enterprise",
     "//components/keyed_service/core",
     "//components/policy/core/browser",
     "//components/policy/core/common",
@@ -723,7 +685,6 @@ source_set("policy") {
   public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
   public += [
-    "chrome_browser_cloud_management_controller_desktop.h",
     "client_data_delegate_desktop.h",
     "cloud/user_policy_signin_service.h",
     "file_selection_dialogs_policy_handler.h",
@@ -735,10 +696,6 @@ source_set("policy") {
     "cloud/user_policy_signin_service_util.h",
   ]
 
-  if (is_mac) {
-    public += [ "browser_dm_token_storage_mac.h" ]
-  }
-
   if (is_linux || is_mac) {
     public += [
       "battery_saver_policy_handler.h",
@@ -747,15 +704,7 @@ source_set("policy") {
   }
 
   if (is_linux || is_mac) {
-    public += [
-      "cloud/profile_token_policy_web_signin_service.h",
-      "cloud/profile_token_policy_web_signin_service_factory.h",
-      "local_sync_policy_handler.h",
-    ]
-  }
-
-  if (is_linux) {
-    public += [ "browser_dm_token_storage_linux.h" ]
+    public += [ "local_sync_policy_handler.h" ]
   }
 
   if (is_linux) {
@@ -866,7 +815,6 @@ source_set("impl") {
     "//components/domain_reliability:prefs",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
-    "//components/enterprise/browser/data_region",
     "//components/enterprise/buildflags",
     "//components/feed/core/shared_prefs:feed_shared_prefs",
     "//components/history/core/common",
@@ -919,25 +867,16 @@ source_set("impl") {
   ]
 
   sources += [
-    "chrome_browser_cloud_management_controller_desktop.cc",
-    "chrome_browser_cloud_management_register_watcher.cc",
-    "chrome_browser_cloud_management_register_watcher.h",
     "client_data_delegate_desktop.cc",
     "cloud/user_policy_signin_service.cc",
     "file_selection_dialogs_policy_handler.cc",
   ]
-  deps += [ "//chrome/browser/ui:enterprise_startup_dialog" ]
 
   sources += [
     "browser_signin_policy_handler.cc",
     "cloud/user_policy_signin_service_factory.cc",
     "cloud/user_policy_signin_service_util.cc",
   ]
-
-  if (is_mac) {
-    sources += [ "browser_dm_token_storage_mac.mm" ]
-    deps += [ "//chrome/browser:app_controller_mac" ]
-  }
 
   if (is_linux || is_mac) {
     sources += [
@@ -947,16 +886,8 @@ source_set("impl") {
   }
 
   if (is_linux || is_mac) {
-    sources += [
-      "cloud/profile_token_policy_web_signin_service.cc",
-      "cloud/profile_token_policy_web_signin_service_factory.cc",
-      "local_sync_policy_handler.cc",
-    ]
+    sources += [ "local_sync_policy_handler.cc" ]
     deps += [ "//components/themes:policy" ]
-  }
-
-  if (is_linux) {
-    sources += [ "browser_dm_token_storage_linux.cc" ]
   }
 
   if (is_linux) {

@@ -23,7 +23,6 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/test_renderer_host.h"
@@ -52,7 +51,6 @@ namespace extensions {
 namespace {
 constexpr char kInvalidId[] = "Invalid id";
 constexpr char kExtensionId[] = "abcdefghijklmnopabcdefghijklmnop";
-constexpr char kFakeJustification[] = "I need it!";
 constexpr char kExtensionManifest[] = R"({
   \"name\" : \"Extension\",
   \"manifest_version\": 3,
@@ -64,11 +62,6 @@ constexpr char kBlockAllExtensionSettings[] = R"({
   "*": {
     "installation_mode":"blocked",
     "blocked_install_message":"This extension is blocked."
-  }
-})";
-constexpr char kBlockOneExtensionSettings[] = R"({
-  "abcdefghijklmnopabcdefghijklmnop": {
-    "installation_mode":"blocked"
   }
 })";
 
@@ -93,49 +86,6 @@ constexpr char kBlockedNotificationsPermissionsExtensionSettings[] = R"({
 constexpr char kWebstoreUserCancelledError[] = "User cancelled install";
 constexpr char kWebstoreBlockByPolicy[] =
     "Extension installation is blocked by policy";
-
-// Helper test struct used for holding data related to extension requests.
-struct ExtensionRequestData {
-  explicit ExtensionRequestData(base::Time timestamp)
-      : ExtensionRequestData(timestamp, std::string()) {}
-  ExtensionRequestData(base::Time timestamp, std::string justification_text)
-      : timestamp(timestamp),
-        justification_text(std::move(justification_text)) {}
-  ~ExtensionRequestData() = default;
-
-  base::Time timestamp;
-  std::string justification_text;
-};
-
-// Verifies that the extension request pending list in |profile| matches the
-// |expected_pending_requests|.
-void VerifyPendingList(const std::map<ExtensionId, ExtensionRequestData>&
-                           expected_pending_requests,
-                       Profile* profile) {
-  const base::DictValue& actual_pending_requests = profile->GetPrefs()->GetDict(
-      enterprise_reporting::kCloudExtensionRequestIds);
-  ASSERT_EQ(expected_pending_requests.size(), actual_pending_requests.size());
-  for (const auto& expected_request : expected_pending_requests) {
-    const base::DictValue* actual_pending_request =
-        actual_pending_requests.FindDict(expected_request.first);
-    ASSERT_NE(nullptr, actual_pending_request);
-
-    // All extensions in the pending list are expected to have a timestamp.
-    EXPECT_EQ(::base::TimeToValue(expected_request.second.timestamp),
-              *actual_pending_request->Find(
-                  extension_misc::kExtensionRequestTimestamp));
-
-    // Extensions in the pending list may not have justification.
-    if (!expected_request.second.justification_text.empty()) {
-      EXPECT_EQ(expected_request.second.justification_text,
-                *actual_pending_request->FindString(
-                    extension_misc::kExtensionWorkflowJustification));
-    } else {
-      EXPECT_FALSE(actual_pending_request->contains(
-          extension_misc::kExtensionWorkflowJustification));
-    }
-  }
-}
 
 void SetExtensionSettings(const std::string& settings_string,
                           TestingProfile* profile) {
@@ -326,20 +276,6 @@ TEST_F(WebstorePrivateGetExtensionStatusTest, ExtensionBlockedByPermission) {
 }
 
 TEST_F(WebstorePrivateGetExtensionStatusTest,
-       ExtensionBlockedWithRequestEnabled) {
-  SetExtensionSettings(kBlockAllExtensionSettings, profile());
-  profile()->GetTestingPrefService()->SetManagedPref(
-      enterprise_reporting::kCloudExtensionRequestEnabled,
-      std::make_unique<base::Value>(true));
-
-  auto function =
-      base::MakeRefCounted<WebstorePrivateGetExtensionStatusFunction>();
-  std::optional<base::Value> response = RunFunctionAndReturnValue(
-      function.get(), GenerateArgs(kExtensionId, kExtensionManifest));
-  VerifyResponse(ExtensionInstallStatus::kCanRequest, *response);
-}
-
-TEST_F(WebstorePrivateGetExtensionStatusTest,
        ExtensionNotBlockedByOptionalPermission) {
   SetExtensionSettings(kBlockedNotificationsPermissionsExtensionSettings,
                        profile());
@@ -365,12 +301,6 @@ class WebstorePrivateBeginInstallWithManifest3Test
     : public WebstorePrivateApiTestBase {
  public:
   WebstorePrivateBeginInstallWithManifest3Test() = default;
-
-  void EnableExtensionRequest(bool enable) {
-    profile()->GetTestingPrefService()->SetManagedPref(
-        enterprise_reporting::kCloudExtensionRequestEnabled,
-        std::make_unique<base::Value>(enable));
-  }
 
   void SetExtensionSettings(const std::string& settings_string) {
     std::optional<base::Value> settings = base::JSONReader::Read(
@@ -414,156 +344,6 @@ class WebstorePrivateBeginInstallWithManifest3Test
   // check).
   test::ScopedDisableRootChecking disable_root_checking_;
 };
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       RequestExtensionWithConfirmThenShowPendingDialog) {
-  EnableExtensionRequest(true);
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-
-  VerifyPendingList({}, profile());
-
-  // Confirm request dialog
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    ScopedTestDialogAutoConfirm auto_confirm(
-        ScopedTestDialogAutoConfirm::ACCEPT);
-    api_test_utils::RunFunction(function.get(),
-                                GenerateArgs(kExtensionId, kExtensionManifest),
-                                profile());
-  }
-  VerifyUserCancelledFunctionResult(function.get());
-  VerifyPendingList({{kExtensionId, ExtensionRequestData(base::Time::Now())}},
-                    profile());
-
-  // Show pending request dialog which can only be canceled.
-  function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    ScopedTestDialogAutoConfirm auto_cancel(
-        ScopedTestDialogAutoConfirm::CANCEL);
-    api_test_utils::RunFunction(function.get(),
-                                GenerateArgs(kExtensionId, kExtensionManifest),
-                                profile());
-  }
-  VerifyUserCancelledFunctionResult(function.get());
-  VerifyPendingList({{kExtensionId, ExtensionRequestData(base::Time::Now())}},
-                    profile());
-}
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       RequestExtensionWithCancel) {
-  EnableExtensionRequest(true);
-  VerifyPendingList({}, profile());
-
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  ScopedTestDialogAutoConfirm auto_cancel(ScopedTestDialogAutoConfirm::CANCEL);
-
-  api_test_utils::RunFunction(function.get(),
-                              GenerateArgs(kExtensionId, kExtensionManifest),
-                              profile());
-  VerifyUserCancelledFunctionResult(function.get());
-  VerifyPendingList({}, profile());
-}
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       RequestExtensionWithJustification) {
-  EnableExtensionRequest(true);
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-
-  VerifyPendingList({}, profile());
-
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    ScopedTestDialogAutoConfirm auto_confirm(
-        ScopedTestDialogAutoConfirm::ACCEPT);
-    auto_confirm.set_justification(kFakeJustification);
-    api_test_utils::RunFunction(function.get(),
-                                GenerateArgs(kExtensionId, kExtensionManifest),
-                                profile());
-  }
-  // Even though the ACCEPT button was selected above, the extension request
-  // dialog results in user_cancelled.
-  VerifyUserCancelledFunctionResult(function.get());
-  VerifyPendingList({{kExtensionId, ExtensionRequestData(base::Time::Now(),
-                                                         kFakeJustification)}},
-                    profile());
-}
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       RequestExtensionWithJustificationAndCancel) {
-  EnableExtensionRequest(true);
-  VerifyPendingList({}, profile());
-
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    ScopedTestDialogAutoConfirm auto_cancel(
-        ScopedTestDialogAutoConfirm::CANCEL);
-    auto_cancel.set_justification(kFakeJustification);
-
-    api_test_utils::RunFunction(function.get(),
-                                GenerateArgs(kExtensionId, kExtensionManifest),
-                                profile());
-  }
-  VerifyUserCancelledFunctionResult(function.get());
-  VerifyPendingList({}, profile());
-}
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       NormalInstallIfRequestExtensionIsDisabled) {
-  EnableExtensionRequest(true);
-  VerifyPendingList({}, profile());
-
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    ScopedTestDialogAutoConfirm auto_confirm(
-        ScopedTestDialogAutoConfirm::ACCEPT);
-    api_test_utils::RunFunction(function.get(),
-                                GenerateArgs(kExtensionId, kExtensionManifest),
-                                profile());
-  }
-  VerifyPendingList({{kExtensionId, ExtensionRequestData(base::Time::Now())}},
-                    profile());
-
-  // Show install prompt dialog if extension request feature is disabled.
-  EnableExtensionRequest(false);
-  function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  {
-    // Successfully confirm the install prompt and the API returns an empty
-    // string without error.
-    ScopedTestDialogAutoConfirm auto_cancel(
-        ScopedTestDialogAutoConfirm::ACCEPT);
-    std::optional<base::Value> response = RunFunctionAndReturnValue(
-        function.get(), GenerateArgs(kExtensionId, kExtensionManifest));
-    ASSERT_TRUE(response);
-    ASSERT_TRUE(response->is_string());
-    EXPECT_TRUE(response->GetString().empty());
-  }
-
-  // Pending list is not changed.
-  VerifyPendingList({{kExtensionId, ExtensionRequestData(base::Time::Now())}},
-                    profile());
-}
 
 TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
        InvalidManifestVersionZero) {
@@ -610,26 +390,6 @@ TEST_F(WebstorePrivateBeginInstallWithManifest3Test, BlockedByPolicy) {
                               profile());
   VerifyBlockedByPolicyFunctionResult(
       function.get(), u"From your administrator: This extension is blocked.");
-}
-
-TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
-       BlockedByPolicyWithExtensionRequest) {
-  SetExtensionSettings(kBlockOneExtensionSettings);
-  EnableExtensionRequest(true);
-  VerifyPendingList({}, profile());
-
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-  auto function =
-      base::MakeRefCounted<WebstorePrivateBeginInstallWithManifest3Function>();
-  function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-  ScopedTestDialogAutoConfirm auto_confirm(ScopedTestDialogAutoConfirm::ACCEPT);
-
-  api_test_utils::RunFunction(function.get(),
-                              GenerateArgs(kExtensionId, kExtensionManifest),
-                              profile());
-  VerifyPendingList({}, profile());
-  VerifyBlockedByPolicyFunctionResult(function.get(), std::u16string());
 }
 
 TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
@@ -879,8 +639,6 @@ class WebstorePrivateOnEnterprisePromoClickFunctionTest
 
 TEST_F(WebstorePrivateOnEnterprisePromoClickFunctionTest,
        HistogramRecordedClick) {
-  PrefService* prefs = profile()->GetPrefs();
-  prefs->SetBoolean(pref_names::kHasDismissedEnterprisePromotion, false);
   auto function =
       base::MakeRefCounted<WebstorePrivateOnEnterprisePromoClickFunction>();
 
@@ -889,7 +647,6 @@ TEST_F(WebstorePrivateOnEnterprisePromoClickFunctionTest,
   histogram_tester_.ExpectUniqueSample(
       "Enterprise.CwsPromotionBannerEvent",
       static_cast<int>(enterprise::CwsPromotionBannerEvent::kClicked), 1);
-  EXPECT_TRUE(prefs->GetBoolean(pref_names::kHasDismissedEnterprisePromotion));
 }
 
 }  // namespace extensions

@@ -23,7 +23,6 @@ export class TestManageProfilesBrowserProxy extends TestBrowserProxy implements
       'removeProfile',
       'getProfileStatistics',
       'closeProfileStatistics',
-      'selectNewAccount',
       'continueWithoutAccount',
       'setProfileName',
       'recordSignInPromoImpression',
@@ -111,10 +110,6 @@ export class TestManageProfilesBrowserProxy extends TestBrowserProxy implements
 
   closeProfileStatistics() {
     this.methodCalled('closeProfileStatistics');
-  }
-
-  selectNewAccount(profileColor: number|null) {
-    this.methodCalled('selectNewAccount', [profileColor]);
   }
 
   continueWithoutAccount(profileColor: number) {

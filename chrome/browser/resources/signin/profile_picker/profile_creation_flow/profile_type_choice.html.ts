@@ -38,11 +38,6 @@ export function getHtml(this: ProfileTypeChoiceElement) {
         $i18n{declineSignInButtonLabel}
       </cr-button>
     </if>
-    <cr-button id="signInButton" class="action-button"
-        @click="${this.onSignInClick_}"
-        ?disabled="${this.profileCreationInProgress}">
-      $i18n{signInButtonLabel}
-    </cr-button>
     <if expr="is_win">
       <cr-button id="notNowButton"
           class="tonal-button"
@@ -52,11 +47,6 @@ export function getHtml(this: ProfileTypeChoiceElement) {
       </cr-button>
     </if>
   ` : html`
-    <cr-button id="signInButton" class="action-button"
-        @click="${this.onSignInClick_}"
-        ?disabled="${this.profileCreationInProgress}">
-      $i18n{signInButtonLabel}
-    </cr-button>
     <cr-button id="notNowButton"
         class="tonal-button"
         @click="${this.onNotNowClick_}"

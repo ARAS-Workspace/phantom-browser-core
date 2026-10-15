@@ -805,7 +805,7 @@ IN_PROC_BROWSER_TEST_P(
 INSTANTIATE_TEST_SUITE_P(
     All,
     SigninInterceptFirstRunExperienceDialogBrowserTest,
-    ::testing::Combine(::testing::Bool(),
+    ::testing::Combine(::testing::Values(false),
                        ::testing::Values(kConsumerEmail, kEnterpriseEmail)),
     [](const auto& info) {
       return (std::get<0>(info.param) ? "InUnoModel" : "InDiceModel") +
@@ -817,7 +817,7 @@ INSTANTIATE_TEST_SUITE_P(
 INSTANTIATE_TEST_SUITE_P(
     All,
     SigninInterceptFirstRunExperienceDialogEnterpriseUserBrowserTest,
-    ::testing::Bool());
+    ::testing::Values(false));
 
 class
     SigninInterceptFirstRunExperienceDialogEnterpriseManagementHandlingBrowserTest
@@ -933,7 +933,7 @@ IN_PROC_BROWSER_TEST_P(
 INSTANTIATE_TEST_SUITE_P(
     All,
     SigninInterceptFirstRunExperienceDialogEnterpriseManagementHandlingBrowserTest,
-    ::testing::Combine(::testing::Bool(),
+    ::testing::Combine(::testing::Values(false),
                        ::testing::Bool(),
                        ::testing::Bool(),
                        ::testing::Bool()),

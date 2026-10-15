@@ -22,7 +22,7 @@ import {ManageProfilesBrowserProxyImpl} from './manage_profiles_browser_proxy.js
 import {navigateTo, NavigationMixin, ProfileCreationSteps, Routes} from './navigation_mixin.js';
 import {getCss} from './profile_picker_app.css.js';
 import {getHtml} from './profile_picker_app.html.js';
-import {isForceSigninEnabled, isProfileCreationAllowed, isUseRefreshedUI} from './profile_picker_flags.js';
+import {isProfileCreationAllowed, isUseRefreshedUI} from './profile_picker_flags.js';
 
 export interface ProfilePickerAppElement {
   $: {
@@ -99,28 +99,6 @@ export class ProfilePickerAppElement extends ProfilePickerAppElementBase {
   override onRouteChange(route: Routes, step: string) {
     if (!isProfileCreationAllowed() && route === Routes.NEW_PROFILE) {
       navigateTo(Routes.MAIN);
-      return;
-    }
-
-    if (step === ProfileCreationSteps.LOAD_FORCE_SIGNIN) {
-      assert(
-          route === Routes.NEW_PROFILE,
-          'LOAD_FORCE_SIGNIN step must be a part of NEW_PROFILE route');
-      assert(
-          isForceSigninEnabled(),
-          'Force signin policy must be enabled to start the force signin flow');
-      // The force sign-in flow is displayed in a dialog on top of the main
-      // view. Load the main view if it isn't already shown.
-      // Do not call `navigateTo(Routes.MAIN)` to not update the history.
-      // It's fine to skip `initializeModules()` for the main view since the
-      // main view will never be lazy loaded.
-      if (this.currentRoute_ !== Routes.MAIN) {
-        this.currentRoute_ = Routes.MAIN;
-        document.title = this.getDocumentTitle_('mainView');
-        this.$.viewManager.switchView('mainView', 'fade-in', 'no-animation');
-      }
-      this.manageProfilesBrowserProxy_.selectNewAccount(null);
-
       return;
     }
 

@@ -268,13 +268,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
   void AddDurableMessageCollector(
       mojo::PendingReceiver<mojom::DurableMessageCollector> receiver) override;
 
-#if BUILDFLAG(IS_MAC)
-  void CreateURLSessionURLLoaderAndStart(
-      const ResourceRequest& request,
-      mojo::PendingReceiver<mojom::URLLoader> loader_receiver,
-      mojo::PendingRemote<mojom::URLLoaderClient> client_remote) override;
-#endif
-
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
   void GetVrpFlags(GetVrpFlagsCallback callback) override;
 #endif
@@ -403,14 +396,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
   GetDurableMessageCollectorManagerForTesting() {
     return durable_message_collector_manager_.get();
   }
-
-#if BUILDFLAG(IS_MAC)
-  inline void SetUseMockURLSessionURLLoaderForTesting(
-      bool use_mock_url_session_url_loader) {
-    use_mock_url_session_url_loader_for_testing_ =
-        use_mock_url_session_url_loader;
-  }
-#endif
 
  private:
   class DelayedDohProbeActivator;
@@ -575,10 +560,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
 
   std::unique_ptr<DevtoolsDurableMessageCollectorManager>
       durable_message_collector_manager_;
-
-#if BUILDFLAG(IS_MAC)
-  bool use_mock_url_session_url_loader_for_testing_{false};
-#endif
 
   base::WeakPtrFactory<NetworkService> weak_factory_{this};
 };

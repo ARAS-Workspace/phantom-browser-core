@@ -508,7 +508,6 @@ source_set("impl") {
     "//chrome/browser/vr",
     "//chrome/browser/web_applications",
     "//components/content_settings/core/browser",
-    "//components/enterprise",
     "//components/favicon/content",
     "//components/favicon/core",
     "//components/history/core/common",

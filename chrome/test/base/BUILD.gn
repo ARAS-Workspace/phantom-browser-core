@@ -400,7 +400,6 @@ source_set("testing_browser_process") {
     "//components/component_updater",
     "//components/keep_alive_registry",
   ]
-  deps += [ "//components/enterprise" ]
   if (enable_background_mode) {
     deps += [ "//chrome/browser/background/extensions" ]
   }

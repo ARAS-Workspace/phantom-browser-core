@@ -57,10 +57,6 @@ enum CertificateSource {
   [EnableIfNot=is_chromeos]
   kPlatformUserDistrustedCerts,
 
-  // Enterprise provisioned client certificates. Only enabled on platforms
-  // where that feature is available.
-  [EnableIf=is_linux|is_mac|is_win] kProvisionedClientCert,
-
   // Extension provided client certificates.
   [EnableIf=is_chromeos] kExtensionsClientCert,
 

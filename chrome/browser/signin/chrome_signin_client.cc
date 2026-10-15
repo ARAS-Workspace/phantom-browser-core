@@ -31,7 +31,6 @@
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/signin/account_consistency_mode_manager.h"
 #include "chrome/browser/signin/chrome_device_id_helper.h"
-#include "chrome/browser/signin/force_signin_verifier.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/signin/signin_util.h"
@@ -237,9 +236,7 @@ ChromeSigninClient::ChromeSigninClient(Profile* profile)
 
 ChromeSigninClient::~ChromeSigninClient() = default;
 
-void ChromeSigninClient::DoFinalInit() {
-  VerifySyncToken();
-}
+void ChromeSigninClient::DoFinalInit() {}
 
 // static
 bool ChromeSigninClient::ProfileAllowsSigninCookies(Profile* profile) {
@@ -454,37 +451,6 @@ SigninClient::SignoutDecision ChromeSigninClient::GetSignoutDecision(
   return SigninClient::SignoutDecision::ALLOW;
 }
 
-void ChromeSigninClient::VerifySyncToken() {
-  // We only verify the token once when Profile is just created.
-  if (signin_util::IsForceSigninEnabled() && !force_signin_verifier_) {
-    force_signin_verifier_ = std::make_unique<ForceSigninVerifier>(
-        profile_, IdentityManagerFactory::GetForProfile(profile_),
-        base::BindOnce(&ChromeSigninClient::OnTokenFetchComplete,
-                       base::Unretained(this)));
-  }
-}
-
-void ChromeSigninClient::OnTokenFetchComplete(bool token_is_valid) {
-  // If the token is valid we do need to do anything special and let the user
-  // proceed.
-  if (token_is_valid) {
-    return;
-  }
-
-  // Token is not valid, we close all the browsers and open the Profile
-  // Picker.
-  should_display_user_manager_ = true;
-  chrome::CloseAllBrowsersWithProfile(
-      profile_,
-      /*skip_beforeunload=*/true,
-      base::BindRepeating(
-          &ChromeSigninClient::OnCloseBrowsersSuccess, base::Unretained(this),
-          signin_metrics::ProfileSignout::kAuthenticationFailedWithForceSignin,
-          // Do not sign the user out to allow them to reauthenticate from the
-          // profile picker.
-          /*should_sign_out=*/false));
-}
-
 void ChromeSigninClient::RecordOpenTabCount(
     signin_metrics::AccessPoint access_point,
     signin::ConsentLevel consent_level) {
@@ -514,10 +480,6 @@ void ChromeSigninClient::OnCloseBrowsersSuccess(
     const signin_metrics::ProfileSignout signout_source_metric,
     bool should_sign_out,
     const base::FilePath& profile_path) {
-  if (signin_util::IsForceSigninEnabled() && force_signin_verifier_.get()) {
-    force_signin_verifier_->Cancel();
-  }
-
   if (should_sign_out) {
     std::move(on_signout_decision_reached_)
         .Run(GetSignoutDecision(signout_source_metric));

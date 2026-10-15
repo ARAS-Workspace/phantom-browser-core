@@ -76,7 +76,6 @@
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "components/component_updater/component_updater_service.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
 
 #if BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
 #include "chrome/browser/notifications/notification_ui_manager.h"
@@ -625,15 +624,6 @@ void TestingBrowserProcess::MaybeStartTearDown() {
 
 void TestingBrowserProcess::ShutdownBrowserPolicyConnector() {
   if (browser_policy_connector_) {
-    // Initial cleanup for ChromeBrowserCloudManagement, shutdown components
-    // that depend on profile and notification system. For example,
-    // ProfileManager observer and KeyServices observer need to be removed
-    // before profiles.
-    auto* cloud_management_controller =
-        browser_policy_connector_->chrome_browser_cloud_management_controller();
-    if (cloud_management_controller) {
-      cloud_management_controller->ShutDown();
-    }
     browser_policy_connector_->Shutdown();
   }
 }

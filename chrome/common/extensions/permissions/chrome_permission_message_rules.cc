@@ -210,14 +210,6 @@ class HostListFormatter : public ChromePermissionMessageFormatter {
   int message_id_for_many_hosts_;
 };
 
-int GetEnterpriseReportingPrivatePermissionMessageId() {
-#if BUILDFLAG(IS_LINUX) or BUILDFLAG(IS_MAC)
-  return IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_REPORTING_PRIVATE_ENABLED_LINUX_AND_MACOS;
-#else
-  return IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_REPORTING_PRIVATE;
-#endif
-}
-
 }  // namespace
 
 ChromePermissionMessageRule::ChromePermissionMessageRule(
@@ -625,12 +617,6 @@ ChromePermissionMessageRule::GetAllRules() {
        {}},
       {IDS_EXTENSION_PROMPT_WARNING_USERS_PRIVATE,
        {APIPermissionID::kUsersPrivate},
-       {}},
-      {GetEnterpriseReportingPrivatePermissionMessageId(),
-       {APIPermissionID::kEnterpriseReportingPrivate},
-       {}},
-      {IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_HARDWARE_PLATFORM,
-       {APIPermissionID::kEnterpriseHardwarePlatform},
        {}},
       {IDS_EXTENSION_PROMPT_WARNING_ENTERPRISE_DEVICE_ATTRIBUTES,
        {APIPermissionID::kEnterpriseDeviceAttributes},

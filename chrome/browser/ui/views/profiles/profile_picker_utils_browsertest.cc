@@ -51,7 +51,9 @@ const PolicyTestParam kPolicyTestParams[] = {
      .value = "1",
      .expected_policy_effect = FirstRunDevicePolicyEffect::kNone},
 #if !BUILDFLAG(IS_LINUX)
-    {.key = policy::key::kBrowserSignin, .value = "2"},
+    {.key = policy::key::kBrowserSignin,
+     .value = "2",
+     .expected_policy_effect = FirstRunDevicePolicyEffect::kNone},
 #endif  // BUILDFLAG(IS_LINUX)
     {.key = policy::key::kPromotionalTabsEnabled, .value = "false"},
 };

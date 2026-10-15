@@ -26,10 +26,6 @@ namespace signin {
 class IdentityManager;
 }  // namespace signin
 
-namespace enterprise_promotion {
-class PromotionEligibilityChecker;
-}  // namespace enterprise_promotion
-
 namespace extensions {
 
 class Extension;
@@ -57,12 +53,6 @@ class WebstorePrivateAPIDelegate {
       const std::u16string& custom_error_message,
       const gfx::ImageSkia& icon,
       base::OnceClosure done_callback) = 0;
-
-  // Maybe create promotion eligibility checker.
-  virtual std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-  CreatePromotionEligibilityChecker(content::BrowserContext* context,
-                                    bool dismissed_banner_pref,
-                                    bool feature_enabled) = 0;
 };
 
 }  // namespace extensions

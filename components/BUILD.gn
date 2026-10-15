@@ -60,7 +60,6 @@ test("components_unittests") {
       "test/data/contextual_tasks/",
       "test/data/crx_file/",
       "test/data/custom_handlers/",
-      "test/data/device_signals/",
       "test/data/dom_distiller/",
       "test/data/explore_sites/",
       "test/data/feed/",
@@ -149,11 +148,9 @@ test("components_unittests") {
     "//components/desktop_to_mobile_promos:unit_tests",
     "//components/device_event_log:unit_tests",
     "//components/device_reauth:unit_tests",
-    "//components/device_signals/core:unit_tests",
     "//components/dom_distiller/core:unit_tests",
     "//components/download:unit_tests",
     "//components/encrypted_messages:unit_tests",
-    "//components/enterprise/device_trust/core/signals:unit_tests",
     "//components/favicon/core:unit_tests",
     "//components/favicon_base:unit_tests",
     "//components/feature_engagement:unit_tests",
@@ -318,9 +315,7 @@ test("components_unittests") {
   # TODO(crbug.com/40818181): Enable all relevant tests on Fuchsia too.
   deps += [
     "//components/browser_sync:unit_tests",
-    "//components/enterprise:unit_tests",
     "//components/enterprise/common:unit_tests",
-    "//components/enterprise/isolated_mode:unit_tests",
     "//components/send_tab_to_self:unit_tests",
     "//components/sync_sessions:unit_tests",
     "//components/update_client:unit_tests",
@@ -427,10 +422,6 @@ test("components_unittests") {
       "//components/guest_contents/browser:unit_tests",
       "//components/surface_embed/renderer:unit_tests",
     ]
-  }
-
-  if (is_linux || is_mac) {
-    deps += [ "//components/enterprise/idle:unit_tests" ]
   }
 
   deps += [
@@ -546,7 +537,6 @@ test("components_unittests") {
 
   if (is_mac) {
     deps += [
-      "//components/enterprise/platform_auth:unit_tests",
       "//components/remote_cocoa/app_shim:unit_tests",
       "//components/remote_cocoa/common:unit_tests",
     ]

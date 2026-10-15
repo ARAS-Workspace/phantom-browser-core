@@ -43,8 +43,6 @@ BASE_DECLARE_FEATURE(kDbusSecretPortal);
 
 BASE_DECLARE_FEATURE(kDestroyProfileOnBrowserClose);
 
-BASE_DECLARE_FEATURE(kFlexOrgManagementDisclosure);
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // Controls whether to load the initial sideloaded external extensions or not.
 BASE_DECLARE_FEATURE(kInitialExternalExtensions);

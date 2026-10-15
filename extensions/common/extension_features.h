@@ -66,15 +66,6 @@ BASE_DECLARE_FEATURE(kApiOdfsConfigPrivate);
 // Controls the availability of the contextualTasksPrivate API.
 BASE_DECLARE_FEATURE(kApiContextualTasksPrivate);
 
-// Controls the availability of the
-// `enterprise.reportingPrivate.onDataMaskingRulesTriggered` API.
-BASE_DECLARE_FEATURE(kApiEnterpriseReportingPrivateOnDataMaskingRulesTriggered);
-
-// Controls the availability of the
-// `enterprise.reportingPrivate.reportForceSaveToCloudEventHandled` API.
-BASE_DECLARE_FEATURE(
-    kApiEnterpriseReportingPrivateReportForceSaveToCloudEventHandled);
-
 // Controls the availability of the enterprise.webrtc API. Acts as a remote
 // kill switch: with this disabled the API is not present in the extension
 // context at all.
@@ -247,10 +238,6 @@ BASE_DECLARE_FEATURE(kAvoidCloneArgsOnExtensionFunctionDispatch);
 // loaded extension's root directory are allowed to start. This helps avoid
 // memory leaks from stale cache entries and false-positive corruption reports.
 BASE_DECLARE_FEATURE(kExtensionContentVerificationUsesExtensionRoot);
-
-// Enables the shouldShowPromotion API to determine which promotion to show for
-// Chrome Enterprise on CWS.
-BASE_DECLARE_FEATURE(kEnableShouldShowPromotion);
 
 // When enabled, web searches with a newly-installed search engine-changing
 // extension will be blocked behind a new explicit-choice dialog. The dialog

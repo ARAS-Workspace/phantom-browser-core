@@ -918,13 +918,6 @@ inline constexpr char kVerticalTabsCollapsedState[] =
 inline constexpr char kVerticalTabsUncollapsedWidth[] =
     "vertical_tabs.uncollapsed_width";
 
-// Integer value controlling the data region to store covered data from Chrome.
-// By default, no preference is selected.
-// - 0: No preference
-// - 1: United States
-// - 2: Europe
-inline constexpr char kChromeDataRegionSetting[] = "chrome_data_region_setting";
-
 // Network annotations that are expected to be disabled based on policy values.
 // Stored as a dict with annotation hash codes as keys.
 inline constexpr char kNetworkAnnotationBlocklist[] =
@@ -1887,11 +1880,6 @@ inline constexpr char kSigninInterceptionEnabled[] =
 // Policy that indicates how to handle animated images.
 inline constexpr char kAnimationPolicy[] = "settings.a11y.animation_policy";
 
-// Boolean pref indicating whether extension DOM activity logging is enabled
-// for enterprise telemetry.
-inline constexpr char kExtensionDOMActivityLoggingEnabled[] =
-    "enterprise_reporting.extension_dom_activity_logging_enabled";
-
 // A list of URLs (for U2F) or domains (for webauthn) that automatically permit
 // direct attestation of a Security Key.
 inline constexpr char kSecurityKeyPermitAttestation[] =
@@ -2069,11 +2057,6 @@ inline constexpr char kNotificationNextTriggerTime[] =
 
 // Preference for controlling whether tab freezing is enabled.
 inline constexpr char kTabFreezingEnabled[] = "tab_freezing_enabled";
-
-// Boolean that enables the Enterprise Hardware Platform Extension API for
-// extensions installed by enterprise policy.
-inline constexpr char kEnterpriseHardwarePlatformAPIEnabled[] =
-    "enterprise_hardware_platform_api.enabled";
 
 // Boolean that specifies whether Signed HTTP Exchange (SXG) loading is enabled.
 inline constexpr char kSignedHTTPExchangeEnabled[] =
@@ -2346,26 +2329,6 @@ inline constexpr char kEnterpriseCustomLabelForProfile[] =
 // Integer value of the custom label preset of a managed profile.
 inline constexpr char kEnterpriseProfileBadgeToolbarSettings[] =
     "enterprise.profile_badging.toolbar_settings";
-
-#if BUILDFLAG(IS_MAC)
-// The integer value of the ExtensibleEnterpriseSSO of whether we should enable
-// extensible enterprise SSO. This is based on the value of the
-// ExtensibleEnterpriseSSOBlocklist.
-inline constexpr char kExtensibleEnterpriseSSOEnabled[] =
-    "extensible_enterprise_sso.enabled";
-
-// The list value of the enabled handlers for extensible enterprise SSO.
-// This is based on the ExtensibleEnterpriseSSOBlocklist policy.
-inline constexpr char kExtensibleEnterpriseSSOEnabledIdps[] =
-    "extensible_enterprise_sso.enabled_idps";
-
-// The list value of hosts for which the extensible enterprise SSO has been
-// configured. This is based on the CFPreferences under key
-// com.apple.extensiblesso
-inline constexpr char kExtensibleEnterpriseSSOConfiguredHosts[] =
-    "extensible_enterprise_sso.configured_hosts";
-
-#endif  //  BUILDFLAG(IS_MAC)
 
 // Allow or don't allow bypassing WebAudio output buffering
 inline constexpr char kWebAudioOutputBufferingEnabled[] =

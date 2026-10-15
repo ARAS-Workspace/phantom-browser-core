@@ -32,7 +32,6 @@
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/frame_tree_node_id.h"
-#include "content/public/browser/legacy_tech_cookie_issue_details.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/alternative_error_page_override_info.mojom-forward.h"
 #include "media/base/picture_in_picture_events_info.h"
@@ -1088,19 +1087,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       base::OnceCallback<void(bool)> callback,
       bool allow);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && BUILDFLAG(ENABLE_GUEST_VIEW)
-
-  // Try to upload an enterprise legacy tech event to the enterprise management
-  // server for admins.
-  void ReportLegacyTechEvent(
-      content::RenderFrameHost* render_frame_host,
-      const std::string& type,
-      const GURL& url,
-      const GURL& frame_url,
-      const std::string& filename,
-      uint64_t line,
-      uint64_t column,
-      std::optional<content::LegacyTechCookieIssueDetails> cookie_issue_details)
-      override;
 
   void OnKeepaliveTimerFired(
       std::unique_ptr<ScopedKeepAlive> keep_alive_handle);

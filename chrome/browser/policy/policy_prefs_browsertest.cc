@@ -38,8 +38,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-
 namespace policy {
 
 const size_t kNumChunks = 32;
@@ -133,9 +131,6 @@ class ChunkedPolicyPrefsTest : public PolicyPrefsTest,
 // disabling this test.
 IN_PROC_BROWSER_TEST_P(ChunkedPolicyPrefsTest, PolicyToPrefsMapping) {
   base::ScopedAllowBlockingForTesting allow_blocking;
-
-  policy::FakeBrowserDMTokenStorage storage;
-  policy::BrowserDMTokenStorage::SetForTesting(&storage);
 
   PrefService* local_state = g_browser_process->local_state();
   PrefService* user_prefs = ProfileManager::GetLastUsedProfileIfLoaded()

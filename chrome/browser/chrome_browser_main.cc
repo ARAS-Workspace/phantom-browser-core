@@ -40,7 +40,6 @@
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
 #include "chrome/browser/component_updater/registration.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/chrome_browser_main_extra_parts_enterprise.h"
 #include "chrome/browser/first_run/bookmark_importer.h"
 #include "chrome/browser/first_run/first_run_features.h"
 #include "chrome/browser/gpu/chrome_browser_main_extra_parts_gpu.h"
@@ -164,8 +163,6 @@
 #include "base/check_op.h"
 #endif
 
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/first_run/upgrade_util_linux.h"
 #include "chrome/browser/ui/views/chrome_browser_main_extra_parts_views_linux.h"
@@ -272,10 +269,6 @@
 #include "chrome/browser/chrome_browser_main_extra_parts_linux.h"
 #elif BUILDFLAG(IS_OZONE)
 #include "chrome/browser/chrome_browser_main_extra_parts_ozone.h"
-#endif
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/platform_auth/platform_auth_policy_observer.h"
 #endif
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
@@ -682,10 +675,6 @@ std::unique_ptr<content::BrowserMainParts> ChromeBrowserMainParts::Create(
   main_parts->AddParts(std::make_unique<ChromeBrowserMainExtraPartsMemory>());
 
   chrome::AddMetricsExtraParts(main_parts.get());
-
-  main_parts->AddParts(
-      std::make_unique<
-          enterprise_util::ChromeBrowserMainExtraPartsEnterprise>());
 
   main_parts->AddParts(
       std::make_unique<headless::ChromeBrowserMainExtraPartsHeadless>());
@@ -1244,14 +1233,6 @@ void ChromeBrowserMainParts::PreProfileInit() {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   SetChromeAppModalDialogManagerDelegate();
 #endif
-
-#if BUILDFLAG(IS_MAC)
-  // Start up the platform auth SSO policy observer.
-  if (auto* local_state = g_browser_process->local_state(); local_state) {
-    platform_auth_policy_observer_ =
-        std::make_unique<PlatformAuthPolicyObserver>(local_state);
-  }
-#endif
 }
 
 void ChromeBrowserMainParts::CallPostProfileInit(Profile* profile) {
@@ -1440,29 +1421,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   }
   downgrade_manager_.UpdateLastVersion(user_data_dir_);
 #endif
-
-  // Initialize the chrome browser cloud management controller after
-  // the browser process singleton is acquired to remove race conditions where
-  // multiple browser processes start simultaneously.  The main
-  // initialization of browser_policy_connector is performed inside
-  // PreMainMessageLoopRun() so that policies can be applied as soon as
-  // possible.
-  //
-  // Note that this protects against multiple browser process starts in
-  // the same user data dir and not multiple starts across user data dirs.
-  browser_process_->browser_policy_connector()->InitCloudManagementController(
-      browser_process_->local_state(),
-      browser_process_->system_network_context_manager()
-          ->GetSharedURLLoaderFactory());
-
-  // Wait for the chrome browser cloud management enrollment to finish.
-  // If enrollment is not mandatory, this function returns immediately.
-  // Abort the launch process if required enrollment fails.
-  if (!browser_process_->browser_policy_connector()
-           ->chrome_browser_cloud_management_controller()
-           ->WaitUntilPolicyEnrollmentFinished()) {
-    return CHROME_RESULT_CODE_CLOUD_POLICY_ENROLLMENT_FAILED;
-  }
 
   // Desktop construction occurs here, (required before profile creation).
   PreProfileInit();
@@ -1774,12 +1732,6 @@ void ChromeBrowserMainParts::PostMainMessageLoopRun() {
   browser_process_->StartTearDown();
 
   publisher_host_factory_resetter_.reset();
-
-#if BUILDFLAG(IS_MAC)
-  // The `ProfileManager` has been destroyed, so no new platform authentication
-  // requests will be created.
-  platform_auth_policy_observer_.reset();
-#endif
 }
 
 void ChromeBrowserMainParts::PostDestroyThreads() {

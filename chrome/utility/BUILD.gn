@@ -132,10 +132,6 @@ static_library("utility") {
       "//chrome/services/removable_storage_writer/public/mojom",
       "//mojo/public/cpp/bindings",
     ]
-
-    if (is_mac || is_linux) {
-      deps += [ "//chrome/services/system_signals" ]
-    }
   }
 
   # NSS decryptor is not needed on ChromeOS.

@@ -793,15 +793,6 @@ class NetworkServiceTestHelper::NetworkServiceTestImpl
     std::move(callback).Run(enabled);
   }
 
-#if BUILDFLAG(IS_MAC)
-  void SetUseMockURLSessionURLLoaderForTesting(
-      bool use_mock_url_session_url_loader) override {
-    network::NetworkService::GetNetworkServiceForTesting()
-        ->SetUseMockURLSessionURLLoaderForTesting(
-            use_mock_url_session_url_loader);
-  }
-#endif
-
   void HasRawHeadersAccess(uint32_t process_id,
                            const GURL& url,
                            HasRawHeadersAccessCallback callback) override {

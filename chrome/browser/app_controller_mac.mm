@@ -124,8 +124,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#include "components/enterprise/isolated_mode/settings.h"
 #include "components/handoff/handoff_manager.h"
 #include "components/handoff/handoff_utility.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
@@ -1295,14 +1293,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
 // This is called after profiles have been loaded and preferences registered.
 // It is safe to access the default profile here.
 - (void)applicationDidFinishLaunching:(NSNotification*)notify {
-  if (g_browser_process->browser_policy_connector()
-          ->chrome_browser_cloud_management_controller()
-          ->IsEnterpriseStartupDialogShowing()) {
-    // As Chrome is not ready when the Enterprise startup dialog is being shown.
-    // Store the notification as it will be reposted when the dialog is closed.
-    return;
-  }
-
   [self setUpdateCheckInterval];
 
   // If enabled, keep Chrome alive when apps are open instead of quitting all
@@ -2163,10 +2153,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
     return dockMenu;
   }
 
-  bool isolated_mode_enabled =
-      enterprise_isolated_mode::IsolatedModeReplacesIncognito(
-          *profile->GetPrefs(), chrome::GetChannel());
-
   if (IncognitoModePrefs::GetAvailability(profile->GetPrefs()) !=
       policy::IncognitoModeAvailability::kDisabled) {
     titleStr = l10n_util::GetNSStringWithFixup(IDS_NEW_INCOGNITO_WINDOW_MAC);
@@ -2175,17 +2161,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
                                keyEquivalent:@""];
     item.target = self;
     item.tag = IDC_NEW_INCOGNITO_WINDOW;
-    item.enabled = [self validateUserInterfaceItem:item];
-    [dockMenu addItem:item];
-  }
-
-  if (isolated_mode_enabled) {
-    titleStr = l10n_util::GetNSStringWithFixup(IDS_NEW_ISOLATED_WINDOW_MAC);
-    item = [[NSMenuItem alloc] initWithTitle:titleStr
-                                      action:@selector(commandFromDock:)
-                               keyEquivalent:@""];
-    item.target = self;
-    item.tag = IDC_NEW_ISOLATED_WINDOW;
     item.enabled = [self validateUserInterfaceItem:item];
     [dockMenu addItem:item];
   }
@@ -2240,9 +2215,7 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
     NSMenuItem* isolatedItem = [fileMenu itemWithTag:IDC_NEW_ISOLATED_WINDOW];
 
     if (incognitoItem && isolatedItem) {
-      bool isolated_mode_enabled =
-          profile && enterprise_isolated_mode::IsolatedModeReplacesIncognito(
-                         *profile->GetPrefs(), chrome::GetChannel());
+      bool isolated_mode_enabled = false;
 
       // Toggle visibility of Isolated Mode item based on policy.
       isolatedItem.hidden = !isolated_mode_enabled;
@@ -2536,9 +2509,7 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
 }
 
 - (BOOL)isProfileReady {
-  return !g_browser_process->browser_policy_connector()
-              ->chrome_browser_cloud_management_controller()
-              ->IsEnterpriseStartupDialogShowing();
+  return YES;
 }
 
 #pragma mark - HandoffObserverDelegate
@@ -2729,17 +2700,6 @@ void CreateGuestProfileIfNeeded() {
   g_browser_process->profile_manager()->CreateProfileAsync(
       ProfileManager::GetGuestProfilePath(),
       base::BindOnce(&UpdateProfileInUse));
-}
-
-void EnterpriseStartupDialogClosed() {
-  CHECK(!g_browser_process->browser_policy_connector()
-             ->chrome_browser_cloud_management_controller()
-             ->IsEnterpriseStartupDialogShowing(),
-        base::NotFatalUntil::M155);
-  NSNotification* notify = [NSNotification
-      notificationWithName:NSApplicationDidFinishLaunchingNotification
-                    object:NSApp];
-  [AppController.sharedController applicationDidFinishLaunching:notify];
 }
 
 void RunInLastProfileSafely(

@@ -30,7 +30,6 @@ source_set("ntp_resource_cache") {
     "//chrome/browser/ui/webui/util",
     "//chrome/common",
     "//chrome/common:channel_info",
-    "//components/enterprise/isolated_mode",
     "//components/keyed_service/core",
     "//components/prefs",
     "//components/search",

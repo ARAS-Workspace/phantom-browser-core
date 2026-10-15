@@ -209,7 +209,6 @@
 #endif
 
 #include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
 
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
 #include "chrome/browser/browser_features.h"
@@ -431,15 +430,6 @@ void BrowserProcessImpl::StartTearDown() {
   metrics_services_manager_.reset();
   intranet_redirect_detector_.reset();
   network_time_tracker_.reset();
-
-  // Initial cleanup for ChromeBrowserCloudManagement, shutdown components that
-  // depend on profile and notification system. For example, ProfileManager
-  // observer and KeyServices observer need to be removed before profiles.
-  auto* cloud_management_controller =
-      browser_policy_connector_->chrome_browser_cloud_management_controller();
-  if (cloud_management_controller) {
-    cloud_management_controller->ShutDown();
-  }
 
   system_notification_helper_.reset();
 

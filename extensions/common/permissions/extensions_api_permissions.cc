@@ -49,7 +49,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
     {APIPermissionID::kClipboardWrite, "clipboardWrite",
      APIPermissionInfo::kFlagSupportsContentCapabilities |
          APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
-    {APIPermissionID::kCrashReportPrivate, "crashReportPrivate"},
     {APIPermissionID::kDeclarativeNetRequest,
      declarative_net_request::kDeclarativeNetRequestPermission,
      APIPermissionInfo::kFlagCannotBeOptional},

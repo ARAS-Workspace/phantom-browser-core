@@ -16,7 +16,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
 #include "components/web_modal/web_contents_modal_dialog_manager.h"
 
@@ -123,13 +122,6 @@ void ProfileManagementFlowController::OnNavigateBackRequested() {
 void ProfileManagementFlowController::OnReloadRequested() {
   DCHECK(initialized_steps_.contains(flow_tracker_.tracked_step()));
   initialized_steps_.at(flow_tracker_.tracked_step())->OnReloadRequested();
-}
-
-ProfilePickerToolbar::Builder
-ProfileManagementFlowController::CreateToolbarBuilder() {
-  return ProfilePickerToolbar::Builder(base::BindRepeating(
-      &ProfileManagementFlowController::OnNavigateBackRequested,
-      weak_factory_.GetWeakPtr()));
 }
 
 std::u16string

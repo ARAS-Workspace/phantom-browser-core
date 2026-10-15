@@ -34,7 +34,6 @@
 #include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/media/prefs/capture_device_ranking.h"
 #include "chrome/browser/search/search.h"
@@ -1023,22 +1022,6 @@ TEST_F(ChromeContentBrowserClientSwitchTest, kPartitionedBlobUrlUsageEnabled) {
   profile()->GetPrefs()->SetBoolean(prefs::kPartitionedBlobUrlUsage, true);
   base::CommandLine result = FetchCommandLineSwitchesForRendererProcess();
   EXPECT_FALSE(result.HasSwitch(blink::switches::kDisableBlobUrlPartitioning));
-}
-
-TEST_F(ChromeContentBrowserClientSwitchTest, LegacyTechReportDisabled) {
-  base::CommandLine result = FetchCommandLineSwitchesForRendererProcess();
-  EXPECT_FALSE(
-      result.HasSwitch(blink::switches::kLegacyTechReportPolicyEnabled));
-}
-
-TEST_F(ChromeContentBrowserClientSwitchTest, LegacyTechReportEnabled) {
-  base::ListValue policy;
-  policy.Append("www.example.com");
-  profile()->GetPrefs()->SetList(
-      enterprise_reporting::kCloudLegacyTechReportAllowlist, std::move(policy));
-  base::CommandLine result = FetchCommandLineSwitchesForRendererProcess();
-  EXPECT_TRUE(
-      result.HasSwitch(blink::switches::kLegacyTechReportPolicyEnabled));
 }
 
 TEST_F(ChromeContentBrowserClientSwitchTest,

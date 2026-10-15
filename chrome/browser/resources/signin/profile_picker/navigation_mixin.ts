@@ -5,7 +5,7 @@
 import {assert, assertNotReached} from 'chrome://resources/js/assert.js';
 import type {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
-import {isBrowserSigninAllowed, isForceSigninEnabled, isSignInProfileCreationSupported} from './profile_picker_flags.js';
+import {isBrowserSigninAllowed, isSignInProfileCreationSupported} from './profile_picker_flags.js';
 
 // LINT.IfChange(ProfilePickerPages)
 /**
@@ -50,9 +50,6 @@ function computeStep(route: Routes): string {
     case Routes.MAIN:
       return 'mainView';
     case Routes.NEW_PROFILE:
-      if (isForceSigninEnabled()) {
-        return ProfileCreationSteps.LOAD_FORCE_SIGNIN;
-      }
       // TODO(msalama): Adjust once sign in profile creation is supported.
       if (!isSignInProfileCreationSupported() || !isBrowserSigninAllowed()) {
         return ProfileCreationSteps.LOCAL_PROFILE_CUSTOMIZATION;

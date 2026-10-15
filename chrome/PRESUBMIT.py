@@ -237,7 +237,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/lifetime/browser_shutdown.cc',
         'chrome/browser/notifications/stub_notification_display_service.cc',
         'chrome/browser/performance_manager/persistence/site_data/site_data_cache_facade.cc',
-        'chrome/browser/policy/chrome_browser_cloud_management_register_watcher.h',
         'chrome/browser/policy/extension_force_install_mixin.cc',
         'chrome/browser/printing/print_job.cc',
         'chrome/browser/printing/print_view_manager_base.cc',

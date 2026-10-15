@@ -44,8 +44,6 @@ void AddCertificateManagerV2Strings(content::WebUIDataSource* html_source) {
        IDS_SETTINGS_CERTIFICATE_MANAGER_V2_CLIENT_CERTIFICATES_FROM_PLATFORM},
       {"certificateManagerV2ClientCertsFromExtension",
        IDS_SETTINGS_CERTIFICATE_MANAGER_V2_CLIENT_CERTIFICATES_FROM_EXTENSION},
-      {"certificateManagerV2ClientCertsFromAdmin",
-       IDS_SETTINGS_CERTIFICATE_MANAGER_V2_CLIENT_CERTIFICATES_FROM_ADMIN},
       {"certificateManagerV2LocalCerts",
        IDS_SETTINGS_CERTIFICATE_MANAGER_V2_LOCAL_CERTIFICATES},
       {"certificateManagerV2LocalCertsDescription",

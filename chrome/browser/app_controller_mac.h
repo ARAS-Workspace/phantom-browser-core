@@ -183,10 +183,6 @@ bool IsOpeningNewWindow();
 // already existed, notify the AppController of the profile in use.
 void CreateGuestProfileIfNeeded();
 
-// Called when Enterprise startup dialog is close and repost
-// applicationDidFinished notification.
-void EnterpriseStartupDialogClosed();
-
 // Tells RunInSafeProfile() or RunInSpecificSafeProfile() what to do if the
 // profile cannot be loaded from disk.
 enum ProfileLoadFailureBehavior {

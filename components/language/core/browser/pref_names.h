@@ -42,11 +42,6 @@ inline constexpr char kBlockedLanguages[] = "translate_blocked_languages";
 inline constexpr char kPrefNeverPromptSitesWithTime[] =
     "translate_site_blocklist_with_time";
 
-// The data region setting. 0: Unset, 1: US, 2: EU.
-// Same value as chrome::prefs::kChromeDataRegionSetting.
-inline constexpr char kTranslateDataRegionSetting[] =
-    "chrome_data_region_setting";
-
 }  // namespace language::prefs
 
 #endif  // COMPONENTS_LANGUAGE_CORE_BROWSER_PREF_NAMES_H_

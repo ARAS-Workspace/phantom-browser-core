@@ -54,8 +54,6 @@
 #include "components/policy/core/common/config_dir_policy_loader.h"
 #endif
 
-#include "chrome/browser/policy/chrome_browser_cloud_management_controller_desktop.h"
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
 #include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/proxy_policy_provider.h"
 
@@ -65,14 +63,7 @@ bool g_command_line_enabled_for_testing = false;
 }  // namespace
 
 ChromeBrowserPolicyConnector::ChromeBrowserPolicyConnector()
-    : BrowserPolicyConnector(base::BindRepeating(&BuildHandlerList)) {
-  std::unique_ptr<ChromeBrowserCloudManagementController::Delegate> delegate =
-      std::make_unique<ChromeBrowserCloudManagementControllerDesktop>();
-
-  chrome_browser_cloud_management_controller_ =
-      std::make_unique<ChromeBrowserCloudManagementController>(
-          std::move(delegate));
-}
+    : BrowserPolicyConnector(base::BindRepeating(&BuildHandlerList)) {}
 
 ChromeBrowserPolicyConnector::~ChromeBrowserPolicyConnector() {
   if (local_test_provider_) {
@@ -119,10 +110,6 @@ bool ChromeBrowserPolicyConnector::HasMachineLevelPolicies() {
 }
 
 void ChromeBrowserPolicyConnector::Shutdown() {
-  // Reset the controller before calling base class so that
-  // shutdown occurs in correct sequence.
-  chrome_browser_cloud_management_controller_.reset();
-
   if (machine_level_user_cloud_policy_manager_) {
     machine_level_user_cloud_policy_manager_->Shutdown();
     machine_level_user_cloud_policy_manager_ = nullptr;
@@ -194,13 +181,6 @@ void ChromeBrowserPolicyConnector::MaybeApplyLocalTestPolicies(
   local_state->ClearPref(policy_prefs::kLocalTestPoliciesForNextStartup);
 }
 
-void ChromeBrowserPolicyConnector::InitCloudManagementController(
-    PrefService* local_state,
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
-  chrome_browser_cloud_management_controller()->MaybeInit(local_state,
-                                                          url_loader_factory);
-}
-
 void ChromeBrowserPolicyConnector::
     SetMachineLevelUserCloudPolicyManagerForTesting(
         MachineLevelUserCloudPolicyManager* manager) {
@@ -262,8 +242,6 @@ ChromeBrowserPolicyConnector::CreatePolicyProviders() {
     providers.insert(providers.begin(), std::move(platform_provider));
   }
 
-  MaybeCreateCloudPolicyManager(&providers);
-
   std::unique_ptr<CommandLinePolicyProvider> command_line_provider =
       CommandLinePolicyProvider::CreateIfAllowed(
           *base::CommandLine::ForCurrentProcess(), chrome::GetChannel());
@@ -319,41 +297,6 @@ ChromeBrowserPolicyConnector::CreatePlatformProvider() {
 #else
   return nullptr;
 #endif
-}
-
-void ChromeBrowserPolicyConnector::MaybeCreateCloudPolicyManager(
-    std::vector<std::unique_ptr<ConfigurationPolicyProvider>>* providers) {
-  if (!chrome_browser_cloud_management_controller_->IsEnabled()) {
-    return;
-  }
-
-  std::unique_ptr<ProxyPolicyProvider> proxy_policy_provider =
-      std::make_unique<ProxyPolicyProvider>();
-  proxy_policy_provider_ = proxy_policy_provider.get();
-  providers->push_back(std::move(proxy_policy_provider));
-
-  chrome_browser_cloud_management_controller_->DeferrableCreatePolicyManager(
-      platform_provider_,
-      base::BindOnce(&ChromeBrowserPolicyConnector::
-                         OnMachineLevelCloudPolicyManagerCreated,
-                     weak_factory_.GetWeakPtr()));
-}
-
-void ChromeBrowserPolicyConnector::OnMachineLevelCloudPolicyManagerCreated(
-    std::unique_ptr<MachineLevelUserCloudPolicyManager>
-        machine_level_user_cloud_policy_manager) {
-  machine_level_user_cloud_policy_manager_ =
-      machine_level_user_cloud_policy_manager.get();
-  if (machine_level_user_cloud_policy_manager_) {
-    machine_level_user_cloud_policy_manager_->Init(GetSchemaRegistry());
-    proxy_policy_provider_->SetOwnedDelegate(
-        std::move(machine_level_user_cloud_policy_manager));
-  } else {
-    // Explicitly transition out of ProxyPolicyProvider's Unspecified state
-    // when no manager is created to unblock IsFirstPolicyLoadComplete() and
-    // the startup policy snapshot.
-    proxy_policy_provider_->SetUnownedDelegate(nullptr);
-  }
 }
 
 }  // namespace policy

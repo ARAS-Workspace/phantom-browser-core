@@ -15,8 +15,6 @@
 #include "build/branding_buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_identity.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
@@ -51,7 +49,6 @@
 #include "ui/webui/webui_util.h"
 
 #include "base/feature_list.h"
-#include "chrome/browser/enterprise/profile_management/profile_management_features.h"
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "base/command_line.h"
@@ -405,11 +402,6 @@ void ManagedUserProfileNoticeHandler::HandleCancel(
 
 void ManagedUserProfileNoticeHandler::HandleLearnMoreClicked(
     const base::ListValue& args) {
-  auto* service = ProfileManagementDisclaimerServiceFactory::GetForProfile(
-      Profile::FromWebUI(web_ui()));
-  if (service) {
-    service->OpenPrivacyPolicyArticlePopUp(is_modal_dialog_);
-  }
 }
 
 void ManagedUserProfileNoticeHandler::OnLongProcessingTime() {

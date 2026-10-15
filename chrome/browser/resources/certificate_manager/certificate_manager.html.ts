@@ -5,7 +5,9 @@
 import {html} from '//resources/lit/v3_0/lit.rollup.js';
 
 import type {CertificateManagerElement} from './certificate_manager.js';
+// <if expr="is_chromeos">
 import {CertificateSource} from './certificate_manager.mojom-webui.js';
+// </if>
 import {Page} from './navigation.js';
 
 export function getHtml(this: CertificateManagerElement) {
@@ -54,15 +56,6 @@ export function getHtml(this: CertificateManagerElement) {
       <h2 class="page-title">$i18n{certificateManagerV2ClientCerts}</h2>
       $i18n{certificateManagerV2ClientCertsDescription}
 
-      <if expr="is_win or is_macosx or is_linux">
-        <certificate-list
-            id="provisionedClientCerts"
-            cert-source="${CertificateSource.kProvisionedClientCert}"
-            header-text="$i18n{certificateManagerV2ClientCertsFromAdmin}"
-            hide-export hide-if-empty
-            @hash-copied="${this.onHashCopied_}">
-        </certificate-list>
-      </if>
       <if expr="is_chromeos">
         <certificate-list
             id="extensionsClientCerts"

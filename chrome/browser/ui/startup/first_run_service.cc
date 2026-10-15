@@ -204,21 +204,7 @@ void FirstRunService::OpenFirstRunIfNeeded(ResumeTaskCallback callback) {
 }
 
 void FirstRunService::OpenFirstRunInternal() {
-  if (IsFirstRunMarkedFinishedInPrefs()) {
-    // Opening the First Run is not needed. For example it might have been
-    // marked finished silently, or is suppressed by policy.
-    //
-    // Note that this assumes that the prefs state is the the only part of
-    // `ShouldOpenFirstRun()` that can change during the service's lifetime.
-    std::move(resume_task_callback_).Run(/*proceed=*/true);
-    return;
-  }
-
-  // Note: we call `Show()` even if the FRE might be already open and rely on
-  // the ProfilePicker to decide what it wants to do with `callback`.
-  ProfilePicker::Show(ProfilePicker::Params::ForFirstRun(
-      profile_->GetPath(), base::BindOnce(&FirstRunService::OnFirstRunHasExited,
-                                          weak_ptr_factory_.GetWeakPtr())));
+  std::move(resume_task_callback_).Run(/*proceed=*/true);
 }
 
 void FirstRunService::FinishFirstRunWithoutResumeTask() {

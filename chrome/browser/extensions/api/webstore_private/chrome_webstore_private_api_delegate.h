@@ -26,10 +26,6 @@ class ChromeWebstorePrivateAPIDelegate : public WebstorePrivateAPIDelegate {
       const std::u16string& custom_error_message,
       const gfx::ImageSkia& icon,
       base::OnceClosure done_callback) override;
-  std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-  CreatePromotionEligibilityChecker(content::BrowserContext* context,
-                                    bool dismissed_banner_pref,
-                                    bool feature_enabled) override;
 };
 
 }  // namespace extensions

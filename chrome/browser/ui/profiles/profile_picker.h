@@ -26,7 +26,6 @@ class WebView;
 }  // namespace views
 
 enum class StartupProfileMode;
-class ForceSigninUIError;
 
 class ProfilePicker {
  public:
@@ -215,45 +214,6 @@ class ProfilePicker {
   // one (see `Params::ForAccountSelecAvailableAccount()` for details on
   // re-activation). When reactivated, the displayed page is not updated.
   static void Show(Params&& params);
-
-  // Helper struct to allow passing different profile information for sign in:
-  // - An optional color for a new profile.
-  // - A file path for an existing profile.
-  using ProfileInfo = std::variant<std::optional<SkColor>, base::FilePath>;
-
-  // Starts the sign-in flow. The layout of the window gets updated for the
-  // sign-in flow while the profiles are created/loaded.
-  // The sign in flow can be triggered for a new or existing profile.
-  // For new profiles, the expected color is expected to be given as the
-  // `profile_info` param. The creation of the new profile happens and then the
-  // sign-in page is rendered using the new profile. The new profile uses a
-  // theme generated from the given profile color if provided or the default
-  // theme.
-  // For an existing profile, the profile path is expected to given as the
-  // `profile_info` param. The profile is loaded then the sign-page will be
-  // rendered with the profile.
-  // `switch_finished_callback` gets informed whether the creation of the new
-  // profile succeeded and the sign-in page gets displayed.
-  static void SwitchToSignIn(
-      ProfileInfo profile_info,
-      base::OnceCallback<void(bool)> switch_finished_callback);
-
-  // Starts the reauth for the existing primary account in the given `profile`.
-  // The flow will remain within the profile picker. The reauth is expected to
-  // be done only on the primary account, if done on another one (the UI may
-  // allow it), the reauth will fail and the signed in account will be signed
-  // out.
-  // On successful reauth, the profile is unlocked and a browser associated with
-  // the `profile` will be opened. On unsuccessful reauth, the user will be
-  // redirected to the profile picker main page, with a popup error dialog
-  // displayed through `on_error_callback`.
-  // `switch_finished_callback` will be called once the step was switched (or
-  // failed to switch to), the bool parameter indicating the success of the
-  // switch.
-  static void SwitchToReauth(
-      Profile* profile,
-      base::OnceCallback<void(bool)> switch_finished_callback,
-      base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback);
 
   // Switch to the flow that comes when the user decides to create a profile
   // without signing in.

@@ -8,7 +8,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
 #include "components/crx_file/id_util.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/policy/core/common/cloud/cloud_policy_client_types.h"
 #include "components/prefs/pref_service.h"
 #include "components/user_prefs/user_prefs.h"
@@ -105,7 +104,6 @@ ExtensionInstallStatus PerformSynchronousChecks(
   }
 
   ExtensionRegistry* registry = ExtensionRegistry::Get(browser_context);
-  PrefService* prefs = user_prefs::UserPrefs::Get(browser_context);
 
   // Check if parent approval is needed for a supervised user to enable
   // an existing extension which is missing parental approval.
@@ -135,19 +133,7 @@ ExtensionInstallStatus PerformSynchronousChecks(
 
   // Check if it's possible for the extension to be requested.
   if (is_blocked_by_policy) {
-    // The ability to request extension installs is not available if the
-    // extension request policy is disabled.
-    if (!prefs->GetBoolean(
-            enterprise_reporting::kCloudExtensionRequestEnabled)) {
-      return kBlockedByPolicy;
-    }
-
-    // An extension which is explicitly blocked by enterprise policy can't be
-    // requested anymore.
-    if (extension_management_client->IsInstallationExplicitlyBlocked(
-            extension_id)) {
-      return kBlockedByPolicy;
-    }
+    return kBlockedByPolicy;
   }
 
   // Check if the extension is using an unsupported manifest version.
@@ -162,19 +148,6 @@ ExtensionInstallStatus PerformSynchronousChecks(
     // The extension is using a deprecated manifest version and should not
     // be installable.
     return kDeprecatedManifestVersion;
-  }
-
-  // If an installed extension is disabled due to policy, return kCanRequest or
-  // kRequestPending instead of kDisabled.
-  // By doing so, user can still request an installed and policy blocked
-  // extension.
-  if (is_blocked_by_policy) {
-    if (prefs->GetDict(enterprise_reporting::kCloudExtensionRequestIds)
-            .Find(extension_id)) {
-      return kRequestPending;
-    }
-
-    return kCanRequest;
   }
 
   if (registry->disabled_extensions().Contains(extension_id)) {

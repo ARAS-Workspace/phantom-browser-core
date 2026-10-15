@@ -556,8 +556,6 @@ template("build_webui") {
         "//chrome/browser/resources/downloads",
         "//chrome/browser/resources/feedback",
         "//chrome/browser/resources/history",
-        "//chrome/browser/resources/intro",
-        "//chrome/browser/resources/management",
         "//chrome/browser/resources/media",
         "//chrome/browser/resources/memory_internals",
         "//chrome/browser/resources/omnibox",

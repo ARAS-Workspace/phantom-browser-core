@@ -18,7 +18,6 @@
 
 class WaitForNetworkCallbackHelper;
 
-class ForceSigninVerifier;
 class Profile;
 
 namespace version_info {
@@ -95,16 +94,11 @@ class ChromeSigninClient : public SigninClient {
   // otherwise the decision is made based on the profile's status.
   SigninClient::SignoutDecision GetSignoutDecision(
       const std::optional<signin_metrics::ProfileSignout> signout_source) const;
-  void VerifySyncToken();
   void OnCloseBrowsersSuccess(
       const signin_metrics::ProfileSignout signout_source_metric,
       bool should_sign_out,
       const base::FilePath& profile_path);
   void OnCloseBrowsersAborted(const base::FilePath& profile_path);
-
-  // Used as the `on_token_fetch_complete` callback in the
-  // `ForceSigninVerifier`.
-  void OnTokenFetchComplete(bool token_is_valid);
 
   void RecordOpenTabCount(signin_metrics::AccessPoint access_point,
                           signin::ConsentLevel consent_level);
@@ -117,7 +111,6 @@ class ChromeSigninClient : public SigninClient {
   base::OnceCallback<void(SignoutDecision)> on_signout_decision_reached_;
 
   bool should_display_user_manager_ = true;
-  std::unique_ptr<ForceSigninVerifier> force_signin_verifier_;
 
   scoped_refptr<network::SharedURLLoaderFactory>
       url_loader_factory_for_testing_;

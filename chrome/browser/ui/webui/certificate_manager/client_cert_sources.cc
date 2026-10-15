@@ -742,13 +742,6 @@ CreatePlatformClientCertSource(
 #endif
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-std::unique_ptr<CertificateManagerPageHandler::CertSource>
-CreateProvisionedClientCertSource(Profile* profile) {
-  return std::make_unique<ClientCertSource>(nullptr);
-}
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 ClientCertManagementAccessControls::ClientCertManagementAccessControls(
     Profile* profile) {}

@@ -129,7 +129,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 #endif
 
       "chrome://profile-picker",
-      "chrome://intro",
       "chrome://profile-customization/?debug",
       "chrome://signin-email-confirmation",
 #if !BUILDFLAG(IS_MAC)

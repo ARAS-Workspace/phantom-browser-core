@@ -48,12 +48,4 @@ void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallBlockedDialog(
       web_contents, std::move(done_callback));
 }
 
-std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-ChromeWebstorePrivateAPIDelegate::CreatePromotionEligibilityChecker(
-    content::BrowserContext* context,
-    bool dismissed_banner_pref,
-    bool feature_enabled) {
-  return nullptr;
-}
-
 }  // namespace extensions

@@ -68,10 +68,6 @@ BASE_FEATURE(kDestroyProfileOnBrowserClose,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-// Enables showing the email of the flex org admin that setup CBCM in the
-// management disclosures.
-BASE_FEATURE(kFlexOrgManagementDisclosure,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 BASE_FEATURE(kInitialExternalExtensions, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)

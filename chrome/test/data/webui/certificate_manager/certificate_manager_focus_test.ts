@@ -108,42 +108,6 @@ suite('CertificateManagerV2FocusTest', () => {
     assertEquals('deadbeef2', await navigator.clipboard.readText());
   });
 
-  // <if expr="is_win or is_macosx or is_linux">
-  test('Copy provisioned client certs hash', async () => {
-    const getCertificatesResolver = new PromiseResolver<void>();
-    testProxy.handler.setCertificatesCallback((source: CertificateSource) => {
-      if (source === CertificateSource.kProvisionedClientCert) {
-        getCertificatesResolver.resolve();
-        return {
-          certs: [
-            {
-              sha256hashHex: 'deadbeef3',
-              displayName: 'cert3',
-              isDeletable: false,
-            },
-          ],
-        };
-      }
-      return {certs: []};
-    });
-
-    initializeElement();
-    await getCertificatesResolver.promise;
-    await microtasksFinished();
-    assertFalse(certManager.$.toast.open);
-
-    const entries =
-        certManager.$.provisionedClientCerts.$.certs.querySelectorAll(
-            'certificate-entry');
-    assertEquals(1, entries.length, 'no certs displayed');
-
-    assertEquals('', await navigator.clipboard.readText());
-    entries[0]!.$.copy.click();
-    assertTrue(certManager.$.toast.open);
-    assertEquals('deadbeef3', await navigator.clipboard.readText());
-  });
-  // </if>
-
   // <if expr="is_chromeos">
   test('Copy extensions client certs hash', async () => {
     const getCertificatesResolver = new PromiseResolver<void>();

@@ -1,5 +1,6 @@
 [
   {
+    "reason_for_missing_test": "This policy has no pref in Phantom: the data region prefs were removed.",
     "os": [
       "win",
       "linux",
@@ -161,6 +162,7 @@
     ]
   },
   {
+    "reason_for_missing_test": "This policy has no pref in Phantom: the data region prefs were removed.",
     "note": "Policy is cloud-only so shouldn't apply if from a platform source.",
     "os": [
       "win",

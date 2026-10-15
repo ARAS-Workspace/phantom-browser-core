@@ -74,12 +74,6 @@
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
-#include "chrome/browser/enterprise/remote_commands/user_remote_commands_service_factory.h"
-#include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service_factory.h"
-#include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_service.h"
-#include "chrome/browser/enterprise/signals/user_permission_service_factory.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
@@ -305,13 +299,6 @@
 #include "chrome/browser/ui/startup/first_run_service.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/idle/idle_service_factory.h"
-#endif
-
-#include "chrome/browser/enterprise/signals/signals_aggregator_factory.h"
-
-#include "chrome/browser/enterprise/groups/enterprise_groups_handler_factory.h"
 #include "chrome/browser/policy/cloud/user_policy_signin_service_factory.h"
 #include "chrome/browser/profiles/gaia_info_update_service_factory.h"
 
@@ -330,11 +317,6 @@
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/signin/enterprise_signin_service_factory.h"
-#include "chrome/browser/enterprise/signin/oidc_authentication_signin_interceptor_factory.h"
-#include "chrome/browser/enterprise/signin/profile_token_web_signin_interceptor_factory.h"
-#include "chrome/browser/enterprise/signin/user_policy_oidc_signin_service_factory.h"
-#include "chrome/browser/policy/cloud/profile_token_policy_web_signin_service_factory.h"
 #include "chrome/browser/search_integrity/search_integrity_factory.h"  // nogncheck
 #include "chrome/browser/signin/accounts_policy_manager_factory.h"
 
@@ -569,21 +551,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   DomainDiversityReporterFactory::GetInstance();
   DownloadBubbleUpdateServiceFactory::GetInstance();
   DownloadCoreServiceFactory::GetInstance();
-  enterprise::ProfileIdServiceFactory::GetInstance();
-  enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-  enterprise_groups::EnterpriseGroupsProfileHandlerFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  enterprise_idle::IdleServiceFactory::GetInstance();
-#endif
-  enterprise_signals::SignalsAggregatorFactory::GetInstance();
-  enterprise_reporting::CloudProfileReportingServiceFactory::GetInstance();
-  enterprise_reporting::LegacyTechServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  enterprise_signals::UserPermissionServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  enterprise_signin::EnterpriseSigninServiceFactory::GetInstance();
-#endif
   OmniboxEverywhereServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   ExitTypeServiceFactory::GetInstance();
@@ -662,9 +629,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   net::ServerCertificateDatabaseServiceFactory::GetInstance();
 #endif
   PreloadingModelKeyedServiceFactory::GetInstance();
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  ProfileManagementDisclaimerServiceFactory::GetInstance();
-#endif
   notebooks::NotebooksServiceFactory::GetInstance();
   NotificationDisplayServiceFactory::GetInstance();
   NotificationMetricsLoggerFactory::GetInstance();
@@ -729,13 +693,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   policy::ExtensionInstallPolicyServiceFactory::GetInstance();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   policy::ManagementServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  policy::ProfileTokenPolicyWebSigninServiceFactory::GetInstance();
-#endif
   policy::UserPolicySigninServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  policy::UserPolicyOidcSigninServiceFactory::GetInstance();
-#endif
   predictors::AutocompleteActionPredictorFactory::GetInstance();
   predictors::LoadingPredictorFactory::GetInstance();
   predictors::PredictorDatabaseFactory::GetInstance();
@@ -750,10 +708,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ProfileNetworkContextServiceFactory::GetInstance();
   ProfilePasswordStoreFactory::GetInstance();
   ProfileStatisticsFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  ProfileTokenWebSigninInterceptorFactory::GetInstance();
-  OidcAuthenticationSigninInterceptorFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   PromoServiceFactory::GetInstance();
 #endif

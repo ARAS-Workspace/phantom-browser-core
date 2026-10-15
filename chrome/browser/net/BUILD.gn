@@ -171,7 +171,6 @@ source_set("impl") {
     "//components/domain_reliability:prefs",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
-    "//components/enterprise",
     "//components/language/core/browser",
     "//components/link_header_util",
     "//components/metrics",

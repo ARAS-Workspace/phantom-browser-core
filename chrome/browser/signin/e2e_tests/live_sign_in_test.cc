@@ -670,68 +670,6 @@ IN_PROC_BROWSER_TEST_P(LiveSignInTest,
 }
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-IN_PROC_BROWSER_TEST_F(LiveSignInTestFullSync, MANUAL_CreateSignedInProfile) {
-  base::HistogramTester histogram_tester;
-  std::optional<TestAccountSigninCredentials> test_account =
-      GetTestAccounts()->GetAccount("TEST_ACCOUNT_1");
-  CHECK(test_account.has_value());
-
-  // Check there is only one profile.
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-  EXPECT_EQ(profile_manager->GetNumberOfProfiles(), 1U);
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1U);
-
-  // Open the profile picker.
-  ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
-      ProfilePicker::EntryPoint::kProfileMenuAddNewProfile));
-  profiles::testing::WaitForPickerLoadStop(
-      GURL("chrome://profile-picker/new-profile"));
-
-  // Simulate a click on the signin button.
-  base::test::TestFuture<bool> proceed_future;
-  ProfilePicker::SwitchToSignIn(SK_ColorRED, proceed_future.GetCallback());
-  EXPECT_TRUE(proceed_future.Get());
-
-  // Signin on Gaia.
-  content::WebContents* picker_contents =
-      ProfilePicker::GetWebViewForTesting()->GetWebContents();
-  Profile* new_profile =
-      Profile::FromBrowserContext(picker_contents->GetBrowserContext());
-  EXPECT_EQ(profile_manager->GetNumberOfProfiles(), 2U);
-  EXPECT_NE(browser()->GetProfile(), new_profile);
-  sign_in_functions.SignInFromCurrentPage(picker_contents, *test_account,
-                                          /*previously_signed_in_accounts=*/0);
-
-  // User is signed in, but Sync is off.
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(new_profile);
-  base::test::RunUntil([&identity_manager]() {
-    return GetPrimaryAccountConsentLevel(identity_manager) ==
-           signin::ConsentLevel::kSignin;
-  });
-
-  // Confirm Sync.
-  ui_test_utils::BrowserCreatedObserver browser_created_observer;
-  GURL sync_confirmation_url =
-      AppendSyncConfirmationQueryParams(GURL("chrome://sync-confirmation/"),
-                                        SyncConfirmationStyle::kWindow, true);
-  profiles::testing::WaitForPickerLoadStop(sync_confirmation_url);
-  LoginUIServiceFactory::GetForProfile(new_profile)
-      ->SyncConfirmationUIClosed(LoginUIService::SYNC_WITH_DEFAULT_SETTINGS);
-
-  // Wait for browser to open.
-  profiles::testing::WaitForPickerClosed();
-  Browser* new_browser = browser_created_observer.Wait();
-  EXPECT_EQ(new_browser->GetProfile(), new_profile);
-  EXPECT_EQ(GetPrimaryAccountConsentLevel(identity_manager),
-            signin::ConsentLevel::kSync);
-
-  // Both LST and Sync Header are received so their time difference must be
-  // recorded.
-  histogram_tester.ExpectTotalCount(
-      "Signin.SigninManager.SyncHeaderArrivalTimeWindowAfterLst", 1);
-}
-
 class LiveSignInGaiaIntegrationTest : public LiveSignInTest {};
 
 // Regression test for crbug.com/420635510.

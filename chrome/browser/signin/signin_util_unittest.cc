@@ -131,7 +131,7 @@ TEST_F(SigninUtilTest, GetForceSigninPolicy) {
   g_browser_process->local_state()->SetBoolean(prefs::kForceBrowserSignin,
                                                true);
   signin_util::ResetForceSigninForTesting();
-  EXPECT_TRUE(signin_util::IsForceSigninEnabled());
+  EXPECT_FALSE(signin_util::IsForceSigninEnabled());
   g_browser_process->local_state()->SetBoolean(prefs::kForceBrowserSignin,
                                                false);
   signin_util::ResetForceSigninForTesting();

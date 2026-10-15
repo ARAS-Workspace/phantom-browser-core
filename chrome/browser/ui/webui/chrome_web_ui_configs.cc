@@ -133,7 +133,6 @@
 
 
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal_ui.h"
-#include "chrome/browser/ui/webui/intro/intro_ui.h"
 #include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
@@ -278,7 +277,6 @@ void RegisterChromeWebUIConfigs() {
 
   map.AddWebUIConfig(std::make_unique<DefaultBrowserModalUIConfig>());
   map.AddWebUIConfig(std::make_unique<ManagedUserProfileNoticeUIConfig>());
-  map.AddWebUIConfig(std::make_unique<IntroUIConfig>());
   map.AddWebUIConfig(std::make_unique<ProfileCustomizationUIConfig>());
   map.AddWebUIConfig(std::make_unique<ProfilePickerUIConfig>());
   map.AddWebUIConfig(std::make_unique<SigninErrorUIConfig>());

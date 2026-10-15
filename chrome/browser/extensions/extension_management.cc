@@ -43,7 +43,6 @@
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/common/pref_names.h"
 #include "components/crx_file/id_util.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/common/content_switches.h"
@@ -69,7 +68,6 @@
 #include "chrome/browser/themes/theme_service_factory.h"
 #endif
 
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/extensions/management/management_util.h"
@@ -108,12 +106,6 @@ ExtensionManagement::ExtensionManagement(Profile* profile)
   pref_change_registrar_.Add(pref_names::kAllowedTypes, pref_change_callback);
   pref_change_registrar_.Add(pref_names::kExtensionManagement,
                              pref_change_callback);
-  pref_change_registrar_.Add(
-      enterprise_reporting::kCloudExtensionRequestEnabled,
-      pref_change_callback);
-  pref_change_registrar_.Add(enterprise_reporting::kCloudReportingEnabled,
-                             pref_change_callback);
-
   pref_change_registrar_.Add(pref_names::kExtensionUnpublishedAvailability,
                              pref_change_callback);
 
@@ -604,9 +596,6 @@ void ExtensionManagement::Refresh() {
       LoadListPreference(pref_names::kAllowedTypes, true);
   const base::DictValue* dict_pref =
       LoadDictPreference(pref_names::kExtensionManagement, true);
-  const base::Value* extension_request_pref =
-      LoadPreference(enterprise_reporting::kCloudExtensionRequestEnabled, false,
-                     base::Value::Type::BOOLEAN);
 
   const base::Value* unpublished_availability_pref =
       LoadPreference(pref_names::kExtensionUnpublishedAvailability,
@@ -619,8 +608,7 @@ void ExtensionManagement::Refresh() {
   default_settings_ = std::make_unique<internal::IndividualSettings>();
 
   // Parse default settings.
-  if ((denied_list_pref && denied_list_pref->contains("*")) ||
-      (extension_request_pref && extension_request_pref->GetBool())) {
+  if (denied_list_pref && denied_list_pref->contains("*")) {
     default_settings_->installation_mode = ManagedInstallationMode::kBlocked;
   }
 

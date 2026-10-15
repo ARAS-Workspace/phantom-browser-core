@@ -25,8 +25,6 @@
 #include "extensions/common/api/webstore_private.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-#include "components/enterprise/browser/promotion/promotion_eligibility_checker.h"  // nogncheck
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace content {
@@ -386,21 +384,10 @@ class WebstorePrivateShouldShowEnterprisePromotionBannerFunction
       const WebstorePrivateShouldShowEnterprisePromotionBannerFunction&) =
       delete;
 
-  void SetFakePromotionEligibilityCheckerForTesting(
-      std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-          checker);
-
  protected:
   ~WebstorePrivateShouldShowEnterprisePromotionBannerFunction() override;
 
   ResponseAction Run() override;
-
-  void OnPromotionEligibilityDetermined(
-      enterprise_management::GetUserEligiblePromotionsResponse response);
-
- private:
-  std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-      promotion_eligibility_checker_;
 };
 
 class WebstorePrivateLogEnterprisePromoShownFunction

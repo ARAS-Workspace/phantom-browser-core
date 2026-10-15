@@ -25,7 +25,6 @@ class ConfigurationPolicyProvider;
 class LocalTestPolicyProvider;
 class ProxyPolicyProvider;
 
-class ChromeBrowserCloudManagementController;
 class MachineLevelUserCloudPolicyManager;
 
 // Extends BrowserPolicyConnector with the setup shared among the desktop
@@ -78,18 +77,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // at the right time.
   void MaybeApplyLocalTestPolicies(PrefService* local_state);
 
-  ChromeBrowserCloudManagementController*
-  chrome_browser_cloud_management_controller() {
-    return chrome_browser_cloud_management_controller_.get();
-  }
-
-  // On non-Android platforms, starts controller initialization right away.
-  // On Android, delays controller initialization until platform policies have
-  // been initialized, or starts controller initialization right away otherwise.
-  void InitCloudManagementController(
-      PrefService* local_state,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
-
   // TODO(chromium:1502062): MachineLevelUserCloudPolicyManager is CBCM's policy
   // provider. Refactor the code accordingly.
   MachineLevelUserCloudPolicyManager*
@@ -134,24 +121,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // Returns the policy provider that supplies platform policies.
   std::unique_ptr<ConfigurationPolicyProvider> CreatePlatformProvider();
 
-  std::unique_ptr<ChromeBrowserCloudManagementController>
-      chrome_browser_cloud_management_controller_;
-
-  // Creates the MachineLevelUserCloudPolicyManager if the browser should be
-  // enrolled in CBCM. On Android, the decision may be postponed until platform
-  // policies have been loaded and it can be decided if an enrollment token is
-  // available or not.
-  void MaybeCreateCloudPolicyManager(
-      std::vector<std::unique_ptr<policy::ConfigurationPolicyProvider>>*
-          providers);
-
-  // Invoked once it can be decided if cloud management is enabled. If enabled,
-  // invoked with a MachineLevelUserCloudPolicyManager instance. Otherwise,
-  // nullptr is passed on instead.
-  void OnMachineLevelCloudPolicyManagerCreated(
-      std::unique_ptr<MachineLevelUserCloudPolicyManager>
-          machine_level_user_cloud_policy_manager);
-
   // If CBCM enrollment is needed, then this proxy points to a
   // MachineLevelUserCloudPolicyManager object. Otherwise, this is innocuous.
   // Using a proxy allows unblocking PolicyService creation on platforms where
@@ -177,10 +146,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   raw_ptr<ConfigurationPolicyProvider> local_test_provider_for_testing_ =
       nullptr;
   std::unique_ptr<LocalTestPolicyProvider> local_test_provider_;
-
-  // Weak pointers needed for tasks that need to wait until it can be decided
-  // if an enrollment token is available or not.
-  base::WeakPtrFactory<ChromeBrowserPolicyConnector> weak_factory_{this};
 };
 
 }  // namespace policy

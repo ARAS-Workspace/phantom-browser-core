@@ -142,7 +142,6 @@
 #include "components/content_extraction/content/browser/inner_text.h"
 #include "components/custom_handlers/protocol_handler.h"
 #include "components/download/public/common/download_url_parameters.h"
-#include "components/enterprise/isolated_mode/settings.h"
 #include "components/google/core/common/google_util.h"
 #include "components/guest_view/browser/guest_view_base.h"
 #include "components/language/core/browser/language_model_manager.h"
@@ -1552,9 +1551,7 @@ void RenderViewContextMenu::AppendLinkItems() {
       }
     }
 
-    bool isolated_mode_enabled =
-        enterprise_isolated_mode::IsolatedModeReplacesIncognito(
-            *GetProfile()->GetPrefs(), chrome::GetChannel());
+    bool isolated_mode_enabled = false;
 
     if (show_open_link_off_the_record && isolated_mode_enabled) {
       AddItemWithOptionalIcon(IDC_CONTENT_CONTEXT_OPENLINK_ISOLATED,
@@ -2348,9 +2345,7 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
   // protect user privacy. Since some policies prevent Incognito browsing,
   // disable options that trigger navigation in the context menu.
   bool navigation_allowed = true;
-  bool isolated_mode_enabled =
-      enterprise_isolated_mode::IsolatedModeReplacesIncognito(
-          *GetProfile()->GetPrefs(), chrome::GetChannel());
+  bool isolated_mode_enabled = false;
 
   switch (id) {
     case IDC_BACK:

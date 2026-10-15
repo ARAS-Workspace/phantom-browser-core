@@ -11,16 +11,10 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_sign_in_provider.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "url/gurl.h"
 
-class ProfilePickerPostSignInAdapter;
 class ProfilePickerWebContentsHost;
-
-namespace signin {
-enum class DeviceSignalsDisclaimerResult;
-}
 
 namespace content {
 class WebContents;
@@ -36,30 +30,6 @@ class ProfileManagementStepController {
   CreateForProfilePickerApp(ProfilePickerWebContentsHost* host,
                             const GURL& initial_url);
 
-  static std::unique_ptr<ProfileManagementStepController> CreateForSignIn(
-      ProfilePickerWebContentsHost* host,
-      std::unique_ptr<ProfilePickerSignInProvider> sign_in_provider);
-
-  // Creates a step controller that will take over from the sign-in step during
-  // a SAML sign-in flow, and transition the flow into a browser window where it
-  // can be completed. `contents` should be the one used to render the sign-in
-  // page. The next steps of the flow will continue in that same `WebContents`.
-  // `finish_picker_section_callback` will be called by the controller to
-  // request the in-picker flow to be terminated, passing a
-  // `PostHostClearedCallback` that should then be executed to resume the flow
-  // in a regular browser window.
-  static std::unique_ptr<ProfileManagementStepController>
-  CreateForFinishSamlSignIn(ProfilePickerWebContentsHost* host,
-                            Profile* profile,
-                            std::unique_ptr<content::WebContents> contents,
-                            base::OnceCallback<void(PostHostClearedCallback)>
-                                finish_picker_section_callback);
-
-  static std::unique_ptr<ProfileManagementStepController>
-  CreateForPostSignInFlow(
-      ProfilePickerWebContentsHost* host,
-      std::unique_ptr<ProfilePickerPostSignInAdapter> signed_in_flow);
-
   static std::unique_ptr<ProfileManagementStepController>
   CreateForSearchEngineChoice(
       ProfilePickerWebContentsHost* host,
@@ -73,12 +43,6 @@ class ProfileManagementStepController {
   CreateForFinishFlowAndRunInBrowser(
       ProfilePickerWebContentsHost* host,
       base::OnceClosure finish_flow_and_run_in_browser_callback);
-
-  static std::unique_ptr<ProfileManagementStepController>
-  CreateForDeviceSignalsDisclaimer(
-      ProfilePickerWebContentsHost* host,
-      Profile* profile,
-      base::OnceCallback<void(signin::DeviceSignalsDisclaimerResult)> callback);
 
   explicit ProfileManagementStepController(ProfilePickerWebContentsHost* host);
   virtual ~ProfileManagementStepController();

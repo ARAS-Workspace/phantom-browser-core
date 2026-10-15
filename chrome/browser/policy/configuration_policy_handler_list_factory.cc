@@ -21,7 +21,6 @@
 #include "build/buildflag.h"
 #include "chrome/browser/bookmarks/bookmark_bar_policy_handler.h"
 #include "chrome/browser/browsing_data/browsing_data_lifetime_policy_handler.h"
-#include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_report_policy_handler.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/net/disk_cache_dir_policy_handler.h"
 #include "chrome/browser/net/explicitly_allowed_network_ports_policy_handler.h"
@@ -64,13 +63,6 @@
 #include "components/custom_handlers/pref_names.h"
 #include "components/domain_reliability/domain_reliability_prefs.h"
 #include "components/embedder_support/pref_names.h"
-#include "components/enterprise/browser/data_region/data_region_policy_handler.h"
-#include "components/enterprise/browser/reporting/cloud_profile_reporting_policy_handler.h"
-#include "components/enterprise/browser/reporting/cloud_reporting_frequency_policy_handler.h"
-#include "components/enterprise/browser/reporting/cloud_reporting_policy_handler.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
-#include "components/enterprise/device_trust/prefs.h"
-#include "components/enterprise/isolated_mode/prefs.h"
 #include "components/feed/core/shared_prefs/pref_names.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
@@ -135,20 +127,11 @@
 #include "components/search_engines/enterprise/search_aggregator_policy_handler.h"
 #include "components/search_engines/enterprise/site_search_policy_handler.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/enterprise/reporting/extension_request/extension_request_policy_handler.h"
-#endif
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/platform_auth/extensible_enterprise_sso_policy_handler.h"
-#endif  // BUILDFLAG(IS_MAC)
-
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/ui/side_search/side_search_prefs.h"
 #endif  // BUILDFLAG(TOOLKIT_VIEWS)
 
 #include "chrome/browser/policy/browser_signin_policy_handler.h"
-#include "components/enterprise/idle/idle_timeout_policy_handler.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/extension_management_constants.h"
@@ -172,10 +155,7 @@
 
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/idle/action.h"
-#include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #include "chrome/browser/external_protocol/auto_launch_protocols_policy_handler.h"
-#include "components/device_signals/core/browser/pref_names.h"  // nogncheck due to crbug.com/40147906
 #include "components/proxy_config/proxy_config_pref_names.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
@@ -379,9 +359,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kAllowSocketPoolSizeRandomizationForProxies,
     prefs::kAllowSocketPoolSizeRandomizationForProxies,
     base::Value::Type::BOOLEAN },
-  { key::kIsolatedModeSettings,
-    enterprise_isolated_mode::kEnterpriseIsolatedModeSettings,
-    base::Value::Type::INTEGER },
 // Policies for all platforms - End
   { key::kAbusiveExperienceInterventionEnforce,
     blocked_content::prefs::kAbusiveExperienceInterventionEnforce,
@@ -840,9 +817,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kCoalesceH2ConnectionsWithClientCertificatesForHosts,
     prefs::kH2ClientCertCoalescingHosts,
     base::Value::Type::LIST },
-  { key::kEnterpriseHardwarePlatformAPIEnabled,
-    prefs::kEnterpriseHardwarePlatformAPIEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kPasswordLeakDetectionEnabled,
     password_manager::prefs::kPasswordLeakDetectionEnabled,
     base::Value::Type::BOOLEAN },
@@ -896,9 +870,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  { key::kUnmanagedDeviceSignalsConsentFlowEnabled,
-    device_signals::prefs::kUnmanagedDeviceSignalsConsentFlowEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kProfileSeparationDomainExceptionList,
     prefs::kProfileSeparationDomainExceptionList,
     base::Value::Type::LIST },
@@ -1032,12 +1003,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     extensions::pref_names::kBlockExternalExtensions,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  { key::kExtensionDOMActivityLoggingEnabled,
-    prefs::kExtensionDOMActivityLoggingEnabled,
-    base::Value::Type::BOOLEAN },
-#endif // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   { key::kExtensionExtendedBackgroundLifetimeForPortConnectionsToUrls,
@@ -1300,13 +1265,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 
   handlers->AddHandler(std::make_unique<autofill::AutofillPolicyHandler>());
   handlers->AddHandler(std::make_unique<ChromeIncognitoModePolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<enterprise_reporting::CloudReportingPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_reporting::CloudReportingFrequencyPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<enterprise_reporting::LegacyTechReportPolicyHandler>());
   handlers->AddHandler(std::make_unique<DefaultSearchPolicyHandler>());
   handlers->AddHandler(
       std::make_unique<bookmarks::ManagedBookmarksPolicyHandler>(
@@ -1485,16 +1443,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
 
   handlers->AddHandler(
-      std::make_unique<enterprise_idle::IdleTimeoutPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<enterprise_idle::IdleTimeoutActionsPolicyHandler>(
-          chrome_schema));
-
-  handlers->AddHandler(
       std::make_unique<content_settings::CookieSettingsPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_reporting::CloudProfileReportingPolicyHandler>());
   handlers->AddHandler(std::make_unique<ForceSafeSearchPolicyHandler>());
   handlers->AddHandler(std::make_unique<ForceYouTubeSafetyModePolicyHandler>());
   handlers->AddHandler(std::make_unique<HomepageLocationPolicyHandler>());
@@ -1558,11 +1507,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           key::kProfileSeparationDataMigrationSettings,
           prefs::kProfileSeparationDataMigrationSettings,
           base::Value::Type::INTEGER)));
-  handlers->AddHandler(std::make_unique<IntRangePolicyHandler>(
-      key::kProfileReauthPrompt, enterprise_signin::prefs::kProfileReauthPrompt,
-      static_cast<int>(enterprise_signin::ProfileReauthPrompt::kDoNotPrompt),
-      static_cast<int>(enterprise_signin::ProfileReauthPrompt::kPromptInTab),
-      false));
 
   handlers->AddHandler(std::make_unique<SimplePolicyHandler>(
       key::kEnterpriseCustomLabelForBrowser,
@@ -1586,17 +1530,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<URLSchemeListPolicyHandler>(
-          key::kSaasUsageReportingDomainUrlsForProfiles,
-          enterprise_reporting::kSaasUsageDomainUrlsForProfile)));
-#endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  handlers->AddHandler(std::make_unique<URLSchemeListPolicyHandler>(
-      key::kSaasUsageReportingDomainUrlsForBrowsers,
-      enterprise_reporting::kSaasUsageDomainUrlsForBrowser));
-#endif
   std::vector<std::unique_ptr<ConfigurationPolicyHandler>>
       signin_legacy_policies;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -1605,36 +1538,12 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       base::Value::Type::BOOLEAN));
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kSecuritySignalsClientCertificatesSelectors,
-          enterprise_reporting::kSecuritySignalsClientCertificatesSelectors,
-          base::Value::Type::LIST)));
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   signin_legacy_policies.push_back(std::make_unique<SimplePolicyHandler>(
       key::kSigninAllowed, prefs::kSigninAllowedOnNextStartup,
       base::Value::Type::BOOLEAN));
   handlers->AddHandler(std::make_unique<LegacyPoliciesDeprecatingPolicyHandler>(
       std::move(signin_legacy_policies),
       std::make_unique<BrowserSigninPolicyHandler>(chrome_schema)));
-
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kUserSecuritySignalsReporting,
-          enterprise_reporting::kUserSecuritySignalsReporting,
-          base::Value::Type::BOOLEAN)));
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kUserSecurityAuthenticatedReporting,
-          enterprise_reporting::kUserSecurityAuthenticatedReporting,
-          base::Value::Type::BOOLEAN)));
-
-#if BUILDFLAG(IS_MAC)
-  handlers->AddHandler(
-      std::make_unique<enterprise_auth::ExtensibleEnterpriseSSOPolicyHandler>(
-          chrome_schema));
-#endif  // BUILDFLAG(IS_MAC)
 
   // On most platforms, there is a legacy policy
   // kUnsafelyTreatInsecureOriginAsSecure which has been replaced by
@@ -1691,8 +1600,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       extensions::pref_names::kExtensionUnpublishedAvailability,
       /*min=*/0, /*max=*/1, /*clamp=*/false));
   handlers->AddHandler(std::make_unique<ExtensionDeveloperModePolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<enterprise_reporting::ExtensionRequestPolicyHandler>());
   handlers->AddHandler(std::make_unique<SimplePolicyHandler>(
       key::kExtensionInstallCloudPolicyChecksEnabled,
       extensions::pref_names::kExtensionInstallCloudPolicyChecksEnabled,
@@ -1717,9 +1624,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(std::make_unique<PrivacySandboxPolicyHandler>());
 
   handlers->AddHandler(std::make_unique<BatterySaverPolicyHandler>());
-
-  handlers->AddHandler(std::make_unique<DataRegionPolicyHandler>(
-      key::kChromeDataRegionSetting, prefs::kChromeDataRegionSetting));
 
   std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>
       gen_ai_default_policies;

@@ -354,11 +354,6 @@ source_set("collected_cookies_infobar_delegate") {
     "//ui/base:features",
   ]
 }
-source_set("enterprise_startup_dialog") {
-  public = [ "enterprise_startup_dialog.h" ]
-  public_deps = [ "//base" ]
-}
-
 source_set("uninstall_browser_prompt") {
   public = [ "uninstall_browser_prompt.h" ]
 }
@@ -457,7 +452,6 @@ source_set("tab_dialogs") {
 # circular includes from each other.
 static_library("ui") {
   sources = [
-    "idle_bubble.h",
     "screen_capture_notification_ui.h",
     "tab_helpers.cc",
     "tab_helpers.h",
@@ -479,7 +473,6 @@ static_library("ui") {
     # should be added to //chrome/browser:browser_generated_files.
     ":accelerator_utils_headers",
     ":crypto_module_password_dialog",
-    ":enterprise_startup_dialog",
     ":simple_message_box_headers",
     ":tab_dialogs",
     ":tab_modal_confirm_dialog",
@@ -700,7 +693,6 @@ static_library("ui") {
     "//components/dom_distiller/content/browser",
     "//components/download/content/factory",
     "//components/embedder_support:user_agent",
-    "//components/enterprise",
     "//components/feature_engagement",
     "//components/find_in_page",
     "//components/history/content/browser",
@@ -829,7 +821,6 @@ static_library("ui") {
   deps += [
     "//chrome/browser/ui/webui/default_browser:default_browser_modal",
     "//chrome/browser/ui/webui/default_browser:modal_mojo_bindings",
-    "//chrome/browser/ui/webui/feature_showcase:mojo_bindings",
   ]
   allow_circular_includes_from +=
       [ "//chrome/browser/ui/views/relaunch_notification:impl" ]
@@ -869,7 +860,7 @@ static_library("ui") {
   ]
 
   allow_circular_includes_from += [
-    # enterprise headers include from //chrome/browser/ui (e.g. idle_dialog.h).
+    # enterprise headers include from //chrome/browser/ui.
     # enterprise:impl includes headers from //chrome/browser/ui that can't be
     # split out yet.
     "//chrome/browser/enterprise",
@@ -1585,10 +1576,6 @@ static_library("ui") {
       "views/profiles/profile_picker_feature_promo_controller.h",
       "views/profiles/profile_picker_flow_controller.cc",
       "views/profiles/profile_picker_flow_controller.h",
-      "views/profiles/profile_picker_post_sign_in_adapter.cc",
-      "views/profiles/profile_picker_post_sign_in_adapter.h",
-      "views/profiles/profile_picker_turn_sync_on_delegate.cc",
-      "views/profiles/profile_picker_turn_sync_on_delegate.h",
       "views/profiles/profile_picker_view.cc",
       "views/profiles/profile_picker_view.h",
       "views/profiles/profile_picker_web_contents_host.h",
@@ -1605,7 +1592,6 @@ static_library("ui") {
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/startup/default_browser_prompt:impl",
       "//chrome/browser/ui/views/profiles:badged_profile_photo",
-      "//chrome/browser/ui/webui/intro",
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/signin:profile_impl",
     ]
@@ -1623,30 +1609,12 @@ static_library("ui") {
         "views/profiles/cross_device_signin_qr_bubble_views.cc",
         "views/profiles/dice_web_signin_interception_bubble_view.cc",
         "views/profiles/dice_web_signin_interception_bubble_view.h",
-        "views/profiles/first_run_flow_controller.cc",
-        "views/profiles/first_run_flow_controller.h",
         "views/profiles/profile_picker_omnibox_everywhere_flow_controller.cc",
         "views/profiles/profile_picker_omnibox_everywhere_flow_controller.h",
-        "views/profiles/profile_picker_reauth_provider.cc",
-        "views/profiles/profile_picker_reauth_provider.h",
-        "views/profiles/profile_picker_sign_in_provider.cc",
-        "views/profiles/profile_picker_sign_in_provider.h",
-        "views/profiles/profile_picker_toolbar.cc",
-        "views/profiles/profile_picker_toolbar.h",
         "views/profiles/profile_picker_utils.cc",
         "views/profiles/profile_picker_utils.h",
       ]
-      deps += [
-        "//chrome/browser/ui/views/profiles/feature_showcase",
-        "//chrome/browser/ui/views/profiles/feature_showcase:metrics",
-        "//chrome/browser/ui/webui/feature_showcase",
-        "//services/audio/public/cpp",
-      ]
     }
-  }
-
-  if (is_mac || is_linux) {
-    deps += [ "//components/enterprise/device_trust/core:metrics" ]
   }
 
   if (is_mac) {
@@ -1739,14 +1707,6 @@ static_library("ui") {
     }
   }
 
-  if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/ui/views/device_signals_consent",
-      "//chrome/browser/ui/views/device_signals_consent:impl",
-    ]
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/views/device_signals_consent:impl" ]
-  }
   if (enable_webui_certificate_viewer) {
     sources += [
       "certificate_dialogs.cc",
@@ -1998,7 +1958,6 @@ static_library("ui") {
       "views/frame/web_contents_close_handler_delegate.h",
       "views/global_error_bubble_view.cc",
       "views/global_error_bubble_view.h",
-      "views/idle_bubble.cc",
       "views/incognito_clear_browsing_data_dialog.cc",
       "views/incognito_clear_browsing_data_dialog.h",
       "views/incognito_clear_browsing_data_dialog_coordinator.cc",
@@ -2657,7 +2616,6 @@ static_library("ui") {
     }
 
     sources += [
-      "idle_dialog.h",
       "views/frame/opaque_browser_frame_view.cc",
       "views/frame/opaque_browser_frame_view.h",
       "views/frame/opaque_browser_frame_view_layout.cc",
@@ -2667,18 +2625,11 @@ static_library("ui") {
       "views/screen_capture_notification_ui_views.cc",
     ]
     deps += [
-      "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
-      "//chrome/browser/ui/views/policy:idle_dialog",
       "//chrome/browser/ui/views/shortcuts",
       "//chrome/browser/ui/views/shortcuts:impl",
       "//ui/views/window/vector_icons",
     ]
     allow_circular_includes_from += [
-      # Circular dependency exists because the following header is not yet
-      # componentized: c/b/ui/idle_dialog.h (IdleDialogView implements
-      # IdleDialog::Show and includes idle_dialog.h)
-      "//chrome/browser/ui/views/policy:idle_dialog",
-
       # Circular dependency exists because the following headers are not yet
       # componentized:
       # - c/b/ui/browser.h

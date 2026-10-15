@@ -107,13 +107,6 @@ source_set("browser_tests") {
     "//components/history_embeddings/core",
   ]
 
-  if (enable_dice_support) {
-    sources += [
-      "feature_showcase/feature_showcase_browsertest.cc",
-      "intro/intro_browsertest.cc",
-    ]
-  }
-
   if (enable_extensions_core) {
     sources += [ "extensions/extensions_browsertest.cc" ]
     deps += [ "//chrome/browser/ui/webui/extensions:test_support" ]
@@ -542,16 +535,9 @@ generate_grd("build_grd") {
   grdp_files += [ "$target_gen_dir/signin/resources.grdp" ]
 
   if (enable_dice_support) {
-    deps += [
-      "feature_showcase:build_grdp",
-      "intro:build_grdp",
-      "signin/signout_confirmation:build_grdp",
-    ]
-    grdp_files += [
-      "$target_gen_dir/feature_showcase/resources.grdp",
-      "$target_gen_dir/intro/resources.grdp",
-      "$target_gen_dir/signin/signout_confirmation/resources.grdp",
-    ]
+    deps += [ "signin/signout_confirmation:build_grdp" ]
+    grdp_files +=
+        [ "$target_gen_dir/signin/signout_confirmation/resources.grdp" ]
   }
 
   if (!enable_extensions_core && enable_guest_view) {

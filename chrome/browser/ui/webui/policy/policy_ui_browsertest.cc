@@ -33,8 +33,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service.h"
-#include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service_factory.h"
 #include "chrome/browser/policy/profile_policy_connector_builder.h"
 #include "chrome/browser/policy/schema_registry_service.h"
 #include "chrome/browser/profiles/profile.h"
@@ -505,13 +503,6 @@ IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonOTRProfile) {
   ASSERT_TRUE(otr_browser);
   content::WebContents* otr_contents =
       otr_browser->tab_strip_model()->GetActiveWebContents();
-
-  // Concretely assert that CloudProfileReportingServiceFactory returns nullptr
-  // for OTR profile, so no reporting service / scheduler is available.
-  EXPECT_EQ(
-      nullptr,
-      enterprise_reporting::CloudProfileReportingServiceFactory::GetForProfile(
-          otr_browser->GetProfile()));
 
   // Turn on the reporting policy.
   policy::PolicyMap policy_map;

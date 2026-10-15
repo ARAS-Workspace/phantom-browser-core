@@ -393,10 +393,6 @@ component("network_service") {
     ]
   }
 
-  if (is_mac) {
-    deps += [ "//components/enterprise/platform_auth:enterprise_platform_auth" ]
-  }
-
   if (enable_vrp_flags) {
     deps += [ "//components/vrp_flags" ]
   }

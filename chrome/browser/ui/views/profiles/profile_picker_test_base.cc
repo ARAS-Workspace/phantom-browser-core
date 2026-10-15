@@ -9,7 +9,6 @@
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_ui_test_utils.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_sign_in_provider.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_view.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
@@ -81,29 +80,4 @@ content::WebContents* WithProfilePickerTestHelpers::web_contents() {
     return nullptr;
   }
   return web_view()->GetWebContents();
-}
-
-GURL WithProfilePickerTestHelpers::GetSigninChromeSyncDiceUrl(
-    const std::string& email) {
-  signin::Flow signin_flow = signin_util::IsForceSigninEnabled()
-                                 ? signin::Flow::EMBEDDED_PROMO
-                                 : signin::Flow::PROMO;
-
-  GURL continue_url;
-  if (base::FeatureList::IsEnabled(kProfilePickerGaiaBlankContinueUrl)) {
-    continue_url = GaiaUrls::GetInstance()->blank_page_url();
-  }
-
-  return signin::GetChromeSyncURLForDice(
-      {.email = email,
-       .continue_url = std::move(continue_url),
-       .request_dark_scheme = view()->ShouldUseDarkColors(),
-       .flow = signin_flow});
-}
-
-GURL WithProfilePickerTestHelpers::GetChromeReauthURL(
-    const std::string& email) {
-  return signin::GetChromeReauthURL(
-      {.email = email,
-       .continue_url = GaiaUrls::GetInstance()->blank_page_url()});
 }

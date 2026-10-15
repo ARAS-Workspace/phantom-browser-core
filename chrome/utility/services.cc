@@ -31,14 +31,9 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/services/mac_notifications/mac_notification_provider_impl.h"
-#include "chrome/services/system_signals/mac/mac_system_signals_service.h"
 #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
 #include "services/proxy_resolver_mac/mac_system_proxy_resolver_impl.h"
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_LINUX)
-#include "chrome/services/system_signals/linux/linux_system_signals_service.h"
-#endif  // BUILDFLAG(IS_LINUX)
 
 #include "chrome/common/importer/profile_import.mojom.h"
 #include "chrome/utility/importer/profile_import_impl.h"
@@ -123,20 +118,6 @@ auto RunMacSystemProxyResolver(
       std::move(receiver));
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-auto RunSystemSignalsService(
-    mojo::PendingReceiver<device_signals::mojom::SystemSignalsService>
-        receiver) {
-#if BUILDFLAG(IS_MAC)
-  return std::make_unique<system_signals::MacSystemSignalsService>(
-      std::move(receiver));
-#else
-  return std::make_unique<system_signals::LinuxSystemSignalsService>(
-      std::move(receiver));
-#endif  // BUILDFLAG(IS_MAC)
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 auto RunProxyResolver(
     mojo::PendingReceiver<proxy_resolver::mojom::ProxyResolverFactory>
@@ -240,10 +221,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 
   services.Add(RunProfileImporter);
   services.Add(RunScreenAIServiceFactory);
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  services.Add(RunSystemSignalsService);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
   services.Add(RunMacNotificationService);

@@ -12,7 +12,6 @@
 #include "base/timer/elapsed_timer.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
 #include "components/web_modal/web_contents_modal_dialog_manager_delegate.h"
 #include "content/public/browser/web_contents.h"
@@ -113,11 +112,6 @@ class ProfileManagementFlowController
   // returns back to the main picker screen (if the original EntryPoint was to
   // open the picker).
   virtual void CancelSigninFlow() = 0;
-
-  // Creates and configures the native toolbar builder with flow-specific
-  // buttons. Overrides in subclasses should retrieve the builder from the base
-  // class first to inherit common configurations (e.g. the back button).
-  virtual ProfilePickerToolbar::Builder CreateToolbarBuilder();
 
   // Picks the profile with `profile_path`.
   // `pick_profile_complete_callback` will be called on profile load.

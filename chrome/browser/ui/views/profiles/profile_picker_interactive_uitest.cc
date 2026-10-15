@@ -46,8 +46,6 @@ DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kPickerWebContentsId);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kButtonEnabled);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kButtonDisabled);
 
-const WebContentsInteractionTestUtil::DeepQuery kSignInButton = {
-    "profile-picker-app", "profile-type-choice", "#signInButton"};
 const WebContentsInteractionTestUtil::DeepQuery kContinueWithoutAccountButton =
     {"profile-picker-app", "profile-type-choice", "#notNowButton"};
 const WebContentsInteractionTestUtil::DeepQuery kAddProfileButton = {
@@ -328,96 +326,6 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerInteractiveUiTest, FullscreenWithKeyboard) {
   // Fullscreen causes the bounds of the widget to change.
   bounds_waiter.Wait();
   EXPECT_TRUE(widget()->IsFullscreen());
-}
-
-IN_PROC_BROWSER_TEST_F(ProfilePickerInteractiveUiTest,
-                       CloseDiceSigninWithKeyboard) {
-  ShowAndFocusPicker(ProfilePicker::EntryPoint::kProfileMenuAddNewProfile);
-
-  RunTestSequenceInContext(
-      views::ElementTrackerViews::GetContextForView(view()),
-
-      // Wait for the profile picker to show the profile type choice screen.
-      WaitForShow(kProfilePickerViewId),
-      InstrumentNonTabWebView(kPickerWebContentsId, web_view()),
-      WaitForWebContentsReady(kPickerWebContentsId,
-                              GURL("chrome://profile-picker/new-profile")),
-
-      // Click "sign in".
-      // Note: the button should be disabled after this, but there is no good
-      // way to verify it in this sequence. It is verified by unit tests in
-      // chrome/test/data/webui/signin/profile_picker_app_test.ts
-      EnsurePresent(kPickerWebContentsId, kSignInButton),
-      MoveMouseTo(kPickerWebContentsId, kSignInButton), ClickMouse(),
-
-      // Wait for switch to the Gaia sign-in page to complete.
-      // Note: kPickerWebContentsId now points to the new profile's WebContents.
-      WaitForWebContentsNavigation(kPickerWebContentsId,
-                                   GetSigninChromeSyncDiceUrl()),
-
-      // Send "Close window" keyboard shortcut and wait for view to close.
-      SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_CLOSE_WINDOW)),
-      WaitForHide(kProfilePickerViewId, /*transition_only_on_event=*/true),
-
-      // Note: The widget/view is destroyed asynchronously, we need to flush the
-      // message loops to be able to reliably check the global state.
-      CheckResult(&ProfilePicker::IsOpen, testing::IsFalse()));
-}
-
-// Checks that both the signin web view and the main picker view are able to
-// process a back keyboard event.
-IN_PROC_BROWSER_TEST_F(ProfilePickerInteractiveUiTest,
-                       NavigateBackFromDiceSigninWithKeyboard) {
-  // Simulate walking through the flow starting at the picker so that navigating
-  // back to the picker makes sense. Check that the navigation list is populated
-  // correctly.
-  ShowAndFocusPicker(ProfilePicker::EntryPoint::kProfileMenuManageProfiles,
-                     GURL("chrome://profile-picker"));
-
-  RunTestSequenceInContext(
-      views::ElementTrackerViews::GetContextForView(view()),
-
-      WaitForShow(kProfilePickerViewId),
-      InstrumentNonTabWebView(kPickerWebContentsId, web_view()),
-      WaitForWebContentsReady(kPickerWebContentsId,
-                              GURL("chrome://profile-picker")),
-      CheckResult(GetNavState(), Eq(NavState{.entry_count = 1,
-                                             .last_committed_entry_index = 0})),
-
-      // Advance to the profile type choice screen.
-      EnsurePresent(kPickerWebContentsId, kAddProfileButton),
-      MoveMouseTo(kPickerWebContentsId, kAddProfileButton), ClickMouse(),
-      WaitForStateChange(
-          kPickerWebContentsId,
-          UrlEntryMatches(GURL("chrome://profile-picker/new-profile"))),
-      CheckResult(GetNavState(), Eq(NavState{.entry_count = 2,
-                                             .last_committed_entry_index = 1})),
-
-      // Advance to the sign-in page.
-      WaitForStateChange(kPickerWebContentsId, Exists(kSignInButton)),
-      MoveMouseTo(kPickerWebContentsId, kSignInButton), ClickMouse(),
-      WaitForWebContentsNavigation(kPickerWebContentsId,
-                                   GetSigninChromeSyncDiceUrl()),
-
-      // Navigate back with the keyboard, switch back to the picker.
-      SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_BACK)),
-      WaitForStateChange(
-          kPickerWebContentsId,
-          UrlEntryMatches(GURL("chrome://profile-picker/new-profile"))),
-      CheckResult(GetNavState(), Eq(NavState{.entry_count = 2,
-                                             .last_committed_entry_index = 1})),
-
-      // Navigate again back with the keyboard.
-      SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_BACK)),
-      WithoutDelay(CheckResult(HasPendingNav(), IsTrue())),
-      WaitForStateChange(kPickerWebContentsId,
-                         UrlEntryMatches(GURL("chrome://profile-picker"))),
-      CheckResult(GetNavState(), Eq(NavState{.entry_count = 2,
-                                             .last_committed_entry_index = 0})),
-
-      // Navigating back once again does nothing.
-      SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_BACK)),
-      WithoutDelay(CheckResult(HasPendingNav(), IsFalse())));
 }
 
 IN_PROC_BROWSER_TEST_F(ProfilePickerInteractiveUiTest,

@@ -26,7 +26,6 @@
 #include "ui/views/view.h"
 #include "ui/views/widget/widget_delegate.h"
 
-class ProfilePickerToolbar;
 class Profile;
 class ScopedProfileKeepAlive;
 class ProfileManagementFlowController;
@@ -69,7 +68,6 @@ class ProfilePickerView : public views::WidgetDelegateView,
       const GURL& url,
       base::OnceClosure navigation_finished_closure) override;
   bool ShouldUseDarkColors() const override;
-  bool AreEffectsEnabled() const override;
   content::WebContents* GetPickerContents() const override;
   web_modal::WebContentsModalDialogHost* GetWebContentsModalDialogHost()
       override;
@@ -78,11 +76,6 @@ class ProfilePickerView : public views::WidgetDelegateView,
   void ShowSigninErrorDialog(
       const std::variant<ForceSigninUIError, SigninUIError>& error,
       bool success) override;
-  void SetNativeToolbarSigninButtonsVisible(bool visible) override;
-  void SetNativeToolbarDontSignInButtonVisible(bool visible) override;
-  void SetNativeToolbarStartBrowsingButtonVisible(bool visible) override;
-  void SetNativeToolbarEffectsControlButtonVisible(bool visible) override;
-  bool AreNativeToolbarSigninButtonsVisibleForTesting() const;
   SkColor GetPreferredBackgroundColor() const override;
 
   // content::WebContentsDelegate:
@@ -114,7 +107,6 @@ class ProfilePickerView : public views::WidgetDelegateView,
   void WindowClosing() override;
   views::ClientView* CreateClientView(views::Widget* widget) override;
   views::View* GetContentsView() override;
-  void Layout(PassKey) override;
   std::u16string GetAccessibleWindowTitle() const override;
   gfx::Size CalculatePreferredSize(
       const views::SizeBounds& available_size) const override;
@@ -210,21 +202,6 @@ class ProfilePickerView : public views::WidgetDelegateView,
   void OnLocalProfileInitialized(std::optional<SkColor> profile_color,
                                  Profile* profile);
 
-  // Switches the layout to the sign-in screen (and creates a new profile or
-  // load an existing one based on the `profile_info` content).
-  void SwitchToSignIn(ProfilePicker::ProfileInfo profile_info,
-                      StepSwitchFinishedCallback switch_finished_callback);
-
-  // Switches the profile picker layout to display the reauth page to the main
-  // account of the given `profile` if needed. On success the `profile` is
-  // unlocked and a browser is opend. On failure the user is redirected to the
-  // profile picker main page with an popup error dialog displayed through
-  // `on_error_callback`.
-  void SwitchToReauth(
-      Profile* profile,
-      StepSwitchFinishedCallback switch_finished_callback,
-      base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback);
-
   // Builds the views hierarchy.
   void BuildLayout();
 
@@ -282,10 +259,6 @@ class ProfilePickerView : public views::WidgetDelegateView,
   // after switching a screen. Must be below all WebContents instances so that
   // WebContents outlive this observer.
   std::unique_ptr<NavigationFinishedObserver> show_screen_finished_observer_;
-
-  // Toolbar view displayed on top of the native WebUI(s) and/or WebView (Gaia),
-  // owned by the view hierarchy.
-  raw_ptr<ProfilePickerToolbar> toolbar_ = nullptr;
 
   std::unique_ptr<ProfileManagementFlowController> flow_controller_;
 

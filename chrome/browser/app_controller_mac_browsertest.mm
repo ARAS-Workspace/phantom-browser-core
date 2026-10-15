@@ -627,42 +627,6 @@ IN_PROC_BROWSER_TEST_F(AppControllerProfilePickerBrowserTest, MenuCommands) {
   EXPECT_TRUE(browser_created_observer.Wait());
 }
 
-class AppControllerFirstRunBrowserTest : public AppControllerBrowserTest {
- public:
-  void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpDefaultCommandLine(command_line);
-    command_line->RemoveSwitch(switches::kNoFirstRun);
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(AppControllerFirstRunBrowserTest,
-                       OpenNewWindowWhileFreIsRunning) {
-  EXPECT_TRUE(ProfilePicker::IsFirstRunOpen());
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 0u);
-  AppController* app_controller = AppController.sharedController;
-  NSMenu* menu = [app_controller applicationDockMenu:NSApp];
-  ASSERT_TRUE(menu);
-
-  NSMenuItem* item = [menu itemWithTag:IDC_NEW_WINDOW];
-  ASSERT_TRUE(item);
-  [app_controller commandDispatch:item];
-
-  profiles::testing::WaitForPickerClosed();
-  EXPECT_FALSE(ProfilePicker::IsFirstRunOpen());
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1u);
-}
-
-IN_PROC_BROWSER_TEST_F(AppControllerFirstRunBrowserTest,
-                       ClickingChromeDockIconDoesNotOpenBrowser) {
-  EXPECT_TRUE(ProfilePicker::IsFirstRunOpen());
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 0u);
-  [AppController.sharedController applicationShouldHandleReopen:NSApp
-                                              hasVisibleWindows:NO];
-
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 0u);
-  ProfilePicker::Hide();
-}
-
 class AppControllerOpenShortcutBrowserTest : public InProcessBrowserTest {
  protected:
   AppControllerOpenShortcutBrowserTest() = default;

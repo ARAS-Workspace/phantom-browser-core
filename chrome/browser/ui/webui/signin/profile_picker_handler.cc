@@ -300,10 +300,6 @@ void ProfilePickerHandler::RegisterMessages() {
       "closeProfileStatistics",
       base::BindRepeating(&ProfilePickerHandler::HandleCloseProfileStatistics,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "selectNewAccount",
-      base::BindRepeating(&ProfilePickerHandler::HandleSelectNewAccount,
-                          base::Unretained(this)));
   // TODO(crbug.com/40144179): Consider renaming this message to
   // 'createLocalProfile' as this is only used for local profiles.
   web_ui()->RegisterMessageCallback(
@@ -402,62 +398,12 @@ void ProfilePickerHandler::TryLaunchLockedProfile(
   CHECK(signin_util::IsForceSigninEnabled());
   CHECK(entry.IsSigninRequired());
 
-  // Only pre-exisitng locked profiles can be reused by reauthing. We consider a
-  // profile as pre-existing if it has been active previously and signed into,
-  // and if there is a RestrictSigninToPattern policy, the account would also
-  // need to match the policy filter.
-
-  // Reauth attempt.
-  if ((syncer::IsReplaceSyncPromosWithSignInPromosEnabled() &&
-       entry.GetSigninState() != SigninState::kNotSignedIn) ||
-      entry.CanBeManaged()) {
-    g_browser_process->profile_manager()->LoadProfileByPath(
-        entry.GetPath(), /*incognito=*/false,
-        base::BindOnce(&ProfilePickerHandler::OnProfileLoadedForSwitchToReauth,
-                       weak_factory_.GetWeakPtr()));
-    return;
-  }
-
-  // Default profile, not yet active, fresh sign in is allowed as the profile
-  // was not used yet. Default profile is the automatically created profile,
-  // initial profile or after deleting the last profile for example.
-  if (entry.GetActiveTime().is_null()) {
-    // Triggers a fresh sign in via profile picker without existing email
-    // address.
-    std::vector<StepSwitchFinishedCallback> callbacks;
-    callbacks.emplace_back(
-        base::BindOnce(&ProfilePickerHandler::OnLoadSigninFinished,
-                       weak_factory_.GetWeakPtr()));
-    callbacks.emplace_back(
-        base::BindOnce(&ProfilePickerHandler::OnResetPickerButtons,
-                       weak_factory_.GetWeakPtr()));
-    ProfilePicker::SwitchToSignIn(
-        entry.GetPath(),
-        CombineCallbacks<StepSwitchFinishedCallback, bool>(std::move(callbacks))
-            .value());
-    return;
-  }
-
-  // Remaining active profiles: those cannot be reauthed or signed in to.
-
   // Do not allow users to sign in to a pre-existing locked profile, as this may
   // force unexpected profile data merge.
   DisplaySigninErrorDialog(
       /*profile_path=*/base::FilePath(),
       ForceSigninUIError::ReauthNotAllowed());
   OnResetPickerButtons(false);
-}
-
-void ProfilePickerHandler::OnProfileLoadedForSwitchToReauth(Profile* profile) {
-  if (!profile) {
-    return;
-  }
-  ProfilePicker::SwitchToReauth(
-      profile,
-      base::BindOnce(&ProfilePickerHandler::OnResetPickerButtons,
-                     weak_factory_.GetWeakPtr()),
-      base::BindOnce(&ProfilePickerHandler::DisplayForceSigninErrorDialog,
-                     weak_factory_.GetWeakPtr(), profile->GetPath()));
 }
 
 void ProfilePickerHandler::DisplaySigninErrorDialog(
@@ -764,31 +710,6 @@ void ProfilePickerHandler::OnProfileStatisticsReceived(
   }
   dict.Set("statistics", std::move(stats));
   FireWebUIListener("profile-statistics-received", dict);
-}
-
-void ProfilePickerHandler::HandleSelectNewAccount(const base::ListValue& args) {
-  AllowJavascript();
-  CHECK_EQ(1U, args.size());
-  std::optional<SkColor> profile_color = args[0].GetIfInt();
-  if (signin_util::IsForceSigninEnabled()) {
-    // Force sign-in policy uses a separate flow that doesn't initialize the
-    // profile color. Generate a new profile color here.
-    profile_color = GenerateNewProfileColor().color;
-  }
-  std::vector<StepSwitchFinishedCallback> callbacks;
-  callbacks.emplace_back(base::BindOnce(
-      &ProfilePickerHandler::OnLoadSigninFinished, weak_factory_.GetWeakPtr()));
-  callbacks.emplace_back(base::BindOnce(
-      &ProfilePickerHandler::OnResetPickerButtons, weak_factory_.GetWeakPtr()));
-  ProfilePicker::SwitchToSignIn(
-      profile_color,
-      CombineCallbacks<StepSwitchFinishedCallback, bool>(std::move(callbacks))
-          .value());
-}
-
-void ProfilePickerHandler::OnLoadSigninFinished(bool success) {
-  AllowJavascript();
-  FireWebUIListener("load-signin-finished", base::Value(success));
 }
 
 void ProfilePickerHandler::OnResetPickerButtons(bool success) {

@@ -25,7 +25,6 @@
 #include "chrome/browser/extensions/standard_management_policy_provider.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
@@ -1194,25 +1193,6 @@ TEST_F(ExtensionManagementServiceTest, IsInstallationExplicitlyBlocked) {
   EXPECT_TRUE(extension_management_->IsInstallationExplicitlyBlocked(removed));
   EXPECT_FALSE(
       extension_management_->IsInstallationExplicitlyBlocked(not_specified));
-}
-
-TEST_F(ExtensionManagementServiceTest,
-       ExtensionsAreBlockedByDefaultForExtensionRequest) {
-  // When extension request policy is set to true, all extensions are blocked by
-  // default.
-  SetPref(true, enterprise_reporting::kCloudExtensionRequestEnabled,
-          std::make_unique<base::Value>(true));
-  EXPECT_TRUE(extension_management_->BlocklistedByDefault());
-  EXPECT_EQ(ManagedInstallationMode::kBlocked,
-            GetInstallationModeById(kTargetExtension));
-  // However, it will be overridden by ExtensionSettings
-  SetExampleDictPref(R"({
-    "*": {
-      "installation_mode": "removed",
-    }
-  })");
-  EXPECT_EQ(ManagedInstallationMode::kRemoved,
-            GetInstallationModeById(kTargetExtension));
 }
 
 // Verifies that extensions that do not update CWS are always allowed by

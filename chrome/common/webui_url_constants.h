@@ -122,11 +122,6 @@ inline constexpr char kChromeUIExtensionsZeroStatePromoHost[] =
     "extensions-zero-state";
 inline constexpr char kChromeUIExtensionsZeroStatePromoURL[] =
     "chrome://extensions-zero-state";
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-inline constexpr char kChromeUIFeatureShowcaseHost[] = "feature-showcase";
-inline constexpr char kChromeUIFeatureShowcaseURL[] =
-    "chrome://feature-showcase/";
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 inline constexpr char kChromeUIFavicon2Host[] = "favicon2";
 inline constexpr char kChromeUIFaviconHost[] = "favicon";
 inline constexpr char kChromeUIFaviconURL[] = "chrome://favicon/";
@@ -166,9 +161,6 @@ inline constexpr char kChromeUIInterstitialHost[] = "interstitials";
 inline constexpr char kChromeUIInterstitialURL[] = "chrome://interstitials/";
 inline constexpr char kChromeUILocalStateHost[] = "local-state";
 inline constexpr char kChromeUILocalStateURL[] = "chrome://local-state";
-inline constexpr char kChromeUIManagementHost[] = "management";
-inline constexpr char kChromeUIManagementURL[] = "chrome://management";
-inline constexpr char16_t kChromeUIManagementURL16[] = u"chrome://management";
 inline constexpr char kChromeUIMediaEngagementHost[] = "media-engagement";
 inline constexpr char kChromeUIMemoryInternalsHost[] = "memory-internals";
 inline constexpr char kChromeUIMetricsInternalsHost[] = "metrics-internals";
@@ -384,16 +376,6 @@ inline constexpr char kChromeUISandboxHost[] = "sandbox";
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-inline constexpr char kChromeUIIntroDefaultBrowserSubPage[] = "default-browser";
-inline constexpr char kChromeUIIntroDefaultBrowserURL[] =
-    "chrome://intro/default-browser";
-inline constexpr char kChromeUIIntroFinishOrContinueSubPage[] =
-    "finish-or-continue";
-inline constexpr char kChromeUIIntroHost[] = "intro";
-inline constexpr char kChromeUIIntroSignInCelebrationSubPage[] =
-    "sign-in-celebration";
-inline constexpr char kChromeUIIntroURL[] = "chrome://intro";
-inline constexpr char kChromeUIIntroWelcomeSubPage[] = "welcome";
 inline constexpr char kChromeUIManagedUserProfileNoticeHost[] =
     "managed-user-profile-notice";
 inline constexpr char kChromeUIManagedUserProfileNoticeUrl[] =

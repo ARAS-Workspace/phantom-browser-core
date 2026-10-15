@@ -32,12 +32,10 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/platform_browser_test.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
 #include "components/policy/proto/device_management_backend.pb.h"
-#include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #include "content/public/browser/gpu_data_manager.h"
 #include "content/public/test/browser_test.h"
 #include "extensions/browser/allowlist_state.h"
@@ -62,9 +60,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#include "components/enterprise/browser/promotion/promotion_eligibility_checker.h"
-#include "components/enterprise/browser/promotion/promotion_prefs.h"
-#include "components/enterprise/promotion_types.h"
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/mock_cloud_policy_client.h"
 
@@ -130,44 +125,6 @@ class WebstoreInstallListener : public WebstorePrivateApi::Delegate {
   std::string id_;
   std::string error_;
   base::RunLoop loop_;
-};
-
-class FakePromotionEligibilityChecker
-    : public enterprise_promotion::PromotionEligibilityChecker {
- public:
-  explicit FakePromotionEligibilityChecker(
-      enterprise_management::GetUserEligiblePromotionsResponse response)
-      : enterprise_promotion::PromotionEligibilityChecker("",
-                                                          nullptr,
-                                                          nullptr,
-                                                          "",
-                                                          false),
-        response_(std::move(response)) {}
-
-  // The only logic: immediately run the callback with our stored response.
-  void MaybeCheckPromotionEligibility(
-      PromotionEligibilityCallback callback) override {
-    std::move(callback).Run(response_);
-  }
-
- private:
-  enterprise_management::GetUserEligiblePromotionsResponse response_;
-};
-
-class FailIfCalledPromotionEligibilityChecker
-    : public enterprise_promotion::PromotionEligibilityChecker {
- public:
-  FailIfCalledPromotionEligibilityChecker()
-      : enterprise_promotion::PromotionEligibilityChecker("",
-                                                          nullptr,
-                                                          nullptr,
-                                                          "",
-                                                          false) {}
-
-  void MaybeCheckPromotionEligibility(
-      PromotionEligibilityCallback callback) override {
-    ADD_FAILURE() << "Network check should not be called when cache is valid.";
-  }
 };
 
 }  // namespace
@@ -455,156 +412,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,
 
   EXPECT_EQ(ALLOWLIST_UNDEFINED,
             GetAllowlist()->GetExtensionAllowlistState(kExtensionId));
-}
-
-class WebstorePrivateEnterprisePromotionApiTest
-    : public MixinBasedInProcessBrowserTest {
- public:
-  WebstorePrivateEnterprisePromotionApiTest() {
-    feature_list_.InitAndEnableFeature(
-        extensions_features::kEnableShouldShowPromotion);
-  }
-  ~WebstorePrivateEnterprisePromotionApiTest() override = default;
-
- protected:
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
-                       DeterminesAndSavesPromotionEligibility) {
-  enterprise_management::GetUserEligiblePromotionsResponse mock_response;
-  mock_response.mutable_promotions()->set_cws_privacy_details_promotion(
-      enterprise_management::CHROME_ENTERPRISE_CORE);
-  auto function = base::MakeRefCounted<
-      WebstorePrivateShouldShowEnterprisePromotionBannerFunction>();
-  function->SetFakePromotionEligibilityCheckerForTesting(
-      std::make_unique<FakePromotionEligibilityChecker>(
-          std::move(mock_response)));
-
-  std::optional<base::Value> result = utils::RunFunctionAndReturnSingleResult(
-      function.get(), "[]", browser()->GetProfile());
-
-  ASSERT_TRUE(result);
-  EXPECT_EQ("CHROME_ENTERPRISE_CORE", result->GetString());
-  EXPECT_EQ(static_cast<int>(enterprise::PromotionType::kChromeEnterpriseCore),
-            browser()->GetProfile()->GetPrefs()->GetInteger(
-                enterprise_promotion::kEnterprisePromotionEligibility));
-}
-
-IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
-                       ReturnsCachedPromotionEligibility) {
-  PrefService* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      enterprise_promotion::kEnterprisePromotionEligibility,
-      static_cast<int>(enterprise::PromotionType::kChromeEnterprisePremium));
-  base::Time future_expiration = base::Time::Now() + base::Hours(1);
-  prefs->SetTime(pref_names::kEnterprisePromotionExpirationTime,
-                 future_expiration);
-  auto function = base::MakeRefCounted<
-      WebstorePrivateShouldShowEnterprisePromotionBannerFunction>();
-  // It should return saved prefs and NEVER call this checker.
-  function->SetFakePromotionEligibilityCheckerForTesting(
-      std::make_unique<FailIfCalledPromotionEligibilityChecker>());
-
-  std::optional<base::Value> result = utils::RunFunctionAndReturnSingleResult(
-      function.get(), "[]", browser()->GetProfile());
-
-  ASSERT_TRUE(result);
-  EXPECT_TRUE(result->is_string());
-  EXPECT_EQ("CHROME_ENTERPRISE_PREMIUM", result->GetString());
-  EXPECT_EQ(
-      static_cast<int>(enterprise::PromotionType::kChromeEnterprisePremium),
-      prefs->GetInteger(enterprise_promotion::kEnterprisePromotionEligibility));
-  EXPECT_EQ(future_expiration,
-            prefs->GetTime(pref_names::kEnterprisePromotionExpirationTime));
-}
-
-IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
-                       ReturnsUnspecifiedResponseWhenBannerWasDismissed) {
-  policy::CloudPolicyManager* manager =
-      browser()->GetProfile()->GetCloudPolicyManager();
-  auto client = std::make_unique<policy::MockCloudPolicyClient>();
-  client->SetDMToken("fake-dm-token");
-  manager->Connect(g_browser_process->local_state(), std::move(client));
-  PrefService* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetBoolean(pref_names::kHasDismissedEnterprisePromotion, true);
-  scoped_refptr<WebstorePrivateShouldShowEnterprisePromotionBannerFunction>
-      function = base::MakeRefCounted<
-          WebstorePrivateShouldShowEnterprisePromotionBannerFunction>();
-
-  std::optional<base::Value> result = utils::RunFunctionAndReturnSingleResult(
-      function.get(), "[]", browser()->GetProfile());
-
-  ASSERT_TRUE(result);
-  EXPECT_EQ(
-      api::webstore_private::ToString(
-          api::webstore_private::PromotionType::kPromotionTypeUnspecified),
-      result->GetString());
-  EXPECT_EQ(static_cast<int>(enterprise::PromotionType::kUnspecified),
-            browser()->GetProfile()->GetPrefs()->GetInteger(
-                enterprise_promotion::kEnterprisePromotionEligibility));
-  EXPECT_EQ(
-      static_cast<int>(enterprise::PromotionType::kUnspecified),
-      prefs->GetInteger(enterprise_promotion::kEnterprisePromotionEligibility));
-}
-
-class WebstorePrivatePolicyTest : public ExtensionWebstorePrivateApiTest {
- public:
-  WebstorePrivatePolicyTest() {
-    browser_dm_token_storage_.SetClientId("client_id");
-    browser_dm_token_storage_.SetEnrollmentToken("enrollment_token");
-    browser_dm_token_storage_.SetDMToken("dm_token");
-    policy::BrowserDMTokenStorage::SetForTesting(&browser_dm_token_storage_);
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    ExtensionWebstorePrivateApiTest::SetUpInProcessBrowserTestFixture();
-    provider_.SetDefaultReturns(
-        /*is_initialization_complete_return=*/true,
-        /*is_first_policy_load_complete_return=*/true);
-    policy::BrowserPolicyConnector::SetPolicyProviderForTesting(&provider_);
-  }
-
- protected:
-  policy::FakeBrowserDMTokenStorage browser_dm_token_storage_;
-  testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
-};
-
-IN_PROC_BROWSER_TEST_F(WebstorePrivatePolicyTest, ExtensionRequestPolicy) {
-  // Block all extensions.
-  policy::PolicyMap policies;
-  base::ListValue blocklist;
-  blocklist.Append("*");
-  policies.Set(policy::key::kExtensionInstallBlocklist,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-               policy::POLICY_SOURCE_CLOUD, base::Value(std::move(blocklist)),
-               nullptr);
-
-  // Enable extension request.
-  policies.Set(policy::key::kCloudExtensionRequestEnabled,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-               policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
-
-  // Enable reporting.
-  policies.Set(policy::key::kCloudReportingEnabled,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-               policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
-
-  provider_.UpdateChromePolicy(policies);
-
-  // Auto-confirm the request dialog.
-  ScopedTestDialogAutoConfirm auto_confirm(ScopedTestDialogAutoConfirm::ACCEPT);
-
-  // Run the test.
-  ASSERT_TRUE(RunInstallTest("extension_request.html", "extension.crx"));
-
-  // Verify that the request was recorded in prefs.
-  const base::DictValue& pending_requests = profile()->GetPrefs()->GetDict(
-      enterprise_reporting::kCloudExtensionRequestIds);
-  EXPECT_EQ(1u, pending_requests.size());
-  EXPECT_TRUE(pending_requests.contains(kExtensionId));
 }
 
 }  // namespace extensions

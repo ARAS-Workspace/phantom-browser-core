@@ -628,7 +628,6 @@ source_set("core") {
     "//chrome/browser/data_sharing",
     "//chrome/browser/devtools",
     "//chrome/browser/dom_distiller",
-    "//chrome/browser/enterprise/platform_auth:features",
     "//chrome/browser/external_protocol",
     "//chrome/browser/favicon",
     "//chrome/browser/finds/core",
@@ -1007,8 +1006,6 @@ source_set("core") {
       "//chrome/services/mac_notifications/public/cpp",
       "//chrome/services/mac_notifications/public/mojom",
       "//components/crash/core/app",
-      "//components/device_signals/core/browser/mac",
-      "//components/enterprise/platform_auth:enterprise_platform_auth",
       "//components/handoff",
       "//components/metal_util",
       "//components/os_crypt/async/browser:keychain_key_provider",
@@ -1579,16 +1576,12 @@ source_set("browser") {
     "//components/custom_handlers",
     "//components/device_event_log",
     "//components/device_reauth",
-    "//components/device_signals/core/browser",
     "//components/dom_distiller/content/browser",
     "//components/domain_reliability",
     "//components/download/content/factory",
     "//components/download/content/public",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
-    "//components/enterprise",
-    "//components/enterprise/browser/identifiers",
-    "//components/enterprise/browser/promotion",
     "//components/error_page/content/browser",
     "//components/favicon/content",
     "//components/favicon/core",
@@ -2051,10 +2044,6 @@ source_set("browser") {
 
   deps += [ ":process_singleton_posix" ]
 
-  if (is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/webui/intro" ]
-  }
-
   deps += [
     "//components/reporting/storage:storage_configuration",
     "//components/reporting/storage:storage_module",
@@ -2085,7 +2074,6 @@ source_set("browser") {
 
   if (is_linux || is_mac) {
     deps += [
-      "//components/device_signals/core/browser",
       "//components/policy/proto",
       "//components/power_metrics",
       "//services/data_decoder/public/cpp",
@@ -2188,13 +2176,6 @@ source_set("browser") {
 
   if (enable_captive_portal_detection) {
     deps += [ "//chrome/browser/captive_portal" ]
-  }
-
-  if (enable_dice_support) {
-    deps += [
-      "//chrome/browser/ui/webui/feature_showcase",
-      "//chrome/browser/ui/webui/feature_showcase:mojo_bindings",
-    ]
   }
 
   if (is_mac) {
@@ -2426,9 +2407,6 @@ group("browser_public_dependencies") {
     "//extensions/buildflags",
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
   ]
-  if (is_linux || is_mac) {
-    public_deps += [ "//components/enterprise/core" ]
-  }
   if (enable_printing) {
     public_deps += [ "//components/printing/common:mojo_interfaces" ]
   }
@@ -2513,12 +2491,7 @@ group("browser_generated_files") {
   public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
 
   if (is_mac || is_linux) {
-    public_deps += [
-      "//chrome/browser/ui/webui/whats_new:mojo_bindings",
-      "//components/enterprise/device_trust/core/attestation/proto:attestation_ca_proto",
-      "//components/enterprise/device_trust/core/attestation/proto:google_key_proto",
-      "//components/enterprise/device_trust/core/attestation/proto:interface_proto",
-    ]
+    public_deps += [ "//chrome/browser/ui/webui/whats_new:mojo_bindings" ]
   }
   if (is_mac || is_linux) {
     public_deps +=

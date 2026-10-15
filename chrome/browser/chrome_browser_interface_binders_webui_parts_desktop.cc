@@ -98,14 +98,6 @@
 #include "ui/webui/resources/js/browser_command/browser_command.mojom.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// The intro mojom targets exist on ChromeOS but these headers are only
-// compiled on Win/Mac/Linux; gn check is static, so suppress it on ChromeOS.
-#include "chrome/browser/ui/webui/intro/finish_or_continue.mojom.h" // nogncheck
-#include "chrome/browser/ui/webui/intro/intro.mojom.h"  // nogncheck
-#include "chrome/browser/ui/webui/intro/intro_ui.h"
-#include "chrome/browser/ui/webui/intro/sign_in_celebration.mojom.h"  // nogncheck
-#include "chrome/browser/ui/webui/intro/sign_in_promo.mojom.h"  // nogncheck
-#include "chrome/browser/ui/webui/intro/welcome.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
@@ -341,19 +333,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   // registry.ForWebUI() pattern used in
   // PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop below which
   // eliminates the need to account for feature flag combinations.
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  RegisterWebUIControllerInterfaceBinder<
-      intro::mojom::SignInCelebrationPageHandlerFactory, IntroUI>(map);
-  RegisterWebUIControllerInterfaceBinder<intro::mojom::IntroPageHandlerFactory,
-                                         IntroUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      intro::mojom::SignInPromoPageHandlerFactory, IntroUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      intro::mojom::FinishOrContinuePageHandlerFactory, IntroUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      intro::mojom::WelcomePageHandlerFactory, IntroUI>(map);
-#endif
 
   auto prompt_surface = default_browser::GetDefaultBrowserPromptSurface();
 

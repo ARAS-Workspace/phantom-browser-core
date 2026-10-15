@@ -6,10 +6,10 @@
 #define CHROME_BROWSER_UI_PROFILES_SIGNIN_INTERCEPT_FIRST_RUN_EXPERIENCE_DIALOG_H_
 
 #include "base/functional/callback_forward.h"
+#include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
 #include "chrome/browser/ui/profiles/profile_customization_synced_theme_waiter.h"
 #include "chrome/browser/ui/signin/signin_modal_dialog.h"
 #include "chrome/browser/ui/signin/signin_view_controller_delegate.h"

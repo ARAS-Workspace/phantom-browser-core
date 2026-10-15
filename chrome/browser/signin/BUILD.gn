@@ -85,8 +85,6 @@ source_set("signin") {
   ]
   public_deps += [ ":signin_promo" ]
 
-  public += [ "force_signin_verifier.h" ]
-
   public += [
     "chrome_signin_and_sync_status_metrics_provider.h",
     "signin_ui_util_extensions.h",
@@ -272,10 +270,7 @@ source_set("impl") {
     "//chrome/browser/ui/navigator",
   ]
 
-  sources += [
-    "force_signin_verifier.cc",
-    "signin_ui_delegate.cc",
-  ]
+  sources += [ "signin_ui_delegate.cc" ]
   deps += [ "//chrome/browser/ui/webui/signin:signin_impl" ]
 
   sources += [
@@ -511,7 +506,6 @@ source_set("unit_tests") {
 
   sources += [
     "chrome_signin_and_sync_status_metrics_provider_unittest.cc",
-    "force_signin_verifier_unittest.cc",
     "signin_ui_util_unittest.cc",
     "signin_util_unittest.cc",
   ]

@@ -9,7 +9,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/signals/user_permission_service_factory.h"
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/themes/theme_service_factory.h"
@@ -19,7 +18,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/device_signals/core/browser/user_permission_service.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/policy/policy_constants.h"
@@ -165,26 +163,4 @@ INSTANTIATE_TEST_SUITE_P(,
                          EnterpriseProfileBadgingTest,
                          testing::Combine(testing::Bool(),
                                           testing::Bool()));
-
-using ManagedBrowserUtilsDeviceSignalsBrowserTest = InProcessBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(ManagedBrowserUtilsDeviceSignalsBrowserTest,
-                       UserAcceptedAccountManagementSharesDeviceSignals) {
-  Profile* profile = browser()->GetProfile();
-  auto* user_permission_service =
-      enterprise_signals::UserPermissionServiceFactory::GetForProfile(profile);
-
-  ASSERT_FALSE(user_permission_service->HasUserConsented());
-  ASSERT_FALSE(UserAcceptedAccountManagement(profile));
-
-  // User has not consented to anything.
-  SetUserAcceptedAccountManagement(profile, false);
-  ASSERT_FALSE(UserAcceptedAccountManagement(profile));
-  ASSERT_FALSE(user_permission_service->HasUserConsented());
-
-  // User has consented to sharing signals for the lifetime of the profile.
-  SetUserAcceptedAccountManagement(profile, true);
-  ASSERT_TRUE(UserAcceptedAccountManagement(profile));
-  ASSERT_EQ(user_permission_service->HasUserConsented(), true);
-}
 }  // namespace enterprise_util

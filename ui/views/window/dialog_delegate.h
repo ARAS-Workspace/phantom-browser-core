@@ -133,8 +133,6 @@ class GlicFreDialogView;
 }
 
 namespace policy {
-class EnterpriseStartupDialogView;
-class IdleDialogView;
 class PolicyDialogBase;
 }  // namespace policy
 
@@ -773,8 +771,6 @@ class VIEWS_EXPORT DialogDelegateView : public DialogDelegate, public View {
   friend class ::autofill::payments::PaymentsWindowUserConsentDialogView;
   friend class ::autofill::payments::SelectBnplIssuerDialog;
   friend class ::extensions::SecurityDialogTrackerTest;
-  friend class ::policy::EnterpriseStartupDialogView;
-  friend class ::policy::IdleDialogView;
   friend class ::policy::PolicyDialogBase;
   friend class ::remoting::MessageBoxCore;
   friend class ::task_manager::TaskManagerView;

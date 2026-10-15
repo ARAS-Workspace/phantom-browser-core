@@ -35,7 +35,6 @@
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/enterprise/isolated_mode/settings.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/strings/grit/privacy_sandbox_strings.h"
@@ -125,10 +124,6 @@ NTPResourceCache::WindowType NTPResourceCache::GetWindowType(Profile* profile) {
     return GUEST;
   }
   if (profile->IsIncognitoProfile() || profile->IsOffTheRecord()) {
-    if (enterprise_isolated_mode::IsolatedModeReplacesIncognito(
-            *profile->GetPrefs(), chrome::GetChannel())) {
-      return ISOLATED;
-    }
     if (profile->IsIncognitoProfile()) {
       return INCOGNITO;
     }

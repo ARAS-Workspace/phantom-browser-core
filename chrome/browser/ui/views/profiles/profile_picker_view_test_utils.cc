@@ -15,7 +15,6 @@
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_ui_test_utils.h"
-#include "chrome/browser/ui/views/profiles/first_run_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_view.h"
@@ -94,9 +93,6 @@ class TestFlowControllerMixin : public BaseFlowController,
 
 using TestProfileManagementFlowController =
     TestFlowControllerMixin<ProfileManagementFlowController>;
-
-using TestFirstRunFlowController =
-    TestFlowControllerMixin<FirstRunFlowController>;
 
 }  // namespace
 
@@ -248,13 +244,6 @@ std::unique_ptr<ProfileManagementFlowController>
 ProfileManagementStepTestView::CreateFlowController(
     Profile* picker_profile,
     ClearHostClosure clear_host_callback) {
-  if (params().entry_point() == ProfilePicker::EntryPoint::kFirstRun) {
-    return std::make_unique<TestFirstRunFlowController>(
-        step_, step_controller_factory_, run_loop_.QuitClosure(), this,
-        std::move(clear_host_callback), picker_profile,
-        /*first_run_exited_callback=*/base::DoNothing());
-  }
-
   return std::make_unique<TestProfileManagementFlowController>(
       step_, step_controller_factory_, run_loop_.QuitClosure(), this,
       std::move(clear_host_callback), /*flow_type_string=*/"TestFlow");

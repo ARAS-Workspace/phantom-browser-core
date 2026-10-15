@@ -33,8 +33,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-
 using ::testing::AnyNumber;
 
 namespace {
@@ -212,8 +210,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
  private:
   content::BrowserTaskEnvironment task_environment_;
   network::TestURLLoaderFactory url_loader_factory_;
-
-  policy::FakeBrowserDMTokenStorage dm_token_storage_;
 };
 
 TEST_F(UpgradeDetectorImplTest, VariationsChanges) {
@@ -535,8 +531,6 @@ class UpgradeDetectorImplTimerTest : public UpgradeDetectorImplTest,
       SetNotificationPeriodPref(base::Milliseconds(period_ms));
   }
 
- private:
-  policy::FakeBrowserDMTokenStorage dm_token_storage_;
 };
 
 INSTANTIATE_TEST_SUITE_P(All,

@@ -10,24 +10,17 @@
 #include "base/test/run_until.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
-#include "chrome/common/extensions/api/enterprise_reporting_private.h"
 #include "chrome/test/base/in_process_browser_test.h"
-#include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#include "components/policy/core/common/cloud/cloud_policy_core.h"
-#include "components/policy/core/common/cloud/cloud_policy_store.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
-#include "components/policy/proto/device_management_backend.pb.h"
 #include "components/prefs/pref_service.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
@@ -80,12 +73,7 @@ constexpr char kManifestTemplate[] = R"(
 
 class ProxyOverrideRulesPrivateApiTest : public extensions::ExtensionApiTest {
  public:
-  ProxyOverrideRulesPrivateApiTest() {
-    browser_dm_token_storage_.SetClientId("client_id");
-    browser_dm_token_storage_.SetEnrollmentToken("enrollment_token");
-    browser_dm_token_storage_.SetDMToken("dm_token");
-    policy::BrowserDMTokenStorage::SetForTesting(&browser_dm_token_storage_);
-  }
+  ProxyOverrideRulesPrivateApiTest() = default;
 
   ~ProxyOverrideRulesPrivateApiTest() override = default;
 
@@ -144,16 +132,6 @@ class ProxyOverrideRulesPrivateApiTest : public extensions::ExtensionApiTest {
         std::make_unique<IdentityTestEnvironmentProfileAdaptor>(profile());
 
     identity_test_env()->SetTestURLLoaderFactory(&test_url_loader_factory_);
-
-    // Set device org's affiliated IDs.
-    auto* browser_policy_manager =
-        g_browser_process->browser_policy_connector()
-            ->machine_level_user_cloud_policy_manager();
-    auto browser_policy_data =
-        std::make_unique<enterprise_management::PolicyData>();
-    browser_policy_data->add_device_affiliation_ids(kAffiliationId);
-    browser_policy_manager->core()->store()->set_policy_data_for_testing(
-        std::move(browser_policy_data));
   }
 
   void TearDownOnMainThread() override {
@@ -174,8 +152,6 @@ class ProxyOverrideRulesPrivateApiTest : public extensions::ExtensionApiTest {
       identity_test_env_profile_adaptor_;
 
   network::TestURLLoaderFactory test_url_loader_factory_;
-
-  policy::FakeBrowserDMTokenStorage browser_dm_token_storage_;
 
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
 };

@@ -249,7 +249,6 @@ static_library("test_support") {
     "//components/autofill/content/renderer:test_support",
     "//components/blocked_content",
     "//components/content_settings/browser",
-    "//components/enterprise",
     "//components/infobars/content",
     "//components/input",
     "//components/network_session_configurator/common",
@@ -590,7 +589,6 @@ source_set("platform_browser_tests") {
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/browsing_data:platform_browser_tests",
     "//chrome/browser/content_settings:content_settings_factory",
-    "//chrome/browser/enterprise/reporting:platform_browser_tests",
     "//chrome/browser/history",
     "//chrome/browser/lifetime",
     "//chrome/browser/login_detection",
@@ -631,7 +629,6 @@ source_set("platform_browser_tests") {
     "//components/content_settings/core/browser:cookie_settings",
     "//components/content_settings/core/common",
     "//components/content_settings/core/common:features",
-    "//components/enterprise:test_support",
     "//components/language_detection/core",
     "//components/metrics",
     "//components/metrics:content",
@@ -730,9 +727,6 @@ source_set("platform_browser_tests") {
   deps += [ "//chrome/test:test_support_ui" ]
   public_deps +=
       [ "//chrome/browser/web_applications:web_applications_test_support" ]
-
-  deps +=
-      [ "//chrome/browser/enterprise/remote_commands:platform_browser_tests" ]
 
   deps += [ "//chrome/browser/ui/prefs:browser_tests" ]
   if (enable_extensions) {
@@ -901,8 +895,6 @@ test("browser_tests") {
     "//chrome/browser/enterprise:browser_tests",
     "//chrome/browser/enterprise/browser_management:browser_tests",
     "//chrome/browser/enterprise/browser_management:management_identity",
-    "//chrome/browser/enterprise/platform_auth:browser_tests",
-    "//chrome/browser/enterprise/signals:browser_tests",
     "//chrome/browser/error_reporting:browser_tests",
     "//chrome/browser/error_reporting:test_support",
     "//chrome/browser/extensions",
@@ -1310,10 +1302,6 @@ test("browser_tests") {
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
     "//components/embedder_support/origin_trials",
-    "//components/enterprise",
-    "//components/enterprise:test_support",
-    "//components/enterprise/browser/identifiers",
-    "//components/enterprise/browser/promotion",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/error_page/content/browser",
     "//components/favicon/content",
@@ -1855,23 +1843,11 @@ test("browser_tests") {
   deps += [ "//chrome/browser/ui/webui/support_tool:browser_tests" ]
 
   if (is_mac || is_linux) {
-    sources += [
-      "../browser/ui/views/profiles/device_signals_disclaimer_browsertest.cc",
-    ]
-  }
-
-  if (is_mac || is_linux) {
-    sources += [ "../browser/ui/views/device_signals_consent/consent_dialog_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/ui/views/device_signals_consent",
-      "//chrome/browser/ui/views/hats",
-    ]
+    deps += [ "//chrome/browser/ui/views/hats" ]
   }
 
   if (is_mac || is_linux) {
     deps += [
-      "//chrome/browser/enterprise/profile_management:browser_tests",
-      "//chrome/browser/enterprise/signin:browser_tests",
       "//chrome/browser/ui/views/media_preview/mic_preview:browser_tests",
       "//chrome/browser/ui/views/profiles:profile_picker_view_test_utils",
       "//chrome/browser/ui/webui:profile_helper",
@@ -2006,12 +1982,6 @@ test("browser_tests") {
     ]
   }
 
-  if (is_mac) {
-    sources += []
-
-    deps += [ "//chrome/browser/enterprise/platform_auth:test_utils" ]
-  }
-
   deps += [ "//chrome/browser/ui/webui/default_browser:browser_tests" ]
 
   if (is_mac) {
@@ -2051,7 +2021,6 @@ test("browser_tests") {
       "//chrome/browser/renderer_host:history_swiper",
       "//chrome/browser/shortcuts",
       "//chrome/browser/webshare:browser_tests",
-      "//components/enterprise/platform_auth:enterprise_platform_auth",
       "//components/onc",
       "//components/remote_cocoa/app_shim",
       "//components/system_media_controls",
@@ -2108,19 +2077,6 @@ test("browser_tests") {
   }
 
   if (enable_dice_support) {
-    if (is_linux) {
-      sources += [
-        "../browser/ui/views/profiles/first_run_default_browser_ui_browsertest.cc",
-        "../browser/ui/views/profiles/first_run_feature_showcase_ui_browsertest.cc",
-        "../browser/ui/views/profiles/first_run_finish_or_continue_ui_browsertest.cc",
-        "../browser/ui/views/profiles/first_run_intro_browsertest.cc",
-        "../browser/ui/views/profiles/first_run_sign_in_celebration_ui_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/ui/views/profiles/feature_showcase",
-        "//chrome/browser/ui/webui/intro",
-      ]
-    }
     deps += [ "//chrome/browser/ui/webui/signin:profile" ]
     deps += [
       "//chrome/browser/signin:signin_promo",
@@ -2137,7 +2093,6 @@ test("browser_tests") {
     sources += [
       "../browser/ui/views/profiles/managed_user_profile_notice_ui_browsertest.cc",
       "../browser/ui/views/profiles/profile_menu_view_ui_browsertest.cc",
-      "../browser/ui/views/profiles/profile_picker_signin_ui_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_ui_browsertest.cc",
       "../browser/ui/views/profiles/profile_type_choice_ui_browsertest.cc",
       "../browser/ui/views/profiles/sync_confirmation_ui_browsertest.cc",
@@ -2265,13 +2220,11 @@ test("browser_tests") {
       ]
     }
     sources += [
-      "../browser/ui/views/policy/enterprise_startup_dialog_view_browsertest.cc",
       "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_browsertest.cc",
       "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_pixel_browsertest.cc",
     ]
     deps += [
       "//chrome/browser/ui/views/extensions:extension_post_install_dialog_view_utils",
-      "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
       "//chrome/browser/ui/views/relaunch_notification:browser_tests",
     ]
     deps += [
@@ -2411,7 +2364,6 @@ test("browser_tests") {
 
   if (is_mac || is_linux) {
     sources += [
-      "../browser/ui/views/profiles/profile_picker_sign_in_provider_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_utils_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_view_browsertest.cc",
     ]
@@ -2819,16 +2771,6 @@ test("unit_tests") {
     "//chrome/browser/engagement",
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/enterprise:unit_tests",
-    "//chrome/browser/enterprise/core:unit_tests",
-    "//chrome/browser/enterprise/identifiers:unit_tests",
-    "//chrome/browser/enterprise/idle:unit_tests",
-    "//chrome/browser/enterprise/platform_auth:unit_tests",
-    "//chrome/browser/enterprise/profile_management:unit_tests",
-    "//chrome/browser/enterprise/remote_commands:unit_tests",
-    "//chrome/browser/enterprise/reporting:unit_tests",
-    "//chrome/browser/enterprise/reporting/test:test_support",
-    "//chrome/browser/enterprise/signals:unit_tests",
-    "//chrome/browser/enterprise/signin:unit_tests",
     "//chrome/browser/external_protocol",
     "//chrome/browser/external_protocol:unit_tests",
     "//chrome/browser/favicon",
@@ -2998,7 +2940,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui/components:unit_tests",
     "//chrome/browser/ui/webui/context_hub:unit_tests",
     "//chrome/browser/ui/webui/internal_debug_pages_disabled",
-    "//chrome/browser/ui/webui/intro:mojo_bindings",
     "//chrome/browser/unified_consent",
     "//chrome/browser/update_client",
     "//chrome/browser/update_client:unit_tests",
@@ -3066,13 +3007,10 @@ test("unit_tests") {
     "//components/data_sharing/public",
     "//components/data_sharing/public:personal_collaboration_data",
     "//components/device_reauth",
-    "//components/device_signals/core/browser",
     "//components/download/public/background_service/test:test_support",
     "//components/embedder_support",
     "//components/encrypted_messages",
     "//components/encrypted_messages:encrypted_message_proto",
-    "//components/enterprise/browser/groups:prefs",
-    "//components/enterprise/browser/identifiers",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:extensions_workflow_events_proto",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
@@ -3355,17 +3293,13 @@ test("unit_tests") {
   if (is_mac) {
     sources += []
     deps += [
-      "//chrome/browser/enterprise/platform_auth:test_utils",
       "//chrome/browser/ui/pdf/infobar:unit_tests",
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar:unit_tests",
     ]
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/ui/views/session_restore_infobar:unit_tests",
-      "//chrome/browser/ui/webui/intro:unit_tests",
-    ]
+    deps += [ "//chrome/browser/ui/views/session_restore_infobar:unit_tests" ]
   }
 
   if (is_mac || is_linux) {
@@ -3419,7 +3353,6 @@ test("unit_tests") {
       "//chrome/common/notifications",
       "//chrome/services/mac_notifications:unit_tests",
       "//chrome/services/mac_notifications/public/mojom",
-      "//components/enterprise/platform_auth:enterprise_platform_auth",
       "//components/power_metrics",
       "//media/capture:test_support",
       "//ui/events/devices:test_support",
@@ -3450,11 +3383,7 @@ test("unit_tests") {
     sources += [ "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_unittest.cc" ]
     deps += [
       "//chrome/browser/ui/signin:unit_tests",
-      "//chrome/browser/ui/views/profiles/feature_showcase:unit_tests",
       "//chrome/browser/ui/webui/cr_components/signin:unit_tests",
-      "//chrome/browser/ui/webui/feature_showcase",
-      "//chrome/browser/ui/webui/feature_showcase:unit_tests",
-      "//chrome/browser/ui/webui/intro",
     ]
   }
 
@@ -3778,8 +3707,6 @@ test("unit_tests") {
     "//components/color",
     "//components/endpoint_fetcher",
     "//components/endpoint_fetcher:test_support",
-    "//components/enterprise",
-    "//components/enterprise:test_support",
     "//components/favicon/content",
     "//components/feature_engagement/test:test_support",
     "//components/fullscreen_control",
@@ -3908,10 +3835,7 @@ test("unit_tests") {
     if (is_mac) {
     }
 
-    deps += [
-      "//chrome/browser/extensions/api/messaging:unit_tests",
-      "//components/enterprise:test_support",
-    ]
+    deps += [ "//chrome/browser/extensions/api/messaging:unit_tests" ]
   }
 
   if (is_mac || is_linux) {
@@ -3958,29 +3882,6 @@ test("unit_tests") {
     configs += [ "//build/linux:gio_config" ]
   }
 
-  if (is_mac || is_linux) {
-    deps += [ "//components/enterprise/device_trust/core:test_support" ]
-  }
-
-  if (is_linux || is_mac) {
-    sources += []
-
-    deps += [
-      "//components/device_signals/core/browser",
-      "//components/device_signals/core/browser:test_support",
-      "//components/enterprise/device_trust",
-      "//components/enterprise/device_trust/core",
-      "//components/enterprise/device_trust/core:unit_tests",
-      "//components/enterprise/device_trust/core/attestation",
-      "//components/enterprise/device_trust/core/attestation:test_support",
-    ]
-  }
-
-  if (is_linux || is_mac) {
-    sources += []
-    deps += [ "//components/enterprise/idle" ]
-  }
-
   if (is_linux || is_mac) {
     deps += [
       "../browser/ui/webui/whats_new:mojo_bindings",
@@ -3998,13 +3899,6 @@ test("unit_tests") {
     deps += [
       "//chrome/browser:app_controller_mac",
       "//chrome/browser:global_keyboard_shortcuts_mac",
-    ]
-  }
-
-  if (is_mac || is_linux) {
-    deps += [
-      "../services/system_signals:unit_tests",
-      "../services/system_signals/public/cpp/browser:unit_tests",
     ]
   }
 
@@ -4082,18 +3976,11 @@ test("unit_tests") {
 
   deps += [
     "//chrome/browser/download/bubble",
-
-    # Remove this when
-    # chrome_browser_cloud_management_register_watcher_unittest.cc is
-    # modularized.
     "//chrome/browser/policy:impl",
     "//chrome/browser/ui/browser_window/test:test_support",
   ]
 
   if (is_linux || is_mac) {
-    sources +=
-        [ "../browser/ui/views/policy/enterprise_startup_dialog_unittest.cc" ]
-
     deps += [
       "//chrome/browser/ui/views/media_preview:unit_tests",
       "//chrome/browser/ui/views/media_preview/camera_preview:unit_tests",
@@ -4101,10 +3988,7 @@ test("unit_tests") {
     ]
   }
 
-  deps += [
-    "//chrome/browser/policy",
-    "//components/enterprise:test_support",
-  ]
+  deps += [ "//chrome/browser/policy" ]
 
   if (is_mac) {
     deps += [ "//components/remote_cocoa/browser" ]
@@ -4906,7 +4790,6 @@ test("interactive_ui_tests") {
     "//components/country_codes",
     "//components/custom_handlers",
     "//components/embedder_support",
-    "//components/enterprise:test_support",
     "//components/favicon/content",
     "//components/favicon/core",
     "//components/feature_engagement/public",
@@ -5340,18 +5223,12 @@ test("interactive_ui_tests") {
   }
 
   if (is_mac || is_linux) {
-    sources += [
-      "../browser/ui/views/profiles/device_signals_disclaimer_interactive_uitest.cc",
-      "../browser/ui/views/profiles/first_run_interactive_uitest.cc",
-      "../browser/ui/views/profiles/profile_bubble_interactive_uitest.cc",
-    ]
+    sources +=
+        [ "../browser/ui/views/profiles/profile_bubble_interactive_uitest.cc" ]
 
     deps += [
-      "//chrome/browser/enterprise/idle:interactive_ui_tests",
       "//chrome/browser/ui/startup:test_support_ui",
-      "//chrome/browser/ui/webui/intro",
       "//chrome/browser/ui/webui/whats_new",
-      "//components/enterprise/idle",
       "//services/audio/public/cpp",
     ]
   }

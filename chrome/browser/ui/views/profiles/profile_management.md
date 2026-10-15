@@ -9,8 +9,6 @@ to pass context around we rely on a lot of callbacks. This is an overview of the
 main callbacks used in the profile management flow, highlighted here through the
 first run experience flow.
 
-![sequence diagram](first_run_flow_sequence_diagram.png)
-
 Diagram source:
 
 ```mermaid

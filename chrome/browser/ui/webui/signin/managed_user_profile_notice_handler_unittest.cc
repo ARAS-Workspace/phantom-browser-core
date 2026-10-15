@@ -41,7 +41,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/enterprise/profile_management/profile_management_features.h"
 
 using testing::_;
 
@@ -242,9 +241,6 @@ TEST_P(ManagedUserProfileNoticeHandleProceedTest,
 // notify the registered callback.
 TEST_P(ManagedUserProfileNoticeHandleProceedTest,
        HandleProceedWithDoneCallback) {
-  base::test::ScopedFeatureList feature_list(
-      profile_management::features::kOidcAuthProfileManagement);
-
   base::MockCallback<signin::SigninChoiceWithConfirmAndRetryCallback>
       mock_process_user_choice_callback;
   base::MockCallback<base::RepeatingClosure> mock_done_callback;
@@ -281,9 +277,6 @@ TEST_P(ManagedUserProfileNoticeHandleProceedTest,
 
 TEST_P(ManagedUserProfileNoticeHandleProceedTest,
        HandleProceedWithDoneCallbackAndUserDataHandling) {
-  base::test::ScopedFeatureList feature_list(
-      profile_management::features::kOidcAuthProfileManagement);
-
   base::MockCallback<signin::SigninChoiceWithConfirmAndRetryCallback>
       mock_process_user_choice_callback;
   base::MockCallback<base::OnceClosure> mock_done_callback;
@@ -330,8 +323,6 @@ TEST_P(ManagedUserProfileNoticeHandleProceedTest,
 
 TEST_P(ManagedUserProfileNoticeHandleProceedTest,
        HandleProceedWithSuccessConfirmationCallback) {
-  base::test::ScopedFeatureList feature_list(
-      profile_management::features::kOidcAuthProfileManagement);
   base::MockCallback<signin::SigninChoiceWithConfirmAndRetryCallback>
       mock_process_user_choice_callback;
   base::MockCallback<base::OnceClosure> mock_done_callback;

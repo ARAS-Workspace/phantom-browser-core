@@ -147,7 +147,6 @@ source_set("unit_tests") {
   deps += [
     "//base:i18n",
     "//chrome/browser/google",
-    "//components/enterprise:test_support",
     "//components/network_time",
     "//content/test:test_support",
   ]

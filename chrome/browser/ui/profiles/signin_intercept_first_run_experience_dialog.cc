@@ -12,8 +12,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
@@ -254,29 +252,6 @@ SigninInterceptFirstRunExperienceDialog::
     auto_accept_management_ = enterprise_util::
         EnabledAutomaticManagementDisclaimerAcceptanceUntilReset(
             browser_->GetProfile());
-
-    if (!base::FeatureList::IsEnabled(switches::kEnforceManagementDisclaimer)) {
-      // Trigger the disclaimer service is to auto-approve the management and
-      // fetch the applicable policies.
-      auto* profile_management_disclaimer_service =
-          ProfileManagementDisclaimerServiceFactory::GetForProfile(
-              browser_->GetProfile());
-      CHECK(profile_management_disclaimer_service);
-      const CoreAccountId account_id_of_ongoing_management_flow =
-          profile_management_disclaimer_service
-              ->GetAccountBeingConsideredForManagementIfAny();
-      // If another account is being made managed then we cannot invoke
-      // `EnsureManagedProfileForAccount` for the present account. However for a
-      // newly created profile this case should not happen.
-      // TODO(crbug.com/418143300): Maybe track this case with a metric.
-      if (account_id_of_ongoing_management_flow.empty() ||
-          account_id_of_ongoing_management_flow == account_id_) {
-        profile_management_disclaimer_service->EnsureManagedProfileForAccount(
-            account_id_,
-            signin_metrics::AccessPoint::kSigninInterceptFirstRunExperience,
-            base::DoNothing());
-      }
-    }
   }
 }
 

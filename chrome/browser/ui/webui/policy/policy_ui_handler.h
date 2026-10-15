@@ -26,8 +26,6 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 
-class PrefChangeRegistrar;
-
 // The JavaScript message handler for the chrome://policy page.
 class PolicyUIHandler : public content::WebUIMessageHandler,
                         public policy::mojom::PolicyPageHandler,
@@ -144,8 +142,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   base::ScopedObservation<policy::SchemaRegistry,
                           policy::SchemaRegistry::Observer>
       schema_registry_observation_{this};
-
-  std::unique_ptr<PrefChangeRegistrar> pref_change_registrar_;
 
   uint32_t reload_policies_count_ = 0;
   uint32_t export_to_json_count_ = 0;

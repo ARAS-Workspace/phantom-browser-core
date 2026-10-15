@@ -38,14 +38,12 @@
 #include "chrome/browser/ui/accelerator_table.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/browser/ui/views/profiles/first_run_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller_impl.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_feature_promo_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_omnibox_everywhere_flow_controller.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_utils.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_widget.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
@@ -163,30 +161,6 @@ void ProfilePicker::Show(Params&& params) {
     g_profile_picker_view = new ProfilePickerView(std::move(params));
   }
   g_profile_picker_view->Display();
-}
-
-// static
-void ProfilePicker::SwitchToSignIn(
-    ProfilePicker::ProfileInfo profile_info,
-    base::OnceCallback<void(bool)> switch_finished_callback) {
-  if (g_profile_picker_view) {
-    g_profile_picker_view->SwitchToSignIn(
-        std::move(profile_info),
-        StepSwitchFinishedCallback(std::move(switch_finished_callback)));
-  }
-}
-
-// static
-void ProfilePicker::SwitchToReauth(
-    Profile* profile,
-    base::OnceCallback<void(bool)> switch_finished_callback,
-    base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback) {
-  if (g_profile_picker_view) {
-    g_profile_picker_view->SwitchToReauth(
-        profile,
-        StepSwitchFinishedCallback(std::move(switch_finished_callback)),
-        std::move(on_error_callback));
-  }
 }
 
 // static
@@ -403,10 +377,6 @@ bool ProfilePickerView::ShouldUseDarkColors() const {
          ui::NativeTheme::PreferredColorScheme::kDark;
 }
 
-bool ProfilePickerView::AreEffectsEnabled() const {
-  return toolbar_ ? toolbar_->AreEffectsEnabled() : true;
-}
-
 content::WebContents* ProfilePickerView::GetPickerContents() const {
   return contents_.get();
 }
@@ -461,28 +431,6 @@ void ProfilePickerView::OnLocalProfileInitialized(
   }
 
   GetProfilePickerFlowController()->SwitchToSignedOutPostIdentityFlow(profile);
-}
-
-void ProfilePickerView::SetNativeToolbarSigninButtonsVisible(bool visible) {
-  CHECK_DEREF(toolbar_).SetSigninButtonsVisible(visible);
-}
-
-void ProfilePickerView::SetNativeToolbarDontSignInButtonVisible(bool visible) {
-  CHECK_DEREF(toolbar_).SetDontSignInButtonVisible(visible);
-}
-
-void ProfilePickerView::SetNativeToolbarStartBrowsingButtonVisible(
-    bool visible) {
-  CHECK_DEREF(toolbar_).SetStartBrowsingButtonVisible(visible);
-}
-
-void ProfilePickerView::SetNativeToolbarEffectsControlButtonVisible(
-    bool visible) {
-  CHECK_DEREF(toolbar_).SetEffectsControlButtonVisible(visible);
-}
-
-bool ProfilePickerView::AreNativeToolbarSigninButtonsVisibleForTesting() const {
-  return CHECK_DEREF(toolbar_).AreSigninButtonsVisibleForTesting();  // IN-TEST
 }
 
 SkColor ProfilePickerView::GetPreferredBackgroundColor() const {
@@ -661,8 +609,6 @@ void ProfilePickerView::Init(Profile* picker_profile) {
   // determine certain aspects of it. E.g. see `GetAccessibleWindowTitle()`.
   flow_controller_ = CreateFlowController(picker_profile, GetClearClosure());
 
-  toolbar_ = AddChildView(flow_controller_->CreateToolbarBuilder().Build());
-
   // The widget is owned by the native widget.
   new ProfilePickerWidget(this);
 
@@ -689,17 +635,6 @@ void ProfilePickerView::FinishInit() {
 std::unique_ptr<ProfileManagementFlowController>
 ProfilePickerView::CreateFlowController(Profile* picker_profile,
                                         ClearHostClosure clear_host_callback) {
-  if (params_.entry_point() == ProfilePicker::EntryPoint::kFirstRun) {
-    auto first_run_exited_callback =
-        base::BindOnce(&ProfilePicker::Params::NotifyFirstRunExited,
-                       // Unretained ok because the controller is owned
-                       // by this through `initialized_steps_`.
-                       base::Unretained(&params_));
-    return std::make_unique<FirstRunFlowController>(
-        /*host=*/this, std::move(clear_host_callback), picker_profile,
-        std::move(first_run_exited_callback));
-  }
-
   if (params_.entry_point() == ProfilePicker::EntryPoint::kOmniboxEverywhere) {
     auto profile_picked_callback =
         base::BindOnce(&ProfilePicker::Params::NotifyProfilePicked,
@@ -712,23 +647,7 @@ ProfilePickerView::CreateFlowController(Profile* picker_profile,
   DCHECK(IsClassicProfilePickerFlow(params_));
   return std::make_unique<ProfilePickerFlowController>(
       /*host=*/this, std::move(clear_host_callback), params_.entry_point(),
-      params_.on_select_profile_target_url(), params_.initial_email());
-}
-
-void ProfilePickerView::SwitchToSignIn(
-    ProfilePicker::ProfileInfo profile_info,
-    StepSwitchFinishedCallback switch_finished_callback) {
-  GetProfilePickerFlowController()->SwitchToSignIn(
-      std::move(profile_info), std::move(switch_finished_callback));
-}
-
-void ProfilePickerView::SwitchToReauth(
-    Profile* profile,
-    StepSwitchFinishedCallback switch_finished_callback,
-    base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback) {
-  GetProfilePickerFlowController()->SwitchToReauth(
-      profile, std::move(switch_finished_callback),
-      std::move(on_error_callback));
+      params_.on_select_profile_target_url());
 }
 
 void ProfilePickerView::WindowClosing() {
@@ -853,12 +772,6 @@ bool ProfilePickerView::GetAcceleratorForCommandId(
     }
   }
   return false;
-}
-
-void ProfilePickerView::Layout(PassKey) {
-  LayoutSuperclass<views::WidgetDelegateView>(this);
-  CHECK(toolbar_);
-  toolbar_->SetBounds(0, 0, width(), toolbar_->GetPreferredSize().height());
 }
 
 void ProfilePickerView::BuildLayout() {

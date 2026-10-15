@@ -32,12 +32,6 @@ BASE_FEATURE(kApiOdfsConfigPrivate, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kApiContextualTasksPrivate, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kApiEnterpriseReportingPrivateOnDataMaskingRulesTriggered,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kApiEnterpriseReportingPrivateReportForceSaveToCloudEventHandled,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kApiEnterpriseWebrtc, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kApiProxyOverrideRulesPrivate, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -174,8 +168,6 @@ BASE_FEATURE(kAvoidCloneArgsOnExtensionFunctionDispatch,
 
 BASE_FEATURE(kExtensionContentVerificationUsesExtensionRoot,
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kEnableShouldShowPromotion, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSearchEngineExplicitChoiceDialog,
              base::FEATURE_DISABLED_BY_DEFAULT);

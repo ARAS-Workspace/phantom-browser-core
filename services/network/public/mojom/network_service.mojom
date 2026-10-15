@@ -487,14 +487,6 @@ interface NetworkService {
   AddDurableMessageCollector(
       pending_receiver<DurableMessageCollector> receiver);
 
-  // Creates and starts URLSessionURLLoader which will perform the `request`.
-  // This is only meant to be used for Okta SSO authentication requests.
-  [EnableIf=is_mac]
-  CreateURLSessionURLLoaderAndStart(
-      URLRequest request,
-      pending_receiver<URLLoader> loader_receiver,
-      pending_remote<URLLoaderClient> client_remote);
-
   // Returns a connection to the VrpFlags if the Network process was
   // launched with --vrp-flags, otherwise returns a null remote.
   [EnableIf=enable_vrp_flags]

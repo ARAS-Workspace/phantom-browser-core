@@ -107,7 +107,6 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
   void HandleSetProfileName(const base::ListValue& args);
   void HandleUpdateProfileOrder(const base::ListValue& args);
 
-  void HandleSelectNewAccount(const base::ListValue& args);
   void HandleGetNewProfileSuggestedThemeInfo(const base::ListValue& args);
   void HandleGetProfileThemeInfo(const base::ListValue& args);
   void HandleGetAvailableIcons(const base::ListValue& args);
@@ -124,7 +123,6 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
   // |args| is unused.
   void HandleRecordSignInPromoImpression(const base::ListValue& args);
 
-  void OnLoadSigninFinished(bool success);
   void OnResetPickerButtons(bool success);
   void GatherProfileStatistics(Profile* profile);
   void OnProfileStatisticsReceived(const base::FilePath& profile_path,
@@ -165,8 +163,6 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
   // Either shows an error dialog with the appropriate information, or attempts
   // to run the signin/reauth flows.
   void TryLaunchLockedProfile(ProfileAttributesEntry& entry);
-  // Callback with the loaded profile to start the reauth flow.
-  void OnProfileLoadedForSwitchToReauth(Profile* profile);
 
   // Updates if guest mode is available following a profile addition, removal,
   // or changed supervision status.

@@ -27,10 +27,6 @@ suite('ProfileTypeChoiceTest', function() {
     assertTrue(isChildVisible(choice, '#backButton'));
   });
 
-  test('SignInButton', function() {
-    assertTrue(isChildVisible(choice, '#signInButton'));
-  });
-
   test('NotNowButton', function() {
     assertTrue(isChildVisible(choice, '#notNowButton'));
   });

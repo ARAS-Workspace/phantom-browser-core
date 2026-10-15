@@ -110,11 +110,6 @@ export interface ManageProfilesBrowserProxy {
   removeProfile(profilePath: string): void;
 
   /**
-   * Starts a signin flow to get an account that will be added to a new profile.
-   */
-  selectNewAccount(profileColor: number|null): void;
-
-  /**
    * Retrieves custom avatar list for the select avatar dialog.
    */
   getAvailableIcons(): Promise<AvatarIcon[]>;
@@ -203,10 +198,6 @@ export class ManageProfilesBrowserProxyImpl {
 
   closeProfileStatistics() {
     chrome.send('closeProfileStatistics');
-  }
-
-  selectNewAccount(profileColor: number|null) {
-    chrome.send('selectNewAccount', [profileColor]);
   }
 
   getAvailableIcons() {

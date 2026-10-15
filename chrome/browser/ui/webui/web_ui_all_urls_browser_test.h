@@ -9,7 +9,6 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "chrome/test/base/in_process_browser_test.h"
-#include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 
 // Class which performs necessary setup to load all chrome urls. If a URL
 // requires a feature flag or other special setup to load correctly, add
@@ -31,7 +30,6 @@ class WebUIAllUrlsBrowserTest
 
  private:
   base::test::ScopedFeatureList feature_list_;
-  policy::FakeBrowserDMTokenStorage fake_dm_token_storage_;
 };
 
 #endif  // CHROME_BROWSER_UI_WEBUI_WEB_UI_ALL_URLS_BROWSER_TEST_H_

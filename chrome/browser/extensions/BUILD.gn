@@ -558,9 +558,6 @@ source_set("extensions") {
     "//components/data_sharing/public:features",
     "//components/download/content/public",
     "//components/embedder_support",
-    "//components/enterprise",
-    "//components/enterprise/browser/identifiers",
-    "//components/enterprise/browser/promotion",
     "//components/favicon/content",
     "//components/guest_view/buildflags",
     "//components/guest_view/common",
@@ -674,10 +671,6 @@ source_set("extensions") {
       "api/automation_internal/chrome_automation_internal_api_delegate.h",
       "api/bookmark_manager_private/bookmark_manager_private_api.cc",
       "api/bookmark_manager_private/bookmark_manager_private_api.h",
-      "api/enterprise_reporting_private/conversion_utils.cc",
-      "api/enterprise_reporting_private/conversion_utils.h",
-      "api/enterprise_reporting_private/enterprise_reporting_private_api.cc",
-      "api/enterprise_reporting_private/enterprise_reporting_private_api.h",
       "api/feedback_private/chrome_feedback_private_delegate.cc",
       "api/feedback_private/chrome_feedback_private_delegate.h",
       "api/file_system/chrome_file_system_delegate.cc",
@@ -887,8 +880,6 @@ source_set("extensions") {
       "//components/browser_sync",
       "//components/browsing_data/content",
       "//components/browsing_data/core",
-      "//components/device_signals/core/browser",
-      "//components/device_signals/core/common",
       "//components/dom_distiller/core",
       "//components/download/public/common:public",
       "//components/embedder_support:user_agent",
@@ -985,23 +976,14 @@ source_set("extensions") {
       "//url",
     ]
 
-    sources += [
-      "api/enterprise_reporting_private/chrome_desktop_report_request_helper.cc",
-      "api/enterprise_reporting_private/chrome_desktop_report_request_helper.h",
-      "api/image_writer_private/operation_nonchromeos.cc",
-    ]
-    deps += [
-      "//components/enterprise/common/proto:connectors_proto",
-      "//components/keep_alive_registry",
-    ]
+    sources += [ "api/image_writer_private/operation_nonchromeos.cc" ]
+    deps += [ "//components/keep_alive_registry" ]
     if (use_gio) {
       configs += [ "//build/linux:gio_config" ]
     }
 
     if (is_mac) {
       sources += [
-        "api/enterprise_reporting_private/keychain_data_helper_mac.cc",
-        "api/enterprise_reporting_private/keychain_data_helper_mac.h",
         "api/image_writer_private/removable_storage_provider_mac.cc",
         "system_display/display_info_provider_mac.cc",
         "system_display/display_info_provider_mac.h",
@@ -1364,7 +1346,6 @@ source_set("unit_tests") {
     "api/declarative_webrequest/webrequest_rules_registry_unittest.cc",
     "api/developer_private/developer_private_api_unittest.cc",
     "api/developer_private/extension_info_generator_unittest.cc",
-    "api/enterprise_hardware_platform/enterprise_hardware_platform_api_unittest.cc",
     "api/extension_action/extension_action_api_unittest.cc",
     "api/identity/extension_token_key_unittest.cc",
     "api/identity/identity_api_unittest.cc",
@@ -1477,7 +1458,6 @@ source_set("unit_tests") {
     "//chrome/browser/extensions/api/bookmarks/test:test_support",
     "//chrome/browser/extensions/api/browsing_data",
     "//chrome/browser/extensions/api/cookies:helpers",
-    "//chrome/browser/extensions/api/enterprise_hardware_platform",
     "//chrome/browser/extensions/api/extension_action",
     "//chrome/browser/extensions/api/omnibox",
     "//chrome/browser/extensions/api/permissions",
@@ -1539,7 +1519,6 @@ source_set("unit_tests") {
 
   if (enable_extensions) {
     sources += [
-      "api/enterprise_reporting_private/enterprise_reporting_private_unittest.cc",
       "api/file_system/file_system_api_unittest.cc",
       "api/identity/gaia_remote_consent_flow_unittest.cc",
       "api/identity/web_auth_flow_info_bar_delegate_unittest.cc",
@@ -1584,7 +1563,6 @@ source_set("unit_tests") {
       "//chrome/browser/webauthn:test_support",
       "//components/affiliations/core/browser:test_support",
       "//components/device_reauth:test_support",
-      "//components/enterprise:test_support",
       "//components/password_manager/content/browser",
       "//components/password_manager/core/browser/leak_detection:test_support",
       "//components/password_manager/core/browser/sharing",
@@ -1849,9 +1827,6 @@ source_set("browser_tests") {
     "//components/back_forward_cache",
     "//components/bookmarks/managed",
     "//components/embedder_support",
-    "//components/enterprise:test_support",
-    "//components/enterprise/browser/promotion",
-    "//components/enterprise/device_trust/core:device_trust_service",
     "//components/favicon/content",
     "//components/history/core/common",
     "//components/infobars/content",
@@ -2076,19 +2051,6 @@ source_set("browser_tests") {
       ]
     }
 
-    if (is_linux || is_mac) {
-      deps += [
-        "//components/device_signals/core/common",
-        "//components/device_signals/core/common:features",
-        "//components/device_signals/test:test_support",
-        "//components/enterprise/device_trust/core:metrics",
-      ]
-    }
-
-    if (is_linux || is_mac) {
-      deps += [ "//components/device_signals/core/browser" ]
-    }
-
     deps += [
       "//chrome/browser:browser_process_platform_part",
       "//chrome/browser/affiliations",
@@ -2136,7 +2098,6 @@ source_set("browser_tests") {
       "//components/consent_auditor",
       "//components/content_settings/core/test:test_support",
       "//components/embedder_support:user_agent",
-      "//components/enterprise:test_support",
       "//components/guest_view/browser:test_support",
       "//components/history_clusters/history_clusters_internals/webui",
       "//components/history_clusters/history_clusters_internals/webui:constants",

@@ -254,10 +254,6 @@ BASE_DECLARE_FEATURE(kEnterpriseProfileBadgingForMenu);
 
 BASE_DECLARE_FEATURE(kEnterpriseManagementDisclaimerUsesCustomLabel);
 BASE_DECLARE_FEATURE(kEnterpriseReleaseNotes);
-BASE_DECLARE_FEATURE(kManagedProfileRequiredInterstitial);
-// Enables WebUI migration for chrome://management on Android Mobile.
-BASE_DECLARE_FEATURE(kMigrateManagementPageToWebUIOnMobile);
-
 
 // Cocoa to views migration.
 #if BUILDFLAG(IS_MAC)
@@ -267,9 +263,6 @@ BASE_DECLARE_FEATURE(kViewsJSAppModalDialog);
 // Controls whether the site-specific data dialog shows a related installed
 // applications section.
 BASE_DECLARE_FEATURE(kPageSpecificDataDialogRelatedInstalledAppsSection);
-
-// Feature for the promotion banner on the top of chrome://management page
-BASE_DECLARE_FEATURE(kEnableManagementPromotionBanner);
 
 // Enables the anchored message bubble to close when deactivated (e.g. when
 // losing focus).

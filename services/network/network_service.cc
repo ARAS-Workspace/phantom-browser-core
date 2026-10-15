@@ -106,10 +106,6 @@
 #include "services/network/network_change_notifier_passive_factory.h"
 #endif
 
-#if BUILDFLAG(IS_MAC)
-#include "components/enterprise/platform_auth/url_session_url_loader_bridge.h"
-#endif
-
 #if BUILDFLAG(IS_CT_SUPPORTED)
 #include "services/network/sct_auditing/sct_auditing_cache.h"
 #endif
@@ -1155,22 +1151,6 @@ void NetworkService::AddDurableMessageCollector(
   }
   durable_message_collector_manager_->AddCollector(std::move(receiver));
 }
-
-#if BUILDFLAG(IS_MAC)
-void NetworkService::CreateURLSessionURLLoaderAndStart(
-    const ResourceRequest& request,
-    mojo::PendingReceiver<mojom::URLLoader> loader_receiver,
-    mojo::PendingRemote<mojom::URLLoaderClient> client_remote) {
-  if (use_mock_url_session_url_loader_for_testing_) {
-    CHECK_IS_TEST();
-    enterprise_auth::CreateURLSessionURLLoaderAndStartForTesting(  // IN-TEST
-        request, std::move(loader_receiver), std::move(client_remote));
-  } else {
-    enterprise_auth::CreateURLSessionURLLoaderAndStart(
-        request, std::move(loader_receiver), std::move(client_remote));
-  }
-}
-#endif
 
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
 void NetworkService::GetVrpFlags(GetVrpFlagsCallback callback) {

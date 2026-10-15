@@ -4,16 +4,10 @@
 
 #include "chrome/browser/policy/cloud/user_policy_signin_service_util.h"
 
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
-#include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "components/enterprise/browser/controller/browser_dm_token_storage.h"
-#include "components/enterprise/browser/identifiers/profile_id_service.h"
-#include "components/policy/core/common/cloud/affiliation.h"
 
 namespace policy {
 
@@ -34,19 +28,11 @@ void UpdateProfileAttributesWhenSignout(Profile* profile,
 
 std::string GetDeviceDMTokenIfAffiliated(
     const std::vector<std::string>& user_affiliation_ids) {
-  if (!IsAffiliated(user_affiliation_ids,
-                    g_browser_process->browser_policy_connector()
-                        ->device_affiliation_ids())) {
-    return std::string();
-  }
-  DMToken token = BrowserDMTokenStorage::Get()->RetrieveDMToken();
-  return token.is_valid() ? token.value() : std::string();
+  return std::string();
 }
 
 std::string GetProfileId(Profile* profile) {
-  return enterprise::ProfileIdServiceFactory::GetForProfile(profile)
-      ->GetProfileId()
-      .value_or("");
+  return std::string();
 }
 
 }  // namespace policy

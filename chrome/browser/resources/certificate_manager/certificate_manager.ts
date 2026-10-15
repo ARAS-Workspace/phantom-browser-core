@@ -40,7 +40,9 @@ import {PromiseResolver} from '//resources/js/promise_resolver.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 
 import type {CertificateConfirmationDialogElement} from './certificate_confirmation_dialog.js';
+// <if expr="is_chromeos">
 import type {CertificateListElement} from './certificate_list.js';
+// </if>
 import {getCss} from './certificate_manager.css.js';
 import {getHtml} from './certificate_manager.html.js';
 import type {ActionResult, SummaryCertInfo} from './certificate_manager.mojom-webui.js';
@@ -67,9 +69,6 @@ export interface CertificateManagerElement {
   $: {
     toolbar: HTMLElement,
     main: CrPageSelectorElement,
-    // <if expr="is_win or is_macosx or is_linux">
-    provisionedClientCerts: CertificateListElement,
-    // </if>
     // <if expr="is_chromeos">
     extensionsClientCerts: CertificateListElement,
     // </if>

@@ -25,10 +25,6 @@
 #include "components/policy/resources/webui/mojom/policy.mojom.h"
 
 #include "chrome/browser/policy/status_provider/user_cloud_policy_status_provider.h"
-#include "components/enterprise/browser/controller/browser_dm_token_storage.h"
-#include "components/enterprise/browser/reporting/common_pref_names.h"
-#include "components/policy/core/browser/webui/machine_level_user_cloud_policy_status_provider.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/prefs/pref_service.h"
 
@@ -71,28 +67,11 @@ std::unique_ptr<policy::PolicyStatusProvider> GetUserPolicyStatusProvider(
   return std::make_unique<policy::PolicyStatusProvider>();
 }
 
-// Returns policy status provider for machine policies
-std::unique_ptr<policy::PolicyStatusProvider> GetMachinePolicyStatusProvider(
-    policy::MachineLevelUserCloudPolicyManager* manager) {
-  policy::BrowserDMTokenStorage* dmTokenStorage =
-      policy::BrowserDMTokenStorage::Get();
-
-  return std::make_unique<policy::MachineLevelUserCloudPolicyStatusProvider>(
-      manager->core(), manager->extension_install_core(),
-      g_browser_process->local_state(),
-      new policy::MachineLevelUserCloudPolicyContext(
-          {dmTokenStorage->RetrieveEnrollmentToken(),
-           dmTokenStorage->RetrieveClientId(),
-           enterprise_reporting::kLastUploadSucceededTimestamp}));
-}
-
 }  // namespace
 
 namespace policy {
 
 const char kUserStatusKey[] = "user";
-
-constexpr char kMachineStatusKey[] = "machine";
 
 std::unique_ptr<PolicyValueAndStatusAggregator>
 PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
@@ -125,22 +104,6 @@ PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
 
   // Device policies.
   if (policy::ManagementServiceFactory::GetForPlatform()->IsManaged()) {
-  }
-
-  // Machine policies.
-  policy::MachineLevelUserCloudPolicyManager* manager =
-      g_browser_process->browser_policy_connector()
-          ->machine_level_user_cloud_policy_manager();
-  if (manager) {
-    policy::BrowserDMTokenStorage* dmTokenStorage =
-        policy::BrowserDMTokenStorage::Get();
-    LOG_POLICY(INFO, POLICY_PROCESSING)
-        << "Retrieved Enrollment Token = "
-        << dmTokenStorage->RetrieveEnrollmentToken()
-        << " and client ID = " << dmTokenStorage->RetrieveClientId();
-
-    aggregator->AddPolicyStatusProvider(
-        kMachineStatusKey, GetMachinePolicyStatusProvider(manager));
   }
   return aggregator;
 }

@@ -104,11 +104,7 @@ group("resources") {
   ]
 
   if (enable_dice_support) {
-    public_deps += [
-      "feature_showcase:resources",
-      "intro:resources",
-      "signin/signout_confirmation:resources",
-    ]
+    public_deps += [ "signin/signout_confirmation:resources" ]
   }
 
   if (enable_extensions_core) {

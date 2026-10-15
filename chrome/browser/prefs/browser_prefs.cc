@@ -27,7 +27,6 @@
 #include "chrome/browser/context_hub/prefs.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/engagement/important_sites_util.h"
-#include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/finds/core/finds_service.h"
@@ -106,11 +105,6 @@
 #include "components/dom_distiller/core/distilled_page_prefs.h"
 #include "components/domain_reliability/domain_reliability_prefs.h"
 #include "components/embedder_support/origin_trials/origin_trial_prefs.h"
-#include "components/enterprise/browser/groups/groups_prefs.h"
-#include "components/enterprise/browser/identifiers/identifiers_prefs.h"
-#include "components/enterprise/browser/promotion/promotion_prefs.h"
-#include "components/enterprise/device_trust/prefs.h"
-#include "components/enterprise/isolated_mode/prefs.h"
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
@@ -276,18 +270,6 @@
 #include "chrome/browser/ui/cocoa/confirm_quit.h"
 #include "chrome/browser/ui/views/frame/glass_frame_service.h"
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
-#endif
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/platform_auth/platform_auth_policy_observer.h"
-#endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "components/device_signals/core/browser/pref_names.h"  // nogncheck due to crbug.com/40147906
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -973,12 +955,10 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 #endif
   chrome_urls::RegisterPrefs(registry);
   ChromeMetricsServiceClient::RegisterPrefs(registry);
-  enterprise_groups::RegisterLocalStatePrefs(registry);
   enterprise_util::RegisterLocalStatePrefs(registry);
   component_updater::RegisterPrefs(registry);
   domain_reliability::RegisterPrefs(registry);
   embedder_support::OriginTrialPrefs::RegisterPrefs(registry);
-  enterprise_reporting::RegisterLocalStatePrefs(registry);
   ExternalProtocolHandler::RegisterPrefs(registry);
   flags_ui::PrefServiceFlagsStorage::RegisterPrefs(registry);
   GpuModeManager::RegisterPrefs(registry);
@@ -1079,10 +1059,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 
   screen_ai::RegisterLocalStatePrefs(registry);
 
-#if BUILDFLAG(IS_MAC)
-  PlatformAuthPolicyObserver::RegisterPrefs(registry);
-#endif  // BUILDFLAG(IS_MAC)
-
   // Platform-specific and compile-time conditional individual preferences.
   // If you have multiple preferences that should clearly be grouped together,
   // please group them together into a helper function called above. Please
@@ -1107,8 +1083,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 #endif
 
   registry->RegisterBooleanPref(prefs::kQRCodeGeneratorEnabled, true);
-
-  registry->RegisterIntegerPref(prefs::kChromeDataRegionSetting, 0);
 
   registry->RegisterIntegerPref(prefs::kToastAlertLevel, 0);
 
@@ -1153,11 +1127,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterIntegerPref(prefs::kContextualTasksNextPanelOpenCount, 0);
   registry->RegisterBooleanPref(prefs::kCtrlTabMru, false);
   cross_device::RegisterProfilePrefs(registry);
-  enterprise::RegisterIdentifiersProfilePrefs(registry);
-  enterprise_connectors::RegisterDeviceTrustConnectorProfilePrefs(registry);
-  enterprise_isolated_mode::RegisterProfilePrefs(registry);
-  enterprise_promotion::RegisterProfilePrefs(registry);
-  enterprise_reporting::RegisterProfilePrefs(registry);
   dom_distiller::DistilledPagePrefs::RegisterProfilePrefs(registry);
   DownloadPrefs::RegisterProfilePrefs(registry);
   finds::FindsService::RegisterProfilePrefs(registry);
@@ -1352,13 +1321,8 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  device_signals::RegisterProfilePrefs(registry);
   ntp_tiles::EnterpriseShortcutsManagerImpl::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  enterprise_signin::RegisterProfilePrefs(registry);
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   preinstalled_extensions::RegisterProfilePrefs(registry);
@@ -1408,8 +1372,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 
   registry->RegisterBooleanPref(
       prefs::kManagedLocalNetworkAccessRestrictionsTemporaryOptOut, false);
-
-  registry->RegisterIntegerPref(prefs::kChromeDataRegionSetting, 0);
 
   registry->RegisterIntegerPref(prefs::kLensOverlayStartCount, 0);
 

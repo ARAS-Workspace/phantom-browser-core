@@ -823,11 +823,6 @@ TEST(PermissionsTest, PermissionMessages) {
   // experimental AI Data command-line flag, we don't need to warn you further.
   skip.insert(APIPermissionID::kExperimentalAiData);
 
-  // The Experimental Actor API is gated on commandline switches, in
-  // addition to the permission in the manifest. If you've turned on the
-  // experimental Actor command-line flag, we don't need to warn you further.
-  skip.insert(APIPermissionID::kExperimentalActor);
-
   // The Identity API has its own server-driven permission prompts.
   skip.insert(APIPermissionID::kIdentity);
 
@@ -837,12 +832,10 @@ TEST(PermissionsTest, PermissionMessages) {
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
   skip.insert(APIPermissionID::kArcAppsPrivate);
 #endif
-  skip.insert(APIPermissionID::kAutoTestPrivate);
   skip.insert(APIPermissionID::kBrailleDisplayPrivate);
   skip.insert(APIPermissionID::kChromeosInfoPrivate);
   skip.insert(APIPermissionID::kCommandLinePrivate);
   skip.insert(APIPermissionID::kContextualTasksPrivate);
-  skip.insert(APIPermissionID::kCrashReportPrivate);
   skip.insert(APIPermissionID::kDeveloperPrivate);
   skip.insert(APIPermissionID::kEchoPrivate);
   skip.insert(APIPermissionID::kEnterprisePlatformKeysPrivate);

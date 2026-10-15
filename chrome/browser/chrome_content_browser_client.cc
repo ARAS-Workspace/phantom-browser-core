@@ -84,8 +84,6 @@
 #include "chrome/browser/download/chrome_download_manager_delegate.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_service.h"
-#include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/favicon/favicon_utils.h"
@@ -293,7 +291,6 @@
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/internal_webui_config.h"
 #include "content/public/browser/isolated_web_apps_policy.h"
-#include "content/public/browser/legacy_tech_cookie_issue_details.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/network_service_instance.h"
 #include "content/public/browser/overlay_window.h"
@@ -395,9 +392,7 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/browser_process_platform_part_mac.h"
-#include "chrome/browser/enterprise/platform_auth/platform_auth_proxying_url_loader_factory.h"
 #include "chrome/common/chrome_version.h"
-#include "components/enterprise/platform_auth/platform_auth_features.h"
 #include "sandbox/mac/sandbox_serializer.h"
 #include "sandbox/policy/mac/params.h"
 #include "sandbox/policy/mac/sandbox_mac.h"
@@ -2515,12 +2510,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       if (prefs->HasPrefPath(prefs::kScrollToTextFragmentEnabled) &&
           !prefs->GetBoolean(prefs::kScrollToTextFragmentEnabled)) {
         command_line->AppendSwitch(switches::kDisableScrollToTextFragment);
-      }
-
-      if (!prefs->GetList(enterprise_reporting::kCloudLegacyTechReportAllowlist)
-               .empty()) {
-        command_line->AppendSwitch(
-            blink::switches::kLegacyTechReportPolicyEnabled);
       }
 
       // The IntensiveWakeUpThrottling feature is typically managed via a
@@ -4973,15 +4962,6 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   }
 #endif
 
-#if BUILDFLAG(IS_MAC)
-  if (base::FeatureList::IsEnabled(enterprise_auth::kOktaSSO)) {
-    // WARNING: This factory blocks certain requests from going out via the
-    // final network bound factory.
-    enterprise_auth::ProxyingURLLoaderFactory::MaybeProxyRequest(
-        request_initiator, type, browser_context, factory_builder);
-  }
-#endif
-
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #else   // !BUILDFLAG (ENABLE_EXTENSIONS_CORE)
@@ -5597,32 +5577,6 @@ void ChromeContentBrowserClient::AddExtraPart(
 std::unique_ptr<HttpAuthCoordinator>
 ChromeContentBrowserClient::CreateHttpAuthCoordinator() {
   return std::make_unique<HttpAuthCoordinator>();
-}
-
-void ChromeContentBrowserClient::ReportLegacyTechEvent(
-    content::RenderFrameHost* render_frame_host,
-    const std::string& type,
-    const GURL& url,
-    const GURL& frame_url,
-    const std::string& filename,
-    uint64_t line,
-    uint64_t column,
-    std::optional<content::LegacyTechCookieIssueDetails> cookie_issue_details) {
-  WebContents* web_contents =
-      WebContents::FromRenderFrameHost(render_frame_host);
-  DCHECK(web_contents);
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  if (!profile) {
-    return;
-  }
-  enterprise_reporting::LegacyTechService* service =
-      enterprise_reporting::LegacyTechServiceFactory::GetForProfile(profile);
-  if (!service) {
-    return;
-  }
-  service->ReportEvent(type, url, frame_url, filename, line, column,
-                       cookie_issue_details);
 }
 
 bool ChromeContentBrowserClient::CanAcceptUntrustedExchangesIfNeeded() {

@@ -11,7 +11,6 @@
 #include "base/test/mock_callback.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
-#include "chrome/browser/enterprise/signin/managed_profile_required_navigation_throttle.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/dice_tab_helper.h"
 #include "chrome/browser/signin/logout_tab_helper.h"
@@ -288,10 +287,6 @@ class SigninViewControllerBrowserTest
     views::Widget* confirmation_prompt = widget_waiter.WaitIfNeededAndGet();
     return confirmation_prompt->widget_delegate()->AsDialogDelegate();
   }
-
- private:
-  base::test::ScopedFeatureList feature_list_{
-      features::kManagedProfileRequiredInterstitial};
 };
 
 IN_PROC_BROWSER_TEST_F(
@@ -962,11 +957,7 @@ IN_PROC_BROWSER_TEST_F(SigninViewControllerBrowserTest,
               /*process_user_choice_callback=*/
               mock_process_user_choice_callback.Get(),
               mock_done_callback.Get()));
-  EXPECT_FALSE(ManagedProfileRequiredNavigationThrottle::IsBlockingNavigations(
-      browser()->GetProfile()));
   browser()->GetFeatures().signin_view_controller()->CloseModalSignin();
-  EXPECT_FALSE(ManagedProfileRequiredNavigationThrottle::IsBlockingNavigations(
-      browser()->GetProfile()));
 
   browser()
       ->GetFeatures()
@@ -981,11 +972,7 @@ IN_PROC_BROWSER_TEST_F(SigninViewControllerBrowserTest,
               /*process_user_choice_callback=*/
               mock_process_user_choice_callback.Get(),
               mock_done_callback.Get()));
-  EXPECT_TRUE(ManagedProfileRequiredNavigationThrottle::IsBlockingNavigations(
-      browser()->GetProfile()));
   browser()->GetFeatures().signin_view_controller()->CloseModalSignin();
-  EXPECT_FALSE(ManagedProfileRequiredNavigationThrottle::IsBlockingNavigations(
-      browser()->GetProfile()));
 }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)

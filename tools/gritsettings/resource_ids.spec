@@ -456,17 +456,9 @@
     "META": {"sizes": {"includes": [10],}},
     "includes": [4100],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/intro/resources.grd": {
-    "META": {"sizes": {"includes": [80],}},
-    "includes": [4110],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/key_value_pair_viewer_shared/resources.grd": {
    "META": {"sizes": {"includes": [10]}},
     "includes": [4160],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/management/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [4280],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/media/resources.grd": {
     "META": {"sizes": {"includes": [20],}},
@@ -1204,10 +1196,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/unexportable_keys_internals/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [7495],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/feature_showcase/resources.grd": {
-    "META": {"sizes": {"includes": [50]}},
-    "includes": [7505],
   },
   # END components/ section.
 

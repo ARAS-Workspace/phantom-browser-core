@@ -208,12 +208,6 @@ CertificateManagerPageHandler::GetCertSource(
                 CERTIFICATE_TRUST_TYPE_DISTRUSTED,
             profile_, &remote_client_);
         break;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      case certificate_manager::mojom::CertificateSource::
-          kProvisionedClientCert:
-        source_ptr = CreateProvisionedClientCertSource(profile_);
-        break;
-#endif
     }
   }
   return *source_ptr;

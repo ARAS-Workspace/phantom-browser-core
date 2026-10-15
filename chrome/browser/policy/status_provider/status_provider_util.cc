@@ -5,8 +5,6 @@
 #include "chrome/browser/policy/status_provider/status_provider_util.h"
 
 #include "base/values.h"
-#include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
-#include "components/enterprise/browser/identifiers/profile_id_service.h"
 #include "components/policy/core/browser/webui/policy_status_provider.h"
 #include "components/policy/resources/webui/mojom/policy.mojom.h"
 #include "google_apis/gaia/gaia_auth_util.h"
@@ -44,12 +42,4 @@ void GetUserAffiliationStatus(base::DictValue* dict, Profile* profile) {
 
 void SetProfileId(base::DictValue* dict, Profile* profile) {
   CHECK(profile);
-  auto* profile_id_service =
-      enterprise::ProfileIdServiceFactory::GetForProfile(profile);
-  if (!profile_id_service)
-    return;
-
-  auto profile_id = profile_id_service->GetProfileId();
-  if (profile_id)
-    dict->Set("profileId", profile_id.value());
 }

@@ -11,7 +11,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/signin/managed_profile_required_navigation_throttle.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_avatar_icon_util.h"
@@ -604,98 +603,13 @@ SigninViewControllerDelegate::CreateManagedUserNoticeDelegate(
     BrowserWindowInterface& browser,
     std::unique_ptr<signin::EnterpriseProfileCreationDialogParams>
         create_param) {
-  bool profile_creation_required_by_policy =
-      create_param->profile_creation_required_by_policy;
-  bool is_oidc_enrollment = create_param->is_oidc_account;
-
-  if (profile_creation_required_by_policy &&
-      base::FeatureList::IsEnabled(
-          features::kManagedProfileRequiredInterstitial)) {
-    if (std::holds_alternative<signin::SigninChoiceWithConfirmAndRetryCallback>(
-            create_param->process_user_choice_callback)) {
-      create_param->process_user_choice_callback = base::BindOnce(
-          [](base::WeakPtr<content::BrowserContext> browser_context,
-             signin::SigninChoiceWithConfirmAndRetryCallback callback,
-             signin::SigninChoice signin_choice,
-             signin::SigninChoiceOperationDoneCallback done_callback,
-             signin::SigninChoiceOperationRetryCallback retry_callback) {
-            if (!browser_context.WasInvalidated()) {
-              ManagedProfileRequiredNavigationThrottle::SetReloadRequired(
-                  browser_context.get(),
-                  signin_choice ==
-                          signin::SigninChoice::SIGNIN_CHOICE_CONTINUE ||
-                      signin_choice ==
-                          signin::SigninChoice::SIGNIN_CHOICE_NEW_PROFILE);
-            }
-            std::move(callback).Run(signin_choice, std::move(done_callback),
-                                    std::move(retry_callback));
-          },
-          browser.GetProfile()->GetWeakPtr(),
-          std::move(std::get<signin::SigninChoiceWithConfirmAndRetryCallback>(
-              create_param->process_user_choice_callback)));
-    }
-
-    if (std::holds_alternative<signin::SigninChoiceCallback>(
-            create_param->process_user_choice_callback)) {
-      create_param->process_user_choice_callback = base::BindOnce(
-          [](base::WeakPtr<content::BrowserContext> browser_context,
-             signin::SigninChoiceCallback callback,
-             signin::SigninChoice signin_choice) {
-            if (!browser_context.WasInvalidated()) {
-              ManagedProfileRequiredNavigationThrottle::SetReloadRequired(
-                  browser_context.get(),
-                  signin_choice ==
-                          signin::SigninChoice::SIGNIN_CHOICE_CONTINUE ||
-                      signin_choice ==
-                          signin::SigninChoice::SIGNIN_CHOICE_NEW_PROFILE);
-            }
-            std::move(callback).Run(signin_choice);
-          },
-          browser.GetProfile()->GetWeakPtr(),
-          std::move(std::get<signin::SigninChoiceCallback>(
-              create_param->process_user_choice_callback)));
-    }
-  }
-
   bool allow_closing_by_pressing_escape =
       !create_param->is_device_signals_disclaimer;
 
-  std::u16string email = base::UTF8ToUTF16(create_param->account_info.email);
   auto web_view = SigninViewControllerDelegateViews::
       CreateManagedUserNoticeConfirmationWebView(browser,
                                                  std::move(create_param));
-  auto* dialog_web_contents = web_view->GetWebContents();
   base::ScopedClosureRunner on_closed_callback;
-
-  // Block all navigations to avoid users bypassing the dialog using another
-  // window.
-  // Does not block navigation to OIDC profile enrollment landing page since we
-  // need to display information there.
-  if (profile_creation_required_by_policy &&
-      base::FeatureList::IsEnabled(
-          features::kManagedProfileRequiredInterstitial) &&
-      !is_oidc_enrollment) {
-    content::WebContents* active_contents =
-        browser.GetTabStripModel()->GetActiveWebContents();
-    // Reload the active web contents so that the managed profile required
-    // interstitial is shown there.
-    CHECK(active_contents);
-    on_closed_callback = ManagedProfileRequiredNavigationThrottle::
-        BlockNavigationUntilEnterpriseActionTaken(
-            browser.GetProfile(), active_contents, dialog_web_contents, email);
-
-    content::OpenURLParams params(active_contents->GetVisibleURL(),
-                                  content::Referrer(),
-                                  WindowOpenDisposition::CURRENT_TAB,
-                                  ui::PAGE_TRANSITION_AUTO_TOPLEVEL, false);
-
-    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-        FROM_HERE,
-        base::BindOnce(base::IgnoreResult(&content::WebContents::OpenURL),
-                       active_contents->GetWeakPtr(), std::move(params),
-                       /*navigation_handle_callback=*/base::DoNothing()));
-  }
-
   return new SigninViewControllerDelegateViews(
       std::move(web_view), &browser, ui::mojom::ModalType::kWindow, true, false,
       /*animate_on_resize=*/true, false, std::move(on_closed_callback),

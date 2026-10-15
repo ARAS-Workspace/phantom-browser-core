@@ -5,30 +5,21 @@
 #include "chrome/browser/ui/views/profiles/profile_picker_flow_controller.h"
 
 #include <string>
-#include <variant>
 
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/trace_event/trace_event.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
-#include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
-#include "chrome/browser/enterprise/signin/signals_disclaimer_metrics.h"
 #include "chrome/browser/metrics/first_web_contents_profiler_base.h"
 #include "chrome/browser/profiles/delete_profile_helper.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_hats_util.h"
-#include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/themes/theme_service.h"
-#include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser_commands.h"
+#include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
@@ -36,36 +27,22 @@
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/singleton_tabs.h"
-#include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/profiles/avatar_toolbar_button.h"
-#include "chrome/browser/ui/views/profiles/profile_customization_bubble_sync_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller_impl.h"
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_post_sign_in_adapter.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_reauth_provider.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_sign_in_provider.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
 #include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_handler.h"
-#include "chrome/browser/ui/webui/signin/signin_ui_error.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "components/prefs/pref_service.h"
-#include "components/signin/public/base/signin_metrics.h"
-#include "components/signin/public/base/signin_switches.h"
-#include "net/base/url_util.h"
-#include "third_party/abseil-cpp/absl/functional/overload.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/mojom/themes.mojom.h"
 
 namespace {
-
-const signin_metrics::AccessPoint kAccessPoint =
-    signin_metrics::AccessPoint::kUserManager;
 
 // Returns the URL to load as initial content for the profile picker. If an
 // empty URL is returned, the profile picker should not be shown until
@@ -99,240 +76,6 @@ GURL GetInitialURL(ProfilePicker::EntryPoint entry_point) {
       // Should not be used for this entry point.
       NOTREACHED();
   }
-}
-
-// Shows the customization bubble if possible. The bubble won't be shown if the
-// color is enforced by policy or downloaded through Sync or the default theme
-// should be used. An IPH is shown after the bubble, or right away if the bubble
-// cannot be shown.
-void ShowCustomizationBubble(std::optional<SkColor> new_profile_color,
-                             BrowserWindowInterface* browser) {
-  DCHECK(browser);
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  if (!browser_view || !browser_view->toolbar_button_provider()) {
-    return;
-  }
-
-  BrowserWindowFeatures& features = browser->GetFeatures();
-  if (ProfileCustomizationBubbleSyncController::CanThemeSyncStart(
-          browser->GetProfile())) {
-    // For sync users, their profile color has not been applied yet. Call a
-    // helper class that applies the color and shows the bubble only if there is
-    // no conflict with a synced theme / color.
-    features.profile_customization_bubble_sync_controller()
-        ->ShowOnSyncFailedOrDefaultTheme(new_profile_color.value());
-  } else {
-    // For non syncing users, simply show the bubble.
-    features.signin_view_controller()->ShowModalProfileCustomizationDialog();
-  }
-}
-
-void MaybeShowProfileIPHs(BrowserWindowInterface* browser) {
-  DCHECK(browser);
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  if (!browser_view) {
-    return;
-  }
-  browser_view->MaybeShowSupervisedUserProfileSignInIPH();
-  browser_view->MaybeShowProfileSwitchIPH();
-}
-
-// Class triggering the signed-in section of the profile management flow, most
-// notably featuring the sync confirmation. In addition to what its base class
-// `ProfilePickerPostSignInAdapter` is doing, this class:
-// - shows in product help and customization bubble at the end of the flow
-// - applies profile customizations (theme, profile name)
-// - finalizes the profile (deleting it if the flow is aborted, marks it
-//   non-ephemeral if the flow is completed)
-// `step_completed_callback` is not called if the flow is canceled.
-// Note that `account_id` has been added to the `IdentityManager` but may not
-// be set as primary yet, because this operation is asynchronous.
-class ProfileCreationPostSignInAdapter : public ProfilePickerPostSignInAdapter {
- public:
-  ProfileCreationPostSignInAdapter(
-      ProfilePickerWebContentsHost* host,
-      Profile* profile,
-      const CoreAccountInfo& account_info,
-      std::unique_ptr<content::WebContents> contents,
-      std::optional<SkColor> profile_color,
-      base::OnceCallback<void(PostHostClearedCallback, bool)>
-          step_completed_callback)
-      : ProfilePickerPostSignInAdapter(host,
-                                       profile,
-                                       account_info,
-                                       std::move(contents),
-                                       kAccessPoint,
-                                       profile_color),
-        step_completed_callback_(std::move(step_completed_callback)) {}
-
-  ProfileCreationPostSignInAdapter(const ProfileCreationPostSignInAdapter&) =
-      delete;
-  ProfileCreationPostSignInAdapter& operator=(
-      const ProfileCreationPostSignInAdapter&) = delete;
-
-  ~ProfileCreationPostSignInAdapter() override {
-    // Record unfinished signed-in profile creation.
-    if (!is_finishing_) {
-      // TODO(crbug.com/40216113): Consider moving this recording into
-      // ProfilePickerTurnSyncOnDelegate and unify this code with Cancel().
-      ProfileMetrics::LogProfileAddSignInFlowOutcome(
-          ProfileMetrics::ProfileSignedInFlowOutcome::kAbortedAfterSignIn);
-    }
-  }
-
-  // ProfilePickerPostSignInAdapter:
-  void Init(StepSwitchFinishedCallback step_switch_callback) override {
-    // Listen for extended account info getting fetched.
-    signin::IdentityManager* identity_manager =
-        IdentityManagerFactory::GetForProfile(profile());
-    profile_name_resolver_ =
-        std::make_unique<ProfileNameResolver>(identity_manager, account_info());
-
-    // Stop with the sign-in navigation and show a spinner instead. The spinner
-    // will be shown until TurnSyncOnHelper figures out whether it's a
-    // managed account and whether sync is disabled by policies (which in some
-    // cases involves fetching policies and can take a couple of seconds).
-    host()->ShowScreen(contents(), GetSyncConfirmationURL(/*loading=*/true),
-                       base::OnceClosure());
-
-    ProfilePickerPostSignInAdapter::Init(std::move(step_switch_callback));
-  }
-
-  void Cancel() override {
-    if (is_finishing_) {
-      return;
-    }
-
-    is_finishing_ = true;
-  }
-
-  void FinishAndOpenBrowserInternal(PostHostClearedCallback callback,
-                                    bool is_continue_callback) override {
-    // Do nothing if the sign-in flow is aborted or if this has already been
-    // called. Note that this can get called first time from a special case
-    // handling (such as the Settings link) and than second time when the
-    // TurnSyncOnHelper finishes.
-    if (is_finishing_) {
-      return;
-    }
-    is_finishing_ = true;
-    std::vector<PostHostClearedCallback> callbacks;
-    callbacks.push_back(std::move(callback));
-    callbacks.push_back(CreateFreshProfileExperienceCallback());
-    callback =
-        CombineCallbacks<PostHostClearedCallback, BrowserWindowInterface*>(
-            std::move(callbacks));
-
-    profile_name_resolver_->RunWithProfileName(base::BindOnce(
-        &ProfileCreationPostSignInAdapter::FinishFlow,
-        // Unretained ok: `this` outlives `profile_name_resolver_`.
-        base::Unretained(this), std::move(callback), is_continue_callback));
-  }
-
- private:
-  PostHostClearedCallback CreateFreshProfileExperienceCallback() {
-    // If there's no color to apply to the profile, skip the customization
-    // bubble and trigger an IPH, instead.
-    if (ThemeServiceFactory::GetForProfile(profile())->UsingPolicyTheme() ||
-        !GetProfileColor().has_value()) {
-      return PostHostClearedCallback(base::BindOnce(&MaybeShowProfileIPHs));
-    } else {
-      // If sync cannot start, we apply `GetProfileColor()` right away before
-      // opening a browser window to avoid flicker. Otherwise, it's applied
-      // later by code triggered from ShowCustomizationBubble().
-      if (!ProfileCustomizationBubbleSyncController::CanThemeSyncStart(
-              profile())) {
-        auto* theme_service = ThemeServiceFactory::GetForProfile(profile());
-        theme_service->SetUserColorAndBrowserColorVariant(
-            GetProfileColor().value(),
-            ui::mojom::BrowserColorVariant::kTonalSpot);
-      }
-      return PostHostClearedCallback(
-          base::BindOnce(&ShowCustomizationBubble, GetProfileColor()));
-    }
-  }
-
-  void FinishFlow(PostHostClearedCallback post_host_cleared_callback,
-                  bool is_continue_callback,
-                  std::u16string name_for_signed_in_profile) {
-    TRACE_EVENT1("browser", "ProfileCreationPostSignInAdapter::FinishFlow",
-                 "profile_path", profile()->GetPath().AsUTF8Unsafe());
-    CHECK(!name_for_signed_in_profile.empty());
-    DCHECK(post_host_cleared_callback.value());
-    DCHECK(step_completed_callback_);
-
-    profile_name_resolver_.reset();
-
-    FinalizeNewProfileSetup(profile(), name_for_signed_in_profile,
-                            /*is_default_name=*/false);
-
-    ProfileMetrics::LogProfileAddNewUser(
-        ProfileMetrics::ADD_NEW_PROFILE_PICKER_SIGNED_IN);
-
-    std::move(step_completed_callback_)
-        .Run(std::move(post_host_cleared_callback), is_continue_callback);
-  }
-
-  // Controls whether the flow still needs to finalize (which includes showing
-  // `profile` browser window at the end of the sign-in flow).
-  bool is_finishing_ = false;
-
-  std::unique_ptr<ProfileNameResolver> profile_name_resolver_;
-  base::OnceCallback<void(PostHostClearedCallback, bool)>
-      step_completed_callback_;
-};
-
-class ReauthFlowStepController : public ProfileManagementStepController {
- public:
-  explicit ReauthFlowStepController(
-      ProfilePickerWebContentsHost* host,
-      std::unique_ptr<ProfilePickerReauthProvider> reauth_provider,
-      Profile* profile)
-      : ProfileManagementStepController(host),
-        reauth_provider_(std::move(reauth_provider)) {}
-
-  ~ReauthFlowStepController() override = default;
-
-  void Show(StepSwitchFinishedCallback step_shown_callback,
-            bool reset_state) override {
-    reauth_provider_->SwitchToReauth(std::move(step_shown_callback));
-  }
-
-  void OnHidden() override {
-    host()->SetNativeToolbarSigninButtonsVisible(false);
-  }
-
-  bool CanNavigateBack() const override {
-    return reauth_provider_
-               ? CanNavigateBackInternal(reauth_provider_->contents())
-               : false;
-  }
-
-  void OnNavigateBackRequested() override {
-    NavigateBackInternal(reauth_provider_->contents());
-  }
-
- private:
-  std::unique_ptr<ProfilePickerReauthProvider> reauth_provider_;
-};
-
-std::unique_ptr<ProfileManagementStepController> CreateReauthtep(
-    ProfilePickerWebContentsHost* host,
-    Profile* profile,
-    base::OnceCallback<void(bool, const ForceSigninUIError&)>
-        on_reauth_completed) {
-  ProfileAttributesEntry* entry =
-      g_browser_process->profile_manager()
-          ->GetProfileAttributesStorage()
-          .GetProfileAttributesWithPath(profile->GetPath());
-
-  return std::make_unique<ReauthFlowStepController>(
-      host,
-      std::make_unique<ProfilePickerReauthProvider>(
-          host, profile, entry->GetGAIAId(),
-          base::UTF16ToUTF8(entry->GetUserName()),
-          std::move(on_reauth_completed)),
-      profile);
 }
 
 void RecordProfilingFinishReason(
@@ -496,15 +239,13 @@ ProfilePickerFlowController::ProfilePickerFlowController(
     ProfilePickerWebContentsHost* host,
     ClearHostClosure clear_host_callback,
     ProfilePicker::EntryPoint entry_point,
-    const GURL& selected_profile_target_url,
-    const std::string& initial_email)
+    const GURL& selected_profile_target_url)
     : ProfileManagementFlowControllerImpl(
           host,
           std::move(clear_host_callback),
           /*flow_type_string=*/"ProfilePickerFlow"),
       entry_point_(entry_point),
-      selected_profile_target_url_(selected_profile_target_url),
-      initial_email_(initial_email) {}
+      selected_profile_target_url_(selected_profile_target_url) {}
 
 ProfilePickerFlowController::~ProfilePickerFlowController() = default;
 
@@ -512,109 +253,7 @@ void ProfilePickerFlowController::Init() {
   RegisterStep(Step::kProfilePicker,
                ProfileManagementStepController::CreateForProfilePickerApp(
                    host(), GetInitialURL(entry_point_)));
-  // If an initial email was provided, switch to the account selection step and
-  // prefill the email field.
-  if (!initial_email_.empty()) {
-    signin_metrics::LogSignInOffered(
-        signin_metrics::AccessPoint::kUserManagerWithPrefilledEmail,
-        signin_metrics::PromoAction::PROMO_ACTION_NO_SIGNIN_PROMO);
-    SwitchToIdentityStepsFromAccountSelection(
-        StepSwitchFinishedCallback(),
-        signin_metrics::AccessPoint::kUserManagerWithPrefilledEmail,
-        base::FilePath(), initial_email_);
-    return;
-  }
   SwitchToStep(Step::kProfilePicker, /*reset_state=*/true);
-}
-
-void ProfilePickerFlowController::SwitchToSignIn(
-    ProfilePicker::ProfileInfo profile_info,
-    StepSwitchFinishedCallback switch_finished_callback) {
-  DCHECK_EQ(Step::kProfilePicker, current_step());
-
-  base::FilePath profile_path;
-  // Split the variant information from `profile_info`.
-  std::visit(absl::Overload{
-                 [&suggested_profile_color =
-                      suggested_profile_color_](std::optional<SkColor> color) {
-                   suggested_profile_color = color;
-                 },
-                 [&profile_path](base::FilePath profile_path_info) {
-                   profile_path = profile_path_info;
-                 },
-             },
-             profile_info);
-
-  SwitchToIdentityStepsFromAccountSelection(std::move(switch_finished_callback),
-                                            kAccessPoint,
-                                            std::move(profile_path));
-}
-
-void ProfilePickerFlowController::SwitchToReauth(
-    Profile* profile,
-    StepSwitchFinishedCallback switch_finished_callback,
-    base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback) {
-  DCHECK_EQ(Step::kProfilePicker, current_step());
-
-  // if the step was already initialized, unregister to make sure the new
-  // reauth is properly initialised and the current reauth step is cleaned.
-  //
-  // TODO(crbug.com/40280498): Cleanup the unregistration of the step with a
-  // proper resettable state within the `ProfilePickerReauthProvider`, and
-  // using the `ProfileManagementFlowController::SwitchToStep()` `reset_state`
-  // value to trigger the reset.
-  if (IsStepInitialized(Step::kReauth)) {
-    UnregisterStep(Step::kReauth);
-  }
-
-  RegisterStep(
-      Step::kReauth,
-      CreateReauthtep(
-          host(), profile,
-          base::BindOnce(&ProfilePickerFlowController::OnReauthCompleted,
-                         base::Unretained(this), profile,
-                         std::move(on_error_callback))));
-
-  SwitchToStep(
-      Step::kReauth, true, std::move(switch_finished_callback),
-      /*pop_step_callback=*/CreateSwitchToStepPopCallback(current_step()));
-}
-
-void ProfilePickerFlowController::OnReauthCompleted(
-    Profile* profile,
-    base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback,
-    bool success,
-    const ForceSigninUIError& error) {
-  if (!success) {
-    CHECK_NE(error.type(), ForceSigninUIError::Type::kNone);
-
-    SwitchToStep(
-        Step::kProfilePicker, /*reset_state=*/true,
-        StepSwitchFinishedCallback(base::BindOnce(
-            &ProfilePickerFlowController::OnProfilePickerStepShownReauthError,
-            base::Unretained(this), std::move(on_error_callback), error)));
-    return;
-  }
-
-  g_browser_process->profile_manager()
-      ->GetProfileAttributesStorage()
-      .GetProfileAttributesWithPath(profile->GetPath())
-      ->LockForceSigninProfile(false);
-
-  FinishFlowAndRunInBrowser(profile, PostHostClearedCallback());
-}
-
-void ProfilePickerFlowController::OnProfilePickerStepShownReauthError(
-    base::OnceCallback<void(const ForceSigninUIError&)> on_error_callback,
-    const ForceSigninUIError& error,
-    bool switch_step_success) {
-  // If the step switch to the profile picker was not successful, do not proceed
-  // with displaying the error dialog.
-  if (!switch_step_success) {
-    return;
-  }
-
-  std::move(on_error_callback).Run(error);
 }
 
 void ProfilePickerFlowController::CancelSigninFlow() {
@@ -658,39 +297,6 @@ std::u16string ProfilePickerFlowController::GetFallbackAccessibleWindowTitle()
   return l10n_util::GetStringUTF16(IDS_PROFILE_PICKER_MAIN_VIEW_TITLE);
 }
 
-void ProfilePickerFlowController::OnWindowClosing() {
-  if (current_step() == Step::kDeviceSignalsDisclaimer &&
-      !signals_disclaimer_result_recorded_) {
-    base::UmaHistogramEnumeration(
-        kEnterpriseSignalsDisclaimerProfilePickerResult,
-        EnterpriseSignalsDisclaimerProfilePickerResult::kProfilePickerClosed);
-  }
-}
-
-std::unique_ptr<ProfilePickerPostSignInAdapter>
-ProfilePickerFlowController::CreatePostSignInAdapter(
-    Profile* signed_in_profile,
-    const CoreAccountInfo& account_info,
-    std::unique_ptr<content::WebContents> contents) {
-  DCHECK(!weak_post_sign_in_adapter_);
-
-  created_profile_ = signed_in_profile->GetWeakPtr();
-  auto step_completed_callback =
-      base::BindOnce(&ProfilePickerFlowController::HandleIdentityStepsCompleted,
-                     // Unretained ok: the callback is passed to a step that
-                     // the `this` will own and outlive.
-                     base::Unretained(this),
-                     // Unretained ok: the steps register a profile keep-alive
-                     // and will be alive until this callback runs.
-                     base::Unretained(created_profile_.get()));
-
-  auto signed_in_flow = std::make_unique<ProfileCreationPostSignInAdapter>(
-      host(), signed_in_profile, account_info, std::move(contents),
-      suggested_profile_color_, std::move(step_completed_callback));
-  weak_post_sign_in_adapter_ = signed_in_flow->GetWeakPtr();
-  return signed_in_flow;
-}
-
 void ProfilePickerFlowController::SwitchToSignedOutPostIdentityFlow(
     Profile* profile) {
   CHECK(profile);
@@ -702,47 +308,6 @@ void ProfilePickerFlowController::SwitchToSignedOutPostIdentityFlow(
       PostHostClearedCallback(base::BindOnce(&ShowLocalProfileCustomization,
                                              profile_picked_time_on_startup_)),
       /*is_continue_callback=*/false);
-}
-
-void ProfilePickerFlowController::ShowSigninError(Profile* profile,
-                                                  const SigninUIError& error) {
-  CHECK_EQ(Step::kAccountSelection, current_step());
-  CHECK(!error.IsOk());
-  base::UmaHistogramEnumeration("ProfilePicker.ProfilePickerFlow.SignInError",
-                                error.type());
-
-  if (signin_util::IsForceSigninEnabled() &&
-      error.type() ==
-          SigninUIError::Type::kUsernameNotAllowedByPatternFromPrefs) {
-    host()->Reset(StepSwitchFinishedCallback(
-        base::BindOnce(&ProfilePickerWebContentsHost::ShowSigninErrorDialog,
-                       base::Unretained(host()),
-                       ForceSigninUIError::SigninPatternNotMatching(
-                           base::UTF16ToUTF8(error.email())))));
-    return;
-  }
-
-  if (error.type() ==
-      SigninUIError::Type::kAccountAlreadyUsedByAnotherProfile) {
-    GURL profile_switch_url(chrome::kChromeUIProfilePickerUrl);
-    profile_switch_url = profile_switch_url.Resolve("profile-switch");
-    // Appends the `profile_path` to be retrieved in the web page.
-    profile_switch_url =
-        net::AppendQueryParameter(profile_switch_url, "profileSwitchPath",
-                                  base::ToString(error.another_profile_path()));
-
-    host()->ShowScreenInPickerContents(profile_switch_url, base::OnceClosure());
-    return;
-  }
-
-  if (base::FeatureList::IsEnabled(switches::kSupportErrorsInProfilePicker)) {
-    // Display the signin error in the profile picker's error dialog.
-    host()->Reset(StepSwitchFinishedCallback(
-        base::BindOnce(&ProfilePickerWebContentsHost::ShowSigninErrorDialog,
-                       base::Unretained(host()), error)));
-  } else {
-    HandleSigninErrorInBrowser(profile, error);
-  }
 }
 
 void ProfilePickerFlowController::PickProfile(
@@ -856,17 +421,9 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
   CHECK(created_profile_);
   base::queue<ProfileManagementFlowController::Step> post_identity_steps;
 
-  content::WebContents* web_contents = nullptr;
-  if (weak_post_sign_in_adapter_) {
-    // TODO(crbug.com/40942098): Find a way to get the web contents without
-    // relying on the weak ptr.
-    web_contents = weak_post_sign_in_adapter_->contents();
-    CHECK(web_contents);
-  } else {
-    // TODO(crbug.com/40942098): Find another way to fetch the web contents.
-    web_contents = GetSignedOutFlowWebContents();
-    CHECK(web_contents);
-  }
+  // TODO(crbug.com/40942098): Find another way to fetch the web contents.
+  content::WebContents* web_contents = GetSignedOutFlowWebContents();
+  CHECK(web_contents);
 
   auto search_engine_choice_step_completed = base::BindOnce(
       &ProfilePickerFlowController::AdvanceToNextPostIdentityStep,
@@ -908,77 +465,7 @@ void ProfilePickerFlowController::OnProfileLoadedForPicking(
     return;
   }
 
-  ProfileManagementDisclaimerService* disclaimer_service =
-      ProfileManagementDisclaimerServiceFactory::GetForProfile(profile);
-  if (disclaimer_service &&
-      disclaimer_service->IsDeviceSignalsDisclaimerRequired(nullptr)) {
-    // Cleanup the step controller if already initialized.
-    if (IsStepInitialized(Step::kDeviceSignalsDisclaimer)) {
-      UnregisterStep(Step::kDeviceSignalsDisclaimer);
-    }
-
-    RegisterStep(
-        Step::kDeviceSignalsDisclaimer,
-        ProfileManagementStepController::CreateForDeviceSignalsDisclaimer(
-            host(), profile,
-            base::BindOnce(
-                &ProfilePickerFlowController::OnDeviceSignalsDisclaimerResult,
-                weak_ptr_factory_.GetWeakPtr(), profile, open_command_line_urls,
-                std::move(pick_profile_complete_callback))));
-
-    SwitchToStep(Step::kDeviceSignalsDisclaimer, /*reset_state=*/true);
-    return;
-  }
-
   profiles::OpenBrowserWindowForProfile(
       std::move(pick_profile_complete_callback), /*always_create=*/false,
       /*is_new_profile=*/false, open_command_line_urls, profile);
-}
-
-void ProfilePickerFlowController::OnDeviceSignalsDisclaimerResult(
-    Profile* profile,
-    bool open_command_line_urls,
-    base::OnceCallback<void(BrowserWindowInterface*)>
-        pick_profile_complete_callback,
-    signin::DeviceSignalsDisclaimerResult result) {
-  signals_disclaimer_result_recorded_ = true;
-  switch (result) {
-    case signin::DeviceSignalsDisclaimerResult::kAccepted:
-      base::UmaHistogramEnumeration(
-          kEnterpriseSignalsDisclaimerProfilePickerResult,
-          EnterpriseSignalsDisclaimerProfilePickerResult::kAccepted);
-
-      ProfileManagementDisclaimerServiceFactory::GetForProfile(profile)
-          ->OnDeviceSignalsCollectionConsentGranted();
-
-      profiles::OpenBrowserWindowForProfile(
-          std::move(pick_profile_complete_callback), /*always_create=*/false,
-          /*is_new_profile=*/false, open_command_line_urls, profile);
-      break;
-    case signin::DeviceSignalsDisclaimerResult::kCanceled:
-      base::UmaHistogramEnumeration(
-          kEnterpriseSignalsDisclaimerProfilePickerResult,
-          EnterpriseSignalsDisclaimerProfilePickerResult::kDeclined);
-
-      SwitchToStep(Step::kProfilePicker, /*reset_state=*/true);
-      UnregisterStep(Step::kDeviceSignalsDisclaimer);
-      if (pick_profile_complete_callback) {
-        std::move(pick_profile_complete_callback).Run(nullptr);
-      }
-      break;
-    case signin::DeviceSignalsDisclaimerResult::kDismissed:
-      base::UmaHistogramEnumeration(
-          kEnterpriseSignalsDisclaimerProfilePickerResult,
-          EnterpriseSignalsDisclaimerProfilePickerResult::
-              kDismissedWithoutExplicitUserAction);
-
-      // kDismissed is caused by the destruction of WebUI.
-      // However it will not be trigger if `this` is destroyed because `this`
-      // owns the webcontents hosting the dialog, so by the time WebUI is
-      // destroyed the WeakPtr will already have been invalidated.
-      if (pick_profile_complete_callback) {
-        std::move(pick_profile_complete_callback).Run(nullptr);
-      }
-      break;
-  }
 }

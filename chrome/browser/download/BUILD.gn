@@ -320,7 +320,6 @@ source_set("unit_tests") {
     "//components/download/public/background_service/test:test_support",
     "//components/download/public/common:public",
     "//components/download/public/common:test_support",
-    "//components/enterprise",
     "//components/history/content/browser",
     "//components/offline_items_collection/core/test_support",
     "//components/policy/core/browser:test_support",

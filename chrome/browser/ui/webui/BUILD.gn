@@ -125,10 +125,7 @@ source_set("configs") {
   }
 
   if (enable_dice_support) {
-    deps += [
-      "//chrome/browser/ui/webui/feature_showcase",
-      "//chrome/browser/ui/webui/signin/signout_confirmation",
-    ]
+    deps += [ "//chrome/browser/ui/webui/signin/signout_confirmation" ]
   }
 
   if (enable_session_service) {
@@ -181,8 +178,6 @@ source_set("configs") {
   if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/webui/discards" ]
   }
-
-  deps += [ "//chrome/browser/ui/webui/intro" ]
 
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/ui/webui/ntp_microsoft_auth" ]
@@ -809,7 +804,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/webui/whats_new",
       "//chrome/test/data/webui:browser_tests",
       "//components/collaboration/public",
-      "//components/enterprise:test_support",
       "//components/history_clusters/core",
       "//components/omnibox/common",
       "//components/optimization_guide/core:features",

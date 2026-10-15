@@ -46,10 +46,6 @@ namespace content {
 class SyntheticTrialSyncer;
 }
 
-#if BUILDFLAG(IS_MAC)
-class PlatformAuthPolicyObserver;
-#endif
-
 class ChromeBrowserMainParts : public content::BrowserMainParts {
  public:
   static std::unique_ptr<content::BrowserMainParts> Create(
@@ -205,11 +201,6 @@ class ChromeBrowserMainParts : public content::BrowserMainParts {
   // created.
   // Must be deleted before `browser_process_`.
   std::unique_ptr<ProfileInitManager> profile_init_manager_;
-
-#if BUILDFLAG(IS_MAC)
-  // Applies enterprise policies for platform auth SSO.
-  std::unique_ptr<PlatformAuthPolicyObserver> platform_auth_policy_observer_;
-#endif
 
   std::unique_ptr<AfterStartupTaskUtils::StartupInProgressRef> first_idle_ref_;
 };
