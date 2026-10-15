@@ -59,9 +59,6 @@ class PageLiveStateDecoratorHelperTest
       media::mojom::DisplayMediaInformationPtr display_media_info,
       bool (PageLiveStateDecorator::Data::*pm_getter)() const);
 
-  // Forces deletion of the PageLiveStateDecoratorHelper.
-  void ResetHelper() { helper_.reset(); }
-
  private:
   PerformanceManagerTestHarnessHelper pm_harness_;
   scoped_refptr<MediaStreamCaptureIndicator> indicator_;
@@ -163,26 +160,6 @@ TEST_F(PageLiveStateDecoratorHelperTest, OnIsCapturingDisplayChanged) {
           /*capture_handle=*/nullptr,
           /*initial_zoom_level=*/100),
       &PageLiveStateDecorator::Data::IsCapturingDisplay);
-}
-
-// Create many WebContents to exercice the code that maintains the linked list
-// of PageLiveStateDecoratorHelper::WebContentsObservers.
-TEST_F(PageLiveStateDecoratorHelperTest, ManyPageNodes) {
-  std::unique_ptr<content::WebContents> c1 = CreateTestWebContents();
-  std::unique_ptr<content::WebContents> c2 = CreateTestWebContents();
-  std::unique_ptr<content::WebContents> c3 = CreateTestWebContents();
-  std::unique_ptr<content::WebContents> c4 = CreateTestWebContents();
-  std::unique_ptr<content::WebContents> c5 = CreateTestWebContents();
-
-  // Expect no crash when WebContentsObservers are destroyed.
-
-  // This deletes WebContentsObservers associated with |c1|, |c3| and |c5|.
-  c1.reset();
-  c3.reset();
-  c5.reset();
-
-  // This deletes remaining WebContentsObservers.
-  ResetHelper();
 }
 
 }  // namespace performance_manager

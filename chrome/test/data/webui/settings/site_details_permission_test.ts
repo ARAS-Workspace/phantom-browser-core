@@ -5,15 +5,20 @@
 // clang-format off
 import 'chrome://webui-test/cr_elements/cr_policy_strings.js';
 
-import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {SiteDetailsPermissionElement} from 'chrome://settings/lazy_load.js';
-import {ChooserType, ContentSetting, ContentSettingsTypes, SiteSettingSource, SiteSettingsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
+import {ContentSetting, ContentSettingsTypes, SiteSettingSource, SiteSettingsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 
 import {TestSiteSettingsBrowserProxy} from './test_site_settings_browser_proxy.js';
 import type {SiteSettingsPref} from './test_util.js';
-import {createContentSettingTypeToValuePair, createDefaultContentSetting, createRawChooserException, createRawSiteException, createSiteSettingsPrefs} from './test_util.js';
+import {createContentSettingTypeToValuePair, createDefaultContentSetting, createRawSiteException, createSiteSettingsPrefs} from './test_util.js';
+
+// <if expr="is_chromeos">
+import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
+import {ChooserType} from 'chrome://settings/lazy_load.js';
+import {createRawChooserException} from './test_util.js';
+// </if>
 // clang-format on
 
 /** @fileoverview Suite of tests for site-details. */
@@ -665,168 +670,4 @@ suite('SiteDetailsPermission', function() {
     assertTrue(deviceEntries[1]!.$.resetSite.hidden);
   });
   // </if>
-
-  test('Chooser exceptions getChooserExceptionList API used', async function() {
-    const origin = 'https://www.example.com';
-    const otherOrigin = 'https://www.otherexample.com';
-
-    const prefsUsb = createSiteSettingsPrefs(
-        /*defaultsList=*/[], /*exceptionsList=*/[], /*chooserExceptionsList=*/[
-          createContentSettingTypeToValuePair(
-              ContentSettingsTypes.USB_DEVICES,
-              [
-                createRawChooserException(
-                    ChooserType.USB_DEVICES, [createRawSiteException(origin)],
-                    {displayName: 'Gadget'}),
-                createRawChooserException(
-                    ChooserType.USB_DEVICES,
-                    [createRawSiteException(
-                        origin, {source: SiteSettingSource.POLICY})],
-                    {displayName: 'Gizmo'}),
-                createRawChooserException(
-                    ChooserType.USB_DEVICES,
-                    [createRawSiteException(otherOrigin)],
-                    {displayName: 'Widget'}),
-              ]),
-        ]);
-    browserProxy.setPrefs(prefsUsb);
-
-    testElement.category = ContentSettingsTypes.USB_DEVICES;
-    testElement.chooserType = ChooserType.USB_DEVICES;
-    testElement.label = 'USB';
-    testElement.site = createRawSiteException(origin, {
-      origin: origin,
-      embeddingOrigin: origin,
-      setting: ContentSetting.ASK,
-      source: SiteSettingSource.PREFERENCE,
-    });
-
-    const chooserType =
-        await browserProxy.whenCalled('getChooserExceptionList');
-    assertEquals(ChooserType.USB_DEVICES, chooserType);
-
-    // Flush the container to ensure that the container is populated.
-    flush();
-
-    // Ensure that only the chooser exceptions with the same origin are
-    // rendered.
-    const deviceEntries = testElement.shadowRoot!.querySelectorAll(
-        'site-details-permission-device-entry');
-
-    assertEquals(deviceEntries.length, 2);
-
-    // The first device entry is a user granted exception.
-    const firstDeviceDisplayName =
-        deviceEntries[0]!.shadowRoot!.querySelector('.url-directionality');
-    assertTrue(!!firstDeviceDisplayName);
-    assertEquals(firstDeviceDisplayName.textContent.trim(), 'Gadget');
-    assertFalse(!!deviceEntries[0]!.shadowRoot!.querySelector(
-        'cr-policy-pref-indicator'));
-    assertFalse(deviceEntries[0]!.$.resetSite.hidden);
-
-    // The second device entry is a policy granted exception.
-    const secondDeviceDisplayName =
-        deviceEntries[1]!.shadowRoot!.querySelector('.url-directionality');
-    assertTrue(!!secondDeviceDisplayName);
-    assertEquals(secondDeviceDisplayName.textContent.trim(), 'Gizmo');
-    assertTrue(!!deviceEntries[1]!.shadowRoot!.querySelector(
-        'cr-policy-pref-indicator'));
-    assertTrue(deviceEntries[1]!.$.resetSite.hidden);
-  });
-
-  test(
-      'Chooser exceptions only incognito permission does not show device entry',
-      async function() {
-        const origin = 'https://www.example.com';
-
-        const prefsUsb = createSiteSettingsPrefs(
-            /*defaultsList=*/[], /*exceptionsList=*/[],
-            /*chooserExceptionsList=*/[
-              createContentSettingTypeToValuePair(
-                  ContentSettingsTypes.USB_DEVICES,
-                  [
-                    createRawChooserException(
-                        ChooserType.USB_DEVICES,
-                        [createRawSiteException(origin, {incognito: true})],
-                        {displayName: 'Gadget'}),
-                  ]),
-            ]);
-        browserProxy.setPrefs(prefsUsb);
-
-        testElement.category = ContentSettingsTypes.USB_DEVICES;
-        testElement.chooserType = ChooserType.USB_DEVICES;
-        testElement.label = 'USB';
-        testElement.site = createRawSiteException(origin, {
-          origin: origin,
-          embeddingOrigin: origin,
-          setting: ContentSetting.ASK,
-          source: SiteSettingSource.PREFERENCE,
-        });
-
-        const chooserType =
-            await browserProxy.whenCalled('getChooserExceptionList');
-        assertEquals(ChooserType.USB_DEVICES, chooserType);
-
-        // Flush the container to ensure that the container is populated.
-        flush();
-
-        // Ensure that no any device entry as the chooser exception only has
-        // incognito permission.
-        const deviceEntries = testElement.shadowRoot!.querySelectorAll(
-            'site-details-permission-device-entry');
-
-        assertEquals(deviceEntries.length, 0);
-      });
-
-  test(
-      'Chooser exception origin with slash ending should still match',
-      async function() {
-        const origin = 'https://www.example.com';
-        const originWithSlashEnding = 'https://www.example.com/';
-
-        const prefsUsb = createSiteSettingsPrefs(
-            /*defaultsList=*/[], /*exceptionsList=*/[],
-            /*chooserExceptionsList=*/[
-              createContentSettingTypeToValuePair(
-                  ContentSettingsTypes.USB_DEVICES,
-                  [
-                    createRawChooserException(
-                        ChooserType.USB_DEVICES,
-                        [createRawSiteException(originWithSlashEnding)],
-                        {displayName: 'Gadget'}),
-                  ]),
-            ]);
-        browserProxy.setPrefs(prefsUsb);
-
-        testElement.category = ContentSettingsTypes.USB_DEVICES;
-        testElement.chooserType = ChooserType.USB_DEVICES;
-        testElement.label = 'USB';
-        testElement.site = createRawSiteException(origin, {
-          origin: origin,
-          embeddingOrigin: origin,
-          setting: ContentSetting.ASK,
-          source: SiteSettingSource.PREFERENCE,
-        });
-
-        const chooserType =
-            await browserProxy.whenCalled('getChooserExceptionList');
-        assertEquals(ChooserType.USB_DEVICES, chooserType);
-
-        // Flush the container to ensure that the container is populated.
-        flush();
-
-        // Ensure that the chooser exception site origin with slash ending
-        // still shows up.
-        const deviceEntries = testElement.shadowRoot!.querySelectorAll(
-            'site-details-permission-device-entry');
-        assertEquals(deviceEntries.length, 1);
-        assertTrue(!!deviceEntries[0]);
-        const deviceDisplayName =
-            deviceEntries[0].shadowRoot!.querySelector('.url-directionality');
-        assertTrue(!!deviceDisplayName);
-        assertEquals(deviceDisplayName.textContent.trim(), 'Gadget');
-        assertFalse(!!deviceEntries[0].shadowRoot!.querySelector(
-            'cr-policy-pref-indicator'));
-        assertFalse(deviceEntries[0].$.resetSite.hidden);
-      });
 });

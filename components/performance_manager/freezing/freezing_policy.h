@@ -206,11 +206,6 @@ class FreezingPolicy : public PageNodeObserver,
   void OnIsAudibleChanged(const FrameNode* frame_node) override;
 
   // PageLiveStateObserver:
-  void OnIsConnectedToUSBDeviceChanged(const PageNode* page_node) override;
-  void OnIsConnectedToBluetoothDeviceChanged(
-      const PageNode* page_node) override;
-  void OnIsConnectedToHidDeviceChanged(const PageNode* page_node) override;
-  void OnIsConnectedToSerialPortChanged(const PageNode* page_node) override;
   void OnIsCapturingVideoChanged(const PageNode* page_node) override;
   void OnIsCapturingAudioChanged(const PageNode* page_node) override;
   void OnIsBeingMirroredChanged(const PageNode* page_node) override;

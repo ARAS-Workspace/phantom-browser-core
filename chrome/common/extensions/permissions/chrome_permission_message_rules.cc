@@ -437,11 +437,6 @@ ChromePermissionMessageRule::GetAllRules() {
        {}},
 
       // Devices-related messages.
-      // Access to users' devices should provide a single warning message
-      // specifying the transport method used; serial and/or Bluetooth.
-      {IDS_EXTENSION_PROMPT_WARNING_BLUETOOTH_SERIAL,
-       {APIPermissionID::kBluetooth, APIPermissionID::kSerial},
-       {APIPermissionID::kBluetoothDevices}},
       {IDS_EXTENSION_PROMPT_WARNING_BLUETOOTH,
        {APIPermissionID::kBluetooth},
        {APIPermissionID::kBluetoothDevices}},
@@ -462,7 +457,6 @@ ChromePermissionMessageRule::GetAllRules() {
       {IDS_EXTENSION_PROMPT_WARNING_BLUETOOTH_PRIVATE,
        {APIPermissionID::kBluetoothPrivate},
        {}},
-      {IDS_EXTENSION_PROMPT_WARNING_SERIAL, {APIPermissionID::kSerial}, {}},
       // Universal 2nd Factor devices.
       {IDS_EXTENSION_PROMPT_WARNING_U2F_DEVICES,
        {APIPermissionID::kU2fDevices},

@@ -732,10 +732,6 @@
     "dependencies": ["permission:scripting"],
     "contexts": ["content_script"]
   },
-  "serial": {
-    "dependencies": ["permission:serial"],
-    "contexts": ["privileged_extension"]
-  },
   "socket": {
     "dependencies": ["permission:socket"],
     "contexts": ["privileged_extension"]
@@ -866,11 +862,6 @@
     "channel": "stable",
     "extension_types": ["extension", "legacy_packaged_app", "platform_app"],
     "contexts": ["privileged_extension"]
-  },
-  "usb": {
-    "dependencies": ["permission:usb"],
-    "contexts": ["privileged_extension"],
-    "platforms": ["chromeos"]
   },
   "userScripts": {
     "dependencies": [ "permission:userScripts" ],

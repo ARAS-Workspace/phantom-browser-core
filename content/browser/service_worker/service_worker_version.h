@@ -974,9 +974,7 @@ class CONTENT_EXPORT ServiceWorkerVersion
   void OnStarting() override;
   void OnStartWorkerMessageSent() override;
   void OnStarted(blink::mojom::ServiceWorkerStartStatus status,
-                 FetchHandlerType new_fetch_handler_type,
-                 bool new_has_hid_event_handlers,
-                 bool new_has_usb_event_handlers) override;
+                 FetchHandlerType new_fetch_handler_type) override;
   void OnStopping() override;
   void OnStopped(blink::EmbeddedWorkerStatus old_status) override;
   void OnDetached(blink::EmbeddedWorkerStatus old_status) override;

@@ -77,14 +77,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, Checkbox) {
   RunTest("settings/checkbox_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsTest, ChooserExceptionList) {
-  RunTest("settings/chooser_exception_list_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, ChooserExceptionListEntry) {
-  RunTest("settings/chooser_exception_list_entry_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SettingsTest, CollapseRadioButton) {
   RunTest("settings/collapse_radio_button_test.js", "mocha.run()");
 }
@@ -395,11 +387,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, SiteDataTest) {
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, SiteDetailsPermission) {
   RunTest("settings/site_details_permission_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, SiteDetailsPermissionDeviceEntry) {
-  RunTest("settings/site_details_permission_device_entry_test.js",
-          "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, SiteEntry) {

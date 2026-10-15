@@ -6,11 +6,9 @@
 #define CHROME_BROWSER_PERFORMANCE_MANAGER_DECORATORS_HELPERS_PAGE_LIVE_STATE_DECORATOR_HELPER_H_
 
 #include "base/callback_list.h"
-#include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/sequence_checker.h"
 #include "chrome/browser/media/webrtc/media_stream_capture_indicator.h"
-#include "components/performance_manager/public/performance_manager_observer.h"
 #include "content/public/browser/devtools_agent_host.h"
 
 namespace performance_manager {
@@ -21,7 +19,6 @@ class ActiveTabObserver;
 
 class PageLiveStateDecoratorHelper
     : public MediaStreamCaptureIndicator::Observer,
-      public PerformanceManagerObserver,
       public content::DevToolsAgentHostObserver {
  public:
   PageLiveStateDecoratorHelper();
@@ -51,20 +48,7 @@ class PageLiveStateDecoratorHelper
   void DevToolsAgentHostDetached(
       content::DevToolsAgentHost* agent_host) override;
 
-  // PerformanceManagerObserver:
-  void OnPageNodeCreatedForWebContents(
-      content::WebContents* web_contents) override;
-
  private:
-  class WebContentsObserver;
-
-  // Linked list of WebContentsObservers created by this
-  // PageLiveStateDecoratorHelper. Each WebContentsObservers removes itself from
-  // the list and destroys itself when its associated WebContents is destroyed.
-  // Additionally, all WebContentsObservers that are still in this list when the
-  // destructor of PageLiveStateDecoratorHelper is invoked are destroyed.
-  raw_ptr<WebContentsObserver> first_web_contents_observer_ = nullptr;
-
   std::unique_ptr<ActiveTabObserver> active_tab_observer_;
 
   SEQUENCE_CHECKER(sequence_checker_);

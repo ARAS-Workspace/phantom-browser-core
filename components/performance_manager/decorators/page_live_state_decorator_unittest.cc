@@ -23,7 +23,6 @@
 #include "components/performance_manager/test_support/decorators_utils.h"
 #include "components/performance_manager/test_support/performance_manager_test_harness.h"
 #include "content/public/browser/web_contents.h"
-#include "content/public/browser/web_contents_capability_type.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -48,10 +47,6 @@ class TestPageLiveStateObserver : public PageLiveStateObserver {
 
   enum class ObserverFunction {
     kNone,
-    kOnIsConnectedToUSBDeviceChanged,
-    kOnIsConnectedToBluetoothDeviceChanged,
-    kOnIsConnectedToHidDeviceChanged,
-    kOnIsConnectedToSerialPortChanged,
     kOnIsCapturingVideoChanged,
     kOnIsCapturingAudioChanged,
     kOnIsBeingMirroredChanged,
@@ -64,27 +59,6 @@ class TestPageLiveStateObserver : public PageLiveStateObserver {
     kOnUpdatedTitleOrFaviconInBackgroundChanged,
   };
 
-  void OnIsConnectedToUSBDeviceChanged(const PageNode* page_node) override {
-    latest_function_called_ =
-        ObserverFunction::kOnIsConnectedToUSBDeviceChanged;
-    page_node_passed_ = page_node;
-  }
-  void OnIsConnectedToBluetoothDeviceChanged(
-      const PageNode* page_node) override {
-    latest_function_called_ =
-        ObserverFunction::kOnIsConnectedToBluetoothDeviceChanged;
-    page_node_passed_ = page_node;
-  }
-  void OnIsConnectedToHidDeviceChanged(const PageNode* page_node) override {
-    latest_function_called_ =
-        ObserverFunction::kOnIsConnectedToHidDeviceChanged;
-    page_node_passed_ = page_node;
-  }
-  void OnIsConnectedToSerialPortChanged(const PageNode* page_node) override {
-    latest_function_called_ =
-        ObserverFunction::kOnIsConnectedToSerialPortChanged;
-    page_node_passed_ = page_node;
-  }
   void OnIsCapturingVideoChanged(const PageNode* page_node) override {
     latest_function_called_ = ObserverFunction::kOnIsCapturingVideoChanged;
     page_node_passed_ = page_node;
@@ -144,7 +118,7 @@ class TestPageLiveStateObserver : public PageLiveStateObserver {
 class MockPageLiveStateObserver : public PageLiveStateObserver {
  public:
   MOCK_METHOD(void,
-              OnIsConnectedToUSBDeviceChanged,
+              OnIsCapturingVideoChanged,
               (const PageNode* page_node),
               (override));
 };
@@ -210,65 +184,6 @@ class PageLiveStateDecoratorTest : public PerformanceManagerTestHarness {
  private:
   std::optional<TestPageLiveStateObserver> observer_;
 };
-
-TEST_F(PageLiveStateDecoratorTest, Usb) {
-  EXPECT_FALSE(PageLiveStateDecorator::IsConnectedToUSBDevice(web_contents()));
-  auto setter = [](content::WebContents* contents, bool value) {
-    PageLiveStateDecorator::OnCapabilityTypesChanged(
-        contents, content::WebContentsCapabilityType::kUSB, value);
-    EXPECT_EQ(PageLiveStateDecorator::IsConnectedToUSBDevice(contents), value);
-  };
-  testing::EndToEndBooleanPropertyTest(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToUSBDevice, setter);
-  VerifyObserverExpectation(TestPageLiveStateObserver::ObserverFunction::
-                                kOnIsConnectedToUSBDeviceChanged);
-}
-
-TEST_F(PageLiveStateDecoratorTest, Bluetooth) {
-  EXPECT_FALSE(
-      PageLiveStateDecorator::IsConnectedToBluetoothDevice(web_contents()));
-  auto setter = [](content::WebContents* contents, bool value) {
-    PageLiveStateDecorator::OnCapabilityTypesChanged(
-        contents, content::WebContentsCapabilityType::kBluetoothConnected,
-        value);
-    EXPECT_EQ(PageLiveStateDecorator::IsConnectedToBluetoothDevice(contents),
-              value);
-  };
-  testing::EndToEndBooleanPropertyTest(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToBluetoothDevice, setter);
-  VerifyObserverExpectation(TestPageLiveStateObserver::ObserverFunction::
-                                kOnIsConnectedToBluetoothDeviceChanged);
-}
-
-TEST_F(PageLiveStateDecoratorTest, Hid) {
-  EXPECT_FALSE(PageLiveStateDecorator::IsConnectedToHidDevice(web_contents()));
-  auto setter = [](content::WebContents* contents, bool value) {
-    PageLiveStateDecorator::OnCapabilityTypesChanged(
-        contents, content::WebContentsCapabilityType::kHID, value);
-    EXPECT_EQ(PageLiveStateDecorator::IsConnectedToHidDevice(contents), value);
-  };
-  testing::EndToEndBooleanPropertyTest(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToHidDevice, setter);
-  VerifyObserverExpectation(TestPageLiveStateObserver::ObserverFunction::
-                                kOnIsConnectedToHidDeviceChanged);
-}
-
-TEST_F(PageLiveStateDecoratorTest, Serial) {
-  EXPECT_FALSE(PageLiveStateDecorator::IsConnectedToSerialPort(web_contents()));
-  auto setter = [](content::WebContents* contents, bool value) {
-    PageLiveStateDecorator::OnCapabilityTypesChanged(
-        contents, content::WebContentsCapabilityType::kSerial, value);
-    EXPECT_EQ(PageLiveStateDecorator::IsConnectedToSerialPort(contents), value);
-  };
-  testing::EndToEndBooleanPropertyTest(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToSerialPort, setter);
-  VerifyObserverExpectation(TestPageLiveStateObserver::ObserverFunction::
-                                kOnIsConnectedToSerialPortChanged);
-}
 
 TEST_F(PageLiveStateDecoratorTest, OnIsCapturingVideoChanged) {
   EXPECT_FALSE(PageLiveStateDecorator::IsCapturingVideo(web_contents()));
@@ -570,9 +485,9 @@ TEST_F(PageLiveStateDecoratorTest, AllPageObservers) {
   EXPECT_TRUE(PageLiveStateDecorator::HasAllPageObserver(&observer1));
 
   // `observer1` should be notified about change to `page1`.
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page1.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page1.get()));
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page1.get())
-      ->SetIsConnectedToUSBDeviceForTesting(true);
+      ->SetIsCapturingVideoForTesting(true);
   ::testing::Mock::VerifyAndClear(&observer1);
 
   auto contents2 = CreateTestWebContents();
@@ -581,26 +496,26 @@ TEST_F(PageLiveStateDecoratorTest, AllPageObservers) {
   ASSERT_TRUE(page2);
 
   // `observer1` should be notified about changes to both pages.
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page1.get()));
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page2.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page1.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page2.get()));
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page1.get())
-      ->SetIsConnectedToUSBDeviceForTesting(false);
+      ->SetIsCapturingVideoForTesting(false);
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page2.get())
-      ->SetIsConnectedToUSBDeviceForTesting(true);
+      ->SetIsCapturingVideoForTesting(true);
   ::testing::Mock::VerifyAndClear(&observer1);
 
   PageLiveStateDecorator::AddAllPageObserver(&observer2);
   EXPECT_TRUE(PageLiveStateDecorator::HasAllPageObserver(&observer2));
 
   // Both observers should be notified about changes to both pages.
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page1.get()));
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page2.get()));
-  EXPECT_CALL(observer2, OnIsConnectedToUSBDeviceChanged(page1.get()));
-  EXPECT_CALL(observer2, OnIsConnectedToUSBDeviceChanged(page2.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page1.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page2.get()));
+  EXPECT_CALL(observer2, OnIsCapturingVideoChanged(page1.get()));
+  EXPECT_CALL(observer2, OnIsCapturingVideoChanged(page2.get()));
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page1.get())
-      ->SetIsConnectedToUSBDeviceForTesting(true);
+      ->SetIsCapturingVideoForTesting(true);
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page2.get())
-      ->SetIsConnectedToUSBDeviceForTesting(false);
+      ->SetIsCapturingVideoForTesting(false);
   ::testing::Mock::VerifyAndClear(&observer1);
   ::testing::Mock::VerifyAndClear(&observer2);
 
@@ -608,10 +523,10 @@ TEST_F(PageLiveStateDecoratorTest, AllPageObservers) {
   EXPECT_FALSE(page1);
 
   // Both observers should be notified about changes to `page2`.
-  EXPECT_CALL(observer1, OnIsConnectedToUSBDeviceChanged(page2.get()));
-  EXPECT_CALL(observer2, OnIsConnectedToUSBDeviceChanged(page2.get()));
+  EXPECT_CALL(observer1, OnIsCapturingVideoChanged(page2.get()));
+  EXPECT_CALL(observer2, OnIsCapturingVideoChanged(page2.get()));
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page2.get())
-      ->SetIsConnectedToUSBDeviceForTesting(true);
+      ->SetIsCapturingVideoForTesting(true);
   ::testing::Mock::VerifyAndClear(&observer1);
   ::testing::Mock::VerifyAndClear(&observer2);
 
@@ -623,9 +538,9 @@ TEST_F(PageLiveStateDecoratorTest, AllPageObservers) {
   EXPECT_FALSE(PageLiveStateDecorator::HasAllPageObserver(&observer1));
 
   // `observer2` should be notified about change to `page2`.
-  EXPECT_CALL(observer2, OnIsConnectedToUSBDeviceChanged(page2.get()));
+  EXPECT_CALL(observer2, OnIsCapturingVideoChanged(page2.get()));
   PageLiveStateDecorator::Data::GetOrCreateForPageNode(page2.get())
-      ->SetIsConnectedToUSBDeviceForTesting(false);
+      ->SetIsCapturingVideoForTesting(false);
   ::testing::Mock::VerifyAndClear(&observer1);
 
   // Removing the last node should not crash, even though there's still an

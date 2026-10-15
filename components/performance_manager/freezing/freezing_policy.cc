@@ -57,26 +57,6 @@ bool HasCannotFreezeReasonForType(
               .empty();
 }
 
-bool IsPageConnectedToUSBDevice(const PageNode* page_node) {
-  return PageLiveStateDecorator::Data::FromPageNode(page_node)
-      ->IsConnectedToUSBDevice();
-}
-
-bool IsPageConnectedToBluetoothDevice(const PageNode* page_node) {
-  return PageLiveStateDecorator::Data::FromPageNode(page_node)
-      ->IsConnectedToBluetoothDevice();
-}
-
-bool IsPageConnectedToHidDevice(const PageNode* page_node) {
-  return PageLiveStateDecorator::Data::FromPageNode(page_node)
-      ->IsConnectedToHidDevice();
-}
-
-bool IsPageConnectedToSerialPort(const PageNode* page_node) {
-  return PageLiveStateDecorator::Data::FromPageNode(page_node)
-      ->IsConnectedToSerialPort();
-}
-
 bool IsPageCapturingVideo(const PageNode* page_node) {
   return PageLiveStateDecorator::Data::FromPageNode(page_node)
       ->IsCapturingVideo();
@@ -585,10 +565,6 @@ void FreezingPolicy::OnPageNodeAdded(const PageNode* page_node) {
   DCHECK(!page_node->IsHoldingBlockingIndexedDBLock());
   DCHECK_EQ(page_node->GetLoadingState(),
             PageNode::LoadingState::kLoadingNotStarted);
-  DCHECK(!IsPageConnectedToUSBDevice(page_node));
-  DCHECK(!IsPageConnectedToBluetoothDevice(page_node));
-  DCHECK(!IsPageConnectedToHidDevice(page_node));
-  DCHECK(!IsPageConnectedToSerialPort(page_node));
   DCHECK(!IsPageCapturingVideo(page_node));
   DCHECK(!IsPageCapturingAudio(page_node));
   DCHECK(!IsPageBeingMirrored(page_node));
@@ -902,34 +878,6 @@ void FreezingPolicy::OnFrameNodeRemoved(
 }
 
 void FreezingPolicy::OnIsAudibleChanged(const FrameNode* frame_node) {}
-
-void FreezingPolicy::OnIsConnectedToUSBDeviceChanged(
-    const PageNode* page_node) {
-  OnCannotFreezeReasonChange(page_node,
-                             /*add=*/IsPageConnectedToUSBDevice(page_node),
-                             CannotFreezeReason::kConnectedToUsbDevice);
-}
-
-void FreezingPolicy::OnIsConnectedToBluetoothDeviceChanged(
-    const PageNode* page_node) {
-  OnCannotFreezeReasonChange(
-      page_node, /*add=*/IsPageConnectedToBluetoothDevice(page_node),
-      CannotFreezeReason::kConnectedToBluetoothDevice);
-}
-
-void FreezingPolicy::OnIsConnectedToHidDeviceChanged(
-    const PageNode* page_node) {
-  OnCannotFreezeReasonChange(page_node,
-                             /*add=*/IsPageConnectedToHidDevice(page_node),
-                             CannotFreezeReason::kConnectedToHidDevice);
-}
-
-void FreezingPolicy::OnIsConnectedToSerialPortChanged(
-    const PageNode* page_node) {
-  OnCannotFreezeReasonChange(page_node,
-                             /*add=*/IsPageConnectedToSerialPort(page_node),
-                             CannotFreezeReason::kConnectedToSerialPort);
-}
 
 void FreezingPolicy::OnIsCapturingVideoChanged(const PageNode* page_node) {
   OnCannotFreezeReasonChange(page_node, /*add=*/IsPageCapturingVideo(page_node),

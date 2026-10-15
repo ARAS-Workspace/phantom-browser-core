@@ -13,7 +13,6 @@
 #include "components/performance_manager/public/graph/graph_registered.h"
 #include "components/performance_manager/public/graph/node_data_describer.h"
 #include "components/performance_manager/public/graph/page_node.h"
-#include "content/public/browser/web_contents_capability_type.h"
 
 namespace content {
 class WebContents;
@@ -59,12 +58,6 @@ class PageLiveStateDecorator
   // Returns whether `observer` is observing all PageNodes.
   static bool HasAllPageObserver(PageLiveStateObserver* observer);
 
-  // Must be called when the capability types used by `contents` change.
-  static void OnCapabilityTypesChanged(
-      content::WebContents* contents,
-      content::WebContentsCapabilityType capability_type,
-      bool used);
-
   // Functions that should be called by a MediaStreamCaptureIndicator::Observer.
   static void OnIsCapturingVideoChanged(content::WebContents* contents,
                                         bool is_capturing_video);
@@ -99,10 +92,6 @@ class PageLiveStateDecorator
 
   // Convenience functions to look up the given properties from the
   // PageLiveStateDecorator::Data for the given `contents`.
-  static bool IsConnectedToUSBDevice(content::WebContents* contents);
-  static bool IsConnectedToBluetoothDevice(content::WebContents* contents);
-  static bool IsConnectedToHidDevice(content::WebContents* contents);
-  static bool IsConnectedToSerialPort(content::WebContents* contents);
   static bool IsCapturingVideo(content::WebContents* contents);
   static bool IsCapturingAudio(content::WebContents* contents);
   static bool IsBeingMirrored(content::WebContents* contents);
@@ -149,10 +138,6 @@ class PageLiveStateDecorator::Data {
   void AddObserver(PageLiveStateObserver* observer);
   void RemoveObserver(PageLiveStateObserver* observer);
 
-  virtual bool IsConnectedToUSBDevice() const = 0;
-  virtual bool IsConnectedToBluetoothDevice() const = 0;
-  virtual bool IsConnectedToHidDevice() const = 0;
-  virtual bool IsConnectedToSerialPort() const = 0;
   virtual bool IsCapturingVideo() const = 0;
   virtual bool IsCapturingAudio() const = 0;
   virtual bool IsBeingMirrored() const = 0;
@@ -168,10 +153,6 @@ class PageLiveStateDecorator::Data {
   static const Data* FromPageNode(const PageNode* page_node);
   static Data* GetOrCreateForPageNode(const PageNode* page_node);
 
-  virtual void SetIsConnectedToUSBDeviceForTesting(bool value) = 0;
-  virtual void SetIsConnectedToBluetoothDeviceForTesting(bool value) = 0;
-  virtual void SetIsConnectedToHidDeviceForTesting(bool value) = 0;
-  virtual void SetIsConnectedToSerialPortForTesting(bool value) = 0;
   virtual void SetIsCapturingVideoForTesting(bool value) = 0;
   virtual void SetIsCapturingAudioForTesting(bool value) = 0;
   virtual void SetIsBeingMirroredForTesting(bool value) = 0;
@@ -198,11 +179,6 @@ class PageLiveStateObserver : public base::CheckedObserver {
   PageLiveStateObserver(const PageLiveStateObserver& other) = delete;
   PageLiveStateObserver& operator=(const PageLiveStateObserver&) = delete;
 
-  virtual void OnIsConnectedToUSBDeviceChanged(const PageNode* page_node) {}
-  virtual void OnIsConnectedToBluetoothDeviceChanged(
-      const PageNode* page_node) {}
-  virtual void OnIsConnectedToHidDeviceChanged(const PageNode* page_node) {}
-  virtual void OnIsConnectedToSerialPortChanged(const PageNode* page_node) {}
   virtual void OnIsCapturingVideoChanged(const PageNode* page_node) {}
   virtual void OnIsCapturingAudioChanged(const PageNode* page_node) {}
   virtual void OnIsBeingMirroredChanged(const PageNode* page_node) {}

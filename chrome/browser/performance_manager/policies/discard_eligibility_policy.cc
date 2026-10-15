@@ -132,9 +132,7 @@ bool DiscardEligibilityPolicy::WillDiscardBePerceptible(
         live_state_data->IsCapturingAudio() ||
         live_state_data->IsBeingMirrored() ||
         live_state_data->IsCapturingWindow() ||
-        live_state_data->IsCapturingDisplay() ||
-        live_state_data->IsConnectedToBluetoothDevice() ||
-        live_state_data->IsConnectedToUSBDevice()) {
+        live_state_data->IsCapturingDisplay()) {
       return true;
     }
   }
@@ -367,14 +365,6 @@ DiscardEligibilityPolicy::CanDiscardWithCustomRecentVisibilityWindow(
     }
     if (live_state_data->IsCapturingDisplay()) {
       add_reason_and_update_result(CannotDiscardReason::kCapturingDisplay,
-                                   CanDiscardResult::kProtected);
-    }
-    if (live_state_data->IsConnectedToBluetoothDevice()) {
-      add_reason_and_update_result(CannotDiscardReason::kConnectedToBluetooth,
-                                   CanDiscardResult::kProtected);
-    }
-    if (live_state_data->IsConnectedToUSBDevice()) {
-      add_reason_and_update_result(CannotDiscardReason::kConnectedToUSB,
                                    CanDiscardResult::kProtected);
     }
     // Don't discard the active tab in any window, even if the window is not

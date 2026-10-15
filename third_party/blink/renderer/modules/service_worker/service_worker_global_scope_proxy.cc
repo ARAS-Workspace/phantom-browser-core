@@ -319,14 +319,6 @@ ServiceWorkerGlobalScopeProxy::FetchHandlerType() {
   return WorkerGlobalScope()->FetchHandlerType();
 }
 
-bool ServiceWorkerGlobalScopeProxy::HasHidEventHandlers() {
-  return WorkerGlobalScope()->HasHidEventHandlers();
-}
-
-bool ServiceWorkerGlobalScopeProxy::HasUsbEventHandlers() {
-  return WorkerGlobalScope()->HasUsbEventHandlers();
-}
-
 void ServiceWorkerGlobalScopeProxy::GetRemoteAssociatedInterface(
     const WebString& name,
     mojo::ScopedInterfaceEndpointHandle handle) {

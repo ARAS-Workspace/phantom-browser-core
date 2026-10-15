@@ -18,7 +18,6 @@
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 
 namespace content {
-enum class WebContentsCapabilityType;
 class WebContents;
 }  // namespace content
 
@@ -79,9 +78,6 @@ class TabAlertController : public tabs::ContentsObservingTabFeature,
   void OnDiscardContents(TabInterface* tab_interface,
                          content::WebContents* old_contents,
                          content::WebContents* new_contents) override;
-  void OnCapabilityTypesChanged(
-      content::WebContentsCapabilityType capability_type,
-      bool used) override;
   void MediaPictureInPictureChanged(bool is_picture_in_picture) override;
   void DidUpdateAudioMutingState(bool muted) override;
 

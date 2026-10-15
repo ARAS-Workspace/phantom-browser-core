@@ -138,12 +138,6 @@ export class SiteDetailsElement extends SiteDetailsElementBase {
         },
       },
 
-      enableWebBluetoothNewPermissionsBackend_: {
-        type: Boolean,
-        value: () =>
-            loadTimeData.getBoolean('enableWebBluetoothNewPermissionsBackend'),
-      },
-
       // <if expr="is_chromeos">
       enableSmartCardReadersContentSetting_: {
         type: Boolean,
@@ -223,7 +217,6 @@ export class SiteDetailsElement extends SiteDetailsElementBase {
   declare private rwsMembership_: string;
   declare private rwsEnterprisePref_: chrome.settingsPrivate.PrefObject;
   declare private enableExperimentalWebPlatformFeatures_: boolean;
-  declare private enableWebBluetoothNewPermissionsBackend_: boolean;
   // <if expr="is_chromeos">
   declare private enableSmartCardReadersContentSetting_: boolean;
   declare private enableWebPrintingContentSetting_: boolean;

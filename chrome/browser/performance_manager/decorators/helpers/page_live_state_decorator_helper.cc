@@ -4,21 +4,17 @@
 
 #include "chrome/browser/performance_manager/decorators/helpers/page_live_state_decorator_helper.h"
 
-#include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
-#include "components/performance_manager/public/decorators/page_live_state_decorator.h"
-#include "components/performance_manager/public/features.h"
-#include "components/performance_manager/public/performance_manager.h"
-#include "components/permissions/permissions_client.h"
-#include "content/public/browser/web_contents_observer.h"
-
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
+#include "components/performance_manager/public/decorators/page_live_state_decorator.h"
+#include "components/performance_manager/public/features.h"
+#include "components/permissions/permissions_client.h"
 
 namespace performance_manager {
 namespace {
@@ -96,76 +92,8 @@ class ActiveTabObserver : public TabStripModelObserver,
 };
 
 }  // namespace
-// Listens to content::WebContentsObserver notifications for a given WebContents
-// and updates the PageLiveStateDecorator accordingly. Destroys itself when the
-// WebContents it observes is destroyed.
-class PageLiveStateDecoratorHelper::WebContentsObserver
-    : public content::WebContentsObserver {
- public:
-  explicit WebContentsObserver(content::WebContents* web_contents,
-                               PageLiveStateDecoratorHelper* outer)
-      : content::WebContentsObserver(web_contents),
-        outer_(outer),
-        prev_(nullptr),
-        next_(outer->first_web_contents_observer_) {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    if (next_) {
-      DCHECK(!next_->prev_);
-      next_->prev_ = this;
-    }
-    outer_->first_web_contents_observer_ = this;
-  }
-
-  WebContentsObserver(const WebContentsObserver&) = delete;
-  WebContentsObserver& operator=(const WebContentsObserver&) = delete;
-
-  ~WebContentsObserver() override {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  }
-
-  // content::WebContentsObserver:
-  void OnCapabilityTypesChanged(
-      content::WebContentsCapabilityType capability_type,
-      bool used) override {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    PageLiveStateDecorator::OnCapabilityTypesChanged(web_contents(),
-                                                     capability_type, used);
-  }
-
-  void WebContentsDestroyed() override {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    DetachAndDestroy();
-  }
-
-  // Removes the WebContentsObserver from the linked list and deletes it.
-  void DetachAndDestroy() {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    if (prev_) {
-      DCHECK_EQ(prev_->next_, this);
-      prev_->next_ = next_;
-    } else {
-      DCHECK_EQ(outer_->first_web_contents_observer_, this);
-      outer_->first_web_contents_observer_ = next_;
-    }
-    if (next_) {
-      DCHECK_EQ(next_->prev_, this);
-      next_->prev_ = prev_;
-    }
-
-    delete this;
-  }
-
- private:
-  const raw_ptr<PageLiveStateDecoratorHelper> outer_;
-  raw_ptr<WebContentsObserver> prev_;
-  raw_ptr<WebContentsObserver> next_;
-
-  SEQUENCE_CHECKER(sequence_checker_);
-};
 
 PageLiveStateDecoratorHelper::PageLiveStateDecoratorHelper() {
-  PerformanceManager::AddObserver(this);
-
   MediaCaptureDevicesDispatcher::GetInstance()
       ->GetMediaStreamCaptureIndicator()
       ->AddObserver(this);
@@ -173,7 +101,6 @@ PageLiveStateDecoratorHelper::PageLiveStateDecoratorHelper() {
   active_tab_observer_ = std::make_unique<ActiveTabObserver>();
 
   content::DevToolsAgentHost::AddObserver(this);
-
 }
 
 PageLiveStateDecoratorHelper::~PageLiveStateDecoratorHelper() {
@@ -184,13 +111,6 @@ PageLiveStateDecoratorHelper::~PageLiveStateDecoratorHelper() {
   MediaCaptureDevicesDispatcher::GetInstance()
       ->GetMediaStreamCaptureIndicator()
       ->RemoveObserver(this);
-
-  // Destroy all WebContentsObserver to ensure that PageLiveStateDecorators are
-  // no longer maintained.
-  while (first_web_contents_observer_)
-    first_web_contents_observer_->DetachAndDestroy();
-
-  PerformanceManager::RemoveObserver(this);
 }
 
 void PageLiveStateDecoratorHelper::OnIsCapturingVideoChanged(
@@ -259,15 +179,6 @@ void PageLiveStateDecoratorHelper::DevToolsAgentHostDetached(
     PageLiveStateDecorator::SetIsDevToolsOpen(agent_host->GetWebContents(),
                                               false);
   }
-}
-
-void PageLiveStateDecoratorHelper::OnPageNodeCreatedForWebContents(
-    content::WebContents* web_contents) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(web_contents);
-  // Start observing the WebContents. See comment on
-  // |first_web_contents_observer_| for lifetime management details.
-  new WebContentsObserver(web_contents, this);
 }
 
 }  // namespace performance_manager

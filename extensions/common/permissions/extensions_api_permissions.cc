@@ -130,8 +130,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
          APIPermissionInfo::kFlagCannotBeOptional},
     {APIPermissionID::kPublicSuffix, "publicSuffix",
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
-    {APIPermissionID::kSerial, "serial",
-     APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kSocket, "socket",
      APIPermissionInfo::kFlagCannotBeOptional |
          APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning,
@@ -158,7 +156,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
          APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kUserScripts, "userScripts",
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
-    {APIPermissionID::kUsb, "usb", APIPermissionInfo::kFlagNone},
     {APIPermissionID::kVideoCapture, "videoCapture",
      APIPermissionInfo::kFlagRequiresManagementUIWarning},
     {APIPermissionID::kVirtualKeyboard, "virtualKeyboard"},

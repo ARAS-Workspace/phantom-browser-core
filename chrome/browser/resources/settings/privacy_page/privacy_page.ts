@@ -199,7 +199,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
       case 'siteSettingsAutoPictureInPicture':
       case 'siteSettingsAutoVerify':
       case 'siteSettingsBackgroundSync':
-      case 'siteSettingsBluetoothDevices':
       case 'siteSettingsBluetoothScanning':
       case 'siteSettingsCamera':
       case 'siteSettingsCapturedSurfaceControl':

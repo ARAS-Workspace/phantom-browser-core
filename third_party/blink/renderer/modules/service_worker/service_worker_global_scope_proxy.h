@@ -112,8 +112,6 @@ class ServiceWorkerGlobalScopeProxy final : public WebServiceWorkerContextProxy,
   void DeferPrepareForEvaluation() override;
   void RunDeferredPrepareForEvaluation() override;
   mojom::blink::ServiceWorkerFetchHandlerType FetchHandlerType() override;
-  bool HasHidEventHandlers() override;
-  bool HasUsbEventHandlers() override;
   void GetRemoteAssociatedInterface(
       const WebString& name,
       mojo::ScopedInterfaceEndpointHandle handle) override;

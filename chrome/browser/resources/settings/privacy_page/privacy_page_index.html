@@ -122,18 +122,6 @@
     </settings-background-sync-page>
   </template>
 
-  <template is="dom-if" if="[[enableWebBluetoothNewPermissionsBackend_]]">
-    <template is="dom-if" if="[[renderView_(
-        routes_.SITE_SETTINGS_BLUETOOTH_DEVICES, currentRoute, inSearchMode)]]"
-        update-when-false>
-      <settings-bluetooth-devices-page slot="view"
-          id="siteSettingsBluetoothDevices"
-          route-path$="[[routes_.SITE_SETTINGS_BLUETOOTH_DEVICES.path]]"
-          data-parent-view-id="privacy">
-      </settings-bluetooth-devices-page>
-    </template>
-  </template>
-
   <template is="dom-if" if="[[enableExperimentalWebPlatformFeatures_]]">
     <template is="dom-if" if="[[renderView_(
         routes_.SITE_SETTINGS_BLUETOOTH_SCANNING, currentRoute,

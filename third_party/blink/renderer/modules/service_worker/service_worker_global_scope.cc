@@ -2370,14 +2370,6 @@ ServiceWorkerGlobalScope::FetchHandlerType() {
   return mojom::blink::ServiceWorkerFetchHandlerType::kEmptyFetchHandler;
 }
 
-bool ServiceWorkerGlobalScope::HasHidEventHandlers() {
-  return false;
-}
-
-bool ServiceWorkerGlobalScope::HasUsbEventHandlers() {
-  return false;
-}
-
 void ServiceWorkerGlobalScope::GetRemoteAssociatedInterface(
     const String& name,
     mojo::ScopedInterfaceEndpointHandle handle) {

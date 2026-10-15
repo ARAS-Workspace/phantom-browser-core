@@ -18,7 +18,7 @@ TEST(APIPermissionSetTest, General) {
   apis.insert(APIPermissionID::kDns);
   apis.insert(APIPermissionID::kAlarms);
   apis.insert(APIPermissionID::kPower);
-  apis.insert(APIPermissionID::kSerial);
+  apis.insert(APIPermissionID::kStorage);
 
   EXPECT_EQ(apis.find(APIPermissionID::kPower)->id(), APIPermissionID::kPower);
   EXPECT_TRUE(apis.find(APIPermissionID::kSocket) == apis.end());
@@ -75,7 +75,7 @@ TEST(APIPermissionSetTest, CreateUnion) {
   apis2.insert(APIPermissionID::kAudioCapture);
   apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
-  apis2.insert(APIPermissionID::kSerial);
+  apis2.insert(APIPermissionID::kStorage);
 
   permission = permission_info->CreateAPIPermission();
   {
@@ -90,7 +90,7 @@ TEST(APIPermissionSetTest, CreateUnion) {
   expected_apis.insert(APIPermissionID::kAudioCapture);
   expected_apis.insert(APIPermissionID::kAlarms);
   expected_apis.insert(APIPermissionID::kPower);
-  expected_apis.insert(APIPermissionID::kSerial);
+  expected_apis.insert(APIPermissionID::kStorage);
 
   permission = permission_info->CreateAPIPermission();
   {
@@ -158,7 +158,7 @@ TEST(APIPermissionSetTest, CreateIntersection) {
   apis2.insert(APIPermissionID::kAudioCapture);
   apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
-  apis2.insert(APIPermissionID::kSerial);
+  apis2.insert(APIPermissionID::kStorage);
   permission = permission_info->CreateAPIPermission();
   {
     base::ListValue list;
@@ -226,7 +226,7 @@ TEST(APIPermissionSetTest, CreateDifference) {
   apis2.insert(APIPermissionID::kAudioCapture);
   apis2.insert(APIPermissionID::kAlarms);
   apis2.insert(APIPermissionID::kPower);
-  apis2.insert(APIPermissionID::kSerial);
+  apis2.insert(APIPermissionID::kStorage);
   permission = permission_info->CreateAPIPermission();
   {
     base::ListValue list;

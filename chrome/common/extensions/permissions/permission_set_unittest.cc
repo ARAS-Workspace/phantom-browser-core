@@ -882,7 +882,6 @@ TEST(PermissionsTest, PermissionMessages) {
   skip.insert(APIPermissionID::kFileSystemRetainEntries);
   skip.insert(APIPermissionID::kFileSystemWrite);
   skip.insert(APIPermissionID::kSocket);
-  skip.insert(APIPermissionID::kUsb);
   skip.insert(APIPermissionID::kVirtualKeyboard);
 
   // We already have a generic message for declaring externally_connectable.

@@ -77,7 +77,7 @@ TEST(PermissionSetMojomTraitsTest, BasicAPIPermissionSet) {
   input.insert(mojom::APIPermissionID::kDns);
   input.insert(mojom::APIPermissionID::kAlarms);
   input.insert(mojom::APIPermissionID::kPower);
-  input.insert(mojom::APIPermissionID::kSerial);
+  input.insert(mojom::APIPermissionID::kStorage);
   input.insert(std::move(permission));
 
   APIPermissionSet output;

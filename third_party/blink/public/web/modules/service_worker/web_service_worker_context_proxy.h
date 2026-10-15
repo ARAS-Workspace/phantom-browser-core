@@ -78,8 +78,6 @@ class WebServiceWorkerContextProxy {
   virtual void DeferPrepareForEvaluation() = 0;
   virtual void RunDeferredPrepareForEvaluation() = 0;
   virtual mojom::ServiceWorkerFetchHandlerType FetchHandlerType() = 0;
-  virtual bool HasHidEventHandlers() = 0;
-  virtual bool HasUsbEventHandlers() = 0;
 
   // Passes an associated endpoint handle to the remote end to be bound to a
   // Channel-associated interface named |name|.

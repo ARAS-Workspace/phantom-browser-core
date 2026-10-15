@@ -25,7 +25,7 @@ import {loadTimeData} from '../i18n_setup.js';
 import {routes} from '../route.js';
 import {Router} from '../router.js';
 
-import {ChooserType, ContentSettingsTypes, CookiesExceptionType, SITE_EXCEPTION_WILDCARD} from './constants.js';
+import {ContentSettingsTypes, CookiesExceptionType, SITE_EXCEPTION_WILDCARD} from './constants.js';
 import {getTemplate} from './site_list_entry.html.js';
 import type {SiteException} from './site_settings_browser_proxy.js';
 import {SiteSettingsMixin} from './site_settings_mixin.js';
@@ -72,24 +72,6 @@ export class SiteListEntryElement extends SiteListEntryElementBase {
         type: String,
       },
 
-      /**
-       * If the site represented is part of a chooser exception, the chooser
-       * type will be stored here to allow the permission to be manipulated.
-       */
-      chooserType: {
-        type: String,
-        value: ChooserType.NONE,
-      },
-
-      /**
-       * If the site represented is part of a chooser exception, the chooser
-       * object will be stored here to allow the permission to be manipulated.
-       */
-      chooserObject: {
-        type: Object,
-        value: null,
-      },
-
       showPolicyPrefIndicator_: {
         type: Boolean,
         computed: 'computeShowPolicyPrefIndicator_(model)',
@@ -112,8 +94,6 @@ export class SiteListEntryElement extends SiteListEntryElementBase {
   declare model: SiteException;
   declare private singletonEntry: boolean;
   declare private sectionHeader: string;
-  declare private chooserType: ChooserType;
-  declare private chooserObject: object;
   declare private showPolicyPrefIndicator_: boolean;
   declare private allowNavigateToSiteDetail_: boolean;
   declare cookiesExceptionType: CookiesExceptionType;
@@ -305,24 +285,12 @@ export class SiteListEntryElement extends SiteListEntryElementBase {
   private onResetButtonClick_() {
     this.fire('site-list-entry-reset-click');
 
-    // Use the appropriate method to reset a chooser exception.
-    if (this.chooserType !== ChooserType.NONE && this.chooserObject !== null) {
-      this.browserProxy.resetChooserExceptionForSite(
-          this.chooserType, this.model.origin, this.chooserObject);
-      return;
-    }
-
     this.browserProxy.resetCategoryPermissionForPattern(
         this.model.origin, this.model.embeddingOrigin, this.model.category,
         this.model.incognito);
   }
 
   private onShowActionMenuClick_() {
-    // Chooser exceptions do not support the action menu, so do nothing.
-    if (this.chooserType !== ChooserType.NONE) {
-      return;
-    }
-
     this.fire('show-action-menu', {
       anchor: this.shadowRoot!.querySelector('#actionMenuButton'),
       model: this.model,

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // clang-format off
-import type {CrTooltipElement, StorageAccessEmbeddingException, StorageAccessSiteException, ChooserException, DefaultContentSetting, OriginInfo, RawChooserException, RawSiteException, SiteException, SiteGroup} from 'chrome://settings/lazy_load.js';
+import type {CrTooltipElement, StorageAccessEmbeddingException, StorageAccessSiteException, DefaultContentSetting, OriginInfo, RawChooserException, RawSiteException, SiteGroup} from 'chrome://settings/lazy_load.js';
 import {ChooserType, ContentSetting, DefaultSettingSource, ContentSettingsTypes, SiteSettingSource} from 'chrome://settings/lazy_load.js';
 import type {Route} from 'chrome://settings/settings.js';
 import {Router} from 'chrome://settings/settings.js';
@@ -225,14 +225,6 @@ export function createOriginInfo(
 export function getContentSettingsTypeFromChooserType(chooserType: ChooserType):
     ContentSettingsTypes|null {
   switch (chooserType) {
-    case ChooserType.HID_DEVICES:
-      return ContentSettingsTypes.HID_DEVICES;
-    case ChooserType.SERIAL_PORTS:
-      return ContentSettingsTypes.SERIAL_PORTS;
-    case ChooserType.USB_DEVICES:
-      return ContentSettingsTypes.USB_DEVICES;
-    case ChooserType.BLUETOOTH_DEVICES:
-      return ContentSettingsTypes.BLUETOOTH_DEVICES;
     // <if expr="is_chromeos">
     case ChooserType.SMART_CARD_READERS_DEVICES:
       return ContentSettingsTypes.SMART_CARD_READERS;
@@ -263,31 +255,6 @@ export function assertTooltipIsHidden(tooltip: CrTooltipElement) {
   assertEquals('1px', tooltipStyle.height);
   assertEquals('1px', tooltipStyle.width);
   assertEquals('hidden', tooltipStyle.overflow);
-}
-
-/**
- * Helper to create a mock SiteException.
- * @param origin The origin to use for this SiteException.
- * @param override An object with a subset of the properties of
- *     SiteException. Properties defined in |override| will overwrite the
- *     defaults in this function's return value.
- */
-export function createSiteException(
-    origin: string, override?: Partial<SiteException>): SiteException {
-  return Object.assign(
-      {
-        category: ContentSettingsTypes.USB_DEVICES,
-        embeddingOrigin: origin,
-        incognito: false,
-        origin: origin,
-        displayName: origin,
-        setting: ContentSetting.DEFAULT,
-        settingDetail: null,
-        enforcement: null,
-        controlledBy: chrome.settingsPrivate.ControlledBy.PRIMARY_USER,
-        isEmbargoed: false,
-      },
-      override || {});
 }
 
 /**
@@ -332,27 +299,6 @@ export function createStorageAccessEmbeddingException(
         embeddingDisplayName: embeddingOrigin,
         description: '',
         incognito: false,
-      },
-      override || {});
-}
-
-/**
- * Helper to create a mock ChooserException.
- * @param chooserType The chooser exception type.
- * @param sites A list of SiteExceptions corresponding to the chooser exception.
- * @param override An object with a subset of the properties of
- *     ChooserException. Properties defined in |override| will overwrite
- *     the defaults in this function's return value.
- */
-export function createChooserException(
-    chooserType: ChooserType, sites: SiteException[],
-    override?: Partial<ChooserException>): ChooserException {
-  return Object.assign(
-      {
-        chooserType: chooserType,
-        displayName: '',
-        object: {},
-        sites: sites,
       },
       override || {});
 }

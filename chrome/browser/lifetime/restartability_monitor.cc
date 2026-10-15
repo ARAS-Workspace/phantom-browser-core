@@ -130,12 +130,6 @@ void AddPageLiveStateBlockers(const performance_manager::PageNode* page_node,
   if (data->IsCapturingDisplay()) {
     state.AddBlocker(Blocker::kCapturingDisplay);
   }
-  if (data->IsConnectedToUSBDevice()) {
-    state.AddBlocker(Blocker::kConnectedToUSB);
-  }
-  if (data->IsConnectedToBluetoothDevice()) {
-    state.AddBlocker(Blocker::kConnectedToBluetooth);
-  }
   if (data->IsDevToolsOpen()) {
     state.AddBlocker(Blocker::kDevToolsOpen);
   }

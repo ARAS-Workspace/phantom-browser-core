@@ -331,10 +331,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
 
   mojom::blink::ServiceWorkerFetchHandlerType FetchHandlerType();
 
-  bool HasHidEventHandlers();
-
-  bool HasUsbEventHandlers();
-
   void GetRemoteAssociatedInterface(const String& name,
                                     mojo::ScopedInterfaceEndpointHandle handle);
 

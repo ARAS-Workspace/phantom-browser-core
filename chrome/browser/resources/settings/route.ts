@@ -75,10 +75,6 @@ function addPrivacyChildRoutes(r: Partial<SettingsRoutes>) {
   r.SITE_SETTINGS_NOTIFICATIONS = r.SITE_SETTINGS.createChild('notifications');
   r.SITE_SETTINGS_POPUPS = r.SITE_SETTINGS.createChild('popups');
   r.SITE_SETTINGS_MIDI_DEVICES = r.SITE_SETTINGS.createChild('midiDevices');
-  if (loadTimeData.getBoolean('enableWebBluetoothNewPermissionsBackend')) {
-    r.SITE_SETTINGS_BLUETOOTH_DEVICES =
-        r.SITE_SETTINGS.createChild('bluetoothDevices');
-  }
   r.SITE_SETTINGS_ZOOM_LEVELS = r.SITE_SETTINGS.createChild('zoomLevels');
   r.SITE_SETTINGS_PDF_DOCUMENTS = r.SITE_SETTINGS.createChild('pdfDocuments');
   r.SITE_SETTINGS_PROTECTED_CONTENT =

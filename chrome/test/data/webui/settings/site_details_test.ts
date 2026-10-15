@@ -8,7 +8,7 @@ import {assert} from 'chrome://resources/js/assert.js';
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {SiteDetailsElement, WebsiteUsageBrowserProxy} from 'chrome://settings/lazy_load.js';
-import {ChooserType, ContentSetting, ContentSettingsTypes, JavascriptOptimizerSetting, SiteSettingSource, SiteSettingsBrowserProxyImpl, WebsiteUsageBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
+import {ContentSetting, ContentSettingsTypes, JavascriptOptimizerSetting, SiteSettingSource, SiteSettingsBrowserProxyImpl, WebsiteUsageBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
 import {loadTimeData, MetricsBrowserProxyImpl, PrivacyElementInteractions, Router, routes} from 'chrome://settings/settings.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
@@ -17,7 +17,7 @@ import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 import {TestMetricsBrowserProxy} from './test_metrics_browser_proxy.js';
 import {TestSiteSettingsBrowserProxy} from './test_site_settings_browser_proxy.js';
 import type {SiteSettingsPref} from './test_util.js';
-import {createContentSettingTypeToValuePair, createRawChooserException, createRawSiteException, createSiteSettingsPrefs} from './test_util.js';
+import {createContentSettingTypeToValuePair, createRawSiteException, createSiteSettingsPrefs} from './test_util.js';
 
 // clang-format on
 
@@ -156,9 +156,6 @@ suite('SiteDetails', function() {
               ContentSettingsTypes.FEDERATED_IDENTITY_API,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
-              ContentSettingsTypes.BLUETOOTH_DEVICES,
-              [createRawSiteException('https://foo.com:443')]),
-          createContentSettingTypeToValuePair(
               ContentSettingsTypes.AR,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
@@ -194,13 +191,6 @@ suite('SiteDetails', function() {
           createContentSettingTypeToValuePair(
               ContentSettingsTypes.LOOPBACK_NETWORK,
               [createRawSiteException('https://foo.com:443')]),
-        ],
-        [
-          createContentSettingTypeToValuePair(
-              ContentSettingsTypes.BLUETOOTH_DEVICES,
-              [createRawChooserException(
-                  ChooserType.BLUETOOTH_DEVICES,
-                  [createRawSiteException('https://foo.com:443')])]),
         ]);
 
     browserProxy = new TestSiteSettingsBrowserProxy();

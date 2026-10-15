@@ -40,7 +40,6 @@ suite('PrivacyPageIndex', function() {
           enableSmartCardReadersContentSetting: false,
           enableWebPrintingContentSetting: false,
           // </if>
-          enableWebBluetoothNewPermissionsBackend: false,
           isGuest: false,
           isAdPrivacyAvailable: true,
         },
@@ -334,16 +333,6 @@ suite('PrivacyPageIndex', function() {
           routes.SITE_SETTINGS_ADS, ['siteSettingsAds'], 'privacy');
     });
 
-    test('RoutingBluetoothDevices', async function() {
-      assertFalse(
-          loadTimeData.getBoolean('enableWebBluetoothNewPermissionsBackend'));
-      await createPrivacyPageIndex(
-          {enableWebBluetoothNewPermissionsBackend: true});
-
-      return testViewsForRoute(
-          routes.SITE_SETTINGS_BLUETOOTH_DEVICES,
-          ['siteSettingsBluetoothDevices'], 'privacy');
-    });
     // TODO(https://crbug.com/530054694): Flaky on Linux.
     // <if expr="not is_linux">
     test('RoutingBluetoothScanning', async function() {

@@ -96,7 +96,6 @@ export class TestSiteSettingsBrowserProxy extends TestBrowserProxy implements
       ContentSettingsTypes.AUTOMATIC_DOWNLOADS,
       ContentSettingsTypes.AUTOMATIC_FULLSCREEN,
       ContentSettingsTypes.BACKGROUND_SYNC,
-      ContentSettingsTypes.BLUETOOTH_DEVICES,
       ContentSettingsTypes.BLUETOOTH_SCANNING,
       ContentSettingsTypes.CAMERA,
       ContentSettingsTypes.CLIPBOARD,

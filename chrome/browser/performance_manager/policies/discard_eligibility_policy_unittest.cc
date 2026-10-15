@@ -395,33 +395,6 @@ TEST_F(DiscardEligibilityPolicyTest, TestCannotDiscardPageCapturingDisplay) {
 }
 
 TEST_F(DiscardEligibilityPolicyTest,
-       TestCannotDiscardPageConnectedToBluetoothDevice) {
-  PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node())
-      ->SetIsConnectedToBluetoothDeviceForTesting(true);
-
-  ExpectCanDiscardProtected(page_node(),
-                            {DiscardReason::URGENT, DiscardReason::PROACTIVE,
-                             DiscardReason::SUGGESTED},
-                            CannotDiscardReason::kConnectedToBluetooth);
-  ExpectCanDiscardEligible(
-      page_node(),
-      {DiscardReason::EXTERNAL, DiscardReason::FROZEN_WITH_GROWING_MEMORY});
-}
-
-TEST_F(DiscardEligibilityPolicyTest, TestCannotDiscardIsConnectedToUSBDevice) {
-  PageLiveStateDecorator::Data::GetOrCreateForPageNode(page_node())
-      ->SetIsConnectedToUSBDeviceForTesting(true);
-
-  ExpectCanDiscardProtected(page_node(),
-                            {DiscardReason::URGENT, DiscardReason::PROACTIVE,
-                             DiscardReason::SUGGESTED},
-                            CannotDiscardReason::kConnectedToUSB);
-  ExpectCanDiscardEligible(
-      page_node(),
-      {DiscardReason::EXTERNAL, DiscardReason::FROZEN_WITH_GROWING_MEMORY});
-}
-
-TEST_F(DiscardEligibilityPolicyTest,
        TestCannotDiscardPageWithFormInteractions) {
   frame_node()->SetHadFormInteraction();
 

@@ -24,7 +24,6 @@
 #include "components/tabs/public/tab_alert.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
-#include "content/public/browser/web_contents_capability_type.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 
@@ -271,33 +270,6 @@ void TabAlertController::OnDiscardContents(TabInterface* tab_interface,
           ->RegisterRecentlyAudibleChangedCallback(base::BindRepeating(
               &TabAlertController::OnRecentlyAudibleStateChanged,
               base::Unretained(this)));
-}
-
-void TabAlertController::OnCapabilityTypesChanged(
-    content::WebContentsCapabilityType capability_type,
-    bool used) {
-  static constexpr base::fixed_flat_map<content::WebContentsCapabilityType,
-                                        TabAlert, 5>
-      capability_type_to_alert =
-          base::MakeFixedFlatMap<content::WebContentsCapabilityType, TabAlert>(
-              {{content::WebContentsCapabilityType::kBluetoothConnected,
-                TabAlert::kBluetoothConnected},
-               {content::WebContentsCapabilityType::kBluetoothScanning,
-                TabAlert::kBluetoothScanActive},
-               {content::WebContentsCapabilityType::kUSB,
-                TabAlert::kUsbConnected},
-               {content::WebContentsCapabilityType::kHID,
-                TabAlert::kHidConnected},
-               {content::WebContentsCapabilityType::kSerial,
-                TabAlert::kSerialConnected}});
-
-  if (!capability_type_to_alert.contains(capability_type)) {
-    return;
-  }
-
-  const TabAlert alert = capability_type_to_alert.at(capability_type);
-  ScopedAlertNotifier notifier(this);
-  UpdateAlertState(alert, used);
 }
 
 void TabAlertController::MediaPictureInPictureChanged(

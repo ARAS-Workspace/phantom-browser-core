@@ -1811,8 +1811,6 @@ class NoFetchHandlerClient : public FakeEmbeddedWorkerInstanceClient {
     host()->OnScriptEvaluationStart();
     host()->OnStarted(blink::mojom::ServiceWorkerStartStatus::kNormalCompletion,
                       blink::mojom::ServiceWorkerFetchHandlerType::kNoHandler,
-                      /*has_hid_event_handlers=*/false,
-                      /*has_usb_event_handlers=*/false,
                       helper()->GetNextThreadId(),
                       blink::mojom::EmbeddedWorkerStartTiming::New());
   }
@@ -2401,84 +2399,6 @@ TEST_P(ServiceWorkerVersionStaticRouterTest, SetRouterEvaluator) {
     EXPECT_EQ(second_rule.sources.begin()->type,
               network::mojom::ServiceWorkerRouterSourceType::kFetchEvent);
   }
-}
-
-// An instance client for controlling whether it has hid event handlers or not.
-class HidEventHandlerClient : public FakeEmbeddedWorkerInstanceClient {
- public:
-  HidEventHandlerClient(EmbeddedWorkerTestHelper* helper,
-                        bool has_hid_event_handlers)
-      : FakeEmbeddedWorkerInstanceClient(helper),
-        has_hid_event_handlers_(has_hid_event_handlers) {}
-
-  HidEventHandlerClient(const NoFetchHandlerClient&) = delete;
-  HidEventHandlerClient& operator=(const NoFetchHandlerClient&) = delete;
-
-  void EvaluateScript() override {
-    host()->OnScriptEvaluationStart();
-    host()->OnStarted(
-        blink::mojom::ServiceWorkerStartStatus::kNormalCompletion,
-        blink::mojom::ServiceWorkerFetchHandlerType::kNotSkippable,
-        has_hid_event_handlers_, /*has_usb_event_handlers_=*/false,
-        helper()->GetNextThreadId(),
-        blink::mojom::EmbeddedWorkerStartTiming::New());
-  }
-
- private:
-  bool has_hid_event_handlers_;
-};
-
-TEST_P(ServiceWorkerVersionTest, HasHidEventHandler) {
-  helper_->AddNewPendingInstanceClient<HidEventHandlerClient>(
-      helper_.get(), /*has_hid_event_handlers*/ true);
-  StartServiceWorker(version_.get());
-  EXPECT_TRUE(version_->has_hid_event_handlers());
-}
-
-TEST_P(ServiceWorkerVersionTest, NoHidEventHandler) {
-  helper_->AddNewPendingInstanceClient<HidEventHandlerClient>(
-      helper_.get(), /*has_hid_event_handlers*/ false);
-  StartServiceWorker(version_.get());
-  EXPECT_FALSE(version_->has_hid_event_handlers());
-}
-
-// An instance client for controlling whether it has hid event handlers or not.
-class UsbEventHandlerClient : public FakeEmbeddedWorkerInstanceClient {
- public:
-  UsbEventHandlerClient(EmbeddedWorkerTestHelper* helper,
-                        bool has_usb_event_handlers)
-      : FakeEmbeddedWorkerInstanceClient(helper),
-        has_usb_event_handlers_(has_usb_event_handlers) {}
-
-  UsbEventHandlerClient(const NoFetchHandlerClient&) = delete;
-  UsbEventHandlerClient& operator=(const NoFetchHandlerClient&) = delete;
-
-  void EvaluateScript() override {
-    host()->OnScriptEvaluationStart();
-    host()->OnStarted(
-        blink::mojom::ServiceWorkerStartStatus::kNormalCompletion,
-        blink::mojom::ServiceWorkerFetchHandlerType::kNotSkippable,
-        /*has_hid_event_handlers_=*/false, has_usb_event_handlers_,
-        helper()->GetNextThreadId(),
-        blink::mojom::EmbeddedWorkerStartTiming::New());
-  }
-
- private:
-  bool has_usb_event_handlers_;
-};
-
-TEST_P(ServiceWorkerVersionTest, HasUsbEventHandler) {
-  helper_->AddNewPendingInstanceClient<UsbEventHandlerClient>(
-      helper_.get(), /*has_usb_event_handlers*/ true);
-  StartServiceWorker(version_.get());
-  EXPECT_TRUE(version_->has_usb_event_handlers());
-}
-
-TEST_P(ServiceWorkerVersionTest, NoUsbEventHandler) {
-  helper_->AddNewPendingInstanceClient<UsbEventHandlerClient>(
-      helper_.get(), /*has_usb_event_handlers*/ false);
-  StartServiceWorker(version_.get());
-  EXPECT_FALSE(version_->has_usb_event_handlers());
 }
 
 TEST_P(ServiceWorkerVersionTest, GetInfoDefaultNavigationPreloadState) {

@@ -133,7 +133,7 @@ TEST_F(ContentCapabilitiesManifestTest, InvalidPermission) {
              "clipboardRead",
              "clipboardWrite",
              "unlimitedStorage",
-             "usb"
+             "alarms"
            ]
          })";
 
@@ -150,7 +150,7 @@ TEST_F(ContentCapabilitiesManifestTest, InvalidPermission) {
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kClipboardRead));
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kClipboardWrite));
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kUnlimitedStorage));
-  EXPECT_EQ(0u, info.permissions.count(APIPermissionID::kUsb));
+  EXPECT_EQ(0u, info.permissions.count(APIPermissionID::kAlarms));
 }
 
 TEST_F(ContentCapabilitiesManifestTest, RejectNonHttpsUrlPatterns) {
@@ -199,7 +199,7 @@ TEST_F(ContentCapabilitiesManifestTest, Valid) {
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kClipboardRead));
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kClipboardWrite));
   EXPECT_EQ(1u, info.permissions.count(APIPermissionID::kUnlimitedStorage));
-  EXPECT_EQ(0u, info.permissions.count(APIPermissionID::kUsb));
+  EXPECT_EQ(0u, info.permissions.count(APIPermissionID::kAlarms));
 }
 
 }  // namespace extensions

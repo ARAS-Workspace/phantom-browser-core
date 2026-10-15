@@ -87,10 +87,6 @@ export enum ContentSetting {
  */
 export enum ChooserType {
   NONE = '',
-  USB_DEVICES = 'usb-devices-data',
-  SERIAL_PORTS = 'serial-ports-data',
-  HID_DEVICES = 'hid-devices-data',
-  BLUETOOTH_DEVICES = 'bluetooth-devices-data',
   // <if expr="is_chromeos">
   SMART_CARD_READERS_DEVICES = 'smart-card-readers-data',
   // </if>

@@ -841,7 +841,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       "    'power',"
       "    'cookies',"
       "    'clipboardRead',"
-      "    'usb',"
       "    'storage',"
       "    'gcm',"
       "    'topSites',"

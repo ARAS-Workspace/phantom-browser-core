@@ -162,21 +162,21 @@ TEST_F(TabAlertControllerTest, NotifiedOnAlertShouldShowChanged) {
 
 TEST_F(TabAlertControllerTest, GetAllAlert) {
   SimulateAudioState(true);
-  tab_alert_controller()->OnCapabilityTypesChanged(
-      content::WebContentsCapabilityType::kBluetoothConnected, true);
+  tab_alert_controller()->OnIsBeingMirroredChanged(
+      tab_interface()->GetContents(), true);
   tab_alert_controller()->MediaPictureInPictureChanged(true);
   tab_alert_controller()->DidUpdateAudioMutingState(true);
 
   std::optional<TabAlert> prioritized_alert =
       tab_alert_controller()->GetAlertToShow();
   ASSERT_TRUE(prioritized_alert.has_value());
-  EXPECT_EQ(prioritized_alert.value(), TabAlert::kBluetoothConnected);
+  EXPECT_EQ(prioritized_alert.value(), TabAlert::kTabCapturing);
   EXPECT_EQ(tab_alert_controller()->GetAllActiveAlerts().size(), 4U);
 
   // Verify that the active alerts list is in sorted order
   std::vector<TabAlert> active_alerts =
       tab_alert_controller()->GetAllActiveAlerts();
-  EXPECT_EQ(active_alerts[0], TabAlert::kBluetoothConnected);
+  EXPECT_EQ(active_alerts[0], TabAlert::kTabCapturing);
   EXPECT_EQ(active_alerts[1], TabAlert::kPipPlaying);
   EXPECT_EQ(active_alerts[2], TabAlert::kAudioMuting);
   EXPECT_EQ(active_alerts[3], TabAlert::kAudioPlaying);
@@ -184,13 +184,12 @@ TEST_F(TabAlertControllerTest, GetAllAlert) {
 
 TEST_F(TabAlertControllerTest, AlertIsActive) {
   SimulateAudioState(true);
-  tab_alert_controller()->OnCapabilityTypesChanged(
-      content::WebContentsCapabilityType::kBluetoothConnected, true);
+  tab_alert_controller()->OnIsBeingMirroredChanged(
+      tab_interface()->GetContents(), true);
   tab_alert_controller()->MediaPictureInPictureChanged(true);
 
   EXPECT_TRUE(tab_alert_controller()->IsAlertActive(TabAlert::kAudioPlaying));
-  EXPECT_TRUE(
-      tab_alert_controller()->IsAlertActive(TabAlert::kBluetoothConnected));
+  EXPECT_TRUE(tab_alert_controller()->IsAlertActive(TabAlert::kTabCapturing));
   EXPECT_TRUE(tab_alert_controller()->IsAlertActive(TabAlert::kPipPlaying));
 
   // When the non-prioritized alert is no longer active, the alert controller

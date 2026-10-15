@@ -101,16 +101,6 @@ function getCategoryItemMap(): Map<ContentSettingsTypes, CategoryListItem> {
       disabledLabel: 'siteSettingsBackgroundSyncBlocked',
     },
     {
-      route: routes.SITE_SETTINGS_BLUETOOTH_DEVICES,
-      id: Id.BLUETOOTH_DEVICES,
-      label: 'siteSettingsBluetoothDevices',
-      icon: 'settings:bluetooth',
-      enabledLabel: 'siteSettingsBluetoothDevicesAsk',
-      disabledLabel: 'siteSettingsBluetoothDevicesBlocked',
-      shouldShow: () =>
-          loadTimeData.getBoolean('enableWebBluetoothNewPermissionsBackend'),
-    },
-    {
       route: routes.SITE_SETTINGS_BLUETOOTH_SCANNING,
       id: Id.BLUETOOTH_SCANNING,
       label: 'siteSettingsBluetoothScanning',
@@ -477,7 +467,6 @@ export class SettingsSiteSettingsPageElement extends
               Id.AUTOMATIC_DOWNLOADS,
               Id.PROTOCOL_HANDLERS,
               Id.MIDI_DEVICES,
-              Id.BLUETOOTH_DEVICES,
               Id.FILE_SYSTEM_WRITE,
               Id.CLIPBOARD,
               Id.PAYMENT_HANDLER,
