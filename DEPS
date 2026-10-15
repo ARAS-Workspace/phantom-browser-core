@@ -3537,12 +3537,6 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/chrome/browser/enterprise/connectors/internal': {
-      'url': Var('chrome_git') + '/chrome/browser/enterprise/connectors/internal.git' + '@' +
-        '7fd7c8dd496740724d0024408ae7a96298e34aa2',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/chrome/browser/glic/resources/internal': {
       'url': Var('chrome_git') + '/chrome/browser/glic/resources/internal.git' + '@' +
          '95f6df7236aeabbcc0409bf3f7e4c284ca3f2e72',

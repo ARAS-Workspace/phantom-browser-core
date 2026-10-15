@@ -25,7 +25,6 @@ inline constexpr std::array kSeparateRepositoryPaths = {
     "chrome/app/theme/default_100_percent/google_chrome/",
     "chrome/app/theme/default_200_percent/google_chrome/",
     "chrome/app/theme/google_chrome/",
-    "chrome/browser/enterprise/connectors/internal/",
     "chrome/browser/google/linkdoctor_internal/",
     "chrome/browser/internal/",
     "chrome/browser/media/engagement_internal/",
