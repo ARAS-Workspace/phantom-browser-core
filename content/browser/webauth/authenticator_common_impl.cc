@@ -2053,8 +2053,7 @@ void AuthenticatorCommonImpl::
     std::move(callback).Run(false);
     return;
   }
-  // Desktop Chrome can always show GPM passkeys through conditional mediation.
-  std::move(callback).Run(true);
+  std::move(callback).Run(false);
 }
 
 void AuthenticatorCommonImpl::Report(

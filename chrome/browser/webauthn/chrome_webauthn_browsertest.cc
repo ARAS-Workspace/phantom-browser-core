@@ -315,6 +315,20 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, ReportInvalidStrings) {
       testing::HasSubstr("Invalid base64url string for credentialId."));
 }
 
+IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, ConditionalMediationUnavailable) {
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(
+      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+
+  EXPECT_EQ(false, content::EvalJs(
+                       web_contents,
+                       "PublicKeyCredential.isConditionalMediationAvailable()"));
+  EXPECT_EQ(false, content::EvalJs(web_contents, R"(
+  PublicKeyCredential.getClientCapabilities().then(c => c.conditionalGet);
+  )"));
+}
+
 class WebAuthnHintsTest : public WebAuthnBrowserTest {
   class Observer : public ChromeAuthenticatorRequestDelegate::TestObserver {
    public:

@@ -2531,13 +2531,7 @@ TEST_F(AuthenticatorContentBrowserClientTest,
        GetClientCapabilities_ConditionalGet_ReturnsFalse) {
   NavigateAndCommit(GURL(kTestOrigin1));
   ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
-  ExpectCapability(capabilities, client_capabilities::kConditionalGet, true);
-}
-
-TEST_F(AuthenticatorContentBrowserClientTest,
-       GPMPasskeys_IsConditionalMediationAvailable) {
-  NavigateAndCommit(GURL(kTestOrigin1));
-  ASSERT_TRUE(AuthenticatorIsConditionalMediationAvailable());
+  ExpectCapability(capabilities, client_capabilities::kConditionalGet, false);
 }
 
 // AuthenticatorImplRemoteDesktopClientOverrideTest exercises the
