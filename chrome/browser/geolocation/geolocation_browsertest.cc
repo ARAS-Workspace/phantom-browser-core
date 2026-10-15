@@ -807,3 +807,39 @@ IN_PROC_BROWSER_TEST_P(GeolocationBrowserTest,
 
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(GeolocationBrowserTest);
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(GeolocationPrerenderBrowserTest);
+
+// Runs without a ScopedGeolocationOverrider: the request reaches
+// GeolocationImpl and its fixed position.
+class GeolocationFixedPositionBrowserTest : public InProcessBrowserTest {
+ public:
+  void SetUpOnMainThread() override {
+    https_test_server_.AddDefaultHandlers(GetChromeTestDataDir());
+    ASSERT_TRUE(https_test_server_.Start());
+  }
+
+ protected:
+  net::EmbeddedTestServer https_test_server_{
+      net::EmbeddedTestServer::TYPE_HTTPS};
+};
+
+IN_PROC_BROWSER_TEST_F(GeolocationFixedPositionBrowserTest,
+                       GetCurrentPositionReturnsFixedPosition) {
+  const GURL url = https_test_server_.GetURL("/geolocation/simple.html");
+  HostContentSettingsMapFactory::GetForProfile(browser()->GetProfile())
+      ->SetPermissionSettingDefaultScope(
+          url, url, content_settings::GeolocationContentSettingsType(),
+          content_settings::PermissionSettingsRegistry::GetInstance()
+              ->Get(content_settings::GeolocationContentSettingsType())
+              ->delegate()
+              .ToPermissionSetting(CONTENT_SETTING_ALLOW));
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
+
+  EXPECT_EQ(
+      "0,0,20",
+      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
+                      "new Promise(resolve => "
+                      "navigator.geolocation.getCurrentPosition("
+                      "p => resolve([p.coords.latitude, p.coords.longitude, "
+                      "p.coords.accuracy].join(',')), "
+                      "e => resolve('error ' + e.code)))"));
+}
