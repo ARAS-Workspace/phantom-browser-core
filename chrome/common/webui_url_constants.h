@@ -385,8 +385,6 @@ inline constexpr char kChromeUISandboxHost[] = "sandbox";
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-inline constexpr char kChromeUIBrowserSwitchHost[] = "browser-switch";
-inline constexpr char kChromeUIBrowserSwitchURL[] = "chrome://browser-switch/";
 inline constexpr char kChromeUIIntroDefaultBrowserSubPage[] = "default-browser";
 inline constexpr char kChromeUIIntroDefaultBrowserURL[] =
     "chrome://intro/default-browser";

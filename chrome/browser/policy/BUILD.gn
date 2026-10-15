@@ -973,10 +973,7 @@ source_set("impl") {
       "cloud/profile_token_policy_web_signin_service_factory.cc",
       "local_sync_policy_handler.cc",
     ]
-    deps += [
-      "//chrome/browser/browser_switcher",
-      "//components/themes:policy",
-    ]
+    deps += [ "//components/themes:policy" ]
   }
 
   if (is_linux) {

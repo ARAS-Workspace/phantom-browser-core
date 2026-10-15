@@ -1009,7 +1009,6 @@
                   '|chrome/browser/ash/arc/enterprise/'\
                   '|chrome/browser/ash/policy/'\
                   '|chrome/browser/policy/'\
-                  '|chrome/test/enterprise'\
                   '|chromeos/ash/components/policy'\
                   '|chromeos/ash/experiences/arc/enterprise/'\
                   '|components/policy/'\

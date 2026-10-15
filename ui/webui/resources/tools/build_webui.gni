@@ -549,7 +549,6 @@ template("build_webui") {
         "//chrome/browser/resources/about_sys",
         "//chrome/browser/resources/accessibility",
         "//chrome/browser/resources/bookmarks",
-        "//chrome/browser/resources/browser_switch",
         "//chrome/browser/resources/certificate_manager",
         "//chrome/browser/resources/certificate_viewer",
         "//chrome/browser/resources/components",

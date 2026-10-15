@@ -345,7 +345,6 @@
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/browser_switcher/browser_switcher_service_factory.h"
 #include "chrome/browser/enterprise/signin/enterprise_signin_service_factory.h"
 #include "chrome/browser/enterprise/signin/oidc_authentication_signin_interceptor_factory.h"
 #include "chrome/browser/enterprise/signin/profile_token_web_signin_interceptor_factory.h"
@@ -540,9 +539,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
 #endif
   browser_actuator::BrowserActuatorServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  browser_switcher::BrowserSwitcherServiceFactory::GetInstance();
-#endif
   browser_sync::UserEventServiceFactory::GetInstance();
   BrowserManagerServiceFactory::GetInstance();
   BrowsingDataHistoryObserverService::Factory::GetInstance();

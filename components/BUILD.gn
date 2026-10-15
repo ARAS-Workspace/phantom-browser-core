@@ -434,10 +434,6 @@ test("components_unittests") {
     deps += [ "//components/enterprise/idle:unit_tests" ]
   }
 
-  if (is_linux || is_mac) {
-    deps += [ "//components/named_system_lock:unit_tests" ]
-  }
-
   deps += [
     "//components/background_sync:unit_tests",
     "//components/blocked_content:unit_tests",

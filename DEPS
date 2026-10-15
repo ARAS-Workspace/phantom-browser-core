@@ -1573,61 +1573,6 @@ deps = {
       ],
   },
 
-  'src/third_party/enterprise_companion/chromium_linux64/cipd': {
-      'dep_type': 'cipd',
-      'condition': 'checkout_linux and non_git_source',
-      'packages': [
-        {
-          'package': 'chromium/third_party/enterprise_companion/chromium_linux64',
-          'version': 'iBA985X_CB5TYlFdZuA4b0lcgjBMpCa3yezk1HgdGzsC',
-        },
-      ],
-  },
-
-  'src/third_party/enterprise_companion/chromium_mac_amd64/cipd': {
-      'dep_type': 'cipd',
-      'condition': 'checkout_mac',
-      'packages': [
-        {
-          'package': 'chromium/third_party/enterprise_companion/chromium_mac_amd64',
-          'version': 'mRJvFMqqvnJNOn5x_vFt8Q_dK1uomIbCXpN5ZaEICP8C',
-        },
-      ],
-  },
-
-  'src/third_party/enterprise_companion/chromium_mac_arm64/cipd': {
-      'dep_type': 'cipd',
-      'condition': 'checkout_mac',
-      'packages': [
-        {
-          'package': 'chromium/third_party/enterprise_companion/chromium_mac_arm64',
-          'version': 'y4ibj8ZUZ5aeP3z4TdXDGFXXu6dMKUEn8juMfAa4GU4C',
-        },
-      ],
-  },
-
-  'src/third_party/enterprise_companion/chromium_win_x86/cipd': {
-      'dep_type': 'cipd',
-      'condition': 'checkout_win',
-      'packages': [
-        {
-          'package': 'chromium/third_party/enterprise_companion/chromium_win_x86',
-          'version': 'jYfrK-P_BYVJ7KJJ5eq1DgxO3UfmMHzM6GurxDEShDgC',
-        },
-      ],
-  },
-
-  'src/third_party/enterprise_companion/chromium_win_x86_64/cipd': {
-      'dep_type': 'cipd',
-      'condition': 'checkout_win',
-      'packages': [
-        {
-          'package': 'chromium/third_party/enterprise_companion/chromium_win_x86_64',
-          'version': 'mnRHkZxdTFxVbv476c09JVUSFZeH5Ud1FPQR7InltZ8C',
-        },
-      ],
-  },
-
   'src/chrome/test/data/autofill/captured_sites/artifacts': {
     'url': Var('chrome_git') + '/chrome/test/captured_sites/autofill.git' + '@' + '27a2afc9520a5a1ee6298ee116ae6ed51364cf1c',
     'condition': 'checkout_chromium_autofill_test_dependencies',

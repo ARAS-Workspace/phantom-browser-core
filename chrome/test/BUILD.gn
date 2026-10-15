@@ -2383,7 +2383,6 @@ test("browser_tests") {
 
   if (is_mac || is_linux) {
     deps += [
-      "//chrome/browser/browser_switcher:browser_tests",
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/webui/signin:browser_tests",
       "//chrome/browser/updates:browser_tests",
@@ -3667,11 +3666,8 @@ test("unit_tests") {
     "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
   ]
 
-  if (is_linux || is_mac) {
-    deps += [ "//chrome/enterprise_companion:constants_prod" ]
-    if (is_mac) {
-      deps += [ "//chrome/updater:browser_sources" ]
-    }
+  if (is_mac) {
+    deps += [ "//chrome/updater:browser_sources" ]
   }
 
   sources += [
@@ -4037,11 +4033,7 @@ test("unit_tests") {
   if (is_linux || is_mac) {
     deps += [
       "../browser/ui/webui/whats_new:mojo_bindings",
-      "//chrome/browser/browser_switcher",
-      "//chrome/browser/browser_switcher:unit_tests",
       "//chrome/browser/enterprise:impl",
-      "//chrome/browser/ui/webui/browser_switch",
-      "//chrome/browser/ui/webui/browser_switch:unit_tests",
       "//chrome/browser/ui/webui/whats_new:unit_tests",
       "//components/user_education/webui",
     ]

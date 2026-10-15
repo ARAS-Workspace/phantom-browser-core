@@ -105,7 +105,6 @@
 #endif  // BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/browser_switcher/browser_switcher_navigation_throttle.h"
 #include "chrome/browser/enterprise/profile_management/oidc_auth_response_capture_navigation_throttle.h"
 #include "chrome/browser/enterprise/profile_management/profile_management_navigation_throttle.h"
 #include "chrome/browser/enterprise/signin/managed_profile_required_navigation_throttle.h"
@@ -356,11 +355,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   web_app::WebUIWebAppNavigationThrottle::MaybeCreateAndAdd(registry);
 
   ImageNavigationThrottle::MaybeCreateAndAdd(registry);
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  browser_switcher::BrowserSwitcherNavigationThrottle::MaybeCreateAndAdd(
-      registry);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
   MaybeCreateAndAddAuthSessionNavigationThrottle(registry);

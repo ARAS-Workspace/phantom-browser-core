@@ -1,12 +1,11 @@
 include_rules = [
   "+chrome/common",
-  "+chrome/enterprise_companion",
+  "+chrome/enterprise_companion/mojom",
   "+chrome/installer/util",
   "+chrome/windows_services/service_program",
   "+components/crash/core/common",
   "+components/crx_file",
   "+components/named_mojo_ipc_server",
-  "+components/named_system_lock",
   "+components/policy",
   "+components/prefs",
   "+components/services/patch",

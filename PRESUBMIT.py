@@ -68,7 +68,6 @@ _HEADER_EXTENSIONS = r'\.(h|hpp|hxx)$'
 
 # Paths with sources that don't use //base.
 _NON_BASE_DEPENDENT_PATHS = (
-    r'^chrome/browser/browser_switcher/bho/',
     r'^tools/win/',
 )
 
@@ -4144,7 +4143,6 @@ def CheckSpamLogging(input_api, output_api):
             r'^chrome/browser/ash/policy/remote_commands/user_command_arc_job\.cc$',
             r'^chrome/browser/chrome_browser_main\.cc$',
             r'^chrome/browser/ui/startup/startup_browser_creator\.cc$',
-            r'^chrome/browser/browser_switcher/bho/.*',
             r'^chrome/browser/diagnostics/diagnostics_writer\.cc$',
             r'^chrome/chrome_elf/dll_hash/dll_hash_main\.cc$',
             r'^chrome/installer/setup/.*',

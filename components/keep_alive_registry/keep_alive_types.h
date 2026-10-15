@@ -64,7 +64,6 @@ enum class KeepAliveOrigin {
   PANEL_VIEW,
   PROFILE_MANAGER,
   USER_MANAGER_VIEW,
-  CREDENTIAL_PROVIDER_SIGNIN_DIALOG,
   WEB_APP_INTENT_PICKER,
 
   // c/b/ui/web_applications

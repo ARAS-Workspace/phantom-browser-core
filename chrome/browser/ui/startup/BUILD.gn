@@ -2,23 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/buildflag_header.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/ui.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
-
-declare_args() {
-  # Allow browser tests that startup with --gcpw-signin flag.
-  # Defaults to !is_chrome_branded, but can be overridden via gn args.
-  can_test_gcpw_signin_startup = !is_chrome_branded
-}
-
-buildflag_header("buildflags") {
-  header = "buildflags.h"
-  flags = [ "CAN_TEST_GCPW_SIGNIN_STARTUP=$can_test_gcpw_signin_startup" ]
-}
 
 # TODO(crbug.com/369883710): modularize all the rest.
 source_set("startup_tab") {

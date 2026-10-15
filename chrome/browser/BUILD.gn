@@ -928,10 +928,7 @@ source_set("core") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/browser_switcher",
-      "//chrome/browser/ui/startup/default_browser_prompt",
-    ]
+    deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 
   if (is_mac || is_linux) {
@@ -2154,13 +2151,6 @@ source_set("browser") {
     deps += [
       "//chrome/browser/webshare",
       "//chrome/browser/webshare:impl",
-    ]
-  }
-
-  if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/browser_switcher",
-      "//chrome/browser/browser_switcher:impl",
     ]
   }
 

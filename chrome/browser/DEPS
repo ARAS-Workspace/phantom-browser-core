@@ -19,7 +19,6 @@ include_rules = [
   "+chrome/android/modules",
   "+chrome/android/test_support_jni_headers",
   "+chrome/app",
-  "+chrome/credential_provider/common",
   "+chrome/grit",
   "+chrome/install_static",
   "+chrome/installer/util",

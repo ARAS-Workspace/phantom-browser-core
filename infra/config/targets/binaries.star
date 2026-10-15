@@ -1092,30 +1092,6 @@ targets.binaries.windowed_test_launcher(
     module_scheme = "gtest",
 )
 
-targets.binaries.script(
-    name = "enterprise_companion_integration_tests",
-    label = "//chrome/enterprise_companion:enterprise_companion_integration_tests",
-    script = "//testing/scripts/run_telemetry_as_googletest.py",
-    # All references have been moved to starlark
-    skip_usage_check = True,
-    args = [
-        "test_service/enterprise_companion_integration_tests_launcher.py",
-        "--test-output-dir=${ISOLATED_OUTDIR}",
-        "--test-launcher-bot-mode",
-        "--gtest_shuffle",
-    ],
-    module_scheme = "gtest",
-)
-
-targets.binaries.console_test_launcher(
-    name = "enterprise_companion_tests",
-    label = "//chrome/enterprise_companion:enterprise_companion_tests",
-    # All references have been moved to starlark
-    skip_usage_check = True,
-    args = ["--gtest_shuffle"],
-    module_scheme = "gtest",
-)
-
 targets.binaries.console_test_launcher(
     name = "env_chromium_unittests",
     label = "//third_party/leveldatabase:env_chromium_unittests",
@@ -1227,14 +1203,6 @@ targets.binaries.console_test_launcher(
 targets.binaries.console_test_launcher(
     name = "gcm_unit_tests",
     label = "//google_apis/gcm:gcm_unit_tests",
-    module_scheme = "gtest",
-)
-
-targets.binaries.console_test_launcher(
-    name = "gcp_unittests",
-    label = "//chrome/credential_provider/test:gcp_unittests",
-    # All references have been moved to starlark
-    skip_usage_check = True,
     module_scheme = "gtest",
 )
 

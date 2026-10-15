@@ -67,8 +67,6 @@ std::ostream& operator<<(std::ostream& out, const KeepAliveOrigin& origin) {
       return out << "PROFILE_MANAGER";
     case KeepAliveOrigin::USER_MANAGER_VIEW:
       return out << "USER_MANAGER_VIEW";
-    case KeepAliveOrigin::CREDENTIAL_PROVIDER_SIGNIN_DIALOG:
-      return out << "CREDENTIAL_PROVIDER_SIGNIN_DIALOG";
     case KeepAliveOrigin::WEB_APP_INTENT_PICKER:
       return out << "WEB_APP_INTENT_PICKER";
     case KeepAliveOrigin::WEB_APP_UNINSTALL:

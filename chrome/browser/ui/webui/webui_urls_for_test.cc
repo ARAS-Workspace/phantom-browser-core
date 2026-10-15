@@ -128,8 +128,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://whats-new",
 #endif
 
-      "chrome://browser-switch",
-      "chrome://browser-switch/internals",
       "chrome://profile-picker",
       "chrome://intro",
       "chrome://profile-customization/?debug",

@@ -1610,7 +1610,6 @@ static_library("ui") {
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/startup/default_browser_prompt:impl",
       "//chrome/browser/ui/views/profiles:badged_profile_photo",
-      "//chrome/browser/ui/webui/browser_switch",
       "//chrome/browser/ui/webui/intro",
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/signin:profile_impl",
@@ -1622,10 +1621,6 @@ static_library("ui") {
     allow_circular_includes_from += [
       "//chrome/browser/ui/startup/default_browser_prompt:impl",
       "//chrome/browser/ui/webui/signin:profile_impl",
-
-      # TODO(crbug.com/364667551): browser_switch_ui.cc includes browser.h from
-      # //chrome/browser/ui:ui.
-      "//chrome/browser/ui/webui/browser_switch",
     ]
 
     if (enable_dice_support) {

@@ -179,7 +179,6 @@
 
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/browser_switcher/browser_switcher_prefs.h"
 #include "chrome/browser/enterprise/idle/action.h"
 #include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #include "chrome/browser/external_protocol/auto_launch_protocols_policy_handler.h"
@@ -1039,39 +1038,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kSigninInterceptionEnabled,
     prefs::kSigninInterceptionEnabled,
     base::Value::Type::BOOLEAN },
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  { key::kAlternativeBrowserPath,
-    browser_switcher::prefs::kAlternativeBrowserPath,
-    base::Value::Type::STRING },
-  { key::kAlternativeBrowserParameters,
-    browser_switcher::prefs::kAlternativeBrowserParameters,
-    base::Value::Type::LIST },
-  { key::kBrowserSwitcherParsingMode,
-    browser_switcher::prefs::kParsingMode,
-    base::Value::Type::INTEGER },
-  { key::kBrowserSwitcherUrlList,
-    browser_switcher::prefs::kUrlList,
-    base::Value::Type::LIST },
-  { key::kBrowserSwitcherUrlGreylist,
-    browser_switcher::prefs::kUrlGreylist,
-    base::Value::Type::LIST },
-  { key::kBrowserSwitcherExternalSitelistUrl,
-    browser_switcher::prefs::kExternalSitelistUrl,
-    base::Value::Type::STRING },
-  { key::kBrowserSwitcherExternalGreylistUrl,
-    browser_switcher::prefs::kExternalGreylistUrl,
-    base::Value::Type::STRING },
-  { key::kBrowserSwitcherEnabled,
-    browser_switcher::prefs::kEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kBrowserSwitcherKeepLastChromeTab,
-    browser_switcher::prefs::kKeepLastTab,
-    base::Value::Type::BOOLEAN },
-  { key::kBrowserSwitcherDelay,
-    browser_switcher::prefs::kDelay,
-    base::Value::Type::INTEGER },
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   { key::kAuthNegotiateDelegateByKdcPolicy,

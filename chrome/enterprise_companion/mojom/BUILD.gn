@@ -1,15 +1,4 @@
 import("//mojo/public/tools/bindings/mojom.gni")
-mojom("mojom") {
-  sources = [ "enterprise_companion.mojom" ]
-
-  visibility = [
-    "//chrome/enterprise_companion:*",
-    "//chrome/updater:*",
-  ]
-
-  deps = [ ":policy_fetch_reason_mojom" ]
-}
-
 mojom("policy_fetch_reason_mojom") {
   sources = [ "policy_fetch_reason.mojom" ]
 
@@ -31,8 +20,5 @@ mojom("policy_fetch_reason_mojom") {
     },
   ]
 
-  visibility = [
-    "//chrome/enterprise_companion/mojom",
-    "//chrome/updater/mojom:*",
-  ]
+  visibility = [ "//chrome/updater/mojom:*" ]
 }

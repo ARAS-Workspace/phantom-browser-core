@@ -158,10 +158,6 @@ source_set("configs") {
     deps += [ "//chrome/browser/ui/webui/sandbox" ]
   }
 
-  if (is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/webui/browser_switch" ]
-  }
-
   if (enable_extensions_core) {
     deps += [
       "//chrome/browser/ui/webui/extensions",

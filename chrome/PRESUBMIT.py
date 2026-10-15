@@ -226,7 +226,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/ash/arc/session/arc_session_manager.cc',
         'chrome/browser/ash/system_web_apps/system_web_app_manager.cc',
         'chrome/browser/browser_process_impl.cc',
-        'chrome/browser/browser_switcher/ieem_sitelist_parser_fuzzer.cc',
         'chrome/browser/btm/btm_browser_signin_detector_factory.h',
         'chrome/browser/chrome_browser_main.cc',
         'chrome/browser/chrome_browser_main.h',
@@ -261,8 +260,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/web_applications/web_app_command_manager.cc',
         'chrome/browser/web_applications/web_app_command_manager.h',
         'chrome/browser/web_applications/web_app_provider.cc',
-        'chrome/credential_provider/extension/service.cc',
-        'chrome/enterprise_companion/app/app.cc',
         'chrome/updater/app/app.cc',
         'chrome/updater/app/app_server.cc',
     ]

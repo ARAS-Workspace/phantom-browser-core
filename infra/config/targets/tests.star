@@ -1040,14 +1040,6 @@ targets.tests.gtest_test(
 )
 
 targets.tests.gtest_test(
-    name = "enterprise_companion_integration_tests",
-)
-
-targets.tests.gtest_test(
-    name = "enterprise_companion_tests",
-)
-
-targets.tests.gtest_test(
     name = "env_chromium_unittests",
 )
 
@@ -1236,10 +1228,6 @@ targets.tests.isolated_script_test(
 
 targets.tests.gtest_test(
     name = "gcm_unit_tests",
-)
-
-targets.tests.gtest_test(
-    name = "gcp_unittests",
 )
 
 targets.tests.gtest_test(

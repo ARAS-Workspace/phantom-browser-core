@@ -21,7 +21,6 @@ import("//build/gn_logs.gni")
 import("//build/toolchain/rbe.gni")
 import("//build/util/generate_wrapper.gni")
 import("//chrome/browser/buildflags.gni")
-import("//chrome/enterprise_companion/config.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -125,10 +124,6 @@ group("gn_all") {
   ]
 
   deps += [ "//chrome/installer" ]
-
-  if (enable_enterprise_companion) {
-    deps += [ "//chrome/enterprise_companion" ]
-  }
 
   deps += [ "//chrome/test:unit_tests" ]
   deps += [ "//ui/accessibility:accessibility_unittests" ]

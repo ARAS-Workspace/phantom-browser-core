@@ -201,10 +201,7 @@ source_set("impl") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/browser_switcher",
-      "//chrome/browser/ui/webui/whats_new",
-    ]
+    deps += [ "//chrome/browser/ui/webui/whats_new" ]
   }
 
   deps += [

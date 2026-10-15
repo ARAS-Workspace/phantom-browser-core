@@ -109,8 +109,6 @@ if (is_mac || is_linux) {
       "//chrome/browser/ui",
       "//chrome/browser/ui/webui/help:*",
       "//chrome/browser/updater:*",
-      "//chrome/enterprise_companion:*",
-      "//chrome/enterprise_companion/device_management_storage:*",
       "//chrome/test:*",
       "//chrome/test:unit_tests",
     ]
@@ -186,7 +184,6 @@ if (is_mac || is_linux) {
       ":tagging",
       ":version_header",
       "//base",
-      "//chrome/enterprise_companion:installer_paths",
       "//chrome/updater/mojom",
       "//components/named_mojo_ipc_server",
       "//components/policy/core/common:common_constants",

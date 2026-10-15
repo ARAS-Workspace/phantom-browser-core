@@ -184,10 +184,6 @@
     "META": {"sizes": {"includes": [50],}},
     "includes": [2900],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/browser_switch/resources.grd": {
-    "META": {"sizes": {"includes": [10],}},
-    "includes": [2920],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/certificate_manager/resources.grd": {
     "META": {"sizes": {"includes": [50],}},
     "includes": [2950],
@@ -758,10 +754,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/common/chromeos/extensions/chromeos_system_extensions_resources.grd": {
     "META": {"sizes": {"includes": [10],}},
     "includes": [5520],
-  },
-  "chrome/credential_provider/gaiacp/gaia_resources.grd": {
-    "includes": [5540],
-    "messages": [5560],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/renderer/resources/resources.grd": {
     "META": {"sizes": {"includes": [100]}},
