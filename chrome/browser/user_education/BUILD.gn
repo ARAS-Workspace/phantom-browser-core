@@ -10,7 +10,6 @@ source_set("user_education") {
     "browser_tutorial_service.h",
     "browser_user_education_storage_service.cc",
     "browser_user_education_storage_service.h",
-    "ntp_promo_identifiers.h",
     "recent_session_observer.cc",
     "recent_session_observer.h",
     "recent_session_tracker.cc",

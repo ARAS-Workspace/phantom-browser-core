@@ -39,7 +39,6 @@ bool IsAllowedActionableAlert(const base::Feature& promo_feature) {
   static constexpr auto kAllowedPromoNames =
       base::MakeFixedFlatSet<std::string_view>({
           "IPH_HighEfficiencyMode",
-          "IPH_iOSEnhancedBrowsingDesktop",
           "IPH_SignInBenefits",
           "IPH_SignInBenefitsNewSignin",
           "IPH_SupervisedUserProfileSignin",
@@ -85,10 +84,7 @@ bool IsAllowedCustomUiPromo(const base::Feature& promo_feature) {
   // Add the text names of allowlisted rotating promos here:
   static constexpr auto kAllowedPromoNames =
       base::MakeFixedFlatSet<std::string_view>(
-          {"IPH_AutofillAtMemory", "IPH_ExtensionsZeroStatePromo",
-           "IPH_iOSEnhancedBrowsingDesktop", "IPH_iOSLensPromoDesktop",
-           "IPH_iOSPasswordPromoDesktop", "IPH_iOSTabGroupsDesktop",
-           "IPH_iOSPriceTrackingDesktop"});
+          {"IPH_AutofillAtMemory", "IPH_ExtensionsZeroStatePromo"});
   return kAllowedPromoNames.contains(promo_feature.name);
 }
 

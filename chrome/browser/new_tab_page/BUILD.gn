@@ -221,7 +221,6 @@ source_set("interactive_ui_tests") {
     "modules/new_tab_page_modules_interactive_uitest.cc",
     "new_tab_page_interactive_uitest.cc",
     "new_tab_page_realbox_interactive_uitest.cc",
-    "ntp_promo/ntp_promo_interactive_uitest.cc",
   ]
 
   deps = [

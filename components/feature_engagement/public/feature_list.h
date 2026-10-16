@@ -224,21 +224,6 @@ DEFINE_VARIATION_PARAM(kIPHSupervisedUserProfileSigninFeature,
                        "IPH_SupervisedUserProfileSignin");
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-DEFINE_VARIATION_PARAM(kIPHiOSPasswordPromoDesktopFeature,
-                       "IPH_iOSPasswordPromoDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSAddressPromoDesktopFeature,
-                       "IPH_iOSAddressPromoDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSPaymentPromoDesktopFeature,
-                       "IPH_iOSPaymentPromoDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSLensPromoDesktopFeature,
-                       "IPH_iOSLensPromoDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSEnhancedBrowsingDesktopFeature,
-                       "IPH_iOSEnhancedBrowsingDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSTabGroupsDesktopFeature,
-                       "IPH_iOSTabGroupsDesktop");
-DEFINE_VARIATION_PARAM(kIPHiOSPriceTrackingDesktopFeature,
-                       "IPH_iOSPriceTrackingDesktop");
-
 DEFINE_VARIATION_PARAM(kIPHResumptionRailFeature, "IPH_ResumptionRail");
 
 // Defines the array of which features should be listed in the chrome://flags
@@ -246,17 +231,7 @@ DEFINE_VARIATION_PARAM(kIPHResumptionRailFeature, "IPH_ResumptionRail");
 // are possible to enable on their own in demo mode.
 inline constexpr flags_ui::FeatureEntry::FeatureVariation
     kIPHDemoModeChoiceVariations[] = {
-        // clang-format off
-// keep-sorted start case=no
-        VARIATION_ENTRY(kIPHiOSAddressPromoDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSEnhancedBrowsingDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSLensPromoDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSPasswordPromoDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSPaymentPromoDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSPriceTrackingDesktopFeature),
-        VARIATION_ENTRY(kIPHiOSTabGroupsDesktopFeature),
-// keep-sorted end
-
+// clang-format off
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         VARIATION_ENTRY(kIPHExtensionsMenuFeature),

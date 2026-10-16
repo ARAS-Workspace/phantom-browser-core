@@ -1055,7 +1055,6 @@ static_library("ui") {
   ]
 
   deps += [
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/preloading/new_tab_page_preload",
     "//chrome/browser/search/background",
     "//chrome/browser/ui/color:mixers",
@@ -1145,8 +1144,6 @@ static_library("ui") {
     "//chrome/browser/ui/browser_ui_controller:impl",
     "//chrome/browser/ui/browser_web_contents_delegate",
     "//chrome/browser/ui/browser_window:create_browser_window",
-    "//chrome/browser/ui/desktop_to_mobile_promos:controller",
-    "//chrome/browser/ui/desktop_to_mobile_promos:service",
     "//chrome/browser/ui/focus",
     "//chrome/browser/ui/focus:impl",
     "//chrome/browser/ui/fullscreen",
@@ -1363,9 +1360,6 @@ static_library("ui") {
     # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.
     "//chrome/browser/ui/webui/util:impl",
 
-    # TODO(crbug.com/40110173): Resolve circular dependencies.
-    "//chrome/browser/ui/desktop_to_mobile_promos:service",
-
     # TODO(crbug.com/40251079): Remove circular dependencies.
     "//chrome/browser/apps/app_service",
 
@@ -1416,7 +1410,6 @@ static_library("ui") {
     "//chrome/browser/ui/tabs:tab_model_impl",
     "//chrome/browser/ui/tabs:tab_strip_impl",
     "//chrome/browser/ui/bookmarks:impl",
-    "//chrome/browser/ui/desktop_to_mobile_promos:controller",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when
     # c/b/ui/browser.h gets componentized.
@@ -2115,7 +2108,6 @@ static_library("ui") {
       "//chrome/browser/apps:icon_standardizer",
       "//chrome/browser/collaboration",
       "//chrome/browser/collaboration/messaging",
-      "//chrome/browser/desktop_to_mobile_promos:utils",
       "//chrome/browser/preloading/bookmarkbar_preload",
       "//chrome/browser/preloading/new_tab_page_preload",
       "//chrome/browser/preloading/prerender",
@@ -2124,7 +2116,6 @@ static_library("ui") {
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/animation",
       "//chrome/browser/ui/autofill/payments",
-      "//chrome/browser/ui/desktop_to_mobile_promos:utils",
       "//chrome/browser/ui/dialogs",
       "//chrome/browser/ui/qrcode_generator",
       "//chrome/browser/ui/qrcode_generator:impl",
@@ -2227,7 +2218,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/permissions/chip:impl",
       "//chrome/browser/ui/views/profiles:avatar_toolbar_button",
       "//chrome/browser/ui/views/profiles:avatar_toolbar_button_impl",
-      "//chrome/browser/ui/views/promos",
       "//chrome/browser/ui/views/qrcode_generator",
       "//chrome/browser/ui/views/select_audio_output",
       "//chrome/browser/ui/views/select_audio_output:impl",

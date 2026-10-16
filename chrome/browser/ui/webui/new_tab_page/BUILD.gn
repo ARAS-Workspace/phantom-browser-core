@@ -70,7 +70,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser:buildflags",
     "//chrome/browser/autocomplete:aim_eligibility_service",
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/enterprise",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/new_tab_page:impl",
@@ -217,7 +216,6 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
   deps += [
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/themes",
     "//chrome/browser/ui/hats:test_support",
     "//chrome/browser/ui/views/side_panel/customize_chrome",

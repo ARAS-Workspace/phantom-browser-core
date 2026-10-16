@@ -366,28 +366,6 @@ BASE_FEATURE(kIPHSupervisedUserProfileSigninFeature,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-BASE_FEATURE(kIPHiOSPasswordPromoDesktopFeature,
-             "IPH_iOSPasswordPromoDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSAddressPromoDesktopFeature,
-             "IPH_iOSAddressPromoDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPaymentPromoDesktopFeature,
-             "IPH_iOSPaymentPromoDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSLensPromoDesktopFeature,
-             "IPH_iOSLensPromoDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSEnhancedBrowsingDesktopFeature,
-             "IPH_iOSEnhancedBrowsingDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSTabGroupsDesktopFeature,
-             "IPH_iOSTabGroupsDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPriceTrackingDesktopFeature,
-             "IPH_iOSPriceTrackingDesktop",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kIPHResumptionRailFeature,
              "IPH_ResumptionRail",
              base::FEATURE_ENABLED_BY_DEFAULT);

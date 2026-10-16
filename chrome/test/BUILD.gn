@@ -876,7 +876,6 @@ test("browser_tests") {
     "//chrome/browser/data_saver",
     "//chrome/browser/data_saver:browser_tests",
     "//chrome/browser/data_sharing:browser_tests",
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/device_api:browser_tests",
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:browser_tests",
@@ -1081,9 +1080,6 @@ test("browser_tests") {
     "//chrome/browser/ui/content_settings",
     "//chrome/browser/ui/content_settings:browser_tests",
     "//chrome/browser/ui/customize_chrome",
-    "//chrome/browser/ui/desktop_to_mobile_promos:browser_tests",
-    "//chrome/browser/ui/desktop_to_mobile_promos:controller",
-    "//chrome/browser/ui/desktop_to_mobile_promos:utils",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/ui/exclusive_access:browser_tests",
     "//chrome/browser/ui/extensions:browser_tests",
@@ -1283,7 +1279,6 @@ test("browser_tests") {
     "//components/cookie_config",
     "//components/country_codes",
     "//components/data_sharing/public",
-    "//components/desktop_to_mobile_promos",
     "//components/device_event_log",
     "//components/domain_reliability:prefs",
     "//components/embedder_support",
@@ -1684,7 +1679,6 @@ test("browser_tests") {
     "../browser/ui/browser_instant_controller_browsertest.cc",
     "../browser/ui/browser_tab_strip_model_delegate_browsertest.cc",
     "../browser/ui/browser_tabrestore_browsertest.cc",
-    "../browser/ui/desktop_to_mobile_promos/ios_promos_utils_browsertest.cc",
     "../browser/ui/native_window_tracker_browsertest.cc",
     "../browser/ui/renderer_event_injection_browsertest.cc",
     "../browser/ui/tab_modal_confirm_dialog_browsertest.cc",
@@ -3431,7 +3425,6 @@ test("unit_tests") {
     "//chrome/browser/ui/animation:unit_tests",
     "//chrome/browser/ui/bookmarks:unit_tests",
     "//chrome/browser/ui/context_highlight:unit_tests",
-    "//chrome/browser/ui/desktop_to_mobile_promos:unit_tests",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/extensions:unit_tests",
     "//chrome/browser/ui/passwords:test_support_ui",
@@ -3620,7 +3613,6 @@ test("unit_tests") {
     "//chrome/browser/ui/color:mixers",
     "//chrome/browser/ui/content_settings",
     "//chrome/browser/ui/content_settings:unit_tests",
-    "//chrome/browser/ui/desktop_to_mobile_promos:service",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/ui/exclusive_access:unit_tests",
     "//chrome/browser/ui/frame",
@@ -4170,8 +4162,6 @@ test("unit_tests") {
     ]
   }
 
-  deps += [ "//chrome/browser/desktop_to_mobile_promos:unit_tests" ]
-
   if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt:unit_tests" ]
   }
@@ -4591,7 +4581,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/bookmarks:test_support",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/data_sharing",
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:interactive_ui_tests",
     "//chrome/browser/devtools:test_support",
@@ -4715,7 +4704,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/views/passwords:password_bubble_view_base",
     "//chrome/browser/ui/views/performance_controls",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button",
-    "//chrome/browser/ui/views/promos:interactive_ui_tests",
     "//chrome/browser/ui/views/send_tab_to_self:interactive_ui_tests",
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/views/tabs/hovercard:hovercard_helpers",

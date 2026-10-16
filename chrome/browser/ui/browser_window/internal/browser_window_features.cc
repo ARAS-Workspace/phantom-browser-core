@@ -49,7 +49,6 @@
 #include "chrome/browser/ui/browser_window_theme_observer.h"
 #include "chrome/browser/ui/call_to_action/call_to_action_lock.h"
 #include "chrome/browser/ui/context_highlight/context_highlight_window_feature.h"
-#include "chrome/browser/ui/desktop_to_mobile_promos/ios_promo_controller.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/extensions/extension_installed_watcher.h"
 #include "chrome/browser/ui/find_bar/find_bar.h"
@@ -150,7 +149,6 @@
 #include "components/collaboration/public/collaboration_service.h"
 #include "components/content_settings/browser/ui/cookie_controls_controller.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
-#include "components/desktop_to_mobile_promos/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/omnibox/browser/location_bar_model.h"
 #include "components/omnibox/browser/location_bar_model_impl.h"
@@ -795,12 +793,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   // instantiated in this block (please keep this list ordered without taking
   // into consideration buildflags, repeating buildflags is ok):
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
-    if (MobilePromoOnDesktopEnabled()) {
-      ios_promo_controller_ =
-          GetUserDataFactory().CreateInstance<IOSPromoController>(*browser,
-                                                                  browser);
-    }
-
     // TODO(crbug.com/350508658): Ideally, we don't pass in a reference to
     // browser as per the guidance in the comment above. However, currently,
     // we need browser to properly determine if the lens overlay is enabled.
@@ -907,7 +899,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   qrcode_window_controller_.reset();
   pinned_toolbar_actions_ = nullptr;
   memory_saver_opt_in_iph_controller_.reset();
-  ios_promo_controller_.reset();
   // Owned-by-all members.
   zoom_bubble_coordinator_.reset();
   zoom_bubble_manager_.reset();

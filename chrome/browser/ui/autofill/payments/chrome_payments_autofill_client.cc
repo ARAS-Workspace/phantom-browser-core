@@ -91,8 +91,6 @@
 #include "chrome/browser/ui/autofill/payments/webauthn_dialog_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/webauthn_dialog_state.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
-#include "chrome/browser/ui/desktop_to_mobile_promos/ios_promos_utils.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "components/autofill/core/browser/payments/desktop_bnpl_strategy.h"
 #include "components/autofill/core/browser/ui/payments/omnibox_autofill_delegate.h"
@@ -238,32 +236,12 @@ void ChromePaymentsAutofillClient::CreditCardUploadCompleted(
   if (SaveCardBubbleControllerImpl* controller =
           SaveCardBubbleControllerImpl::GetOrCreateForWebContents(
               web_contents())) {
-    // Only attempt to show the iOS payment promo if the card was successfully
-    // uploaded and there is no VCN enroll flow callback, and still fallback to
-    // normal confirmation bubble if showing the promo fails.
     if (card_saved && !on_confirmation_closed_callback) {
-      base::OnceClosure promo_will_show_callback =
-          controller->GetEndSaveCardPromptFlowCallback();
-      base::OnceClosure promo_not_shown_callback =
-          controller->GetShowConfirmationForCardSuccessfullySavedCallback();
-
-      BrowserWindowInterface* browser =
-          GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-              web_contents());
-
-      if (!browser) {
-        std::move(promo_not_shown_callback).Run();
-        return;
-      }
-
-      ios_promos_utils::MaybeOverrideCardConfirmationBubbleWithIOSPaymentPromo(
-          browser->GetBrowserForMigrationOnly(),
-          std::move(promo_will_show_callback),
-          std::move(promo_not_shown_callback));
-
+      controller->ShowConfirmationBubbleView(
+          /*card_saved=*/true, /*is_for_save_and_fill=*/true,
+          /*on_confirmation_closed_callback=*/std::nullopt);
       return;
     }
-
     controller->ShowConfirmationBubbleView(
         card_saved, /*is_for_save_and_fill=*/false,
         std::move(on_confirmation_closed_callback));

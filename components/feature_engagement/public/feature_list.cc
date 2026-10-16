@@ -17,15 +17,6 @@ namespace {
 // |kIPHDemoModeChoiceVariations| array.
 const base::Feature* const kAllFeatures[] = {
     &kIPHDummyFeature,  // Ensures non-empty array for all platforms.
-    // keep-sorted start case=no
-    &kIPHiOSAddressPromoDesktopFeature,
-    &kIPHiOSEnhancedBrowsingDesktopFeature,
-    &kIPHiOSLensPromoDesktopFeature,
-    &kIPHiOSPasswordPromoDesktopFeature,
-    &kIPHiOSPaymentPromoDesktopFeature,
-    &kIPHiOSPriceTrackingDesktopFeature,
-    &kIPHiOSTabGroupsDesktopFeature,
-    // keep-sorted end
 
     &kIPHResumptionRailFeature,
 

@@ -90,10 +90,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorDesktopMediaPickerDescriptionLabel] = {
       ui::kColorSysOnSurfaceSubtle};
 
-  // Desktop to iOS promo bubble colors.
-  mixer[kColorDesktopToIOSPromoFooterSubtitleLabel] = {
-      ui::kColorSysOnSurfaceSubtle};
-
   // Download bubble colors.
   mixer[kColorDownloadBubbleRowHover] = {ui::kColorSysStateHoverOnSubtle};
   mixer[kColorDownloadBubbleShowAllDownloadsIcon] = {

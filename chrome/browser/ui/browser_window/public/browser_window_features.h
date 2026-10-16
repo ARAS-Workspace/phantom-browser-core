@@ -80,7 +80,6 @@ class ImmersiveModeController;
 class IncognitoClearBrowsingDataDialogCoordinator;
 class InitialWebUIManager;
 class InitialWebUIWindowMetricsManager;
-class IOSPromoController;
 class LocationBar;
 class LocationBarModel;
 class MemorySaverOptInIPHController;
@@ -555,7 +554,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<InitialWebUIWindowMetricsManager>
       initial_webui_window_metrics_manager_;
   std::unique_ptr<BrowserInstantController> instant_controller_;
-  std::unique_ptr<IOSPromoController> ios_promo_controller_;
 
   // Helper which implements the LiveTabContext interface.
   std::unique_ptr<BrowserLiveTabContext> live_tab_context_;

@@ -13,24 +13,20 @@ source_set("user_education") {
     "autofill_help_bubble_factory.h",
     "browser_help_bubble.h",
     "browser_help_bubble_event_relay.h",
-    "browser_ntp_promos.h",
     "browser_user_education_service.h",
     "custom_webui_help_bubble_controller.h",
     "impl/browser_feature_promo_controller.h",
     "impl/browser_feature_promo_preconditions.h",
     "impl/browser_user_education_context.h",
     "impl/browser_user_education_interface_impl.h",
-    "ios_promo_bubble_view.h",
   ]
 
   public_deps = [
     "//base",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/user_education",
-    "//chrome/browser/ui/views/promos:constants",
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/browser/user_education",
-    "//components/desktop_to_mobile_promos",
     "//components/user_education/common",
     "//components/user_education/views",
     "//components/user_education/webui",
@@ -62,7 +58,6 @@ source_set("impl") {
     "autofill_help_bubble_factory.cc",
     "browser_help_bubble.cc",
     "browser_help_bubble_event_relay.cc",
-    "browser_ntp_promos.cc",
     "browser_user_education_service.cc",
     "custom_webui_help_bubble.cc",
     "custom_webui_help_bubble.h",
@@ -71,13 +66,11 @@ source_set("impl") {
     "impl/browser_feature_promo_preconditions.cc",
     "impl/browser_user_education_context.cc",
     "impl/browser_user_education_interface_impl.cc",
-    "ios_promo_bubble_view.cc",
   ]
 
   public_deps = [ ":user_education" ]
 
   deps = [
-    "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/devtools",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:profile",
@@ -92,8 +85,6 @@ source_set("impl") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/actions:actions_headers",
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/desktop_to_mobile_promos:service",
-    "//chrome/browser/ui/desktop_to_mobile_promos:utils",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/ui/feature_first_run",
     "//chrome/browser/ui/focus",
@@ -118,7 +109,6 @@ source_set("impl") {
     "//chrome/browser/ui/views/bookmarks",
     "//chrome/browser/ui/views/frame:toolbar_button_provider",
     "//chrome/browser/ui/views/page_action",
-    "//chrome/browser/ui/views/promos",
     "//chrome/browser/ui/views/tabs/tab",
     "//chrome/browser/ui/views/toolbar",
     "//chrome/browser/ui/webui:webui_util",
@@ -128,7 +118,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
     "//chrome/browser/user_education",
     "//chrome/browser/web_applications",
-    "//components/desktop_to_mobile_promos",
     "//components/feature_engagement/public",
     "//components/send_tab_to_self:features",
     "//components/user_education/views",
@@ -156,9 +145,7 @@ source_set("unit_tests") {
   testonly = true
   sources = [
     "browser_help_bubble_unittest.cc",
-    "browser_ntp_promos_unittest.cc",
     "browser_user_education_service_unittest.cc",
-    "ios_promo_bubble_view_unittest.cc",
     "views_tutorial_unittest.cc",
   ]
 
@@ -173,13 +160,10 @@ source_set("unit_tests") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/signin",
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/desktop_to_mobile_promos:service",
     "//chrome/browser/ui/user_education",
     "//chrome/browser/ui/views/frame:test_with_browser_view",
     "//chrome/browser/user_education",
     "//chrome/test:test_support",
-    "//components/sync_device_info:test_support",
-    "//components/sync_preferences:features",
     "//components/user_education/common",
     "//components/user_education/test",
     "//components/user_education/views:test_support",

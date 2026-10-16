@@ -71,7 +71,6 @@ InfoBarUiTest.*
 InlineLoginHelperBrowserTest.InvokeUi_*
 InteractionTestUtilBrowserTest.CompareScreenshot_*
 InteractionTestUtilBrowserUiTest.CompareScreenshot_*
-*IOSPromoBubbleBrowserTest.*
 IsolatedWebAppInstallerViewUiPixelTest.*
 *ContextualTasks*PixelTest*
 *LensSidePanel*PixelTest*
@@ -82,7 +81,6 @@ LocalCardMigrationBrowserUiTest.*
 *MemorySaverImprovedFaviconTreatmentTest.*
 Mv2DeprecationReEnableDialogBrowserTest.*
 NewTabPageTest.*
-NtpPromoVisualUiTest.*
 NtpRealboxUiScreenshotTest.*
 OfferNotificationBubbleViewPixelBrowserTest.*
 OmniboxAimWebUiInteractiveTest.QueryWithTabContext*

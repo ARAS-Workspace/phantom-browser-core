@@ -270,21 +270,6 @@ void SaveCardBubbleControllerImpl::ShowConfirmationBubbleView(
   }
 }
 
-base::OnceClosure SaveCardBubbleControllerImpl::
-    GetShowConfirmationForCardSuccessfullySavedCallback() {
-  return base::BindOnce(
-      &SaveCardBubbleControllerImpl::ShowConfirmationBubbleView,
-      weak_ptr_factory_.GetWeakPtr(), /*card_saved=*/true,
-      /*is_for_save_and_fill=*/true,
-      /*on_confirmation_closed_callback=*/std::nullopt);
-}
-
-base::OnceClosure
-SaveCardBubbleControllerImpl::GetEndSaveCardPromptFlowCallback() {
-  return base::BindOnce(&SaveCardBubbleControllerImpl::EndSaveCardPromptFlow,
-                        weak_ptr_factory_.GetWeakPtr());
-}
-
 std::u16string SaveCardBubbleControllerImpl::GetWindowTitle() const {
   switch (current_bubble_type_) {
     case PaymentsBubbleType::kLocalSave:
@@ -986,13 +971,6 @@ bool SaveCardBubbleControllerImpl::IsWebContentsActive() {
   // of screen bounds.
   return web_contents() &&
          web_contents()->GetVisibility() == content::Visibility::VISIBLE;
-}
-
-void SaveCardBubbleControllerImpl::EndSaveCardPromptFlow() {
-  HideBubble(/*initiated_by_bubble_manager=*/false);
-  current_bubble_type_ = PaymentsBubbleType::kInactive;
-  confirmation_ui_params_.reset();
-  UpdatePageActionIcon();
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(SaveCardBubbleControllerImpl);
