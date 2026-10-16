@@ -12,7 +12,6 @@
 #include "base/containers/fixed_flat_map.h"
 #include "base/functional/bind.h"
 #include "base/memory/raw_ptr.h"
-#include "base/metrics/field_trial.h"
 #include "base/path_service.h"
 #include "base/strings/strcat.h"
 #include "base/strings/stringprintf.h"
@@ -29,8 +28,6 @@
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/instant_service.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
@@ -158,142 +155,6 @@ IN_PROC_BROWSER_TEST_F(ChromeContentBrowserClientBrowserTest,
   ASSERT_TRUE(entry != nullptr);
   EXPECT_EQ(url, entry->GetURL());
   EXPECT_EQ(url, entry->GetVirtualURL());
-}
-
-// Helper class to mark "https://ntp.com/" as an isolated origin.
-class IsolatedOriginNTPBrowserTest : public InProcessBrowserTest,
-                                     public InstantTestBase {
- public:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    https_test_server().SetCertHostnames({"ntp.com"});
-    ASSERT_TRUE(https_test_server().InitializeAndListen());
-
-    // Mark ntp.com (with an appropriate port from the test server) as an
-    // isolated origin.
-    GURL isolated_url(https_test_server().GetURL("ntp.com", "/"));
-    command_line->AppendSwitchASCII(switches::kIsolateOrigins,
-                                    isolated_url.spec());
-  }
-
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-    host_resolver()->AddRule("*", "127.0.0.1");
-    https_test_server().StartAcceptingConnections();
-  }
-};
-
-// Verifies that when the remote NTP URL has an origin which is also marked as
-// an isolated origin (i.e., requiring a dedicated process), the NTP URL
-// still loads successfully, and the resulting process is marked as an Instant
-// process.  See https://crbug.com/41339429.
-IN_PROC_BROWSER_TEST_F(IsolatedOriginNTPBrowserTest,
-                       IsolatedOriginDoesNotInterfereWithNTP) {
-  GURL base_url =
-      https_test_server().GetURL("ntp.com", "/instant_extended.html");
-  GURL ntp_url =
-      https_test_server().GetURL("ntp.com", "/instant_extended_ntp.html");
-  SetupInstant(browser()->GetProfile(), base_url, ntp_url);
-
-  // Sanity check that a SiteInstance for a generic ntp.com URL requires a
-  // dedicated process.
-  content::BrowserContext* context = browser()->GetProfile();
-  GURL isolated_url(https_test_server().GetURL("ntp.com", "/title1.html"));
-  scoped_refptr<content::SiteInstance> site_instance =
-      content::SiteInstance::CreateForURL(context, isolated_url);
-  EXPECT_TRUE(site_instance->RequiresDedicatedProcess());
-  // Verify the isolated origin does not receive an NTP site URL scheme.
-  EXPECT_FALSE(site_instance->GetSecurityPrincipal().SchemeIs(
-      chrome::kChromeSearchScheme));
-
-  // The site URL for the NTP URL should resolve to a chrome-search:// URL via
-  // GetEffectiveURL(), even if the NTP URL matches an isolated origin.
-  scoped_refptr<content::SiteInstance> ntp_site_instance =
-      content::SiteInstance::CreateForURL(context, ntp_url);
-  EXPECT_TRUE(ntp_site_instance->GetSecurityPrincipal().SchemeIs(
-      chrome::kChromeSearchScheme));
-
-  // Navigate to the NTP URL and verify that the resulting process is marked as
-  // an Instant process.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), ntp_url));
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  InstantService* instant_service =
-      InstantServiceFactory::GetForProfile(browser()->GetProfile());
-  EXPECT_TRUE(instant_service->IsInstantProcess(
-      contents->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID()));
-  EXPECT_EQ(contents->GetPrimaryMainFrame()
-                ->GetSiteInstance()
-                ->GetSecurityPrincipal()
-                .GetDeprecatedSiteURL(),
-            ntp_site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL());
-
-  // Navigating to a non-NTP URL on ntp.com should not result in an Instant
-  // process.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), isolated_url));
-  EXPECT_FALSE(instant_service->IsInstantProcess(
-      contents->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID()));
-  EXPECT_EQ(contents->GetPrimaryMainFrame()
-                ->GetSiteInstance()
-                ->GetSecurityPrincipal()
-                .GetDeprecatedSiteURL(),
-            site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL());
-}
-
-// Helper class to test window creation from NTP.
-class OpenWindowFromNTPBrowserTest : public InProcessBrowserTest,
-                                     public InstantTestBase {
- public:
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-    host_resolver()->AddRule("*", "127.0.0.1");
-    https_test_server().SetCertHostnames({"ntp.com"});
-    ASSERT_TRUE(https_test_server().InitializeAndListen());
-    https_test_server().StartAcceptingConnections();
-  }
-};
-
-// Test checks that navigations from NTP tab to URLs with same host as NTP but
-// different path do not reuse NTP SiteInstance. See https://crbug.com/40583115
-// for details.
-IN_PROC_BROWSER_TEST_F(OpenWindowFromNTPBrowserTest,
-                       TransferFromNTPCreateNewTab) {
-  GURL search_url =
-      https_test_server().GetURL("ntp.com", "/instant_extended.html");
-  GURL ntp_url =
-      https_test_server().GetURL("ntp.com", "/instant_extended_ntp.html");
-  SetupInstant(browser()->GetProfile(), search_url, ntp_url);
-
-  // Navigate to the NTP URL and verify that the resulting process is marked as
-  // an Instant process.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), ntp_url));
-  content::WebContents* ntp_tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  InstantService* instant_service =
-      InstantServiceFactory::GetForProfile(browser()->GetProfile());
-  EXPECT_TRUE(instant_service->IsInstantProcess(
-      ntp_tab->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID()));
-
-  // Execute script that creates new window from ntp tab with
-  // ntp.com/title1.html as target url. Host is same as remote-ntp host, yet
-  // path is different.
-  GURL generic_url(https_test_server().GetURL("ntp.com", "/title1.html"));
-  content::TestNavigationObserver opened_tab_observer(nullptr);
-  opened_tab_observer.StartWatchingNewWebContents();
-  EXPECT_TRUE(ExecJs(ntp_tab, "window.open('" + generic_url.spec() + "');"));
-  opened_tab_observer.Wait();
-  ASSERT_EQ(2, browser()->tab_strip_model()->count());
-
-  content::WebContents* opened_tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait until newly opened tab is fully loaded.
-  EXPECT_TRUE(WaitForLoadStop(opened_tab));
-
-  EXPECT_NE(opened_tab, ntp_tab);
-  EXPECT_EQ(generic_url, opened_tab->GetLastCommittedURL());
-  // New created tab should not reside in an Instant process.
-  EXPECT_FALSE(instant_service->IsInstantProcess(
-      opened_tab->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID()));
 }
 
 // Test for the state of Forced Colors Mode for a given WebContents across
@@ -1183,47 +1044,6 @@ IN_PROC_BROWSER_TEST_F(ChromeContentBrowserClientBrowserTest, OpenURL) {
   }
 
   EXPECT_EQ(previous_count + 2, browser()->tab_strip_model()->count());
-}
-
-class InstantNTPURLRewriteBrowserTest : public InProcessBrowserTest,
-                                        public InstantTestBase {
- protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitch("ignore-certificate-errors");
-  }
-
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-    host_resolver()->AddRule("*", "127.0.0.1");
-    ASSERT_TRUE(https_test_server().Start());
-  }
-
-  void InstallTemplateURLWithNewTabPage(GURL new_tab_page_url) {
-    SetupInstant(browser()->GetProfile(), GURL("http://foo.com/url"),
-                 new_tab_page_url);
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(InstantNTPURLRewriteBrowserTest,
-                       UberURLHandler_InstantExtendedNewTabPage) {
-  const GURL& url_original = chrome::ChromeUINewTabURLAsGURL();
-  const GURL url_rewritten =
-      https_test_server().GetURL("localhost", "/title1.html");
-  InstallTemplateURLWithNewTabPage(url_rewritten);
-  ASSERT_TRUE(base::FieldTrialList::CreateFieldTrial(
-      "InstantExtended", "Group1 use_cacheable_ntp:1"));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url_original));
-
-  content::NavigationEntry* entry = browser()
-                                        ->tab_strip_model()
-                                        ->GetActiveWebContents()
-                                        ->GetController()
-                                        .GetLastCommittedEntry();
-  ASSERT_NE(nullptr, entry);
-  EXPECT_EQ(url_rewritten, entry->GetURL());
-  EXPECT_EQ(url_original, entry->GetVirtualURL());
 }
 
 }  // namespace

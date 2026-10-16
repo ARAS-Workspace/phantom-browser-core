@@ -103,6 +103,17 @@ void ExpectHistogramsSampleCount(const base::HistogramTester& histogram_tester,
 }  // namespace
 
 class SearchEngineChoiceServiceTest : public SearchEngineChoiceServiceTestBase {
+ protected:
+  // The fallback default search engine is DuckDuckGo. Tests that expect Google
+  // to be recorded select it explicitly, which does not record a choice.
+  void SelectGoogleAsDefaultSearchEngine() {
+    std::unique_ptr<TemplateURLData> data =
+        TemplateURLDataFromPrepopulatedEngine(
+            TemplateURLPrepopulateData::google);
+    auto template_url = std::make_unique<TemplateURL>(*data);
+    template_url_service().SetUserSelectedDefaultSearchProvider(
+        template_url.get());
+  }
 };
 
 TEST_F(SearchEngineChoiceServiceTest, GuestSessionDsePropagation) {
@@ -149,7 +160,8 @@ TEST_F(SearchEngineChoiceServiceTest,
                                prepopulate_data_resolver(),
                                base::NullCallback());
   DefaultSearchManager::Source source;
-  EXPECT_EQ(manager.GetDefaultSearchEngine(&source)->prepopulate_id, 1);
+  EXPECT_EQ(manager.GetDefaultSearchEngine(&source)->prepopulate_id,
+            TemplateURLPrepopulateData::duckduckgo.id);
   EXPECT_EQ(source, DefaultSearchManager::Source::FROM_FALLBACK);
 
   // Test the changes in the SearchEngineChoiceService propagate to the DSE
@@ -251,6 +263,7 @@ TEST_F(SearchEngineChoiceServiceTest, RecordChoiceMade) {
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kSearchEngineChoiceCountry, "US");
 
+  SelectGoogleAsDefaultSearchEngine();
   const TemplateURL* default_search_engine =
       template_url_service().GetDefaultSearchProvider();
   EXPECT_EQ(default_search_engine->prepopulate_id(),
@@ -361,6 +374,7 @@ TEST_F(SearchEngineChoiceServiceTest, RecordChoiceMade_DeviceChoiceImport_Initia
       switches::kSearchEngineChoiceCountry);
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kSearchEngineChoiceCountry, kBelgiumCountryId.CountryCode());
+  SelectGoogleAsDefaultSearchEngine();
 
   // Test that the choice is recorded for DeviceChoiceImport on initial run.
   search_engine_choice_service().RecordChoiceMade(
@@ -434,6 +448,7 @@ TEST_F(SearchEngineChoiceServiceTest,
       switches::kSearchEngineChoiceCountry);
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kSearchEngineChoiceCountry, kBelgiumCountryId.CountryCode());
+  SelectGoogleAsDefaultSearchEngine();
 
   // Write some choice record.
   search_engine_choice_service().RecordChoiceMade(
@@ -498,6 +513,7 @@ TEST_F(SearchEngineChoiceServiceTest, RecordChoiceMade_ByLocation_Waffle) {
       switches::kSearchEngineChoiceCountry);
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kSearchEngineChoiceCountry, kBelgiumCountryId.CountryCode());
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(template_url_service().GetDefaultSearchProvider()->prepopulate_id(),
             TemplateURLPrepopulateData::google.id);
 

@@ -35,6 +35,7 @@
 #include "components/prefs/testing_pref_service.h"
 #include "components/search_engines/search_engines_test_environment.h"
 #include "components/search_engines/template_url.h"
+#include "components/search_engines/template_url_data_util.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/variations/entropy_provider.h"
 #include "components/variations/scoped_variations_ids_provider.h"
@@ -45,6 +46,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/metrics_proto/omnibox_focus_type.pb.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 #include "url/gurl.h"
 
 using testing::_;
@@ -284,6 +286,14 @@ void ZeroSuggestProviderTest::SetUp() {
 
   TemplateURLService* template_url_service = client_->GetTemplateURLService();
   template_url_service->Load();
+
+  // The fallback default search provider is DuckDuckGo; add Google and make
+  // it the user selected default search provider.
+  TemplateURL* google_provider = template_url_service->Add(
+      std::make_unique<TemplateURL>(*TemplateURLDataFromPrepopulatedEngine(
+          TemplateURLPrepopulateData::google)));
+  ASSERT_TRUE(google_provider);
+  template_url_service->SetUserSelectedDefaultSearchProvider(google_provider);
 
   // Verify that Google is the default search provider.
   ASSERT_EQ(SEARCH_ENGINE_GOOGLE,

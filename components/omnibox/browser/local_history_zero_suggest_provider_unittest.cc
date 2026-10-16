@@ -33,10 +33,12 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/search_engines/search_engines_test_util.h"
 #include "components/search_engines/template_url.h"
+#include "components/search_engines/template_url_data_util.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_focus_type.pb.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
 using base::Time;
 using metrics::OmniboxEventProto;
@@ -91,11 +93,12 @@ class LocalHistoryZeroSuggestProviderTest
     provider_ = base::WrapRefCounted(
         LocalHistoryZeroSuggestProvider::Create(client_.get(), this));
 
-    // Add the fallback default search provider to the TemplateURLService so
-    // that it gets a valid unique identifier. Make the newly added provider the
-    // user selected default search provider.
+    // Add Google to the TemplateURLService so that it gets a valid unique
+    // identifier; the fallback default search provider is DuckDuckGo. Make the
+    // newly added provider the user selected default search provider.
     TemplateURL* default_provider = client_->GetTemplateURLService()->Add(
-        std::make_unique<TemplateURL>(default_search_provider()->data()));
+        std::make_unique<TemplateURL>(*TemplateURLDataFromPrepopulatedEngine(
+            TemplateURLPrepopulateData::google)));
     client_->GetTemplateURLService()->SetUserSelectedDefaultSearchProvider(
         default_provider);
 

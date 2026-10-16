@@ -225,6 +225,16 @@ class SearchEngineChoiceEligibilityTest
         policy_service(), template_url_service());
   }
 
+  // The fallback default search engine is DuckDuckGo, which the dynamic
+  // conditions report as `kHasNonGoogleSearchEngine`. Tests expecting
+  // eligibility select Google explicitly.
+  void SelectGoogleAsDefaultSearchEngine() {
+    TemplateURL* google = template_url_service().GetTemplateURLForKeyword(
+        TemplateURLPrepopulateData::google.keyword);
+    ASSERT_TRUE(google);
+    template_url_service().SetUserSelectedDefaultSearchProvider(google);
+  }
+
  private:
   bool skip_search_engine_choice_service_init_ = false;
 
@@ -265,6 +275,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
 // Test that the choice screen gets displayed if the
 // `DefaultSearchProviderEnabled` policy is not set.
 TEST_F(SearchEngineChoiceEligibilityTest, ShowChoiceScreenIfPoliciesAreNotSet) {
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -301,6 +312,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
 // 'DefaultSearchProviderSearchURL' policy is not set.
 TEST_F(SearchEngineChoiceEligibilityTest,
        ShowChoiceScreenIfPolicySetToTrueWithoutUrlSet) {
+  SelectGoogleAsDefaultSearchEngine();
   policy_map().Set(policy::key::kDefaultSearchProviderEnabled,
                    policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
                    policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
@@ -350,6 +362,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
 // screen.
 TEST_F(SearchEngineChoiceEligibilityTest,
        ShowChoiceScreenIfTheTimestampPrefIsNotSet) {
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -385,6 +398,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
   // `kForceSearchEngineChoiceScreen` is checked during the creation of
   // `search_engine_choice_service` which already happens during test set up.
   InitService({.force_reset = true});
+  SelectGoogleAsDefaultSearchEngine();
 
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
@@ -416,6 +430,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
 TEST_F(SearchEngineChoiceEligibilityTest,
        ChoiceScreenConditions_SkipFor3p_Waffle) {
   // First, check the state with Google as the default search engine
+  SelectGoogleAsDefaultSearchEngine();
   ASSERT_TRUE(
       template_url_service().GetDefaultSearchProvider()->prepopulate_id() ==
       TemplateURLPrepopulateData::google.id);
@@ -487,6 +502,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId());
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(/* allow_unknown_current_location= */ true),
@@ -505,6 +521,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("BE"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(/* allow_unknown_current_location= */ false),
@@ -523,6 +540,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("BE"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -541,6 +559,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("BE"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -558,6 +577,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("BE"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -576,6 +596,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("US"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),
@@ -632,6 +653,7 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       regional_capabilities_service().GetClientForTesting())
       .SetVariationsLatestCountryId(CountryId("DE"));
 
+  SelectGoogleAsDefaultSearchEngine();
   EXPECT_EQ(GetStaticConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
   EXPECT_EQ(GetDynamicConditions(),

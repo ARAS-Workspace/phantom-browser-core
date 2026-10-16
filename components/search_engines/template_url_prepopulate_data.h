@@ -116,9 +116,9 @@ const PrepopulatedEngine* GetPrepopulatedEngineFromBuiltInData(
 // Removes prepopulated engines and their version stored in user prefs.
 void ClearPrepopulatedEnginesInPrefs(PrefService* prefs);
 
-// Returns the fallback default search provider, currently hardcoded to be
-// Google, or whichever one is the first of the list if Google is not in the
-// list of prepopulated search engines.
+// Returns the fallback default search provider: DuckDuckGo from the list of
+// prepopulated search engines, or the built-in DuckDuckGo definition if it is
+// not in that list.
 // Search provider overrides are read from `prefs`.
 // The region-specific list is used to ensure we prioritise returning a search
 // engine relevant for the given country, for cases where the `prepopulated_id`

@@ -25,7 +25,7 @@ chrome.test.runTests([
   function QueryPopulatedDispositionEmpty() {
     chrome.tabs.create({}, async (tab) => {
       await waitForNewTab(tab.id);
-      const navigated = waitForNavigationToGoogle(tab.id);
+      const navigated = waitForNavigationToSearch(tab.id);
       chrome.search.query({text: SEARCH_WORDS}, () => {});
       await navigated;
       chrome.test.succeed();
@@ -36,7 +36,7 @@ chrome.test.runTests([
   function QueryPopulatedDispositionCurrentTab() {
     chrome.tabs.create({}, async (tab) => {
       await waitForNewTab(tab.id);
-      const navigated = waitForNavigationToGoogle(tab.id);
+      const navigated = waitForNavigationToSearch(tab.id);
       chrome.search.query({text: SEARCH_WORDS, disposition: 'CURRENT_TAB'});
       await navigated;
       chrome.test.succeed();
@@ -49,7 +49,7 @@ chrome.test.runTests([
       const initialTabIds = initialTabs.map(tab => tab.id);
       Promise
           .all([
-            waitForGoogleInAnyTab(),
+            waitForSearchInAnyTab(),
             new Promise(resolve => {
               chrome.search.query(
                   {text: SEARCH_WORDS, disposition: 'NEW_TAB'}, () => {
@@ -82,7 +82,7 @@ chrome.test.runTests([
       const initialWindowIds = initialWindows.map(window => window.id);
       Promise
           .all([
-            waitForGoogleInAnyTab(),
+            waitForSearchInAnyTab(),
             new Promise((resolve) => {
               chrome.search.query(
                   {text: SEARCH_WORDS, disposition: 'NEW_WINDOW'}, () => {
@@ -106,7 +106,7 @@ chrome.test.runTests([
   function QueryPopulatedTabIDValid() {
     chrome.tabs.create({}, async (tab) => {
       await waitForNewTab(tab.id);
-      const navigated = waitForNavigationToGoogle(tab.id);
+      const navigated = waitForNavigationToSearch(tab.id);
       chrome.search.query({text: SEARCH_WORDS, tabId: tab.id});
       await navigated;
       chrome.test.succeed();
@@ -158,10 +158,11 @@ function waitForNewTab(tabId) {
   return waitForTab(tabId, 'newtab');
 }
 
-function waitForNavigationToGoogle(tabId) {
-  return waitForTab(tabId, 'www.google.com');
+// The search results are expected on DuckDuckGo, the default search engine.
+function waitForNavigationToSearch(tabId) {
+  return waitForTab(tabId, 'duckduckgo.com');
 }
 
-function waitForGoogleInAnyTab() {
-  return waitForTab(-1, 'www.google.com');
+function waitForSearchInAnyTab() {
+  return waitForTab(-1, 'duckduckgo.com');
 }

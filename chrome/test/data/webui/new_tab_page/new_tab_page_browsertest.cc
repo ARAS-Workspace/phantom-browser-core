@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 #include "base/test/scoped_feature_list.h"
+#include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/webui_url_constants.h"
+#include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "components/history_clusters/core/features.h"
 #include "components/search/ntp_features.h"
+#include "components/search_engines/template_url_service.h"
 #include "content/public/test/browser_test.h"
 
 class NewTabPageBrowserTest : public WebUIMochaBrowserTest {
@@ -23,6 +26,15 @@ IN_PROC_BROWSER_TEST_F(NewTabPageTest, MetricsUtils) {
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, RealboxSearchbox) {
+  // The realbox is part of the WebUI NTP, which is the NTP with Google as the
+  // default search provider.
+  TemplateURLService* template_url_service =
+      TemplateURLServiceFactory::GetForProfile(GetProfileForSetup());
+  search_test_utils::WaitForTemplateURLServiceToLoad(template_url_service);
+  TemplateURL* google =
+      template_url_service->GetTemplateURLForKeyword(u"google.com");
+  ASSERT_TRUE(google);
+  template_url_service->SetUserSelectedDefaultSearchProvider(google);
   RunTest("new_tab_page/searchbox_ntp_test.js",
           "runMochaSuite('SearchboxTest');");
 }

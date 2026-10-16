@@ -27,6 +27,7 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_service_client.h"
 #include "components/webdata/common/web_database_service.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
 void RegisterPrefsForTemplateURLService(
     user_prefs::PrefRegistrySyncable* registry) {
@@ -162,8 +163,15 @@ void LoadedTemplateURLServiceUnitTestBase::SetUp() {
   template_url_service().Load();
   template_url_service_load_waiter_.WaitForLoadComplete(template_url_service());
 
+  // The fallback default search engine (DuckDuckGo) is not in the default list
+  // of prepopulated engines, so it is added next to them.
+  const TemplateURL* default_search_provider =
+      template_url_service().GetDefaultSearchProvider();
+  ASSERT_TRUE(default_search_provider);
+  ASSERT_EQ(default_search_provider->prepopulate_id(),
+            TemplateURLPrepopulateData::duckduckgo.id);
   ASSERT_EQ(GetKeywordTemplateURLs().size(),
-            regional_capabilities::GetDefaultPrepopulatedEngines().size());
+            regional_capabilities::GetDefaultPrepopulatedEngines().size() + 1);
 }
 
 void LoadedTemplateURLServiceUnitTestBase::TearDown() {

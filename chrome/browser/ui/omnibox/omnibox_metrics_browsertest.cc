@@ -78,7 +78,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxMetricsTest, LogSearchEngineUsed) {
   const AutocompleteResult& result = controller()->result();
   ASSERT_FALSE(result.empty());
   const AutocompleteMatch& match = result.match_at(0);
-  EXPECT_EQ(u"google.com", match.keyword);
+  EXPECT_EQ(u"duckduckgo.com", match.keyword);
   EXPECT_EQ(u"z", match.fill_into_edit);
   EXPECT_EQ(AutocompleteMatchType::SEARCH_WHAT_YOU_TYPED,
             result.match_at(0).type);
@@ -91,10 +91,10 @@ IN_PROC_BROWSER_TEST_F(OmniboxMetricsTest, LogSearchEngineUsed) {
   EXPECT_TRUE(controller()->done());
 
   histogram_tester.ExpectUniqueSample("Omnibox.SearchEngineType",
-                                      SEARCH_ENGINE_GOOGLE, 1);
+                                      SEARCH_ENGINE_DUCKDUCKGO, 1);
   histogram_tester.ExpectUniqueSample(
       "Omnibox.SearchEngineType.Fallback.DefaultSearchProvider",
-      SEARCH_ENGINE_GOOGLE, 1);
+      SEARCH_ENGINE_DUCKDUCKGO, 1);
 }
 
 IN_PROC_BROWSER_TEST_F(OmniboxMetricsTest, LogSearchEngineUsed_PostNavigation) {

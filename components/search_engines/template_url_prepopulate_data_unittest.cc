@@ -480,16 +480,13 @@ TEST_F(TemplateURLPrepopulateDataTest, ClearProvidersFromPrefs) {
     EXPECT_NE(1001, t_urls[i]->prepopulate_id);
   }
 
-  // Ensures the fallback URL is Google and has the optional fields filled.
+  // Ensures the fallback URL is DuckDuckGo.
   std::unique_ptr<TemplateURLData> fallback_t_url =
       prepopulate_data_resolver().GetFallbackSearch();
-  EXPECT_EQ(TemplateURLPrepopulateData::google.name,
+  EXPECT_EQ(TemplateURLPrepopulateData::duckduckgo.name,
             fallback_t_url->short_name());
   EXPECT_FALSE(fallback_t_url->suggestions_url.empty());
-  EXPECT_FALSE(fallback_t_url->image_url.empty());
-  EXPECT_FALSE(fallback_t_url->contextual_search_url.empty());
-  EXPECT_FALSE(fallback_t_url->image_url_post_params.empty());
-  EXPECT_EQ(TemplateURLPrepopulateData::google.type,
+  EXPECT_EQ(TemplateURLPrepopulateData::duckduckgo.type,
             TemplateURL(*fallback_t_url).GetEngineType(SearchTermsData()));
 }
 
@@ -514,22 +511,13 @@ TEST_F(TemplateURLPrepopulateDataTest, ProvidersFromPrepopulated) {
     EXPECT_TRUE(t_urls[0]->last_modified.is_null());
   }
 
-  // Ensures the fallback URL is Google and has the optional fields filled.
+  // Ensures the fallback URL is DuckDuckGo.
   std::unique_ptr<TemplateURLData> fallback_t_url =
       prepopulate_data_resolver().GetFallbackSearch();
-  EXPECT_EQ(TemplateURLPrepopulateData::google.name,
+  EXPECT_EQ(TemplateURLPrepopulateData::duckduckgo.name,
             fallback_t_url->short_name());
   EXPECT_FALSE(fallback_t_url->suggestions_url.empty());
-  EXPECT_FALSE(fallback_t_url->image_url.empty());
-  EXPECT_FALSE(fallback_t_url->contextual_search_url.empty());
-  EXPECT_FALSE(fallback_t_url->image_url_post_params.empty());
-  // Expect at least 2 alternate_urls.
-  // This caught a bug with static initialization of arrays, so leave this in.
-  EXPECT_GT(fallback_t_url->alternate_urls.size(), 1u);
-  for (size_t i = 0; i < fallback_t_url->alternate_urls.size(); ++i) {
-    EXPECT_FALSE(fallback_t_url->alternate_urls[i].empty());
-  }
-  EXPECT_EQ(TemplateURLPrepopulateData::google.type,
+  EXPECT_EQ(TemplateURLPrepopulateData::duckduckgo.type,
             TemplateURL(*fallback_t_url).GetEngineType(SearchTermsData()));
 }
 
@@ -769,35 +757,36 @@ TEST_F(TemplateURLPrepopulateDataTest, HttpsUrls) {
   }
 }
 
-TEST_F(TemplateURLPrepopulateDataTest, FindGoogleAsFallback) {
+TEST_F(TemplateURLPrepopulateDataTest, FindDuckDuckGoAsFallback) {
   std::unique_ptr<TemplateURLData> fallback_url;
 
-  // Google is first in US, so confirm index 0.
+  // DuckDuckGo is in the US list but not first.
   CountryId us_country_id("US");
   OverrideCountryId(us_country_id);
-  EXPECT_EQ(TemplateURLPrepopulateData::kRegionalSettings.find(us_country_id)
+  EXPECT_NE(TemplateURLPrepopulateData::kRegionalSettings.find(us_country_id)
                 ->second->search_engines[0]
                 ->id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.id);
 
   fallback_url = prepopulate_data_resolver().GetFallbackSearch();
+  ASSERT_TRUE(fallback_url);
   EXPECT_EQ(fallback_url->prepopulate_id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.id);
 
-  // Google is not first in CN; confirm it is found at index > 0.
-  // If Google ever does reach top in China, this test will need to be adjusted:
-  // check template_url_prepopulate_data.cc reference orders (engines_CN, etc.)
-  // to find a suitable country and index.
+  // DuckDuckGo is not in the CN list; the built-in definition is returned.
   CountryId cn_country_id("CN");
   OverrideCountryId(cn_country_id);
+  for (const auto& engine :
+       prepopulate_data_resolver().GetPrepopulatedEngines()) {
+    EXPECT_NE(engine->prepopulate_id,
+              TemplateURLPrepopulateData::duckduckgo.id);
+  }
   fallback_url = prepopulate_data_resolver().GetFallbackSearch();
-  EXPECT_NE(TemplateURLPrepopulateData::kRegionalSettings.find(cn_country_id)
-                ->second->search_engines[0]
-                ->id,
-            TemplateURLPrepopulateData::google.id);
-  EXPECT_TRUE(fallback_url);
+  ASSERT_TRUE(fallback_url);
   EXPECT_EQ(fallback_url->prepopulate_id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.id);
+  EXPECT_EQ(fallback_url->keyword(),
+            TemplateURLPrepopulateData::duckduckgo.keyword);
 }
 
 // Regression test for https://crbug.com/1500526.

@@ -61,7 +61,10 @@ void SetOverrides(sync_preferences::TestingPrefServiceSyncable* prefs,
             .Set("alternate_urls", std::move(alternate_urls)));
   };
 
-  add_definition(100, update ? "new_foo" : "foo", "https://atlas.com");
+  // The first definition has the ID of DuckDuckGo, the fallback default search
+  // engine, so that it is the fallback engine while the overrides apply.
+  add_definition(TemplateURLPrepopulateData::duckduckgo.id,
+                 update ? "new_foo" : "foo", "https://atlas.com");
   add_definition(101, update ? "new_bar" : "bar", "https://brave.com");
   add_definition(102, update ? "new_bar" : "bar", "https://conduit.com");
   add_definition(103, "at.yahoo.com", "https://at.search.yahoo.com");
@@ -175,9 +178,9 @@ TEST_F(DefaultSearchManagerTest, DefaultSearchSetByUserPref) {
   std::unique_ptr<TemplateURLData> fallback_t_url_data =
       prepopulate_data_resolver().GetFallbackSearch();
   EXPECT_EQ(fallback_t_url_data->keyword(),
-            TemplateURLPrepopulateData::google.keyword);
+            TemplateURLPrepopulateData::duckduckgo.keyword);
   EXPECT_EQ(fallback_t_url_data->prepopulate_id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.id);
   DefaultSearchManager::Source source = DefaultSearchManager::FROM_POLICY;
   // If no user pref is set, we should use the pre-populated values.
   ExpectSimilar(fallback_t_url_data.get(),
@@ -230,19 +233,19 @@ TEST_F(DefaultSearchManagerTest, DefaultSearchOverridesIgnoredWhenFlagEnabled) {
   SetOverrides(pref_service(), false);
   auto manager = create_manager();
 
-  // The fallback engine should be the default prepopulated one (Google), not
-  // the one from overrides.
+  // The fallback engine should be the default prepopulated one (DuckDuckGo),
+  // not the one from overrides.
   std::unique_ptr<TemplateURLData> fallback_t_url_data =
       prepopulate_data_resolver().GetFallbackSearch();
   EXPECT_EQ(fallback_t_url_data->keyword(),
-            TemplateURLPrepopulateData::google.keyword);
+            TemplateURLPrepopulateData::duckduckgo.keyword);
   EXPECT_EQ(fallback_t_url_data->prepopulate_id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.id);
 
   DefaultSearchManager::Source source = DefaultSearchManager::FROM_POLICY;
   const TemplateURLData* engine = manager->GetDefaultSearchEngine(&source);
   ASSERT_TRUE(engine);
-  EXPECT_EQ(engine->keyword(), TemplateURLPrepopulateData::google.keyword);
+  EXPECT_EQ(engine->keyword(), TemplateURLPrepopulateData::duckduckgo.keyword);
   EXPECT_EQ(DefaultSearchManager::FROM_FALLBACK, source);
 }
 
@@ -254,12 +257,13 @@ TEST_F(DefaultSearchManagerTest, DefaultSearchSetByOverrides) {
   SetOverrides(pref_service(), false);
   auto manager = create_manager();
 
+  // The fallback engine is the DuckDuckGo entry from the overrides.
   std::unique_ptr<TemplateURLData> fallback_t_url_data =
       prepopulate_data_resolver().GetFallbackSearch();
   EXPECT_NE(fallback_t_url_data->keyword(),
-            TemplateURLPrepopulateData::google.keyword);
-  EXPECT_NE(fallback_t_url_data->prepopulate_id,
-            TemplateURLPrepopulateData::google.id);
+            TemplateURLPrepopulateData::duckduckgo.keyword);
+  EXPECT_EQ(fallback_t_url_data->prepopulate_id,
+            TemplateURLPrepopulateData::duckduckgo.id);
 
   DefaultSearchManager::Source source = DefaultSearchManager::FROM_POLICY;
   EXPECT_TRUE(manager->GetDefaultSearchEngine(&source));

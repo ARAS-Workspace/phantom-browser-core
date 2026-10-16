@@ -69,9 +69,9 @@ class Resolver : public KeyedService {
   std::unique_ptr<TemplateURLData> GetEngineFromFullList(
       std::u16string_view keyword) const;
 
-  // Returns the fallback default search provider, currently hardcoded to be
-  // Google, or whichever one is the first of the list if Google is not in the
-  // list of prepopulated search engines.
+  // Returns the fallback default search provider: DuckDuckGo from the list of
+  // prepopulated search engines, or the built-in DuckDuckGo definition if it is
+  // not in that list.
   // May return `nullptr` if for some reason there are no prepopulated search
   // engines available.
   std::unique_ptr<TemplateURLData> GetFallbackSearch() const;

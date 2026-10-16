@@ -48,10 +48,10 @@ const addTabListener = (tabIdExpected) => {
     // Note: make sure to stop listening to future events, so that this
     // doesn't affect future tests.
     chrome.tabs.onUpdated.removeListener(listener);
-    // The tab finished loading. It should be on google (the default
+    // The tab finished loading. It should be on DuckDuckGo (the default
     // search engine).
     const hostname = new URL(tab.url).hostname;
-    assertEq('www.google.com', hostname);
+    assertEq('duckduckgo.com', hostname);
     succeed();
   });
 };

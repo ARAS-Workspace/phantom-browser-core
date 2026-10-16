@@ -7,7 +7,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/threading/thread_restrictions.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/search_test_utils.h"
@@ -36,17 +35,10 @@ void SetUserSelectedDefaultSearchProvider(Profile* profile,
 }
 
 GURL GetFinalNtpUrl(Profile* profile) {
-  if (search::GetNewTabPageURL(profile) ==
-      chrome::ChromeUINewTabPageURLAsGURL()) {
-    // If chrome://newtab/ already maps to the local/WebUI NTP, then that will
-    // load correctly, even without network.  The URL associated with the
-    // WebContents will stay chrome://newtab/.
-    return chrome::ChromeUINewTabURLAsGURL();
-  }
-  // If chrome://newtab/ maps to a remote URL, then it will fail to load in a
-  // browser_test environment.  In this case, we will get redirected to the
-  // 3P WebUI NTP, which changes the URL associated with the WebContents.
-  return GURL(chrome::kChromeUINewTabPageThirdPartyURL);
+  // chrome://newtab/ maps to a local WebUI NTP (chrome://new-tab-page/ or
+  // chrome://new-tab-page-third-party/), which loads without network. The URL
+  // associated with the WebContents stays chrome://newtab/.
+  return chrome::ChromeUINewTabURLAsGURL();
 }
 
 }  // namespace ntp_test_utils

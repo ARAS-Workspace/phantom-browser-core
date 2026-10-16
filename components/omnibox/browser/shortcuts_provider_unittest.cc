@@ -146,10 +146,10 @@ struct TestShortcutData shortcut_test_db[] = {
      AutocompleteMatch::DocumentType::NONE, "Abcdef", "0,1,4,0", "Abcdef",
      "0,3,4,1", ui::PAGE_TRANSITION_TYPED, AutocompleteMatchType::HISTORY_URL,
      "", 1, 100},
-    {GetGuid(), "query", "query", "https://www.google.com/search?q=query",
+    {GetGuid(), "query", "query", "https://duckduckgo.com/?q=query",
      AutocompleteMatch::DocumentType::NONE, "query", "0,0", "Google Search",
      "0,4", ui::PAGE_TRANSITION_GENERATED,
-     AutocompleteMatchType::SEARCH_HISTORY, "google.com", 1, 100},
+     AutocompleteMatchType::SEARCH_HISTORY, "duckduckgo.com", 1, 100},
     {GetGuid(), "word", "www.word", "https://www.google.com/search?q=www.word",
      AutocompleteMatch::DocumentType::NONE, "www.word", "0,0", "Google Search",
      "0,4", ui::PAGE_TRANSITION_GENERATED,
@@ -376,7 +376,7 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatch) {
   // Another test, simply for a query match type, not a navigation URL match
   // type.
   text = u"que";
-  expected_url = "https://www.google.com/search?q=query";
+  expected_url = "https://duckduckgo.com/?q=query";
   expected_urls.clear();
   expected_urls.push_back(ExpectedURLAndAllowedToBeDefault(expected_url, true));
   RunShortcutsProviderTest(provider_, text, false, expected_urls, expected_url,
@@ -526,17 +526,17 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatchKeyword) {
   TestShortcutData shortcuts[] = {
       create_keyword_shortcut("yahoo.com explicit keyword", "yahoo.com",
                               "https://yahoo.com/explicit-keyword", true, true),
-      create_keyword_shortcut("google.com non-explicit keyword", "google.com",
-                              "https://google.com/non-explicit-keyword", false,
-                              true),
+      create_keyword_shortcut(
+          "duckduckgo.com non-explicit keyword", "duckduckgo.com",
+          "https://duckduckgo.com/non-explicit-keyword", false, true),
       create_keyword_shortcut("google.com navigation", "",
                               "https://google.com/navigation", false, false),
       create_keyword_shortcut("yahoo.com search on google.com", "google.com",
                               "https://google.com/q=yahoo.com", true, true),
       create_keyword_shortcut("search on yahoo.com", "yahoo.com",
                               "https://yahoo.com/q=search", false, true),
-      create_keyword_shortcut("search on google.com", "google.com",
-                              "https://google.com/q=search", false, true),
+      create_keyword_shortcut("search on duckduckgo.com", "duckduckgo.com",
+                              "https://duckduckgo.com/q=search", false, true),
   };
   PopulateShortcutsBackendWithTestData(client_->GetShortcutsBackend(),
                                        shortcuts);
@@ -573,8 +573,8 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatchKeyword) {
 
   // When the input is in keyword mode, a match with a keyword hint can not be
   // default.
-  test(u"google.com non-e", true, "https://google.com/non-explicit-keyword",
-       false, u"");
+  test(u"duckduckgo.com non-e", true,
+       "https://duckduckgo.com/non-explicit-keyword", false, u"");
 
   // When the input is NOT in keyword mode, a match with a keyword can not be
   // default.
@@ -583,8 +583,8 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatchKeyword) {
 
   // When the input is NOT in keyword mode, a match with a keyword hint can be
   // default.
-  test(u"google.com non-ex", false, "https://google.com/non-explicit-keyword",
-       true, u"plicit keyword");
+  test(u"duckduckgo.com non-ex", false,
+       "https://duckduckgo.com/non-explicit-keyword", true, u"plicit keyword");
 
   // When the input is NOT in keyword mode, a match without a keyword can be
   // default.
@@ -597,8 +597,8 @@ TEST_F(ShortcutsProviderTest, SimpleSingleMatchKeyword) {
 
   // When the input is NOT in keyword mode, a match from the default search
   // provider can be default.
-  test(u"search on g", false, "https://google.com/q=search", true,
-       u"oogle.com");
+  test(u"search on d", false, "https://duckduckgo.com/q=search", true,
+       u"uckduckgo.com");
 }
 
 TEST_F(ShortcutsProviderTest, MultiMatch) {

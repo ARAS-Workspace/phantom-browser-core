@@ -530,30 +530,6 @@ IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorKeepSocketBrowserTest,
   }
 }
 
-class SearchEnginePreconnectorDesktopAutoStartBrowserTest
-    : public SearchEnginePreconnectorBrowserTest {
- public:
-  SearchEnginePreconnectorDesktopAutoStartBrowserTest() {
-    feature_list_.InitWithFeaturesAndParameters(
-        {
-            {features::kPreconnectToSearch, {{"startup_delay_ms", "0"}}},
-            {net::features::kSearchEnginePreconnectInterval,
-             {{"preconnect_interval", "0"}}},
-        },
-        {});
-  }
-
-  ~SearchEnginePreconnectorDesktopAutoStartBrowserTest() override = default;
-};
-
-IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorDesktopAutoStartBrowserTest,
-                       AutoStartDesktop) {
-  int preresolve_count =
-      SearchEnginePreconnector::SearchEnginePreconnect2Enabled() ? 1 : 2;
-  // Verifies that the default search is preconnected.
-  WaitForPreresolveCountForURL(GURL(kGoogleSearch), preresolve_count);
-}
-
 class SearchEnginePreconnectorEnabledOnlyBrowserTest
     : public SearchEnginePreconnectorBrowserTest,
       public testing::WithParamInterface<std::tuple<bool, bool>> {
@@ -1477,40 +1453,6 @@ class SearchEnginePreconnectorDeviceBoundSessionBrowserTest
 };
 
 IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorDeviceBoundSessionBrowserTest,
-                       PrewarmsDeviceBoundSessionOnStart) {
-  auto mock_manager =
-      std::make_unique<network::MockDeviceBoundSessionManager>();
-
-  base::RunLoop run_loop;
-  EXPECT_CALL(*mock_manager, PrewarmSessionsForUrl)
-      .WillOnce([&run_loop](const GURL& url,
-                            network::mojom::DeviceBoundSessionManager::
-                                PrewarmSessionsForUrlCallback callback) {
-        std::move(callback).Run({}, std::nullopt);
-        run_loop.Quit();
-      });
-
-  auto* preconnector =
-      SearchEnginePreconnectorKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile());
-  ASSERT_TRUE(preconnector);
-
-  // Stop preconnector so the pre-existing pre-warmer is destroyed before we
-  // replace the proxy.
-  preconnector->StopPreconnecting();
-
-  browser()
-      ->GetProfile()
-      ->GetDefaultStoragePartition()
-      ->OverrideDeviceBoundSessionManagerForTesting(std::move(mock_manager));
-
-  preconnector->StartPreconnecting(/*with_startup_delay=*/true);
-
-  run_loop.Run();
-  EXPECT_TRUE(preconnector->HasDeviceBoundSessionPrewarmerForTesting());
-}
-
-IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorDeviceBoundSessionBrowserTest,
                        DoesNotPrewarmWhenSearchSuggestDisabled) {
   browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSearchSuggestEnabled,
                                                   false);
@@ -1533,41 +1475,6 @@ IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorDeviceBoundSessionBrowserTest,
 
   preconnector->StartPreconnecting(/*with_startup_delay=*/true);
 
-  EXPECT_FALSE(preconnector->HasDeviceBoundSessionPrewarmerForTesting());
-}
-
-IN_PROC_BROWSER_TEST_F(SearchEnginePreconnectorDeviceBoundSessionBrowserTest,
-                       PrewarmerCancelledWhenStopped) {
-  auto mock_manager =
-      std::make_unique<network::MockDeviceBoundSessionManager>();
-
-  base::RunLoop run_loop;
-  EXPECT_CALL(*mock_manager, PrewarmSessionsForUrl)
-      .WillOnce([&run_loop](const GURL& url,
-                            network::mojom::DeviceBoundSessionManager::
-                                PrewarmSessionsForUrlCallback callback) {
-        // Schedule next prewarm in 10 seconds.
-        std::move(callback).Run({}, base::Time::Now() + base::Seconds(10));
-        run_loop.Quit();
-      });
-
-  auto* preconnector =
-      SearchEnginePreconnectorKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile());
-  ASSERT_TRUE(preconnector);
-  preconnector->StopPreconnecting();
-
-  browser()
-      ->GetProfile()
-      ->GetDefaultStoragePartition()
-      ->OverrideDeviceBoundSessionManagerForTesting(std::move(mock_manager));
-
-  preconnector->StartPreconnecting(/*with_startup_delay=*/true);
-  run_loop.Run();
-  EXPECT_TRUE(preconnector->HasDeviceBoundSessionPrewarmerForTesting());
-
-  // Stop preconnector (e.g. when app goes to background).
-  preconnector->StopPreconnecting();
   EXPECT_FALSE(preconnector->HasDeviceBoundSessionPrewarmerForTesting());
 }
 #endif  // BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)

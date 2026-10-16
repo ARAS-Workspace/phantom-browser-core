@@ -1209,7 +1209,7 @@ TEST_F(TemplateURLServiceSyncTest, MergeConflictingPrepopulatedEngine) {
   data.safe_for_autoreplace = true;
   data.date_created = Time::FromTimeT(50);
   data.last_modified = Time::FromTimeT(50);
-  data.prepopulate_id = 1;
+  data.prepopulate_id = default_turl->prepopulate_id;
   data.sync_guid = "default";
   model()->Add(std::make_unique<TemplateURL>(data));
 
@@ -1220,7 +1220,7 @@ TEST_F(TemplateURLServiceSyncTest, MergeConflictingPrepopulatedEngine) {
   new_data.safe_for_autoreplace = false;
   new_data.date_created = Time::FromTimeT(100);
   new_data.last_modified = Time::FromTimeT(100);
-  new_data.prepopulate_id = 1;
+  new_data.prepopulate_id = default_turl->prepopulate_id;
   new_data.sync_guid = "different_guid";
 
   // Test that a remote TemplateURL can override a local TemplateURL not yet

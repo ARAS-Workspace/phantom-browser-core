@@ -153,13 +153,11 @@
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/test_extension_action_dispatcher_observer.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/login/login_handler.h"                 // nogncheck
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"  // nogncheck
-#include "chrome/browser/ui/search/ntp_test_utils.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/network_session_configurator/common/network_switches.h"
@@ -316,20 +314,6 @@ base::Value ExecuteScriptAndReturnValue(const ExtensionId& extension_id,
       context, extension_id, script,
       BackgroundScriptExecutor::ResultCapture::kSendScriptResult);
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-std::optional<bool> ExecuteScriptAndReturnBool(const ExtensionId& extension_id,
-                                               content::BrowserContext* context,
-                                               const std::string& script) {
-  std::optional<bool> result;
-  base::Value script_result =
-      ExecuteScriptAndReturnValue(extension_id, context, script);
-  if (script_result.is_bool()) {
-    result = script_result.GetBool();
-  }
-  return result;
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 std::optional<std::string> ExecuteScriptAndReturnString(
     const ExtensionId& extension_id,
@@ -3244,104 +3228,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest,
   ASSERT_TRUE(navigation_observer.last_navigation_succeeded());
   EXPECT_FALSE(HasSeenWebRequestInBackgroundScript(extension, profile(),
                                                    web_url.GetHost()));
-}
-
-// Test fixture which sets a custom NTP Page.
-// Not ported to desktop Android because the Android NTP is native UI.
-class NTPInterceptionWebRequestAPITest
-    : public ExtensionApiTest,
-      public testing::WithParamInterface<ContextType> {
- public:
-  NTPInterceptionWebRequestAPITest()
-      : ExtensionApiTest(GetParam()),
-        https_test_server_(net::EmbeddedTestServer::TYPE_HTTPS) {}
-
-  NTPInterceptionWebRequestAPITest(const NTPInterceptionWebRequestAPITest&) =
-      delete;
-  NTPInterceptionWebRequestAPITest& operator=(
-      const NTPInterceptionWebRequestAPITest&) = delete;
-  ~NTPInterceptionWebRequestAPITest() override = default;
-
-  // ExtensionApiTest override:
-  void SetUpOnMainThread() override {
-    ExtensionApiTest::SetUpOnMainThread();
-    test_data_dir_ = test_data_dir_.AppendASCII("webrequest")
-                         .AppendASCII("ntp_request_interception");
-    https_test_server_.ServeFilesFromDirectory(test_data_dir_);
-    ASSERT_TRUE(https_test_server_.Start());
-
-    GURL ntp_url = https_test_server_.GetURL("/fake_ntp.html");
-    ntp_test_utils::SetUserSelectedDefaultSearchProvider(
-        profile(), https_test_server_.base_url().spec(), ntp_url.spec());
-  }
-
-  const net::EmbeddedTestServer* https_test_server() const {
-    return &https_test_server_;
-  }
-
- private:
-  net::EmbeddedTestServer https_test_server_;
-};
-
-INSTANTIATE_TEST_SUITE_P(PersistentBackground,
-                         NTPInterceptionWebRequestAPITest,
-                         ::testing::Values(ContextType::kPersistentBackground));
-
-INSTANTIATE_TEST_SUITE_P(ServiceWorker,
-                         NTPInterceptionWebRequestAPITest,
-                         ::testing::Values(ContextType::kServiceWorker));
-
-// Ensures that requests made by the NTP Instant renderer are hidden from the
-// Web Request API. Regression test for crbug.com/40089982.
-IN_PROC_BROWSER_TEST_P(NTPInterceptionWebRequestAPITest,
-                       NTPRendererRequestsHidden) {
-  // Loads an extension which tries to intercept requests to
-  // "fake_ntp_script.js", which will be loaded as part of the NTP renderer.
-  ExtensionTestMessageListener listener("ready", ReplyBehavior::kWillReply);
-  const Extension* extension =
-      LoadExtension(test_data_dir_.AppendASCII("extension"));
-  ASSERT_TRUE(extension);
-  EXPECT_TRUE(listener.WaitUntilSatisfied());
-  // Wait for webRequest listeners to be set up.
-  profile()->GetDefaultStoragePartition()->FlushNetworkInterfaceForTesting();
-
-  // Have the extension listen for requests to |fake_ntp_script.js|.
-  listener.Reply(https_test_server()->GetURL("/fake_ntp_script.js").spec());
-
-  // Returns true if the given extension was able to intercept the request to
-  // "fake_ntp_script.js".
-  auto was_script_request_intercepted =
-      [this](const ExtensionId& extension_id) {
-        const std::optional<bool> result = ExecuteScriptAndReturnBool(
-            extension_id, profile(), "getAndResetRequestIntercepted();");
-        DCHECK(result);
-        return *result;
-      };
-
-  // Returns true if the given |web_contents| has window.scriptExecuted set to
-  // true;
-  auto was_ntp_script_loaded = [](content::WebContents* web_contents) {
-    return content::EvalJs(web_contents, "!!window.scriptExecuted;")
-        .ExtractBool();
-  };
-
-  WebContents* web_contents = GetActiveWebContents();
-
-  // Navigate to the NTP. The request for "fake_ntp_script.js" should not have
-  // reached the extension, since it was made by the instant NTP renderer, which
-  // is semi-privileged.
-  ASSERT_TRUE(NavigateToURL(web_contents, chrome::ChromeUINewTabURLAsGURL()));
-  EXPECT_TRUE(was_ntp_script_loaded(web_contents));
-  ASSERT_TRUE(search::IsInstantNTP(web_contents));
-  EXPECT_FALSE(was_script_request_intercepted(extension->id()));
-
-  // However, when a normal webpage requests the same script, the request should
-  // be seen by the extension.
-  ASSERT_TRUE(NavigateToURL(
-      web_contents, https_test_server()->GetURL("/page_with_ntp_script.html")));
-  EXPECT_TRUE(was_ntp_script_loaded(web_contents));
-  ASSERT_FALSE(search::IsInstantNTP(web_contents));
-  EXPECT_TRUE(was_script_request_intercepted(extension->id()));
 }
 
 class WebRequestApiTestWithManagementPolicy

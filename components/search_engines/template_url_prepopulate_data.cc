@@ -288,9 +288,13 @@ std::unique_ptr<TemplateURLData> GetPrepopulatedFallbackSearch(
     PrefService& prefs,
     const std::vector<raw_ptr<const PrepopulatedEngine>>&
         regional_prepopulated_engines) {
-  return FindPrepopulatedEngineInternal(prefs, regional_prepopulated_engines,
-                                        google.id,
-                                        /*use_first_as_fallback=*/true);
+  std::unique_ptr<TemplateURLData> fallback = FindPrepopulatedEngineInternal(
+      prefs, regional_prepopulated_engines, duckduckgo.id,
+      /*use_first_as_fallback=*/false);
+  if (fallback) {
+    return fallback;
+  }
+  return TemplateURLDataFromPrepopulatedEngine(duckduckgo);
 }
 
 }  // namespace TemplateURLPrepopulateData

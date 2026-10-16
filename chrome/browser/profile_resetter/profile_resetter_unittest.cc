@@ -108,7 +108,8 @@ const char kDistributionConfigWithSearch[] =
     "      \"favicon_url\" : \"http://www.foo.com/favicon.ico\","
     "      \"suggest_url\" : \"http://www.foo.com/s?q={searchTerms}\","
     "      \"encoding\" : \"UTF-8\","
-    "      \"id\" : 1001"
+    // The ID of DuckDuckGo, the fallback default search engine.
+    "      \"id\" : 92"
     "    }"
     "  ],"
     " \"extensions\" : {"
@@ -352,10 +353,9 @@ TEST_P(ProfileResetterTestWithIgnoreSearchProviderOverrides,
   ASSERT_NE(static_cast<TemplateURL*>(nullptr), default_engine);
 
   if (IsParamFeatureEnabled()) {
-    EXPECT_EQ(u"Google", default_engine->short_name());
-    EXPECT_EQ(u"google.com", default_engine->keyword());
-    EXPECT_NE(std::string::npos,
-              default_engine->url().find("{google:baseURL}"));
+    EXPECT_EQ(u"DuckDuckGo", default_engine->short_name());
+    EXPECT_EQ(u"duckduckgo.com", default_engine->keyword());
+    EXPECT_EQ("https://duckduckgo.com/?q={searchTerms}", default_engine->url());
   } else {
     EXPECT_EQ(u"first", default_engine->short_name());
     EXPECT_EQ(u"firstkey", default_engine->keyword());

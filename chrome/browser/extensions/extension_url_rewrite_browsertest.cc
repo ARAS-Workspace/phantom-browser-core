@@ -83,9 +83,8 @@ class ExtensionURLRewriteBrowserTest : public extensions::ExtensionBrowserTest {
 
 IN_PROC_BROWSER_TEST_F(ExtensionURLRewriteBrowserTest, NewTabPageURL) {
   // Navigate to chrome://newtab and check that the location bar text is blank.
-  // We do not use TestURLNotShown here because the virtual URL may be
-  // updated to the local NTP since we do not have a network connection to
-  // reach the remote NTP.
+  // chrome://newtab maps to a local WebUI NTP, which keeps chrome://newtab as
+  // its virtual URL.
   ASSERT_TRUE(
       NavigateToURL(GetActiveWebContents(), chrome::ChromeUINewTabURLAsGURL()));
   EXPECT_EQ("", GetLocationBarText());

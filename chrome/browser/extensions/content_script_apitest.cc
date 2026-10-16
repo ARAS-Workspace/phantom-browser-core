@@ -83,11 +83,6 @@
 #include "pdf/pdf_features.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/search/ntp_test_utils.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -2265,67 +2260,6 @@ IN_PROC_BROWSER_TEST_F(ContentScriptMatchOriginAsFallbackTest,
     // related frame. https://crbug.com/40142417.
     EXPECT_TRUE(DidScriptRunInFrame(data_url_host));
   }
-}
-
-// Test fixture which sets a custom NTP Page for content script injection tests.
-// These tests are skipped on Android because Android uses native UI instead of
-// webui for the NTP and hence the NTP isn't scriptable.
-// TODO(karandeepb): Similar logic to set up a custom NTP is used elsewhere as
-// well. Abstract this away into a reusable test fixture class.
-class NTPInterceptionTest : public ExtensionApiTest,
-                            public testing::WithParamInterface<ContextType> {
- public:
-  NTPInterceptionTest()
-      : https_test_server_(net::EmbeddedTestServer::TYPE_HTTPS) {}
-
-  NTPInterceptionTest(const NTPInterceptionTest&) = delete;
-  NTPInterceptionTest& operator=(const NTPInterceptionTest&) = delete;
-
-  // ExtensionApiTest override:
-  void SetUpOnMainThread() override {
-    ExtensionApiTest::SetUpOnMainThread();
-    test_data_dir_ = test_data_dir_.AppendASCII("ntp_content_script");
-    https_test_server_.ServeFilesFromDirectory(test_data_dir_);
-    ASSERT_TRUE(https_test_server_.Start());
-
-    GURL ntp_url = https_test_server_.GetURL("/fake_ntp.html");
-    ntp_test_utils::SetUserSelectedDefaultSearchProvider(
-        profile(), https_test_server_.base_url().spec(), ntp_url.spec());
-  }
-
- private:
-  net::EmbeddedTestServer https_test_server_;
-};
-
-INSTANTIATE_TEST_SUITE_P(PersistentBackground,
-                         NTPInterceptionTest,
-                         ::testing::Values(ContextType::kPersistentBackground));
-INSTANTIATE_TEST_SUITE_P(ServiceWorker,
-                         NTPInterceptionTest,
-                         ::testing::Values(ContextType::kServiceWorker));
-
-// Ensure extensions can't inject a content script into the New Tab page.
-// Regression test for crbug.com/40091421.
-IN_PROC_BROWSER_TEST_P(NTPInterceptionTest, ContentScript) {
-  // Load an extension which tries to inject a script into every frame.
-  ExtensionTestMessageListener listener("ready");
-  const Extension* extension = LoadExtension(test_data_dir_);
-  ASSERT_TRUE(extension);
-  ASSERT_TRUE(listener.WaitUntilSatisfied());
-
-  // Create a corresponding off the record profile for the current profile. This
-  // is necessary to reproduce crbug.com/40091421, which occurs in part due to
-  // incorrect handling of multiple profiles by the NTP code.
-  BrowserWindowInterface* incognito_browser = CreateIncognitoBrowser(profile());
-  ASSERT_TRUE(incognito_browser);
-
-  // Ensure that the extension isn't able to inject the script into the New Tab
-  // Page.
-  content::WebContents* web_contents = GetActiveWebContents();
-  ASSERT_TRUE(NavigateToURL(web_contents, chrome::ChromeUINewTabURLAsGURL()));
-  ASSERT_TRUE(search::IsInstantNTP(web_contents));
-
-  EXPECT_EQ(false, EvalJs(web_contents, "document.title !== 'Fake NTP';"));
 }
 
 IN_PROC_BROWSER_TEST_F(ContentScriptApiTest, CoepFrameTest) {

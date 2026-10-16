@@ -288,7 +288,6 @@ source_set("browser_tests") {
   sources = [
     "alternate_nav_infobar_delegate_browsertest.cc",
     "omnibox_metrics_browsertest.cc",
-    "omnibox_search_aggregator_browsertest.cc",
   ]
   deps = [
     ":omnibox",

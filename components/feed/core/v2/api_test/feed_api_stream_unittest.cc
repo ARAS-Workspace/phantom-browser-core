@@ -3403,9 +3403,9 @@ TEST_F(FeedApiTest, GetRequestMetadataWithDefaultSearchEngine) {
   RequestMetadata metadata =
       stream_->GetRequestMetadata(StreamType(StreamKind::kForYou), false);
 
-  // Defaults to Google for tests.
+  // Defaults to DuckDuckGo for tests, which is not Google.
   ASSERT_EQ(metadata.default_search_engine,
-            feedwire::DefaultSearchEngine::ENGINE_GOOGLE);
+            feedwire::DefaultSearchEngine::ENGINE_OTHER);
 }
 
 TEST_F(FeedApiTest, ClearAllOnSigninAllowedPrefChange) {

@@ -352,14 +352,15 @@ TemplateURLServiceTestBase::CreatePreloadedTemplateURL(
 
 // TODO(crbug.com/530597465): Remove this when cleaning up the feature.
 void TemplateURLServiceTestBase::SetOverriddenEngines() {
-  // Set custom search engine as default fallback through overrides.
+  // Set custom search engine as default fallback through overrides. It has the
+  // ID of DuckDuckGo, the fallback default search engine.
   base::DictValue entry;
   entry.Set("name", "override_name");
   entry.Set("keyword", "override_keyword");
   entry.Set("search_url", "http://override.com/s?q={searchTerms}");
   entry.Set("favicon_url", "http://override.com/favicon.ico");
   entry.Set("encoding", "UTF-8");
-  entry.Set("id", 1001);
+  entry.Set("id", TemplateURLPrepopulateData::duckduckgo.id);
   entry.Set("suggest_url", "http://override.com/suggest?q={searchTerms}");
 
   base::ListValue overrides_list;
@@ -1162,8 +1163,12 @@ TEST_F(TemplateURLServiceTest, RepairPrepopulatedSearchEngines) {
   // Now perform the actual repair that should restore Yahoo and Bing.
   model()->RepairPrepopulatedSearchEngines();
 
-  // Google is default.
-  ASSERT_EQ(google, model()->GetDefaultSearchProvider());
+  // DuckDuckGo, the fallback default search engine, is default. It is not in
+  // the regional list, so its built-in definition is added.
+  const TemplateURL* default_engine = model()->GetDefaultSearchProvider();
+  ASSERT_TRUE(default_engine);
+  EXPECT_EQ(TemplateURLPrepopulateData::duckduckgo.id,
+            default_engine->prepopulate_id());
   // The keyword wasn't reverted.
   EXPECT_EQ(u"trash", google->short_name());
   EXPECT_EQ("www.google.com",
@@ -2081,8 +2086,14 @@ TEST_F(TemplateURLServiceTest, KeywordConflictNonReplaceableEngines) {
 // Verifies that we don't have reentrant behavior when resolving default search
 // provider keyword conflicts. crbug.com/40110481
 TEST_F(TemplateURLServiceTest, DefaultSearchProviderKeywordConflictReentrancy) {
-  // Merely loading should increment the count once.
+  // Merely loading does not increment the count, as the fallback default
+  // search engine is DuckDuckGo. Selecting Google should increment it once.
   test_util()->VerifyLoad();
+  EXPECT_EQ(0, test_util()->dsp_set_to_google_callback_count());
+  TemplateURL* google = model()->GetTemplateURLForKeyword(
+      TemplateURLPrepopulateData::google.keyword);
+  ASSERT_TRUE(google);
+  model()->SetUserSelectedDefaultSearchProvider(google);
   EXPECT_EQ(1, test_util()->dsp_set_to_google_callback_count());
 
   // We use a fake {google:baseURL} to take advantage of our existing

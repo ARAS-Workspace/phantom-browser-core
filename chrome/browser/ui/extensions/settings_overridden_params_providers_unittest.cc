@@ -13,11 +13,13 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/search_test_utils.h"
+#include "components/search_engines/template_url_data_util.h"
 #include "components/search_engines/template_url_service.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/permissions/permissions_updater.h"
 #include "extensions/browser/ui_util.h"
 #include "extensions/common/extension_builder.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
 class SettingsOverriddenParamsProvidersUnitTest
     : public extensions::ExtensionServiceTestBase {
@@ -67,6 +69,16 @@ class SettingsOverriddenParamsProvidersUnitTest
 
 TEST_F(SettingsOverriddenParamsProvidersUnitTest,
        GetExtensionControllingNewTab) {
+  // The "back to Google" messaging needs Google as the default search engine;
+  // the fallback default search engine is DuckDuckGo.
+  TemplateURLService* template_url_service =
+      TemplateURLServiceFactory::GetForProfile(profile());
+  TemplateURL* google = template_url_service->Add(
+      std::make_unique<TemplateURL>(*TemplateURLDataFromPrepopulatedEngine(
+          TemplateURLPrepopulateData::google)));
+  ASSERT_TRUE(google);
+  template_url_service->SetUserSelectedDefaultSearchProvider(google);
+
   // With no extensions installed, there should be no controlling extension.
   EXPECT_EQ(std::nullopt,
             settings_overridden_params::GetNtpOverriddenParams(profile()));

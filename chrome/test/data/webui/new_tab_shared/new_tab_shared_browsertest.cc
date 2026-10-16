@@ -9,7 +9,8 @@
 class NewTabSharedBrowserTest : public WebUIMochaBrowserTest {
  protected:
   NewTabSharedBrowserTest() {
-    set_test_loader_host(chrome::kChromeUINewTabHost);
+    // The customize buttons are part of the WebUI NTP (chrome://new-tab-page).
+    set_test_loader_host(chrome::kChromeUINewTabPageHost);
   }
 };
 

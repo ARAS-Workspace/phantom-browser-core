@@ -176,16 +176,16 @@ IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, BasicOmniboxState) {
 
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL("chrome://version")));
-  EXPECT_EQ("chrome://version", base::UTF16ToUTF8(omnibox->GetText()));
+  EXPECT_EQ("phantom://version", base::UTF16ToUTF8(omnibox->GetText()));
 
   tab_strip_model->SelectTabAt(0);
   EXPECT_EQ("about:blank", base::UTF16ToUTF8(omnibox->GetText()));
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL("chrome://chrome-urls")));
-  EXPECT_EQ("chrome://chrome-urls", base::UTF16ToUTF8(omnibox->GetText()));
+  EXPECT_EQ("phantom://chrome-urls", base::UTF16ToUTF8(omnibox->GetText()));
 
   tab_strip_model->SelectTabAt(1);
-  EXPECT_EQ("chrome://version", base::UTF16ToUTF8(omnibox->GetText()));
+  EXPECT_EQ("phantom://version", base::UTF16ToUTF8(omnibox->GetText()));
 }
 
 IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, LocationIcon) {
@@ -209,7 +209,7 @@ IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, LocationIcon) {
 
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL("chrome://version")));
-  EXPECT_EQ("chrome://version", base::UTF16ToUTF8(omnibox->GetText()));
+  EXPECT_EQ("phantom://version", base::UTF16ToUTF8(omnibox->GetText()));
 
   EXPECT_EQ("webui-toolbar:chrome_product",
             content::EvalJs(GetWebUIToolbarWebContents(), kGetIcon));

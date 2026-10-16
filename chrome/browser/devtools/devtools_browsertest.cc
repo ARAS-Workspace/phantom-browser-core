@@ -3406,8 +3406,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestOpenSearchResultsInNewTab) {
   content::WebContents* new_wc = observer.GetWebContents();
 
   std::string opened_url = new_wc->GetVisibleURL().spec();
-  constexpr char kExpectedUrl[] =
-      "https://www.google.com/search?q=test+query&sourceid=chrome&ie=UTF-8";
+  constexpr char kExpectedUrl[] = "https://duckduckgo.com/?q=test+query";
   EXPECT_EQ(opened_url, kExpectedUrl);
   CloseDevToolsWindow();
 }

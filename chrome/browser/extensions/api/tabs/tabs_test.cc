@@ -3227,7 +3227,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_WebToAboutNewTab) {
   // definitely undesirable for http-initiated navigations (see r818969), but
   // it is less clear what should happen in extension-initiated navigations.
   GURL about_newtab_url = GURL("about:newtab");
-  GURL chrome_newtab_url = GURL("chrome://new-tab-page/");
+  GURL chrome_newtab_url = GURL("chrome://new-tab-page-third-party/");
   // Navigate a tab to an extension page.
   content::WebContents* extension_contents = GetActiveWebContents();
   ASSERT_TRUE(NavigateToURL(extension_contents, extension_url));

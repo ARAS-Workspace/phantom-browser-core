@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/common/url_constants.h"
 #include "components/google/core/common/google_util.h"
 #include "components/search/ntp_features.h"
@@ -85,17 +84,6 @@ enum NewTabURLState {
   NEW_TAB_URL_MAX
 };
 
-const TemplateURL* GetDefaultSearchProviderTemplateURL(Profile* profile) {
-  if (profile) {
-    TemplateURLService* template_url_service =
-        TemplateURLServiceFactory::GetForProfile(profile);
-    if (template_url_service) {
-      return template_url_service->GetDefaultSearchProvider();
-    }
-  }
-  return nullptr;
-}
-
 bool IsMatchingServiceWorker(const GURL& my_url, const GURL& document_url) {
   // The origin should match.
   if (!MatchesOrigin(my_url, document_url)) {
@@ -147,32 +135,10 @@ struct NewTabURLDetails {
       return NewTabURLDetails(GURL(), NEW_TAB_URL_INCOGNITO);
     }
 
-    const bool default_is_google = DefaultSearchProviderIsGoogle(profile);
-    const GURL local_url(default_is_google
+    const GURL local_url(DefaultSearchProviderIsGoogle(profile)
                              ? chrome::ChromeUINewTabPageURLAsGURL()
                              : GURL(chrome::kChromeUINewTabPageThirdPartyURL));
-    if (default_is_google) {
-      return NewTabURLDetails(local_url, NEW_TAB_URL_VALID);
-    }
-
-    const TemplateURL* template_url =
-        GetDefaultSearchProviderTemplateURL(profile);
-    if (!profile || !template_url) {
-      return NewTabURLDetails(local_url, NEW_TAB_URL_BAD);
-    }
-
-    GURL search_provider_url(template_url->new_tab_url_ref().ReplaceSearchTerms(
-        TemplateURLRef::SearchTermsArgs(std::u16string()),
-        UIThreadSearchTermsData()));
-
-    if (!search_provider_url.is_valid()) {
-      return NewTabURLDetails(local_url, NEW_TAB_URL_NOT_SET);
-    }
-    if (!search_provider_url.SchemeIsCryptographic()) {
-      return NewTabURLDetails(local_url, NEW_TAB_URL_INSECURE);
-    }
-
-    return NewTabURLDetails(search_provider_url, NEW_TAB_URL_VALID);
+    return NewTabURLDetails(local_url, NEW_TAB_URL_VALID);
   }
 
   const GURL url;

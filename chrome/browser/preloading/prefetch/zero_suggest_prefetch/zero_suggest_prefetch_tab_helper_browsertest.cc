@@ -20,6 +20,7 @@
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
+#include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_controller_config.h"
@@ -86,6 +87,18 @@ class ZeroSuggestPrefetchTabHelperBrowserTest : public InProcessBrowserTest {
         ->SetAutocompleteControllerForTesting(std::move(controller));
   }
 
+  // The NTP and SRP page classifications expected below require Google as the
+  // default search engine; the fallback default search engine is DuckDuckGo.
+  void SelectGoogleAsDefaultSearchEngine() {
+    TemplateURLService* template_url_service =
+        TemplateURLServiceFactory::GetForProfile(browser()->GetProfile());
+    search_test_utils::WaitForTemplateURLServiceToLoad(template_url_service);
+    TemplateURL* google =
+        template_url_service->GetTemplateURLForKeyword(u"google.com");
+    ASSERT_TRUE(google);
+    template_url_service->SetUserSelectedDefaultSearchProvider(google);
+  }
+
   base::test::ScopedFeatureList webui_omnibox_feature_list_;
   base::test::ScopedFeatureList feature_list_;
   omnibox_feature_configs::ScopedConfigForTesting<
@@ -131,6 +144,8 @@ class ZeroSuggestPrefetchTabHelperBrowserTestOnWeb
 // with the expected page classification.
 IN_PROC_BROWSER_TEST_F(ZeroSuggestPrefetchTabHelperBrowserTestOnNTP,
                        StartPrefetch) {
+  SelectGoogleAsDefaultSearchEngine();
+
   const std::string srp_url = "https://www.google.com/search?q=hello+world";
   const std::string web_url = "https://www.example.com";
   auto input_is_correct = [](const AutocompleteInput& input) {
@@ -183,6 +198,8 @@ IN_PROC_BROWSER_TEST_F(ZeroSuggestPrefetchTabHelperBrowserTestOnNTP,
 // with the expected page classification.
 IN_PROC_BROWSER_TEST_F(ZeroSuggestPrefetchTabHelperBrowserTestOnSRP,
                        StartPrefetch) {
+  SelectGoogleAsDefaultSearchEngine();
+
   const std::string srp_url = "https://www.google.com/search?q=hello+world";
   const std::string web_url = "https://www.example.com";
   auto input_is_correct = [](const AutocompleteInput& input) {
