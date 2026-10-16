@@ -1500,7 +1500,8 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
   if (security_principal.SchemeIs(content::kChromeUIScheme)) {
     const std::string_view host = security_principal.GetHost();
     if (host == chrome::kChromeUINewTabHost ||
-        host == chrome::kChromeUINewTabPageHost) {
+        host == chrome::kChromeUINewTabPageHost ||
+        host == chrome::kChromeUINewTabPageThirdPartyHost) {
       return true;
     }
   }

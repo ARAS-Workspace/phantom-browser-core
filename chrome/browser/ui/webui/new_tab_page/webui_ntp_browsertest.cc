@@ -167,6 +167,43 @@ IN_PROC_BROWSER_TEST_F(WebUiNtpBrowserTest, ProcessPerSite) {
   }
 }
 
+// The local third party NTP is the NTP with the DuckDuckGo fallback default
+// search provider.
+class WebUiThirdPartyNtpBrowserTest : public InProcessBrowserTest {
+ private:
+  test::ScopedPrewarmFeatureList scoped_prewarm_feature_list_{
+      test::ScopedPrewarmFeatureList::PrewarmState::kDisabled};
+};
+
+// Verify that the local third party NTP uses process-per-site.
+IN_PROC_BROWSER_TEST_F(WebUiThirdPartyNtpBrowserTest, ProcessPerSite) {
+  std::vector<content::WebContents*> tabs;
+
+  // Open a few NTPs.
+  for (size_t i = 0; i < 3; i++) {
+    content::WebContentsAddedObserver tab_observer;
+    chrome::NewTab(browser(), NewTabTypes::kNoUserAction);
+
+    // Wait for the new tab.
+    auto* tab = tab_observer.GetWebContents();
+    ASSERT_TRUE(WaitForLoadStop(tab));
+
+    // Sanity check: the NTP should be the local third party NTP.
+    EXPECT_EQ(chrome::kChromeUINewTabPageThirdPartyURL,
+              EvalJs(tab, "window.location.href",
+                     content::EXECUTE_SCRIPT_DEFAULT_OPTIONS,
+                     /*world_id=*/1));
+
+    tabs.push_back(tab);
+  }
+
+  // Verify that all NTPs share a process.
+  for (size_t i = 1; i < tabs.size(); i++) {
+    EXPECT_EQ(tabs[0]->GetPrimaryMainFrame()->GetProcess(),
+              tabs[i]->GetPrimaryMainFrame()->GetProcess());
+  }
+}
+
 // Verify that the WebUI NTP uses an available spare process and does not
 // discard it as in https://crbug.com/40699271.
 IN_PROC_BROWSER_TEST_F(WebUiNtpBrowserTest, SpareRenderer) {
