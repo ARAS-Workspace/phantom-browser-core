@@ -424,10 +424,6 @@
     "META": {"sizes": {"includes": [10],}},
     "includes": [3960],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/feedback/resources.grd": {
-    "META": {"sizes": {"includes": [40],}},
-    "includes": [3980],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/gaia_auth_host/resources.grd": {
     "META": {"sizes": {"includes": [20],}},
     "includes": [4000],

@@ -175,8 +175,6 @@ DEFINE_VARIATION_PARAM(kIPHTabGroupsSaveV2CloseGroupFeature,
                        "IPH_TabGroupsSaveV2CloseGroup");
 DEFINE_VARIATION_PARAM(kIPHTabGroupsSharedTabChangedFeature,
                        "IPH_TabGroupsSharedTabChanged");
-DEFINE_VARIATION_PARAM(kIPHTabGroupsSharedTabFeedbackFeature,
-                       "IPH_TabGroupsSharedTabFeedback");
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
@@ -322,7 +320,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHSplitViewHorizontalIndirectAccessFeature),
         VARIATION_ENTRY(kIPHTabAudioMutingFeature),
         VARIATION_ENTRY(kIPHTabGroupsSharedTabChangedFeature),
-        VARIATION_ENTRY(kIPHTabGroupsSharedTabFeedbackFeature),
         VARIATION_ENTRY(kIPHTabSearchComboButtonFeature),
         VARIATION_ENTRY(kIPHWebUiHelpBubbleTestFeature),
 // keep-sorted end

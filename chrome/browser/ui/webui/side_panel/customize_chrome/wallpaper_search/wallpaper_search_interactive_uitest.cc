@@ -15,7 +15,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
-#include "chrome/browser/ui/webui/feedback/feedback_dialog.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_string_map.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
@@ -531,36 +530,6 @@ IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
                 "(el) => el.querySelectorAll('.result').length === 1")),
       // 11. Ensure that the NTP has a background.
       WaitForStateChange(kNewTabPageElementId, ntp_has_background));
-}
-
-// The feedback dialog on Cros happens at the system level, which cannot be
-// easily tested here.
-IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
-                       FeedbackDialogShowsOnThumbsDown) {
-  EXPECT_CALL(mock_optimization_guide_keyed_service(),
-              ShouldFeatureBeCurrentlyAllowedForFeedback(
-                  optimization_guide::proto::LogAiDataRequest::FeatureCase::
-                      kWallpaperSearch))
-      .WillOnce(testing::Return(true));
-
-  // Intercept Wallpaper Search descriptor fetches, and respond with data.
-  std::unique_ptr<content::URLLoaderInterceptor> descriptors_fetch_interceptor =
-      SetUpDescriptorsResponseWithData();
-
-  const DeepQuery kFeedbackButtons = {
-      "customize-chrome-app", "#wallpaperSearchPage", "#feedbackButtons"};
-  const DeepQuery kThumbsDown = {"customize-chrome-app", "#wallpaperSearchPage",
-                                 "#feedbackButtons", "#thumbsDown"};
-  RunTestSequence(
-      // 1. Open Wallpaper Search.
-      Steps(OpenNewTabPage(), OpenWallpaperSearchAt(kCustomizeChromeElementId)),
-      // 2. Show feedback buttons.
-      ExecuteJsAt(kCustomizeChromeElementId, kFeedbackButtons,
-                  "(el) => el.hidden = false"),
-      // 3. Click thumbs down button.
-      ClickElement(kCustomizeChromeElementId, kThumbsDown),
-      // 4. Ensure that the feedback dialog shows.
-      InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
 }
 
 IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,

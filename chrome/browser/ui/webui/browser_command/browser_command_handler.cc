@@ -12,7 +12,6 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/command_updater_impl.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -92,10 +91,8 @@ void BrowserCommandHandler::CanExecuteCommand(
     case Command::kUnknownCommand:
     case Command::kOpenPasswordManager:
     case Command::kStartPasswordManagerTutorial:
-      // Nothing to do.
-      break;
     case Command::kOpenFeedbackForm:
-      can_execute = true;
+      // Nothing to do.
       break;
     case Command::kOpenPrivacyGuide:
       can_execute =
@@ -158,10 +155,8 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
 
   switch (command) {
     case Command::kUnknownCommand:
-      // Nothing to do.
-      break;
     case Command::kOpenFeedbackForm:
-      OpenFeedbackForm();
+      // Nothing to do.
       break;
     case Command::kOpenPrivacyGuide:
       NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kPrivacyGuideSubPage)),
@@ -297,20 +292,6 @@ void BrowserCommandHandler::EnableVerticalTabs() {
 
   tabs::RecordVerticalTabStripModeChanged(
       true, tabs::VerticalTabStripEntryPoint::kWhatsNew);
-}
-
-void BrowserCommandHandler::OpenFeedbackForm() {
-  chrome::ShowFeedbackPage(feedback_settings_.url, profile_,
-                           feedback_settings_.source,
-                           std::string() /* description_template */,
-                           std::string() /* description_placeholder_text */,
-                           feedback_settings_.category /* category_tag */,
-                           std::string() /* extra_diagnostics */);
-}
-
-void BrowserCommandHandler::ConfigureFeedbackCommand(
-    FeedbackCommandSettings settings) {
-  feedback_settings_ = settings;
 }
 
 void BrowserCommandHandler::EnableSupportedCommands() {

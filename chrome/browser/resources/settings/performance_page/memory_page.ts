@@ -16,7 +16,6 @@ import type {SettingsToggleButtonElement} from '../controls/settings_toggle_butt
 
 import {getCss} from './memory_page.css.js';
 import {getHtml} from './memory_page.html.js';
-import {PerformanceBrowserProxyImpl, PerformanceFeedbackCategory} from './performance_browser_proxy.js';
 import type {PerformanceMetricsProxy} from './performance_metrics_proxy.js';
 import {MemorySaverModeState, PerformanceMetricsProxyImpl} from './performance_metrics_proxy.js';
 
@@ -89,23 +88,6 @@ export class SettingsMemoryPageElement extends SettingsMemoryPageElementBase {
       return false;
     }
     return this.memorySaverStatePref_.value !== MemorySaverModeState.DISABLED;
-  }
-
-  protected showSendFeedbackButton_(): boolean {
-    // <if expr="_google_chrome">
-    return true;
-    // </if>
-    // <if expr="not _google_chrome">
-    return false;
-    // </if>
-  }
-
-  protected onSendFeedback_(_e: Event) {
-    // <if expr="_google_chrome">
-    _e.stopPropagation();
-    PerformanceBrowserProxyImpl.getInstance().openFeedbackDialog(
-        PerformanceFeedbackCategory.TABS);
-    // </if>
   }
 }
 

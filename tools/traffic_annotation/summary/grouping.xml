@@ -372,7 +372,6 @@ after discussions on the right group.
     </sender>
     <sender name="Crash Reports"/>
     <sender name="Chrome Performance, Feedback, and Usage Statistics">
-      <annotation id="chrome_feedback_report_app"/>
       <annotation id="metrics_report_ukm"/>
       <annotation id="metrics_report_uma"/>
     </sender>

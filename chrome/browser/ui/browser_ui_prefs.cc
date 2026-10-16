@@ -153,7 +153,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(prefs::kFullscreenAllowed, true);
 #endif
 
-  registry->RegisterBooleanPref(prefs::kUserFeedbackAllowed, true);
   registry->RegisterBooleanPref(
       prefs::kExternalProtocolDialogShowAlwaysOpenCheckbox, true);
   registry->RegisterBooleanPref(prefs::kScreenCaptureAllowed, true);

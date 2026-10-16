@@ -9,8 +9,6 @@ import {NetworkPredictionOptions} from './constants.js';
 export function getHtml(this: SpeedPageElement) {
   return html`<!--_html_template_start_-->
 <settings-section
-    ?show-send-feedback-button="${this.showSendFeedbackButton_()}"
-    @send-feedback="${this.onSendFeedback_}"
     page-title="$i18n{speedPageTitle}">
 
   <settings-toggle-button id="preloadingToggle"

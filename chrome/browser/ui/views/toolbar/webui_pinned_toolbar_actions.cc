@@ -524,10 +524,6 @@ void WebUIPinnedToolbarActions::HandleContextMenu(
       action_id = kActionSidePanelShowMerchantTrust;
       break;
     case toolbar_ui_api::mojom::ContextMenuType::
-        kPinnedActionSendSharedTabGroupFeedback:
-      action_id = kActionSendSharedTabGroupFeedback;
-      break;
-    case toolbar_ui_api::mojom::ContextMenuType::
         kPinnedActionSidePanelShowComments:
       action_id = kActionSidePanelShowComments;
       break;

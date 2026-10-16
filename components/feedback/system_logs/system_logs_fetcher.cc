@@ -5,83 +5,21 @@
 #include "components/feedback/system_logs/system_logs_fetcher.h"
 
 #include <memory>
-#include <string_view>
 #include <utility>
 
-#include "base/containers/span.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/logging.h"
 #include "base/not_fatal_until.h"
 #include "base/task/sequenced_task_runner.h"
-#include "base/task/task_traits.h"
-#include "base/task/thread_pool.h"
 
 namespace system_logs {
 
-namespace {
-
-// List of keys in the SystemLogsResponse map whose corresponding values will
-// not be redacted.
-constexpr const char* const kKeysExemptOfRedaction[] = {
-    "CHROMEOS_BOARD_APPID",
-    "CHROMEOS_CANARY_APPID",
-    "CHROMEOS_RELEASE_APPID",
-    // Base64-encoded binary data are exempted to keep them from getting
-    // corrupted by individual redaction tools.
-    "cros_ec_panicinfo",
-    "i915_error_state",
-    "perf-data",
-    "perfetto-data",
-    // Contains URL-like app-ids which should not be redacted.
-    "app_service",
-};
-
-// Returns true if the given |key| and its corresponding value are exempt from
-// redaction.
-bool IsKeyExempt(const std::string& key) {
-  for (auto* const exempt_key : kKeysExemptOfRedaction) {
-    if (key == exempt_key)
-      return true;
-  }
-  return false;
-}
-
-// Runs the Redaction tool over the entris of |response|.
-void Redact(redaction::RedactionTool* redactor, SystemLogsResponse* response) {
-  for (auto& element : *response) {
-    if (!IsKeyExempt(element.first))
-      element.second = redactor->Redact(element.second);
-  }
-}
-
-}  // namespace
-
-SystemLogsFetcher::SystemLogsFetcher(
-    bool scrub_data,
-    base::span<const std::string_view> first_party_extension_ids)
+SystemLogsFetcher::SystemLogsFetcher()
     : response_(std::make_unique<SystemLogsResponse>()),
-      num_pending_requests_(0),
-      task_runner_for_redactor_(
-          scrub_data
-              ? base::ThreadPool::CreateSequencedTaskRunner(
-                    // User visible because this is called when the user is
-                    // looking at the send feedback dialog, watching a spinner.
-                    {base::TaskPriority::USER_VISIBLE,
-                     base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN})
-              : nullptr),
-      redactor_(scrub_data ? std::make_unique<redaction::RedactionTool>(
-                                 first_party_extension_ids)
-                           : nullptr) {}
+      num_pending_requests_(0) {}
 
-SystemLogsFetcher::~SystemLogsFetcher() {
-  // Ensure that destruction happens on same sequence where the object is being
-  // accessed.
-  if (redactor_) {
-    DCHECK(task_runner_for_redactor_);
-    task_runner_for_redactor_->DeleteSoon(FROM_HERE, std::move(redactor_));
-  }
-}
+SystemLogsFetcher::~SystemLogsFetcher() = default;
 
 void SystemLogsFetcher::AddSource(std::unique_ptr<SystemLogsSource> source) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -117,21 +55,7 @@ void SystemLogsFetcher::OnFetched(
 
   VLOG(1) << "Received SystemLogSource: " << source_name;
 
-  if (redactor_) {
-    // It is safe to pass the unretained redactor_ instance here because
-    // the redactor_ is owned by |this| and |this| only deletes itself
-    // once all responses have been collected and added (see AddResponse()).
-    SystemLogsResponse* response_ptr = response.get();
-    task_runner_for_redactor_->PostTaskAndReply(
-        FROM_HERE,
-        base::BindOnce(Redact, base::Unretained(redactor_.get()),
-                       base::Unretained(response_ptr)),
-        base::BindOnce(&SystemLogsFetcher::AddResponse,
-                       weak_ptr_factory_.GetWeakPtr(), source_name,
-                       std::move(response)));
-  } else {
-    AddResponse(source_name, std::move(response));
-  }
+  AddResponse(source_name, std::move(response));
 }
 
 void SystemLogsFetcher::AddResponse(

@@ -139,7 +139,6 @@
   E(kActionCreateShortcut, IDC_CREATE_SHORTCUT) \
   E(kActionDevToolsConsole, IDC_DEV_TOOLS_CONSOLE) \
   E(kActionDevToolsDevices, IDC_DEV_TOOLS_DEVICES) \
-  E(kActionFeedback, IDC_FEEDBACK) \
   E(kActionShowBookmarkBar, IDC_SHOW_BOOKMARK_BAR) \
   E(kActionBookmarkBarSubmenuAlwaysShow, \
     IDC_BOOKMARK_BAR_SUBMENU_ALWAYS_SHOW) \
@@ -369,9 +368,6 @@
   E(kActionDebugPrintViewTreeDetails, IDC_DEBUG_PRINT_VIEW_TREE_DETAILS) \
   E(kActionDebugPrintWindowHierarchy, IDC_DEBUG_PRINT_WINDOW_HIERARCHY) \
   E(kActionDebugPrintLayerHierarchy, IDC_DEBUG_PRINT_LAYER_HIERARCHY) \
-  /* Autofill feedback. */ \
-  E(kActionContentContextAutofillFeedback, \
-    IDC_CONTENT_CONTEXT_AUTOFILL_FEEDBACK) \
   /* Autofill context menu commands */ \
   E(kActionContentContextAutofillImprovedSuggestions) \
   E(kActionContentContextAutofillFallbackPasswordsSelectPassword, \
@@ -401,7 +397,6 @@
   E(kActionToggleCollapseVertical, IDC_TOGGLE_VERTICAL_TABS_COLLAPSE) \
   E(kActionToggleVerticalTabsExpandOnHover, \
     IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER) \
-  E(kActionVerticalTabsSendFeedback, IDC_VERTICAL_TABS_SEND_FEEDBACK) \
   /*Organizer Panel*/ \
   E(kActionToggleOrganizerPanel) \
   /*Omnibox Everywhere Status Icon Menu*/ \
@@ -465,7 +460,6 @@
   E(kActionForward, IDC_FORWARD) \
   E(kActionNewIncognitoWindow, IDC_NEW_INCOGNITO_WINDOW) \
   E(kActionNewIsolatedWindow, IDC_NEW_ISOLATED_WINDOW) \
-  E(kActionSendSharedTabGroupFeedback, IDC_SEND_SHARED_TAB_GROUP_FEEDBACK) \
   E(kActionShowPasswordManager, IDC_SHOW_PASSWORD_MANAGER) \
   E(kActionShowPaymentMethods, IDC_SHOW_PAYMENT_METHODS) \
   E(kActionShowAddresses, IDC_SHOW_ADDRESSES) \

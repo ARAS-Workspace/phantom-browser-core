@@ -153,9 +153,6 @@ inline constexpr char kRestoreOnStartup[] = "session.restore_on_startup";
 // are only restored on startup if kRestoreOnStartup is 4.
 inline constexpr char kURLsToRestoreOnStartup[] = "session.startup_urls";
 
-// Boolean that is true when user feedback to Google is allowed.
-inline constexpr char kUserFeedbackAllowed[] = "feedback_allowed";
-
 #if BUILDFLAG(ENABLE_RLZ)
 // Integer. RLZ ping delay in seconds.
 inline constexpr char kRlzPingDelaySeconds[] = "rlz_ping_delay";

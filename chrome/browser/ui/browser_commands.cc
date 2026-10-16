@@ -36,7 +36,6 @@
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/favicon/favicon_utils.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -2490,16 +2489,6 @@ void OpenTaskManager(BrowserWindowInterface* browser,
   base::RecordAction(UserMetricsAction("TaskManager"));
   chrome::ShowTaskManager(
       browser ? browser->GetBrowserForMigrationOnly() : nullptr, start_action);
-}
-
-void OpenFeedbackDialog(BrowserWindowInterface* browser,
-                        feedback::FeedbackSource source,
-                        const std::string& description_template,
-                        const std::string& category_tag) {
-  base::RecordAction(UserMetricsAction("Feedback"));
-  chrome::ShowFeedbackPage(browser, source, description_template,
-                           std::string() /* description_placeholder_text */,
-                           category_tag, std::string() /* extra_diagnostics */);
 }
 
 void ToggleBookmarkBar(BrowserWindowInterface* browser) {

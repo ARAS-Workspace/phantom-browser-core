@@ -41,7 +41,6 @@ group("resources") {
     "content_settings:resources",
     "data_sharing:resources",
     "downloads:resources",
-    "feedback:resources",
     "gaia_auth_host:resources",
     "history:resources",
     "inspect:resources",

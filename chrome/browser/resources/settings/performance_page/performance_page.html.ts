@@ -7,8 +7,6 @@ import type {PerformancePageElement} from './performance_page.js';
 
 export function getHtml(this: PerformancePageElement) {
   return html`<!--_html_template_start_--><settings-section
-    ?show-send-feedback-button="${this.showSendFeedbackButton_()}"
-    @send-feedback="${this.onSendFeedback_}"
     page-title="$i18n{generalPageTitle}">
   <settings-toggle-button id="performanceInterventionToggleButton"
       @change="${this.onPerformanceInterventionToggleButtonChange_}"

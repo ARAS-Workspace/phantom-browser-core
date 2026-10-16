@@ -72,13 +72,6 @@ suite('HistoryAppTest', function() {
     await microtasksFinished();
     assertEquals(
         element.$.tabsScrollContainer, element.getScrollTargetForTesting());
-
-    // Switching to synced tabs should change scroll target to it.
-    element.$.router.selectedPage = 'syncedTabs';
-    await microtasksFinished();
-    assertEquals(
-        element.shadowRoot.querySelector('#syncedDevicesScroll'),
-        element.getScrollTargetForTesting());
   });
 
   test('ShowsHistoryEmbeddings', async () => {

@@ -9,8 +9,6 @@ import {MemorySaverModeAggressiveness} from './performance_metrics_proxy.js';
 export function getHtml(this: SettingsMemoryPageElement) {
   return html`<!--_html_template_start_-->
 <settings-section
-    ?show-send-feedback-button="${this.showSendFeedbackButton_()}"
-    @send-feedback="${this.onSendFeedback_}"
     page-title="$i18n{memoryPageTitle}">
   <settings-toggle-button id="toggleButton" @change="${this.onMemorySaverModeChange_}"
       pref-key="performance_tuning.high_efficiency_mode.state"

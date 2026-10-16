@@ -35,7 +35,6 @@ ts_library("build_ts") {
     "//tools/typescript/definitions/developer_private.d.ts",
     "//tools/typescript/definitions/dom_automation_controller.d.ts",
     "//tools/typescript/definitions/extension_types.d.ts",
-    "//tools/typescript/definitions/feedback_private.d.ts",
     "//tools/typescript/definitions/file_system.d.ts",
     "//tools/typescript/definitions/i18n.d.ts",
     "//tools/typescript/definitions/input_method_private.d.ts",

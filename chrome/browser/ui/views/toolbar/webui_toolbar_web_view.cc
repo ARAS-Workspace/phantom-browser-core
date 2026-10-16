@@ -638,8 +638,6 @@ void WebUIToolbarWebView::HandleContextMenu(
     case toolbar_ui_api::mojom::ContextMenuType::
         kPinnedActionSidePanelShowMerchantTrust:
     case toolbar_ui_api::mojom::ContextMenuType::
-        kPinnedActionSendSharedTabGroupFeedback:
-    case toolbar_ui_api::mojom::ContextMenuType::
         kPinnedActionSidePanelShowComments:
       pinned_toolbar_actions_.HandleContextMenu(menu_type, screen_rect, source);
       break;

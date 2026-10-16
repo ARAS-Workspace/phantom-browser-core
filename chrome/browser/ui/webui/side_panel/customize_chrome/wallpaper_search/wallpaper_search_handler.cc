@@ -25,15 +25,12 @@
 #include "base/token.h"
 #include "base/values.h"
 #include "chrome/browser/browser_features.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/background/wallpaper_search/wallpaper_search_background_manager.h"
 #include "chrome/browser/search/background/wallpaper_search/wallpaper_search_data.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
@@ -66,7 +63,6 @@
 #include "skia/ext/image_operations.h"
 #include "skia/ext/skia_utils_base.h"
 #include "third_party/skia/include/core/SkBitmap.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/gfx/codec/png_codec.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/image/image.h"
@@ -526,10 +522,6 @@ void WallpaperSearchHandler::UpdateHistory() {
 }
 
 void WallpaperSearchHandler::SetUserFeedback(UserFeedback selected_option) {
-  if (selected_option == UserFeedback::kThumbsDown) {
-    ShowFeedbackPage();
-  }
-
   optimization_guide::proto::UserFeedback user_feedback =
       OptimizationFeedbackFromWallpaperSearchFeedback(selected_option);
   if (!log_entries_.empty()) {
@@ -562,37 +554,6 @@ void WallpaperSearchHandler::LaunchHatsSurvey() {
       base::GetFieldTrialParamByFeatureAsTimeDelta(
           features::kHappinessTrackingSurveysForWallpaperSearch,
           ntp_features::kWallpaperSearchHatsDelayParam, base::TimeDelta()));
-}
-
-void WallpaperSearchHandler::ShowFeedbackPage() {
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->GetLastActiveBrowser();
-  if (!browser) {
-    return;
-  }
-  OptimizationGuideKeyedService* opt_guide_keyed_service =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser->GetProfile());
-  if (!opt_guide_keyed_service ||
-      !opt_guide_keyed_service->ShouldFeatureBeCurrentlyAllowedForFeedback(
-          optimization_guide::proto::LogAiDataRequest::kWallpaperSearch)) {
-    return;
-  }
-  base::DictValue feedback_metadata;
-  if (!log_entries_.empty()) {
-    feedback_metadata.Set("log_id", log_entries_.back()
-                                        .first->log_ai_data_request()
-                                        ->model_execution_info()
-                                        .execution_id());
-  }
-  chrome::ShowFeedbackPage(
-      browser, feedback::kFeedbackSourceAI,
-      /*description_template=*/std::string(),
-      /*description_placeholder_text=*/
-      l10n_util::GetStringUTF8(IDS_NTP_WALLPAPER_SEARCH_FEEDBACK_PLACEHOLDER),
-      /*category_tag=*/"wallpaper_search",
-      /*extra_diagnostics=*/std::string(),
-      /*autofill_metadata=*/base::DictValue(), std::move(feedback_metadata));
 }
 
 void WallpaperSearchHandler::OnHistoryUpdated() {

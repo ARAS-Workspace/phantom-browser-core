@@ -5,10 +5,16 @@
 #include "chrome/browser/feedback/system_logs/log_sources/memory_details_log_source.h"
 
 #include "chrome/browser/memory_details.h"
-#include "components/feedback/feedback_report.h"
 #include "content/public/browser/browser_thread.h"
 
 namespace system_logs {
+
+namespace {
+
+// Key of the memory usage details that include the tab titles.
+constexpr char kMemUsageWithTabTitlesKey[] = "mem_usage_with_title";
+
+}  // namespace
 
 // Reads Chrome memory usage.
 class SystemLogsMemoryHandler : public MemoryDetails {
@@ -26,7 +32,7 @@ class SystemLogsMemoryHandler : public MemoryDetails {
 
     auto response = std::make_unique<SystemLogsResponse>();
     (*response)["mem_usage"] = ToLogString(/*include_tab_title=*/false);
-    (*response)[feedback::FeedbackReport::kMemUsageWithTabTitlesKey] =
+    (*response)[kMemUsageWithTabTitlesKey] =
         ToLogString(/*include_tab_title=*/true);
     DCHECK(!callback_.is_null());
     std::move(callback_).Run(std::move(response));

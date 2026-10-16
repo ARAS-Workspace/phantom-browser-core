@@ -724,7 +724,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/device_api",
     "//chrome/browser/devtools",
     "//chrome/browser/dictation",
-    "//chrome/browser/feedback",
     "//chrome/browser/metrics/critical_user_journeys",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/profile_resetter",

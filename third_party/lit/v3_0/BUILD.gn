@@ -43,7 +43,6 @@ ts_library("build_ts") {
     "//chrome/browser/resources/downloads:build_ts",
     "//chrome/browser/resources/extensions:build_ts",
     "//chrome/browser/resources/extensions_zero_state_promo:build_ts",
-    "//chrome/browser/resources/feedback:build_ts",
     "//chrome/browser/resources/guest_view_shared:build_ts",
     "//chrome/browser/resources/history:build_ts",
     "//chrome/browser/resources/infobar_internals:build_ts",

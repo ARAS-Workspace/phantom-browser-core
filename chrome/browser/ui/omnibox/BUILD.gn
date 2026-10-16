@@ -90,8 +90,6 @@ source_set("impl") {
     "//chrome/browser/bitmap_fetcher",
     "//chrome/browser/bookmarks",
     "//chrome/browser/favicon",
-    "//chrome/browser/feedback",
-    "//chrome/browser/feedback:feedback_enum",
     "//chrome/browser/history",
     "//chrome/browser/page_load_metrics",
     "//chrome/browser/preloading",

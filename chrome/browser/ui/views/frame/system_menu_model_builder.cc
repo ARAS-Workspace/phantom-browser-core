@@ -171,9 +171,6 @@ void SystemMenuModelBuilder::BuildSystemMenuForBrowserWindow(
               .value(),
           kToggleVerticalTabsExpandOnHoverElementId);
     }
-
-    model->AddItemWithStringId(IDC_VERTICAL_TABS_SEND_FEEDBACK,
-                               IDS_VERTICAL_TABS_SEND_FEEDBACK);
   }
 
   if (chrome::CanOpenTaskManager()) {

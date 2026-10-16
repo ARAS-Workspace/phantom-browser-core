@@ -15,10 +15,7 @@
 #include "base/notreached.h"
 #include "base/strings/strcat.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/split_tab_util.h"
@@ -85,19 +82,6 @@ std::string_view GetMetricsSuffixForCommand(
     case SplitTabMenuModel::CommandId::kToggleOrientation:
       return "ToggleOrientation";
   }
-}
-
-BrowserWindowInterface* GetBrowserWithTabStripModel(
-    TabStripModel* tab_strip_model) {
-  BrowserWindowInterface* result = nullptr;
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [tab_strip_model, &result](BrowserWindowInterface* browser) {
-        if (browser->GetTabStripModel() == tab_strip_model) {
-          result = browser;
-        }
-        return !result;
-      });
-  return result;
 }
 
 }  // namespace
@@ -172,17 +156,6 @@ SplitTabMenuModel::SplitTabMenuModel(TabStripModel* tab_strip_model,
   SetElementIdentifierAt(
       GetIndexOfCommandId(GetCommandIdInt(CommandId::kExitSplit)).value(),
       kExitSplitMenuItem);
-
-  // Only render feedback in the toolbar button menu.
-  if (menu_source == MenuSource::kToolbarButton &&
-      chrome::CanShowFeedback(tab_strip_model->profile())) {
-    AddSeparator(ui::MenuSeparatorType::NORMAL_SEPARATOR);
-    AddItemWithStringIdAndIcon(
-        GetCommandIdInt(CommandId::kSendFeedback), IDS_SPLIT_TAB_SEND_FEEDBACK,
-        ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                           ? kFeedbackIcon
-                                           : kReportOldIcon));
-  }
 }
 
 SplitTabMenuModel::~SplitTabMenuModel() = default;
@@ -282,8 +255,7 @@ void SplitTabMenuModel::ExecuteCommand(int command_id, int event_flags) {
       tab_strip_model_->RemoveSplit(split_id);
       break;
     case CommandId::kSendFeedback:
-      SendFeedback();
-      break;
+      NOTREACHED();
     case CommandId::kToggleOrientation: {
       split_tabs::SplitTabLayout new_layout =
           GetSplitLayout() == split_tabs::SplitTabLayout::kSideBySide
@@ -354,12 +326,4 @@ void SplitTabMenuModel::CloseWebContents(content::WebContents* contents) {
   tab_strip_model_->CloseWebContents(
       contents, TabCloseTypes::CLOSE_USER_GESTURE |
                     TabCloseTypes::CLOSE_CREATE_HISTORICAL_TAB);
-}
-
-void SplitTabMenuModel::SendFeedback() {
-  BrowserWindowInterface* const browser =
-      GetBrowserWithTabStripModel(tab_strip_model_);
-  CHECK(browser);
-  chrome::ShowFeedbackPage(browser, feedback::kFeedbackSourceSplitView, "", "",
-                           "split_view", "");
 }

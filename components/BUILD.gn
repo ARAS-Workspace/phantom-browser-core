@@ -459,8 +459,6 @@ test("components_unittests") {
   }
 
   deps += [
-    "//components/feedback:unit_tests",
-    "//components/feedback/redaction_tool:unit_tests",
     "//components/keep_alive_registry:unit_tests",
     "//components/manta:unit_tests",
   ]

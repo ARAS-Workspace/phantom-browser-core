@@ -13,7 +13,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/with_feature_override.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_features.h"
@@ -502,35 +501,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, ProfileSyncOnTest) {
       profile_menu->GetIndexOfCommandId(IDC_SHOW_SYNC_SETTINGS).value();
   EXPECT_TRUE(profile_menu->IsEnabledAt(sync_settings_index));
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-bool DoesHelpMenuHaveCommand(const AppMenuModel& model, int command_id) {
-  const size_t help_menu_index =
-      model.GetIndexOfCommandId(AppMenuModel::kHelpMenuPlaceholder).value();
-  ui::SimpleMenuModel* help_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(help_menu_index));
-  return help_menu->GetIndexOfCommandId(command_id).has_value();
-}
-
-IN_PROC_BROWSER_TEST_F(AppMenuModelTest, Feedback_UserFeedbackAllowedPolicy) {
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kUserFeedbackAllowed,
-                                                  true);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_TRUE(DoesHelpMenuHaveCommand(model, IDC_FEEDBACK));
-  }
-
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kUserFeedbackAllowed,
-                                                  false);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_FALSE(DoesHelpMenuHaveCommand(model, IDC_FEEDBACK));
-  }
-}
-
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 class AppMenuModelSigninPromoTest : public base::test::WithFeatureOverride,
                                     public AppMenuModelTest {

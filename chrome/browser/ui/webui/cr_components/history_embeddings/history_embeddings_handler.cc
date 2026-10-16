@@ -10,11 +10,8 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
@@ -28,7 +25,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/url_formatter/url_formatter.h"
 #include "history_embeddings_handler.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/l10n/time_format.h"
 #include "url/gurl.h"
 
@@ -258,23 +254,6 @@ void HistoryEmbeddingsHandler::RecordSearchResultsMetrics(
 void HistoryEmbeddingsHandler::SetUserFeedback(
     history_embeddings::mojom::UserFeedback user_feedback) {
   user_feedback_ = OptimizationFeedbackFromMojoUserFeedback(user_feedback);
-  if (user_feedback ==
-      history_embeddings::mojom::UserFeedback::kUserFeedbackNegative) {
-    BrowserWindowInterface* browser =
-        GlobalBrowserCollection::GetInstance()->GetLastActiveBrowser();
-    if (!browser) {
-      return;
-    }
-
-    chrome::ShowFeedbackPage(
-        browser, feedback::kFeedbackSourceAI,
-        /*description_template=*/std::string(),
-        /*description_placeholder_text=*/
-        l10n_util::GetStringUTF8(IDS_HISTORY_EMBEDDINGS_FEEDBACK_PLACEHOLDER),
-        /*category_tag=*/"genai_history",
-        /*extra_diagnostics=*/std::string(),
-        /*autofill_metadata=*/base::DictValue(), base::DictValue());
-  }
 }
 
 void HistoryEmbeddingsHandler::OpenSettingsPage() {

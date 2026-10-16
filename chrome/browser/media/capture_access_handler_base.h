@@ -85,8 +85,6 @@ class CaptureAccessHandlerBase : public MediaAccessHandler {
       const extensions::Extension* extension);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-  static bool IsBuiltInFeedbackUI(const GURL& origin);
-
   void UpdateExtensionTrusted(const content::MediaStreamRequest& request,
                               bool is_allowlisted_extension);
 

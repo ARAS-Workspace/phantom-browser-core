@@ -187,30 +187,6 @@ class SharedTabGroupInteractiveUiTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-// Verify the feedback button is only shown when there is at least one shared
-// tab group in the current browser.
-IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest, FeedbackButtonVisible) {
-  TabGroupId group_id = CreateNewTabGroup();
-  ShareTabGroup(group_id, syncer::CollaborationId("fake_collaboration_id"),
-                data_sharing::MemberRole::kOwner, /*should_sign_in=*/false);
-
-  // Manually activate an inactive tab since the test version of
-  // MakeTabGroupShared does not fire observers.
-  browser()->GetTabStripModel()->ActivateTabAt(1);
-
-  RunTestSequence(
-      // Verify the feedback button is visible when there is 1 shared tab group.
-      FinishTabstripAnimations(), WaitForShow(kTabGroupHeaderElementId),
-      WaitForShow(kSharedTabGroupFeedbackElementId),
-      // Verify the feedback button is not visible if we remove it.
-      HoverTabGroupHeader(group_id), ClickMouse(ui_controls::RIGHT),
-      WaitForShow(kTabGroupEditorBubbleId),
-      PressButton(kTabGroupEditorBubbleCloseGroupButtonId),
-      WaitForHide(kTabGroupEditorBubbleCloseGroupButtonId),
-      FinishTabstripAnimations(),
-      WaitForHide(kSharedTabGroupFeedbackElementId));
-}
-
 // Take a screenshot of the shared tab group in app menu > tab groups.
 IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest,
                        SharedTabGroupInAppMenu) {

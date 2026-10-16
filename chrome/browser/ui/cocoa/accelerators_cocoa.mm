@@ -13,7 +13,6 @@
 #include "base/i18n/rtl.h"
 #include "base/mac/mac_util.h"
 #include "base/memory/singleton.h"
-#include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "printing/buildflags/buildflags.h"
 #import "ui/base/accelerators/platform_accelerator_cocoa.h"
@@ -109,10 +108,6 @@ const struct AcceleratorMapping {
      ui::VKEY_OEM_2},
     {IDC_TOGGLE_FULLSCREEN_TOOLBAR, ui::EF_COMMAND_DOWN | ui::EF_SHIFT_DOWN,
      ui::VKEY_F},
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    {IDC_FEEDBACK, ui::EF_COMMAND_DOWN | ui::EF_ALT_DOWN | ui::EF_SHIFT_DOWN,
-     ui::VKEY_I},
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
     {IDC_TAB_SEARCH, ui::EF_COMMAND_DOWN | ui::EF_SHIFT_DOWN, ui::VKEY_A},
     {IDC_TOGGLE_VERTICAL_TABS_COLLAPSE, ui::EF_COMMAND_DOWN | ui::EF_SHIFT_DOWN,
      ui::VKEY_L},

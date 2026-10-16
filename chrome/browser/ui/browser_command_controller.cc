@@ -30,8 +30,6 @@
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/feedback/public/feedback_source.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -612,13 +610,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
 #endif  // !BUILDFLAG(IS_MAC)
       ToggleCollapseVerticalTabs(browser_);
       break;
-    case IDC_VERTICAL_TABS_SEND_FEEDBACK:
-      chrome::ShowFeedbackPage(browser_, feedback::kFeedbackSourceVerticalTabs,
-                               /*description_template=*/"",
-                               /*description_placeholder_text=*/"",
-                               /*category_tag=*/"vertical_tabs",
-                               /*extra_diagnostics=*/"");
-      break;
     case IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER:
       ToggleVerticalTabsExpandOnHover(browser_);
       break;
@@ -870,11 +861,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_VIRTUAL_CARD_ENROLL:
       ShowVirtualCardEnrollBubble(browser_);
       break;
-    case IDC_SEND_SHARED_TAB_GROUP_FEEDBACK:
-      OpenFeedbackDialog(browser_, feedback::kFeedbackSourceDesktopTabGroups,
-                         /*description_template=*/std::string(),
-                         /*category_tag=*/"tab_group_share");
-      break;
     case IDC_MANAGE_PASSWORDS_FOR_PAGE:
       ManagePasswordsForPage(browser_);
       break;
@@ -1024,11 +1010,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_TASK_MANAGER_MAIN_MENU:
       OpenTaskManager(browser_, task_manager::StartAction::kMainMenu);
       break;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    case IDC_FEEDBACK:
-      OpenFeedbackDialog(browser_, feedback::kFeedbackSourceBrowserCommand);
-      break;
-#endif
     case IDC_SHOW_BOOKMARK_BAR:
       ToggleBookmarkBar(browser_);
       break;
@@ -1481,7 +1462,6 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_EXIT, true);
   command_updater_->UpdateCommandEnabled(IDC_NAME_WINDOW, true);
   command_updater_->UpdateCommandEnabled(IDC_TOGGLE_VERTICAL_TABS, true);
-  command_updater_->UpdateCommandEnabled(IDC_VERTICAL_TABS_SEND_FEEDBACK, true);
   command_updater_->UpdateCommandEnabled(
       IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER, true);
   command_updater_->UpdateCommandEnabled(IDC_TOGGLE_VERTICAL_TABS_COLLAPSE,
@@ -2000,12 +1980,6 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
 
   // Show various bits of UI
   command_updater_->UpdateCommandEnabled(kDeveloperMenuId, show_main_ui);
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  command_updater_->UpdateCommandEnabled(
-      IDC_FEEDBACK,
-      show_main_ui ||
-          browser_->GetType() == BrowserWindowInterface::Type::TYPE_DEVTOOLS);
-#endif
 
   command_updater_->UpdateCommandEnabled(IDC_EDIT_SEARCH_ENGINES, show_main_ui);
   command_updater_->UpdateCommandEnabled(IDC_ABOUT, show_main_ui);

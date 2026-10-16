@@ -153,8 +153,6 @@ export class PinnedToolbarActionElement extends PinnedToolbarActionElementBase {
         return ContextMenuType.kPinnedActionSidePanelShowShoppingInsights;
       case PinnedToolbarAction.kSidePanelShowMerchantTrust:
         return ContextMenuType.kPinnedActionSidePanelShowMerchantTrust;
-      case PinnedToolbarAction.kSendSharedTabGroupFeedback:
-        return ContextMenuType.kPinnedActionSendSharedTabGroupFeedback;
       case PinnedToolbarAction.kSidePanelShowComments:
         return ContextMenuType.kPinnedActionSidePanelShowComments;
       case PinnedToolbarAction.kUnspecified:

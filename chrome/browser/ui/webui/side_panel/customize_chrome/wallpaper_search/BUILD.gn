@@ -21,7 +21,6 @@ source_set("wallpaper_search") {
   ]
   deps = [
     "//chrome/browser:browser_features",
-    "//chrome/browser/feedback",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search/background",

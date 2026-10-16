@@ -20,7 +20,6 @@ export class TestPerformanceBrowserProxy extends TestBrowserProxy implements
       'getCpuPerformanceInfo',
       'getCurrentOpenSites',
       'getDeviceHasBattery',
-      'openFeedbackDialog',
       'validateTabDiscardExceptionRule',
     ]);
   }
@@ -46,10 +45,6 @@ export class TestPerformanceBrowserProxy extends TestBrowserProxy implements
   getDeviceHasBattery() {
     this.methodCalled('getDeviceHasBattery');
     return Promise.resolve(false);
-  }
-
-  openFeedbackDialog(categoryTag: string) {
-    this.methodCalled('openFeedbackDialog', categoryTag);
   }
 
   setValidationResults(results: Record<string, boolean>) {

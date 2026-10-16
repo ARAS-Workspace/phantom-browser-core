@@ -5,15 +5,16 @@
 #ifndef COMPONENTS_FEEDBACK_SYSTEM_LOGS_SYSTEM_LOGS_SOURCE_H_
 #define COMPONENTS_FEEDBACK_SYSTEM_LOGS_SYSTEM_LOGS_SOURCE_H_
 
+#include <map>
 #include <memory>
 #include <string>
 
 #include "base/functional/callback.h"
-#include "components/feedback/feedback_common.h"
 
 namespace system_logs {
 
-using SystemLogsResponse = FeedbackCommon::SystemLogsMap;
+// Key-value pairs of logs and other system information.
+using SystemLogsResponse = std::map<std::string, std::string>;
 
 // Callback that the data sources use to return data. The data must not be null.
 using SysLogsSourceCallback =

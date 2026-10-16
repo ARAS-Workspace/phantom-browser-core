@@ -50,7 +50,6 @@ class ContentRulesRegistry;
 class DisplayInfoProvider;
 class ExtensionOptionsGuest;
 class ExtensionOptionsGuestDelegate;
-class FeedbackPrivateDelegate;
 class FileSystemDelegate;
 class ManagementAPIDelegate;
 class MediaPerceptionAPIDelegate;
@@ -187,9 +186,6 @@ class ExtensionsAPIClient {
 
   // Returns a delegate for embedder-specific chrome.fileSystem behavior.
   virtual FileSystemDelegate* GetFileSystemDelegate();
-
-  // Returns a delegate for the chrome.feedbackPrivate API.
-  virtual FeedbackPrivateDelegate* GetFeedbackPrivateDelegate();
 
   virtual AutomationInternalApiDelegate* GetAutomationInternalApiDelegate();
 

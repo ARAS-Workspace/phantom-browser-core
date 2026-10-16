@@ -19,7 +19,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/history/top_sites_factory.h"
@@ -169,9 +168,6 @@ std::vector<std::pair<ui::MenuModel*, size_t>> FindMenuItemsForCommand(
 
 std::vector<DbusAppmenuCommand> BuildHelpMenu(Profile& profile) {
   std::vector<DbusAppmenuCommand> help_menu;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  help_menu.push_back({IDC_FEEDBACK, IDS_FEEDBACK});
-#endif
   help_menu.push_back({IDC_HELP_PAGE_VIA_MENU, IDS_HELP_PAGE});
   return help_menu;
 }

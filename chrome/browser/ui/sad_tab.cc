@@ -11,11 +11,8 @@
 #include "base/metrics/histogram_macros.h"
 #include "base/notreached.h"
 #include "base/time/time.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/net/referrer.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tab_contents/tab_contents_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/grit/generated_resources.h"
@@ -25,21 +22,13 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/web_contents.h"
-#include "ui/base/l10n/l10n_util.h"
 
 namespace {
 
-void RecordEvent(bool feedback, ui_metrics::SadTabEvent event) {
-  if (feedback) {
-    UMA_HISTOGRAM_ENUMERATION(ui_metrics::kSadTabFeedbackHistogramKey, event,
-                              ui_metrics::SadTabEvent::MAX_SAD_TAB_EVENT);
-  } else {
-    UMA_HISTOGRAM_ENUMERATION(ui_metrics::kSadTabReloadHistogramKey, event,
-                              ui_metrics::SadTabEvent::MAX_SAD_TAB_EVENT);
-  }
+void RecordEvent(ui_metrics::SadTabEvent event) {
+  UMA_HISTOGRAM_ENUMERATION(ui_metrics::kSadTabReloadHistogramKey, event,
+                            ui_metrics::SadTabEvent::MAX_SAD_TAB_EVENT);
 }
-
-constexpr char kCategoryTagCrash[] = "Crash";
 
 // Return true if this function has been called in the last 10 seconds.
 bool IsRepeatedlyCrashing() {
@@ -116,8 +105,7 @@ int SadTab::GetInfoMessage() {
 }
 
 int SadTab::GetButtonTitle() {
-  return show_feedback_button_ ? IDS_CRASHED_TAB_FEEDBACK_LINK
-                               : IDS_SAD_TAB_RELOAD_LABEL;
+  return IDS_SAD_TAB_RELOAD_LABEL;
 }
 
 std::vector<int> SadTab::GetSubMessages() {
@@ -157,29 +145,15 @@ void SadTab::RecordFirstPaint() {
   DCHECK(!recorded_paint_);
   recorded_paint_ = true;
 
-  RecordEvent(show_feedback_button_, ui_metrics::SadTabEvent::DISPLAYED);
+  RecordEvent(ui_metrics::SadTabEvent::DISPLAYED);
 }
 
 void SadTab::PerformAction(SadTab::Action action) {
   DCHECK(recorded_paint_);
   switch (action) {
     case Action::kButton:
-      RecordEvent(show_feedback_button_,
-                  ui_metrics::SadTabEvent::BUTTON_CLICKED);
-      if (show_feedback_button_) {
-        chrome::ShowFeedbackPage(
-            GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-                web_contents_),
-            feedback::kFeedbackSourceSadTabPage,
-            std::string() /* description_template */,
-            l10n_util::GetStringUTF8(kind_ == SAD_TAB_KIND_CRASHED
-                                         ? IDS_CRASHED_TAB_FEEDBACK_MESSAGE
-                                         : IDS_KILLED_TAB_FEEDBACK_MESSAGE),
-            std::string(kCategoryTagCrash), std::string());
-      } else {
-        web_contents_->GetController().Reload(content::ReloadType::NORMAL,
-                                              true);
-      }
+      RecordEvent(ui_metrics::SadTabEvent::BUTTON_CLICKED);
+      web_contents_->GetController().Reload(content::ReloadType::NORMAL, true);
       break;
   }
 }
@@ -188,7 +162,6 @@ SadTab::SadTab(content::WebContents* web_contents, SadTabKind kind)
     : web_contents_(web_contents),
       kind_(kind),
       is_repeatedly_crashing_(IsRepeatedlyCrashing()),
-      show_feedback_button_(false),
       recorded_paint_(false) {
   switch (kind) {
     case SAD_TAB_KIND_CRASHED:
@@ -199,9 +172,4 @@ SadTab::SadTab(content::WebContents* web_contents, SadTabKind kind)
                    << web_contents->GetURL().DeprecatedGetOriginAsURL().spec();
       break;
   }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // Only Google Chrome-branded browsers may show the Feedback button.
-  show_feedback_button_ = is_repeatedly_crashing_;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }

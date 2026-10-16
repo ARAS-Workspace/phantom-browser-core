@@ -632,7 +632,7 @@ IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
                        A11yAnnouncements) {
   AXAnnouncementObserver announcement_observer(views::AXUpdateNotifier::Get());
 
-  actions::ActionId action_id = kActionSendSharedTabGroupFeedback;
+  actions::ActionId action_id = kActionPrint;
 
   // Initial State: Unpinned.
   ASSERT_FALSE(model_->Contains(action_id));

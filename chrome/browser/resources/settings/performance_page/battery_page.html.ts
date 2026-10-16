@@ -9,8 +9,6 @@ import {BatterySaverModeState} from './performance_metrics_proxy.js';
 export function getHtml(this: SettingsBatteryPageElement) {
   return html`<!--_html_template_start_-->
 <settings-section
-    ?show-send-feedback-button="${this.showSendFeedbackButton_()}"
-    @send-feedback="${this.onSendFeedback_}"
     page-title="$i18n{batteryPageTitle}">
   <if expr="is_chromeos">
   ${this.isBatterySaverModeManagedByOs_ ? html`

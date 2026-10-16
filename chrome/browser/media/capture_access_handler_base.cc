@@ -10,7 +10,6 @@
 
 #include "build/build_config.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/common/webui_url_constants.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
@@ -179,8 +178,7 @@ void CaptureAccessHandlerBase::UpdateMediaRequestState(
 void CaptureAccessHandlerBase::UpdateExtensionTrusted(
     const content::MediaStreamRequest& request,
     bool is_allowlisted_extension) {
-  UpdateTrusted(request, is_allowlisted_extension ||
-                             IsBuiltInFeedbackUI(request.security_origin));
+  UpdateTrusted(request, is_allowlisted_extension);
 }
 
 void CaptureAccessHandlerBase::UpdateTrusted(
@@ -326,7 +324,3 @@ bool CaptureAccessHandlerBase::IsExtensionAllowedForScreenCapture(
   return false;
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-bool CaptureAccessHandlerBase::IsBuiltInFeedbackUI(const GURL& origin) {
-  return origin.spec() == chrome::kChromeUIFeedbackURL;
-}

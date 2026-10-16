@@ -25,7 +25,7 @@ import {loadTimeData} from '../i18n_setup.js';
 
 import {NetworkPredictionOptions} from './constants.js';
 import type {CpuPerformanceInfo} from './performance_browser_proxy.js';
-import {PerformanceBrowserProxyImpl, PerformanceFeedbackCategory} from './performance_browser_proxy.js';
+import {PerformanceBrowserProxyImpl} from './performance_browser_proxy.js';
 import {getCss} from './speed_page.css.js';
 import {getHtml} from './speed_page.html.js';
 
@@ -149,23 +149,6 @@ export class SpeedPageElement extends SpeedPageElementBase {
       this.$.preloadingExtended.updateCollapsed();
       this.$.preloadingStandard.updateCollapsed();
     });
-  }
-
-  protected showSendFeedbackButton_(): boolean {
-    // <if expr="_google_chrome">
-    return true;
-    // </if>
-    // <if expr="not _google_chrome">
-    return false;
-    // </if>
-  }
-
-  protected onSendFeedback_(_e: Event) {
-    // <if expr="_google_chrome">
-    _e.stopPropagation();
-    PerformanceBrowserProxyImpl.getInstance().openFeedbackDialog(
-        PerformanceFeedbackCategory.SPEED);
-    // </if>
   }
 
   protected getCpuPerformanceNominalTierLabel_(): string {

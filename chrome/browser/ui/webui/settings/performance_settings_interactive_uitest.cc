@@ -11,7 +11,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/power_monitor_test_utils.h"
 #include "base/test/scoped_feature_list.h"
-#include "build/branding_buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/performance_manager/public/user_tuning/battery_saver_mode_manager.h"
 #include "chrome/browser/profiles/profile.h"
@@ -24,7 +23,6 @@
 #include "chrome/browser/ui/performance_controls/test_support/memory_saver_interactive_test_mixin.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/webui/feedback/feedback_dialog.h"
 #include "chrome/browser/ui/webui/test_support/webui_interactive_test_mixin.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -85,30 +83,6 @@ const WebContentsInteractionTestUtil::DeepQuery kExceptionDialogAddButton = {
     "tab-discard-exception-tabbed-add-dialog",
     "cr-button#actionButton"};
 
-const WebContentsInteractionTestUtil::DeepQuery kPerformanceFeedbackButton = {
-    "settings-ui",
-    "settings-main",
-    "settings-performance-page-index",
-    "settings-performance-page",
-    "settings-section",
-    "cr-icon-button#feedback"};
-
-const WebContentsInteractionTestUtil::DeepQuery kMemorySaverFeedbackButton = {
-    "settings-ui",
-    "settings-main",
-    "settings-performance-page-index",
-    "settings-memory-page",
-    "settings-section",
-    "cr-icon-button#feedback"};
-
-const WebContentsInteractionTestUtil::DeepQuery kBatterySaverFeedbackButton = {
-    "settings-ui",
-    "settings-main",
-    "settings-performance-page-index",
-    "settings-battery-page",
-    "settings-section",
-    "cr-icon-button#feedback"};
-
 }  // namespace
 
 class PerformanceSettingsInteractiveTest
@@ -164,20 +138,6 @@ IN_PROC_BROWSER_TEST_F(PerformanceSettingsInteractiveTest,
                                discard_ring_treatment_setting, true),
       CheckDiscardRingTreatmentLogged(true, 1, histogram_tester));
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-IN_PROC_BROWSER_TEST_F(PerformanceSettingsInteractiveTest,
-                       PerformanceSendFeedbackDialogOpens) {
-  RunTestSequence(
-      InstrumentTab(kPerformanceSettingsPage),
-      NavigateWebContents(
-          kPerformanceSettingsPage,
-          GURL(chrome::GetSettingsUrl(chrome::kPerformanceSubPage))),
-      ClickElement(kPerformanceSettingsPage, kPerformanceFeedbackButton),
-      InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
-}
-
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 class MemorySettingsInteractiveTest
     : public MemorySaverInteractiveTestMixin<
@@ -259,20 +219,6 @@ IN_PROC_BROWSER_TEST_F(MemorySettingsInteractiveTest,
       CheckMemorySaverModeLogged(MemorySaverModeState::kEnabled, 1,
                                  histogram_tester));
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-IN_PROC_BROWSER_TEST_F(MemorySettingsInteractiveTest,
-                       MemorySaverSendFeedbackDialogOpens) {
-  RunTestSequence(
-      InstrumentTab(kPerformanceSettingsPage),
-      NavigateWebContents(
-          kPerformanceSettingsPage,
-          GURL(chrome::GetSettingsUrl(chrome::kPerformanceSubPage))),
-      ClickElement(kPerformanceSettingsPage, kMemorySaverFeedbackButton),
-      InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
-}
-
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 class MemorySaverAggressivenessSettingsInteractiveTest
     : public MemorySettingsInteractiveTest {
@@ -488,19 +434,6 @@ IN_PROC_BROWSER_TEST_F(BatterySettingsInteractiveTest,
       CheckBatteryStateLogged(
           histogram_tester, BatterySaverModeState::kEnabledBelowThreshold, 2));
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-IN_PROC_BROWSER_TEST_F(BatterySettingsInteractiveTest,
-                       BatterySaverSendFeedbackDialogOpens) {
-  RunTestSequence(
-      InstrumentTab(kPerformanceSettingsPage),
-      NavigateWebContents(
-          kPerformanceSettingsPage,
-          GURL(chrome::GetSettingsUrl(chrome::kPerformanceSubPage))),
-      ClickElement(kPerformanceSettingsPage, kBatterySaverFeedbackButton),
-      InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
-}
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 class TabDiscardExceptionsSettingsInteractiveTest
     : public MemorySaverInteractiveTestMixin<

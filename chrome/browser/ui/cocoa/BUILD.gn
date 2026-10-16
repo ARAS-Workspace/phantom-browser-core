@@ -131,7 +131,6 @@ source_set("cocoa") {
     "//chrome/browser/bookmarks",
     "//chrome/browser/devtools",
     "//chrome/browser/favicon",
-    "//chrome/browser/feedback:feedback_impl",
     "//chrome/browser/headless",
     "//chrome/browser/history",
     "//chrome/browser/lifetime",

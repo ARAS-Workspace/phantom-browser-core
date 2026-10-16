@@ -105,7 +105,6 @@ class WallpaperSearchHandler
   void OnHistoryUpdated() override;
 
  private:
-  void ShowFeedbackPage();
   void DecodeHistoryImage(image_fetcher::ImageDecodedCallback callback,
                           std::string image);
   void OnDescriptorsRetrieved(GetDescriptorsCallback callback,

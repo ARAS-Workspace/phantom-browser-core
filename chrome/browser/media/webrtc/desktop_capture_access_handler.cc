@@ -29,7 +29,6 @@
 #include "chrome/browser/ui/simple_message_box.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/url_formatter/elide_url.h"
 #include "content/public/browser/browser_thread.h"
@@ -45,7 +44,6 @@
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/switches.h"
-#include "media/base/media_switches.h"
 #include "services/network/public/cpp/is_potentially_trustworthy.h"
 #include "third_party/blink/public/common/mediastream/media_stream_request.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
@@ -89,12 +87,6 @@ bool ShouldDisplayNotification(const extensions::Extension* extension) {
   return !(extension &&
            (extension->location() == ManifestLocation::kComponent ||
             extension->location() == ManifestLocation::kExternalComponent));
-}
-
-// Returns true if an on-screen notification should not be displayed after
-// desktop capture is taken for the |url|.
-bool HasNotificationExemption(const GURL& url) {
-  return url.spec() == chrome::kChromeUIFeedbackURL;
 }
 
 // Find browser or app window from a given |web_contents|.
@@ -183,12 +175,6 @@ MediaStreamRequestResult CheckIfRequestApproved(
     return MediaStreamRequestResult::OK;
   }
 
-  // chrome://feedback/ is allowed by default.
-  // The user can still decide whether the screenshot taken is shared or not.
-  if (request.security_origin.spec() == chrome::kChromeUIFeedbackURL) {
-    return MediaStreamRequestResult::OK;
-  }
-
   gfx::NativeWindow parent_window =
       FindParentWindowForWebContents(web_contents);
   const std::u16string application_name = base::UTF8ToUTF16(
@@ -245,8 +231,7 @@ void DesktopCaptureAccessHandler::ProcessScreenCaptureAccessRequest(
   const bool screen_capture_enabled =
       base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableUserMediaScreenCapturing) ||
-      pending_request->is_allowlisted_extension ||
-      IsBuiltInFeedbackUI(pending_request->request.security_origin);
+      pending_request->is_allowlisted_extension;
 
   if (!screen_capture_enabled) {
     std::move(pending_request->callback)
@@ -330,8 +315,7 @@ void DesktopCaptureAccessHandler::HandleRequest(
   const bool is_allowlisted_extension =
       IsExtensionAllowedForScreenCapture(extension);
   const bool should_display_notification =
-      display_notification_ && ShouldDisplayNotification(extension) &&
-      !HasNotificationExemption(request.security_origin);
+      display_notification_ && ShouldDisplayNotification(extension);
   std::unique_ptr<PendingAccessRequest> pending_request =
       std::make_unique<PendingAccessRequest>(
           /*picker=*/nullptr, request, std::move(callback),
@@ -383,10 +367,6 @@ void DesktopCaptureAccessHandler::HandleRequest(
           .Run(blink::mojom::StreamDevicesSet(),
                MediaStreamRequestResult::PERMISSION_DENIED_BY_SYSTEM,
                /*ui=*/nullptr);
-      return;
-    }
-    if (IsFeedbackRequestWithSckPicker(request.security_origin)) {
-      ProcessChangeSourceRequest(web_contents, std::move(pending_request));
       return;
     }
 #endif
@@ -582,14 +562,8 @@ void DesktopCaptureAccessHandler::ProcessQueuedAccessRequest(
       capture_policy::GetIncludableWebContentsFilter(request_origin,
                                                      capture_level);
 
-  std::vector<DesktopMediaList::Type> media_types;
-  if (IsFeedbackRequestWithSckPicker(request_origin)) {
-    media_types = {DesktopMediaList::Type::kWebContents,
-                   DesktopMediaList::Type::kWindow,
-                   DesktopMediaList::Type::kScreen};
-  } else {
-    media_types = {DesktopMediaList::Type::kWebContents};
-  }
+  std::vector<DesktopMediaList::Type> media_types = {
+      DesktopMediaList::Type::kWebContents};
 
   auto source_lists = picker_factory_->CreateMediaList(
       media_types, web_contents, includable_web_contents_filter);
@@ -603,10 +577,6 @@ void DesktopCaptureAccessHandler::ProcessQueuedAccessRequest(
                      pending_request.application_title);
   DesktopMediaPicker::Params picker_params(
       DesktopMediaPicker::Params::RequestSource::kExtension);
-  if (IsFeedbackRequestWithSckPicker(request_origin)) {
-    picker_params.preferred_display_surface =
-        blink::mojom::PreferredDisplaySurface::MONITOR;
-  }
   picker_params.web_contents = web_contents;
   gfx::NativeWindow parent_window = web_contents->GetTopLevelNativeWindow();
   picker_params.context = parent_window;
@@ -786,14 +756,4 @@ void DesktopCaptureAccessHandler::OnDesktopCaptureDevicesObtained(
 
 void DesktopCaptureAccessHandler::SetRequestApprovedForTest(bool approved) {
   request_approved_for_test_ = approved;
-}
-
-bool DesktopCaptureAccessHandler::IsFeedbackRequestWithSckPicker(
-    const GURL& origin) const {
-#if BUILDFLAG(IS_MAC)
-  return IsBuiltInFeedbackUI(origin) &&
-         base::FeatureList::IsEnabled(media::kUseSCContentSharingPicker);
-#else
-  return false;
-#endif
 }

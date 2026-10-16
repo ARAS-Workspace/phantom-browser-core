@@ -116,8 +116,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser:defaults",
     "//chrome/browser/favicon",
-    "//chrome/browser/feedback",
-    "//chrome/browser/feedback:feedback_impl",
     "//chrome/browser/prefs",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:misc",

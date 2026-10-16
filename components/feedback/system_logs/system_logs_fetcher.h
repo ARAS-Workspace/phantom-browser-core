@@ -9,16 +9,11 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 
-#include "base/containers/span.h"
 #include "base/functional/callback.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
-#include "base/task/sequenced_task_runner.h"
-#include "components/feedback/feedback_common.h"
-#include "components/feedback/redaction_tool/redaction_tool.h"
 #include "components/feedback/system_logs/system_logs_source.h"
 
 namespace system_logs {
@@ -36,7 +31,7 @@ using SysLogsFetcherCallback =
 //      // do something with the logs
 //   }
 //   void GetLogs() {
-//     SystemLogsFetcher* fetcher = new SystemLogsFetcher(/*scrub_data=*/ true);
+//     SystemLogsFetcher* fetcher = new SystemLogsFetcher();
 //     fetcher->AddSource(std::make_unique<LogSourceOne>());
 //     fetcher->AddSource(std::make_unique<LogSourceTwo>());
 //     fetcher->Fetch(base::BindOnce(&Example::ProcessLogs, this));
@@ -44,13 +39,7 @@ using SysLogsFetcherCallback =
 // };
 class SystemLogsFetcher {
  public:
-  // If |scrub_data| is true, logs will be redacted.
-  // |first_party_extension_ids| is a span of all the 1st party
-  // extension IDs whose URLs won't be redacted. It is OK to pass an
-  // empty span if it's OK to redact those URLs or they won't be present.
-  explicit SystemLogsFetcher(
-      bool scrub_data,
-      base::span<const std::string_view> first_party_extension_ids = {});
+  SystemLogsFetcher();
 
   SystemLogsFetcher(const SystemLogsFetcher&) = delete;
   SystemLogsFetcher& operator=(const SystemLogsFetcher&) = delete;
@@ -65,8 +54,7 @@ class SystemLogsFetcher {
   void Fetch(SysLogsFetcherCallback callback);
 
  private:
-  // Callback passed to all the data sources. May call Scrub(), then calls
-  // AddResponse().
+  // Callback passed to all the data sources. Calls AddResponse().
   void OnFetched(const std::string& source_name,
                  std::unique_ptr<SystemLogsResponse> response);
 
@@ -86,9 +74,6 @@ class SystemLogsFetcher {
 
   std::unique_ptr<SystemLogsResponse> response_;  // The actual response data.
   size_t num_pending_requests_;  // The number of callbacks it should get.
-
-  scoped_refptr<base::SequencedTaskRunner> task_runner_for_redactor_;
-  std::unique_ptr<redaction::RedactionTool> redactor_;
 
   base::WeakPtrFactory<SystemLogsFetcher> weak_ptr_factory_{this};
 };

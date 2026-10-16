@@ -77,7 +77,6 @@
 
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
-#include "chrome/browser/extensions/api/feedback_private/chrome_feedback_private_delegate.h"
 #include "chrome/browser/extensions/api/file_system/chrome_file_system_delegate.h"
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
@@ -392,15 +391,6 @@ FileSystemDelegate* ChromeExtensionsAPIClient::GetFileSystemDelegate() {
     file_system_delegate_ = std::make_unique<ChromeFileSystemDelegate>();
   }
   return file_system_delegate_.get();
-}
-
-FeedbackPrivateDelegate*
-ChromeExtensionsAPIClient::GetFeedbackPrivateDelegate() {
-  if (!feedback_private_delegate_) {
-    feedback_private_delegate_ =
-        std::make_unique<ChromeFeedbackPrivateDelegate>();
-  }
-  return feedback_private_delegate_.get();
 }
 
 AutomationInternalApiDelegate*

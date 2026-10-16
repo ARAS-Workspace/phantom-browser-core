@@ -218,9 +218,6 @@ class AppMenu final : public views::MenuDelegate,
   // Menu corresponding to IDC_SAVED_TAB_GROUPS_MENU.
   raw_ptr<views::MenuItemView> saved_tab_groups_menu_ = nullptr;
 
-  // Menu corresponding to IDC_FEEDBACK.
-  raw_ptr<views::MenuItemView, DanglingUntriaged> feedback_menu_item_ = nullptr;
-
   // Menu corresponding to IDC_TAKE_SCREENSHOT.
   raw_ptr<views::MenuItemView, DanglingUntriaged> screenshot_menu_item_ =
       nullptr;

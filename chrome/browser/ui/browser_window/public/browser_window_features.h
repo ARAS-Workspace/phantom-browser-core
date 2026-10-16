@@ -205,7 +205,6 @@ namespace tab_groups {
 class DeletionDialogController;
 class MostRecentSharedTabUpdateStore;
 class SessionServiceTabGroupSyncObserver;
-class SharedTabGroupFeedbackController;
 }  // namespace tab_groups
 
 namespace tabs {
@@ -398,11 +397,6 @@ class BrowserWindowFeatures {
 
   SessionServiceBrowserHelper* session_service_browser_helper() {
     return session_service_browser_helper_.get();
-  }
-
-  tab_groups::SharedTabGroupFeedbackController*
-  shared_tab_group_feedback_controller() {
-    return shared_tab_group_feedback_controller_.get();
   }
 
   // TODO(crbug.com/346158959): For historical reasons, side_panel_ui is an
@@ -644,8 +638,6 @@ class BrowserWindowFeatures {
       new_tab_footer_controller_;
   std::unique_ptr<omnibox::OmniboxPopupCloser> omnibox_popup_closer_;
   std::unique_ptr<ScrimViewController> scrim_view_controller_;
-  std::unique_ptr<tab_groups::SharedTabGroupFeedbackController>
-      shared_tab_group_feedback_controller_;
   std::unique_ptr<SidePanelCoordinator> side_panel_coordinator_;
   std::unique_ptr<split_tabs::SplitTabHighlightController>
       split_tab_highlight_controller_;

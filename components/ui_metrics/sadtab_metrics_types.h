@@ -21,8 +21,6 @@ enum class SadTabEvent {
 
 // Describes the mode of the Sad Tab as being in 'reload' mode.
 const char kSadTabReloadHistogramKey[] = "Tabs.SadTab.Reload.Event";
-// Describes the mode of the Sad Tab as being in 'feedback' mode.
-const char kSadTabFeedbackHistogramKey[] = "Tabs.SadTab.Feedback.Event";
 }
 
 #endif  // COMPONENTS_UI_METRICS_SADTAB_METRICS_TYPES_H_

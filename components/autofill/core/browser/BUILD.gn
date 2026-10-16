@@ -533,8 +533,6 @@ static_library("browser") {
     "autofill_ai_form_rationalization.h",
     "autofill_browser_util.cc",
     "autofill_browser_util.h",
-    "autofill_feedback_data.cc",
-    "autofill_feedback_data.h",
     "autofill_field.cc",
     "autofill_field.h",
     "autofill_format_string.cc",

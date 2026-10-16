@@ -27,7 +27,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/extensions/extension_ui_util.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -1016,13 +1015,6 @@ void HelpMenuModel::Build(BrowserWindowInterface* browser) {
                                           : kReleaseAlertOldIcon);
   }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (chrome::CanShowFeedback(browser->GetProfile())) {
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_FEEDBACK, IDS_FEEDBACK,
-        features::IsRoundedIconsEnabled() ? kFeedbackIcon : kReportOldIcon);
-  }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1568,13 +1560,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       break;
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
     // Help menu.
-    case IDC_FEEDBACK:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.Feedback",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_FEEDBACK);
-      break;
     case IDC_CHROME_TIPS:
       if (!uma_action_recorded_) {
         base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ChromeTips",

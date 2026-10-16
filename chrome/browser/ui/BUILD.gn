@@ -477,7 +477,6 @@ static_library("ui") {
     ":tab_dialogs",
     ":tab_modal_confirm_dialog",
     "//chrome/browser:browser_public_dependencies",
-    "//chrome/browser/feedback",
     "//chrome/browser/headless",
     "//chrome/browser/history",
     "//chrome/browser/history:impl",
@@ -551,7 +550,6 @@ static_library("ui") {
     "//chrome/browser/enterprise:impl",
     "//chrome/browser/external_protocol",
     "//chrome/browser/favicon",
-    "//chrome/browser/feedback:feedback_impl",
     "//chrome/browser/file_system_access",
     "//chrome/browser/finds",
     "//chrome/browser/finds/core",
@@ -891,12 +889,6 @@ static_library("ui") {
     # c/b/ui/browser.h, browser_commands.h, browser_window.h
     # c/b/ui/scoped_tabbed_browser_displayer.h
     # c/b/ui/views/frame/browser_view.h
-
-    # TODO(crbug.com/364667551): Remove this circular dependency when
-    # c/b/ui/webui/feedback/feedback_dialog.h gets componentized.
-    # feedback_impl includes headers from //chrome/browser/ui (e.g. browser.h,
-    # browser_tabstrip.h, browser_window.h) that can't be split out yet.
-    "//chrome/browser/feedback:feedback_impl",
 
     # lifetime:impl includes headers from //chrome/browser/ui that can't be
     # split out yet (e.g. browser_window.h).
@@ -1314,8 +1306,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/waap:manager",
     "//chrome/browser/ui/webui/data_sharing",
-    "//chrome/browser/ui/webui/feedback",
-    "//chrome/browser/ui/webui/feedback:impl",
     "//chrome/browser/ui/webui/multistep_filter_internals",
     "//chrome/browser/ui/webui/on_device_internals",
     "//chrome/browser/ui/webui/search_engine_choice",
@@ -2970,7 +2960,6 @@ source_set("chrome_pages") {
   public_deps = [
     "//base",
     "//build:branding_buildflags",
-    "//chrome/browser/feedback:feedback_enum",
     "//chrome/browser/signin",
     "//chrome/browser/ui/user_education",
     "//components/content_settings/core/common",
@@ -3158,7 +3147,6 @@ if (toolkit_views) {
       ":sad_tab",
       "//chrome/app:generated_resources",
       "//chrome/app/vector_icons",
-      "//chrome/browser/feedback",
       "//chrome/browser/lifetime",
       "//chrome/browser/memory",
       "//chrome/browser/net",

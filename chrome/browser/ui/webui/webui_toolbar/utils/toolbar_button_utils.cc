@@ -333,12 +333,6 @@ ActionItemToPinnedToolbarAction(actions::ActionItem* item) {
                            : vector_icons::kStorefrontOldIcon));
       return toolbar_ui_api::mojom::PinnedToolbarAction::
           kSidePanelShowMerchantTrust;
-    case kActionSendSharedTabGroupFeedback:
-      CHECK_EQ(icon, &(features::IsRoundedIconsEnabled()
-                           ? vector_icons::kFeedbackIcon
-                           : vector_icons::kFeedbackOldIcon));
-      return toolbar_ui_api::mojom::PinnedToolbarAction::
-          kSendSharedTabGroupFeedback;
     case kActionSidePanelShowComments:
       CHECK_EQ(icon, &(features::IsRoundedIconsEnabled()
                            ? vector_icons::kChatIcon
@@ -413,9 +407,6 @@ std::optional<actions::ActionId> PinnedToolbarActionToActionId(
     case toolbar_ui_api::mojom::PinnedToolbarAction::
         kSidePanelShowMerchantTrust:
       return kActionSidePanelShowMerchantTrust;
-    case toolbar_ui_api::mojom::PinnedToolbarAction::
-        kSendSharedTabGroupFeedback:
-      return kActionSendSharedTabGroupFeedback;
     case toolbar_ui_api::mojom::PinnedToolbarAction::kSidePanelShowComments:
       return kActionSidePanelShowComments;
     case toolbar_ui_api::mojom::PinnedToolbarAction::kDivider:

@@ -13,7 +13,6 @@
 #include "base/values.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "chrome/browser/feedback/public/feedback_source.h"
 #include "chrome/browser/ui/user_education/show_promo_in_page.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/signin/public/base/signin_buildflags.h"

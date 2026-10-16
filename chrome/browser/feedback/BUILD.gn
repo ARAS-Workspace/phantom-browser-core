@@ -6,109 +6,38 @@ import("//build/config/ui.gni")
 
 assert(is_mac || is_linux)
 
-source_set("feedback_enum") {
-  sources = [ "public/feedback_source.h" ]
-}
-
-source_set("feedback") {
+# The log sources of chrome://system (chrome/browser/ui/webui/system).
+source_set("system_logs") {
   sources = [
-    "feedback_uploader_chrome.h",
-    "feedback_uploader_factory_chrome.h",
-  ]
-  public_deps = [
-    "//build/config/chromebox_for_meetings:buildflags",
-    "//components/feedback",
-    "//components/feedback/content:factory",
-    "//components/signin/public/identity_manager",
-  ]
-  deps = [
-    "//chrome/browser/signin",
-    "//google_apis",
-  ]
-
-  # The non-android feed code has circular dependencies and the easiest way to
-  # decouple is to separate between the interface and the implementation. Many
-  # parts of Chrome want to call a method "ShowFeedback" to show the feedback
-  # page (the interface). The implementation of the feedback uploader requires
-  # fetching data from many different components (the implementation).
-  sources += [
-    "feedback_dialog_utils.h",
-    "show_feedback_page.h",
-    "system_logs/chrome_system_logs_fetcher.h",
-  ]
-  public_deps += [
-    "//base",
-    "//chrome/browser/feedback:feedback_enum",
-    "//components/sessions:session_id",
-  ]
-}
-
-source_set("feedback_impl") {
-  sources = [
-    "feedback_uploader_chrome.cc",
-    "feedback_uploader_factory_chrome.cc",
-  ]
-  deps = [
-    ":feedback",
-    "//chrome/browser:browser_process",
-    "//chrome/browser:memory_details",
-    "//chrome/browser/profiles:profile",
-    "//chrome/browser/signin",
-    "//chrome/common:constants",
-    "//content/public/browser",
-  ]
-  public_deps = [ "//components/feedback" ]
-  sources += [
-    "feedback_dialog_utils.cc",
-    "show_feedback_page.cc",
     "system_logs/about_system_logs_fetcher.cc",
     "system_logs/about_system_logs_fetcher.h",
-    "system_logs/chrome_system_logs_fetcher.cc",
     "system_logs/log_sources/chrome_internal_log_source.cc",
     "system_logs/log_sources/chrome_internal_log_source.h",
     "system_logs/log_sources/chrome_root_store_log_source.cc",
     "system_logs/log_sources/chrome_root_store_log_source.h",
-    "system_logs/log_sources/crash_ids_source.cc",
-    "system_logs/log_sources/crash_ids_source.h",
-    "system_logs/log_sources/device_event_log_source.cc",
-    "system_logs/log_sources/device_event_log_source.h",
     "system_logs/log_sources/memory_details_log_source.cc",
     "system_logs/log_sources/memory_details_log_source.h",
-    "system_logs/log_sources/performance_log_source.cc",
-    "system_logs/log_sources/performance_log_source.h",
     "system_logs/log_sources/related_website_sets_source.cc",
     "system_logs/log_sources/related_website_sets_source.h",
   ]
-  public_deps += [
-    "//chrome/browser/feedback:feedback_enum",
-    "//components/feedback/content:factory",
-    "//components/upload_list",
-  ]
-  deps += [
+  public_deps = [ "//components/feedback" ]
+  deps = [
     "//base",
-    "//chrome/browser/crash_upload_list",
-    "//chrome/browser/devtools",
+    "//chrome/browser:browser_process",
+    "//chrome/browser:memory_details",
     "//chrome/browser/extensions",
     "//chrome/browser/first_party_sets",
     "//chrome/browser/metrics",
-    "//chrome/browser/performance_manager/public/user_tuning",
+    "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles:profile_manager",
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",
-    "//chrome/browser/ui:ui_features",
-    "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/tabs:tab_strip",
-    "//chrome/browser/ui/views/web_dialogs",
-    "//chrome/browser/ui/webui/feedback",
-    "//chrome/browser/ui/webui/top_chrome",
     "//chrome/browser/updater",
     "//chrome/common",
-    "//components/device_event_log",
-    "//components/feedback",
-    "//components/performance_manager",
+    "//chrome/common:constants",
     "//components/tabs:public",
+    "//content/public/browser",
     "//extensions/browser",
-    "//extensions/browser/api/feedback_private",
     "//extensions/browser/api/power",
     "//net",
     "//services/cert_verifier:lib",
@@ -126,25 +55,17 @@ source_set("unit_tests") {
   testonly = true
 
   deps = [
-    ":feedback_impl",
+    ":system_logs",
     "//base/test:test_support",
     "//chrome/browser",
-    "//chrome/browser/performance_manager:test_support",
     "//chrome/common:constants",
     "//chrome/test:test_support",
     "//content/test:test_support",
     "//testing/gtest",
   ]
-  sources = [
-    "system_logs/log_sources/crash_ids_source_unittest.cc",
-    "system_logs/log_sources/performance_log_source_unittest.cc",
-    "system_logs/log_sources/related_website_sets_source_unittest.cc",
-  ]
-  deps += [
-    "//components/feedback",
-    "//components/performance_manager",
-    "//components/upload_list",
-  ]
+  sources =
+      [ "system_logs/log_sources/related_website_sets_source_unittest.cc" ]
+  deps += [ "//components/feedback" ]
 }
 
 source_set("browser_tests") {
@@ -156,7 +77,7 @@ source_set("browser_tests") {
       [ "system_logs/log_sources/chrome_internal_log_source_browsertest.cc" ]
 
   deps = [
-    ":feedback_impl",
+    ":system_logs",
     "//base",
     "//chrome/browser/metrics",
     "//chrome/browser/ui",

@@ -39,7 +39,6 @@ namespace {
 
 std::vector<Command> supported_commands = {
     Command::kUnknownCommand,  // Included for SupportedCommands test
-    Command::kOpenFeedbackForm,
     Command::kOpenPrivacyGuide,
     Command::kStartTabGroupTutorial,
     Command::kOpenPasswordManager,
@@ -67,11 +66,6 @@ class TestCommandHandler : public BrowserCommandHandler {
   void NavigateToURL(const GURL&, WindowOpenDisposition) override {
     // The functionality of opening a URL is removed, as it cannot be executed
     // in a unittest.
-  }
-
-  void OpenFeedbackForm() override {
-    // The functionality of opening the feedback form is removed, as it cannot
-    // be executed in a unittest.
   }
 
   void OpenAISettings() override {
@@ -193,8 +187,6 @@ class MockCommandHandler : public TestCommandHandler {
   MOCK_METHOD(void, StartTutorial, (StartTutorialInPage::Params params));
 
   MOCK_METHOD(void, NavigateToURL, (const GURL&, WindowOpenDisposition));
-
-  MOCK_METHOD(void, OpenFeedbackForm, ());
 
   MOCK_METHOD(void, OpenAISettings, ());
 
@@ -328,13 +320,6 @@ TEST_F(BrowserCommandHandlerTest, SupportedCommands) {
   EXPECT_TRUE(ExecuteCommand(Command::kUnknownCommand, ClickInfo::New()));
   histogram_tester.ExpectBucketCount(
       BrowserCommandHandler::kPromoBrowserCommandHistogramName, 0, 1);
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenFeedbackFormCommand) {
-  // Open feedback form command calls open feedback form.
-  ClickInfoPtr info = ClickInfo::New();
-  EXPECT_CALL(*command_handler_, OpenFeedbackForm());
-  EXPECT_TRUE(ExecuteCommand(Command::kOpenFeedbackForm, std::move(info)));
 }
 
 TEST_F(BrowserCommandHandlerTest, CanExecuteCommand_OpenPrivacyGuide) {

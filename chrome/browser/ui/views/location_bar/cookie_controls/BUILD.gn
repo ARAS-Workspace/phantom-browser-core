@@ -57,7 +57,6 @@ source_set("impl") {
       "//chrome/app/vector_icons",
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/favicon",
-      "//chrome/browser/feedback",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/ui:url_identity",
       "//chrome/browser/ui/browser_window",

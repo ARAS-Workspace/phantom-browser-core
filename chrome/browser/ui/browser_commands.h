@@ -314,10 +314,6 @@ bool CanOpenTaskManager();
 void OpenTaskManager(
     BrowserWindowInterface* browser,
     task_manager::StartAction start_action = task_manager::StartAction::kOther);
-void OpenFeedbackDialog(BrowserWindowInterface* browser,
-                        feedback::FeedbackSource source,
-                        const std::string& description_template = std::string(),
-                        const std::string& category_tag = std::string());
 void ToggleBookmarkBar(BrowserWindowInterface* browser);
 void SetBookmarkBarVisibilityState(BrowserWindowInterface* browser,
                                    bookmarks::BookmarkBarVisibilityState state);

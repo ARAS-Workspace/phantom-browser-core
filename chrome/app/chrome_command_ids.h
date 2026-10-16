@@ -92,7 +92,6 @@
 #define IDC_MOVE_TAB_TO_NEW_WINDOW      34056
 #define IDC_NEW_SPLIT_TAB               34057
 #define IDC_TOGGLE_VERTICAL_TABS        34058
-#define IDC_VERTICAL_TABS_SEND_FEEDBACK 34059
 #define IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER 34060
 #define IDC_TOGGLE_VERTICAL_TABS_COLLAPSE 34061
 
@@ -148,7 +147,6 @@
 #define IDC_SHOW_PAYMENT_METHODS        35042
 #define IDC_SHOW_ADDRESSES              35043
 #define IDC_ORGANIZE_TABS               35044
-#define IDC_SEND_SHARED_TAB_GROUP_FEEDBACK 35046
 
 // Page-manipulation commands that target a specified tab, which may not be the
 // active one.
@@ -204,7 +202,6 @@
 #define IDC_DEV_TOOLS_CONSOLE           40005
 #define IDC_TASK_MANAGER                40006
 #define IDC_DEV_TOOLS_DEVICES           40007
-#define IDC_FEEDBACK                    40008
 #define IDC_SHOW_BOOKMARK_BAR           40009
 #define IDC_SHOW_HISTORY                40010
 #define IDC_SHOW_BOOKMARK_MANAGER       40011
@@ -465,8 +462,6 @@
 #define IDC_DEBUG_PRINT_LAYER_HIERARCHY 52514
 // Please leave a gap here for new debug commands.
 
-// Autofill feedback.
-#define IDC_CONTENT_CONTEXT_AUTOFILL_FEEDBACK 52990
 // Autofill context menu commands
 #define IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD 52998
 #define IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS 52999

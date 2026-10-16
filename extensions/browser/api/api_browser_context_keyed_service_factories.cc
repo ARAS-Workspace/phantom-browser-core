@@ -32,7 +32,6 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/api/api_resource_manager.h"
 #include "extensions/browser/api/audio/audio_api.h"
-#include "extensions/browser/api/feedback_private/feedback_private_api.h"
 #include "extensions/browser/api/networking_private/networking_private_event_router_factory.h"
 #include "extensions/browser/api/printer_provider/printer_provider_api_factory.h"
 #include "extensions/browser/api/protocol_handlers/protocol_handlers_manager.h"
@@ -79,7 +78,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   api::TCPSocketEventDispatcher::GetFactoryInstance();
   api::UDPSocketEventDispatcher::GetFactoryInstance();
   AudioAPI::GetFactoryInstance();
-  FeedbackPrivateAPI::GetFactoryInstance();
 #if BUILDFLAG(IS_LINUX)
   NetworkingPrivateEventRouterFactory::GetInstance();
 #endif

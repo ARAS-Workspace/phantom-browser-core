@@ -36,8 +36,6 @@
 #include "chrome/browser/command_updater.h"
 #include "chrome/browser/extensions/api/omnibox/omnibox_api.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/feedback/public/feedback_source.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/omnibox/autocomplete_controller_emitter_factory.h"
@@ -881,21 +879,6 @@ void ChromeOmniboxClient::OnNavigationLikely(
     search_preload_service->OnNavigationLikely(
         index, match, navigation_predictor, location_bar_->GetWebContents());
   }
-}
-
-void ChromeOmniboxClient::ShowFeedbackPage(const std::u16string& input_text,
-                                           const GURL& destination_url) {
-  base::DictValue ai_metadata;
-  ai_metadata.Set("input", base::UTF16ToUTF8(input_text));
-  ai_metadata.Set("destination_url", destination_url.spec());
-  chrome::ShowFeedbackPage(
-      browser_, feedback::kFeedbackSourceAI,
-      /*description_template=*/std::string(),
-      /*description_placeholder_text=*/
-      l10n_util::GetStringUTF8(IDS_HISTORY_EMBEDDINGS_FEEDBACK_PLACEHOLDER),
-      /*category_tag=*/"genai_history",
-      /*extra_diagnostics=*/std::string(),
-      /*autofill_metadata=*/base::DictValue(), std::move(ai_metadata));
 }
 
 void ChromeOmniboxClient::OnAutocompleteAccept(

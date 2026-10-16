@@ -48,7 +48,6 @@
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 #include "chrome/browser/platform_util.h"
@@ -729,28 +728,6 @@ void BrowserActions::InitializeChromeMenuActions() {
             .SetAccelerator(ui::Accelerator(
                 ui::VKEY_L, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR))
             .Build());
-
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  chrome::ShowFeedbackPage(
-                      bwi, feedback::kFeedbackSourceVerticalTabs,
-                      /*description_template=*/"",
-                      /*description_placeholder_text=*/"",
-                      /*category_tag=*/"vertical_tabs",
-                      /*extra_diagnostics=*/"");
-                },
-                bwi))
-            .SetActionId(kActionVerticalTabsSendFeedback)
-            .SetText(l10n_util::GetStringUTF16(IDS_VERTICAL_TABS_SEND_FEEDBACK))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled()
-                    ? vector_icons::kFeedbackIcon
-                    : vector_icons::kFeedbackOldIcon,
-                ui::kColorIcon))
-            .Build());
   }
 
   if (organizer_panel::IsOrganizerPanelFeatureEnabled()) {
@@ -1296,26 +1273,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               ? kDownloadIcon
               : kDownloadToolbarButtonChromeRefreshOldIcon)
           .Build());
-
-  if (tab_groups::SavedTabGroupUtils::SupportsSharedTabGroups()) {
-    root_action_item_->AddChild(
-        ChromeMenuAction(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  chrome::OpenFeedbackDialog(
-                      bwi, feedback::kFeedbackSourceDesktopTabGroups,
-                      /*description_template=*/std::string(),
-                      /*category_tag=*/"tab_group_share");
-                },
-                bwi),
-            kActionSendSharedTabGroupFeedback,
-            IDS_DATA_SHARING_SHARED_GROUPS_FEEDBACK,
-            IDS_DATA_SHARING_SHARED_GROUPS_FEEDBACK,
-            features::IsRoundedIconsEnabled() ? vector_icons::kFeedbackIcon
-                                              : vector_icons::kFeedbackOldIcon)
-            .Build());
-  }
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3058,19 +3015,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionSharingHubScreenshot)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowFeedbackPage(
-                    bwi, feedback::kFeedbackSourceBrowserCommand, std::string(),
-                    std::string(), std::string(), std::string());
-              },
-              bwi))
-          .SetActionId(kActionFeedback)
           .Build());
 
   root_action_item_->AddChild(

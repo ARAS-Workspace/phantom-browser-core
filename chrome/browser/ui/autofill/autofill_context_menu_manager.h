@@ -22,13 +22,11 @@ class ContentPasswordManagerDriver;
 namespace autofill {
 
 class AutofillDriver;
-class AutofillManager;
 
 // `AutofillContextMenuManager` is responsible for adding/executing Autofill
 // related context menu items. `RenderViewContextMenu` is intended to own and
 // control the lifetime of `AutofillContextMenuManager`.
 // The options include:
-// Provide Autofill feedback
 // Fill in Form
 class AutofillContextMenuManager : public RenderViewContextMenuObserver {
  public:
@@ -61,10 +59,6 @@ class AutofillContextMenuManager : public RenderViewContextMenuObserver {
   }
 
  private:
-  // Conditionally adds the feedback manual fallback item if Autofill is
-  // available for the field.
-  void MaybeAddAutofillFeedbackItem();
-
   // Conditionally adds the address, payments and / or passwords Autofill manual
   // fallbacks to the context menu model depending on whether there's data to
   // suggest.
@@ -103,10 +97,6 @@ class AutofillContextMenuManager : public RenderViewContextMenuObserver {
       password_manager::ContentPasswordManagerDriver& password_manager_drivern);
 
   void LogSelectPasswordManualFallbackContextMenuEntryAccepted();
-
-  // Triggers the feedback flow for Autofill command.
-  void ExecuteAutofillFeedbackCommand(const LocalFrameToken& frame_token,
-                                      AutofillManager& manager);
 
   // Triggers @memory search popup on the field that the context menu was
   // opened on.

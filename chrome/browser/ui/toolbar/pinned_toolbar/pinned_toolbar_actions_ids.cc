@@ -11,8 +11,6 @@ namespace pinned_toolbar_actions {
 
 ui::ElementIdentifier GetElementIdentifierForAction(actions::ActionId id) {
   switch (id) {
-    case kActionSendSharedTabGroupFeedback:
-      return kSharedTabGroupFeedbackElementId;
     case kActionSidePanelShowComments:
       return kSharedTabGroupCommentsActionElementId;
     case kActionSidePanelShowLensOverlayResults:

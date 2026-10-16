@@ -23,8 +23,6 @@ source_set("renderer") {
     "api/declarative_content_hooks_delegate.h",
     "api/dom_hooks_delegate.cc",
     "api/dom_hooks_delegate.h",
-    "api/feedback_private_hooks_delegate.cc",
-    "api/feedback_private_hooks_delegate.h",
     "api/file_system_natives.cc",
     "api/file_system_natives.h",
     "api/i18n_hooks_delegate.cc",
@@ -453,9 +451,7 @@ source_set("unit_tests") {
   # TODO(https://crbug.com/356905053): Gradually include more of these sources
   # in the desktop-android build when the related extensions APIs are enabled.
   if (enable_extensions) {
-    sources += [
-      "api/automation/automation_internal_custom_bindings_unittest.cc",
-      "api/feedback_private_hooks_delegate_unittest.cc",
-    ]
+    sources +=
+        [ "api/automation/automation_internal_custom_bindings_unittest.cc" ]
   }
 }

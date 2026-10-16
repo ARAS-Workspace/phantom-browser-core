@@ -21,7 +21,6 @@ import {loadTimeData} from '../i18n_setup.js';
 
 import {getCss} from './battery_page.css.js';
 import {getHtml} from './battery_page.html.js';
-import {PerformanceBrowserProxyImpl, PerformanceFeedbackCategory} from './performance_browser_proxy.js';
 import type {PerformanceMetricsProxy} from './performance_metrics_proxy.js';
 import {BatterySaverModeState, PerformanceMetricsProxyImpl} from './performance_metrics_proxy.js';
 
@@ -95,23 +94,6 @@ export class SettingsBatteryPageElement extends SettingsBatteryPageElementBase {
         loadTimeData.getString('osPowerSettingsUrl'));
   }
   // </if>
-
-  protected showSendFeedbackButton_(): boolean {
-    // <if expr="_google_chrome">
-    return true;
-    // </if>
-    // <if expr="not _google_chrome">
-    return false;
-    // </if>
-  }
-
-  protected onSendFeedback_(_e: Event) {
-    // <if expr="_google_chrome">
-    _e.stopPropagation();
-    PerformanceBrowserProxyImpl.getInstance().openFeedbackDialog(
-        PerformanceFeedbackCategory.BATTERY);
-    // </if>
-  }
 }
 
 declare global {

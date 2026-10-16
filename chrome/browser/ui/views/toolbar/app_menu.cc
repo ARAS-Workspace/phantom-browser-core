@@ -1424,12 +1424,11 @@ void AppMenu::WillShowMenu(MenuItemView* menu) {
 }
 
 void AppMenu::WillHideMenu(MenuItemView* menu) {
-  // Turns off the fade out animation of the app menus if |feedback_menu_item_|
-  // or |screenshot_menu_item_| is selected. This excludes the app menu itself
+  // Turns off the fade out animation of the app menus if
+  // |screenshot_menu_item_| is selected. This excludes the app menu itself
   // from the screenshot.
-  if (menu->HasSubmenu() &&
-      ((feedback_menu_item_ && feedback_menu_item_->IsSelected()) ||
-       (screenshot_menu_item_ && screenshot_menu_item_->IsSelected()))) {
+  if (menu->HasSubmenu() && screenshot_menu_item_ &&
+      screenshot_menu_item_->IsSelected()) {
     // It's okay to just turn off the animation and not turn it back on because
     // the menu widget will be recreated next time it's opened. See
     // ToolbarView::RunMenu() and Init() of this class.
@@ -1666,14 +1665,6 @@ void AppMenu::PopulateMenu(MenuItemView* parent, MenuModel* model) {
         DCHECK(!saved_tab_groups_menu_);
         saved_tab_groups_menu_ = item;
         break;
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      case IDC_FEEDBACK:
-        DCHECK(!feedback_menu_item_);
-        feedback_menu_item_ = item;
-        break;
-#endif
-
 
       case AppMenuModel::kRecentTabsMenuPlaceholder:
         DCHECK(!recent_tabs_menu_model_delegate_.get());

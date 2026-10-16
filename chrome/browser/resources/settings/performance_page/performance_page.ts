@@ -19,7 +19,6 @@ import type {SettingsToggleButtonElement} from '../controls/settings_toggle_butt
 import {routes} from '../route.js';
 import {Router} from '../router.js';
 
-import {PerformanceBrowserProxyImpl, PerformanceFeedbackCategory} from './performance_browser_proxy.js';
 import type {PerformanceMetricsProxy} from './performance_metrics_proxy.js';
 import {PerformanceMetricsProxyImpl} from './performance_metrics_proxy.js';
 import {getHtml} from './performance_page.html.js';
@@ -82,23 +81,6 @@ export class SettingsPerformancePageElement extends
         PrefService.getInstance()
             .getPref<boolean>(PERFORMANCE_INTERVENTION_NOTIFICATION_PREF)
             .value);
-  }
-
-  protected showSendFeedbackButton_(): boolean {
-    // <if expr="_google_chrome">
-    return true;
-    // </if>
-    // <if expr="not _google_chrome">
-    return false;
-    // </if>
-  }
-
-  protected onSendFeedback_(_e: Event) {
-    // <if expr="_google_chrome">
-    _e.stopPropagation();
-    PerformanceBrowserProxyImpl.getInstance().openFeedbackDialog(
-        PerformanceFeedbackCategory.NOTIFICATIONS);
-    // </if>
   }
 }
 

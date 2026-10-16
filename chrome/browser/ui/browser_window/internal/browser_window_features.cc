@@ -72,7 +72,6 @@
 #include "chrome/browser/ui/tabs/saved_tab_groups/most_recent_shared_tab_update_store.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/saved_tab_group_utils.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/session_service_tab_group_sync_observer.h"
-#include "chrome/browser/ui/tabs/saved_tab_groups/shared_tab_group_feedback_controller.h"
 #include "chrome/browser/ui/tabs/split_tab_highlight_controller.h"
 #include "chrome/browser/ui/tabs/split_view_iph_controller.h"
 #include "chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl/tab_drag_window_adapter_impl.h"
@@ -838,12 +837,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
     if (browser->GetTabStripModel()->SupportsTabGroups() &&
         tab_groups::SavedTabGroupUtils::SupportsSharedTabGroups() &&
         tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile)) {
-      if (browser_view) {
-        shared_tab_group_feedback_controller_ =
-            std::make_unique<tab_groups::SharedTabGroupFeedbackController>(
-                browser_view->browser());
-        shared_tab_group_feedback_controller_->Init();
-      }
       recent_activity_bubble_coordinator_ =
           GetUserDataFactory().CreateInstance<RecentActivityBubbleCoordinator>(
               *browser, browser);
@@ -910,9 +903,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   split_tab_highlight_controller_.reset();
   sharing_hub_window_controller_.reset();
   recent_activity_bubble_coordinator_.reset();
-  if (shared_tab_group_feedback_controller_) {
-    shared_tab_group_feedback_controller_->TearDown();
-  }
   send_tab_to_self_toolbar_bubble_controller_.reset();
   qrcode_window_controller_.reset();
   pinned_toolbar_actions_ = nullptr;

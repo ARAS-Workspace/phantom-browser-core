@@ -12,8 +12,7 @@ source_set("system") {
   deps = [
     "//base",
     "//chrome/browser:browser_process",
-    "//chrome/browser/feedback",
-    "//chrome/browser/feedback:feedback_impl",
+    "//chrome/browser/feedback:system_logs",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/resources/about_sys:resources",
     "//chrome/browser/resources/key_value_pair_viewer_shared:resources",

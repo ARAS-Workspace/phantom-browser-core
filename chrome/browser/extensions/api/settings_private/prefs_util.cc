@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/feature_list.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/accessibility/tree_fixing/pref_names.h"
@@ -454,11 +453,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   // Proxy override rules.
   (*s_allowlist)[proxy_config::prefs::kProxyOverrideRules] =
       settings_api::PrefType::kList;
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  (*s_allowlist)[::prefs::kUserFeedbackAllowed] =
-      settings_api::PrefType::kBoolean;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
   // Performance settings.
   (*s_allowlist)

@@ -74,7 +74,6 @@ if (enable_extensions) {
     "app_window.webidl",
     "audio.webidl",
     "automation_internal.webidl",
-    "feedback_private.webidl",
     "file_system.idl",
     "mime_handler.webidl",
     "networking_private.webidl",
