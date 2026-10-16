@@ -14,7 +14,6 @@
 #include "base/notreached.h"
 #include "base/strings/escape.h"
 #include "base/strings/string_split.h"
-#include "components/google/core/common/google_util.h"
 #include "components/signin/core/browser/chrome_connected_header_helper.h"
 #include "components/signin/core/browser/dice_response_params.h"
 #include "google_apis/gaia/gaia_auth_util.h"

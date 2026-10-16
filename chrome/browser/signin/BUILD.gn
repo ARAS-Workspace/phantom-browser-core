@@ -179,7 +179,6 @@ source_set("impl") {
     "//chrome/browser/autofill",
     "//chrome/browser/bookmarks",
     "//chrome/browser/content_settings:content_settings_factory",
-    "//chrome/browser/google",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/lifetime",
     "//chrome/browser/metrics",

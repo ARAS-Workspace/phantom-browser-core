@@ -57,7 +57,6 @@
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
 #include "chrome/browser/extensions/updater/chrome_extension_downloader_factory.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
-#include "chrome/browser/google/google_brand.h"
 #include "chrome/browser/lifetime/termination_notification.h"
 #include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/profiles/profile.h"

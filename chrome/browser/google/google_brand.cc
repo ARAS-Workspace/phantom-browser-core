@@ -13,16 +13,12 @@
 #include "base/no_destructor.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/build_config.h"
-#include "chrome/installer/util/google_update_settings.h"
 
 namespace google_brand {
 
 const char* g_brand_for_testing = nullptr;
 
 // Global functions -----------------------------------------------------------
-
-#if !BUILDFLAG(IS_MAC)
 
 bool GetBrand(std::string* brand) {
   if (g_brand_for_testing) {
@@ -38,8 +34,6 @@ bool GetReactivationBrand(std::string* brand) {
   brand->clear();
   return true;
 }
-
-#endif
 
 bool GetRlzBrand(std::string* brand) {
   return GetBrand(brand);

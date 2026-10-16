@@ -12,7 +12,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_web_contents_observer.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/google/core/common/google_util.h"
 #include "components/optimization_guide/core/hints/hint_cache.h"
 #include "components/optimization_guide/core/hints/push_notification_manager.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"

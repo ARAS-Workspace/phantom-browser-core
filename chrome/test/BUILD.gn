@@ -2777,7 +2777,6 @@ test("unit_tests") {
     "//chrome/browser/finds/core:unit_tests",
     "//chrome/browser/first_party_sets",
     "//chrome/browser/first_party_sets:unit_tests",
-    "//chrome/browser/google:unit_tests",
     "//chrome/browser/history",
     "//chrome/browser/history:unit_tests",
     "//chrome/browser/history_clusters",

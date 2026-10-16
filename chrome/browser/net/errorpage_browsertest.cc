@@ -43,7 +43,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/browsing_data/content/browsing_data_helper.h"
 #include "components/error_page/content/browser/net_error_auto_reloader.h"
-#include "components/google/core/common/google_util.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"

@@ -27,7 +27,6 @@
 #include "chrome/browser/extensions/updater/authenticated_network_fetcher.h"
 #include "chrome/browser/extensions/updater/extension_update_client_command_line_config_policy.h"
 #include "chrome/browser/extensions/updater/extension_updater_switches.h"
-#include "chrome/browser/google/google_brand.h"
 #include "chrome/browser/update_client/chrome_update_query_params_delegate.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_paths.h"

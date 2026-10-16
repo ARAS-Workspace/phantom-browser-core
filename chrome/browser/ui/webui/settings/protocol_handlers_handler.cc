@@ -24,7 +24,6 @@
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/common/url_constants.h"
 #include "components/custom_handlers/protocol_handler.h"
-#include "components/google/core/common/google_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/web_ui.h"

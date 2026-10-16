@@ -79,7 +79,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/captive_portal/core/buildflags.h"
 #include "components/feature_engagement/public/feature_list.h"
-#include "components/google/core/common/google_util.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/os_crypt/async/browser/key_provider.h"
 #include "components/password_manager/core/browser/password_manager_switches.h"

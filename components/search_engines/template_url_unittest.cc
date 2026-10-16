@@ -22,7 +22,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/with_feature_override.h"
 #include "build/branding_buildflags.h"
-#include "components/google/core/common/google_util.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/search_engines/regulatory_extension_type.h"
 #include "components/search_engines/search_engines_switches.h"

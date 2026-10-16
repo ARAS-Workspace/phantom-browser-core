@@ -557,7 +557,6 @@ static_library("ui") {
     "//chrome/browser/finds/core",
     "//chrome/browser/first_run",
     "//chrome/browser/first_run:impl",
-    "//chrome/browser/google",
     "//chrome/browser/history",
     "//chrome/browser/history_clusters",
     "//chrome/browser/history_embeddings",

@@ -83,7 +83,6 @@ source_set("impl") {
   deps += [
     "//base:build_time",
     "//chrome/browser:buildflags",
-    "//chrome/browser/google",
     "//chrome/browser/obsolete_system",
     "//content/public/browser",
   ]
@@ -146,7 +145,6 @@ source_set("unit_tests") {
 
   deps += [
     "//base:i18n",
-    "//chrome/browser/google",
     "//components/network_time",
     "//content/test:test_support",
   ]

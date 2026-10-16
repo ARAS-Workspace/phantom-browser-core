@@ -15,7 +15,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/url_constants.h"
-#include "components/google/core/common/google_util.h"
 #include "components/search/ntp_features.h"
 #include "components/search/search.h"
 #include "components/search_engines/search_engine_type.h"
