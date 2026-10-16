@@ -3497,12 +3497,6 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/chrome/browser/google/linkdoctor_internal': {
-      'url': Var('chrome_git') + '/chrome/linkdoctor.git' + '@' +
-        'fe28a8f90c5471f20f8fee9ff7f6c6f8b8d02bed', # from svn revision 32577
-      'condition': 'checkout_src_internal',
-  },
-
   'src/chrome/browser/internal': {
       'url': Var('chrome_git') + '/chrome/browser_internal.git' + '@' +
         'd6ef1b0301bfd9bcbe8186df026b6405860bb856',

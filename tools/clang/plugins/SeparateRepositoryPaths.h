@@ -23,7 +23,6 @@ constexpr const char* const kSeparateRepositoryPaths[] = {
     "chrome/app/theme/default_100_percent/google_chrome/",
     "chrome/app/theme/default_200_percent/google_chrome/",
     "chrome/app/theme/google_chrome/",
-    "chrome/browser/google/linkdoctor_internal/",
     "chrome/browser/internal/",
     "chrome/browser/media/engagement_internal/",
     "chrome/browser/resources/chromeos/quickoffice/",

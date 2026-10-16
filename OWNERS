@@ -59,7 +59,6 @@ per-file chrome/browser/actor/resources/internal=*
 per-file chrome/browser/cpu_performance_internal=*
 per-file chrome/browser/glic/e2e_test/internal=*
 per-file chrome/browser/glic/resources/internal=*
-per-file chrome/browser/google/linkdoctor_internal=*
 per-file chrome/browser/internal=*
 per-file chrome/browser/media/engagement_internal=*
 per-file chrome/browser/nearby_sharing/internal=*
