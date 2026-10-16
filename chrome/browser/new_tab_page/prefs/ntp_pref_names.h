@@ -64,13 +64,6 @@ inline constexpr char kNtpModuleStalenessCountDict[] =
 inline constexpr char kNtpModulesAutoRemovalDisabledDict[] =
     "ntp.modules_auto_removal_disabled";
 
-// Tracks whether the user has enabled animated doodles on the NTP.
-inline constexpr char kNtpAnimatedDoodlesEnabled[] =
-    "ntp.animated_doodles_enabled";
-
-// Tracks whether the user has enabled doodle murals on the NTP.
-inline constexpr char kNtpDoodleMuralsEnabled[] = "ntp.doodle_murals_enabled";
-
 // Tracks how many times a user hovers on a NewTabPage tile link.
 inline constexpr char kNtpMostVisitedTileHoverCount[] =
     "ntp.most_visited_tile_hover_count";

@@ -284,7 +284,6 @@ include_rules = [
   "+components/shared_highlighting/core/common",
   "+components/search",
   "+components/search_engines",
-  "+components/search_provider_logos",
   "+components/security_interstitials/content",
   "+components/security_interstitials/core",
   "+components/security_state/content",

@@ -14,7 +14,6 @@ build_webui("build") {
     "background_image.html",
     "image.html",
     "microsoft_auth.html",
-    "one_google_bar.html",
   ]
 
   ts_files = [
@@ -22,8 +21,6 @@ build_webui("build") {
     "microsoft_auth.ts",
     "microsoft_auth_proxy.ts",
     "msal_browser.ts",
-    "one_google_bar.ts",
-    "one_google_bar_api.ts",
   ]
 
   extra_grdp_files = [ "$target_gen_dir/msal_browser_resources.grdp" ]

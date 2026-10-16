@@ -109,7 +109,6 @@
 #include "chrome/browser/net/dns_probe_service_factory.h"
 #include "chrome/browser/net/profile_network_context_service_factory.h"
 #include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_factory.h"
-#include "chrome/browser/new_tab_page/promos/promo_service_factory.h"
 #include "chrome/browser/notifications/metrics/notification_metrics_logger_factory.h"
 #include "chrome/browser/notifications/notification_display_service_factory.h"
 #include "chrome/browser/notifications/notifier_state_tracker_factory.h"
@@ -173,7 +172,6 @@
 #include "chrome/browser/search_engines/template_url_fetcher_factory.h"
 #include "chrome/browser/search_engines/template_url_prepopulate_data_resolver_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/search_provider_logos/logo_service_factory.h"
 #include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service_factory.h"
 #include "chrome/browser/sessions/session_data_service_factory.h"
@@ -379,10 +377,6 @@
 #include "chrome/browser/gapis/gapis_service_factory.h"
 #include "components/gapis/features.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-#include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
-#endif
 
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/bookmarks/bookmark_expanded_state_tracker_factory.h"
@@ -602,7 +596,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
   LoginUIServiceFactory::GetInstance();
-  LogoServiceFactory::GetInstance();
   LookalikeUrlServiceFactory::GetInstance();
   ManagedConfigurationAPIFactory::GetInstance();
   manta::MantaServiceFactory::GetInstance();
@@ -647,9 +640,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   GeolocationHeaderServiceFactory::GetInstance();
   OnDeviceTailModelServiceFactory::GetInstance();
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-  OneGoogleBarServiceFactory::GetInstance();
-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
   // TODO(b/502297163): Implement for Android.
   OneTimePermissionsTrackerFactory::GetInstance();
   OptimizationGuideGlobalStateHolderKeyedServiceFactory::GetInstance();
@@ -708,9 +698,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ProfileNetworkContextServiceFactory::GetInstance();
   ProfilePasswordStoreFactory::GetInstance();
   ProfileStatisticsFactory::GetInstance();
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-  PromoServiceFactory::GetInstance();
-#endif
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();
   ReadingListModelFactory::GetInstance();

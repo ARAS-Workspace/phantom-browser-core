@@ -66,11 +66,6 @@ class NTPUserDataLogger : public MostVisitedMetricsLogger {
 
   ~NTPUserDataLogger() override;
 
-  // Called when a One Google Bar fetch has been completed after |duration|.
-  // |success| is true if the fetch was successful.
-  static void LogOneGoogleBarFetchDuration(bool success,
-                                           const base::TimeDelta& duration);
-
   // MostVisitedMetricsLogger:
   // Called when an event occurs on the NTP that requires a counter to be
   // incremented. |time| is the delta time from navigation start until this

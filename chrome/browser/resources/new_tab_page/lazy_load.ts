@@ -10,8 +10,6 @@
  * elements (either not visible by default or not as performance critical).
  */
 
-import './iframe.js';
-import './middle_slot_promo.js';
 import './modules/module_descriptors.js';
 import './modules/modules.js';
 import './ntp_promo/individual_promos.js';
@@ -26,7 +24,6 @@ export {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_butto
 export {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 export {PageImageServiceBrowserProxy} from 'chrome://resources/cr_components/page_image_service/browser_proxy.js';
 export {PluralStringProxyImpl as NTPPluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
-export {MiddleSlotPromoElement, PromoDismissAction} from './middle_slot_promo.js';
 export {microsoftAuthModuleDescriptor, MicrosoftAuthModuleElement} from './modules/authentication/microsoft_auth_module.js';
 export {MicrosoftAuthProxyImpl} from './modules/authentication/microsoft_auth_module_proxy.js';
 export {CalendarElement} from './modules/calendar/calendar.js';
@@ -41,7 +38,6 @@ export {dummyV2Descriptor, ModuleElement as DummyModuleElement} from './modules/
 export {FileSuggestionElement} from './modules/file_suggestion/file_suggestion.js';
 export {microsoftFilesModuleDescriptor, MicrosoftFilesModuleElement} from './modules/file_suggestion/microsoft_files_module.js';
 export {MicrosoftFilesProxyImpl} from './modules/file_suggestion/microsoft_files_proxy.js';
-export {IframeElement} from './iframe.js';
 export {InfoDialogElement} from './modules/info_dialog.js';
 export {ParentTrustedDocumentProxy} from './modules/microsoft_auth_frame_connector.js';
 export {ModuleDescriptor} from './modules/module_descriptor.js';

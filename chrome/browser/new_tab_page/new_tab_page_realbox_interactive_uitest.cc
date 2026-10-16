@@ -74,7 +74,6 @@ const DeepQuery kComposeButton = {"ntp-app", "ntp-searchbox", "#composeButton",
                                   "#composeButton"};
 const DeepQuery kSearchboxDropdown = {"ntp-app", "ntp-searchbox",
                                       "cr-searchbox-dropdown"};
-const DeepQuery kNtpLogo = {"ntp-app", "#logo"};
 }  // namespace
 
 class NtpRealboxUiTestBase
@@ -206,9 +205,9 @@ IN_PROC_BROWSER_TEST_F(NtpRealboxDefaultExperienceInteractiveTest,
       SendKeyPress(kNtpElementId, ui::VKEY_A),
       // Wait for the verbatim match to render.
       WaitForVerbatimMatch(kNtpElementId, kRealboxMatch, "a"),
-      // Verify: Clicking outside the realbox should close suggestions dropdown,
-      // but leave the text inside the realbox visible.
-      MoveMouseTo(kNtpElementId, kNtpLogo), ClickMouse(),
+      // Verify: Moving focus out of the realbox should close suggestions
+      // dropdown, but leave the text inside the realbox visible.
+      ExecuteJsAt(kNtpElementId, kRealboxInput, "(el) => el.blur()"),
       WaitForElementVisibilityChange(kSearchboxDropdown,
                                      /*expected_visible=*/false),
       CheckJsResultAt(kNtpElementId, kRealboxInput,

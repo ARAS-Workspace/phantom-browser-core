@@ -6,13 +6,8 @@
 #define CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_UNTRUSTED_SOURCE_H_
 
 #include <string>
-#include <vector>
 
 #include "base/memory/raw_ptr.h"
-#include "base/scoped_observation.h"
-#include "base/time/time.h"
-#include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service.h"
-#include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_observer.h"
 #include "content/public/browser/url_data_source.h"
 
 class Profile;
@@ -40,8 +35,7 @@ class Profile;
 //         * positionX: (optional) CSS background-position-x property.
 //         * positionY: (optional) CSS background-position-y property.
 //   Each of those helpers only accept URLs with HTTPS or chrome-untrusted:.
-class UntrustedSource : public content::URLDataSource,
-                        public OneGoogleBarServiceObserver {
+class UntrustedSource : public content::URLDataSource {
  public:
   explicit UntrustedSource(Profile* profile);
   ~UntrustedSource() override;
@@ -65,10 +59,6 @@ class UntrustedSource : public content::URLDataSource,
                             int render_process_id) override;
 
  private:
-  // OneGoogleBarServiceObserver:
-  void OnOneGoogleBarDataUpdated() override;
-  void OnOneGoogleBarServiceShuttingDown() override;
-
   void ServeBackgroundImage(const GURL& url,
                             const GURL& url_2x,
                             std::string_view size,
@@ -81,15 +71,6 @@ class UntrustedSource : public content::URLDataSource,
   bool IsURLAllowed(const GURL& url);
   bool IsURLBlockedByPolicy(const GURL& url);
 
-  std::vector<content::URLDataSource::GotDataCallback>
-      one_google_bar_callbacks_;
-  // This dangling raw_ptr occurred in:
-  // browser_tests: All/TabSharingUIViewsBrowserTest.ChangeCapturedTabFavicon/0
-  // https://ci.chromium.org/ui/p/chromium-m113/builders/try/win-rel/958/test-results?q=ExactID%3Aninja%3A%2F%2Fchrome%2Ftest%3Abrowser_tests%2FTabSharingUIViewsBrowserTest.ChangeCapturedTabFavicon%2FAll.0+VHash%3Abdbee181b3e0309b
-  raw_ptr<OneGoogleBarService, FlakyDanglingUntriaged> one_google_bar_service_;
-  base::ScopedObservation<OneGoogleBarService, OneGoogleBarServiceObserver>
-      one_google_bar_service_observation_{this};
-  std::optional<base::TimeTicks> one_google_bar_load_start_time_;
   raw_ptr<Profile, FlakyDanglingUntriaged> profile_;
 };
 

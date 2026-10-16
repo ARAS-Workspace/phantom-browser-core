@@ -231,7 +231,6 @@
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups_page_handler.h"
-#include "chrome/browser/new_tab_page/promos/promo_service.h"
 #include "chrome/browser/screen_ai/pref_names.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/signin/signin_promo.h"
@@ -1304,7 +1303,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   OutlookCalendarPageHandler::RegisterProfilePrefs(registry);
   PinnedTabCodec::RegisterProfilePrefs(registry);
   promos_utils::RegisterProfilePrefs(registry);
-  PromoService::RegisterProfilePrefs(registry);
   settings::SettingsUI::RegisterProfilePrefs(registry);
   send_tab_to_self::RegisterProfilePrefs(registry);
   signin::RegisterProfilePrefs(registry);

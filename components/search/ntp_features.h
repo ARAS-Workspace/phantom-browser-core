@@ -50,17 +50,12 @@ BASE_DECLARE_FEATURE(kNtpDisableBrowserInitiatedLinks);
 BASE_DECLARE_FEATURE(kNtpDummyModules);
 #endif
 BASE_DECLARE_FEATURE(kNtpComprehensiveTheming);
-BASE_DECLARE_FEATURE(kNtpGoogleLogo26);
-BASE_DECLARE_FEATURE(kNtpLogo);
-BASE_DECLARE_FEATURE(kNtpMiddleSlotPromo);
-BASE_DECLARE_FEATURE(kNtpMiddleSlotPromoDismissal);
 BASE_DECLARE_FEATURE(kNtpModulesLoadTimeoutMilliseconds);
 BASE_DECLARE_FEATURE(kNtpModulesOrder);
 BASE_DECLARE_FEATURE(kNtpModulesDragAndDrop);
 BASE_DECLARE_FEATURE(kNtpModulesLoad);
 BASE_DECLARE_FEATURE(kNtpModuleSignInRequirement);
 BASE_DECLARE_FEATURE(kNtpOutlookCalendarModule);
-BASE_DECLARE_FEATURE(kNtpOneGoogleBar);
 BASE_DECLARE_FEATURE(kNtpSharepointModule);
 enum class NtpSharepointModuleDataType {
   kTrendingInsights,
@@ -84,15 +79,12 @@ BASE_DECLARE_FEATURE(kNtpMicrosoftAuthenticationModule);
 BASE_DECLARE_FEATURE(kNtpNextFeatures);
 BASE_DECLARE_FEATURE(kNtpNextCanvasChip);
 BASE_DECLARE_FEATURE(kNtpStarterChip);
-BASE_DECLARE_FEATURE(kNtpOneGoogleBarAsyncBarParts);
 BASE_DECLARE_FEATURE(kNtpFooter);
 BASE_DECLARE_FEATURE(kNtpTabGroupsModule);
 BASE_DECLARE_FEATURE(kNtpTabGroupsModuleZeroState);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationModuleRemoval);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationShortcutsRemoval);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationDismissModulesRemoval);
-BASE_DECLARE_FEATURE(kNtpAnimatedDoodles);
-BASE_DECLARE_FEATURE(kNtpDoodleMurals);
 BASE_DECLARE_FEATURE(kLightningTakeoverEdition);
 BASE_DECLARE_FEATURE(kNtpShortcutsRedesign);
 BASE_DECLARE_FEATURE(kNtpSimplificationBookmarkBar);
@@ -131,8 +123,6 @@ extern const char kNtpChromeCartModuleHeuristicsImprovementParam[];
 extern const char kNtpChromeCartModuleCouponParam[];
 // Parameter determining the type of calendar data to render.
 extern const char kNtpOutlookCalendarModuleDataParam[];
-// Parameter determining the type of middle slot promo data to render.
-extern const char kNtpMiddleSlotPromoDismissalParam[];
 // Parameter determining the modules that are eligigle for HaTS.
 extern const char kNtpModulesEligibleForHappinessTrackingSurveyParam[];
 // Parameter determining module trigger ids for HaTS for eligible module ids for

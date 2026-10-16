@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import './logo.js';
 import './ntp_searchbox.js';
 import '/strings.m.js';
 import 'chrome://new-tab-page/shared/customize_buttons/customize_buttons.js';
@@ -14,10 +13,7 @@ import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_
 import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 import {assert} from 'chrome://resources/js/assert.js';
-import type {ClickInfo} from 'chrome://resources/js/browser_command.mojom-webui.js';
-import {Command} from 'chrome://resources/js/browser_command.mojom-webui.js';
-import {BrowserCommandProxy} from 'chrome://resources/js/browser_command/browser_command_proxy.js';
-import {hexColorToSkColor, skColorToRgba} from 'chrome://resources/js/color_utils.js';
+import {skColorToRgba} from 'chrome://resources/js/color_utils.js';
 import {EventTracker} from 'chrome://resources/js/event_tracker.js';
 import {FocusOutlineManager} from 'chrome://resources/js/focus_outline_manager.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
@@ -35,8 +31,6 @@ import {SidePanelOpenTrigger} from './customize_buttons.mojom-webui.js';
 import {CustomizeButtonsProxy} from './customize_buttons_proxy.js';
 import {CustomizeChromeSection} from './customize_chrome.mojom-webui.js';
 import {CustomizeDialogPage} from './customize_dialog_types.js';
-import type {IframeElement} from './iframe.js';
-import type {LogoElement} from './logo.js';
 import {recordDuration, recordEnumeration, recordLinearValue, recordLoadDuration, recordSparseValueWithPersistentHash} from './metrics_utils.js';
 import {ParentTrustedDocumentProxy} from './modules/microsoft_auth_frame_connector.js';
 import type {PageCallbackRouter, PageHandlerRemote, Theme} from './new_tab_page.mojom-webui.js';
@@ -52,17 +46,6 @@ enum ModuleLoadStatus {
   MODULE_LOAD_IN_PROGRESS = 0,
   MODULE_LOAD_NOT_ATTEMPTED = 1,
   MODULE_LOAD_COMPLETE = 2,
-}
-
-interface ExecutePromoBrowserCommandData {
-  commandId: Command;
-  clickInfo: ClickInfo;
-}
-
-interface CanShowPromoWithBrowserCommandData {
-  frameType: string;
-  messageType: string;
-  commandId: Command;
 }
 
 /**
@@ -113,7 +96,6 @@ enum NtpWallpaperSearchButtonHideCondition {
 }
 
 const CUSTOMIZE_URL_PARAM: string = 'customize';
-const OGB_IFRAME_ORIGIN = 'chrome-untrusted://new-tab-page';
 const MSAL_IFRAME_ORIGIN = 'chrome-untrusted://ntp-microsoft-auth';
 const VOICE_QUERY_LENGTH_LIMIT = 120;
 const VOICE_IDLE_TIMEOUT_MS = 8000;
@@ -156,8 +138,6 @@ const AppElementBase = HelpBubbleMixinLit(CrLitElement);
 export interface AppElement {
   $: {
     customizeButtons: CustomizeButtonsElement,
-    oneGoogleBarClipPath: HTMLElement,
-    logo: LogoElement,
     searchbox: NtpSearchboxElement,
     undoToast: CrToastElement,
     undoToastMessage: HTMLElement,
@@ -209,9 +189,6 @@ export class AppElement extends AppElementBase {
       // Protected properties
       // =======================================================================
 
-      oneGoogleBarIframeOrigin_: {type: String},
-      oneGoogleBarIframePath_: {type: String},
-      oneGoogleBarLoaded_: {type: Boolean},
       theme_: {type: Object},
       showCustomize_: {type: Boolean},
       showCustomizeChromeText_: {type: Boolean},
@@ -243,17 +220,12 @@ export class AppElement extends AppElementBase {
 
       // Used in cr-searchbox component via host-context.
       colorSourceIsBaseline: {type: Boolean},
-      logoColor_: {type: Object},
-      singleColoredLogo_: {type: Boolean},
 
       realboxShown_: {type: Boolean},
 
       showLensUploadDialog_: {type: Boolean},
 
-      logoEnabled_: {type: Boolean},
-      oneGoogleBarEnabled_: {type: Boolean},
       shortcutsEnabled_: {type: Boolean},
-      middleSlotPromoEnabled_: {type: Boolean},
       modulesEnabled_: {type: Boolean},
 
       browserPromoType_: {type: String},
@@ -273,9 +245,8 @@ export class AppElement extends AppElementBase {
       multiLineEnabled_: {type: Boolean},
 
       /**
-       * In order to avoid flicker, the promo and modules are hidden until both
-       * are loaded. If modules are disabled, the promo is shown as soon as it
-       * is loaded.
+       * In order to avoid flicker, the modules are hidden until they are
+       * loaded.
        */
       promoAndModulesLoaded_: {type: Boolean},
 
@@ -284,8 +255,6 @@ export class AppElement extends AppElementBase {
        * to show up immediately on load.
        */
       lazyRender_: {type: Boolean},
-
-      scrolledToTop_: {type: Boolean},
 
       wallpaperSearchButtonAnimationEnabled_: {type: Boolean},
       wallpaperSearchButtonEnabled_: {type: Boolean},
@@ -324,7 +293,6 @@ export class AppElement extends AppElementBase {
       // =======================================================================
 
       selectedCustomizeDialogPage_: {type: String},
-      middleSlotPromoLoaded_: {type: Boolean},
 
       modulesLoadedStatus_: {
         type: Number,
@@ -342,9 +310,6 @@ export class AppElement extends AppElementBase {
   accessor realboxCanShowSecondarySide: boolean = false;
   accessor realboxHadSecondarySide: boolean = false;
 
-  protected accessor oneGoogleBarIframeOrigin_: string = OGB_IFRAME_ORIGIN;
-  protected accessor oneGoogleBarIframePath_: string|undefined;
-  protected accessor oneGoogleBarLoaded_: boolean = false;
   protected accessor theme_: Theme|null = null;
   protected accessor showCustomize_: boolean = false;
   protected accessor showCustomizeChromeText_: boolean = false;
@@ -370,20 +335,12 @@ export class AppElement extends AppElementBase {
   protected accessor backgroundImageAttribution2_: string = '';
   protected accessor backgroundImageAttributionUrl_: string = '';
   protected accessor colorSourceIsBaseline: boolean = false;
-  protected accessor logoColor_: SkColor|null = null;
-  protected accessor singleColoredLogo_: boolean = false;
   protected accessor realboxShown_: boolean = false;
   protected accessor showLensUploadDialog_: boolean = false;
   protected accessor caretAnimationsEnabled_: boolean =
       loadTimeData.getBoolean('caretAnimationEnabled');
-  protected accessor logoEnabled_: boolean =
-      loadTimeData.getBoolean('logoEnabled');
-  protected accessor oneGoogleBarEnabled_: boolean =
-      loadTimeData.getBoolean('oneGoogleBarEnabled');
   protected accessor shortcutsEnabled_: boolean =
       loadTimeData.getBoolean('shortcutsEnabled');
-  protected accessor middleSlotPromoEnabled_: boolean =
-      loadTimeData.getBoolean('middleSlotPromoEnabled');
   protected accessor modulesEnabled_: boolean =
       loadTimeData.getBoolean('modulesEnabled');
   protected accessor browserPromoType_: string =
@@ -401,8 +358,6 @@ export class AppElement extends AppElementBase {
       loadTimeData.getBoolean('multiLineEnabled');
   protected accessor promoAndModulesLoaded_: boolean = false;
   protected accessor lazyRender_: boolean = false;
-  protected accessor scrolledToTop_: boolean =
-      document.documentElement.scrollTop <= 0;
   protected accessor wallpaperSearchButtonAnimationEnabled_: boolean =
       loadTimeData.getBoolean('wallpaperSearchButtonAnimationEnabled');
   protected accessor wallpaperSearchButtonEnabled_: boolean =
@@ -443,7 +398,6 @@ export class AppElement extends AppElementBase {
   protected accessor searchboxCallbackRouter_: SearchboxPageCallbackRouter;
 
   private accessor selectedCustomizeDialogPage_: string|null = null;
-  private accessor middleSlotPromoLoaded_: boolean = false;
   private accessor modulesLoadedStatus_: ModuleLoadStatus =
       ModuleLoadStatus.MODULE_LOAD_IN_PROGRESS;
   private callbackRouter_: PageCallbackRouter;
@@ -477,13 +431,6 @@ export class AppElement extends AppElementBase {
     this.backgroundManager_ = BackgroundManager.getInstance();
     this.shouldPrintPerformance_ =
         new URLSearchParams(location.search).has('print_perf');
-
-    this.oneGoogleBarIframePath_ = (() => {
-      const params = new URLSearchParams();
-      params.set(
-          'paramsencoded', btoa(window.location.search.replace(/^[?]/, '&')));
-      return `${OGB_IFRAME_ORIGIN}/one-google-bar?${params}`;
-    })();
 
     this.showCustomize_ =
         WindowProxy.getInstance().url.searchParams.has(CUSTOMIZE_URL_PARAM);
@@ -579,30 +526,9 @@ export class AppElement extends AppElementBase {
       this.setCustomizeChromeSidePanelVisible_(this.showCustomize_);
       recordCustomizeChromeOpen(NtpCustomizeChromeEntryPoint.URL);
     }
-    this.eventTracker_.add(window, 'message', (event: MessageEvent) => {
-      const data = event.data;
-      // Something in OneGoogleBar is sending a message that is received here.
-      // Need to ignore it.
-      if (typeof data !== 'object') {
-        return;
-      }
-      if ('frameType' in data && data.frameType === 'one-google-bar') {
-        this.handleOneGoogleBarMessage_(event);
-      }
-    });
     this.eventTracker_.add(window, 'keydown', this.onWindowKeydown_.bind(this));
     this.eventTracker_.add(
         window, 'click', this.onWindowClick_.bind(this), /*capture=*/ true);
-    this.eventTracker_.add(document, 'scroll', () => {
-      this.scrolledToTop_ = document.documentElement.scrollTop <= 0;
-    });
-    this.eventTracker_.add(
-        WindowProxy.getInstance().matchMedia('(prefers-color-scheme: dark)'),
-        'change', (e: MediaQueryListEvent) => {
-          if (e.matches) {
-            this.updateOneGoogleBarAppearance_();
-          }
-        });
     if (loadTimeData.getString('backgroundImageUrl')) {
       this.backgroundManager_.getBackgroundImageLoadTime().then(
           time => {
@@ -658,14 +584,12 @@ export class AppElement extends AppElementBase {
       this.backgroundImageAttributionUrl_ =
           this.computeBackgroundImageAttributionUrl_();
       this.colorSourceIsBaseline = this.computeColorSourceIsBaseline();
-      this.logoColor_ = this.computeLogoColor_();
-      this.singleColoredLogo_ = this.computeSingleColoredLogo_();
     }
 
     // theme_, showLensUploadDialog_
     this.realboxShown_ = this.computeRealboxShown_();
 
-    // middleSlotPromoLoaded_, modulesLoadedStatus_
+    // modulesLoadedStatus_
     this.promoAndModulesLoaded_ = this.computePromoAndModulesLoaded_();
 
     // wallpaperSearchButtonEnabled_, showBackgroundImage_, backgroundColor_
@@ -746,22 +670,12 @@ export class AppElement extends AppElementBase {
       this.maybeRegisterCustomizeButtonHelpBubble_();
     }
 
-    if (changedPrivateProperties.has('logoColor_')) {
-      this.style.setProperty(
-          '--ntp-logo-color', this.rgbaOrInherit_(this.logoColor_));
-    }
-
     if (changedPrivateProperties.has('showBackgroundImage_')) {
       this.onShowBackgroundImageChange_();
     }
 
     if (changedPrivateProperties.has('promoAndModulesLoaded_')) {
       this.onPromoAndModulesLoadedChange_();
-    }
-
-    if (changedPrivateProperties.has('oneGoogleBarLoaded_') ||
-        changedPrivateProperties.has('theme_')) {
-      this.updateOneGoogleBarAppearance_();
     }
 
     if (changedPrivateProperties.has('showVoiceSearchOverlay_') &&
@@ -795,19 +709,6 @@ export class AppElement extends AppElementBase {
     this.voiceSearchTranscript_ = '';
   }
 
-  // Called to update the OGB of relevant NTP state changes.
-  private updateOneGoogleBarAppearance_() {
-    if (this.oneGoogleBarLoaded_) {
-      const isNtpDarkTheme =
-          this.theme_ && (!!this.theme_.backgroundImage || this.theme_.isDark);
-      $$<IframeElement>(this, '#oneGoogleBar')!.postMessage({
-        type: 'updateAppearance',
-        // We should be using a light OGB for dark themes and vice versa.
-        applyLightTheme: isNtpDarkTheme,
-      });
-    }
-  }
-
   private computeShowCustomizeChromeText_(): boolean {
     if (this.showWallpaperSearchButton_) {
       return false;
@@ -833,10 +734,8 @@ export class AppElement extends AppElementBase {
   }
 
   private computePromoAndModulesLoaded_(): boolean {
-    return (!loadTimeData.getBoolean('middleSlotPromoEnabled') ||
-            this.middleSlotPromoLoaded_) &&
-        (!loadTimeData.getBoolean('modulesEnabled') ||
-         this.modulesLoadedStatus_ === ModuleLoadStatus.MODULE_LOAD_COMPLETE);
+    return !loadTimeData.getBoolean('modulesEnabled') ||
+        this.modulesLoadedStatus_ === ModuleLoadStatus.MODULE_LOAD_COMPLETE;
   }
 
   private onRealboxCanShowSecondarySideChanged_ = (e: MediaQueryListEvent) => {
@@ -1114,118 +1013,6 @@ export class AppElement extends AppElementBase {
     return !!this.theme_ && this.theme_.isBaseline;
   }
 
-  private computeLogoColor_(): SkColor|null {
-    if (!this.theme_) {
-      return null;
-    }
-
-    return this.theme_.logoColor ||
-        (this.theme_.isDark ? hexColorToSkColor('#ffffff') : null);
-  }
-
-  private computeSingleColoredLogo_(): boolean {
-    return !!this.theme_ && (!!this.theme_.logoColor || this.theme_.isDark);
-  }
-
-  /**
-   * Sends the command received from the given source and origin to the browser.
-   * Relays the browser response to whether or not a promo containing the given
-   * command can be shown back to the source promo frame. |commandSource| and
-   * |commandOrigin| are used only to send the response back to the source promo
-   * frame and should not be used for anything else.
-   * @param  messageData Data received from the source promo frame.
-   * @param commandSource Source promo frame.
-   * @param commandOrigin Origin of the source promo frame.
-   */
-  private canShowPromoWithBrowserCommand_(
-      messageData: CanShowPromoWithBrowserCommandData, commandSource: Window,
-      commandOrigin: string) {
-    // Make sure we don't send unsupported commands to the browser.
-    /** @type {!Command} */
-    const commandId = Object.values(Command).includes(messageData.commandId) ?
-        messageData.commandId :
-        Command.kUnknownCommand;
-
-    BrowserCommandProxy.getInstance().handler.canExecuteCommand(commandId).then(
-        ({canExecute}) => {
-          const response = {
-            messageType: messageData.messageType,
-            [messageData.commandId]: canExecute,
-          };
-          commandSource.postMessage(response, commandOrigin);
-        });
-  }
-
-  /**
-   * Sends the command and the accompanying mouse click info received from the
-   * promo of the given source and origin to the browser. Relays the execution
-   * status response back to the source promo frame. |commandSource| and
-   * |commandOrigin| are used only to send the execution status response back to
-   * the source promo frame and should not be used for anything else.
-   * @param commandData Command and mouse click info.
-   * @param commandSource Source promo frame.
-   * @param commandOrigin Origin of the source promo frame.
-   */
-  private executePromoBrowserCommand_(
-      commandData: ExecutePromoBrowserCommandData, commandSource: Window,
-      commandOrigin: string) {
-    // Make sure we don't send unsupported commands to the browser.
-    const commandId = Object.values(Command).includes(commandData.commandId) ?
-        commandData.commandId :
-        Command.kUnknownCommand;
-
-    BrowserCommandProxy.getInstance()
-        .handler.executeCommand(commandId, commandData.clickInfo)
-        .then(({commandExecuted}) => {
-          commandSource.postMessage(commandExecuted, commandOrigin);
-        });
-  }
-
-  /**
-   * Handles messages from the OneGoogleBar iframe. The messages that are
-   * handled include show bar on load and overlay updates.
-   *
-   * 'overlaysUpdated' message includes the updated array of overlay rects that
-   * are shown.
-   */
-  private handleOneGoogleBarMessage_(event: MessageEvent) {
-    const data = event.data;
-    if (data.messageType === 'loaded') {
-      const oneGoogleBar = $$<IframeElement>(this, '#oneGoogleBar')!;
-      oneGoogleBar.style.clipPath = 'url(#oneGoogleBarClipPath)';
-      oneGoogleBar.style.zIndex = '1000';
-      this.oneGoogleBarLoaded_ = true;
-      this.pageHandler_.onOneGoogleBarRendered(WindowProxy.getInstance().now());
-    } else if (data.messageType === 'overlaysUpdated') {
-      this.$.oneGoogleBarClipPath.querySelectorAll('rect').forEach(el => {
-        el.remove();
-      });
-      const overlayRects = data.data as DOMRect[];
-      overlayRects.forEach(({x, y, width, height}) => {
-        const rectElement =
-            document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        // Add 8px around every rect to ensure shadows are not cutoff.
-        rectElement.setAttribute('x', `${x - 8}`);
-        rectElement.setAttribute('y', `${y - 8}`);
-        rectElement.setAttribute('width', `${width + 16}`);
-        rectElement.setAttribute('height', `${height + 16}`);
-        this.$.oneGoogleBarClipPath.appendChild(rectElement);
-      });
-    } else if (data.messageType === 'can-show-promo-with-browser-command') {
-      this.canShowPromoWithBrowserCommand_(
-          data, event.source as Window, event.origin);
-    } else if (data.messageType === 'execute-browser-command') {
-      this.executePromoBrowserCommand_(
-          data.data, event.source as Window, event.origin);
-    } else if (data.messageType === 'click') {
-      recordClick(NtpElement.ONE_GOOGLE_BAR);
-    }
-  }
-
-  protected onNtpMiddleSlotPromoLoaded_() {
-    this.middleSlotPromoLoaded_ = true;
-  }
-
   protected onModulesLoaded_(e: CustomEvent<number|null>) {
     this.modulesLoadedStatus_ = e.detail ?
         ModuleLoadStatus.MODULE_LOAD_COMPLETE :
@@ -1352,17 +1139,11 @@ export class AppElement extends AppElementBase {
     }
     for (const target of e.composedPath()) {
       switch (target) {
-        case $$(this, 'ntp-logo'):
-          recordClick(NtpElement.LOGO);
-          return;
         case $$(this, 'ntp-searchbox'):
           recordClick(NtpElement.REALBOX);
           return;
         case $$(this, 'cr-most-visited'):
           recordClick(NtpElement.MOST_VISITED);
-          return;
-        case $$(this, 'ntp-middle-slot-promo'):
-          recordClick(NtpElement.MIDDLE_SLOT_PROMO);
           return;
         case $$(this, '#modules'):
           recordClick(NtpElement.MODULE);

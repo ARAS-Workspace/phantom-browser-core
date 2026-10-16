@@ -27,7 +27,6 @@ include_rules = [
   "+chrome/browser/ui/user_education/browser_user_education_interface.h",
   "+chrome/browser/ui/webui/webui_embedding_context.h",
   "+chrome/browser/user_education/user_education_service.h",
-  "+chrome/browser/content_settings/cookie_settings_factory.h",
   "+chrome/browser/segmentation_platform/segmentation_platform_service_factory.h",
   "+chrome/browser/ui/webui/ntp/new_tab_ui.h",
   "+chrome/browser/visited_url_ranking/visited_url_ranking_service_factory.h",
@@ -37,7 +36,6 @@ include_rules = [
   "+chrome/browser/ui/tabs/saved_tab_groups/saved_tab_group_utils.h",
   "+chrome/browser/ui/tabs/tab_strip_model.h",
   "+chrome/browser/signin/chrome_signin_helper.h",
-  "+chrome/browser/signin/account_consistency_mode_manager.h",
 ]
 
 test_rules = [

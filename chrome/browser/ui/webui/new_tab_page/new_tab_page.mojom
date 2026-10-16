@@ -57,8 +57,6 @@ struct Theme {
   bool daily_refresh_enabled;
   // True if the theme is dark (e.g. NTP background color is dark).
   bool is_dark;
-  // Color of Google logo. If not set show the logo multi-colored.
-  skia.mojom.SkColor? logo_color;
   // Collection id of the background image.
   string? background_image_collection_id;
   // The background image.
@@ -70,88 +68,6 @@ struct Theme {
   url.mojom.Url? background_image_attribution_url;
   // Theme settings for the NTP MV tiles.
   most_visited.mojom.MostVisitedTheme most_visited;
-};
-
-// Type of image of an image doodle. Used for metrics logging only.
-enum DoodleImageType {
-  // Animation of an animated doodle.
-  kAnimation,
-  // Image of a static doodle.
-  kStatic,
-};
-
-// A simple or animated doodle in either dark or light mode.
-struct ImageDoodle {
-  // Doodle image encoded as data URL.
-  url.mojom.Url image_url;
-  // URL pointing to animated content (e.g. gif). Only set for animated doodles.
-  url.mojom.Url? animation_url;
-  // Dimensions of the original image in pixels.
-  uint32 width;
-  uint32 height;
-  // Color of the background the doodle was designed for. If the NTP background
-  // differs from that color we show the doodle in a box of that color.
-  skia.mojom.SkColor background_color;
-  // URLs to be pinged when an image has been shown.
-  url.mojom.Url image_impression_log_url;
-  url.mojom.Url? animation_impression_log_url;
-};
-
-// A simple or animated doodle in both dark and light mode.
-struct AllModeImageDoodle {
-  // Doodles for respective modes.
-  ImageDoodle light;
-  ImageDoodle? dark;
-  // URL opened in new tab when the doodle is clicked.
-  url.mojom.Url? on_click_url;
-  // URL displayed to users, which they can use to share the doodle.
-  url.mojom.Url share_url;
-};
-
-// A doodle. Retrieved from the Google doodle server.
-struct Doodle {
-  // Set for simple and animated doodles.
-  AllModeImageDoodle? image;
-  // Localized description of the doodle.
-  string description;
-};
-
-// A channel through which a doodle can be shared.
-enum DoodleShareChannel {
-  kFacebook,
-  kTwitter,
-  kEmail,
-  kLinkCopy,
-};
-
-struct PromoImagePart {
-  url.mojom.Url image_url;
-  url.mojom.Url target;
-};
-
-struct PromoLinkPart {
-  string text;
-  url.mojom.Url url;
-};
-
-struct PromoTextPart {
-  string text;
-};
-
-union PromoPart {
-  PromoImagePart image;
-  PromoLinkPart link;
-  PromoTextPart text;
-};
-
-// Homepage promo used to display a message with a link on the NTP.
-struct Promo {
-  // A unique identifier for this promo.
-  string? id;
-  // URL to ping to log a promo impression. May be invalid.
-  url.mojom.Url? log_url;
-  // Middle slot promo data.
-  array<PromoPart> middle_slot_parts;
 };
 
 // Used to determine available modules for the NTP.
@@ -202,14 +118,6 @@ interface PageHandler {
   // Returns the visibility of NTP tiles and the shortcuts type.
   GetMostVisitedSettings() => (ntp_tiles.mojom.TileType shortcuts_type,
     bool shortcuts_visible);
-  // Gets current doodle if there is one.
-  GetDoodle() => (Doodle? doodle);
-  // Updates middle slot promo data. Triggers a call to |SetPromo|.
-  UpdatePromoData();
-  // Marks a promo as blocked.
-  BlocklistPromo(string promo_id);
-  // Unmarks a promo as blocked.
-  UndoBlocklistPromo(string promo_id);
   // Called when a module the given id is dismissed.
   OnDismissModule(string module_id);
   // Called when a module the given id is restored.
@@ -247,34 +155,8 @@ interface PageHandler {
   MaybeTriggerAutomaticCustomizeChromePromo();
 
   // ======= METRICS =======
-  // Logs that the One Google Bar was added to the DOM / loaded in an iframe at
-  // |time|.
-  OnOneGoogleBarRendered(double time);
-  // Logs that the promo iframe was loaded at |time| and pings |log_url| for
-  // promo metrics logging.
-  OnPromoRendered(double time, url.mojom.Url? log_url);
   // Logs an action performed in the customize dialog.
   OnCustomizeDialogAction(CustomizeDialogAction action);
-  // Logs that the |type| image of an image doodle has been clicked. If set, the
-  // |log_url| should be pinged for metrics logging.
-  OnDoodleImageClicked(DoodleImageType type, url.mojom.Url? log_url);
-  // Logs that the |type| image of an image doodle has been shown at |time|.
-  // Returns additional params, which are fetched from |image_url|, we use to
-  // perform more doodle logging later. We can't fetch the params in JS because
-  // the NTP renderer process does not have network access.
-  OnDoodleImageRendered(DoodleImageType type,
-                        double time,
-                        url.mojom.Url log_url)
-      => (string? image_click_params,
-          url.mojom.Url? interaction_log_url,
-          string? share_id);
-  // Logs that the doodle with |doodle_id| has been shared through |channel|.
-  // |share_id| comes from a previous call to |OnDoodleImageRendered|.
-  OnDoodleShared(DoodleShareChannel channel,
-                 string doodle_id,
-                 string? share_id);
-  // Logs that a link on a promo has been clicked.
-  OnPromoLinkClicked();
   // Logs that the <ntp-app> element's |ready| callback method was called.
   OnAppRendered(double time);
   // Records that the user engaged with the contextual search IPH.
@@ -291,8 +173,6 @@ interface Page {
   // Allows modules to load on NTP when the UI has postponed module loading for
   // some reason.
   SetModulesLoadable();
-  // Sets NTP homepage promo.
-  SetPromo(Promo? promo);
   // Shows a toast with information about Chrome Webstore themes.
   ShowWebstoreToast();
   // Sets wallpaper search button's visibility to |visible|.

@@ -34,10 +34,6 @@ export class WindowProxy {
     return Math.random();
   }
 
-  createIframeSrc(src: string): string {
-    return src;
-  }
-
   matchMedia(query: string): MediaQueryList {
     return window.matchMedia(query);
   }

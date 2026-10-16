@@ -87,7 +87,6 @@ export function createTheme({
     backgroundImageAttribution2: '',
     dailyRefreshEnabled: false,
     backgroundImageCollectionId: '',
-    logoColor: null,
     isBaseline: isBaseline,
     isDark,
     isGm3,

@@ -246,21 +246,6 @@ NTPUserDataLogger::NTPUserDataLogger(
 
 NTPUserDataLogger::~NTPUserDataLogger() = default;
 
-// static
-void NTPUserDataLogger::LogOneGoogleBarFetchDuration(
-    bool success,
-    const base::TimeDelta& duration) {
-  DEPRECATED_UMA_HISTOGRAM_MEDIUM_TIMES(
-      "NewTabPage.OneGoogleBar.RequestLatency", duration);
-  if (success) {
-    DEPRECATED_UMA_HISTOGRAM_MEDIUM_TIMES(
-        "NewTabPage.OneGoogleBar.RequestLatency.Success", duration);
-  } else {
-    DEPRECATED_UMA_HISTOGRAM_MEDIUM_TIMES(
-        "NewTabPage.OneGoogleBar.RequestLatency.Failure", duration);
-  }
-}
-
 void NTPUserDataLogger::LogEvent(NTPLoggingEventType event,
                                  base::TimeDelta time) {
   if (!DefaultSearchProviderIsGoogle()) {

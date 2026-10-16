@@ -683,11 +683,6 @@ source_set("platform_browser_tests") {
     "//url",
   ]
 
-  if (enable_webui_ntp) {
-    # For web_request_apitest.cc.
-    deps += [ "//chrome/browser/new_tab_page" ]
-  }
-
   deps += [
     "//chrome/browser/ui/location_bar",
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
@@ -1879,7 +1874,6 @@ test("browser_tests") {
     "//chrome/browser/profiles:profile_io_data",
     "//chrome/browser/resource_coordinator",
     "//chrome/browser/resource_coordinator:browser_tests",
-    "//chrome/browser/search_provider_logos",
     "//chrome/browser/sessions",
     "//chrome/browser/sessions:browser_tests",
     "//chrome/browser/signin:signin_promo",
@@ -3116,7 +3110,6 @@ test("unit_tests") {
     "//components/schema_org/common:improved_mojom",
     "//components/search",
     "//components/search_engines",
-    "//components/search_provider_logos",
     "//components/security_interstitials/content:proto",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/security_interstitials/core:unsafe_resource",

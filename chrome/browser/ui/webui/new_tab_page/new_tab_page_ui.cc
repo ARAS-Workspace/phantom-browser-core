@@ -23,7 +23,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/values.h"
-#include "build/branding_buildflags.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/buildflags.h"
@@ -43,7 +42,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/search_provider_logos/logo_service_factory.h"
 #include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
@@ -76,9 +74,7 @@
 #include "chrome/grit/new_tab_page_resources.h"
 #include "chrome/grit/new_tab_page_resources_map.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/favicon_base/favicon_url_parser.h"
-#include "components/google/core/common/google_util.h"
 #include "components/grit/components_scaled_resources.h"
 #include "components/history_clusters/core/features.h"
 #include "components/ntp_tiles/features.h"
@@ -117,9 +113,7 @@
 #include "ui/webui/resources/grit/webui_resources.h"
 #include "ui/webui/resources/grit/webui_resources_map.h"
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
-#include "ui/webui/webui_allowlist.h"
 #include "ui/webui/webui_util.h"
-#include "url/origin.h"
 #include "url/url_util.h"
 
 #include "chrome/browser/ui/browser_window.h"
@@ -233,33 +227,8 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
                      ntp_features::kNtpNextShowDismissalUIParam.Get());
   source->AddBoolean("ntpNextDisablementContextMenuEnabled",
                      ntp_features::kNtpNextDisablementContextMenuParam.Get());
-  source->AddBoolean(
-
-      "oneGoogleBarEnabled",
-      base::FeatureList::IsEnabled(ntp_features::kNtpOneGoogleBar));
   source->AddBoolean("shortcutsEnabled",
                      base::FeatureList::IsEnabled(ntp_features::kNtpShortcuts));
-  source->AddBoolean("logoEnabled",
-                     base::FeatureList::IsEnabled(ntp_features::kNtpLogo));
-  source->AddBoolean(
-      "animatedDoodlesEnabled",
-      base::FeatureList::IsEnabled(ntp_features::kNtpAnimatedDoodles));
-  source->AddBoolean(
-      "doodleMuralsEnabled",
-      base::FeatureList::IsEnabled(ntp_features::kNtpDoodleMurals));
-  bool use_google_logo_26 = false;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  use_google_logo_26 =
-      base::FeatureList::IsEnabled(ntp_features::kNtpGoogleLogo26);
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  source->AddBoolean("useGoogleLogo26", use_google_logo_26);
-  source->AddBoolean(
-      "middleSlotPromoEnabled",
-      base::FeatureList::IsEnabled(ntp_features::kNtpMiddleSlotPromo) &&
-          profile->GetPrefs()->GetBoolean(prefs::kNtpPromoVisible));
-  source->AddBoolean(
-      "middleSlotPromoDismissalEnabled",
-      base::FeatureList::IsEnabled(ntp_features::kNtpMiddleSlotPromoDismissal));
   source->AddBoolean(
       "modulesDragAndDropEnabled",
       base::FeatureList::IsEnabled(ntp_features::kNtpModulesDragAndDrop));
@@ -303,7 +272,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
       omnibox::kVoiceSearchCoherenceSearchboxWithLiveTranscription.Get());
 
   static constexpr webui::LocalizedString kStrings[] = {
-      {"doneButton", IDS_DONE},
       {"dismissButton", IDS_NTP_DISMISS},
       {"title", IDS_NEW_TAB_TITLE},
       {"undo", IDS_NEW_TAB_UNDO_THUMBNAIL_REMOVE},
@@ -357,7 +325,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
       // code (here and elsewhere) into the searchbox directories or a new
       // component.
       {"audioError", IDS_NEW_TAB_VOICE_AUDIO_ERROR},
-      {"close", IDS_NTP_CLOSE},
       {"languageError", IDS_NEW_TAB_VOICE_LANGUAGE_ERROR},
       {"learnMore", IDS_LEARN_MORE},
       {"learnMoreA11yLabel", IDS_NEW_TAB_VOICE_LEARN_MORE_ACCESSIBILITY_LABEL},
@@ -407,14 +374,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
        IDS_LENS_SEARCH_UPLOAD_DIALOG_VALIDATION_ERROR_CONFORMANCE},
       {"lensSearchUploadDialogErrorMultipleUrls",
        IDS_LENS_SEARCH_UPLOAD_DIALOG_ERROR_MULTIPLE_URLS},
-
-      // Logo/doodle.
-      {"copyLink", IDS_NTP_DOODLE_SHARE_DIALOG_COPY_LABEL},
-      {"doodleLink", IDS_NTP_DOODLE_SHARE_DIALOG_LINK_LABEL},
-      {"email", IDS_NTP_DOODLE_SHARE_DIALOG_MAIL_LABEL},
-      {"facebook", IDS_NTP_DOODLE_SHARE_DIALOG_FACEBOOK_LABEL},
-      {"shareDoodle", IDS_NTP_DOODLE_SHARE_LABEL},
-      {"twitter", IDS_NTP_DOODLE_SHARE_DIALOG_TWITTER_LABEL},
 
       // Theme.
       {"themeCreatedBy", IDS_NEW_TAB_ATTRIBUTION_INTRO},
@@ -544,12 +503,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
       {"modulesTabGroupsZeroStateText",
        IDS_NTP_MODULES_TAB_GROUPS_ZERO_STATE_TEXT},
 
-      // Middle slot promo.
-      {"undoDismissPromoButtonToast", IDS_NTP_UNDO_DISMISS_PROMO_BUTTON_TOAST},
-      {"mobilePromoDescription", IDS_NTP_MOBILE_PROMO_DESCRIPTION},
-      {"mobilePromoHeader", IDS_NTP_MOBILE_PROMO_HEADER},
-      {"mobilePromoQrCode", IDS_NTP_MOBILE_PROMO_QR_CODE_LABEL},
-
       // Threads rail.
 
       // Webstore toast.
@@ -618,23 +571,13 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
   source->AddResourcePaths(kNewTabSharedResources);
 #endif  // BUILDFLAG(OPTIMIZE_WEBUI)
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // Overrides the mapping installed by SetupWebUIDataSource() above, so the
-  // stable logo path serves the 2026 version of the Google logo.
-  if (use_google_logo_26) {
-    source->AddResourcePath("icons/google_logo.svg",
-                            IDR_NEW_TAB_PAGE_BRANDED_GOOGLE_LOGO_SVG);
-  }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-  // Allow embedding of iframes for the doodle and
-  // chrome-untrusted://new-tab-page for other external content and resources.
+  // Allow embedding of chrome-untrusted://new-tab-page for other external
+  // content and resources.
   // NOTE: Use caution when overriding content security policies as that cean
   // lead to subtle security bugs such as https://crbug.com/40057334.
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ChildSrc,
-      base::StringPrintf("child-src https: %s %s %s;",
-                         google_util::CommandLineGoogleBaseURL().spec().c_str(),
+      base::StringPrintf("child-src %s %s;",
                          chrome::kChromeUIUntrustedNewTabPageUrl,
                          chrome::kChromeUIUntrustedNtpMicrosoftAuthURL));
   source->OverrideContentSecurityPolicy(
@@ -729,14 +672,6 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
 
   web_ui->AddRequestableScheme(content::kChromeUIUntrustedScheme);
 
-// Give OGB 3P Cookie Permissions. Only necessary.
-  WebUIAllowlist::GetOrCreate(profile_)->RegisterAutoGrantedThirdPartyCookies(
-      url::Origin::Create(GURL(chrome::kChromeUIUntrustedNewTabPageUrl)),
-      {
-          ContentSettingsPattern::FromURL(GURL("https://ogs.google.com")),
-          ContentSettingsPattern::FromURL(GURL("https://corp.google.com")),
-      });
-
   // Store basic theme info in load time data to make the background color and
   // background image available as soon as the page loads to prevent a potential
   // white flicker.
@@ -778,14 +713,11 @@ bool NewTabPageUI::IsNewTabPageOrigin(const GURL& url) {
 // static
 void NewTabPageUI::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterTimePref(kPrevNavigationTimePrefName, base::Time());
-  registry->RegisterBooleanPref(prefs::kNtpPromoVisible, true);
   registry->RegisterTimePref(ntp_prefs::kNtpLastModuleStalenessUpdate,
                              base::Time());
   registry->RegisterDictionaryPref(ntp_prefs::kNtpModuleStalenessCountDict);
   registry->RegisterDictionaryPref(
       ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  registry->RegisterBooleanPref(ntp_prefs::kNtpAnimatedDoodlesEnabled, true);
-  registry->RegisterBooleanPref(ntp_prefs::kNtpDoodleMuralsEnabled, true);
 }
 
 // static
@@ -795,8 +727,6 @@ void NewTabPageUI::ResetProfilePrefs(PrefService* prefs) {
   prefs->SetDict(ntp_prefs::kNtpModuleStalenessCountDict, base::DictValue());
   prefs->SetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict,
                  base::DictValue());
-  prefs->SetBoolean(ntp_prefs::kNtpAnimatedDoodlesEnabled, true);
-  prefs->SetBoolean(ntp_prefs::kNtpDoodleMuralsEnabled, true);
   prefs->SetDict(prefs::kContextMenuAnimationState, base::DictValue());
 }
 
@@ -942,7 +872,6 @@ void NewTabPageUI::CreatePageHandler(
   page_handler_ = std::make_unique<NewTabPageHandler>(
       std::move(pending_page_handler), std::move(pending_page), profile_,
       ntp_custom_background_service_, theme_service_,
-      LogoServiceFactory::GetForProfile(profile_),
       SyncServiceFactory::GetForProfile(profile_),
       segmentation_platform::SegmentationPlatformServiceFactory::GetForProfile(
           profile_),

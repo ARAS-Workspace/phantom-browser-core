@@ -13,7 +13,6 @@
 #include "chrome/browser/command_updater_impl.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/new_tab_page/promos/promo_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/browser_commands.h"

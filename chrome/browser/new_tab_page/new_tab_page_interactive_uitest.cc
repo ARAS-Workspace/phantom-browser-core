@@ -53,9 +53,7 @@ class NewTabPageTest : public InProcessBrowserTest,
                        public content::DevToolsAgentHostClient {
  public:
   NewTabPageTest() {
-    features_.InitWithFeatures(
-        {}, {ntp_features::kNtpOneGoogleBar, ntp_features::kNtpShortcuts,
-             ntp_features::kNtpMiddleSlotPromo});
+    features_.InitWithFeatures({}, {ntp_features::kNtpShortcuts});
   }
 
   ~NewTabPageTest() override = default;

@@ -78,7 +78,6 @@ after discussions on the right group.
       <annotation id="safe_browsing_cache_collector"/>
       <annotation id="safety_check_update_connectivity"/>
       <annotation id="open_search"/>
-      <annotation id="logo_service"/>
       <annotation id="ssl_name_mismatch_lookup"/>
       <annotation id="ui_devtools_server"/>
       <annotation id="background_fetch_context"/>
@@ -351,7 +350,6 @@ after discussions on the right group.
     <sender name="Omnibox">
       <annotation id="omnibox_documentsuggest"/>
       <annotation id="omnibox_zerosuggest"/>
-      <annotation id="one_google_bar_service"/>
       <annotation id="search_prefetch_service"/>
     </sender>
     <sender name="Contextual Search">
@@ -403,12 +401,10 @@ after discussions on the right group.
       <annotation id="early_hints_preload"/>
     </sender>
     <sender name="New Tab Page">
-      <annotation id="new_tab_page_handler"/>
       <annotation id="backdrop_collection_images_download"/>
       <annotation id="backdrop_collection_names_download"/>
       <annotation id="backdrop_next_image_download"/>
       <annotation id="popular_sites_fetch"/>
-      <annotation id="promo_service"/>
     </sender>
     <sender name="Speech Recognition"/>
     <sender name="Spellcheck">

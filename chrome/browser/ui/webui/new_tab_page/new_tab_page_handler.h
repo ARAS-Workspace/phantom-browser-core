@@ -5,10 +5,8 @@
 #ifndef CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_NEW_TAB_PAGE_HANDLER_H_
 #define CHROME_BROWSER_UI_WEBUI_NEW_TAB_PAGE_NEW_TAB_PAGE_HANDLER_H_
 
-#include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -19,8 +17,6 @@
 #include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
 #include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_observer.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
-#include "chrome/browser/new_tab_page/promos/promo_service.h"
-#include "chrome/browser/new_tab_page/promos/promo_service_observer.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_observer.h"
@@ -31,7 +27,6 @@
 #include "components/ntp_tiles/tile_type.h"
 #include "components/optimization_guide/core/model_execution/settings_enabled_observer.h"
 #include "components/prefs/pref_change_registrar.h"
-#include "components/search_provider_logos/logo_common.h"
 #include "components/segmentation_platform/public/result.h"
 #include "components/themes/ntp_background_service_observer.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
@@ -45,8 +40,8 @@
 #include "ui/native_theme/native_theme.h"
 #include "ui/native_theme/native_theme_observer.h"
 
-class GURL;
 class OptimizationGuideKeyedService;
+class PrefRegistrySimple;
 class Profile;
 class MicrosoftAuthService;
 class NTPUserDataLogger;
@@ -59,10 +54,6 @@ class WebContents;
 namespace new_tab_footer {
 class NewTabFooterController;
 }
-
-namespace search_provider_logos {
-class LogoService;
-}  // namespace search_provider_logos
 
 namespace segmentation_platform {
 class SegmentationPlatformService;
@@ -81,7 +72,6 @@ class NewTabPageHandler
       public ui::NativeThemeObserver,
       public ThemeServiceObserver,
       public NtpCustomBackgroundServiceObserver,
-      public PromoServiceObserver,
       public optimization_guide::SettingsEnabledObserver,
       public MicrosoftAuthServiceObserver,
       public new_tab_footer::NewTabFooterControllerObserver {
@@ -92,7 +82,6 @@ class NewTabPageHandler
                     Profile* profile,
                     NtpCustomBackgroundService* ntp_custom_background_service,
                     ThemeService* theme_service,
-                    search_provider_logos::LogoService* logo_service,
                     syncer::SyncService* sync_service,
                     segmentation_platform::SegmentationPlatformService*
                         segmentation_platform_service,
@@ -130,10 +119,6 @@ class NewTabPageHandler
   // new_tab_page::mojom::PageHandler:
   void SetMostVisitedSettings(ntp_tiles::TileType type, bool visible) override;
   void GetMostVisitedSettings(GetMostVisitedSettingsCallback callback) override;
-  void GetDoodle(GetDoodleCallback callback) override;
-  void UpdatePromoData() override;
-  void BlocklistPromo(const std::string& promo_id) override;
-  void UndoBlocklistPromo(const std::string& promo_id) override;
   void OnDismissModule(const std::string& module_id) override;
   void OnRestoreModule(const std::string& module_id) override;
   void SetModulesVisible(bool visible) override;
@@ -152,21 +137,8 @@ class NewTabPageHandler
   void GetModulesOrder(GetModulesOrderCallback callback) override;
   void UpdateModulesLoadable() override;
   void OnAppRendered(double time) override;
-  void OnOneGoogleBarRendered(double time) override;
-  void OnPromoRendered(double time,
-                       const std::optional<GURL>& log_url) override;
   void OnCustomizeDialogAction(
       new_tab_page::mojom::CustomizeDialogAction action) override;
-  void OnDoodleImageClicked(new_tab_page::mojom::DoodleImageType type,
-                            const std::optional<GURL>& log_url) override;
-  void OnDoodleImageRendered(new_tab_page::mojom::DoodleImageType type,
-                             double time,
-                             const GURL& log_url,
-                             OnDoodleImageRenderedCallback callback) override;
-  void OnDoodleShared(new_tab_page::mojom::DoodleShareChannel channel,
-                      const std::string& doodle_id,
-                      const std::optional<std::string>& share_id) override;
-  void OnPromoLinkClicked() override;
   void MaybeTriggerAutomaticCustomizeChromePromo() override;
   void OnContextualSearchIPHEngaged() override;
 
@@ -180,10 +152,6 @@ class NewTabPageHandler
   // NtpCustomBackgroundServiceObserver:
   void OnCustomBackgroundImageUpdated() override;
 
-  // PromoServiceObserver:
-  void OnPromoDataUpdated() override;
-  void OnPromoServiceShuttingDown() override;
-
   // SettingsEnabledObserver:
   void OnChangeInFeatureCurrentlyEnabledState(bool is_now_enabled) override;
 
@@ -193,27 +161,11 @@ class NewTabPageHandler
   // new_tab_footer::NewTabFooterControllerObserver:
   void OnFooterVisibilityUpdated(bool visible) override;
 
-  void OnLogoAvailable(
-      GetDoodleCallback callback,
-      search_provider_logos::LogoCallbackReason type,
-      const std::optional<search_provider_logos::EncodedLogo>& logo);
-
   // Called when the embedding BrowserWindowInterface has changed.
   void OnBrowserWindowInterfaceChanged();
 
   void LogEvent(NTPLoggingEventType event);
   void LogEvent(NTPLoggingEventType event, base::TimeDelta delta);
-
-  typedef base::OnceCallback<void(bool success,
-                                  std::optional<std::string> body)>
-      OnFetchResultCallback;
-  void Fetch(const GURL& url, OnFetchResultCallback on_result);
-  void OnFetchResult(const network::SimpleURLLoader* loader,
-                     OnFetchResultCallback on_result,
-                     std::optional<std::string> body);
-  void OnLogFetchResult(OnDoodleImageRenderedCallback callback,
-                        bool success,
-                        std::optional<std::string> body);
 
   ntp_tiles::TileType GetTileType() const;
   bool IsShortcutsVisible() const;
@@ -254,8 +206,6 @@ class NewTabPageHandler
   NTPUserDataLogger logger_;
   base::ScopedObservation<ThemeService, ThemeServiceObserver>
       theme_service_observation_{this};
-  base::ScopedObservation<PromoService, PromoServiceObserver>
-      promo_service_observation_{this};
   base::ScopedObservation<MicrosoftAuthService, MicrosoftAuthServiceObserver>
       microsoft_auth_service_observation_{this};
   base::ScopedObservation<new_tab_footer::NewTabFooterController,
@@ -263,25 +213,18 @@ class NewTabPageHandler
       footer_controller_observation_{this};
 
   raw_ptr<NtpCustomBackgroundService> const ntp_custom_background_service_;
-  raw_ptr<search_provider_logos::LogoService> const logo_service_;
   raw_ptr<const ui::ThemeProvider> const theme_provider_;
   raw_ptr<ThemeService> const theme_service_;
   raw_ptr<syncer::SyncService> const sync_service_;
   raw_ptr<segmentation_platform::SegmentationPlatformService> const
       segmentation_platform_service_;
-  GURL last_blocklisted_;
-  std::optional<base::TimeTicks> one_google_bar_load_start_time_;
   raw_ptr<Profile> const profile_;
   raw_ptr<content::WebContents> const web_contents_;
   std::unique_ptr<NewTabPageFeaturePromoHelper> feature_promo_helper_;
   base::Time ntp_navigation_start_time_;
   raw_ptr<const std::vector<ntp::ModuleIdDetail>> const module_id_details_;
-  std::unordered_map<const network::SimpleURLLoader*,
-                     std::unique_ptr<network::SimpleURLLoader>>
-      loader_map_;
   PrefChangeRegistrar pref_change_registrar_;
   PrefChangeRegistrar local_state_pref_change_registrar_;
-  raw_ptr<PromoService> promo_service_;
   raw_ptr<MicrosoftAuthService> const microsoft_auth_service_;
   raw_ptr<OptimizationGuideKeyedService> optimization_guide_keyed_service_ =
       nullptr;
@@ -290,7 +233,6 @@ class NewTabPageHandler
   base::ScopedObservation<NtpCustomBackgroundService,
                           NtpCustomBackgroundServiceObserver>
       ntp_custom_background_service_observation_{this};
-  std::optional<base::TimeTicks> promo_load_start_time_;
   base::DictValue interaction_module_id_trigger_dict_;
   // Notifies this when the browser window context changes.
   base::CallbackListSubscription browser_window_changed_subscription_;

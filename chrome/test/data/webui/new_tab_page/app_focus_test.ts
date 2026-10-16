@@ -51,7 +51,6 @@ suite('NewTabPageAppFocusTest', () => {
                                                    removeEventListener() {},
                                                  }));
     windowProxy.setPromiseResolveFor('waitForLazyRender');
-    windowProxy.setResultFor('createIframeSrc', '');
     windowProxy.setResultFor('url', url);
     fakeMetricsPrivate();
     backgroundManager = installMock(BackgroundManager);
@@ -63,9 +62,6 @@ suite('NewTabPageAppFocusTest', () => {
     handler.setPromiseResolveFor('getMostVisitedSettings', {
       customLinksEnabled: false,
       shortcutsVisible: false,
-    });
-    handler.setPromiseResolveFor('getDoodle', {
-      doodle: null,
     });
     handler.setPromiseResolveFor('getModulesIdNames', {data: []});
     installMock(

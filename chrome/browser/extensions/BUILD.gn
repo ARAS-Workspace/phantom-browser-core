@@ -1787,7 +1787,6 @@ source_set("browser_tests") {
     "//chrome/browser/extensions/api/bookmarks/test:test_support",
     "//chrome/browser/extensions/api/messaging:platform_browser_tests",
     "//chrome/browser/lifetime:termination_notification",
-    "//chrome/browser/new_tab_page",
     "//chrome/browser/permissions",
     "//chrome/browser/policy:test_support",
     "//chrome/browser/prefetch",

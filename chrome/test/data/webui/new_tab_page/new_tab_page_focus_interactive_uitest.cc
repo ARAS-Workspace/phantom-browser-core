@@ -16,10 +16,6 @@ class NewTabPageFocusTest : public WebUIMochaFocusTest {
   }
 };
 
-IN_PROC_BROWSER_TEST_F(NewTabPageFocusTest, DoodleShareDialogFocus) {
-  RunTest("new_tab_page/doodle_share_dialog_focus_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageFocusTest, AppFocus) {
   RunTest("new_tab_page/app_focus_test.js", "mocha.run()");
 }

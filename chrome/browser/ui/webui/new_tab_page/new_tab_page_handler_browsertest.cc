@@ -11,7 +11,6 @@
 #include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
-#include "chrome/browser/search_provider_logos/logo_service_factory.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -43,9 +42,7 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #endif
 
 namespace {
@@ -73,7 +70,6 @@ class MockPage : public new_tab_page::mojom::Page {
   MOCK_METHOD(void, SetModulesLoadable, ());
   MOCK_METHOD(void, SetModulesFreVisibility, (bool));
   MOCK_METHOD(void, SetCustomizeChromeSidePanelVisibility, (bool));
-  MOCK_METHOD(void, SetPromo, (new_tab_page::mojom::PromoPtr));
   MOCK_METHOD(void, ShowWebstoreToast, ());
   MOCK_METHOD(void, SetWallpaperSearchButtonVisibility, (bool));
   MOCK_METHOD(void, FooterVisibilityUpdated, (bool));
@@ -113,7 +109,6 @@ class NewTabPageHandlerBaseBrowserTest : public InProcessBrowserTest {
         mock_page_.BindAndGetRemote(), profile(),
         NtpCustomBackgroundServiceFactory::GetForProfile(profile()),
         ThemeServiceFactory::GetForProfile(profile()),
-        LogoServiceFactory::GetForProfile(profile()),
         /*sync_service=*/nullptr,
         /*segmentation_platform_service=*/nullptr, web_contents(),
         /*ntp_navigation_start_time=*/base::Time::Now(),
@@ -425,110 +420,3 @@ IN_PROC_BROWSER_TEST_F(
       "SidePanel.OpenTrigger",
       SidePanelOpenTrigger::kNewTabPageAutomaticCustomizeChrome, 1);
 }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-class NewTabPageHandlerManagedTest : public NewTabPageHandlerBaseBrowserTest,
-                                     public testing::WithParamInterface<bool> {
- public:
-  NewTabPageHandlerManagedTest() {
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/{ntp_features::kNtpFooter},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpOnMainThread() override {
-    NewTabPageHandlerBaseBrowserTest::SetUpOnMainThread();
-
-    CreateHandlerAndVerifyExpectations();
-
-    // Simulate browser management.
-    scoped_browser_management_ =
-        std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-            policy::ManagementServiceFactory::GetForProfile(profile()),
-            managed() ? policy::EnterpriseManagementAuthority::DOMAIN_LOCAL
-                      : policy::EnterpriseManagementAuthority::NONE);
-
-    NavigateToNewTabPage();
-    mock_page()->FlushForTesting();
-  }
-
-  void TearDownOnMainThread() override {
-    scoped_browser_management_.reset();
-    NewTabPageHandlerBaseBrowserTest::TearDownOnMainThread();
-  }
-
-  void NavigateToNewTabPage() {
-    ui_test_utils::NavigateToURLWithDisposition(
-        browser(), chrome::ChromeUINewTabPageURLAsGURL(),
-        WindowOpenDisposition::CURRENT_TAB,
-        ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-  }
-
-  bool managed() { return GetParam(); }
-  PrefService* local_state() { return g_browser_process->local_state(); }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      scoped_browser_management_;
-};
-
-INSTANTIATE_TEST_SUITE_P(, NewTabPageHandlerManagedTest, testing::Bool());
-
-IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, UpdateFooterVisibility) {
-  EXPECT_CALL(*mock_page(), FooterVisibilityUpdated)
-      .WillOnce([this](bool visible) { EXPECT_EQ(managed(), visible); });
-
-  handler().UpdateFooterVisibility();
-  mock_page()->FlushForTesting();
-}
-
-// Verifies footer visibility respects user preference when no enterprise label
-// is set.
-IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, SetCustomFooterLabel) {
-  bool visible;
-  EXPECT_CALL(*mock_page(), FooterVisibilityUpdated)
-      .Times(3)
-      .WillRepeatedly([&visible](bool visible_arg) { visible = visible_arg; });
-
-  profile()->GetPrefs()->SetBoolean(prefs::kNtpFooterVisible, false);
-  mock_page()->FlushForTesting();
-
-  EXPECT_FALSE(visible);
-
-  local_state()->SetString(prefs::kEnterpriseCustomLabelForBrowser,
-                           "CustomLabel");
-  mock_page()->FlushForTesting();
-
-  EXPECT_EQ(managed(), visible);
-
-  local_state()->SetString(prefs::kEnterpriseCustomLabelForBrowser, "");
-  mock_page()->FlushForTesting();
-
-  EXPECT_FALSE(visible);
-}
-
-// Verifies footer visibility respects user preference when no enterprise logo
-// is set.
-IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, SetCustomFooterLogo) {
-  bool visible;
-  EXPECT_CALL(*mock_page(), FooterVisibilityUpdated)
-      .Times(3)
-      .WillRepeatedly([&visible](bool visible_arg) { visible = visible_arg; });
-
-  profile()->GetPrefs()->SetBoolean(prefs::kNtpFooterVisible, false);
-  mock_page()->FlushForTesting();
-
-  EXPECT_FALSE(visible);
-
-  local_state()->SetString(prefs::kEnterpriseLogoUrlForBrowser, "logo_url");
-  mock_page()->FlushForTesting();
-
-  EXPECT_EQ(managed(), visible);
-
-  local_state()->SetString(prefs::kEnterpriseLogoUrlForBrowser, "");
-  mock_page()->FlushForTesting();
-
-  EXPECT_FALSE(visible);
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

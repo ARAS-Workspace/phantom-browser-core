@@ -22,27 +22,9 @@ IN_PROC_BROWSER_TEST_F(NewTabPageTest, MetricsUtils) {
   RunTest("new_tab_page/metrics_utils_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, VoiceSearchOverlay) {
-  RunTest("new_tab_page/voice_search_overlay_test.js", "mocha.run()");
-}
-
-using NewTabPageNextTest = NewTabPageBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(NewTabPageNextTest, Realbox) {
-  RunTest("new_tab_page/realbox_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, RealboxSearchbox) {
   RunTest("new_tab_page/searchbox_ntp_test.js",
           "runMochaSuite('SearchboxTest');");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, Logo) {
-  RunTest("new_tab_page/logo_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, DoodleShareDialog) {
-  RunTest("new_tab_page/doodle_share_dialog_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, BackgroundManager) {
@@ -51,10 +33,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageTest, BackgroundManager) {
 
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, BackgroundImage) {
   RunTest("new_tab_page/background_image_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, MiddleSlotPromo) {
-  RunTest("new_tab_page/middle_slot_promo_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, ImageProcessor) {
@@ -156,24 +134,9 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, Misc) {
           "runMochaSuite('NewTabPageAppTest Misc')");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, OgbThemingRemoveScrim) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest OgbThemingRemoveScrim')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, OgbScrim) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest OgbScrim')");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, Theming) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppTest Theming')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, Promo) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest Promo')");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, Clicks) {
@@ -196,11 +159,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, CustomizeChromeSidePanel) {
           "runMochaSuite('NewTabPageAppTest CustomizeChromeSidePanel')");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ReducedMotion) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppReducedMotionTest')");
-}
-
 // TODO(crbug.com/428156129): Re-enable test
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, DISABLED_WallpaperSearch) {
   RunTest("new_tab_page/app_test.js",
@@ -220,11 +178,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, NewTabFooter) {
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, AutoRemovalToast) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppTest AutoRemovalToast')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, VoiceSearchAndSpeechRecognition) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest VoiceSearchAndSpeechRecognition')");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, EnergyEffectVariant) {

@@ -95,21 +95,6 @@ BASE_FEATURE(kNtpDisableBrowserInitiatedLinks,
 BASE_FEATURE(kNtpDummyModules, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-// If enabled, branded NTPs use the 2026 version of the Google logo.
-BASE_FEATURE(kNtpGoogleLogo26, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, logo will be shown.
-// This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kNtpLogo, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, middle slot promo will be shown.
-// This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kNtpMiddleSlotPromo, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, middle slot promo will be dismissed from New Tab Page until new
-// promo message is populated
-BASE_FEATURE(kNtpMiddleSlotPromoDismissal, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Dummy feature to set param "NtpModulesLoadTimeoutMillisecondsParam".
 // This is used for an emergency Finch param. Keep indefinitely.
 BASE_FEATURE(kNtpModulesLoadTimeoutMilliseconds,
@@ -139,10 +124,6 @@ BASE_FEATURE(kNtpModulesLoad, base::FEATURE_DISABLED_BY_DEFAULT);
 // If enabled, makes browser sign-in requirement per-module, instead of a
 // requirement for all modules.
 BASE_FEATURE(kNtpModuleSignInRequirement, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, OneGoogleBar will be shown. Disabled on Android to save memory.
-// This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kNtpOneGoogleBar, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, outlook calendar module will be shown.
 BASE_FEATURE(kNtpOutlookCalendarModule, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -209,9 +190,6 @@ BASE_FEATURE(kNtpNextCanvasChip, base::FEATURE_DISABLED_BY_DEFAULT);
 // If enabled, the starter chip will be shown.
 BASE_FEATURE(kNtpStarterChip, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// If enabled, the OGB loader will request for the async bar parts payload type.
-BASE_FEATURE(kNtpOneGoogleBarAsyncBarParts, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // If enabled, a footer will show on the NTP.
 BASE_FEATURE(kNtpFooter, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -237,12 +215,6 @@ BASE_FEATURE(kNtpFeatureOptimizationShortcutsRemoval,
 // If enabled, the dismiss module buttons will be removed from the NTP modules.
 BASE_FEATURE(kNtpFeatureOptimizationDismissModulesRemoval,
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, will support animated Doodles on the NTP.
-BASE_FEATURE(kNtpAnimatedDoodles, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, will support Doodle Murals on the NTP.
-BASE_FEATURE(kNtpDoodleMurals, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, animates the AIM caret on the NTP.
 BASE_FEATURE(kNtpAnimatedCaret, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -289,8 +261,6 @@ const char kNtpChromeCartModuleHeuristicsImprovementParam[] =
 const char kNtpChromeCartModuleCouponParam[] = "NtpChromeCartModuleCouponParam";
 const char kNtpOutlookCalendarModuleDataParam[] =
     "NtpOutlookCalendarModuleDataParam";
-const char kNtpMiddleSlotPromoDismissalParam[] =
-    "NtpMiddleSlotPromoDismissalParam";
 const char kNtpMostRelevantTabResumptionModuleDataParam[] =
     "NtpMostRelevantTabResumptionModuleDataParam";
 const char kNtpMostRelevantTabResumptionModuleMaxVisitsParam[] =

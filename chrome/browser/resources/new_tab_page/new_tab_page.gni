@@ -27,19 +27,11 @@ all_ts_files = [
 # Files holding a Lit element definition and have an equivalent .html file.
 all_web_component_files = [
                             "app.ts",
-                            "doodle_share_dialog.ts",
-                            "iframe.ts",
-                            "logo.ts",
-                            "middle_slot_promo.ts",
                             "voice_search_overlay.ts",
                           ] + modules_web_component_files
 
 all_css_files = [
                   "app.css",
-                  "doodle_share_dialog.css",
-                  "iframe.css",
-                  "logo.css",
-                  "middle_slot_promo.css",
                   "ntp_searchbox.css",
                   "voice_search_overlay.css",
                 ] + modules_css_files + ntp_promo_css_files

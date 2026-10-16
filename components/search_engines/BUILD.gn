@@ -88,7 +88,6 @@ static_library("search_engines") {
     "//components/regional_capabilities:data",
     "//components/search_engines/search_engine_choice:buildflags",
     "//components/search_engines/search_engine_choice:switches",
-    "//components/search_provider_logos:switches",
     "//components/signin/public/base",
     "//components/strings",
     "//components/url_formatter",

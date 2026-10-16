@@ -5,12 +5,11 @@
 import type {Module} from 'chrome://new-tab-page/lazy_load.js';
 import {counterfactualLoad, ModuleDescriptor, ModuleRegistry} from 'chrome://new-tab-page/lazy_load.js';
 import type {CustomizeButtonsDocumentRemote} from 'chrome://new-tab-page/new_tab_page.js';
-import {$$, BackgroundManager, BrowserCommandProxy, CUSTOMIZE_CHROME_BUTTON_ELEMENT_ID, CustomizeButtonsDocumentCallbackRouter, CustomizeButtonsHandlerRemote, CustomizeButtonsProxy, CustomizeChromeSection, CustomizeDialogPage, NewTabPageProxy, NtpCustomizeChromeEntryPoint, NtpElement, SearchboxBrowserProxy, SidePanelOpenTrigger, VoiceAction, WindowProxy} from 'chrome://new-tab-page/new_tab_page.js';
+import {$$, BackgroundManager, CUSTOMIZE_CHROME_BUTTON_ELEMENT_ID, CustomizeButtonsDocumentCallbackRouter, CustomizeButtonsHandlerRemote, CustomizeButtonsProxy, CustomizeChromeSection, CustomizeDialogPage, NewTabPageProxy, NtpCustomizeChromeEntryPoint, NtpElement, SearchboxBrowserProxy, SidePanelOpenTrigger, VoiceAction, WindowProxy} from 'chrome://new-tab-page/new_tab_page.js';
 import type {AppElement, CustomizeButtonsElement, PageRemote} from 'chrome://new-tab-page/new_tab_page.js';
 import {NtpBackgroundImageSource, PageCallbackRouter, PageHandlerRemote} from 'chrome://new-tab-page/new_tab_page.js';
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
-import {Command, CommandHandlerRemote} from 'chrome://resources/js/browser_command.mojom-webui.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {isMac} from 'chrome://resources/js/platform.js';
 import {PromiseResolver} from 'chrome://resources/js/promise_resolver.js';
@@ -19,7 +18,7 @@ import {assertDeepEquals, assertEquals, assertFalse, assertNotEquals, assertTrue
 import type {MetricsTracker} from 'chrome://webui-test/metrics_test_support.js';
 import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
-import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {assertNotStyle, assertStyle, createBackgroundImage, createTheme, installMock} from './test_support.js';
 
@@ -71,9 +70,6 @@ suite('NewTabPageAppTest', () => {
       customLinksEnabled: false,
       shortcutsVisible: false,
     });
-    handler.setPromiseResolveFor('getDoodle', {
-      doodle: null,
-    });
     handler.setPromiseResolveFor('getModulesIdNames', {data: []});
     handler.setPromiseResolveFor('getModulesOrder', {data: []});
     windowProxy.setResultMapperFor(
@@ -86,7 +82,6 @@ suite('NewTabPageAppTest', () => {
                         removeEventListener: () => {},
                       }));
     windowProxy.setPromiseResolveFor('waitForLazyRender');
-    windowProxy.setResultFor('createIframeSrc', '');
     windowProxy.setResultFor('url', url);
     callbackRouterRemote = NewTabPageProxy.getInstance()
                                .callbackRouter.$.bindNewPipeAndPassRemote();
@@ -244,81 +239,6 @@ suite('NewTabPageAppTest', () => {
     });
   });
 
-  suite(`OgbThemingRemoveScrim`, () => {
-    test('Ogb updates on ntp load', async () => {
-      // Act.
-
-      // Create a dark mode theme with a custom background.
-      const theme = createTheme({isDark: true});
-      theme.backgroundImage = createBackgroundImage('https://foo.com');
-      callbackRouterRemote.setTheme(theme);
-      await callbackRouterRemote.$.flushForTesting();
-
-      // Notify the NTP that the ogb has loaded.
-      window.dispatchEvent(new MessageEvent('message', {
-        data: {
-          frameType: 'one-google-bar',
-          messageType: 'loaded',
-        },
-        source: window,
-        origin: window.origin,
-      }));
-      await microtasksFinished();
-
-      // Assert.
-
-      // Dark mode themes with background images and removeScrim set should
-      // apply background protection to the ogb.
-      assertEquals(1, windowProxy.getCallCount('postMessage'));
-      const [_, {type, applyLightTheme}] =
-          windowProxy.getArgs('postMessage')[0];
-      assertEquals('updateAppearance', type);
-      assertEquals(true, applyLightTheme);
-      assertNotStyle($$(app, '#oneGoogleBarScrim')!, 'display', 'none');
-    });
-  });
-
-  suite('OgbScrim', () => {
-    test('scroll bounce', async () => {
-      // Arrange.
-
-      // Set theme that triggers the scrim.
-      const theme = createTheme({isDark: true});
-      theme.backgroundImage = createBackgroundImage('https://foo.com');
-      callbackRouterRemote.setTheme(theme);
-      await callbackRouterRemote.$.flushForTesting();
-
-      // Make sure page is scrollable.
-      const spacer = document.createElement('div');
-      spacer.style.width = '100%';
-      spacer.style.height = '10000px';
-      spacer.style.flexShrink = '0';
-      $$(app, '#content')!.append(spacer);
-
-      // Simulates a vertical scroll.
-      const scrollY = async (y: number) => {
-        window.scroll(0, y);
-        // `window.scroll` doesn't automatically trigger scroll event.
-        window.dispatchEvent(new Event('scroll'));
-        // Wait for position update to propagate.
-        await new Promise<void>(
-            resolve => requestAnimationFrame(() => resolve()));
-      };
-
-      // Act (no bounce).
-      await scrollY(0);
-
-      // Assert (no bounce).
-      assertStyle($$(app, '#oneGoogleBarScrim')!, 'position', 'fixed');
-
-      // Act (scroll).
-      await scrollY(10);
-
-      // Assert (scroll).
-      assertStyle($$(app, '#oneGoogleBarScrim')!, 'position', 'absolute');
-    });
-  });
-
   suite('Theming', () => {
     test('setting theme updates ntp', async () => {
       // Act.
@@ -338,10 +258,6 @@ suite('NewTabPageAppTest', () => {
       assertFalse(await backgroundManager.whenCalled('setShowBackgroundImage'));
       assertStyle($$(app, '#backgroundImageAttribution')!, 'display', 'none');
       assertStyle($$(app, '#backgroundImageAttribution2')!, 'display', 'none');
-      assertFalse(app.$.logo.singleColored);
-      assertTrue(!!app.$.logo.theme);
-      assertFalse(app.$.logo.theme?.isDark);
-      assertEquals(0xffff0000, app.$.logo.theme?.backgroundColor?.value);
     });
 
     test('setting 3p theme shows attribution', async () => {
@@ -387,7 +303,6 @@ suite('NewTabPageAppTest', () => {
       assertEquals(
           'https://img.png',
           (await backgroundManager.whenCalled('setBackgroundImage')).url);
-      assertTrue(!!app.$.logo.theme?.backgroundColor);
     });
 
     test('setting attributions shows attributions', async function() {
@@ -415,20 +330,6 @@ suite('NewTabPageAppTest', () => {
           'bar', $$(app, '#backgroundImageAttribution2')!.textContent.trim());
     });
 
-    test('setting logo color colors logo', async function() {
-      // Arrange.
-      const theme = createTheme();
-      theme.logoColor = {value: 0xffff0000};
-
-      // Act.
-      callbackRouterRemote.setTheme(theme);
-      await callbackRouterRemote.$.flushForTesting();
-
-      // Assert.
-      assertTrue(app.$.logo.singleColored);
-      assertStyle(app.$.logo, '--ntp-logo-color', 'rgba(255, 0, 0, 1.00)');
-    });
-
     test('theme updates add shortcut color', async () => {
       const theme = createTheme();
       theme.mostVisited.useWhiteTileIcon = true;
@@ -449,39 +350,6 @@ suite('NewTabPageAppTest', () => {
       assertFalse(mostVisited.hasAttribute('is-dark_'));
       await callbackRouterRemote.$.flushForTesting();
       assertTrue(mostVisited.hasAttribute('is-dark_'));
-    });
-
-    [true, false].forEach((isDark) => {
-      test(
-          `OGB light mode whenever background image
-          (ignoring dark mode) isDark: ${isDark}`,
-          async () => {
-            // Act.
-
-            // Create a theme with a custom background.
-            const theme = createTheme({isDark: isDark});
-            theme.backgroundImage = createBackgroundImage('https://foo.com');
-            callbackRouterRemote.setTheme(theme);
-            await callbackRouterRemote.$.flushForTesting();
-
-            // Notify the NTP that the ogb has loaded.
-            window.dispatchEvent(new MessageEvent('message', {
-              data: {
-                frameType: 'one-google-bar',
-                messageType: 'loaded',
-              },
-              source: window,
-              origin: window.origin,
-            }));
-            await microtasksFinished();
-
-            // Assert.
-            assertEquals(1, windowProxy.getCallCount('postMessage'));
-            const [_, {type, applyLightTheme}] =
-                windowProxy.getArgs('postMessage')[0];
-            assertEquals('updateAppearance', type);
-            assertEquals(true, applyLightTheme);
-          });
     });
 
     suite('theming metrics', () => {
@@ -647,75 +515,6 @@ suite('NewTabPageAppTest', () => {
     });
   });
 
-  suite('Promo', () => {
-    test('can show promo with browser command', async () => {
-      const promoBrowserCommandHandler = installMock(
-          CommandHandlerRemote,
-          mock => BrowserCommandProxy.getInstance().handler = mock);
-      promoBrowserCommandHandler.setPromiseResolveFor(
-          'canExecuteCommand', {canExecute: true});
-
-      const commandId = 123;  // Unsupported command.
-      window.dispatchEvent(new MessageEvent('message', {
-        data: {
-          frameType: 'one-google-bar',
-          messageType: 'can-show-promo-with-browser-command',
-          commandId,
-        },
-        source: window,
-        origin: window.origin,
-      }));
-
-      // Make sure the command is sent to the browser.
-      const expectedCommandId =
-          await promoBrowserCommandHandler.whenCalled('canExecuteCommand');
-      // Unsupported commands get resolved to the default command before being
-      // sent to the browser.
-      assertEquals(Command.kUnknownCommand, expectedCommandId);
-
-      // Make sure the promo frame gets notified whether the promo can be shown.
-      const {data} = await eventToPromise('message', window);
-      assertEquals('can-show-promo-with-browser-command', data.messageType);
-      assertTrue(data[commandId]);
-    });
-
-    test('executes promo browser command', async () => {
-      const promoBrowserCommandHandler = installMock(
-          CommandHandlerRemote,
-          mock => BrowserCommandProxy.getInstance().handler = mock);
-      promoBrowserCommandHandler.setPromiseResolveFor(
-          'executeCommand', {commandExecuted: true});
-
-      const commandId = 123;  // Unsupported command.
-      const clickInfo = {middleButton: true};
-      window.dispatchEvent(new MessageEvent('message', {
-        data: {
-          frameType: 'one-google-bar',
-          messageType: 'execute-browser-command',
-          data: {
-            commandId,
-            clickInfo,
-          },
-        },
-        source: window,
-        origin: window.origin,
-      }));
-
-      // Make sure the command and click information are sent to the browser.
-      const [expectedCommandId, expectedClickInfo] =
-          await promoBrowserCommandHandler.whenCalled('executeCommand');
-      // Unsupported commands get resolved to the default command before being
-      // sent to the browser.
-      assertEquals(Command.kUnknownCommand, expectedCommandId);
-      assertEquals(clickInfo, expectedClickInfo);
-
-      // Make sure the promo frame gets notified whether the command was
-      // executed.
-      const {data: commandExecuted} = await eventToPromise('message', window);
-      assertTrue(commandExecuted);
-    });
-  });
-
   suite('Clicks', () => {
     suiteSetup(() => {
       loadTimeData.overrideValues({
@@ -725,10 +524,8 @@ suite('NewTabPageAppTest', () => {
 
     ([
       ['#content', NtpElement.BACKGROUND],
-      ['ntp-logo', NtpElement.LOGO],
       ['ntp-searchbox', NtpElement.REALBOX],
       ['cr-most-visited', NtpElement.MOST_VISITED],
-      ['ntp-middle-slot-promo', NtpElement.MIDDLE_SLOT_PROMO],
       ['#modules', NtpElement.MODULE],
     ] as Array<[string, NtpElement]>)
         .forEach(([selector, element]) => {
@@ -751,42 +548,17 @@ suite('NewTabPageAppTest', () => {
       assertEquals(
           1, metrics.count('NewTabPage.Click', NtpElement.CUSTOMIZE_BUTTON));
     });
-
-    test('clicking OGB records click', () => {
-      // Act.
-      window.dispatchEvent(new MessageEvent('message', {
-        data: {
-          frameType: 'one-google-bar',
-          messageType: 'click',
-        },
-      }));
-
-      // Assert.
-      assertEquals(1, metrics.count('NewTabPage.Click'));
-      assertEquals(
-          1, metrics.count('NewTabPage.Click', NtpElement.ONE_GOOGLE_BAR));
-    });
   });
 
   function modulesCommonTests(modulesElementTag: string) {
-    test('promo and modules coordinate', async () => {
+    test('modules are shown once loaded', async () => {
       // Arrange.
       loadTimeData.overrideValues({navigationStartTime: 0.0});
       windowProxy.setResultFor('now', 123.0);
-      const middleSlotPromo = $$(app, 'ntp-middle-slot-promo');
-      assertTrue(!!middleSlotPromo);
       const modules = $$(app, modulesElementTag)!;
       assertTrue(!!modules);
 
       // Assert.
-      assertStyle(middleSlotPromo, 'display', 'none');
-      assertStyle(modules, 'display', 'none');
-
-      // Act.
-      middleSlotPromo.dispatchEvent(new Event('ntp-middle-slot-promo-loaded'));
-
-      // Assert.
-      assertStyle(middleSlotPromo, 'display', 'none');
       assertStyle(modules, 'display', 'none');
 
       // Act.
@@ -794,7 +566,6 @@ suite('NewTabPageAppTest', () => {
       await microtasksFinished();
 
       // Assert.
-      assertNotStyle(middleSlotPromo, 'display', 'none');
       assertNotStyle(modules, 'display', 'none');
       assertEquals(1, metrics.count('NewTabPage.Modules.ShownTime'));
       assertEquals(1, metrics.count('NewTabPage.Modules.ShownTime', 123));
@@ -1575,168 +1346,6 @@ suite('NewTabPageAppTest', () => {
     });
   });
 
-  suite('VoiceSearchAndSpeechRecognition', () => {
-    interface SpeechRecognitionAlternative {
-      transcript: string;
-      confidence: number;
-    }
-
-    interface SpeechRecognitionResult {
-      isFinal: boolean;
-      0: SpeechRecognitionAlternative;
-    }
-
-    interface SpeechRecognitionEvent {
-      results: SpeechRecognitionResult[];
-      resultIndex: number;
-    }
-
-    interface MockSpeechRecognitionErrorEvent {
-      error: string;
-    }
-
-    interface WindowWithSpeech {
-      webkitSpeechRecognition: unknown;
-    }
-
-    let originalSpeechRecognition: unknown;
-    let mockSpeechRecognition: MockSpeechRecognition;
-
-    class MockSpeechRecognition {
-      voiceSearchInProgress: boolean = false;
-      onresult:
-          ((this: MockSpeechRecognition,
-            ev: SpeechRecognitionEvent) => void)|null = null;
-      onend: (() => void)|null = null;
-      onaudiostart:
-          ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
-      onspeechstart:
-          ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
-      onnomatch:
-          ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
-      onerror:
-          ((this: MockSpeechRecognition,
-            ev: MockSpeechRecognitionErrorEvent) => void)|null = null;
-      interimResults = true;
-      continuous = false;
-
-      constructor() {
-        mockSpeechRecognition = this;
-      }
-
-      start() {
-        this.voiceSearchInProgress = true;
-      }
-
-      stop() {
-        this.voiceSearchInProgress = false;
-      }
-
-      abort() {
-        this.voiceSearchInProgress = false;
-        if (this.onend) {
-          setTimeout(() => this.onend!(), 0);
-        }
-      }
-    }
-
-    setup(() => {
-      const win = window as unknown as WindowWithSpeech;
-      originalSpeechRecognition = win.webkitSpeechRecognition;
-      win.webkitSpeechRecognition = MockSpeechRecognition;
-
-    });
-
-    teardown(() => {
-      const win = window as unknown as WindowWithSpeech;
-      win.webkitSpeechRecognition = originalSpeechRecognition;
-    });
-
-    test(
-        'dynamicTimeoutEnabled = true configures speech recognition and ' +
-            'disables idle timer',
-        async () => {
-          loadTimeData.overrideValues({
-            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
-          });
-          await recreateApp();
-
-          windowProxy.resetResolver('setTimeout');
-          windowProxy.reset();
-
-          // Open voice search dialog.
-          const searchbox = $$(app, '#searchbox');
-          assertTrue(!!searchbox);
-          searchbox.dispatchEvent(new Event('open-voice-search'));
-          await microtasksFinished();
-
-          // Verify speech recognition continuous property is false.
-          assertFalse(mockSpeechRecognition.continuous);
-
-          // Verify setTimeout is NOT called for idle timeout (only called for
-          // outside click listener registration).
-          const setTimeoutCalls = windowProxy.getArgs('setTimeout');
-          const has8000Timeout = setTimeoutCalls.some(
-              (args: [unknown, number]) => args[1] === 8000);
-          assertFalse(
-              has8000Timeout,
-              'Should not start idle timer when dynamicTimeout is enabled');
-        });
-
-    // TODO(crbug.com/527969922): Re-enable this test
-    test.skip('Activation via mic click with experiment disabled', async () => {
-      loadTimeData.overrideValues({
-        voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
-        voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
-      });
-      await recreateApp();
-
-      metrics = fakeMetricsPrivate();
-
-      // Act: Open voice search dialog.
-      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
-      await microtasksFinished();
-
-      // Assert: Logs original legacy metrics, does NOT log new metrics.
-      assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
-      assertEquals(
-          1, metrics.count(VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE));
-      assertEquals(0, metrics.count('VoiceSearch.Action'));
-      assertEquals(0, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
-    });
-
-    // TODO(crbug.com/527969922): Re-enable this test
-    test.skip(
-        'Activation via keyboard shortcut with experiment disabled',
-        async () => {
-          loadTimeData.overrideValues({
-            voiceSearchCoherenceAnySearchboxExperimentEnabled: false,
-            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
-          });
-          await recreateApp();
-
-          metrics = fakeMetricsPrivate();
-
-          // Act: Press shortcut keys.
-          window.dispatchEvent(new KeyboardEvent('keydown', {
-            ctrlKey: true,
-            shiftKey: true,
-            code: 'Period',
-          }));
-          await microtasksFinished();
-
-          // Assert: Logs original legacy metrics, does NOT log new metrics.
-          assertEquals(1, metrics.count(VOICE_ACTIONS_METRIC));
-          assertEquals(
-              1,
-              metrics.count(
-                  VOICE_ACTIONS_METRIC, VoiceAction.ACTIVATE_KEYBOARD));
-          assertEquals(0, metrics.count('VoiceSearch.Action'));
-          assertEquals(0, metrics.count('VoiceSearch.Action.NTP_REALBOX'));
-        });
-
-  });
-
   suite('EnergyEffectVariant', () => {
     ['energy-effect-original',
      'energy-effect-darker-shadow',
@@ -1751,146 +1360,5 @@ suite('NewTabPageAppTest', () => {
               await recreateApp();
               assertEquals(variant, app.getAttribute('energy-effect-variant_'));
             }));
-  });
-});
-
-suite('NewTabPageAppReducedMotionTest', () => {
-  suiteSetup(() => {
-    loadTimeData.overrideValues({
-      ntpRealboxNextEnabled: true,
-      ntpNextFeaturesEnabled: true,
-      energyEffectAnimationEnabled: false,
-    });
-  });
-
-  let app: AppElement;
-  let windowProxy: TestMock<WindowProxy>;
-  let handler: TestMock<PageHandlerRemote>;
-  let backgroundManager: TestMock<BackgroundManager>;
-  let searchboxHandler: TestMock<SearchboxPageHandlerRemote>;
-  let moduleRegistry: TestMock<ModuleRegistry>;
-  let moduleResolver: PromiseResolver<Module[]>;
-
-  const url: URL = new URL(location.href);
-  const backgroundImageLoadTime: number = 123;
-
-  function createSetup() {
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    windowProxy =
-        installMock(WindowProxy, (mock) => WindowProxy.setInstance(mock));
-    windowProxy.setResultFor('waitForLazyRender', Promise.resolve());
-    windowProxy.setResultFor('createIframeSrc', '');
-    windowProxy.setResultFor('now', new Date());
-    windowProxy.setResultFor('url', url);
-    windowProxy.setResultFor('matchMedia', {
-      matches: false,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      addListener: () => {},
-      removeListener: () => {},
-    });
-    handler = installMock(
-        PageHandlerRemote,
-        mock => NewTabPageProxy.setInstance(mock, new PageCallbackRouter()));
-    handler.setResultFor('getMostVisitedSettings', Promise.resolve({
-      customLinksEnabled: false,
-      shortcutsVisible: false,
-    }));
-    handler.setResultFor('getDoodle', Promise.resolve({
-      doodle: null,
-    }));
-    handler.setResultFor('getModulesIdNames', Promise.resolve({data: []}));
-    handler.setResultFor('getModulesEligibleForRemoval', Promise.resolve({
-      moduleIds: [],
-    }));
-    handler.setResultFor('getModulesOrder', Promise.resolve({moduleIds: []}));
-    backgroundManager = installMock(
-        BackgroundManager, (mock) => BackgroundManager.setInstance(mock));
-    backgroundManager.setResultFor(
-        'getBackgroundImageLoadTime', Promise.resolve(backgroundImageLoadTime));
-    moduleRegistry =
-        installMock(ModuleRegistry, (mock) => ModuleRegistry.setInstance(mock));
-    moduleResolver = new PromiseResolver();
-    moduleRegistry.setResultFor('initializeModules', moduleResolver.promise);
-      searchboxHandler = installMock(SearchboxPageHandlerRemote, mock => {
-        SearchboxBrowserProxy.getInstance().handler = mock;
-      });
-    searchboxHandler.setResultFor('getRecentTabs', Promise.resolve({tabs: []}));
-    searchboxHandler.setResultFor(
-        'getPageClassification',
-        Promise.resolve({metricSource: 'NTP_REALBOX'}));
-    searchboxHandler.setResultFor(
-        'getSmartTabSharingActive', Promise.resolve({active: false}));
-  }
-
-  async function createAndAppendApp() {
-    app = document.createElement('ntp-app');
-    document.body.appendChild(app);
-    await microtasksFinished();
-  }
-
-  function setReducedMotionPreference(reducedMotionPreferred: boolean) {
-    if (reducedMotionPreferred) {
-      document.documentElement.style.setProperty(
-          '--cr-animations-disabled', '1');
-    } else {
-      document.documentElement.style.removeProperty('--cr-animations-disabled');
-    }
-  }
-
-  suite('ReducedMotionScrim', () => {
-    setup(createSetup);
-
-    test(
-        'scrim transition is none when reduced motion is preferred',
-        async () => {
-          setReducedMotionPreference(true);
-          await createAndAppendApp();
-          await microtasksFinished();
-
-          const scrim = app.shadowRoot.querySelector('#scrim')!;
-          assertStyle(scrim, 'transition-property', 'none');
-        });
-
-    test(
-        'scrim transition is not none when reduced motion is not preferred',
-        async () => {
-          setReducedMotionPreference(false);
-          await createAndAppendApp();
-          await microtasksFinished();
-
-          const scrim = app.shadowRoot.querySelector('#scrim')!;
-          assertNotStyle(scrim, 'transition-property', 'none');
-        });
-  });
-
-  suite('ReducedMotionModules', () => {
-    setup(() => {
-      loadTimeData.overrideValues({
-        modulesEnabled: true,
-      });
-      createSetup();
-    });
-
-    [false, true].forEach(preferred => {
-      test(
-          `modules animation is ${
-              preferred ? '' : 'not '}none when reduced motion is ${
-              preferred ? '' : 'not '}preferred`,
-          async () => {
-            setReducedMotionPreference(preferred);
-            await createAndAppendApp();
-
-            const modules = app.shadowRoot.querySelector('ntp-modules')!;
-            modules.dispatchEvent(
-                new CustomEvent('modules-loaded', {detail: 1}));
-            await microtasksFinished();
-
-            const assertion_fn = preferred ? assertStyle : assertNotStyle;
-            assertion_fn(
-                app.shadowRoot.querySelector('#modules')!, 'animation-name',
-                'none');
-          });
-    });
   });
 });
