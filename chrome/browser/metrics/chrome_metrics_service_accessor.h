@@ -85,10 +85,6 @@ namespace segmentation_platform {
 class FieldTrialRegisterImpl;
 }
 
-namespace feed {
-class FeedServiceDelegateImpl;
-}  // namespace feed
-
 namespace browser_sync {
 class DeviceInfoSyncClientImpl;
 }  // namespace browser_sync
@@ -166,7 +162,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class OptimizationGuideKeyedService;
   friend class optimization_guide::ChromeOnDeviceModelServiceController;
   friend class WebUITabStripFieldTrial;
-  friend class feed::FeedServiceDelegateImpl;
   friend class FirstRunService;
   friend class browser_sync::DeviceInfoSyncClientImpl;
   friend class HttpsFirstModeService;

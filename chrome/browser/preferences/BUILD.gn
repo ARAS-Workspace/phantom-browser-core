@@ -61,8 +61,6 @@ java_cpp_strings("java_pref_names_srcjar") {
     "//components/bookmarks/common/bookmark_pref_names.h",
     "//components/dom_distiller/core/pref_names.h",
     "//components/embedder_support/pref_names.h",
-    "//components/feed/core/common/pref_names.cc",
-    "//components/feed/core/shared_prefs/pref_names.cc",
     "//components/history/core/common/pref_names.cc",
     "//components/language/core/browser/pref_names.h",
     "//components/metrics/metrics_profile_pref_names.h",

@@ -138,7 +138,6 @@ source_set("impl") {
     "//components/content_settings/browser",
     "//components/crash/core/app",
     "//components/device_event_log",
-    "//components/feed:feature_list",
     "//components/heavy_ad_intervention",
     "//components/history/core/common",
     "//components/language/core/browser",

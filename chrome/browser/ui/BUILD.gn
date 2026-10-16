@@ -2823,10 +2823,6 @@ group("ui_public_dependencies") {
     "//ui/views",
     "//ui/views/controls/webview",
     "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
-
-    # TODO: Use //chrome/browser after fixing cyclic dependency.
-    "//components/feed/core/proto:proto_ios_shared_v2",
-    "//components/feed/core/proto:proto_v2",
   ]
   if (chrome_root_store_cert_management_ui) {
     public_deps += [ "//chrome/browser/resources/certificate_manager:mojom" ]

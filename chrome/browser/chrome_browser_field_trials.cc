@@ -21,7 +21,6 @@
 #include "chrome/browser/metrics/chrome_metrics_service_client.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
-#include "components/feed/feed_feature_list.h"
 #include "components/metrics/metrics_features.h"
 #include "components/metrics/metrics_pref_names.h"
 #include "components/metrics/persistent_histograms.h"

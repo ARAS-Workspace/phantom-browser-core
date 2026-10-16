@@ -126,7 +126,6 @@ source_set("tab_menu_impl") {
     "//chrome/browser/ui/send_tab_to_self",
     "//chrome/browser/ui/web_applications",
     "//chrome/browser/user_education",
-    "//components/feed:feature_list",
   ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

@@ -49,7 +49,6 @@ chrome/browser/autofill/android/junit/src/org/chromium/chrome/browser/autofill/e
 chrome/browser/chromeos/extensions/telemetry
 chrome/browser/download
 chrome/browser/extensions/commands
-chrome/browser/feed/android
 chrome/browser/first_run
 chrome/browser/mac
 chrome/browser/metrics

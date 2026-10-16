@@ -132,7 +132,6 @@ static_library("renderer") {
     "//components/continuous_search/renderer",
     "//components/country_codes",
     "//components/dom_distiller/content/renderer",
-    "//components/feed:feature_list",
     "//components/google/core/common",
     "//components/guest_view/buildflags",
     "//components/heap_profiling/in_process",

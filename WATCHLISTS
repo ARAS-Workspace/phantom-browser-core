@@ -1181,11 +1181,6 @@
                   'tools/metrics/histograms/metadata/feature_engagement/|' \
                   'tools/feature_engagement/',
     },
-    'feed': {
-      'filepath': 'chrome/android/feed|' \
-                  'chrome/browser/feed/|' \
-                  'components/feed/'
-    },
     'fileapi': {
       'filepath': 'file_system/|' \
                   'fileapi/'
@@ -2885,9 +2880,6 @@
     'extension': ['chromium-apps-reviews@chromium.org',
                   'extensions-reviews@chromium.org'],
     'feature_engagement': ['mschillaci+watchfet@google.com'],
-    'feed': ['harringtond+watch@chromium.org',
-             'petewil+watch@chromium.org',
-             'iwells+watch@chromium.org'],
     'fileapi': ['kinuko+fileapi@chromium.org'],
     'filebrowse': ['rginda+watch@chromium.org'],
     'filesapp': ['filesapp-reviews@chromium.org'],

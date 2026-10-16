@@ -28,10 +28,6 @@ after discussions on the right group.
       <annotation id="webapk_create"/>
       <annotation id="webapk_update"/>
     </sender>
-    <sender name="Feed Library">
-      <annotation id="interest_feedv2_send"/>
-      <annotation id="interest_feedv2_image_send"/>
-    </sender>
   </group>
   <group name="ChromeOS" hidden="true">
     <sender name="ChromeOS Unsorted"/>
