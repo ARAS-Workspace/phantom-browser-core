@@ -366,7 +366,6 @@ test("components_unittests") {
       "//components/page_load_metrics/browser:unit_tests",
       "//components/page_load_metrics/browser/observers/ad_metrics:unit_tests",
       "//components/page_load_metrics/common:unit_tests",
-      "//components/page_load_metrics/google/browser:unit_tests",
       "//components/page_load_metrics/renderer:unit_tests",
       "//components/paint_preview/browser:unit_tests",
       "//components/paint_preview/common:unit_tests",

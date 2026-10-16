@@ -7,7 +7,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/page_load_metrics/chrome_initiator_location.h"
 #include "components/page_load_metrics/browser/navigation_handle_user_data.h"
-#include "components/page_load_metrics/google/browser/google_url_util.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/base/page_transition_types.h"
@@ -15,8 +14,6 @@
 namespace {
 
 void RecordInitiatorMetrics(content::NavigationHandle& navigation_handle) {
-  bool is_srp =
-      page_load_metrics::IsGoogleSearchResultUrl(navigation_handle.GetURL());
   auto* navigation_handle_user_data =
       page_load_metrics::NavigationHandleUserData::GetForNavigationHandle(
           navigation_handle);
@@ -51,10 +48,6 @@ void RecordInitiatorMetrics(content::NavigationHandle& navigation_handle) {
 
   base::UmaHistogramEnumeration("Navigation.InitiatorType.All",
                                 initiator_location);
-  if (is_srp) {
-    base::UmaHistogramEnumeration("Navigation.InitiatorType.SRP",
-                                  initiator_location);
-  }
 }
 
 }  // namespace

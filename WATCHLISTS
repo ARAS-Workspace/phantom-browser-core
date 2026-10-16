@@ -1782,8 +1782,7 @@
       'filepath': '/page_load_metrics/'
     },
     'page_load_metrics_abandoned_navigations': {
-      'filepath': 'chrome/browser/page_load_metrics/observers/gws_abandoned_page_load_metrics_observer.(cc|h)$|' \
-                  'components/page_load_metrics/browser/observers/abandoned_page_load_metrics_observer.(cc|h)$'
+      'filepath': 'components/page_load_metrics/browser/observers/abandoned_page_load_metrics_observer.(cc|h)$'
     },
     'page_zoom': {
       'filepath': 'host_zoom' \

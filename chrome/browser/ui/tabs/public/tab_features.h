@@ -42,7 +42,6 @@ class CommitLimitOOMRecoveryTracker;
 class CookieControlsPageActionController;
 class FileSystemAccessPageActionController;
 class FocusTabAfterNavigationHelper;
-class FromGWSNavigationAndKeepAliveRequestObserver;
 class HttpAuthCacheStatus;
 class IntentPickerViewPageActionController;
 class MemorySaverChipTabHelper;
@@ -354,9 +353,6 @@ class TabFeatures {
   // navigations.
   std::unique_ptr<FocusTabAfterNavigationHelper>
       focus_tab_after_navigation_helper_;
-
-  std::unique_ptr<FromGWSNavigationAndKeepAliveRequestObserver>
-      from_gws_navigation_and_keep_alive_request_observer_;
 
   // Records use counters for cross-partition subresource loads that used
   // server HTTP auth.

@@ -146,9 +146,6 @@ class PrerenderManager : public content::WebContentsObserver,
   PrewarmDecision ShouldPrewarm(GURL& prewarm_url);
   bool IsPrewarmValid();
 
-  void OnSearchPrewarmPrerenderNavigationHandle(
-      content::NavigationHandle& navigation_handle);
-
   void NotifySearchPrewarmFinished(content::PrerenderLifecycleStatus result);
 
   // content::PrerenderHandle::Observer:

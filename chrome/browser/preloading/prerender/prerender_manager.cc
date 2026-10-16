@@ -29,7 +29,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/page_load_metrics/browser/navigation_handle_user_data.h"
-#include "components/page_load_metrics/google/browser/prerender_prewarm_navigation_data.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/browser_thread.h"
@@ -300,9 +299,7 @@ bool PrerenderManager::MaybeStartPrewarmSearchResult() {
           [](const GURL& url, const std::optional<content::UrlMatchType>&) {
             return false;
           }),
-      base::BindRepeating(
-          &PrerenderManager::OnSearchPrewarmPrerenderNavigationHandle,
-          GetWeakPtr()),
+      /*prerender_navigation_handle_callback=*/{},
       /*allow_reuse=*/true);
 
   if (search_prewarm_handle_ && search_prewarm_handle_->IsValid() &&
@@ -582,18 +579,6 @@ bool PrerenderManager::IsPrewarmValid() {
     return search_prewarm_handle_ && search_prewarm_handle_->IsValid();
   }
   return search_prewarm_handle_ != nullptr;
-}
-
-void PrerenderManager::OnSearchPrewarmPrerenderNavigationHandle(
-    content::NavigationHandle& navigation_handle) {
-  // Set the PrerenderPrewarmNavigationData for the navigation. This is used to
-  // determine if a navigation is a DSE prewarm navigation, and if the
-  // navigation happened after a DSE prewarm. Note that `prerender_host_reused`
-  // is set to false here because this is a new navigation and we are not
-  // certain if this is a prerender navigation or not yet.
-  page_load_metrics::PrerenderPrewarmNavigationData::GetOrCreate(
-      &navigation_handle,
-      /*prewarm_committed=*/true);
 }
 
 PrerenderManager::PrerenderManager(content::WebContents* web_contents)

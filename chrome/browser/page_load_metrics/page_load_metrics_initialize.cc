@@ -25,14 +25,10 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/page_load_metrics/observers/bookmark_bar_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/captcha_metrics_observer.h"
-#include "chrome/browser/page_load_metrics/observers/chrome_gws_abandoned_page_load_metrics_observer.h"
-#include "chrome/browser/page_load_metrics/observers/chrome_gws_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/core/amp_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/core/ukm_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/document_write_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/foreground_duration_ukm_observer.h"
-#include "chrome/browser/page_load_metrics/observers/from_gws_page_load_metrics_observer.h"
-#include "chrome/browser/page_load_metrics/observers/gws_hp_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/https_engagement_metrics/https_engagement_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/javascript_frameworks_ukm_observer.h"
 #include "chrome/browser/page_load_metrics/observers/lcp_critical_path_predictor_page_load_metrics_observer.h"
@@ -58,6 +54,7 @@
 #include "components/page_load_metrics/browser/features.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 #include "components/page_load_metrics/browser/navigation_scenario.h"
+#include "components/page_load_metrics/browser/observers/abandoned_page_load_metrics_observer.h"
 #include "components/page_load_metrics/browser/observers/ad_metrics/ads_page_load_metrics_observer.h"
 #include "components/page_load_metrics/browser/observers/paid_content_page_load_metrics_observer.h"
 #include "components/page_load_metrics/browser/observers/preload_serving_metrics_page_load_metrics_observer.h"
@@ -65,8 +62,6 @@
 #include "components/page_load_metrics/browser/observers/zstd_page_load_metrics_observer.h"
 #include "components/page_load_metrics/browser/page_load_metrics_embedder_base.h"
 #include "components/page_load_metrics/browser/page_load_tracker.h"
-#include "components/page_load_metrics/google/browser/from_gws_abandoned_page_load_metrics_observer.h"
-#include "components/page_load_metrics/google/browser/gws_abandoned_page_load_metrics_observer.h"
 #include "content/public/browser/internal_webui_config.h"
 #include "content/public/browser/preload_serving_metrics_capsule.h"
 #include "content/public/browser/web_contents.h"
@@ -195,14 +190,7 @@ void PageLoadMetricsEmbedder::RegisterObservers(
     tracker->AddObserver(std::make_unique<AMPPageLoadMetricsObserver>());
     tracker->AddObserver(std::make_unique<JavascriptFrameworksUkmObserver>());
     tracker->AddObserver(std::make_unique<SchemePageLoadMetricsObserver>());
-    tracker->AddObserver(std::make_unique<FromGWSPageLoadMetricsObserver>());
-    tracker->AddObserver(std::make_unique<ChromeGWSPageLoadMetricsObserver>());
-    tracker->AddObserver(
-        std::make_unique<FromGWSAbandonedPageLoadMetricsObserver>());
     tracker->AddObserver(std::make_unique<AbandonedPageLoadMetricsObserver>());
-    tracker->AddObserver(
-        std::make_unique<ChromeGWSAbandonedPageLoadMetricsObserver>());
-    tracker->AddObserver(std::make_unique<GWSHpPageLoadMetricsObserver>());
     tracker->AddObserver(std::make_unique<ForegroundDurationUKMObserver>());
     tracker->AddObserver(
         std::make_unique<DocumentWritePageLoadMetricsObserver>());

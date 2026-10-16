@@ -45,7 +45,6 @@ source_set("impl") {
     "//chrome/browser/task_manager",
     "//chrome/browser/ui",
     "//components/page_load_metrics/browser",
-    "//components/page_load_metrics/google/browser",
     "//components/tabs:impl",
   ]
 

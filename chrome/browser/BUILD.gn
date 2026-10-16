@@ -1614,7 +1614,6 @@ source_set("browser") {
     "//components/page_load_metrics/browser",
     "//components/page_load_metrics/browser/observers/ad_metrics",
     "//components/page_load_metrics/common",
-    "//components/page_load_metrics/google/browser",
     "//components/paint_preview/buildflags",
     "//components/paint_preview/features",
     "//components/password_manager/content/browser",

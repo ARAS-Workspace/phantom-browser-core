@@ -12,7 +12,6 @@
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
-#include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_observer.h"
 #include "chrome/browser/multistep_filter/chrome_filter_navigation_observer.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 #include "chrome/browser/net/http_auth_cache_status.h"
@@ -292,10 +291,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
     search_engine_choice_tab_helper_ =
         std::make_unique<SearchEngineChoiceTabHelper>(tab.GetContents());
   }
-
-  from_gws_navigation_and_keep_alive_request_observer_ =
-      FromGWSNavigationAndKeepAliveRequestObserver::MaybeCreate(
-          tab.GetContents());
 
   resource_usage_helper_ =
       GetUserDataFactory().CreateInstance<TabResourceUsageTabHelper>(tab, tab);

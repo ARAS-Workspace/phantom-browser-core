@@ -1455,62 +1455,6 @@ TEST_P(AdsPageLoadMetricsObserverTest, NoHistogramWithoutCommit) {
                     .size());
 }
 
-TEST_P(AdsPageLoadMetricsObserverTest,
-       SubresourceFilterDisabled_NoAdsDetected) {
-  // Setup the subresource filter as disabled on all sites.
-  scoped_configuration().ResetConfiguration(subresource_filter::Configuration(
-      subresource_filter::mojom::ActivationLevel::kDisabled,
-      subresource_filter::ActivationScope::ALL_SITES,
-      subresource_filter::ActivationList::SUBRESOURCE_FILTER));
-
-  RenderFrameHost* main_frame = NavigateMainFrame(kNonAdUrl);
-  RenderFrameHost* ad_frame = CreateAndNavigateSubFrame(kAdUrl, main_frame);
-  ResourceDataUpdate(main_frame, ResourceCached::kNotCached, base::KiBU(10));
-  ResourceDataUpdate(ad_frame, ResourceCached::kNotCached, base::KiBU(10));
-
-  // Navigate again to trigger histograms.
-  NavigateFrame(kNonAdUrl, main_frame);
-
-  TestHistograms(histogram_tester(), test_ukm_recorder(),
-                 std::vector<ExpectedFrameBytes>(),
-                 /*non_ad_cached=*/base::KiBU(0),
-                 /*non_ad_uncached=*/base::KiBU(20));
-
-  // Verify that other UMA wasn't written.
-  histogram_tester().ExpectTotalCount(
-      "PageLoad.Clients.Ads.Bytes.AdFrames.Aggregate.Total", 0);
-}
-
-// Frames that are disallowed (and filtered) by the subresource filter should
-// not be counted.
-TEST_P(AdsPageLoadMetricsObserverTest, FilterAds_DoNotLogMetrics) {
-  // Setup the subresource filter in non-dryrun mode to trigger on a site.
-  scoped_configuration().ResetConfiguration(subresource_filter::Configuration(
-      subresource_filter::mojom::ActivationLevel::kEnabled,
-      subresource_filter::ActivationScope::ACTIVATION_LIST,
-      subresource_filter::ActivationList::SUBRESOURCE_FILTER));
-
-  NavigateMainFrame(kNonAdUrl);
-
-  ResourceDataUpdate(main_rfh(), ResourceCached::kNotCached, base::KiBU(10),
-                     /*mime_type=*/"", /*is_ad_resource=*/false);
-
-  RenderFrameHost* subframe = AppendChildFrame(main_rfh());
-  std::unique_ptr<NavigationSimulator> simulator =
-      CreateNavigationSimulator(kDefaultDisallowedUrl, subframe);
-  ResourceDataUpdate(subframe, ResourceCached::kNotCached, base::KiBU(10),
-                     /*mime_type=*/"", /*is_ad_resource=*/true);
-  simulator->Commit();
-
-  EXPECT_NE(content::NavigationThrottle::PROCEED,
-            simulator->GetLastThrottleCheckResult());
-
-  NavigateMainFrame(kNonAdUrl);
-
-  histogram_tester().ExpectTotalCount(
-      SuffixedHistogram("FrameCounts.AdFrames.Total"), 0);
-}
-
 // Per-frame histograms recorded when root ad frame is destroyed.
 TEST_P(AdsPageLoadMetricsObserverTest,
        FrameDestroyed_PerFrameHistogramsLogged) {

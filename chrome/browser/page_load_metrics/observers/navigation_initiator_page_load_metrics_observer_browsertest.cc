@@ -127,10 +127,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
       "Navigation.InitiatorType.All",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kNewTabPage)),
       1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kNewTabPage)),
-      0);
 }
 
 IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest, Basic) {
@@ -144,49 +140,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest, Basic) {
       MetricValue(
           page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
       1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      0);
-}
-
-IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
-                       SearchResultsPage) {
-  base::HistogramTester histogram_tester;
-
-  GURL url = embedded_test_server()->GetURL("www.google.com", "/search?q=test");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.All",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      1);
-}
-
-IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
-                       NonSearchResultsPage) {
-  base::HistogramTester histogram_tester;
-
-  GURL url = embedded_test_server()->GetURL("www.google.com", "/empty.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.All",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      0);
 }
 
 IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
@@ -214,10 +167,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
       "Navigation.InitiatorType.All",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
       1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
-      0);
 
   // Navigate away to flush PreloadServingMetrics.
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
@@ -250,10 +199,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
 
   histogram_tester.ExpectBucketCount(
       "Navigation.InitiatorType.All",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
-      1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
       1);
 
@@ -290,16 +235,7 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
           page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
       2);
   histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(
-          page_load_metrics::NavigationHandleUserData::kInitiatorLocationOther),
-      0);
-  histogram_tester.ExpectBucketCount(
       "Navigation.InitiatorType.All",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
-      0);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
       0);
 
@@ -320,7 +256,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
 
   // Metrics are collected for the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   GURL prerender_url =
       embedded_test_server()->GetURL("www.example.com", "/simple.html");
@@ -329,7 +264,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // Before activation, no metrics should be recorded for the prerendered page.
   // We should only see the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   // Activate via link click.
   content::TestActivationManager activation_manager(GetActiveWebContents(),
@@ -350,10 +284,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
       "Navigation.InitiatorType.All",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
       1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
-      0);
 
   // Navigate away to flush PreloadServingMetrics.
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
@@ -373,7 +303,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
 
   // Metrics are collected for the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   GURL prerender_url =
       embedded_test_server()->GetURL("www.google.com", "/search?q=test");
@@ -382,7 +311,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // Before activation, no metrics should be recorded for the prerendered page.
   // We should only see the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   // Activate via link click.
   content::TestActivationManager activation_manager(GetActiveWebContents(),
@@ -401,10 +329,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // navigations.
   histogram_tester.ExpectBucketCount(
       "Navigation.InitiatorType.All",
-      MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
-      1);
-  histogram_tester.ExpectBucketCount(
-      "Navigation.InitiatorType.SRP",
       MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kLinkClick)),
       1);
 
@@ -451,7 +375,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // Before activation, no metrics should be recorded for the prerendered page.
   // We should only see the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   // Activate.
   content::TestActivationManager activation_manager(GetActiveWebContents(),
@@ -467,7 +390,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // After activation, the metric should be recorded. We expect 2 total
   // navigations.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 2);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 }
 
 IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
@@ -492,7 +414,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
 
   // Metrics are collected for the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   GURL prerender_url =
       embedded_test_server()->GetURL("www.google.com", "/search?q=test");
@@ -517,7 +438,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // Before activation, no metrics should be recorded for the prerendered page.
   // We should only see the initial navigation.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 1);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 0);
 
   // Activate.
   content::TestActivationManager activation_manager(GetActiveWebContents(),
@@ -533,7 +453,6 @@ IN_PROC_BROWSER_TEST_F(NavigationInitiatorPageLoadMetricsBrowserTest,
   // After activation, the metric should be recorded. We expect 2 total
   // navigations.
   histogram_tester.ExpectTotalCount("Navigation.InitiatorType.All", 2);
-  histogram_tester.ExpectTotalCount("Navigation.InitiatorType.SRP", 1);
 }
 
 class NavigationInitiatorPageLoadMetricsBFCacheBrowserTest
@@ -589,11 +508,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         MetricValue(page_load_metrics::NavigationHandleUserData::
                         kInitiatorLocationOther),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(page_load_metrics::NavigationHandleUserData::
-                        kInitiatorLocationOther),
-        0);
   }
   content::RenderFrameHostWrapper rfh_a(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -614,11 +528,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         MetricValue(page_load_metrics::NavigationHandleUserData::
                         kInitiatorLocationOther),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(page_load_metrics::NavigationHandleUserData::
-                        kInitiatorLocationOther),
-        0);
   }
   content::RenderFrameHostWrapper rfh_b(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -639,10 +548,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
-        0);
   }
   content::RenderFrameHostWrapper rfh_a2(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -661,10 +566,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kForward)),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kForward)),
-        0);
   }
 
   {
@@ -676,9 +577,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
     histogram_tester.ExpectUniqueSample(
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kReload)), 1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kReload)), 0);
   }
 
   // Navigate away to flush PreloadServingMetrics.
@@ -713,11 +611,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         MetricValue(page_load_metrics::NavigationHandleUserData::
                         kInitiatorLocationOther),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(page_load_metrics::NavigationHandleUserData::
-                        kInitiatorLocationOther),
-        1);
   }
   content::RenderFrameHostWrapper rfh_srp(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -738,11 +631,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         MetricValue(page_load_metrics::NavigationHandleUserData::
                         kInitiatorLocationOther),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(page_load_metrics::NavigationHandleUserData::
-                        kInitiatorLocationOther),
-        0);
   }
   content::RenderFrameHostWrapper rfh_b(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -763,10 +651,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
-        1);
   }
   content::RenderFrameHostWrapper rfh_srp2(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -785,10 +669,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kForward)),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kForward)),
-        0);
   }
   content::RenderFrameHostWrapper rfh_b2(
       GetActiveWebContents()->GetPrimaryMainFrame());
@@ -807,10 +687,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
         "Navigation.InitiatorType.All",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
         1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kBackward)),
-        1);
   }
 
   {
@@ -821,9 +697,6 @@ IN_PROC_BROWSER_TEST_P(NavigationInitiatorPageLoadMetricsBFCacheBrowserTest,
 
     histogram_tester.ExpectUniqueSample(
         "Navigation.InitiatorType.All",
-        MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kReload)), 1);
-    histogram_tester.ExpectUniqueSample(
-        "Navigation.InitiatorType.SRP",
         MetricValue(GetInitiatorLocation(ChromeInitiatorLocation::kReload)), 1);
   }
 

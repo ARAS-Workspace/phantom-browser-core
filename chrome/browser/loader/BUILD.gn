@@ -3,13 +3,7 @@
 # found in the LICENSE file.
 
 source_set("loader") {
-  sources = [
-    "from_gws_navigation_and_keep_alive_request_observer.h",
-    "from_gws_navigation_and_keep_alive_request_tab_helper.h",
-    "from_gws_navigation_and_keep_alive_request_tracker.h",
-    "from_gws_navigation_and_keep_alive_request_tracker_factory.h",
-    "keep_alive_request_tracker.h",
-  ]
+  sources = [ "keep_alive_request_tracker.h" ]
   public_deps = [
     "//base",
     "//chrome/browser/profiles:profile",
@@ -27,19 +21,12 @@ source_set("loader") {
 }
 
 source_set("impl") {
-  sources = [
-    "from_gws_navigation_and_keep_alive_request_observer.cc",
-    "from_gws_navigation_and_keep_alive_request_tab_helper.cc",
-    "from_gws_navigation_and_keep_alive_request_tracker.cc",
-    "from_gws_navigation_and_keep_alive_request_tracker_factory.cc",
-    "keep_alive_request_tracker.cc",
-  ]
+  sources = [ "keep_alive_request_tracker.cc" ]
   deps = [
     ":loader",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/navigator",
     "//components/page_load_metrics/browser",
-    "//components/page_load_metrics/google/browser",
     "//services/metrics/public/cpp:metrics_cpp",
   ]
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
@@ -79,11 +66,7 @@ source_set("browser_tests") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "from_gws_navigation_and_keep_alive_request_observer_unittest.cc",
-    "from_gws_navigation_and_keep_alive_request_tracker_unittest.cc",
-    "keep_alive_request_tracker_unittest.cc",
-  ]
+  sources = [ "keep_alive_request_tracker_unittest.cc" ]
   deps = [
     ":impl",
     ":loader",

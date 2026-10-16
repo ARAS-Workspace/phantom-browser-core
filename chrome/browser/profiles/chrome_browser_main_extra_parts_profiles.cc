@@ -90,7 +90,6 @@
 #include "chrome/browser/language/accept_languages_service_factory.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/language/url_language_histogram_factory.h"
-#include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_tracker_factory.h"
 #include "chrome/browser/login_detection/login_detection_keyed_service_factory.h"
 #include "chrome/browser/lookalikes/lookalike_url_service_factory.h"
 #include "chrome/browser/manta/manta_service_factory.h"
@@ -564,7 +563,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   first_party_sets::FirstPartySetsPolicyServiceFactory::GetInstance();
   FirstRunServiceFactory::GetInstance();
   FontPrefChangeNotifierFactory::GetInstance();
-  FromGWSNavigationAndKeepAliveRequestTrackerFactory::GetInstance();
   GAIAInfoUpdateServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(gapis::kEnableGapis)) {
