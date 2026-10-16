@@ -43,7 +43,6 @@
 #include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_test_util.h"
 #include "chrome/browser/ui/test/test_browser_ui.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -84,14 +83,7 @@ using testing::Property;
 
 class AppMenuBrowserTest : public UiBrowserTest {
  public:
-  AppMenuBrowserTest() {
-    // Disable the comparison tables submenu.
-    // TODO(crbug.com/429347589): Clean up and update test to work by triggering
-    // disruptive notification revocation (or other SH feature).
-    scoped_feature_list_.InitWithFeatures(
-        {}, /*disabled_features=*/{
-            features::kSafetyHubDisruptiveNotificationRevocation});
-  }
+  AppMenuBrowserTest() = default;
 
   // UiBrowserTest:
   void ShowUi(const std::string& name) override;
@@ -121,7 +113,6 @@ class AppMenuBrowserTest : public UiBrowserTest {
  private:
   raw_ptr<Browser> browser_ = nullptr;
   std::optional<int> command_id_;
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 void AppMenuBrowserTest::ShowUi(const std::string& name) {
