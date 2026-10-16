@@ -3677,12 +3677,6 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/components/ntp_tiles/resources/internal': {
-      'url': Var('chrome_git') + '/chrome/components/ntp_tiles/resources.git' + '@' +
-        '48c257ae331a9c642af38b8f62cb2c789e2a7da6',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/components/optimization_guide/internal': {
       'url': Var('chrome_git') + '/chrome/components/optimization_guide.git' + '@' +
         '7c38b77a11e87c58f1cac9f609129766228b0259',

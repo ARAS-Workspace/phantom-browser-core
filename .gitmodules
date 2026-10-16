@@ -751,10 +751,6 @@
 	path = components/metrics/internal
 	url = https://chrome-internal.googlesource.com/chrome/components/metrics/internal
 	gclient-condition = checkout_src_internal
-[submodule "components/ntp_tiles/resources/internal"]
-	path = components/ntp_tiles/resources/internal
-	url = https://chrome-internal.googlesource.com/chrome/components/ntp_tiles/resources
-	gclient-condition = checkout_src_internal
 [submodule "components/optimization_guide/internal"]
 	path = components/optimization_guide/internal
 	url = https://chrome-internal.googlesource.com/chrome/components/optimization_guide

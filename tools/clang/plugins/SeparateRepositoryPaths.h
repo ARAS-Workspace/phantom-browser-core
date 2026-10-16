@@ -47,7 +47,6 @@ constexpr const char* const kSeparateRepositoryPaths[] = {
     "components/autofill/core/browser/form_parsing/internal_resources/",
     "components/crash/core/app/internal/",
     "components/metrics/internal/",
-    "components/ntp_tiles/resources/internal/",
     "components/optimization_guide/internal/",
     "components/resources/default_100_percent/google_chrome/",
     "components/resources/default_200_percent/google_chrome/",

@@ -95,7 +95,6 @@ per-file components/autofill/core/browser/form_parsing/internal_resources=*
 per-file components/autofill/core/browser/geo/chrome_alternative_state_name_maps=*
 per-file components/crash/core/app/internal=*
 per-file components/metrics/internal=*
-per-file components/ntp_tiles/resources/internal=*
 per-file components/optimization_guide/internal=*
 per-file components/personal_context/core/resources/internal=*
 per-file components/plus_addresses/core/browser/resources/internal=*
