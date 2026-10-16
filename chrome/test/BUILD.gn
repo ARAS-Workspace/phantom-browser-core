@@ -890,8 +890,6 @@ test("browser_tests") {
     "//chrome/browser/enterprise:browser_tests",
     "//chrome/browser/enterprise/browser_management:browser_tests",
     "//chrome/browser/enterprise/browser_management:management_identity",
-    "//chrome/browser/error_reporting:browser_tests",
-    "//chrome/browser/error_reporting:test_support",
     "//chrome/browser/extensions",
     "//chrome/browser/external_protocol",
     "//chrome/browser/favicon",
@@ -1037,9 +1035,6 @@ test("browser_tests") {
     "//chrome/browser/storage_access_api",
     "//chrome/browser/storage_access_api:browser_tests",
     "//chrome/browser/subresource_filter:browser_tests",
-    "//chrome/browser/support_tool",
-    "//chrome/browser/support_tool:browser_tests",
-    "//chrome/browser/support_tool:support_tool_proto",
     "//chrome/browser/sync",
     "//chrome/browser/sync:browser_tests",
     "//chrome/browser/sync/test/integration:sync_integration_test_support",
@@ -1834,8 +1829,6 @@ test("browser_tests") {
       "//chrome/browser/search_engine_choice:browser_tests",
     ]
   }
-
-  deps += [ "//chrome/browser/ui/webui/support_tool:browser_tests" ]
 
   if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/views/hats" ]
@@ -3520,7 +3513,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
     "//chrome/browser/ui/webui/settings",
     "//chrome/browser/ui/webui/signin:unit_tests",
-    "//chrome/browser/ui/webui/support_tool:unit_tests",
     "//chrome/browser/ui/webui/util:unit_tests",
     "//chrome/browser/ui/webui/version",
     "//chrome/browser/ui/webui/webui_toolbar",
@@ -3604,7 +3596,6 @@ test("unit_tests") {
     "//chrome/browser/companion/text_finder:unit_tests",
     "//chrome/browser/content_settings:unit_tests",
     "//chrome/browser/context_hub",
-    "//chrome/browser/error_reporting:unit_test",
     "//chrome/browser/image_editor:image_editor_component_util",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/importer:unit_tests",
@@ -3624,9 +3615,6 @@ test("unit_tests") {
     "//chrome/browser/search/background",
     "//chrome/browser/search_engine_choice:unit_tests",
     "//chrome/browser/sensor:unit_tests",
-    "//chrome/browser/support_tool",
-    "//chrome/browser/support_tool:support_tool_proto",
-    "//chrome/browser/support_tool:unit_tests",
     "//chrome/browser/task_manager",
     "//chrome/browser/task_manager:unit_tests",
     "//chrome/browser/themes",

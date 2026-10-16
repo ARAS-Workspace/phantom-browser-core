@@ -160,7 +160,6 @@
 -SitePerProcessWebViewTest.ContentScript/InnerWebContents
 -SitePerProcessWebViewTest.ContentScript/MPArch
 -SSLUITest.BadCertFollowedByGoodCert
--SupportToolTest.All
 -TabModalConfirmDialogTest.Accept
 -TabRestoreTest.RestoreTabFromClosedWindowByID
 -TabStatsTrackerBrowserTest.TabSwitch

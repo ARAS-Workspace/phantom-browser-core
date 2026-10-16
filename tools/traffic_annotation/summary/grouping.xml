@@ -370,9 +370,7 @@ after discussions on the right group.
       <annotation id="omaha_client_android_uc"/>
       <annotation id="update_client"/>
     </sender>
-    <sender name="Crash Reports">
-      <annotation id="javascript_report_error"/>
-    </sender>
+    <sender name="Crash Reports"/>
     <sender name="Chrome Performance, Feedback, and Usage Statistics">
       <annotation id="chrome_feedback_report_app"/>
       <annotation id="metrics_report_ukm"/>

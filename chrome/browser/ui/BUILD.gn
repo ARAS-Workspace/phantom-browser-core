@@ -1204,7 +1204,6 @@ static_library("ui") {
     "//chrome/browser/reading_list",
     "//chrome/browser/regional_capabilities",
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-    "//chrome/browser/support_tool",
     "//chrome/browser/tab_group_sync:utils",
     "//chrome/browser/themes",
     "//chrome/browser/ui/apps",

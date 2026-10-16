@@ -102,7 +102,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://signin-internals",
       "chrome://site-engagement",
       "chrome://subresource-filter-internals",
-      "chrome://support-tool",
       "chrome://sync-internals",
       "chrome://system",
       "chrome://tab-search.top-chrome",

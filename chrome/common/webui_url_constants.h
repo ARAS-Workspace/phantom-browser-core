@@ -261,7 +261,6 @@ inline constexpr char kChromeUISplitViewNewTabPageURL[] =
 inline constexpr char kChromeUISubresourceFilterInternalsHost[] =
     "subresource-filter-internals";
 inline constexpr char kChromeUISuggestInternalsHost[] = "suggest-internals";
-inline constexpr char kChromeUISupportToolHost[] = "support-tool";
 inline constexpr char kChromeUISyncConfirmationHost[] = "sync-confirmation";
 inline constexpr char kChromeUISyncConfirmationLoadingPath[] = "loading";
 inline constexpr char kChromeUISyncConfirmationURL[] =

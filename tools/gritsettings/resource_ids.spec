@@ -660,10 +660,7 @@
     "META": {"sizes": {"includes": [10]}},
     "includes": [5000],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/support_tool/resources.grd": {
-    "META": {"sizes": {"includes": [30]}},
-    "includes": [5020],
-  }, "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/tab_group_home/resources.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/tab_group_home/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [5030],
   },

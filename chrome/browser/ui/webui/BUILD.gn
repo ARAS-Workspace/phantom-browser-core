@@ -169,7 +169,6 @@ source_set("configs") {
   deps += [
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/downloads",
-    "//chrome/browser/ui/webui/support_tool",
     "//chrome/browser/ui/webui/system",
     "//chrome/browser/ui/webui/user_education_internals",
     "//chrome/browser/ui/webui/webui_gallery",

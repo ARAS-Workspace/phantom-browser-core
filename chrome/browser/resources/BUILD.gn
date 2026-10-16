@@ -63,7 +63,6 @@ group("resources") {
     "side_panel/shared:resources",
     "side_panel/tabs_from_other_devices:resources",
     "signin:resources",
-    "support_tool:resources",
     "tab_group_home:resources",
     "tab_search:resources",
     "webnn_internals:resources",

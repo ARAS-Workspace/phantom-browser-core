@@ -39,7 +39,7 @@ void SetCrashReporterClient(CrashReporterClient* client);
 // On Windows, the CrashReporterClient lives in chrome_elf.dll. Unless you are
 // in chrome_elf.dll, this function will returns nullptr. If you want to access
 // the client data from outside of the component, use functions in
-// crash_export_thunks.h (Windows-only) or client_upload_info.h (all platforms).
+// crash_export_thunks.h (Windows-only).
 CrashReporterClient* GetCrashReporterClient();
 #endif
 

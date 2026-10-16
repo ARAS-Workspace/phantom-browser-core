@@ -163,7 +163,6 @@
 #include "ui/message_center/message_center.h"
 
 #include "chrome/browser/devtools/devtools_auto_opener.h"
-#include "chrome/browser/error_reporting/chrome_js_error_report_processor.h"
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/resource_coordinator/tab_manager.h"
@@ -1217,7 +1216,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
       ChromePluginServiceFilter::GetInstance());
 #endif  // BUILDFLAG(ENABLE_PLUGINS)
 
-  ChromeJsErrorReportProcessor::Create();
   storage_monitor::StorageMonitor::Create();
 
   features_->PreMainMessageLoopRun();
