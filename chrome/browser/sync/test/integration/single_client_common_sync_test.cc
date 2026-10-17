@@ -18,14 +18,12 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/committed_all_nudged_changes_checker.h"
-#include "chrome/browser/sync/test/integration/reading_list_helper.h"
 #include "chrome/browser/sync/test/integration/send_tab_to_self_helper.h"
 #include "chrome/browser/sync/test/integration/sync_integration_test_util.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
@@ -39,9 +37,6 @@
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/policy/policy_constants.h"
-#include "components/reading_list/core/dual_reading_list_model.h"
-#include "components/reading_list/core/mock_reading_list_model_observer.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_prefs.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -551,49 +546,22 @@ class SingleClientFeatureToTransportSyncTest : public SyncTest {
     SyncTest::OnProfileCreationStarted(profile);
   }
 
-  bool SetupClients() override {
-    if (!SyncTest::SetupClients()) {
-      return false;
-    }
-
-    reading_list_helper::WaitForReadingListModelLoaded(reading_list_model());
-    return true;
-  }
-
   SyncTest::SetupSyncMode GetSetupSyncMode() const override {
     return SetupSyncMode::kSyncTheFeature;
   }
 
-  reading_list::DualReadingListModel* reading_list_model() {
-    return static_cast<reading_list::DualReadingListModel*>(
-        ReadingListModelFactory::GetForBrowserContext(GetProfile(0)));
-  }
-
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
-
- protected:
-  const GURL kUrl{"https://url.com/"};
 };
 
 IN_PROC_BROWSER_TEST_F(SingleClientFeatureToTransportSyncTest,
                        PRE_ShouldFixBadMetadata) {
-  fake_server_->InjectEntity(
-      reading_list_helper::CreateTestReadingListEntity(kUrl, "Title"));
-
   ASSERT_TRUE(SetupSync());
   ASSERT_TRUE(GetSyncService(0)->IsSyncFeatureActive());
 
-  // The ReadingList entry is in the local-or-syncable model.
-  ASSERT_EQ(reading_list_model()->size(), 1ul);
-  ASSERT_EQ(reading_list_model()->GetStorageStateForURLForTesting(kUrl),
-            reading_list::DualReadingListModel::StorageStateForTesting::
-                kExistsInLocalOrSyncableModelOnly);
-  // Note: Sync metadata now exists in the local-or-syncable model.
-
-  // Similarly for bookmarks: Even though no actual bookmarks were downloaded,
-  // the local-or-syncable model is now tracking metadata. (Depending on feature
-  // flags, the account model may or may not exist.)
+  // Even though no actual bookmarks were downloaded, the local-or-syncable
+  // bookmark model is now tracking metadata. (Depending on feature flags, the
+  // account model may or may not exist.)
   ASSERT_TRUE(
       LocalOrSyncableBookmarkSyncServiceFactory::GetForProfile(GetProfile(0))
           ->IsTrackingMetadata());
@@ -613,19 +581,9 @@ IN_PROC_BROWSER_TEST_F(SingleClientFeatureToTransportSyncTest,
   ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
   ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());
 
-  ASSERT_EQ(reading_list_model()->size(), 1ul);
-
-  // Verify that the URL is marked as needing upload. Most importantly, this
-  // call would CHECK-crash if both models were tracking metadata, so this
-  // serves as verification that the Sync-the-feature mode metadata was cleaned
-  // up.
-  const base::flat_set<GURL> urls_to_upload =
-      reading_list_model()->GetKeysThatNeedUploadToSyncServer();
-  EXPECT_FALSE(urls_to_upload.empty());
-
-  // Similarly for bookmarks: The local-or-syncable model's metadata should have
-  // been cleared. (The account model may or may not be active and tracking
-  // metadata now, depending on feature flags.)
+  // The local-or-syncable bookmark model's metadata should have been cleared.
+  // (The account model may or may not be active and tracking metadata now,
+  // depending on feature flags.)
   EXPECT_FALSE(
       LocalOrSyncableBookmarkSyncServiceFactory::GetForProfile(GetProfile(0))
           ->IsTrackingMetadata());
@@ -638,9 +596,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientFeatureToTransportSyncTest,
   histograms.ExpectBucketCount(
       "Sync.ClearMetadataWhileStopped",
       syncer::DataTypeHistogramValue(syncer::PASSWORDS), 1);
-  histograms.ExpectBucketCount(
-      "Sync.ClearMetadataWhileStopped",
-      syncer::DataTypeHistogramValue(syncer::READING_LIST), 1);
   histograms.ExpectBucketCount(
       "Sync.ClearMetadataWhileStopped",
       syncer::DataTypeHistogramValue(syncer::AUTOFILL_WALLET_DATA), 1);
@@ -817,9 +772,6 @@ class SingleClientOldProgressMarkerSyncTest : public SyncTest {
   const GURL kBookmarkUrl1 = GURL("https://example1.com");
   const GURL kBookmarkUrl2 = GURL("https://example2.com");
   const GURL kBookmarkUrl3 = GURL("https://example3.com");
-  const GURL kReadingListUrl1 = GURL("https://readme1.com/");
-  const GURL kReadingListUrl2 = GURL("https://readme2.com/");
-  const GURL kReadingListUrl3 = GURL("https://readme3.com/");
 };
 
 IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
@@ -835,25 +787,10 @@ IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
   bookmark_model->AddURL(bookmark_model->account_bookmark_bar_node(), 0,
                          kBookmarkTitle2, kBookmarkUrl2);
 
-  // Add two reading list entries.
-  ReadingListModel* reading_list_model =
-      ReadingListModelFactory::GetForBrowserContext(GetProfile(0));
-  reading_list_model->AddOrReplaceEntry(kReadingListUrl1, "title1",
-                                        reading_list::ADDED_VIA_CURRENT_APP,
-                                        /*estimated_read_time=*/std::nullopt,
-                                        /*creation_time=*/std::nullopt);
-  reading_list_model->AddOrReplaceEntry(kReadingListUrl2, "title2",
-                                        reading_list::ADDED_VIA_CURRENT_APP,
-                                        /*estimated_read_time=*/std::nullopt,
-                                        /*creation_time=*/std::nullopt);
-
   // Wait for everything to arrive on the server.
   bookmarks_helper::ServerBookmarksEqualityChecker(
       {{kBookmarkTitle1, kBookmarkUrl1}, {kBookmarkTitle2, kBookmarkUrl2}},
       /*cryptographer=*/nullptr)
-      .Wait();
-  reading_list_helper::ServerReadingListURLsEqualityChecker(
-      {kReadingListUrl1, kReadingListUrl2})
       .Wait();
 
   // Pretend that the last poll happened long ago, so that after restart, a poll
@@ -873,19 +810,11 @@ IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
       CreateTombstone(syncer::BOOKMARKS, kBookmarkUuid1.AsLowercaseString()));
   GetFakeServer()->InjectEntity(bookmarks_helper::CreateBookmarkServerEntity(
       kBookmarkTitle3, kBookmarkUrl3));
-  // Same for the reading list entries: The first gets deleted, and a third gets
-  // added.
-  GetFakeServer()->InjectEntity(
-      CreateTombstone(syncer::READING_LIST, kReadingListUrl1.spec()));
-  GetFakeServer()->InjectEntity(
-      reading_list_helper::CreateTestReadingListEntity(kReadingListUrl3,
-                                                       "new title"));
 
   // The client is offline for so long that its progress markers are no longer
   // usable. This means the server will send a full update, with a "clear all"
   // GC directive, instead of a regular incremental update.
   GetFakeServer()->SetRejectOldProgressMarkerForType(syncer::BOOKMARKS);
-  GetFakeServer()->SetRejectOldProgressMarkerForType(syncer::READING_LIST);
 
   base::HistogramTester histograms;
 
@@ -900,12 +829,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
   bookmarks_helper::BookmarksUrlChecker(0, kBookmarkUrl2, 1).Wait();
   bookmarks_helper::BookmarksUrlChecker(0, kBookmarkUrl3, 1).Wait();
 
-  ReadingListModel* reading_list_model =
-      ReadingListModelFactory::GetForBrowserContext(GetProfile(0));
-  reading_list_helper::LocalReadingListURLsEqualityChecker(
-      reading_list_model, {kReadingListUrl2, kReadingListUrl3})
-      .Wait();
-
   // Verify via histograms that the server indeed sent a full update, not an
   // incremental one - in particular, that it did not send any tombstones. Note
   // that the DataTypeEntityChange histograms are recorded at a low level (in
@@ -919,10 +842,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
   EXPECT_THAT(histograms.GetAllSamples("Sync.DataTypeEntityChange.BOOKMARK"),
               ElementsAre(base::Bucket(
                   syncer::DataTypeEntityChange::kRemoteNonInitialUpdate, 6)));
-  EXPECT_THAT(
-      histograms.GetAllSamples("Sync.DataTypeEntityChange.READING_LIST"),
-      ElementsAre(base::Bucket(
-          syncer::DataTypeEntityChange::kRemoteNonInitialUpdate, 2)));
 }
 
 }  // namespace

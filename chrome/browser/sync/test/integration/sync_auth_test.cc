@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/strings/stringprintf.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/threading/platform_thread.h"
 #include "base/time/time.h"
 #include "build/buildflag.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/preferences_helper.h"
@@ -22,7 +20,6 @@
 #include "components/bookmarks/browser/bookmark_node.h"
 #include "components/browser_sync/browser_sync_switches.h"
 #include "components/prefs/pref_service.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
@@ -92,25 +89,13 @@ class SyncAuthTestBase : public SyncTest {
 
   ~SyncAuthTestBase() override = default;
 
-  void AddReadingListEntry() {
-    int index = GetNextEntryIndex();
-    std::string title = base::StringPrintf("Entry %d", index);
-    GURL url = GURL(base::StringPrintf("http://www.foo%d.com", index));
-
-    ReadingListModel* model =
-        ReadingListModelFactory::GetForBrowserContext(GetProfile(0));
-    model->AddOrReplaceEntry(url, title, reading_list::ADDED_VIA_CURRENT_APP,
-                             /*estimated_read_time=*/std::nullopt,
-                             /*creation_time=*/std::nullopt);
-  }
-
-  // Helper function that adds a reading list entry and waits for either an auth
-  // error, or for the entry to be committed. Returns true if it detects an
-  // auth error, false if the entry is committed successfully.
+  // Helper function that changes a synced preference and waits for either an
+  // auth error, or for the change to be committed. Returns true if it detects
+  // an auth error, false if the change is committed successfully.
   bool AttemptToTriggerAuthError() {
-    AddReadingListEntry();
+    preferences_helper::ChangeBooleanPref(0, prefs::kHomePageIsNewTabPage);
 
-    // Run until the entry is committed or an auth error is encountered.
+    // Run until the change is committed or an auth error is encountered.
     TestForAuthError(GetSyncService(0)).Wait();
     return TestForAuthError::HasAuthError(GetSyncService(0));
   }
@@ -134,11 +119,7 @@ class SyncAuthTestBase : public SyncTest {
   }
 
  private:
-  int GetNextEntryIndex() { return entry_index_++; }
-
   base::test::ScopedFeatureList scoped_feature_list_;
-
-  int entry_index_ = 0;
 };
 
 class SyncAuthTest
@@ -396,7 +377,8 @@ IN_PROC_BROWSER_TEST_P(SyncAuthTest, TokenExpiry) {
   GetFakeServer()->SetHttpError(net::HTTP_UNAUTHORIZED);
 
   // Trigger a sync cycle to trigger an auth error.
-  AddReadingListEntry();
+  GetSyncService(0)->TriggerRefresh(
+      syncer::SyncService::TriggerRefreshSource::kUnknown, {syncer::BOOKMARKS});
 
   // Wait until a new token is fetched.
   ASSERT_TRUE(base::test::RunUntil([this]() {

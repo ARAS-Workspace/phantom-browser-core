@@ -89,7 +89,6 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/profiles/profile_selections.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/sessions/exit_type_service.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -931,7 +930,6 @@ void ProfileImpl::OnLocaleReady(CreateMode create_mode) {
   CHECK(!BookmarkModelFactory::GetForBrowserContextIfExists(this));
   CHECK(!ProfilePasswordStoreFactory::HasStore(this));
   CHECK(!AccountPasswordStoreFactory::HasStore(this));
-  CHECK(!ReadingListModelFactory::HasModel(this));
   CHECK(!ThemeServiceFactory::GetForProfileIfExists(this));
 
   if (create_mode == CreateMode::kAsynchronous) {

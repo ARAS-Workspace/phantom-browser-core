@@ -29,7 +29,6 @@
 #include "components/password_manager/core/browser/features/password_manager_features_util.h"
 #include "components/password_manager/core/browser/ui/saved_passwords_presenter.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/user_data_importer/utility/bookmark_util.h"
 #include "components/user_data_importer/utility/history_callback_from_rust.h"
@@ -278,7 +277,6 @@ SafariDataImporter::SafariDataImporter(
     autofill::PaymentsDataManager* payments_data_manager,
     history::HistoryService* history_service,
     bookmarks::BookmarkModel* bookmark_model,
-    ReadingListModel* reading_list_model,
     syncer::SyncService* sync_service,
     PrefService* pref_service,
     std::unique_ptr<BookmarkParser> bookmark_parser,
@@ -293,7 +291,6 @@ SafariDataImporter::SafariDataImporter(
       payments_data_manager_(CHECK_DEREF(payments_data_manager)),
       history_service_(CHECK_DEREF(history_service)),
       bookmark_model_(CHECK_DEREF(bookmark_model)),
-      reading_list_model_(CHECK_DEREF(reading_list_model)),
       sync_service_(sync_service),
       pref_service_(pref_service),
       metrics_recorder_(ImporterMetricsRecorder::Source::kSafari),
@@ -385,7 +382,6 @@ void SafariDataImporter::CompleteImport(
   }
 
   metrics_recorder_.bookmark_metrics().OnImportStarted();
-  metrics_recorder_.reading_list_metrics().OnImportStarted();
   GetRunner()->PostTask(
       FROM_HERE, base::BindOnce(&SafariDataImporter::ContinueImportBookmarks,
                                 weak_factory_.GetWeakPtr())
@@ -552,7 +548,6 @@ void SafariDataImporter::OnZipArchiveReady(bool success) {
                            weak_factory_.GetWeakPtr()));
 
   metrics_recorder_.bookmark_metrics().OnPreparationStarted();
-  metrics_recorder_.reading_list_metrics().OnPreparationStarted();
   blocking_worker_.AsyncCall(&BlockingWorker::WriteBookmarksToTmpFile)
       .Then(base::BindOnce(&SafariDataImporter::PrepareBookmarks,
                            weak_factory_.GetWeakPtr()));
@@ -644,8 +639,6 @@ void SafariDataImporter::PrepareBookmarks(
   if (!result.path || result.path->empty()) {
     metrics_recorder_.bookmark_metrics().LogOutcome(
         DataTypeMetrics::ImportOutcome::kNotPresent);
-    metrics_recorder_.reading_list_metrics().LogOutcome(
-        DataTypeMetrics::ImportOutcome::kNotPresent);
     client_->OnBookmarksReady(base::ok(0u));
     return;
   }
@@ -654,8 +647,6 @@ void SafariDataImporter::PrepareBookmarks(
       GetRunner(), base::BindOnce(&SafariDataImporter::OnBookmarksParsed,
                                   weak_factory_.GetWeakPtr()));
   metrics_recorder_.bookmark_metrics().LogFileSizeBytes(result.file_size_bytes);
-  metrics_recorder_.reading_list_metrics().LogFileSizeBytes(
-      result.file_size_bytes);
 
   blocking_worker_.AsyncCall(&BlockingWorker::ParseBookmarks)
       .WithArgs(result.path, std::move(import_bookmarks_callback));
@@ -682,7 +673,6 @@ void SafariDataImporter::OnBookmarksParsed(
                    &SafariDataImporter::OnBookmarkParsingError, this);
 
   pending_bookmarks_ = std::move(value.bookmarks);
-  pending_reading_list_ = std::move(value.reading_list);
 
   size_t importable_bookmarks_count = 0;
   for (const auto& bookmark : pending_bookmarks_) {
@@ -693,19 +683,14 @@ void SafariDataImporter::OnBookmarksParsed(
 
   metrics_recorder_.bookmark_metrics().OnPreparationFinished(
       importable_bookmarks_count);
-  metrics_recorder_.reading_list_metrics().OnPreparationFinished(
-      pending_reading_list_.size());
 
-  client_->OnBookmarksReady(
-      base::ok(importable_bookmarks_count + pending_reading_list_.size()));
+  client_->OnBookmarksReady(base::ok(importable_bookmarks_count));
 }
 
 void SafariDataImporter::OnBookmarkParsingError(
     BookmarkParser::BookmarkParsingError error) {
   metrics_recorder_.LogBookmarksError(ConvertBookmarkError(error));
   metrics_recorder_.bookmark_metrics().LogOutcome(
-      DataTypeMetrics::ImportOutcome::kFailure);
-  metrics_recorder_.reading_list_metrics().LogOutcome(
       DataTypeMetrics::ImportOutcome::kFailure);
 
   client_->OnBookmarksReady(base::ok(0u));
@@ -833,20 +818,13 @@ void SafariDataImporter::ContinueImportBookmarks() {
   size_t imported_bookmarks_count = user_data_importer::ImportBookmarks(
       &*bookmark_model_, std::move(pending_bookmarks_),
       l10n_util::GetStringUTF16(IDS_IMPORTED_FROM_SAFARI_FOLDER));
-  size_t imported_reading_list_count = user_data_importer::ImportReadingList(
-      &*reading_list_model_, std::move(pending_reading_list_));
 
   metrics_recorder_.bookmark_metrics().OnImportFinished(
       imported_bookmarks_count);
-  metrics_recorder_.reading_list_metrics().OnImportFinished(
-      imported_reading_list_count);
   metrics_recorder_.bookmark_metrics().LogOutcome(
       DataTypeMetrics::ImportOutcome::kSuccess);
-  metrics_recorder_.reading_list_metrics().LogOutcome(
-      DataTypeMetrics::ImportOutcome::kSuccess);
 
-  client_->OnBookmarksImported(imported_bookmarks_count +
-                               imported_reading_list_count);
+  client_->OnBookmarksImported(imported_bookmarks_count);
 }
 
 void SafariDataImporter::OnImportComplete() {

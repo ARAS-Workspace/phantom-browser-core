@@ -148,7 +148,6 @@ BrowserRootViewBrowserTest.*
 -SingleClientPollingSyncTestNoIpProt.*
 -SingleClientPreferencesWithAccountStorageMergeSyncTest.*
 -SingleClientPreferencesWithAccountStorageSyncTest.*
--SingleClientReadingListSyncTest.*
 -SingleClientSavedTabGroupsSyncTest.*
 -SingleClientSearchEnginesSyncTest.*
 -SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled.*

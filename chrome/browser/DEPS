@@ -264,7 +264,6 @@ include_rules = [
   "+components/qr_code_generator",
   "+components/query_parser",
   "+components/quirks",
-  "+components/reading_list/core",
   "+components/record_replay/content/browser",
   "+components/record_replay/core/browser",
   "+components/record_replay/core/common",

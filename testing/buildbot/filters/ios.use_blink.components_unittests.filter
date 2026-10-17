@@ -385,7 +385,6 @@
 -SafariDataImporterTest.Bookmarks_Folders
 -SafariDataImporterTest.Bookmarks_MiscJunk
 -SafariDataImporterTest.Bookmarks_NoTopLevelDL
--SafariDataImporterTest.Bookmarks_ReadingList
 -SafariDataImporterTest.CancelImport
 -SafariDataImporterTest.DuplicateBookmarkFolders
 -SafariDataImporterTest.HandleGarbageFile
@@ -400,11 +399,9 @@
 -SafariDataImporterTest.ImportPasswords
 -SafariDataImporterTest.ImportPasswordsBlockedByPolicy
 -SafariDataImporterTest.ImportPaymentCardsBlockedByPolicy
--SafariDataImporterTest.ImportReadingListBlockedByPolicy
 -SafariDataImporterTest.ImportsEmptyFolder
 -SafariDataImporterTest.ImportSingleBookmark
 -SafariDataImporterTest.ImportsMultipleBookmarks
--SafariDataImporterTest.ImportsMultipleReadingListItems
 -SafariDataImporterTest.ImportsNestedBookmark
 -SafariDataImporterTest.ImportToBothStoresSequentially
 -SafariDataImporterTest.ImportWithNoBookmarks

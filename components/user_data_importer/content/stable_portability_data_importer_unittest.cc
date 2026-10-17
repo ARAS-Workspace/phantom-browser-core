@@ -21,7 +21,6 @@
 #include "base/test/run_until.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
-#include "base/time/default_clock.h"
 #include "base/time/time.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_test_util.h"
@@ -29,9 +28,6 @@
 #include "components/bookmarks/test/test_matchers.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/test/history_service_test_util.h"
-#include "components/reading_list/core/fake_reading_list_model_storage.h"
-#include "components/reading_list/core/reading_list_model.h"
-#include "components/reading_list/core/reading_list_model_impl.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/user_data_importer/content/content_bookmark_parser.h"
 #include "components/user_data_importer/content/content_bookmark_parser_in_utility_process.h"
@@ -95,49 +91,6 @@ MATCHER_P4(IsUrlBookmarkWithinTimeRange, title, url, min_time, max_time, "") {
   return true;
 }
 
-MATCHER_P3(IsReadingListEntry, title, url, creation_time, "") {
-  if (arg->Title() != title) {
-    *result_listener << "which has title " << arg->Title();
-    return false;
-  }
-  if (arg->URL() != url) {
-    *result_listener << "which has url " << arg->URL();
-    return false;
-  }
-  base::Time actual_creation_time =
-      base::Time::UnixEpoch() + base::Microseconds(arg->CreationTime());
-  if (actual_creation_time != creation_time) {
-    *result_listener << "which has creation time " << actual_creation_time;
-    return false;
-  }
-  return true;
-}
-
-MATCHER_P4(IsReadingListEntryWithinTimeRange,
-           title,
-           url,
-           min_time,
-           max_time,
-           "") {
-  if (arg->Title() != title) {
-    *result_listener << "which has title " << arg->Title();
-    return false;
-  }
-  if (arg->URL() != url) {
-    *result_listener << "which has url " << arg->URL();
-    return false;
-  }
-  base::Time creation_time =
-      base::Time::UnixEpoch() + base::Microseconds(arg->CreationTime());
-  if (creation_time < min_time || creation_time > max_time) {
-    *result_listener << "which has creation time " << creation_time
-                     << " not in range [" << min_time << ", " << max_time
-                     << "]";
-    return false;
-  }
-  return true;
-}
-
 class StablePortabilityDataImporterTest : public testing::Test {
  public:
   StablePortabilityDataImporterTest() : receiver_(&fake_utility_parser_) {}
@@ -149,21 +102,12 @@ class StablePortabilityDataImporterTest : public testing::Test {
     auto parser = std::make_unique<ContentBookmarkParser>();
     parser->SetServiceForTesting(receiver_.BindNewPipeAndPassRemote());
 
-    auto storage = std::make_unique<FakeReadingListModelStorage>();
-    auto* storage_raw = storage.get();
-    reading_list_model_ = std::make_unique<ReadingListModelImpl>(
-        std::move(storage), syncer::StorageType::kUnspecified,
-        syncer::WipeModelUponSyncDisabledBehavior::kNever,
-        base::DefaultClock::GetInstance());
-    storage_raw->TriggerLoadCompletion();
-
     CHECK(history_dir_.CreateUniqueTempDir());
     history_service_ =
         history::CreateHistoryService(history_dir_.GetPath(), true);
 
     importer_ = std::make_unique<StablePortabilityDataImporter>(
-        history_service_.get(), bookmark_model_.get(),
-        reading_list_model_.get(), std::move(parser));
+        history_service_.get(), bookmark_model_.get(), std::move(parser));
   }
 
   void TearDown() override { task_environment_.RunUntilIdle(); }
@@ -176,17 +120,11 @@ class StablePortabilityDataImporterTest : public testing::Test {
     return number_bookmarks_imported_;
   }
 
-  int GetNumberOfReadingListImported() const {
-    return number_reading_list_imported_;
-  }
-
   int GetNumberOfHistoryImported() const { return number_history_imported_; }
 
   const bookmarks::BookmarkNode* GetOtherBookmarkNode() {
     return bookmark_model_->other_node();
   }
-
-  const ReadingListModel& GetReadingListModel() { return *reading_list_model_; }
 
   void ImportBookmarks(const std::string& html_data) {
     bookmarks_callback_called_ = false;
@@ -195,15 +133,6 @@ class StablePortabilityDataImporterTest : public testing::Test {
     base::FilePath path = dir.GetPath().AppendASCII("bookmarks.html");
     ASSERT_TRUE(base::WriteFile(path, html_data));
     ImportBookmarksFile(path);
-  }
-
-  void ImportReadingList(const std::string& html_data) {
-    reading_list_callback_called_ = false;
-    base::ScopedTempDir dir;
-    ASSERT_TRUE(dir.CreateUniqueTempDir());
-    base::FilePath path = dir.GetPath().AppendASCII("reading_list.html");
-    ASSERT_TRUE(base::WriteFile(path, html_data));
-    ImportReadingListFile(path);
   }
 
 #if BUILDFLAG(IS_POSIX)
@@ -234,26 +163,6 @@ class StablePortabilityDataImporterTest : public testing::Test {
 
     ASSERT_TRUE(
         base::test::RunUntil([&]() { return bookmarks_callback_called_; }));
-  }
-
-  void ImportReadingListFile(const base::FilePath& reading_list_file) {
-    PrepareCallbacks();
-
-    // Note: Some tests use an invalid (non-existent) file name, so `file` might
-    // be invalid here.
-    base::File file(reading_list_file,
-                    base::File::FLAG_OPEN | base::File::FLAG_READ);
-
-    importer_->ImportReadingList(
-        std::move(file),
-        // Use of Unretained below is safe because the RunUntil loop below
-        // guarantees this outlives the tasks.
-        base::BindOnce(
-            &StablePortabilityDataImporterTest::OnReadingListConsumed,
-            base::Unretained(this)));
-
-    ASSERT_TRUE(
-        base::test::RunUntil([&]() { return reading_list_callback_called_; }));
   }
 
 #if BUILDFLAG(IS_POSIX)
@@ -299,11 +208,6 @@ class StablePortabilityDataImporterTest : public testing::Test {
     number_bookmarks_imported_ = number_imported;
   }
 
-  void OnReadingListConsumed(int number_imported) {
-    reading_list_callback_called_ = true;
-    number_reading_list_imported_ = number_imported;
-  }
-
   void OnHistoryConsumed(int number_imported) {
     history_callback_called_ = true;
     number_history_imported_ = number_imported;
@@ -311,7 +215,6 @@ class StablePortabilityDataImporterTest : public testing::Test {
 
   void PrepareCallbacks() {
     bookmarks_callback_called_ = false;
-    reading_list_callback_called_ = false;
     history_callback_called_ = false;
   }
 
@@ -322,12 +225,9 @@ class StablePortabilityDataImporterTest : public testing::Test {
   base::ScopedTempDir history_dir_;
   std::unique_ptr<history::HistoryService> history_service_;
   std::unique_ptr<bookmarks::BookmarkModel> bookmark_model_;
-  std::unique_ptr<ReadingListModel> reading_list_model_;
   bool bookmarks_callback_called_ = false;
-  bool reading_list_callback_called_ = false;
   bool history_callback_called_ = false;
   int number_bookmarks_imported_ = -1;
-  int number_reading_list_imported_ = -1;
   int number_history_imported_ = -1;
   std::unique_ptr<StablePortabilityDataImporter> importer_;
 };
@@ -361,7 +261,6 @@ TEST_F(StablePortabilityDataImporterTest, Bookmarks_Basic) {
               IsUrlBookmarkWithinTimeRange(
                   u"Chromium", GURL("https://www.chromium.org/"),
                   import_start_time, import_end_time)))));
-  EXPECT_EQ(GetReadingListModel().size(), 0u);
 
   // Check that the histograms are recorded correctly.
   histogram_tester.ExpectUniqueSample(kHistogramPrefix + "Bookmarks.Outcome",
@@ -397,8 +296,6 @@ TEST_F(StablePortabilityDataImporterTest, Bookmarks_NoTopLevelDL) {
               IsUrlBookmarkWithinTimeRange(
                   u"Chromium", GURL("https://www.chromium.org/"),
                   import_start_time, import_end_time)))));
-
-  EXPECT_EQ(GetReadingListModel().size(), 0u);
 }
 
 // Tests parsing an HTML file with folders, both empty and with bookmarks.
@@ -446,61 +343,6 @@ TEST_F(StablePortabilityDataImporterTest, Bookmarks_Folders) {
                               base::Time::FromSecondsSinceUnixEpoch(
                                   1674205200)))))),
               IsFolder(u"Empty Folder", ElementsAre())))));
-
-  EXPECT_EQ(GetReadingListModel().size(), 0u);
-}
-
-// Tests parsing a simple HTML file with three reading list items.
-TEST_F(StablePortabilityDataImporterTest, ReadingList) {
-  base::HistogramTester histogram_tester;
-  const base::Time import_start_time = base::Time::Now();
-  ImportReadingList(
-      R"(<!DOCTYPE NETSCAPE-Bookmark-file-1>
-      <!--This is an automatically generated file.
-      It will be read and overwritten.
-      Do Not Edit! -->
-      <DL>
-      <DT><A HREF="https://www.google.com/" ADD_DATE="904914000">Google</A>
-      <DT><A HREF="https://en.wikipedia.org/wiki/The_Beach_Boys">The Beach Boys</A>
-      <DT><A HREF="https://en.wikipedia.org/wiki/Brian_Wilson" ADD_DATE="-868878000">Brian Wilson</A>
-      </DL><p>
-      </DL>)");
-  const base::Time import_end_time = base::Time::Now();
-  EXPECT_EQ(GetNumberOfReadingListImported(), 3);
-
-  EXPECT_EQ(GetReadingListModel().size(), 3u);
-
-  // "Imported" bookmarks folder should *not* have been created.
-  const bookmarks::BookmarkNode* other_node = GetOtherBookmarkNode();
-  EXPECT_THAT(other_node->children(), ElementsAre());
-
-  std::vector<const ReadingListEntry*> entries;
-  for (const auto& gurl : GetReadingListModel().GetKeys()) {
-    entries.push_back(GetReadingListModel().GetEntryByURL(gurl).get());
-  }
-
-  EXPECT_THAT(
-      entries,
-      UnorderedElementsAre(
-          IsReadingListEntry("Google", GURL("https://www.google.com/"),
-                             base::Time::FromSecondsSinceUnixEpoch(904914000)),
-          IsReadingListEntryWithinTimeRange(
-              "The Beach Boys",
-              GURL("https://en.wikipedia.org/wiki/The_Beach_Boys"),
-              import_start_time, import_end_time),
-          IsReadingListEntryWithinTimeRange(
-              "Brian Wilson",
-              GURL("https://en.wikipedia.org/wiki/Brian_Wilson"),
-              import_start_time, import_end_time)));
-
-  // Check that the histograms are recorded correctly.
-  histogram_tester.ExpectUniqueSample(kHistogramPrefix + "ReadingList.Outcome",
-                                      DataTypeMetrics::ImportOutcome::kSuccess,
-                                      1);
-  histogram_tester.ExpectBucketCount(
-      kHistogramPrefix + "ReadingList.PreparedCount", 3, 1);
-  histogram_tester.ExpectBucketCount(
-      kHistogramPrefix + "ReadingList.ImportedCount", 3, 1);
 }
 
 // Tests parsing an HTML with several not valid formats. The parser should still
@@ -567,23 +409,6 @@ TEST_F(StablePortabilityDataImporterTest, Bookmarks_EmptyInput) {
                                       1);
   histogram_tester.ExpectUniqueSample(
       kHistogramPrefix + "Bookmarks.Error",
-      user_data_importer::BookmarksImportError::kFailedToRead, 1);
-}
-
-TEST_F(StablePortabilityDataImporterTest, ReadingList_EmptyInput) {
-  base::HistogramTester histogram_tester;
-
-  ImportReadingList("");
-  // Empty input data is considered an error. (In practice, this could also
-  // happen if the file read fails for some reason.)
-  EXPECT_EQ(GetNumberOfReadingListImported(), -1);
-
-  // Check that the histograms are recorded correctly.
-  histogram_tester.ExpectUniqueSample(kHistogramPrefix + "ReadingList.Outcome",
-                                      DataTypeMetrics::ImportOutcome::kFailure,
-                                      1);
-  histogram_tester.ExpectUniqueSample(
-      kHistogramPrefix + "ReadingList.Error",
       user_data_importer::BookmarksImportError::kFailedToRead, 1);
 }
 
@@ -823,13 +648,6 @@ TEST_F(StablePortabilityDataImporterTest, CallbacksAreCalled) {
   EXPECT_EQ(GetNumberOfBookmarksImported(), -1);
   histogram_tester.ExpectUniqueSample(
       kHistogramPrefix + "Bookmarks.Outcome",
-      DataTypeMetrics::ImportOutcome::kNotPresent, 1);
-
-  ImportReadingListFile(
-      base::FilePath(FILE_PATH_LITERAL("/invalid/path/to/reading_list/file")));
-  EXPECT_EQ(GetNumberOfReadingListImported(), -1);
-  histogram_tester.ExpectUniqueSample(
-      kHistogramPrefix + "ReadingList.Outcome",
       DataTypeMetrics::ImportOutcome::kNotPresent, 1);
 
 #if BUILDFLAG(IS_POSIX)

@@ -132,11 +132,9 @@ class ImporterMetricsRecorder {
   DataTypeMetrics& history_metrics() { return history_metrics_; }
   DataTypeMetrics& password_metrics() { return password_metrics_; }
   DataTypeMetrics& payment_card_metrics() { return payment_card_metrics_; }
-  DataTypeMetrics& reading_list_metrics() { return reading_list_metrics_; }
 
   // Log specific failure cases, as documented in the respective enums above.
   void LogBookmarksError(BookmarksImportError error);
-  void LogReadingListError(BookmarksImportError error);
   void LogPasswordsError(PasswordsImportError error);
 
  private:
@@ -150,7 +148,6 @@ class ImporterMetricsRecorder {
   DataTypeMetrics history_metrics_;
   DataTypeMetrics password_metrics_;
   DataTypeMetrics payment_card_metrics_;
-  DataTypeMetrics reading_list_metrics_;
 };
 
 }  // namespace user_data_importer

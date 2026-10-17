@@ -144,9 +144,7 @@ ImporterMetricsRecorder::ImporterMetricsRecorder(
       history_metrics_(source_name_, DataTypeMetrics::DataType::kHistory),
       password_metrics_(source_name_, DataTypeMetrics::DataType::kPasswords),
       payment_card_metrics_(source_name_,
-                            DataTypeMetrics::DataType::kPaymentCards),
-      reading_list_metrics_(source_name_,
-                            DataTypeMetrics::DataType::kReadingList) {}
+                            DataTypeMetrics::DataType::kPaymentCards) {}
 
 ImporterMetricsRecorder::~ImporterMetricsRecorder() = default;
 
@@ -166,10 +164,6 @@ void ImporterMetricsRecorder::OnFlowFinished() {
 
 void ImporterMetricsRecorder::LogBookmarksError(BookmarksImportError error) {
   base::UmaHistogramEnumeration(GetMetricName("Bookmarks.Error"), error);
-}
-
-void ImporterMetricsRecorder::LogReadingListError(BookmarksImportError error) {
-  base::UmaHistogramEnumeration(GetMetricName("ReadingList.Error"), error);
 }
 
 void ImporterMetricsRecorder::LogPasswordsError(PasswordsImportError error) {

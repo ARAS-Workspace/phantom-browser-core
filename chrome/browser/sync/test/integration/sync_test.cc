@@ -950,7 +950,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
                                        syncer::DEVICE_INFO,
                                        syncer::SECURITY_EVENTS,
                                        syncer::SEND_TAB_TO_SELF,
-                                       syncer::SHARING_MESSAGE,
                                        syncer::USER_CONSENTS};
   allowed_types.PutAll(syncer::ControlTypes());
   allowed_types.Put(syncer::CONTACT_INFO);
@@ -969,9 +968,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   if (base::FeatureList::IsEnabled(
           switches::kSyncEnableBookmarksInTransportMode)) {
     allowed_types.Put(syncer::BOOKMARKS);
-  }
-  if (syncer::IsReadingListAccountStorageEnabled()) {
-    allowed_types.Put(syncer::READING_LIST);
   }
   if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
     allowed_types.Put(syncer::AUTOFILL_WALLET_METADATA);
@@ -1063,7 +1059,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   // These types are excluded on Android as they run outside Chrome.
   allowed_types.Put(syncer::INCOMING_PASSWORD_SHARING_INVITATION);
   allowed_types.Put(syncer::OUTGOING_PASSWORD_SHARING_INVITATION);
-  allowed_types.Put(syncer::WEBAUTHN_CREDENTIAL);
 
 #if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(

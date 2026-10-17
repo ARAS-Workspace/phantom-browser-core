@@ -111,7 +111,6 @@ source_set("sync") {
     "//chrome/browser/prefs:util",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:profile_manager",
-    "//chrome/browser/reading_list",
     "//chrome/browser/search_engines",
     "//chrome/browser/tab_group_sync",
     "//chrome/browser/tab_group_sync:utils",

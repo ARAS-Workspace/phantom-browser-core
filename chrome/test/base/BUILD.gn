@@ -300,7 +300,6 @@ source_set("testing_profile_impl") {
     "//chrome/browser/profiles:misc",
     "//chrome/browser/profiles:profile_util",
     "//chrome/browser/profiles:profiles_extra_parts",
-    "//chrome/browser/reading_list",
     "//chrome/browser/search_engines",
     "//chrome/browser/ssl",
     "//chrome/browser/transition_manager",

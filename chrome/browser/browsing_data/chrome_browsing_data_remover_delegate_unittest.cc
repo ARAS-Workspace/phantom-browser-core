@@ -68,7 +68,6 @@
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/segmentation_platform/ukm_data_manager_test_utils.h"
 #include "chrome/browser/segmentation_platform/ukm_database_client.h"
@@ -148,8 +147,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_test_util.h"
 #include "components/private_verification_tokens/common/private_verification_tokens_database.h"
 #include "components/private_verification_tokens/common/private_verification_tokens_token.h"
-#include "components/reading_list/core/mock_reading_list_model_observer.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/segmentation_platform/public/features.h"
 #include "components/site_engagement/content/site_engagement_service.h"
@@ -1054,19 +1051,6 @@ class ChromeBrowsingDataRemoverDelegateTest : public testing::Test {
     return completion_observer.failed_data_types();
   }
 
-  void WaitForReadingListModelLoaded(ReadingListModel* reading_list_model) {
-    testing::NiceMock<MockReadingListModelObserver> observer_;
-    base::RunLoop run_loop;
-    EXPECT_CALL(observer_, ReadingListModelLoaded).WillOnce([&run_loop] {
-      run_loop.Quit();
-    });
-    // If the ReadingListModel is already loaded, it'll call
-    // ReadingListModelLoaded() immediately.
-    reading_list_model->AddObserver(&observer_);
-    run_loop.Run();
-    reading_list_model->RemoveObserver(&observer_);
-  }
-
   const base::Time& GetBeginTime() {
     return remover_->GetLastUsedBeginTimeForTesting();
   }
@@ -1636,21 +1620,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, DeleteBookmarks) {
   BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
                                 constants::DATA_TYPE_BOOKMARKS, false);
   EXPECT_EQ(0u, bookmark_model->bookmark_bar_node()->children().size());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, ClearReadingList) {
-  TestingProfile* profile = GetProfile();
-  auto* reading_list_model =
-      ReadingListModelFactory::GetForBrowserContext(profile);
-  WaitForReadingListModelLoaded(reading_list_model);
-  reading_list_model->AddOrReplaceEntry(GURL("http://url.com/"), "entry_title",
-                                        reading_list::ADDED_VIA_CURRENT_APP,
-                                        /*estimated_read_time=*/std::nullopt,
-                                        /*creation_time=*/std::nullopt);
-  EXPECT_EQ(1u, reading_list_model->size());
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_READING_LIST, false);
-  EXPECT_EQ(0u, reading_list_model->size());
 }
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, DeleteBookmarkHistory) {

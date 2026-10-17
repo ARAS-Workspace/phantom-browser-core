@@ -64,8 +64,6 @@ source_set("unit_tests") {
     "//components/bookmarks/test",
     "//components/history/core/browser",
     "//components/history/core/test",
-    "//components/reading_list/core",
-    "//components/reading_list/core:test_support",
     "//components/strings:components_strings_grit",
     "//components/user_data_importer/common",
     "//components/user_data_importer/mojom",

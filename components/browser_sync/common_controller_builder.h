@@ -72,10 +72,6 @@ class PasswordSenderService;
 class PasswordStoreInterface;
 }  // namespace password_manager
 
-namespace reading_list {
-class DualReadingListModel;
-}  // namespace reading_list
-
 namespace send_tab_to_self {
 class SendTabToSelfSyncService;
 }  // namespace send_tab_to_self
@@ -182,8 +178,6 @@ class CommonControllerBuilder {
   void SetPrefService(PrefService* pref_service);
   void SetPrefServiceSyncable(
       sync_preferences::PrefServiceSyncable* pref_service_syncable);
-  void SetDualReadingListModel(
-      reading_list::DualReadingListModel* dual_reading_list_model);
   void SetSendTabToSelfSyncService(send_tab_to_self::SendTabToSelfSyncService*
                                        send_tab_to_self_sync_service);
   void SetSessionSyncService(
@@ -258,8 +252,6 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateEncryptedTabContextItemDataTypeController(
       syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateReadingListDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateSearchEnginesDataTypeController(version_info::Channel channel);
   std::unique_ptr<syncer::DataTypeController>
@@ -350,8 +342,6 @@ class CommonControllerBuilder {
       pref_service_syncable_;
   SafeOptional<raw_ptr<sync_sessions::SessionSyncService>>
       session_sync_service_;
-  SafeOptional<raw_ptr<reading_list::DualReadingListModel>>
-      dual_reading_list_model_;
   SafeOptional<raw_ptr<send_tab_to_self::SendTabToSelfSyncService>>
       send_tab_to_self_sync_service_;
   SafeOptional<raw_ptr<syncer::UserEventService>> user_event_service_;

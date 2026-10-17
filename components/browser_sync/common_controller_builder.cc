@@ -50,8 +50,6 @@
 #include "components/password_manager/core/browser/sync/password_data_type_controller.h"
 #include "components/password_manager/core/browser/sync/password_local_data_batch_uploader.h"
 #include "components/prefs/pref_service.h"
-#include "components/reading_list/core/dual_reading_list_model.h"
-#include "components/reading_list/core/reading_list_local_data_batch_uploader.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/send_tab_to_self/send_tab_to_self_data_type_controller.h"
@@ -317,11 +315,6 @@ void CommonControllerBuilder::SetPrefServiceSyncable(
   pref_service_syncable_.Set(pref_service_syncable);
 }
 
-void CommonControllerBuilder::SetDualReadingListModel(
-    reading_list::DualReadingListModel* dual_reading_list_model) {
-  dual_reading_list_model_.Set(dual_reading_list_model);
-}
-
 void CommonControllerBuilder::SetSendTabToSelfSyncService(
     send_tab_to_self::SendTabToSelfSyncService* send_tab_to_self_sync_service) {
   send_tab_to_self_sync_service_.Set(send_tab_to_self_sync_service);
@@ -461,10 +454,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::SHARED_TAB_GROUP_DATA)) {
     add_controller(CreateSharedTabGroupDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::READING_LIST)) {
-    add_controller(CreateReadingListDataTypeController());
   }
 
   if (!disabled_types.Has(syncer::SEARCH_ENGINES)) {
@@ -859,26 +848,6 @@ CommonControllerBuilder::CreateSharedTabGroupDataTypeController(
       /*delegate_for_transport_mode=*/
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
       sync_service, collaboration_service_.value());
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateReadingListDataTypeController() {
-  syncer::DataTypeControllerDelegate* delegate_for_transport_mode =
-      dual_reading_list_model_.value()
-          ->GetSyncControllerDelegateForTransportMode()
-          .get();
-  return std::make_unique<DataTypeController>(
-      syncer::READING_LIST,
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-          dual_reading_list_model_.value()->GetSyncControllerDelegate().get()),
-      /*delegate_for_transport_mode=*/
-      delegate_for_transport_mode
-          ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                delegate_for_transport_mode)
-          : nullptr,
-      std::make_unique<reading_list::ReadingListLocalDataBatchUploader>(
-          dual_reading_list_model_.value()));
 }
 
 std::unique_ptr<syncer::DataTypeController>

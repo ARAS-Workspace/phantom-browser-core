@@ -35,8 +35,6 @@ namespace syncer {
 class SyncService;
 }
 
-class ReadingListModel;
-
 namespace user_data_importer {
 
 struct ImportedBookmarkEntry;
@@ -63,7 +61,6 @@ class SafariDataImporter {
                      autofill::PaymentsDataManager* payments_data_manager,
                      history::HistoryService* history_service,
                      bookmarks::BookmarkModel* bookmark_model,
-                     ReadingListModel* reading_list_model,
                      syncer::SyncService* sync_service,
                      PrefService* pref_service,
                      std::unique_ptr<BookmarkParser> bookmark_parser,
@@ -228,8 +225,7 @@ class SafariDataImporter {
   // Imports Credit Cards to the Payments Data Manager.
   void ContinueImportPaymentCards();
 
-  // Imports bookmarks and reading list entries from pending data into the
-  // corresponding BookmarkModel and ReadingListModel.
+  // Imports bookmarks from pending data into the BookmarkModel.
   void ContinueImportBookmarks();
 
   // Invoked when all import processing tasks have concluded. Logs metrics.
@@ -262,9 +258,6 @@ class SafariDataImporter {
   // Service used to import bookmarks.
   const raw_ref<bookmarks::BookmarkModel> bookmark_model_;
 
-  // Service used to import reading lists.
-  const raw_ref<ReadingListModel> reading_list_model_;
-
   // Stores pointer to `SyncService` instance.
   raw_ptr<syncer::SyncService> sync_service_;
 
@@ -280,10 +273,6 @@ class SafariDataImporter {
   // Bookmarks which have been parsed, but not yet committed to permanent
   // storage.
   std::vector<ImportedBookmarkEntry> pending_bookmarks_;
-
-  // Reading List entries which have been parsed, but not yet committed to
-  // permanent storage.
-  std::vector<ImportedBookmarkEntry> pending_reading_list_;
 
   // Helper object which logs metrics about the import flow.
   ImporterMetricsRecorder metrics_recorder_;

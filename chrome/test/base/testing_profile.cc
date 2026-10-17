@@ -48,7 +48,6 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_observer.h"
 #include "chrome/browser/profiles/storage_partition_descriptor.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/search_engines/template_url_fetcher_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -339,9 +338,6 @@ void TestingProfile::Init(CreateMode create_mode) {
     base::CreateDirectory(profile_path_);
 
   if (!AreKeyedServicesDisabledForProfileByDefault(this)) {
-    ReadingListModelFactory::GetInstance()->SetTestingFactory(
-        this, ReadingListModelFactory::GetDefaultFactoryForTesting());
-
     // TODO(joaodasilva): remove this once this PKS isn't created in ProfileImpl
     // anymore, after converting the PrefService to a PKS. Until then it must
     // be associated with a TestingProfile too.

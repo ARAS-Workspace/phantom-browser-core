@@ -110,11 +110,9 @@ void StablePortabilityDataImporter::BackgroundWorker::ParseHistory(
 StablePortabilityDataImporter::StablePortabilityDataImporter(
     history::HistoryService* history_service,
     bookmarks::BookmarkModel* bookmark_model,
-    ReadingListModel* reading_list_model,
     std::unique_ptr<ContentBookmarkParser> bookmark_parser)
     : history_service_(history_service),
       bookmark_model_(bookmark_model),
-      reading_list_model_(reading_list_model),
       metrics_recorder_(
           ImporterMetricsRecorder::Source::kStablePortabilityData),
       origin_sequence_task_runner_(
@@ -155,36 +153,6 @@ void StablePortabilityDataImporter::ImportBookmarks(
   background_worker_.AsyncCall(&BackgroundWorker::ParseBookmarks)
       .WithArgs(std::move(file),
                 std::move(bookmarks_parser_callback_on_thread));
-}
-
-void StablePortabilityDataImporter::ImportReadingList(
-    base::File file,
-    ImportCallback reading_list_callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  metrics_recorder_.reading_list_metrics().OnPreparationStarted();
-
-  if (!file.IsValid()) {
-    metrics_recorder_.reading_list_metrics().LogOutcome(
-        DataTypeMetrics::ImportOutcome::kNotPresent);
-    PostCallback(std::move(reading_list_callback), -1);
-    return;
-  }
-
-  // Safe to bind to WeakPtr to this callback, because it will run on the same
-  // sequence, `origin_thread_task_runner`, where the importer was created.
-  auto reading_list_parser_callback = base::BindOnce(
-      &StablePortabilityDataImporter::OnReadingListParsed,
-      weak_factory_.GetWeakPtr(), std::move(reading_list_callback));
-  auto reading_list_parser_callback_on_thread = base::BindPostTask(
-      origin_sequence_task_runner_, std::move(reading_list_parser_callback));
-
-  // Post to the thread pool the task for parsing the file. Adding the actual
-  // data to the user's storage should still be done on the origin sequence by
-  // `OnBookmarksParsed`, as that's where the `reading_list_model_` lives.
-  background_worker_.AsyncCall(&BackgroundWorker::ParseBookmarks)
-      .WithArgs(std::move(file),
-                std::move(reading_list_parser_callback_on_thread));
 }
 
 #if BUILDFLAG(IS_POSIX)
@@ -311,46 +279,6 @@ void StablePortabilityDataImporter::OnBookmarksParsingError(
   metrics_recorder_.bookmark_metrics().LogOutcome(
       DataTypeMetrics::ImportOutcome::kFailure);
   PostCallback(std::move(bookmarks_callback), -1);
-}
-
-void StablePortabilityDataImporter::OnReadingListParsed(
-    ImportCallback reading_list_callback,
-    BookmarkParser::BookmarkParsingResult result) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  if (!reading_list_model_) {
-    metrics_recorder_.reading_list_metrics().LogOutcome(
-        DataTypeMetrics::ImportOutcome::kFailure);
-    PostCallback(std::move(reading_list_callback), -1);
-    return;
-  }
-
-  ASSIGN_OR_RETURN(BookmarkParser::ParsedBookmarks value, std::move(result),
-                   &StablePortabilityDataImporter::OnReadingListParsingError,
-                   this, std::move(reading_list_callback));
-
-  metrics_recorder_.reading_list_metrics().OnPreparationFinished(
-      value.bookmarks.size());
-  metrics_recorder_.reading_list_metrics().OnImportStarted();
-
-  // Add the parsed reading list entries to the user's storage.
-  size_t imported_count = ::user_data_importer::ImportReadingList(
-      reading_list_model_, std::move(value.bookmarks));
-
-  metrics_recorder_.reading_list_metrics().OnImportFinished(imported_count);
-  metrics_recorder_.reading_list_metrics().LogOutcome(
-      DataTypeMetrics::ImportOutcome::kSuccess);
-  PostCallback(std::move(reading_list_callback), imported_count);
-}
-
-void StablePortabilityDataImporter::OnReadingListParsingError(
-    ImportCallback reading_list_callback,
-    BookmarkParser::BookmarkParsingError error) {
-  metrics_recorder_.LogReadingListError(ConvertBookmarkError(error));
-  metrics_recorder_.reading_list_metrics().LogOutcome(
-      DataTypeMetrics::ImportOutcome::kFailure);
-  PostCallback(std::move(reading_list_callback), -1);
 }
 
 void StablePortabilityDataImporter::PostCallback(auto callback, auto results) {

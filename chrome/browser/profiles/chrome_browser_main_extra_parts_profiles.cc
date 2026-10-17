@@ -160,7 +160,6 @@
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/profile_resetter/triggered_profile_resetter_factory.h"
 #include "chrome/browser/profiles/renderer_updater_factory.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
@@ -693,7 +692,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ProfileStatisticsFactory::GetInstance();
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();
-  ReadingListModelFactory::GetInstance();
   record_replay::TaskStoreFactory::GetInstance();
   record_replay::TaskParametersExtractorFactory::GetInstance();
   record_replay::TaskServiceFactory::GetInstance();

@@ -17,8 +17,6 @@ include_rules = [
   "+components/notebooks/public",
   "+components/password_manager/core/browser",
   "+components/prefs",
-  "+components/reading_list/core",
-  "+components/reading_list/features",
   "+components/saved_tab_groups/public",
   "+components/search_engines",
   "+components/send_tab_to_self",

@@ -85,7 +85,6 @@ class SyncServiceFactoryTest : public testing::Test {
     // preprocessor conditions in ChromeSyncClient::CreateDataTypeControllers:
 
     // ChromeSyncClient types.
-    datatypes.Put(syncer::READING_LIST);
     datatypes.Put(syncer::SECURITY_EVENTS);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)

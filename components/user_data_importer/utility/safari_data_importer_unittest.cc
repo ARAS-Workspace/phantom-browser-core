@@ -17,7 +17,6 @@
 #include "base/test/run_until.h"
 #include "base/test/scoped_mock_clock_override.h"
 #include "base/test/task_environment.h"
-#include "base/time/default_clock.h"
 #include "components/affiliations/core/browser/fake_affiliation_service.h"
 #include "components/autofill/core/browser/foundations/test_autofill_client.h"
 #include "components/autofill/core/common/autofill_prefs.h"
@@ -40,9 +39,6 @@
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/password_manager/services/csv_password/fake_password_parser_service.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/reading_list/core/fake_reading_list_model_storage.h"
-#include "components/reading_list/core/reading_list_model.h"
-#include "components/reading_list/core/reading_list_model_impl.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/test/test_sync_service.h"
 #include "components/user_data_importer/utility/bookmark_parser.h"
@@ -138,18 +134,6 @@ class SafariDataImporterTest : public testing::Test {
     bookmark_model_ = bookmarks::TestBookmarkClient::CreateModelWithClient(
         std::move(bookmark_client));
 
-    auto storage = std::make_unique<FakeReadingListModelStorage>();
-
-    base::WeakPtr<FakeReadingListModelStorage> storage_ptr =
-        storage->AsWeakPtr();
-
-    reading_list_model_ = std::make_unique<ReadingListModelImpl>(
-        std::move(storage), syncer::StorageType::kUnspecified,
-        syncer::WipeModelUponSyncDisabledBehavior::kNever,
-        base::DefaultClock::GetInstance());
-
-    storage_ptr->TriggerLoadCompletion();
-
     pref_service_.registry()->RegisterBooleanPref(
         password_manager::prefs::kCredentialsEnableService, true);
     pref_service_.registry()->RegisterBooleanPref(
@@ -166,9 +150,8 @@ class SafariDataImporterTest : public testing::Test {
     importer_ = std::make_unique<SafariDataImporter>(
         &client_, &presenter_,
         &autofill_client_.GetPersonalDataManager().payments_data_manager(),
-        history_service_.get(), bookmark_model_.get(),
-        reading_list_model_.get(), &sync_service_, &pref_service_,
-        std::move(parser), "en-US");
+        history_service_.get(), bookmark_model_.get(), &sync_service_,
+        &pref_service_, std::move(parser), "en-US");
 
     mojo::PendingRemote<password_manager::mojom::CSVPasswordParser>
         pending_remote{receiver_.BindNewPipeAndPassRemote()};
@@ -196,10 +179,6 @@ class SafariDataImporterTest : public testing::Test {
 
   const std::vector<ImportedBookmarkEntry>& GetPendingBookmarks() const {
     return importer_->pending_bookmarks_;
-  }
-
-  const std::vector<ImportedBookmarkEntry>& GetPendingReadingList() const {
-    return importer_->pending_reading_list_;
   }
 
   void PrepareBookmarks(std::string html_data) {
@@ -374,8 +353,6 @@ class SafariDataImporterTest : public testing::Test {
     EXPECT_CALL(client_, OnHistoryImported(7u));  // Actual.
   }
 
-  ReadingListModel* GetReadingListModel() { return reading_list_model_.get(); }
-
   password_manager::TestPasswordStore* profile_store() {
     return profile_store_.get();
   }
@@ -418,7 +395,6 @@ class SafariDataImporterTest : public testing::Test {
   base::ScopedTempDir history_dir_;
   std::unique_ptr<history::HistoryService> history_service_;
   std::unique_ptr<bookmarks::BookmarkModel> bookmark_model_;
-  std::unique_ptr<ReadingListModel> reading_list_model_;
   bool presenter_ready_ = false;
 
   // On iOS, bookmark processing happens in WebKit, so running until idle isn't
@@ -472,8 +448,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_Basic) {
   EXPECT_EQ(entry.creation_time, base::Time::Now());
   EXPECT_EQ(entry.url, GURL("https://www.chromium.org/"));
   EXPECT_THAT(entry.path, IsEmpty());
-
-  EXPECT_EQ(GetPendingReadingList().size(), 0u);
 }
 
 // Identical to the above test, but without the top-level <DL> tag enclosing it.
@@ -506,8 +480,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_NoTopLevelDL) {
   EXPECT_EQ(entry.creation_time, base::Time::Now());
   EXPECT_EQ(entry.url, GURL("https://www.chromium.org/"));
   EXPECT_THAT(entry.path, IsEmpty());
-
-  EXPECT_EQ(GetPendingReadingList().size(), 0u);
 }
 
 TEST_F(SafariDataImporterTest, Bookmarks_Folders) {
@@ -566,8 +538,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_Folders) {
   EXPECT_EQ(entry.creation_time, base::Time::Now());
   EXPECT_TRUE(entry.url.is_empty());
   EXPECT_THAT(entry.path, IsEmpty());
-
-  EXPECT_EQ(GetPendingReadingList().size(), 0u);
 }
 
 TEST_F(SafariDataImporterTest, Bookmarks_MiscJunk) {

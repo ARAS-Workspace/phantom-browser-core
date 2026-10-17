@@ -34,7 +34,6 @@
 #include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profiles_state.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/security_events/security_event_recorder_factory.h"
 #include "chrome/browser/signin/about_signin_internals_factory.h"
@@ -173,8 +172,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
           PersonalCollaborationDataServiceFactory::GetForProfile(profile));
   builder.SetDeviceInfoSyncService(
       DeviceInfoSyncServiceFactory::GetForProfile(profile));
-  builder.SetDualReadingListModel(
-      ReadingListModelFactory::GetAsDualReadingListForBrowserContext(profile));
   builder.SetFaviconService(FaviconServiceFactory::GetForProfile(
       profile, ServiceAccessType::IMPLICIT_ACCESS));
   builder.SetGoogleGroupsManager(
