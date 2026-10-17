@@ -302,9 +302,7 @@ class CustomizeChromePageHandlerTest : public testing::Test {
     const std::vector<ntp::ModuleIdDetail> module_id_details = {
         {ntp_modules::kMostRelevantTabResumptionModuleId,
          IDS_NTP_MODULES_MOST_RELEVANT_TAB_RESUMPTION_TITLE},
-        {ntp_modules::kMicrosoftAuthenticationModuleId,
-         IDS_NTP_MODULES_MICROSOFT_AUTHENTICATION_NAME,
-         IDS_NTP_MICROSOFT_AUTHENTICATION_SIDE_PANEL_DESCRIPTION}};
+        {ntp_modules::kTabGroupsModuleId, IDS_NTP_MODULES_TAB_GROUPS_TITLE}};
     handler_ = std::make_unique<CustomizeChromePageHandler>(
         mojo::PendingReceiver<side_panel::mojom::CustomizeChromePageHandler>(),
         mock_page_.BindAndGetRemote(), &mock_ntp_custom_background_service_,
@@ -1307,16 +1305,12 @@ TEST_F(CustomizeChromePageHandlerWithModulesTest, SetModulesSettings) {
             tab_resumption_settings->name);
   EXPECT_EQ(std::nullopt, tab_resumption_settings->description);
   EXPECT_TRUE(tab_resumption_settings->enabled);
-  const auto& microsoft_auth_settings = modules_settings[1];
-  EXPECT_EQ(ntp_modules::kMicrosoftAuthenticationModuleId,
-            microsoft_auth_settings->id);
-  EXPECT_EQ(
-      l10n_util::GetStringUTF8(IDS_NTP_MODULES_MICROSOFT_AUTHENTICATION_NAME),
-      microsoft_auth_settings->name);
-  EXPECT_EQ(l10n_util::GetStringUTF8(
-                IDS_NTP_MICROSOFT_AUTHENTICATION_SIDE_PANEL_DESCRIPTION),
-            microsoft_auth_settings->description);
-  EXPECT_TRUE(microsoft_auth_settings->enabled);
+  const auto& tab_groups_settings = modules_settings[1];
+  EXPECT_EQ(ntp_modules::kTabGroupsModuleId, tab_groups_settings->id);
+  EXPECT_EQ(l10n_util::GetStringUTF8(IDS_NTP_MODULES_TAB_GROUPS_TITLE),
+            tab_groups_settings->name);
+  EXPECT_EQ(std::nullopt, tab_groups_settings->description);
+  EXPECT_TRUE(tab_groups_settings->enabled);
 }
 
 TEST_F(CustomizeChromePageHandlerWithModulesTest, SetModulesVisible_True) {
@@ -1395,14 +1389,13 @@ TEST_F(CustomizeChromePageHandlerWithModulesTest, SetModuleDisabled) {
                   ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
                   .FindBool(ntp_modules::kMostRelevantTabResumptionModuleId)
                   .value_or(false));
-  const auto& microsoft_auth_settings = modules_settings[1];
-  EXPECT_EQ(ntp_modules::kMicrosoftAuthenticationModuleId,
-            microsoft_auth_settings->id);
-  EXPECT_TRUE(microsoft_auth_settings->enabled);
+  const auto& tab_groups_settings = modules_settings[1];
+  EXPECT_EQ(ntp_modules::kTabGroupsModuleId, tab_groups_settings->id);
+  EXPECT_TRUE(tab_groups_settings->enabled);
   EXPECT_FALSE(profile()
                    .GetPrefs()
                    ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-                   .FindBool(ntp_modules::kMicrosoftAuthenticationModuleId)
+                   .FindBool(ntp_modules::kTabGroupsModuleId)
                    .value_or(false));
 }
 
@@ -1428,8 +1421,8 @@ TEST_F(CustomizeChromePageHandlerWithModulesTest,
   EXPECT_EQ(2u, modules_settings.size());
   const auto& tab_resumption_settings = modules_settings[0];
   EXPECT_FALSE(tab_resumption_settings->visible);
-  const auto& microsoft_auth_settings = modules_settings[1];
-  EXPECT_TRUE(microsoft_auth_settings->visible);
+  const auto& tab_groups_settings = modules_settings[1];
+  EXPECT_TRUE(tab_groups_settings->visible);
 }
 
 class CustomizeChromePageHandlerWithModulesVisibilityTest

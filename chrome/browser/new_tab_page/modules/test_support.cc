@@ -18,7 +18,6 @@ MockHistoryService::~MockHistoryService() = default;
 
 const std::vector<base::test::FeatureRef>& kAllModuleFeatures = {
     ntp_features::kNtpMostRelevantTabResumptionModule,
-    ntp_features::kNtpOutlookCalendarModule,
 };
 
 std::vector<base::test::FeatureRef> ComputeDisabledFeaturesList(

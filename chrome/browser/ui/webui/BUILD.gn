@@ -172,10 +172,6 @@ source_set("configs") {
   if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/webui/discards" ]
   }
-
-  if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/ui/webui/ntp_microsoft_auth" ]
-  }
 }
 
 source_set("webui") {

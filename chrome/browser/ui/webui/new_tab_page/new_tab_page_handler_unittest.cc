@@ -27,9 +27,6 @@
 #include "base/token.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_factory.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_observer.h"
 #include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
@@ -119,10 +116,6 @@ class MockPage : public new_tab_page::mojom::Page {
   MOCK_METHOD(void, ShowWebstoreToast, ());
   MOCK_METHOD(void, SetWallpaperSearchButtonVisibility, (bool));
   MOCK_METHOD(void, FooterVisibilityUpdated, (bool));
-  MOCK_METHOD(void,
-              ConnectToParentDocument,
-              (mojo::PendingRemote<
-                  new_tab_page::mojom::MicrosoftAuthUntrustedDocument>));
 
   mojo::Receiver<new_tab_page::mojom::Page> receiver_{this};
 };
@@ -173,21 +166,9 @@ class MockNtpCustomBackgroundService : public NtpCustomBackgroundService {
   MOCK_METHOD(void, AddObserver, (NtpCustomBackgroundServiceObserver*));
 };
 
-class MockMicrosoftAuthService : public MicrosoftAuthService {
- public:
-  MOCK_METHOD0(GetAuthState, MicrosoftAuthService::AuthState());
-  MOCK_METHOD(void, AddObserver, (MicrosoftAuthServiceObserver*), (override));
-};
-
 std::unique_ptr<TestingProfile> MakeTestingProfile(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   TestingProfile::Builder profile_builder;
-  profile_builder.AddTestingFactory(
-      MicrosoftAuthServiceFactory::GetInstance(),
-      base::BindRepeating([](content::BrowserContext* context)
-                              -> std::unique_ptr<KeyedService> {
-        return std::make_unique<testing::NiceMock<MockMicrosoftAuthService>>();
-      }));
   profile_builder.AddTestingFactory(
       OptimizationGuideKeyedServiceFactory::GetInstance(),
       base::BindRepeating([](content::BrowserContext* context)
@@ -346,8 +327,7 @@ class NewTabPageHandlerTest : public testing::Test {
 
  private:
   const std::vector<ntp::ModuleIdDetail> module_id_details = {
-      {ntp_modules::kMicrosoftFilesModuleId,
-       IDS_NTP_MODULES_MICROSOFT_FILES_NAME}};
+      {ntp_modules::kDummyModuleId, IDS_NTP_MODULES_DUMMY_TITLE}};
   raw_ptr<MockHatsService> mock_hats_service_;
 };
 
@@ -728,96 +708,6 @@ TEST_F(NewTabPageHandlerTest, Histograms) {
       1);
 }
 
-class NewTabPageHandlerMicrosoftAuthStateTest
-    : public NewTabPageHandlerTest,
-      public ::testing::WithParamInterface<MicrosoftAuthService::AuthState> {
- public:
-  NewTabPageHandlerMicrosoftAuthStateTest() {
-    profile_->GetTestingPrefService()->SetManagedPref(
-        prefs::kNtpSharepointModuleVisible, base::Value(true));
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/{ntp_features::kNtpMicrosoftAuthenticationModule,
-                              ntp_features::kNtpSharepointModule,
-                              ntp_features::kNtpOutlookCalendarModule},
-        /*disabled_features=*/{});
-
-    mock_microsoft_auth_service_ = static_cast<MockMicrosoftAuthService*>(
-        MicrosoftAuthServiceFactory::GetForProfile(profile_.get()));
-    EXPECT_CALL(*mock_microsoft_auth_service_, AddObserver)
-        .Times(1)
-        .WillOnce(testing::SaveArg<0>(&microsoft_auth_service_observer_));
-  }
-
-  MockMicrosoftAuthService& mock_microsoft_auth_service() {
-    return *mock_microsoft_auth_service_;
-  }
-
-  MicrosoftAuthServiceObserver& microsoft_auth_service_observer() {
-    return *microsoft_auth_service_observer_;
-  }
-
-  void SetAuthState(MicrosoftAuthService::AuthState state) {
-    ON_CALL(mock_microsoft_auth_service(), GetAuthState())
-        .WillByDefault(testing::Return(state));
-  }
-
-  MicrosoftAuthService::AuthState AuthState() const { return GetParam(); }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  raw_ptr<MockMicrosoftAuthService> mock_microsoft_auth_service_;
-  raw_ptr<MicrosoftAuthServiceObserver> microsoft_auth_service_observer_;
-};
-
-TEST_P(NewTabPageHandlerMicrosoftAuthStateTest, OnAuthStateUpdated) {
-  SetAuthState(AuthState());
-
-  microsoft_auth_service_observer().OnAuthStateUpdated();
-  mock_page_.FlushForTesting();
-
-  base::ListValue auth_dependent_modules;
-  for (const char* id : ntp_modules::kMicrosoftAuthDependentModuleIds) {
-    auth_dependent_modules.Append(id);
-  }
-  const std::string auth_id = ntp_modules::kMicrosoftAuthenticationModuleId;
-  base::ListValue expected_disabled_modules;
-  switch (AuthState()) {
-    case MicrosoftAuthService::AuthState::kNone:
-      break;
-    case MicrosoftAuthService::AuthState::kError:
-      expected_disabled_modules = std::move(auth_dependent_modules);
-      break;
-    case MicrosoftAuthService::AuthState::kSuccess:
-      expected_disabled_modules.Append(auth_id);
-      break;
-  }
-
-  EXPECT_EQ(profile_->GetPrefs()->GetList(prefs::kNtpHiddenModules),
-            expected_disabled_modules);
-}
-
-TEST_P(NewTabPageHandlerMicrosoftAuthStateTest,
-       UpdateModulesLoadableTriggersPageCall) {
-  SetAuthState(AuthState());
-
-  handler_->UpdateModulesLoadable();
-
-  if (AuthState() == MicrosoftAuthService::AuthState::kNone) {
-    EXPECT_CALL(mock_page_, SetModulesLoadable()).Times(0);
-  } else {
-    EXPECT_CALL(mock_page_, SetModulesLoadable()).Times(1);
-  }
-
-  mock_page_.FlushForTesting();
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    NewTabPageHandlerMicrosoftAuthStateTest,
-    ::testing::Values(MicrosoftAuthService::AuthState::kNone,
-                      MicrosoftAuthService::AuthState::kError,
-                      MicrosoftAuthService::AuthState::kSuccess));
-
 TEST_F(NewTabPageHandlerTest, GetModulesIdNames) {
   std::vector<new_tab_page::mojom::ModuleIdNamePtr> modules_details;
   base::MockCallback<NewTabPageHandler::GetModulesIdNamesCallback> callback;
@@ -829,7 +719,7 @@ TEST_F(NewTabPageHandlerTest, GetModulesIdNames) {
       });
   handler_->GetModulesIdNames(callback.Get());
   EXPECT_EQ(modules_details.size(), 1u);
-  EXPECT_EQ(modules_details.front()->id, ntp_modules::kMicrosoftFilesModuleId);
+  EXPECT_EQ(modules_details.front()->id, ntp_modules::kDummyModuleId);
 }
 
 TEST_F(NewTabPageHandlerTest, GetModulesOrder) {
@@ -839,7 +729,7 @@ TEST_F(NewTabPageHandlerTest, GetModulesOrder) {
   base::test::ScopedFeatureList features;
   features.InitWithFeaturesAndParameters(
       {{ntp_features::kNtpModulesOrder,
-        {{ntp_features::kNtpModulesOrderParam, "bar,baz,microsoft_files"}}},
+        {{ntp_features::kNtpModulesOrderParam, "bar,baz"}}},
        {ntp_features::kNtpModulesDragAndDrop, {}}},
       {});
   base::ListValue module_ids_value;
@@ -849,9 +739,7 @@ TEST_F(NewTabPageHandlerTest, GetModulesOrder) {
                                 std::move(module_ids_value));
 
   handler_->GetModulesOrder(callback.Get());
-  EXPECT_THAT(module_ids, ElementsAre("foo", "bar", "baz", "microsoft_files",
-                                      "microsoft_authentication",
-                                      "outlook_calendar", "tab_resumption"));
+  EXPECT_THAT(module_ids, ElementsAre("foo", "bar", "baz", "tab_resumption"));
 }
 
 class NewTabPageHandlerModuleRemovalTest : public NewTabPageHandlerTest {
@@ -954,7 +842,7 @@ TEST_F(NewTabPageHandlerModuleRemovalTest,
 
   ScopedDictPrefUpdate update(profile_->GetPrefs(),
                               ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  update->Set(ntp_modules::kMicrosoftFilesModuleId, true);
+  update->Set(ntp_modules::kDummyModuleId, true);
 
   // Act.
   std::vector<std::string> removed_modules = WrapGetModulesEligibleForRemoval();
@@ -980,7 +868,7 @@ TEST_F(NewTabPageHandlerModuleRemovalTest,
   const int below_staleness_threshold = 1;
   ScopedDictPrefUpdate update(profile_->GetPrefs(),
                               ntp_prefs::kNtpModuleStalenessCountDict);
-  update->Set(ntp_modules::kMicrosoftFilesModuleId, below_staleness_threshold);
+  update->Set(ntp_modules::kDummyModuleId, below_staleness_threshold);
 
   // Act.
   std::vector<std::string> removed_modules = WrapGetModulesEligibleForRemoval();
@@ -1006,31 +894,33 @@ TEST_F(NewTabPageHandlerModuleRemovalTest,
   const int above_staleness_threshold = 100;
   ScopedDictPrefUpdate update(profile_->GetPrefs(),
                               ntp_prefs::kNtpModuleStalenessCountDict);
-  update->Set(ntp_modules::kMicrosoftFilesModuleId, above_staleness_threshold);
+  update->Set(ntp_modules::kDummyModuleId, above_staleness_threshold);
 
   // Act.
   std::vector<std::string> removed_modules = WrapGetModulesEligibleForRemoval();
 
   // Assert.
   EXPECT_EQ(1u, removed_modules.size());
-  EXPECT_TRUE(std::ranges::contains(removed_modules,
-                                    ntp_modules::kMicrosoftFilesModuleId));
+  EXPECT_TRUE(
+      std::ranges::contains(removed_modules, ntp_modules::kDummyModuleId));
 }
 
 TEST_F(NewTabPageHandlerTest, SetModulesDisabledTrueDisabledAndTrueUserAction) {
   // Arrange.
   ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
   base::ListValue& initial_disabled_modules_list = update.Get();
-  initial_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
+  initial_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
 
   std::vector<std::string> set_disabled_modules_true = {
-      ntp_modules::kMicrosoftFilesModuleId,
+      ntp_modules::kDummyModuleId,
       ntp_modules::kTabGroupsModuleId,
   };
 
   base::ListValue expected_disabled_modules_list;
-  expected_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
-  expected_disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  expected_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
+  expected_disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   expected_disabled_modules_list.Append(ntp_modules::kTabGroupsModuleId);
 
   // Act.
@@ -1043,17 +933,16 @@ TEST_F(NewTabPageHandlerTest, SetModulesDisabledTrueDisabledAndTrueUserAction) {
 
   const base::DictValue& removal_disabled_dict = profile_->GetPrefs()->GetDict(
       ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  EXPECT_TRUE(
-      removal_disabled_dict.FindBool(ntp_modules::kMicrosoftFilesModuleId)
-          .value_or(false));
+  EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kDummyModuleId)
+                  .value_or(false));
   EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kTabGroupsModuleId)
                   .value_or(false));
 
   const base::DictValue& interacted_count_dict =
       profile_->GetPrefs()->GetDict(prefs::kNtpModulesInteractedCountDict);
-  EXPECT_EQ(1,
-            interacted_count_dict.FindInt(ntp_modules::kMicrosoftFilesModuleId)
-                .value_or(0));
+  EXPECT_EQ(
+      1,
+      interacted_count_dict.FindInt(ntp_modules::kDummyModuleId).value_or(0));
   EXPECT_EQ(1, interacted_count_dict.FindInt(ntp_modules::kTabGroupsModuleId)
                    .value_or(0));
 }
@@ -1063,17 +952,19 @@ TEST_F(NewTabPageHandlerTest,
   // Arrange.
   ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
   base::ListValue& initial_disabled_modules_list = update.Get();
-  initial_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
-  initial_disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  initial_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
+  initial_disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   initial_disabled_modules_list.Append(ntp_modules::kTabGroupsModuleId);
 
   std::vector<std::string> set_disabled_modules_false = {
-      ntp_modules::kMicrosoftFilesModuleId,
+      ntp_modules::kDummyModuleId,
       ntp_modules::kTabGroupsModuleId,
   };
 
   base::ListValue expected_disabled_modules_list;
-  expected_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
+  expected_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
 
   // Act.
   handler_->SetModulesDisabled(set_disabled_modules_false, /*disabled=*/false,
@@ -1084,17 +975,16 @@ TEST_F(NewTabPageHandlerTest,
             profile_->GetPrefs()->GetList(prefs::kNtpDisabledModules));
   const base::DictValue& removal_disabled_dict = profile_->GetPrefs()->GetDict(
       ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  EXPECT_TRUE(
-      removal_disabled_dict.FindBool(ntp_modules::kMicrosoftFilesModuleId)
-          .value_or(false));
+  EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kDummyModuleId)
+                  .value_or(false));
   EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kTabGroupsModuleId)
                   .value_or(false));
 
   const base::DictValue& interacted_count_dict =
       profile_->GetPrefs()->GetDict(prefs::kNtpModulesInteractedCountDict);
-  EXPECT_EQ(1,
-            interacted_count_dict.FindInt(ntp_modules::kMicrosoftFilesModuleId)
-                .value_or(0));
+  EXPECT_EQ(
+      1,
+      interacted_count_dict.FindInt(ntp_modules::kDummyModuleId).value_or(0));
   EXPECT_EQ(1, interacted_count_dict.FindInt(ntp_modules::kTabGroupsModuleId)
                    .value_or(0));
 }
@@ -1104,16 +994,18 @@ TEST_F(NewTabPageHandlerTest,
   // Arrange.
   ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
   base::ListValue& initial_disabled_modules_list = update.Get();
-  initial_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
+  initial_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
 
   std::vector<std::string> set_disabled_modules_true = {
-      ntp_modules::kMicrosoftFilesModuleId,
+      ntp_modules::kDummyModuleId,
       ntp_modules::kTabGroupsModuleId,
   };
 
   base::ListValue expected_disabled_modules_list;
-  expected_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
-  expected_disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  expected_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
+  expected_disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   expected_disabled_modules_list.Append(ntp_modules::kTabGroupsModuleId);
 
   // Act.
@@ -1126,17 +1018,16 @@ TEST_F(NewTabPageHandlerTest,
 
   const base::DictValue& removal_disabled_dict = profile_->GetPrefs()->GetDict(
       ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  EXPECT_TRUE(
-      removal_disabled_dict.FindBool(ntp_modules::kMicrosoftFilesModuleId)
-          .value_or(false));
+  EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kDummyModuleId)
+                  .value_or(false));
   EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kTabGroupsModuleId)
                   .value_or(false));
 
   const base::DictValue& interacted_count_dict =
       profile_->GetPrefs()->GetDict(prefs::kNtpModulesInteractedCountDict);
-  EXPECT_EQ(0,
-            interacted_count_dict.FindInt(ntp_modules::kMicrosoftFilesModuleId)
-                .value_or(0));
+  EXPECT_EQ(
+      0,
+      interacted_count_dict.FindInt(ntp_modules::kDummyModuleId).value_or(0));
   EXPECT_EQ(0, interacted_count_dict.FindInt(ntp_modules::kTabGroupsModuleId)
                    .value_or(0));
 }
@@ -1146,17 +1037,19 @@ TEST_F(NewTabPageHandlerTest,
   // Arrange.
   ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
   base::ListValue& initial_disabled_modules_list = update.Get();
-  initial_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
-  initial_disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  initial_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
+  initial_disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   initial_disabled_modules_list.Append(ntp_modules::kTabGroupsModuleId);
 
   std::vector<std::string> set_disabled_modules_false = {
-      ntp_modules::kMicrosoftFilesModuleId,
+      ntp_modules::kDummyModuleId,
       ntp_modules::kTabGroupsModuleId,
   };
 
   base::ListValue expected_disabled_modules_list;
-  expected_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
+  expected_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
 
   // Act.
   handler_->SetModulesDisabled(set_disabled_modules_false, /*disabled=*/false,
@@ -1168,17 +1061,16 @@ TEST_F(NewTabPageHandlerTest,
 
   const base::DictValue& removal_disabled_dict = profile_->GetPrefs()->GetDict(
       ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  EXPECT_TRUE(
-      removal_disabled_dict.FindBool(ntp_modules::kMicrosoftFilesModuleId)
-          .value_or(false));
+  EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kDummyModuleId)
+                  .value_or(false));
   EXPECT_TRUE(removal_disabled_dict.FindBool(ntp_modules::kTabGroupsModuleId)
                   .value_or(false));
 
   const base::DictValue& interacted_count_dict =
       profile_->GetPrefs()->GetDict(prefs::kNtpModulesInteractedCountDict);
-  EXPECT_EQ(0,
-            interacted_count_dict.FindInt(ntp_modules::kMicrosoftFilesModuleId)
-                .value_or(0));
+  EXPECT_EQ(
+      0,
+      interacted_count_dict.FindInt(ntp_modules::kDummyModuleId).value_or(0));
   EXPECT_EQ(0, interacted_count_dict.FindInt(ntp_modules::kTabGroupsModuleId)
                    .value_or(0));
 }
@@ -1187,9 +1079,10 @@ TEST_F(NewTabPageHandlerTest, SetModulesDisabledEmptyList) {
   // Arrange.
   ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
   base::ListValue& initial_disabled_modules_list = update.Get();
-  initial_disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  initial_disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   initial_disabled_modules_list.Append(ntp_modules::kTabGroupsModuleId);
-  initial_disabled_modules_list.Append(ntp_modules::kOutlookCalendarModuleId);
+  initial_disabled_modules_list.Append(
+      ntp_modules::kMostRelevantTabResumptionModuleId);
 
   std::vector<std::string> set_disabled_modules_empty = {};
 
@@ -1208,7 +1101,7 @@ TEST_F(NewTabPageHandlerTest, SurveyLaunchedEligibleModulesCriteria) {
       {
           {features::kHappinessTrackingSurveysForDesktopNtpModules,
            {{ntp_features::kNtpModulesEligibleForHappinessTrackingSurveyParam,
-             "tab_groups,microsoft_files"}}},
+             "tab_groups,dummy"}}},
       },
       {});
 
@@ -1233,7 +1126,7 @@ TEST_F(NewTabPageHandlerTest, SurveyLaunchSkippedEligibleModulesCriteria) {
       {
           {features::kHappinessTrackingSurveysForDesktopNtpModules,
            {{ntp_features::kNtpModulesEligibleForHappinessTrackingSurveyParam,
-             ntp_modules::kMicrosoftFilesModuleId}}},
+             ntp_modules::kDummyModuleId}}},
       },
       {});
 
@@ -1255,19 +1148,19 @@ TEST_F(NewTabPageHandlerTest, SetModuleDisabled) {
   EXPECT_EQ(disabled_modules_list,
             profile_->GetPrefs()->GetList(prefs::kNtpDisabledModules));
 
-  std::vector<std::string> module_ids = {ntp_modules::kMicrosoftFilesModuleId};
+  std::vector<std::string> module_ids = {ntp_modules::kDummyModuleId};
   handler_->SetModulesDisabled(module_ids, /*disabled=*/true,
                                /*is_user_action=*/true);
   EXPECT_CALL(mock_page_, SetDisabledModules).Times(1);
   mock_page_.FlushForTesting();
 
-  disabled_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  disabled_modules_list.Append(ntp_modules::kDummyModuleId);
   EXPECT_EQ(disabled_modules_list,
             profile_->GetPrefs()->GetList(prefs::kNtpDisabledModules));
 
   EXPECT_TRUE(profile_->GetPrefs()
                   ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-                  .FindBool(ntp_modules::kMicrosoftFilesModuleId)
+                  .FindBool(ntp_modules::kDummyModuleId)
                   .value_or(false));
 }
 
@@ -1285,27 +1178,27 @@ TEST_F(NewTabPageHandlerTest, SetModuleHiddenAndDisabled) {
   mock_page_.FlushForTesting();
 
   base::ListValue hidden_modules_list;
-  hidden_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  hidden_modules_list.Append(ntp_modules::kDummyModuleId);
   profile_->GetPrefs()->SetList(prefs::kNtpHiddenModules,
                                 std::move(hidden_modules_list));
   mock_page_.FlushForTesting();
   EXPECT_FALSE(all);
   EXPECT_EQ(1u, disabled_module_ids.size());
-  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kMicrosoftFilesModuleId);
+  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kDummyModuleId);
 
-  std::vector<std::string> module_ids = {ntp_modules::kMicrosoftFilesModuleId};
+  std::vector<std::string> module_ids = {ntp_modules::kDummyModuleId};
   handler_->SetModulesDisabled(module_ids, /*disabled=*/true,
                                /*is_user_action=*/true);
   mock_page_.FlushForTesting();
   // Ensure |disabled_module_ids| still only has one entry for
-  // `ntp_modules::kMicrosoftFilesModuleId`.
+  // `ntp_modules::kDummyModuleId`.
   EXPECT_FALSE(all);
   EXPECT_EQ(1u, disabled_module_ids.size());
-  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kMicrosoftFilesModuleId);
+  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kDummyModuleId);
 
   EXPECT_TRUE(profile_->GetPrefs()
                   ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-                  .FindBool(ntp_modules::kMicrosoftFilesModuleId)
+                  .FindBool(ntp_modules::kDummyModuleId)
                   .value_or(false));
 }
 
@@ -1325,7 +1218,7 @@ TEST_F(NewTabPageHandlerTest, SetModuleHiddenAndDisabledCardsManagedVisible) {
   mock_page_.FlushForTesting();
 
   // Managed card visibility should ignore disabling of cards.
-  std::vector<std::string> module_ids = {ntp_modules::kMicrosoftFilesModuleId};
+  std::vector<std::string> module_ids = {ntp_modules::kDummyModuleId};
   handler_->SetModulesDisabled(module_ids, /*disabled=*/true,
                                /*is_user_action=*/true);
   mock_page_.FlushForTesting();
@@ -1335,17 +1228,17 @@ TEST_F(NewTabPageHandlerTest, SetModuleHiddenAndDisabledCardsManagedVisible) {
   // Managed card visibility that forces display of cards should respect
   // hidden cards.
   base::ListValue hidden_modules_list;
-  hidden_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  hidden_modules_list.Append(ntp_modules::kDummyModuleId);
   profile_->GetPrefs()->SetList(prefs::kNtpHiddenModules,
                                 std::move(hidden_modules_list));
   mock_page_.FlushForTesting();
   EXPECT_FALSE(all);
   EXPECT_EQ(1u, disabled_module_ids.size());
-  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kMicrosoftFilesModuleId);
+  EXPECT_EQ(disabled_module_ids[0], ntp_modules::kDummyModuleId);
 
   EXPECT_TRUE(profile_->GetPrefs()
                   ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-                  .FindBool(ntp_modules::kMicrosoftFilesModuleId)
+                  .FindBool(ntp_modules::kDummyModuleId)
                   .value_or(false));
 }
 
@@ -1368,14 +1261,14 @@ TEST_F(NewTabPageHandlerTest,
   // Managed card visibility of cards should ignore hidden and disabled cards
   // and send a value of true for all cards being disabled.
   base::ListValue hidden_modules_list;
-  hidden_modules_list.Append(ntp_modules::kMicrosoftFilesModuleId);
+  hidden_modules_list.Append(ntp_modules::kDummyModuleId);
   profile_->GetPrefs()->SetList(prefs::kNtpHiddenModules,
                                 std::move(hidden_modules_list));
   mock_page_.FlushForTesting();
   EXPECT_TRUE(all);
   EXPECT_TRUE(disabled_module_ids.empty());
 
-  std::vector<std::string> module_ids = {ntp_modules::kMicrosoftFilesModuleId};
+  std::vector<std::string> module_ids = {ntp_modules::kDummyModuleId};
   handler_->SetModulesDisabled(module_ids, /*disabled=*/true,
                                /*is_user_action=*/true);
   mock_page_.FlushForTesting();
@@ -1384,7 +1277,7 @@ TEST_F(NewTabPageHandlerTest,
 
   EXPECT_TRUE(profile_->GetPrefs()
                   ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-                  .FindBool(ntp_modules::kMicrosoftFilesModuleId)
+                  .FindBool(ntp_modules::kDummyModuleId)
                   .value_or(false));
 }
 

@@ -1198,13 +1198,6 @@ inline constexpr char kNtpCustomizeChromeIPHAutoOpened[] =
     "NewTabPage.CustomizeChromeIPHAutoOpened";
 // List keeping track of modules not allowed to show on New Tab Page.
 inline constexpr char kNtpHiddenModules[] = "NewTabPage.HiddenModules";
-// Time the Microsoft files module was last dismissed.
-inline constexpr char kNtpMicrosoftFilesModuleLastDismissedTime[] =
-    "NewTabPage.MicrosoftFilesModuleLastDismissedTime";
-// The next time file suggestions can be requested after hitting a throttling
-// error.
-inline constexpr char kNtpMicrosoftFilesModuleRetryAfterTime[] =
-    "NewTabPage.MicrosoftFilesModuleRetryAfterTime";
 // List keeping track of NTP modules order.
 inline constexpr char kNtpModulesOrder[] = "NewTabPage.ModulesOrder";
 // Whether NTP modules are visible.
@@ -1217,26 +1210,6 @@ inline constexpr char kNtpModulesLoadedCountDict[] =
 // Dictionary of number of times the user has interacted with a module.
 inline constexpr char kNtpModulesInteractedCountDict[] =
     "NewTabPage.ModulesInteractedCountDict";
-// Whether a user's file attachment page can be successfully retrieved. Kept in
-// sync with `kOutlookCalendarLastAttachmentRequestTime.`
-inline constexpr char kNtpOutlookCalendarLastAttachmentRequestSuccess[] =
-    "NewTabPage.OutlookCalendar.LastAttachmentRequestSuccess";
-// The last time the validity of an attachment's resource URL was checked.
-inline constexpr char kNtpOutlookCalendarLastAttachmentRequestTime[] =
-    "NewTabPage.OutlookCalendar.LastAttachmentRequestTime";
-// Time the Outlook Calendar module was last dismissed.
-inline constexpr char kNtpOutlookCalendarLastDismissedTime[] =
-    "NewTabPage.OutlookCalendar.LastDismissedTime";
-// The next time a user's Outlook calendar data can be requested after hitting a
-// throttling error.
-inline constexpr char kNtpOutlookCalendarRetryAfterTime[] =
-    "NewTabPage.OutlookCalendar.RetryAfterTime";
-// Whether NTP Outlook Calendar module is visible.
-inline constexpr char kNtpOutlookModuleVisible[] =
-    "NewTabPage.OutlookModuleVisible";
-// Whether NTP Sharepoint module is visible.
-inline constexpr char kNtpSharepointModuleVisible[] =
-    "NewTabPage.SharepointModuleVisible";
 // Number of times NTP wallpaper search button animation has been visible.
 inline constexpr char kNtpWallpaperSearchButtonShownCount[] =
     "NewTabPage.WallpaperSearchButtonShownCount";

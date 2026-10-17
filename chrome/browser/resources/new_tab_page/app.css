@@ -263,14 +263,6 @@ ntp-searchbox[shown] {
   padding: 16px;
 }
 
-/*
-  Microsoft Auth's iframe is used for script sandboxing only and requires no
-  user interaction. It does not need to be visible.
-*/
-#microsoftAuth {
-  display: none;
-}
-
 #dialogAnchor {
   anchor-name: --dialog-anchor;
   inset-inline-start: 0;

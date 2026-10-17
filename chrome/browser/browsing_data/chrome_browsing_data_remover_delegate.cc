@@ -160,8 +160,6 @@
 #include "services/tracing/public/cpp/background_tracing/background_tracing_manager.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_factory.h"
 #include "chrome/browser/user_education/browser_user_education_storage_service.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
@@ -577,18 +575,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       media_device_salt_service->DeleteSalts(
           delete_begin_, delete_end_, std::move(storage_key_matcher),
           CreateTaskCompletionClosure(TracingDataType::kMediaDeviceSalts));
-    }
-
-    // Remove local storage data from New Tab page when whenever there's a
-    // Microsoft auth service and cookies and site data is cleared.
-    MicrosoftAuthService* microsoft_auth_service =
-        MicrosoftAuthServiceFactory::GetForProfile(profile_);
-    if (microsoft_auth_service) {
-      microsoft_auth_service->ClearAuthData();
-
-      profile_->GetDefaultStoragePartition()->ClearDataForOrigin(
-          content::StoragePartition::REMOVE_DATA_MASK_LOCAL_STORAGE,
-          chrome::ChromeUINewTabPageURLAsGURL(), base::DoNothing());
     }
   }
 

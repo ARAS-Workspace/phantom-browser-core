@@ -32,12 +32,7 @@ enum class NtpShortcutsAutoRemovalReason {
 
 bool IsCartModuleEnabled();
 bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature);
-bool IsFeatureEnabled(const base::Feature& feature);
-bool IsFeatureForceEnabled(const base::Feature& feature);
-bool IsMicrosoftFilesModuleEnabledForProfile(Profile* profile);
 bool IsMostRelevantTabResumeModuleEnabled(Profile* profile);
-bool IsOutlookCalendarModuleEnabledForProfile(Profile* profile);
-bool IsMicrosoftModuleEnabledForProfile(Profile* profile);
 bool IsProfileSignedIn(Profile* profile);
 
 // Return the country code as provided by the variations service.
@@ -46,11 +41,6 @@ std::string GetVariationsServiceCountryCode(
 void LogModuleEnablement(const base::Feature& feature,
                          bool enabled,
                          const std::string& reason);
-void LogModuleDismissed(const base::Feature& feature,
-                        bool enabled,
-                        const std::string& remaining_hours);
-void LogModuleError(const base::Feature& feature,
-                    const std::string& error_message);
 
 bool IsTopSitesEnabled(Profile* profile);
 bool IsCustomLinksEnabled(Profile* profile);

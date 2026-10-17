@@ -55,15 +55,6 @@ BASE_DECLARE_FEATURE(kNtpModulesOrder);
 BASE_DECLARE_FEATURE(kNtpModulesDragAndDrop);
 BASE_DECLARE_FEATURE(kNtpModulesLoad);
 BASE_DECLARE_FEATURE(kNtpModuleSignInRequirement);
-BASE_DECLARE_FEATURE(kNtpOutlookCalendarModule);
-BASE_DECLARE_FEATURE(kNtpSharepointModule);
-enum class NtpSharepointModuleDataType {
-  kTrendingInsights,
-  kNonInsights,
-  kTrendingInsightsFakeData,
-  kNonInsightsFakeData,
-  kCombinedSuggestions,
-};
 BASE_DECLARE_FEATURE(kNtpShortcuts);
 BASE_DECLARE_FEATURE(kNtpMostVisitedHighDpiFavicons);
 BASE_DECLARE_FEATURE(kNtpHandleMostVisitedNavigationExplicitly);
@@ -75,7 +66,6 @@ BASE_DECLARE_FEATURE(kNtpTabResumptionModuleTimeLimit);
 BASE_DECLARE_FEATURE(kNtpWallpaperSearchButton);
 BASE_DECLARE_FEATURE(kNtpWallpaperSearchButtonAnimation);
 BASE_DECLARE_FEATURE(kNtpWallpaperSearchButtonAnimationShownThreshold);
-BASE_DECLARE_FEATURE(kNtpMicrosoftAuthenticationModule);
 BASE_DECLARE_FEATURE(kNtpNextFeatures);
 BASE_DECLARE_FEATURE(kNtpNextCanvasChip);
 BASE_DECLARE_FEATURE(kNtpStarterChip);
@@ -120,8 +110,6 @@ extern const char kNtpChromeCartModuleAbandonedCartDiscountUseUtmParam[];
 extern const char kNtpChromeCartModuleHeuristicsImprovementParam[];
 // Parameter for enabling coupons on the Cart module.
 extern const char kNtpChromeCartModuleCouponParam[];
-// Parameter determining the type of calendar data to render.
-extern const char kNtpOutlookCalendarModuleDataParam[];
 // Parameter determining the modules that are eligigle for HaTS.
 extern const char kNtpModulesEligibleForHappinessTrackingSurveyParam[];
 // Parameter determining module trigger ids for HaTS for eligible module ids for
@@ -165,40 +153,11 @@ extern const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount;
 // Customize Chrome in a session.
 extern const base::FeatureParam<int>
     kNtpCustomizeChromeAutoShownSessionMaxCount;
-// Parameter determining whether the existence of Outlook attachment pages
-// should be checked.
-extern const base::FeatureParam<bool>
-    kNtpOutlookCalendarModuleAttachmentCheckParam;
-// Parameter determining whether attachments should be disabled.
-extern const base::FeatureParam<bool>
-    kNtpOutlookCalendarModuleDisableAttachmentsParam;
-// Parameter determining the max number of events to display on the Outlook
-// Calendar module.
-extern const base::FeatureParam<int> kNtpOutlookCalendarModuleMaxEventsParam;
-// Parameter determining the time range of events.
-extern const base::FeatureParam<base::TimeDelta>
-    kNtpOutlookCalendarModuleRetrievalWindowParam;
 // Parameter determining the background color of the expanded state realbox.
 extern const base::FeatureParam<bool>
     kNtpRealboxCr23ExpandedStateBgMatchesOmnibox;
 // Parameter determining the whether the steady state realbox has a shadow.
 extern const base::FeatureParam<bool> kNtpRealboxCr23SteadyStateShadow;
-// Parameter determining the type of data to render.
-extern const base::FeatureParam<NtpSharepointModuleDataType>
-    kNtpSharepointModuleDataParam;
-// Parameter determining the max number of files to display on the Microsoft
-// files module.
-extern const base::FeatureParam<int> kNtpMicrosoftFilesModuleMaxFilesParam;
-// Parameter determining the max number of trending files to display on the
-// Microsoft files module. Used only for the
-// `NtpSharepointModuleDataType::kCombinedSuggestions` variation.
-extern const base::FeatureParam<int>
-    kNtpMicrosoftFilesModuleMaxTrendingFilesForCombinedParam;
-// Parameter determining the max number of used and shared files to display on
-// the Microsoft files module. Used only for the
-// `NtpSharepointModuleDataType::kCombinedSuggestions` variation.
-extern const base::FeatureParam<int>
-    kNtpMicrosoftFilesModuleMaxNonInsightsFilesForCombinedParam;
 // Parameter determining whether the tab resumption module should filter visits
 // that are associated with local tabs.
 extern const base::FeatureParam<bool>

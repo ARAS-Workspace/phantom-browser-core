@@ -73,10 +73,6 @@ class MockPage : public new_tab_page::mojom::Page {
   MOCK_METHOD(void, ShowWebstoreToast, ());
   MOCK_METHOD(void, SetWallpaperSearchButtonVisibility, (bool));
   MOCK_METHOD(void, FooterVisibilityUpdated, (bool));
-  MOCK_METHOD(void,
-              ConnectToParentDocument,
-              (mojo::PendingRemote<
-                  new_tab_page::mojom::MicrosoftAuthUntrustedDocument>));
 
   mojo::Receiver<new_tab_page::mojom::Page> receiver_{this};
 };

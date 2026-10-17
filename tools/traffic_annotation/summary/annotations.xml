@@ -246,10 +246,7 @@ Refer to README.md for content description and update process.
  <item id="lens_overlay_gen204" added_in_milestone="131" content_hash_code="0522c289" os_list="linux,windows,chromeos,android" file_path="chrome/browser/ui/lens/lens_overlay_gen204_controller.cc" />
  <item id="policy_proxy_config" added_in_milestone="131" content_hash_code="015c4f8d" os_list="linux,windows" file_path="chrome/enterprise_companion/proxy_config_service.cc" />
  <item id="lens_overlay_languages" added_in_milestone="132" content_hash_code="06a41fb0" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/lens/lens_overlay_languages_controller.cc" />
- <item id="outlook_calendar_page_handler" added_in_milestone="133" content_hash_code="02d4c022" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc" />
  <item id="omnibox_search_aggregator_suggest" added_in_milestone="133" content_hash_code="07a2e0b4" os_list="linux,windows,android,chromeos" file_path="components/omnibox/browser/enterprise_search_aggregator_suggestions_service.cc" />
- <item id="microsoft_files_page_handler" added_in_milestone="134" content_hash_code="0550fd5d" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files_page_handler.cc" />
- <item id="outlook_calendar_event_attachment" added_in_milestone="134" content_hash_code="07ede3aa" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.cc" />
  <item id="metrics_report_dwa" added_in_milestone="135" content_hash_code="04a744db" os_list="linux,windows,android,chromeos" file_path="components/metrics/net/net_metrics_log_uploader.cc" />
  <item id="version_history" added_in_milestone="135" content_hash_code="05797d05" os_list="linux,windows,chromeos" file_path="chrome/browser/upgrade_detector/version_history_client.cc" />
  <item id="payments_autofill" added_in_milestone="135" content_hash_code="04acbe74" os_list="linux,windows,android,chromeos" file_path="components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc" />

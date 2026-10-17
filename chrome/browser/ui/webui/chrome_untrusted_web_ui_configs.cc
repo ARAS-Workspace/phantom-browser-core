@@ -17,8 +17,6 @@
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui_untrusted.h"
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 
-#include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.h"
-
 void RegisterChromeUntrustedWebUIConfigs() {
 #if defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW)
   auto& map = content::WebUIConfigMap::GetInstance();
@@ -33,7 +31,4 @@ void RegisterChromeUntrustedWebUIConfigs() {
   map.AddUntrustedWebUIConfig(
       std::make_unique<printing::PrintPreviewUIUntrustedConfig>());
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
-
-  map.AddUntrustedWebUIConfig(
-      std::make_unique<NtpMicrosoftAuthUntrustedUIConfig>());
 }

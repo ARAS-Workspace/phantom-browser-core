@@ -16,10 +16,7 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files.mojom.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
-#include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth.mojom.h"
-#include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
 #include "chrome/browser/themes/theme_service.h"
@@ -73,10 +70,7 @@ class CustomizeButtonsHandler;
 #if !defined(OFFICIAL_BUILD)
 class FooHandler;
 #endif
-class OutlookCalendarPageHandler;
 class GURL;
-class MicrosoftAuthPageHandler;
-class MicrosoftFilesPageHandler;
 class MostRelevantTabResumptionPageHandler;
 class MostVisitedHandler;
 class MostVisitedPrefObserver;
@@ -150,27 +144,6 @@ class NewTabPageUI
       mojo::PendingReceiver<most_visited::mojom::MostVisitedPageHandlerFactory>
           pending_receiver);
 
-  // Instantiates the implementor of
-  // npt::calendar::mojom::OutlookCalendarPageHandler mojo interface passing the
-  // pending receiver that will be internally bound.
-  void BindInterface(
-      mojo::PendingReceiver<ntp::calendar::mojom::OutlookCalendarPageHandler>
-          pending_receiver);
-
-  // Instantiates the implementor of
-  // npt::authentication::mojom::MicrosoftAuthPageHandler mojo
-  // interface passing the pending receiver that will be internally bound.
-  void BindInterface(mojo::PendingReceiver<
-                     ntp::authentication::mojom::MicrosoftAuthPageHandler>
-                         pending_receiver);
-
-  // Instantiates the implementor of
-  // file_suggestion::mojom::MicrosoftFilesPageHandler mojo interface
-  // passing the pending receiver that will be internally bound.
-  void BindInterface(
-      mojo::PendingReceiver<file_suggestion::mojom::MicrosoftFilesPageHandler>
-          pending_receiver);
-
 #if !defined(OFFICIAL_BUILD)
   // Instantiates the implementor of the foo::mojom::FooHandler mojo interface
   // passing the pending receiver that will be internally bound.
@@ -196,10 +169,6 @@ class NewTabPageUI
   void BindInterface(
       mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandlerFactory>
           pending_receiver);
-
-  void ConnectToParentDocument(
-      mojo::PendingRemote<new_tab_page::mojom::MicrosoftAuthUntrustedDocument>
-          child_page);
 
   static scoped_refptr<base::RefCountedMemory> GetFaviconResourceBytes(
       ui::ResourceScaleFactor scale_factor);
@@ -308,9 +277,6 @@ class NewTabPageUI
   const std::vector<ntp::ModuleIdDetail> module_id_details_;
 
   // Mojo implementations for modules:
-  std::unique_ptr<MicrosoftAuthPageHandler> microsoft_auth_handler_;
-  std::unique_ptr<MicrosoftFilesPageHandler> microsoft_files_handler_;
-  std::unique_ptr<OutlookCalendarPageHandler> outlook_calendar_handler_;
   std::unique_ptr<TabGroupsPageHandler> tab_groups_handler_;
 
   base::WeakPtrFactory<NewTabPageUI> weak_ptr_factory_{this};

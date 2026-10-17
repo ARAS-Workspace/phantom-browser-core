@@ -1162,7 +1162,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/new_tab_page_third_party",
     "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
     "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
-    "//chrome/browser/ui/webui/ntp_microsoft_auth",
     "//chrome/browser/ui/webui/omnibox",
     "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
     "//chrome/browser/ui/webui/omnibox_everywhere",

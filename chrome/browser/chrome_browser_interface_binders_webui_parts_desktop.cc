@@ -9,11 +9,7 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files.mojom.h"
-#include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth.mojom.h"
-#include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/side_panel/history/history_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
@@ -29,11 +25,9 @@
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
-#include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.h"
 #include "chrome/browser/ui/webui/omnibox/logging/logs.mojom.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/debug/omnibox_everywhere_debug.mojom.h"
@@ -252,25 +246,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
                                            NewTabPageUI>(map);
   }
 
-  if (IsOutlookCalendarModuleEnabledForProfile(Profile::FromBrowserContext(
-          render_frame_host->GetBrowserContext()))) {
-    RegisterWebUIControllerInterfaceBinder<
-        ntp::calendar::mojom::OutlookCalendarPageHandler, NewTabPageUI>(map);
-  }
-
-  if (IsMicrosoftModuleEnabledForProfile(Profile::FromBrowserContext(
-          render_frame_host->GetBrowserContext()))) {
-    RegisterWebUIControllerInterfaceBinder<
-        ntp::authentication::mojom::MicrosoftAuthPageHandler, NewTabPageUI>(
-        map);
-  }
-
-  if (IsMicrosoftFilesModuleEnabledForProfile(Profile::FromBrowserContext(
-          render_frame_host->GetBrowserContext()))) {
-    RegisterWebUIControllerInterfaceBinder<
-        file_suggestion::mojom::MicrosoftFilesPageHandler, NewTabPageUI>(map);
-  }
-
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::BookmarksPageHandlerFactory, BookmarksSidePanelUI>(
       map);
@@ -387,10 +362,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(
     registry.ForWebUI<DataSharingUI>()
         .Add<data_sharing::mojom::PageHandlerFactory>();
   }
-
-  registry.ForWebUI<NtpMicrosoftAuthUntrustedUI>()
-      .Add<new_tab_page::mojom::
-               MicrosoftAuthUntrustedDocumentInterfacesFactory>();
 }
 
 }  // namespace chrome::internal

@@ -14,8 +14,6 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_observer.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/themes/theme_service.h"
@@ -43,7 +41,6 @@
 class OptimizationGuideKeyedService;
 class PrefRegistrySimple;
 class Profile;
-class MicrosoftAuthService;
 class NTPUserDataLogger;
 class NewTabPageFeaturePromoHelper;
 
@@ -73,7 +70,6 @@ class NewTabPageHandler
       public ThemeServiceObserver,
       public NtpCustomBackgroundServiceObserver,
       public optimization_guide::SettingsEnabledObserver,
-      public MicrosoftAuthServiceObserver,
       public new_tab_footer::NewTabFooterControllerObserver {
  public:
   NewTabPageHandler(mojo::PendingReceiver<new_tab_page::mojom::PageHandler>
@@ -109,12 +105,6 @@ class NewTabPageHandler
 
   // This method should be called before the tab is deleted.
   void TabWillDelete();
-
-  // Called when a child page wants to bind its interface in `page_`, so they
-  // can communicate via Mojo.
-  void ConnectToParentDocument(
-      mojo::PendingRemote<new_tab_page::mojom::MicrosoftAuthUntrustedDocument>
-          child_untrusted_document_remote);
 
   // new_tab_page::mojom::PageHandler:
   void SetMostVisitedSettings(ntp_tiles::TileType type, bool visible) override;
@@ -155,9 +145,6 @@ class NewTabPageHandler
   // SettingsEnabledObserver:
   void OnChangeInFeatureCurrentlyEnabledState(bool is_now_enabled) override;
 
-  // MicrosoftAuthServiceObserver:
-  void OnAuthStateUpdated() override;
-
   // new_tab_footer::NewTabFooterControllerObserver:
   void OnFooterVisibilityUpdated(bool visible) override;
 
@@ -188,8 +175,6 @@ class NewTabPageHandler
       std::string_view interaction,
       const std::string& module_id);
 
-  void SetModuleHidden(const std::string& module_id, bool hidden);
-
   // Returns a list of module ids that are eligible for removal, which is
   // determined the module staleness and the staleness threshold.
   std::vector<std::string> GetModulesEligibleForRemoval() const;
@@ -198,16 +183,9 @@ class NewTabPageHandler
 
   void TryShowRealboxContextualMenuIPH(ui::TrackedElement* element);
 
-  // Synchronizes Microsoft module enablement with their current authentication
-  // state. The return value indicates whether the modules should be considered
-  // loadable.
-  bool SyncMicrosoftModulesWithAuth();
-
   NTPUserDataLogger logger_;
   base::ScopedObservation<ThemeService, ThemeServiceObserver>
       theme_service_observation_{this};
-  base::ScopedObservation<MicrosoftAuthService, MicrosoftAuthServiceObserver>
-      microsoft_auth_service_observation_{this};
   base::ScopedObservation<new_tab_footer::NewTabFooterController,
                           new_tab_footer::NewTabFooterControllerObserver>
       footer_controller_observation_{this};
@@ -225,7 +203,6 @@ class NewTabPageHandler
   raw_ptr<const std::vector<ntp::ModuleIdDetail>> const module_id_details_;
   PrefChangeRegistrar pref_change_registrar_;
   PrefChangeRegistrar local_state_pref_change_registrar_;
-  raw_ptr<MicrosoftAuthService> const microsoft_auth_service_;
   raw_ptr<OptimizationGuideKeyedService> optimization_guide_keyed_service_ =
       nullptr;
   base::ScopedObservation<ui::NativeTheme, ui::NativeThemeObserver>

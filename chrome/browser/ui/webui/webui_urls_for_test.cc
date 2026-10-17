@@ -145,7 +145,6 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
   // exempted from these basic checks.
   static constexpr std::string_view kChromeUntestedUrls[] = {
       "chrome-untrusted://data-sharing",
-      "chrome-untrusted://ntp-microsoft-auth",
       "chrome-untrusted://print",
 #if !defined(NDEBUG)
       // TODO(crbug.com/487113801): Investigate why tests are flaky on dbg bots.

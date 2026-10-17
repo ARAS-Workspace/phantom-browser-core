@@ -28,23 +28,6 @@ const std::vector<ModuleIdDetail> MakeModuleIdDetails(bool is_managed_profile,
                                                       Profile* profile) {
   std::vector<ModuleIdDetail> details;
 
-  if (IsOutlookCalendarModuleEnabledForProfile(profile)) {
-    details.emplace_back(ntp_modules::kOutlookCalendarModuleId,
-                         IDS_NTP_MODULES_OUTLOOK_CALENDAR_TITLE);
-  }
-
-  if (IsMicrosoftFilesModuleEnabledForProfile(profile)) {
-    details.emplace_back(ntp_modules::kMicrosoftFilesModuleId,
-                         IDS_NTP_MODULES_MICROSOFT_FILES_NAME);
-  }
-
-  if (IsMicrosoftModuleEnabledForProfile(profile)) {
-    details.emplace_back(
-        ntp_modules::kMicrosoftAuthenticationModuleId,
-        IDS_NTP_MODULES_MICROSOFT_AUTHENTICATION_NAME,
-        IDS_NTP_MICROSOFT_AUTHENTICATION_SIDE_PANEL_DESCRIPTION);
-  }
-
   if (IsMostRelevantTabResumeModuleEnabled(profile)) {
     details.emplace_back(ntp_modules::kMostRelevantTabResumptionModuleId,
                          IDS_NTP_MODULES_MOST_RELEVANT_TAB_RESUMPTION_TITLE);

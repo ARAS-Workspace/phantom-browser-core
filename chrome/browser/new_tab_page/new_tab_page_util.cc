@@ -6,7 +6,6 @@
 
 #include "base/hash/hash.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
@@ -73,26 +72,6 @@ bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature) {
   return IsInUS();
 }
 
-bool IsFeatureEnabled(const base::Feature& feature) {
-  if (base::FeatureList::GetInstance()->IsFeatureOverridden(feature.name)) {
-    return IsFeatureForceEnabled(feature);
-  }
-
-  bool is_default_enabled =
-      feature.default_state == base::FeatureState::FEATURE_ENABLED_BY_DEFAULT;
-  LogModuleEnablement(feature, is_default_enabled,
-                      "default feature flag value");
-  return is_default_enabled;
-}
-
-bool IsFeatureForceEnabled(const base::Feature& feature) {
-  const bool force_enabled = base::FeatureList::IsEnabled(feature);
-  LogModuleEnablement(
-      feature, force_enabled,
-      force_enabled ? "feature flag forced on" : "feature flag forced off");
-  return force_enabled;
-}
-
 bool IsMostRelevantTabResumeModuleEnabled(Profile* profile) {
   if (!IsProfileSignedIn(profile)) {
     LogModuleEnablement(ntp_features::kNtpMostRelevantTabResumptionModule,
@@ -106,37 +85,6 @@ bool IsMostRelevantTabResumeModuleEnabled(Profile* profile) {
                  g_browser_process->GetApplicationLocale()) &&
          base::FeatureList::IsEnabled(
              ntp_features::kNtpMostRelevantTabResumptionModule);
-}
-
-bool IsMicrosoftFilesModuleEnabledForProfile(Profile* profile) {
-  if (IsFeatureEnabled(ntp_features::kNtpSharepointModule) &&
-      IsFeatureEnabled(ntp_features::kNtpMicrosoftAuthenticationModule) &&
-      profile->GetPrefs()->IsManagedPreference(
-          prefs::kNtpSharepointModuleVisible) &&
-      profile->GetPrefs()->GetBoolean(prefs::kNtpSharepointModuleVisible)) {
-    return true;
-  }
-  LogModuleEnablement(ntp_features::kNtpSharepointModule, false,
-                      "disabled by policy");
-  return false;
-}
-
-bool IsOutlookCalendarModuleEnabledForProfile(Profile* profile) {
-  if (IsFeatureEnabled(ntp_features::kNtpOutlookCalendarModule) &&
-      IsFeatureEnabled(ntp_features::kNtpMicrosoftAuthenticationModule) &&
-      profile->GetPrefs()->IsManagedPreference(
-          prefs::kNtpOutlookModuleVisible) &&
-      profile->GetPrefs()->GetBoolean(prefs::kNtpOutlookModuleVisible)) {
-    return true;
-  }
-  LogModuleEnablement(ntp_features::kNtpOutlookCalendarModule, false,
-                      "disabled by policy");
-  return false;
-}
-
-bool IsMicrosoftModuleEnabledForProfile(Profile* profile) {
-  return IsMicrosoftFilesModuleEnabledForProfile(profile) ||
-         IsOutlookCalendarModuleEnabledForProfile(profile);
 }
 
 bool IsProfileSignedIn(Profile* profile) {
@@ -166,29 +114,6 @@ void LogModuleEnablement(const base::Feature& feature,
       optimization_guide_common::mojom::LogSource::NTP_MODULE,
       OptimizationGuideLogger::GetInstance())
       << feature.name << (enabled ? " enabled: " : " disabled: ") << reason;
-}
-
-void LogModuleDismissed(const base::Feature& feature,
-                        bool dismissed,
-                        const std::string& remaining_hours) {
-  std::string log = base::StrCat({feature.name, " dismissal: "});
-  if (dismissed) {
-    base::StrAppend(&log, {remaining_hours, " hours remaining"});
-  } else {
-    base::StrAppend(&log, {" not dismissed"});
-  }
-  OPTIMIZATION_GUIDE_LOGGER(
-      optimization_guide_common::mojom::LogSource::NTP_MODULE,
-      OptimizationGuideLogger::GetInstance())
-      << log;
-}
-
-void LogModuleError(const base::Feature& feature,
-                    const std::string& error_message) {
-  OPTIMIZATION_GUIDE_LOGGER(
-      optimization_guide_common::mojom::LogSource::NTP_MODULE,
-      OptimizationGuideLogger::GetInstance())
-      << feature.name << " error: " << error_message;
 }
 
 bool IsTopSitesEnabled(Profile* profile) {

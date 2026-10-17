@@ -125,12 +125,6 @@ BASE_FEATURE(kNtpModulesLoad, base::FEATURE_DISABLED_BY_DEFAULT);
 // requirement for all modules.
 BASE_FEATURE(kNtpModuleSignInRequirement, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// If enabled, outlook calendar module will be shown.
-BASE_FEATURE(kNtpOutlookCalendarModule, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, sharepoint module will be shown.
-BASE_FEATURE(kNtpSharepointModule, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // If enabled, shortcuts will be shown.
 // This is a kill switch. Keep indefinitely.
 BASE_FEATURE(kNtpShortcuts, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -176,10 +170,6 @@ BASE_FEATURE(kNtpWallpaperSearchButtonHideCondition,
 // This is used for an emergency Finch param. Keep indefinitely.
 BASE_FEATURE(kNtpWallpaperSearchButtonAnimationShownThreshold,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, the Microsoft Authentication module will be shown.
-BASE_FEATURE(kNtpMicrosoftAuthenticationModule,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, the features of NTP Next (AI action chips etc.) will be shown.
 BASE_FEATURE(kNtpNextFeatures, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -256,8 +246,6 @@ const char kNtpChromeCartModuleAbandonedCartDiscountUseUtmParam[] =
 const char kNtpChromeCartModuleHeuristicsImprovementParam[] =
     "NtpChromeCartModuleHeuristicsImprovementParam";
 const char kNtpChromeCartModuleCouponParam[] = "NtpChromeCartModuleCouponParam";
-const char kNtpOutlookCalendarModuleDataParam[] =
-    "NtpOutlookCalendarModuleDataParam";
 const char kNtpMostRelevantTabResumptionModuleDataParam[] =
     "NtpMostRelevantTabResumptionModuleDataParam";
 const char kNtpMostRelevantTabResumptionModuleMaxVisitsParam[] =
@@ -315,24 +303,6 @@ const base::FeatureParam<int> kNtpCustomizeChromeAutoShownSessionMaxCount(
     "max_customize_chrome_auto_shown_session_count",
     1);
 
-const base::FeatureParam<bool> kNtpOutlookCalendarModuleAttachmentCheckParam(
-    &ntp_features::kNtpOutlookCalendarModule,
-    "NtpOutlookCalendarModuleAttachmentCheckParam",
-    true);
-extern const base::FeatureParam<bool>
-    kNtpOutlookCalendarModuleDisableAttachmentsParam(
-        &ntp_features::kNtpOutlookCalendarModule,
-        "NtpOutlookCalendarModuleDisableAttachmentsParam",
-        false);
-const base::FeatureParam<int> kNtpOutlookCalendarModuleMaxEventsParam(
-    &ntp_features::kNtpOutlookCalendarModule,
-    "NtpOutlookCalendarModuleMaxEventsParam",
-    5);
-const base::FeatureParam<base::TimeDelta>
-    kNtpOutlookCalendarModuleRetrievalWindowParam(
-        &ntp_features::kNtpOutlookCalendarModule,
-        "NtpOutlookCalendarModuleRetrievalWindowParam",
-        base::Hours(12));
 const base::FeatureParam<bool> kNtpRealboxCr23ExpandedStateBgMatchesOmnibox(
     &ntp_features::kRealboxCr23Theming,
     "kNtpRealboxCr23ExpandedStateBgMatchesOmnibox",
@@ -346,39 +316,6 @@ const base::FeatureParam<bool>
         &kNtpMostRelevantTabResumptionModule,
         /*name=*/"local_tab_filter",
         /*default_value=*/true};
-
-const base::FeatureParam<NtpSharepointModuleDataType>::Option
-    kNtpSharepointModuleDataTypeOptions[] = {
-        {NtpSharepointModuleDataType::kTrendingInsights, "trending-insights"},
-        {NtpSharepointModuleDataType::kNonInsights, "non-insights"},
-        {NtpSharepointModuleDataType::kTrendingInsightsFakeData,
-         "fake-trending"},
-        {NtpSharepointModuleDataType::kNonInsightsFakeData,
-         "fake-non-insights"},
-        {NtpSharepointModuleDataType::kCombinedSuggestions, "combined"}};
-
-const base::FeatureParam<NtpSharepointModuleDataType>
-    kNtpSharepointModuleDataParam{&ntp_features::kNtpSharepointModule,
-                                  "NtpSharepointModuleDataParam",
-                                  NtpSharepointModuleDataType::kNonInsights,
-                                  &kNtpSharepointModuleDataTypeOptions};
-
-const base::FeatureParam<int> kNtpMicrosoftFilesModuleMaxFilesParam(
-    &ntp_features::kNtpSharepointModule,
-    "NtpMicrosoftFilesModuleMaxFilesParam",
-    6);
-
-const base::FeatureParam<int>
-    kNtpMicrosoftFilesModuleMaxTrendingFilesForCombinedParam(
-        &ntp_features::kNtpSharepointModule,
-        "NtpMicrosoftFilesModuleMaxTrendingFilesForCombinedParam",
-        2);
-
-const base::FeatureParam<int>
-    kNtpMicrosoftFilesModuleMaxNonInsightsFilesForCombinedParam(
-        &ntp_features::kNtpSharepointModule,
-        "NtpMicrosoftFilesModuleMaxNonInsightsFilesForCombinedParam",
-        4);
 
 const base::FeatureParam<base::TimeDelta>
     kNtpTabGroupsModuleWindowEndDeltaParam(

@@ -32,7 +32,6 @@ import {CustomizeButtonsProxy} from './customize_buttons_proxy.js';
 import {CustomizeChromeSection} from './customize_chrome.mojom-webui.js';
 import {CustomizeDialogPage} from './customize_dialog_types.js';
 import {recordDuration, recordEnumeration, recordLinearValue, recordLoadDuration, recordSparseValueWithPersistentHash} from './metrics_utils.js';
-import {ParentTrustedDocumentProxy} from './modules/microsoft_auth_frame_connector.js';
 import type {PageCallbackRouter, PageHandlerRemote, Theme} from './new_tab_page.mojom-webui.js';
 import {NtpBackgroundImageSource} from './new_tab_page.mojom-webui.js';
 import {NewTabPageProxy} from './new_tab_page_proxy.js';
@@ -96,7 +95,6 @@ enum NtpWallpaperSearchButtonHideCondition {
 }
 
 const CUSTOMIZE_URL_PARAM: string = 'customize';
-const MSAL_IFRAME_ORIGIN = 'chrome-untrusted://ntp-microsoft-auth';
 const VOICE_QUERY_LENGTH_LIMIT = 120;
 const VOICE_IDLE_TIMEOUT_MS = 8000;
 
@@ -239,9 +237,6 @@ export class AppElement extends AppElementBase {
         reflect: true,
       },
 
-      microsoftModuleEnabled_: {type: Boolean},
-      microsoftAuthIframePath_: {type: String},
-
       multiLineEnabled_: {type: Boolean},
 
       /**
@@ -351,9 +346,6 @@ export class AppElement extends AppElementBase {
       loadTimeData.getInteger('browserPromoCompletedLimit');
   protected accessor showBrowserPromo_: boolean = false;
   protected accessor modulesShownToUser: boolean = false;
-  protected accessor microsoftModuleEnabled_: boolean =
-      loadTimeData.getBoolean('microsoftModuleEnabled');
-  protected accessor microsoftAuthIframePath_: string = MSAL_IFRAME_ORIGIN;
   protected accessor multiLineEnabled_: boolean =
       loadTimeData.getBoolean('multiLineEnabled');
   protected accessor promoAndModulesLoaded_: boolean = false;
@@ -406,7 +398,6 @@ export class AppElement extends AppElementBase {
       CustomizeButtonsDocumentCallbackRouter;
   private customizeButtonsHandler_: CustomizeButtonsHandlerRemote;
   private backgroundManager_: BackgroundManager;
-  private connectMicrosoftAuthToParentDocumentListenerId_: number|null = null;
   private setThemeListenerId_: number|null = null;
   private setCustomizeChromeSidePanelVisibilityListener_: number|null = null;
   private setWallpaperSearchButtonVisibilityListener_: number|null = null;
@@ -467,14 +458,6 @@ export class AppElement extends AppElementBase {
     super.connectedCallback();
     realboxCanShowSecondarySideMediaQueryList.addEventListener(
         'change', this.onRealboxCanShowSecondarySideChanged_);
-
-    // Listen for chrome-untrusted://ntp-microsoft-auth iframe trying to
-    // connect to the NTP.
-    this.connectMicrosoftAuthToParentDocumentListenerId_ =
-        this.callbackRouter_.connectToParentDocument.addListener(
-            childDocumentRemote => {
-              ParentTrustedDocumentProxy.setInstance(childDocumentRemote);
-            });
 
     this.setThemeListenerId_ =
         this.callbackRouter_.setTheme.addListener(theme => {
@@ -557,8 +540,6 @@ export class AppElement extends AppElementBase {
     realboxCanShowSecondarySideMediaQueryList.removeEventListener(
         'change', this.onRealboxCanShowSecondarySideChanged_);
 
-    this.callbackRouter_.removeListener(
-        this.connectMicrosoftAuthToParentDocumentListenerId_!);
     this.callbackRouter_.removeListener(this.setThemeListenerId_!);
     this.callbackRouter_.removeListener(this.showWebstoreToastListenerId_!);
     this.callbackRouter_.removeListener(

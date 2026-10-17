@@ -36,20 +36,13 @@ export {Action as VoiceAction, Error as VoiceError} from './voice_search_overlay
 export {WindowProxy} from './window_proxy.js';
 
 export * from './new_tab_page.mojom-webui.js';
-export type {CalendarEvent, Attachment} from './calendar_data.mojom-webui.js';
 export type {Promo as NtpPromo, NtpPromoClientRemote, NtpPromoHandlerInterface} from './ntp_promo.mojom-webui.js';
 export {NtpPromoClientCallbackRouter} from './ntp_promo.mojom-webui.js';
 export type {CustomizeChromePageRemote} from './customize_chrome.mojom-webui.js';
 export {CustomizeChromeSection} from './customize_chrome.mojom-webui.js';
 export type {CustomizeButtonsDocumentRemote} from './customize_buttons.mojom-webui.js';
 export {CustomizeButtonsDocumentCallbackRouter, CustomizeButtonsHandlerRemote, SidePanelOpenTrigger} from './customize_buttons.mojom-webui.js';
-export type {File} from './file_suggestion.mojom-webui.js';
-export {RecommendationType} from './file_suggestion.mojom-webui.js';
-export {MicrosoftAuthPageHandlerRemote} from './microsoft_auth.mojom-webui.js';
-export {MicrosoftFilesPageHandlerRemote} from './microsoft_files.mojom-webui.js';
 export {PageHandlerRemote as TabResumptionPageHandlerRemote, ScoredURLUserAction} from './most_relevant_tab_resumption.mojom-webui.js';
-export {AuthType, MicrosoftAuthUntrustedDocumentRemote} from './ntp_microsoft_auth_shared_ui.mojom-webui.js';
-export {OutlookCalendarPageHandlerRemote} from './outlook_calendar.mojom-webui.js';
 export type {TabGroup} from './tab_groups.mojom-webui.js';
 export {PageHandlerRemote as TabGroupsPageHandlerRemote} from './tab_groups.mojom-webui.js';
 export {Color} from './tab_group_types.mojom-webui.js';

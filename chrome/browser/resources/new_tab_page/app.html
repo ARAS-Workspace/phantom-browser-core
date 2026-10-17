@@ -1,7 +1,4 @@
 <div id="content">
-  ${this.lazyRender_ && this.microsoftModuleEnabled_ ? html`
-    <iframe id="microsoftAuth" src="${this.microsoftAuthIframePath_}"></iframe>
-  ` : ''}
   ${this.ntpRealboxNextEnabled_ ? html`
     <div id="scrim"
         @click="${this.onScrimClick_}"

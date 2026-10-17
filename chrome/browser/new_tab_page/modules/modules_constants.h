@@ -12,23 +12,10 @@ namespace ntp_modules {
 inline constexpr char kAllModulesId[] = "all";
 inline constexpr char kDummyModuleId[] = "dummy";
 inline constexpr char kMostRelevantTabResumptionModuleId[] = "tab_resumption";
-inline constexpr char kMicrosoftAuthenticationModuleId[] =
-    "microsoft_authentication";
-inline constexpr char kOutlookCalendarModuleId[] = "outlook_calendar";
-inline constexpr char kMicrosoftFilesModuleId[] = "microsoft_files";
 inline constexpr char kTabGroupsModuleId[] = "tab_groups";
 
-// All modules that require successful Microsoft authentication before being
-// loaded.
-inline constexpr std::array<const char*, 2> kMicrosoftAuthDependentModuleIds = {
-    kMicrosoftFilesModuleId,
-    kOutlookCalendarModuleId,
-};
-
 // Default order for modules.
-inline constexpr std::array<const char*, 4> kOrderedModuleIds = {
-    ntp_modules::kMicrosoftAuthenticationModuleId,
-    ntp_modules::kOutlookCalendarModuleId, ntp_modules::kMicrosoftFilesModuleId,
+inline constexpr std::array<const char*, 1> kOrderedModuleIds = {
     ntp_modules::kMostRelevantTabResumptionModuleId};
 
 }  // namespace ntp_modules

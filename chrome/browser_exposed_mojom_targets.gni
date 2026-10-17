@@ -18,8 +18,6 @@ browser_exposed_mojom_targets = [
   "//cc/mojom:mojom_browser_controls",
   "//cc/mojom:mojom_layer_trees",
   "//chrome/browser/media:mojo_bindings",
-  "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
-  "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
   "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
   "//chrome/browser/resource_coordinator:mojo_bindings",
   "//chrome/browser/resources/certificate_manager:mojom",

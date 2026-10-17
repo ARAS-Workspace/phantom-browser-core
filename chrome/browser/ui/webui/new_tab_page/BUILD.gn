@@ -14,7 +14,6 @@ mojom("mojo_bindings") {
   webui_module_path = "/"
 
   public_deps = [
-    "//chrome/browser/ui/webui/ntp_microsoft_auth:shared",
     "//components/ntp_tiles:mojo_bindings",
     "//components/omnibox/browser:mojo_bindings",
     "//skia/public/mojom",
@@ -73,9 +72,6 @@ source_set("impl") {
     "//chrome/browser/enterprise",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/new_tab_page:impl",
-    "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/authentication:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
     "//chrome/browser/optimization_guide",
@@ -105,7 +101,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui/cr_components/searchbox:searchbox_impl",
     "//chrome/browser/ui/webui/customize_buttons",
     "//chrome/browser/ui/webui/customize_buttons:impl",
-    "//chrome/browser/ui/webui/ntp_microsoft_auth:untrusted",
     "//chrome/browser/ui/webui/page_not_available_for_guest",
     "//chrome/browser/ui/webui/sanitized_image:sanitized_image_source",
     "//chrome/browser/ui/webui/searchbox",

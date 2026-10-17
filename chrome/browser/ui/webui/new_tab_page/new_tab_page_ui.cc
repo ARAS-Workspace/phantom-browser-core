@@ -28,13 +28,9 @@
 #include "chrome/browser/buildflags.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
-#include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth_page_handler.h"
-#include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups_page_handler.h"
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -382,7 +378,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
       {"ok", IDS_OK},
 
       // Modules.
-      {"dismissModuleToastMessage", IDS_NTP_MODULES_DISMISS_TOAST_MESSAGE},
       {"disableModuleToastMessage", IDS_NTP_MODULES_DISABLE_TOAST_MESSAGE},
       {"moduleHeaderMoreActionsMenu", IDS_NTP_MODULE_HEADER_MORE_ACTIONS_MENU},
       {"moduleInfoButtonTitle", IDS_NTP_MODULES_INFO_BUTTON_TITLE},
@@ -393,34 +388,12 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
       {"modulesTasksInfo", IDS_NTP_MODULES_TASKS_INFO},
       {"modulesDisableToastMessage",
        IDS_NTP_MODULES_HISTORY_CLUSTERS_DISABLE_TOAST_MESSAGE},
-      {"modulesFilesSentence", IDS_NTP_MODULES_FILES_SENTENCE},
       {"modulesDummyLower", IDS_NTP_MODULES_DUMMY_LOWER},
-      {"modulesMicrosoftFilesInfo", IDS_NTP_MODULES_MICROSOFT_FILES_INFO},
-      {"modulesMicrosoftFilesName", IDS_NTP_MODULES_MICROSOFT_FILES_NAME},
-      {"modulesMicrosoftFilesDisableButtonText",
-       IDS_NTP_MODULES_MICROSOFT_FILES_DISABLE_BUTTON_TEXT},
       {"modulesDummyTitle", IDS_NTP_MODULES_DUMMY_TITLE},
       {"modulesDismissForHoursButtonText",
        IDS_NTP_MODULES_DISMISS_FOR_HOURS_BUTTON_TEXT},
       {"modulesDismissForDaysButtonText",
        IDS_NTP_MODULES_DISMISS_FOR_DAYS_BUTTON_TEXT},
-      {"modulesMicrosoftSignOutButtonText",
-       IDS_NTP_MODULES_MICROSOFT_SIGN_OUT_BUTTON_TEXT},
-      {"modulesOutlookCalendarTitle", IDS_NTP_MODULES_OUTLOOK_CALENDAR_TITLE},
-      {"modulesOutlookCalendarDisableButtonText",
-       IDS_NTP_MODULES_OUTLOOK_CALENDAR_DISABLE_BUTTON_TEXT},
-      {"modulesOutlookCalendarDismissToastMessage",
-       IDS_NTP_MODULES_OUTLOOK_CALENDAR_DISMISS_TOAST_MESSAGE},
-      {"modulesOutlookCalendarInfo", IDS_NTP_MODULES_OUTLOOK_CALENDAR_INFO},
-      {"modulesCalendarJoinMeetingButtonText",
-       IDS_NTP_MODULES_CALENDAR_JOIN_MEETING_BUTTON_TEXT},
-      {"modulesCalendarJoinMeetingButtonAcc",
-       IDS_NTP_MODULES_CALENDAR_JOIN_MEETING_BUTTON_ACCNAME},
-      {"modulesCalendarInProgress", IDS_NTP_MODULES_CALENDAR_IN_PROGRESS},
-      {"modulesCalendarInXMin", IDS_NTP_MODULES_CALENDAR_IN_X_MIN},
-      {"modulesCalendarInXHr", IDS_NTP_MODULES_CALENDAR_IN_X_HR},
-      {"modulesCalendarSeeMore", IDS_NTP_MODULES_CALENDAR_SEE_MORE},
-      {"modulesCalendarSeeMoreAcc", IDS_NTP_MODULES_CALENDAR_SEE_MORE_ACCNAME},
       {"modulesKaleidoscopeTitle", IDS_NTP_MODULES_KALEIDOSCOPE_TITLE},
       {"modulesTasksInfoTitle", IDS_NTP_MODULES_SHOPPING_TASKS_INFO_TITLE},
       {"modulesTasksInfoClose", IDS_NTP_MODULES_SHOPPING_TASKS_INFO_CLOSE},
@@ -480,17 +453,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
        IDS_TAB_RESUME_DECORATORS_FREQUENTLY_VISITED},
       {"modulesMostRelevantTabResumptionVisitedXAgo",
        IDS_TAB_RESUME_DECORATORS_VISITED_X_AGO},
-      {"modulesMicrosoftAuthName",
-       IDS_NTP_MODULES_MICROSOFT_AUTHENTICATION_NAME},
-      {"modulesMicrosoftAuthDisable",
-       IDS_NTP_MICROSOFT_AUTHENTICATION_DISABLE_BUTTON_TEXT},
-      {"modulesMicrosoftAuthDismiss",
-       IDS_NTP_MICROSOFT_AUTHENTICATION_DISMISS_BUTTON_TEXT},
-      {"modulesMicrosoftAuthHeading", IDS_NTP_MICROSOFT_AUTHENTICATION_HEADING},
-      {"modulesMicrosoftAuthSubheading",
-       IDS_NTP_MICROSOFT_AUTHENTICATION_SUBHEADING},
-      {"modulesMicrosoftAuthSignIn",
-       IDS_NTP_MICROSOFT_AUTHENTICATION_SIGN_IN_BUTTON_TEXT},
       {"modulesTabGroupsDismissToastMessage",
        IDS_NTP_MODULES_TAB_GROUPS_DISMISS_TOAST_MESSAGE},
       {"modulesTabGroupsDisableToastMessage",
@@ -518,22 +480,13 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
           ntp_features::kNtpFeatureOptimizationDismissModulesRemoval));
 
   source->AddString(
-      "calendarModuleDismissHours",
-      base::NumberToString(
-          OutlookCalendarPageHandler::kDismissDuration.InHours()));
-  source->AddString("fileSuggestionDismissHours",
-                    base::NumberToString(
-                        MicrosoftFilesPageHandler::kDismissDuration.InHours()));
-  source->AddString(
       "tabGroupsModuleDismissHours",
       base::NumberToString(
           ntp_features::kNtpTabGroupsModuleWindowEndDeltaParam.Get()
               .InHours()));
 
-  bool microsoft_module_enabled = IsMicrosoftModuleEnabledForProfile(profile);
-  source->AddBoolean("microsoftModuleEnabled", microsoft_module_enabled);
-  source->AddBoolean("modulesReloadable", microsoft_module_enabled);
-  source->AddBoolean("waitToLoadModules", microsoft_module_enabled);
+  source->AddBoolean("modulesReloadable", false);
+  source->AddBoolean("waitToLoadModules", false);
 
   source->AddLocalizedString("searchBoxPlaceholder",
                              IDS_GOOGLE_SEARCH_BOX_EMPTY_HINT_MD);
@@ -577,9 +530,8 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
   // lead to subtle security bugs such as https://crbug.com/40057334.
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ChildSrc,
-      base::StringPrintf("child-src %s %s;",
-                         chrome::kChromeUIUntrustedNewTabPageUrl,
-                         chrome::kChromeUIUntrustedNtpMicrosoftAuthURL));
+      base::StringPrintf("child-src %s;",
+                         chrome::kChromeUIUntrustedNewTabPageUrl));
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::MediaSrc,
       "media-src blob: data: 'self';");
@@ -811,27 +763,6 @@ void NewTabPageUI::BindInterface(
 }
 
 void NewTabPageUI::BindInterface(
-    mojo::PendingReceiver<ntp::calendar::mojom::OutlookCalendarPageHandler>
-        pending_page_handler) {
-  outlook_calendar_handler_ = std::make_unique<OutlookCalendarPageHandler>(
-      std::move(pending_page_handler), profile_);
-}
-
-void NewTabPageUI::BindInterface(
-    mojo::PendingReceiver<ntp::authentication::mojom::MicrosoftAuthPageHandler>
-        pending_page_handler) {
-  microsoft_auth_handler_ = std::make_unique<MicrosoftAuthPageHandler>(
-      std::move(pending_page_handler), profile_);
-}
-
-void NewTabPageUI::BindInterface(
-    mojo::PendingReceiver<file_suggestion::mojom::MicrosoftFilesPageHandler>
-        pending_page_handler) {
-  microsoft_files_handler_ = std::make_unique<MicrosoftFilesPageHandler>(
-      std::move(pending_page_handler), profile_);
-}
-
-void NewTabPageUI::BindInterface(
     mojo::PendingReceiver<page_image_service::mojom::PageImageServiceHandler>
         pending_page_handler) {
   base::WeakPtr<page_image_service::ImageService> image_service_weak;
@@ -877,12 +808,6 @@ void NewTabPageUI::CreatePageHandler(
           profile_),
       web_contents(), navigation_start_time_, navigation_start_time_ticks_,
       &module_id_details_);
-}
-
-void NewTabPageUI::ConnectToParentDocument(
-    mojo::PendingRemote<new_tab_page::mojom::MicrosoftAuthUntrustedDocument>
-        child_page) {
-  page_handler_->ConnectToParentDocument(std::move(child_page));
 }
 
 void NewTabPageUI::CreateBrowserCommandHandler(

@@ -177,10 +177,6 @@ const GURL& ChromeUINewTabPageURLAsGURL();
 inline constexpr char kChromeUINewTabURL[] = "chrome://newtab/";
 const GURL& ChromeUINewTabURLAsGURL();
 inline constexpr char kChromeUINewTabFooterURL[] = "chrome://newtab-footer/";
-inline constexpr char kChromeUIUntrustedNtpMicrosoftAuthHost[] =
-    "ntp-microsoft-auth";
-inline constexpr char kChromeUIUntrustedNtpMicrosoftAuthURL[] =
-    "chrome-untrusted://ntp-microsoft-auth/";
 inline constexpr char kChromeUINTPTilesInternalsHost[] = "ntp-tiles-internals";
 inline constexpr char kChromeUIOmniboxHost[] = "omnibox";
 inline constexpr char kChromeUIOmniboxAimEligibilityPage[] =

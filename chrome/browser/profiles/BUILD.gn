@@ -706,7 +706,6 @@ source_set("profiles_extra_parts_impl") {
     "//components/sync/base:features",
     "//media",
     "//services/network/public/cpp",
-    "//ui/webui:buildflags",
   ]
 
   public_deps = [

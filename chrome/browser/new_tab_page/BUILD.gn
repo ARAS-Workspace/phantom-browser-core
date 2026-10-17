@@ -10,30 +10,18 @@ assert(enable_webui_ntp)
 source_set("new_tab_page") {
   public = [
     "feature_promo_helper/new_tab_page_feature_promo_helper.h",
-    "microsoft_auth/microsoft_auth_service.h",
-    "microsoft_auth/microsoft_auth_service_factory.h",
-    "microsoft_auth/microsoft_auth_service_observer.h",
-    "modules/file_suggestion/microsoft_files_page_handler.h",
-    "modules/microsoft_modules_helper.h",
     "modules/modules_constants.h",
     "modules/modules_switches.h",
     "modules/new_tab_page_modules.h",
-    "modules/v2/authentication/microsoft_auth_page_handler.h",
-    "modules/v2/calendar/calendar_fake_data_helper.h",
-    "modules/v2/calendar/outlook_calendar_page_handler.h",
     "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h",
     "modules/v2/most_relevant_tab_resumption/url_visit_types_mojom_traits.h",
     "new_tab_page_util.h",
   ]
   public_deps = [
-    "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/authentication:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
     "//chrome/browser/new_tab_page/prefs",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/ui/webui/ntp_microsoft_auth:untrusted",
     "//chrome/common:constants",
     "//components/ntp_tiles",
     "//components/search",
@@ -58,15 +46,8 @@ source_set("new_tab_page") {
 source_set("impl") {
   sources = [
     "feature_promo_helper/new_tab_page_feature_promo_helper.cc",
-    "microsoft_auth/microsoft_auth_service.cc",
-    "microsoft_auth/microsoft_auth_service_factory.cc",
-    "modules/file_suggestion/microsoft_files_page_handler.cc",
-    "modules/microsoft_modules_helper.cc",
     "modules/modules_switches.cc",
     "modules/new_tab_page_modules.cc",
-    "modules/v2/authentication/microsoft_auth_page_handler.cc",
-    "modules/v2/calendar/calendar_fake_data_helper.cc",
-    "modules/v2/calendar/outlook_calendar_page_handler.cc",
     "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.cc",
     "new_tab_page_util.cc",
   ]
@@ -162,11 +143,7 @@ source_set("unit_tests") {
   ]
 
   sources += [
-    "microsoft_auth/microsoft_auth_service_unittest.cc",
-    "modules/file_suggestion/microsoft_files_page_handler_unittest.cc",
     "modules/new_tab_page_modules_unittest.cc",
-    "modules/v2/authentication/microsoft_auth_page_handler_unittest.cc",
-    "modules/v2/calendar/outlook_calendar_page_handler_unittest.cc",
     "modules/v2/tab_groups/tab_groups_page_handler_unittest.cc",
   ]
   deps += [

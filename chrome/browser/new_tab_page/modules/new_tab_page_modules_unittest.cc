@@ -20,14 +20,11 @@
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_url_loader_factory.h"
@@ -52,8 +49,8 @@ std::unique_ptr<TestingProfile> MakeTestingProfile(
 const char kSampleUserEmail[] = "user@gmail.com";
 const std::vector<ntp::ModuleIdDetail>& GetSampleModules() {
   static const base::NoDestructor<std::vector<ntp::ModuleIdDetail>> modules(
-      std::vector<ntp::ModuleIdDetail>{{ntp_modules::kMicrosoftFilesModuleId,
-                                        IDS_NTP_MODULES_MICROSOFT_FILES_NAME}});
+      std::vector<ntp::ModuleIdDetail>{
+          {ntp_modules::kTabGroupsModuleId, IDS_NTP_MODULES_TAB_GROUPS_TITLE}});
   return *modules;
 }
 
@@ -84,12 +81,8 @@ class NewTabPageModulesTest : public testing::Test {
 
 TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_PopulatesStructCorrectly) {
   base::test::ScopedFeatureList features;
-  profile().GetTestingPrefService()->SetManagedPref(
-      prefs::kNtpSharepointModuleVisible, base::Value(true));
   features.InitWithFeatures(
-      /*enabled_features=*/{ntp_features::kNtpMicrosoftAuthenticationModule,
-                            ntp_features::kNtpSharepointModule,
-                            ntp_features::kNtpMostRelevantTabResumptionModule},
+      /*enabled_features=*/{ntp_features::kNtpMostRelevantTabResumptionModule},
       /*disabled_features=*/{});
   identity_test_env().SetCookieAccounts(
       {{kSampleUserEmail, signin::GetTestGaiaIdForEmail(kSampleUserEmail)}});
@@ -97,20 +90,8 @@ TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_PopulatesStructCorrectly) {
   const std::vector<ntp::ModuleIdDetail> module_id_details =
       ntp::MakeModuleIdDetails(/*is_managed_profile=*/false,
                                /*profile=*/&profile());
-  EXPECT_EQ(3u, module_id_details.size());
-  const auto& microsoft_files_details = module_id_details[0];
-  EXPECT_EQ(ntp_modules::kMicrosoftFilesModuleId, microsoft_files_details.id_);
-  EXPECT_EQ(IDS_NTP_MODULES_MICROSOFT_FILES_NAME,
-            microsoft_files_details.name_message_id_);
-  EXPECT_EQ(std::nullopt, microsoft_files_details.description_message_id_);
-  const auto& microsoft_auth_details = module_id_details[1];
-  EXPECT_EQ(ntp_modules::kMicrosoftAuthenticationModuleId,
-            microsoft_auth_details.id_);
-  EXPECT_EQ(IDS_NTP_MODULES_MICROSOFT_AUTHENTICATION_NAME,
-            microsoft_auth_details.name_message_id_);
-  EXPECT_EQ(IDS_NTP_MICROSOFT_AUTHENTICATION_SIDE_PANEL_DESCRIPTION,
-            microsoft_auth_details.description_message_id_);
-  const auto& tab_resumption_details = module_id_details[2];
+  EXPECT_EQ(1u, module_id_details.size());
+  const auto& tab_resumption_details = module_id_details[0];
   EXPECT_EQ(ntp_modules::kMostRelevantTabResumptionModuleId,
             tab_resumption_details.id_);
   EXPECT_EQ(IDS_NTP_MODULES_MOST_RELEVANT_TAB_RESUMPTION_TITLE,
@@ -169,80 +150,4 @@ TEST_F(NewTabPageModulesTest, HasModulesEnabled_NtpModulesLoadFlag) {
       {{kSampleUserEmail, signin::GetTestGaiaIdForEmail(kSampleUserEmail)}});
   ASSERT_FALSE(ntp::HasModulesEnabled(GetSampleModules(),
                                       identity_test_env().identity_manager()));
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_MicrosoftCards) {
-  profile().GetTestingPrefService()->SetManagedPref(
-      prefs::kNtpSharepointModuleVisible, base::Value(true));
-  profile().GetTestingPrefService()->SetManagedPref(
-      prefs::kNtpOutlookModuleVisible, base::Value(true));
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpMicrosoftAuthenticationModule,
-      ntp_features::kNtpSharepointModule,
-      ntp_features::kNtpOutlookCalendarModule,
-  };
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(3u, module_id_details.size());
-}
-
-TEST_F(NewTabPageModulesTest,
-       MakeModuleIdDetails_MicrosoftCardsSharepointOnly) {
-  profile().GetTestingPrefService()->SetManagedPref(
-      prefs::kNtpSharepointModuleVisible, base::Value(true));
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpMicrosoftAuthenticationModule,
-      ntp_features::kNtpSharepointModule,
-      ntp_features::kNtpOutlookCalendarModule,
-  };
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(2u, module_id_details.size());
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_MicrosoftCardsOutlookOnly) {
-  profile().GetTestingPrefService()->SetManagedPref(
-      prefs::kNtpOutlookModuleVisible, base::Value(true));
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpMicrosoftAuthenticationModule,
-      ntp_features::kNtpSharepointModule,
-      ntp_features::kNtpOutlookCalendarModule,
-  };
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(2u, module_id_details.size());
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_MicrosoftCardsDisabled) {
-  base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      /*enabled_features=*/{},
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, {}));
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(0u, module_id_details.size());
 }

@@ -94,47 +94,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, DummyModule) {
 }
 #endif  // !defined(OFFICIAL_BUILD)
 
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, Calendar) {
-  RunTest("new_tab_page/modules/calendar/calendar_test.js",
-          "runMochaSuite('NewTabPageModulesCalendarTest general')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, CalendarMetrics) {
-  RunTest("new_tab_page/modules/calendar/calendar_test.js",
-          "runMochaSuite('NewTabPageModulesCalendarTest metrics')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, CalendarEvent) {
-  RunTest("new_tab_page/modules/calendar/calendar_event_test.js",
-          "runMochaSuite('NewTabPageModulesCalendarEventTest general')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, CalendarEventMetrics) {
-  RunTest("new_tab_page/modules/calendar/calendar_event_test.js",
-          "runMochaSuite('NewTabPageModulesCalendarEventTest metrics')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, OutlookCalendarModule) {
-  RunTest("new_tab_page/modules/calendar/outlook_calendar_module_test.js",
-          "mocha.run()");
-}
-
-#define MAYBE_FileSuggestion FileSuggestion
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, MAYBE_FileSuggestion) {
-  RunTest("new_tab_page/modules/file_suggestion/file_suggestion_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, MicrosoftFilesModule) {
-  RunTest("new_tab_page/modules/file_suggestion/microsoft_files_module_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, MicrosoftAuthModule) {
-  RunTest("new_tab_page/modules/authentication/microsoft_auth_module_test.js",
-          "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, TabGroupsModule) {
   RunTest("new_tab_page/modules/tab_groups/module_test.js", "mocha.run()");
 }
@@ -175,11 +134,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, CustomizeChromeSidePanel) {
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, DISABLED_WallpaperSearch) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppTest WallpaperSearch')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, MicrosoftAuth) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest MicrosoftAuth')");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, NewTabFooter) {

@@ -107,23 +107,14 @@ class NewTabPageUtilBrowserTest : public SigninBrowserTestBase,
 class NewTabPageUtilEnableFlagBrowserTest : public NewTabPageUtilBrowserTest {
  public:
   NewTabPageUtilEnableFlagBrowserTest() {
-    features().InitWithFeatures(
-        {ntp_features::kNtpChromeCartModule,
-         ntp_features::kNtpMicrosoftAuthenticationModule,
-         ntp_features::kNtpOutlookCalendarModule,
-         ntp_features::kNtpSharepointModule},
-        {});
+    features().InitWithFeatures({ntp_features::kNtpChromeCartModule}, {});
   }
 };
 
 class NewTabPageUtilDisableFlagBrowserTest : public NewTabPageUtilBrowserTest {
  public:
   NewTabPageUtilDisableFlagBrowserTest() {
-    features().InitWithFeatures(
-        {}, {ntp_features::kNtpChromeCartModule,
-             ntp_features::kNtpMicrosoftAuthenticationModule,
-             ntp_features::kNtpOutlookCalendarModule,
-             ntp_features::kNtpSharepointModule});
+    features().InitWithFeatures({}, {ntp_features::kNtpChromeCartModule});
   }
 };
 
@@ -152,68 +143,6 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
   auto locale = std::make_unique<ScopedBrowserLocale>("en-US");
   g_browser_process->variations_service()->OverrideStoredPermanentCountry("us");
   EXPECT_FALSE(IsCartModuleEnabled());
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       EnableMicrosoftFilesByFlag) {
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kNTPSharepointCardVisible,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_PLATFORM, base::Value(true), nullptr);
-  policy_provider().UpdateChromePolicy(policies);
-  EXPECT_TRUE(IsMicrosoftFilesModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpSharepointModule.name) +
-                    " enabled: feature flag forced on");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
-                       DisableMicrosoftFilesByFlag) {
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kNTPSharepointCardVisible,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_PLATFORM, base::Value(true), nullptr);
-  policy_provider().UpdateChromePolicy(policies);
-  EXPECT_FALSE(IsMicrosoftFilesModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpSharepointModule.name) +
-                    " disabled: feature flag forced off");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       MicrosoftFilesPolicyDisabled) {
-  EXPECT_FALSE(IsMicrosoftFilesModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpSharepointModule.name) +
-                    " disabled: disabled by policy");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       EnableOutlookCalendarByFlag) {
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kNTPOutlookCardVisible,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_PLATFORM, base::Value(true), nullptr);
-  policy_provider().UpdateChromePolicy(policies);
-  EXPECT_TRUE(IsOutlookCalendarModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpOutlookCalendarModule.name) +
-                    " enabled: feature flag forced on");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
-                       DisableOutlookCalendarByFlag) {
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kNTPOutlookCardVisible,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_PLATFORM, base::Value(true), nullptr);
-  policy_provider().UpdateChromePolicy(policies);
-  EXPECT_FALSE(IsOutlookCalendarModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpOutlookCalendarModule.name) +
-                    " disabled: feature flag forced off");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       OutlookCalendarPolicyDisabled) {
-  EXPECT_FALSE(IsOutlookCalendarModuleEnabledForProfile(GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpOutlookCalendarModule.name) +
-                    " disabled: disabled by policy");
 }
 
 class NewTabPageUtilTileTypesEnterpriseShortcutsBrowserTest
@@ -290,8 +219,8 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilFeatureOptimizationModuleRemovalTest,
   // Arrange.
   const std::vector<std::string> module_ids = {
       ntp_modules::kTabGroupsModuleId,
-      ntp_modules::kOutlookCalendarModuleId,
-      ntp_modules::kMicrosoftFilesModuleId,
+      ntp_modules::kMostRelevantTabResumptionModuleId,
+      ntp_modules::kDummyModuleId,
   };
 
   // Act.
@@ -339,7 +268,7 @@ class NewTabPageUtilStalenessUpdateBrowserTest
 
   void InitMockModules() {
     loaded_modules = {ntp_modules::kTabGroupsModuleId,
-                      ntp_modules::kOutlookCalendarModuleId};
+                      ntp_modules::kMostRelevantTabResumptionModuleId};
   }
 
   // Advances the mock clock by the given time delta.
@@ -540,9 +469,9 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
   EXPECT_EQ(updated_tab_groups_staleness_count.value_or(0),
             expected_tab_groups_staleness_count);
 
-  std::optional<int> updated_outlook_calendar_staleness_count =
-      updated_dict.FindInt(ntp_modules::kOutlookCalendarModuleId);
-  EXPECT_EQ(updated_outlook_calendar_staleness_count.value_or(0), 1);
+  std::optional<int> updated_tab_resumption_staleness_count =
+      updated_dict.FindInt(ntp_modules::kMostRelevantTabResumptionModuleId);
+  EXPECT_EQ(updated_tab_resumption_staleness_count.value_or(0), 1);
 
   histogram_tester_.ExpectBucketCount(
       "NewTabPage.Modules.AutoRemovalSkipped.Disabled",
@@ -599,13 +528,13 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
   InitMockModules();
   const bool is_above_staleness_count = GetParam();
   const int tab_groups_staleness_count = is_above_staleness_count ? 10 : 0;
-  const int outlook_calendar_staleness_count = is_above_staleness_count ? 5 : 0;
+  const int tab_resumption_staleness_count = is_above_staleness_count ? 5 : 0;
   if (is_above_staleness_count) {
     ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
                                 ntp_prefs::kNtpModuleStalenessCountDict);
     update->Set(ntp_modules::kTabGroupsModuleId, tab_groups_staleness_count);
-    update->Set(ntp_modules::kOutlookCalendarModuleId,
-                outlook_calendar_staleness_count);
+    update->Set(ntp_modules::kMostRelevantTabResumptionModuleId,
+                tab_resumption_staleness_count);
   }
 
   const TimeDelta staleness_threshold =
@@ -629,8 +558,8 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
       "NewTabPage.Modules.AutoRemovalStaleDays.tab_groups",
       tab_groups_staleness_count, 1);
   histogram_tester_.ExpectUniqueSample(
-      "NewTabPage.Modules.AutoRemovalStaleDays.outlook_calendar",
-      outlook_calendar_staleness_count, 1);
+      "NewTabPage.Modules.AutoRemovalStaleDays.tab_resumption",
+      tab_resumption_staleness_count, 1);
 }
 
 IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,

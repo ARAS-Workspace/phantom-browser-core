@@ -74,7 +74,6 @@
 #include "chrome/browser/ui/web_applications/tabbed_web_app_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/webui_web_app_navigation_throttle.h"
 #include "chrome/browser/ui/webui/image/image_navigation_throttle.h"
-#include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_response_capture_navigation_throttle.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_throttle.h"
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
@@ -341,9 +340,6 @@ void CreateAndAddChromeThrottlesForNavigation(
     error_page::NetErrorAutoReloader::MaybeCreateAndAddNavigationThrottle(
         registry);
   }
-
-  NtpMicrosoftAuthResponseCaptureNavigationThrottle::MaybeCreateAndAdd(
-      registry);
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
   offline_pages::OfflinePageNavigationThrottle::MaybeCreateAndAdd(registry);

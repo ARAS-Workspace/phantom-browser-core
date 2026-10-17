@@ -34,8 +34,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
-#include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service_factory.h"
 #include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
@@ -328,8 +326,6 @@ NewTabPageHandler::NewTabPageHandler(
       feature_promo_helper_(std::make_unique<NewTabPageFeaturePromoHelper>()),
       ntp_navigation_start_time_(ntp_navigation_start_time),
       module_id_details_(module_id_details),
-      microsoft_auth_service_(
-          MicrosoftAuthServiceFactory::GetForProfile(profile)),
       interaction_module_id_trigger_dict_(
           MakeModuleInteractionTriggerIdDictionary()),
       browser_window_changed_subscription_(
@@ -348,9 +344,6 @@ NewTabPageHandler::NewTabPageHandler(
   native_theme_observation_.Observe(ui::NativeTheme::GetInstanceForNativeUi());
   ntp_custom_background_service_observation_.Observe(
       ntp_custom_background_service_.get());
-  if (microsoft_auth_service_) {
-    microsoft_auth_service_->AddObserver(this);
-  }
   if (customize_chrome::IsWallpaperSearchEnabledForProfile(profile_)) {
     optimization_guide_keyed_service_ =
         OptimizationGuideKeyedServiceFactory::GetForProfile(profile_);
@@ -406,9 +399,6 @@ NewTabPageHandler::~NewTabPageHandler() {
         ->RemoveModelExecutionSettingsEnabledObserver(this);
     optimization_guide_keyed_service_ = nullptr;
   }
-  if (microsoft_auth_service_) {
-    microsoft_auth_service_->RemoveObserver(this);
-  }
 }
 
 // static
@@ -422,8 +412,6 @@ void NewTabPageHandler::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterDictionaryPref(prefs::kNtpModulesInteractedCountDict);
   registry->RegisterDictionaryPref(prefs::kNtpModulesLoadedCountDict);
   registry->RegisterIntegerPref(prefs::kNtpWallpaperSearchButtonShownCount, 0);
-  registry->RegisterBooleanPref(prefs::kNtpOutlookModuleVisible, false);
-  registry->RegisterBooleanPref(prefs::kNtpSharepointModuleVisible, false);
   registry->RegisterIntegerPref(
       prefs::kNtpCustomizeChromeSidePanelAutoOpeningsCount, 0);
   registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeExplicitlyClosed,
@@ -698,9 +686,7 @@ void NewTabPageHandler::GetModulesOrder(GetModulesOrderCallback callback) {
 }
 
 void NewTabPageHandler::UpdateModulesLoadable() {
-  if (!microsoft_auth_service_ || SyncMicrosoftModulesWithAuth()) {
-    page_->SetModulesLoadable();
-  }
+  page_->SetModulesLoadable();
 }
 
 void NewTabPageHandler::UpdateFooterVisibility() {
@@ -814,10 +800,6 @@ void NewTabPageHandler::OnCustomBackgroundImageUpdated() {
 void NewTabPageHandler::OnChangeInFeatureCurrentlyEnabledState(
     bool is_now_enabled) {
   page_->SetWallpaperSearchButtonVisibility(is_now_enabled);
-}
-
-void NewTabPageHandler::OnAuthStateUpdated() {
-  UpdateModulesLoadable();
 }
 
 void NewTabPageHandler::OnFooterVisibilityUpdated(bool visible) {
@@ -938,54 +920,6 @@ const std::string& NewTabPageHandler::GetSurveyTriggerIdForModuleAndInteraction(
   return kNoTriggerId;
 }
 
-void NewTabPageHandler::SetModuleHidden(const std::string& module_id,
-                                        bool hidden) {
-  ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpHiddenModules);
-  base::ListValue& list = update.Get();
-  if (hidden) {
-    if (!list.contains(module_id)) {
-      list.Append(module_id);
-    }
-  } else {
-    list.EraseValue(base::Value(module_id));
-  }
-}
-
-bool NewTabPageHandler::SyncMicrosoftModulesWithAuth() {
-  MicrosoftAuthService::AuthState state =
-      microsoft_auth_service_->GetAuthState();
-
-  const std::vector<std::string> auth_dependent_modules(
-      ntp_modules::kMicrosoftAuthDependentModuleIds.begin(),
-      ntp_modules::kMicrosoftAuthDependentModuleIds.end());
-  const std::string auth_id = ntp_modules::kMicrosoftAuthenticationModuleId;
-  std::vector<std::string> enabled_modules;
-  std::vector<std::string> disabled_modules;
-  switch (state) {
-    case MicrosoftAuthService::AuthState::kNone:
-      break;
-    case MicrosoftAuthService::AuthState::kError:
-      enabled_modules.push_back(auth_id);
-      disabled_modules = auth_dependent_modules;
-      break;
-    case MicrosoftAuthService::AuthState::kSuccess:
-      enabled_modules = auth_dependent_modules;
-      disabled_modules.push_back(auth_id);
-      break;
-    default:
-      NOTREACHED();
-  }
-
-  for (const auto& module_id : enabled_modules) {
-    SetModuleHidden(module_id, false);
-  }
-  for (const auto& module_id : disabled_modules) {
-    SetModuleHidden(module_id, true);
-  }
-
-  return state != MicrosoftAuthService::AuthState::kNone;
-}
-
 void NewTabPageHandler::TryShowRealboxContextualMenuIPH(
     ui::TrackedElement* element) {
   if (!element || !element->IsA<ui::TrackedElementWebUI>()) {
@@ -1015,10 +949,4 @@ void NewTabPageHandler::TryShowRealboxContextualMenuIPH(
   feature_promo_helper_->MaybeShowFeaturePromo(
       feature_engagement::kIPHDesktopRealboxContextualSearchFeature,
       web_contents_.get());
-}
-
-void NewTabPageHandler::ConnectToParentDocument(
-    mojo::PendingRemote<new_tab_page::mojom::MicrosoftAuthUntrustedDocument>
-        child_untrusted_document_remote) {
-  page_->ConnectToParentDocument(std::move(child_untrusted_document_remote));
 }

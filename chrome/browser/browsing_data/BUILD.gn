@@ -157,9 +157,6 @@ source_set("impl") {
     "//ui/strings:ui_strings__strings_grit",
   ]
 
-  if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/new_tab_page" ]
-  }
   deps += [
     "//chrome/browser/profiles/keep_alive",
     "//chrome/browser/ui/browser_window",
@@ -248,10 +245,6 @@ source_set("unit_tests") {
 
   if (enable_extensions) {
     sources += [ "counters/hosted_apps_counter_unittest.cc" ]
-  }
-
-  if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/new_tab_page" ]
   }
 
   if (enable_extensions) {

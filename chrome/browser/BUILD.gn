@@ -1110,10 +1110,7 @@ source_set("core") {
   }
 
   if (enable_webui_ntp) {
-    deps += [
-      "//chrome/browser/new_tab_page",
-      "//chrome/browser/ui/webui/ntp_microsoft_auth",
-    ]
+    deps += [ "//chrome/browser/new_tab_page" ]
   }
 
   deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
@@ -1833,7 +1830,6 @@ source_set("browser") {
     deps += [
       "//chrome/browser/new_tab_page",
       "//chrome/browser/new_tab_page:impl",
-      "//chrome/browser/ui/webui/ntp_microsoft_auth",
     ]
   }
   deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
@@ -2425,9 +2421,6 @@ group("browser_generated_files") {
     "//components/webui/chrome_urls/mojom:mojo_bindings",
   ]
   public_deps += [
-    "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/authentication:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
     "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
     "//chrome/browser/share/proto",
@@ -2440,8 +2433,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/new_tab_footer:mojo_bindings",
     "//chrome/browser/ui/webui/new_tab_page:mojo_bindings",
     "//chrome/browser/ui/webui/new_tab_page_third_party:mojo_bindings",
-    "//chrome/browser/ui/webui/ntp_microsoft_auth:shared",
-    "//chrome/browser/ui/webui/ntp_microsoft_auth:untrusted",
     "//chrome/browser/ui/webui/omnibox_popup/mojom",
     "//chrome/browser/ui/webui/on_device_internals:mojom",
     "//chrome/browser/ui/webui/side_panel/bookmarks:mojo_bindings",
