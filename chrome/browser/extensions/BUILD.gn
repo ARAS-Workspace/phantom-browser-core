@@ -1638,7 +1638,6 @@ source_set("browser_tests") {
     "api/processes/processes_apitest.cc",
     "api/proxy/proxy_apitest.cc",
     "api/public_suffix/public_suffix_apitest.cc",
-    "api/reading_list/reading_list_apitest.cc",
     "api/runtime/runtime_apitest.cc",
     "api/scripting/scripting_apitest.cc",
     "api/search/search_api_apitest.cc",

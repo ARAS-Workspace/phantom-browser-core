@@ -782,10 +782,6 @@
     ],
     "platforms": ["chromeos"]
   },
-  "readingList": {
-    "dependencies": ["permission:readingList"],
-    "contexts": ["privileged_extension"]
-  },
   "resourcesPrivate": [{
     "dependencies": ["permission:resourcesPrivate"],
     "contexts": ["privileged_extension"]
