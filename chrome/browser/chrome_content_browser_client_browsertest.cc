@@ -848,7 +848,7 @@ class TopChromeChromeContentBrowserClientTest
 IN_PROC_BROWSER_TEST_F(TopChromeChromeContentBrowserClientTest,
                        ShouldReuseRendererWhenTopChromePagesPresent) {
   const GURL top_chrome_url(chrome::kChromeUITabSearchURL);
-  const GURL top_chrome_url2(chrome::kChromeUIReadLaterURL);
+  const GURL top_chrome_url2(chrome::kChromeUIBookmarksSidePanelURL);
   const GURL random_url(GURL("www.google.com"));
 
   const auto navigate_browser = [&](const GURL& url, int index) {
@@ -898,7 +898,7 @@ IN_PROC_BROWSER_TEST_P(BundledCodeCacheChromeContentBrowserClientTest,
                        ConfiguresRendererForDisallowV8FeatureOverrides) {
   ASSERT_TRUE(embedded_test_server()->Start());
   const GURL top_chrome_url1(chrome::kChromeUITabSearchURL);
-  const GURL top_chrome_url2(chrome::kChromeUIReadLaterURL);
+  const GURL top_chrome_url2(chrome::kChromeUIBookmarksSidePanelURL);
   const GURL& non_top_chrome_url1 = chrome::ChromeUINewTabPageURLAsGURL();
   const GURL non_top_chrome_url2(
       embedded_test_server()->GetURL("/title1.html"));

@@ -238,7 +238,7 @@ void NTPResourceCache::CreateNewTabIncognitoHTML(
   DCHECK(profile_->HasAnyOffTheRecordProfile());
 
   replacements["incognitoTabDescription"] =
-      l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_SUBTITLE_WITH_READING_LIST);
+      l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_SUBTITLE);
   replacements["incognitoTabHeading"] =
       l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_TITLE);
   replacements["incognitoTabWarning"] =

@@ -9,7 +9,6 @@
 
 // Please keep this list alphabetized.
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kActionItemZoomElementId);
-DEFINE_ELEMENT_IDENTIFIER_VALUE(kAddCurrentTabToReadingListElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kAiModePageActionIconElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kAutofillAddressPageActionElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(
@@ -124,7 +123,6 @@ DEFINE_ELEMENT_IDENTIFIER_VALUE(kProductSpecificationsButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kOrganizerPanelButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kOrganizerPanelControlsViewElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kOrganizerPanelViewElementId);
-DEFINE_ELEMENT_IDENTIFIER_VALUE(kReadLaterSidePanelWebViewElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kRecordButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kReloadButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kRightAlignedSidePanelSeparatorViewElementId);
@@ -143,7 +141,6 @@ DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelMoreInfoButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelOpenInNewTabButtonElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelPinButtonElementId);
-DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelReadingListUnreadElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelResizeAreaElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelResizeHandleElementId);
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kSidePanelRoundedCornerViewElementId);

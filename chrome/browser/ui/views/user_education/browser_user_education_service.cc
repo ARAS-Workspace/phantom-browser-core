@@ -44,7 +44,6 @@
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
 #include "chrome/browser/ui/toolbar/bookmark_sub_menu_model.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
-#include "chrome/browser/ui/toolbar/reading_list_sub_menu_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/show_promo_in_page.h"
 #include "chrome/browser/ui/views/autofill/at_memory_promo_bubble_view.h"
@@ -947,28 +946,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(80, "lyf@chromium.org",
                        "Triggered once per-app when is in quiet notification "
                        "mode and a notification is triggered in a PWA.")));
-
-  // kIPHReadingListDiscoveryFeature:
-  registry.RegisterFeature(
-      std::move(FeaturePromoSpecification::CreateForLegacyPromo(
-                    &feature_engagement::kIPHReadingListDiscoveryFeature,
-                    kToolbarAppMenuButtonElementId,
-                    IDS_READING_LIST_DISCOVERY_PROMO_PINNING)
-                    .SetHighlightedMenuItem(
-                        ReadingListSubMenuModel::kReadingListMenuShowUI)));
-
-  // kIPHReadingListEntryPointFeature:
-  registry.RegisterFeature(FeaturePromoSpecification::CreateForSnoozePromo(
-      feature_engagement::kIPHReadingListEntryPointFeature,
-      kBookmarkStarViewElementId, IDS_READING_LIST_ENTRY_POINT_PROMO));
-
-  // kIPHReadingListInSidePanelFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForLegacyPromo(
-          &feature_engagement::kIPHReadingListInSidePanelFeature,
-          kToolbarAppMenuButtonElementId,
-          IDS_READING_LIST_IN_SIDE_PANEL_PROMO_PINNING)
-          .SetHighlightedMenuItem(BookmarkSubMenuModel::kReadingListMenuItem)));
 
   // kIPHResumptionRailFeature:
   registry.RegisterFeature(std::move(

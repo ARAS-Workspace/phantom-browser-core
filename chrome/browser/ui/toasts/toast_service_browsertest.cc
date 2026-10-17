@@ -27,7 +27,8 @@ using ToastIdEnumSet = base::EnumSet<ToastId>;
 // specification.
 constexpr auto kDeprecatedToastIds =
     std::to_array<std::underlying_type_t<ToastId>>(
-        {/*kLensOverlay=*/4,
+        {/*kAddedToReadingList=*/3,
+         /*kLensOverlay=*/4,
          /*kAddedToComparisonTable=*/6,
          /*kPlusAddressOverride=*/8,
          /*kSyncEsbOn=*/9,

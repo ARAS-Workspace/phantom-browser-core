@@ -19,9 +19,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_toolbar_icon_controller.h"
-#include "chrome/browser/ui/side_panel/side_panel_entry_id.h"
-#include "chrome/browser/ui/side_panel/side_panel_enums.h"
-#include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer_factory.h"
@@ -90,23 +87,6 @@ void ToastService::RegisterToasts(
                                       ? vector_icons::kLinkIcon
                                       : kLinkChromeRefreshOldIcon,
                                   IDS_LINK_COPIED_TO_HIGHLIGHT_TOAST_BODY)
-          .Build());
-
-  toast_registry_->RegisterToast(
-      ToastId::kAddedToReadingList,
-      ToastSpecification::Builder(features::IsRoundedIconsEnabled()
-                                      ? kListAltIcon
-                                      : kReadingListOldIcon,
-                                  IDS_READING_LIST_TOAST_BODY)
-          .AddActionButton(IDS_READING_LIST_TOAST_BUTTON,
-                           base::BindRepeating(
-                               [](BrowserWindowInterface* window) {
-                                 window->GetFeatures().side_panel_ui()->Show(
-                                     SidePanelEntryId::kReadingList,
-                                     SidePanelOpenTrigger::kReadingListToast);
-                               },
-                               base::Unretained(browser_window_interface)))
-          .AddCloseButton()
           .Build());
 
   toast_registry_->RegisterToast(

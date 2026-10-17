@@ -1157,7 +1157,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerOrderingUiTest, PriorityOrder) {
       // instead of potentially affecting another element of higher priority.
       PinActionsAndVerifyDisplayed(
           {ChromeActionIds::kActionSidePanelShowBookmarks,
-           ChromeActionIds::kActionSidePanelShowReadingList}),
+           ChromeActionIds::kActionPrint}),
       WaitForElementVisibility(kToolbarHomeButtonElementId, true),
       WaitForElementVisibility(kToolbarForwardButtonElementId, true),
       CheckActionItemOverflowed(ChromeActionIds::kActionSidePanelShowBookmarks,
@@ -1211,7 +1211,7 @@ IN_PROC_BROWSER_TEST_P(
       // instead of potentially affecting another element of higher priority.
       PinActionsAndVerifyDisplayed(
           {ChromeActionIds::kActionSidePanelShowBookmarks,
-           ChromeActionIds::kActionSidePanelShowReadingList}),
+           ChromeActionIds::kActionPrint}),
       WaitForElementVisibility(kToolbarHomeButtonElementId, true),
       WaitForElementVisibility(kToolbarForwardButtonElementId, true),
       CheckActionItemOverflowed(ChromeActionIds::kActionSidePanelShowBookmarks,

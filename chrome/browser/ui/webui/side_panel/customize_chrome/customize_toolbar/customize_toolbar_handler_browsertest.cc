@@ -110,8 +110,6 @@ IN_PROC_BROWSER_TEST_F(CustomizeToolbarHandlerBrowserTest, ListActions) {
 
   EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kShowBookmarks));
-  EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowReadingList));
   EXPECT_TRUE(
       contains_action(side_panel::customize_chrome::mojom::ActionId::kHome));
   EXPECT_TRUE(

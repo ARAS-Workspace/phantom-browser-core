@@ -58,7 +58,6 @@ group("resources") {
     "side_panel/customize_chrome:resources",
     "side_panel/history:resources",
     "side_panel/history_clusters:resources",
-    "side_panel/reading_list:resources",
     "side_panel/shared:resources",
     "side_panel/tabs_from_other_devices:resources",
     "signin:resources",
@@ -127,7 +126,6 @@ if (enable_webui_generate_code_cache) {
     public_deps = [
       "side_panel/bookmarks:code_cache_resources",
       "side_panel/customize_chrome:code_cache_resources",
-      "side_panel/reading_list:code_cache_resources",
       "side_panel/shared:code_cache_resources",
       "side_panel/tabs_from_other_devices:code_cache_resources",
       "webui_toolbar:code_cache_resources",

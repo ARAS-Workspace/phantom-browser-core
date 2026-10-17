@@ -16,7 +16,6 @@
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -37,13 +36,10 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
-#include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "chrome/browser/ui/web_applications/web_app_tabbed_utils.h"
 #include "chrome/browser/ui/window_feature_controller/window_feature_controller.h"
 #include "chrome/common/chrome_switches.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/saved_tab_groups/internal/saved_tab_group_model.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
@@ -335,21 +331,6 @@ bool BrowserTabStripModelDelegate::CanReload() const {
   return chrome::CanReload(browser_);
 }
 
-void BrowserTabStripModelDelegate::AddToReadLater(
-    std::vector<content::WebContents*> web_contentses) {
-  ReadingListModel* model =
-      ReadingListModelFactory::GetForBrowserContext(browser_->GetProfile());
-  if (!model || !model->loaded()) {
-    return;
-  }
-
-  chrome::MoveTabsToReadLater(browser_, web_contentses);
-}
-
-bool BrowserTabStripModelDelegate::SupportsReadLater() {
-  return !browser_->GetProfile()->IsGuestSession() && !IsForWebApp();
-}
-
 bool BrowserTabStripModelDelegate::IsForWebApp() {
   return web_app::AppBrowserController::IsWebApp(browser_);
 }
@@ -506,12 +487,6 @@ void BrowserTabStripModelDelegate::CloseTab(
         model->CloseWebContents(web_contents.get(),
                                 TabCloseTypes::CLOSE_USER_GESTURE |
                                     TabCloseTypes::CLOSE_CREATE_HISTORICAL_TAB);
-
-        // Try to show reading list IPH if needed.
-        if (model->count() >= 7) {
-          BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
-              feature_engagement::kIPHReadingListEntryPointFeature);
-        }
       },
       weak_factory_.GetWeakPtr(), tab_interface->GetContents()->GetWeakPtr(),
       std::move(cb2));

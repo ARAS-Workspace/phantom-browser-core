@@ -971,11 +971,6 @@ class BrowserView : public BrowserWindow,
   // Called when ui::TouchUiController changes the current touch mode.
   void TouchModeChanged();
 
-  // Attempts to show in-product help for the reading list as moved into the
-  // side panel. Should be called when the IPH backend is initialized or
-  // whenever the touch mode changes.
-  void MaybeShowReadingListInSidePanelIPH();
-
   // Attempts showing the IPH promo listing benefits for signed-in users
   // after the sync-to-signin migration.
   void MaybeShowSignInBenefitsIPH();

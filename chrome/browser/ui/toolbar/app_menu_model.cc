@@ -1190,7 +1190,6 @@ void AppMenuModel::ExecuteCommand(int command_id, int event_flags) {
   switch (command_id) {
     case IDC_SHOW_BOOKMARK_SIDE_PANEL:
     case IDC_SHOW_HISTORY_CLUSTERS_SIDE_PANEL:
-    case IDC_READING_LIST_MENU_SHOW_UI:
     case IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL: {
       actions::ActionInvocationContext context =
           actions::ActionInvocationContext::Builder()
@@ -1675,22 +1674,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
             "WrenchMenu.TimeToAction.ManageChromeProfiles", delta);
       }
       LogMenuAction(MENU_ACTION_MANAGE_CHROME_PROFILES);
-      break;
-
-    // Reading list submenu.
-    case IDC_READING_LIST_MENU_ADD_TAB:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.ReadingListAddTab", delta);
-      }
-      LogMenuAction(MENU_ACTION_READING_LIST_ADD_TAB);
-      break;
-    case IDC_READING_LIST_MENU_SHOW_UI:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.ReadingListShowUi", delta);
-      }
-      LogMenuAction(MENU_ACTION_READING_LIST_SHOW_UI);
       break;
 
     case IDC_SHOW_PAYMENT_METHODS:

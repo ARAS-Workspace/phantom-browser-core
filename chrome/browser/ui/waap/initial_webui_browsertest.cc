@@ -323,7 +323,7 @@ IN_PROC_BROWSER_TEST_F(InitialWebUINavigationBrowserTest,
       non_initial_webui_web_contents->GetPrimaryMainFrame()->GetProcess());
 
   // 4) Navigate to another non-Initial TopChrome WebUI in a new WebContents.
-  GURL url3(chrome::kChromeUIReadLaterURL);
+  GURL url3(chrome::kChromeUIBookmarksSidePanelURL);
   EXPECT_TRUE(IsTopChromeWebUIURL(url3));
   std::unique_ptr<content::WebContents> non_initial_webui_web_contents2 =
       CreateAndNavigateWebContents(url3, nullptr);

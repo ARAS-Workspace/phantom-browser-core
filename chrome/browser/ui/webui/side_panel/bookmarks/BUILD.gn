@@ -59,7 +59,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/sanitized_image:sanitized_image_source",
-    "//chrome/browser/ui/webui/side_panel/reading_list",
     "//chrome/browser/undo",
     "//chrome/common",
     "//components/bookmarks/managed",

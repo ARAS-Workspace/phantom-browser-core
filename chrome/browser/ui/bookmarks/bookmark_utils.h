@@ -69,9 +69,6 @@ std::u16string FormatBookmarkURLForDisplay(const GURL& url);
 // Returns true if the tab groups should be displayed in the bookmark bar.
 bool ShouldShowTabGroupsInBookmarkBar(Profile* profile);
 
-// Returns true if the reading list should be displayed in the bookmark bar.
-bool ShouldShowReadingListInBookmarkBar(Profile* profile);
-
 // Returns the drag operations for the specified node.
 int GetBookmarkDragOperation(content::BrowserContext* browser_context,
                              const bookmarks::BookmarkNode* node);

@@ -240,8 +240,6 @@
 #define IDC_PERFORMANCE                             40266
 #define IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS       40268
 #define IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE  40269
-#define IDC_READING_LIST_MENU_ADD_TAB   40271
-#define IDC_READING_LIST_MENU_SHOW_UI   40272
 #define IDC_SHOW_READING_MODE_SIDE_PANEL 40273
 #define IDC_SHOW_BOOKMARK_SIDE_PANEL    40274
 #define IDC_SHOW_CHROME_LABS            40276
@@ -300,7 +298,6 @@
 #define IDC_CONTENT_CONTEXT_OPENLINKINPROFILE 50108
 #define IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP 50109
 #define IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW 50111
-#define IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST 50112
 #define IDC_CONTENT_CONTEXT_OPENLINK_ISOLATED 50113
 // Image items.
 #define IDC_CONTENT_CONTEXT_SAVEIMAGEAS 50120
@@ -531,7 +528,6 @@ constexpr int kSaveAndShareMenuId = 57339;
 constexpr int kRecentTabsMenuId = 57338;
 constexpr int kSharingHubMenuId = 57337;
 constexpr int kProfileMenuId = 57336;
-constexpr int kReadingListMenuId = 57335;
 constexpr int kExtensionsSubMenuId = 57334;
 constexpr int kBookmarksMenuId = 57333;
 constexpr int kSavedTabGroupsMenuId = 57332;

@@ -39,7 +39,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
-#include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 
@@ -107,7 +106,6 @@ void BindTrackedElementHandlerRestricted(
       controller->GetAs<NewTabPageUI>() ||
 #endif
       controller->GetAs<UserEducationInternalsUI>() ||
-      controller->GetAs<ReadingListUI>() ||
       controller->GetAs<CustomizeChromeUI>() ||
       controller->GetAs<HistoryUI>() ||
       controller->GetAs<ProfilePickerUI>() ||

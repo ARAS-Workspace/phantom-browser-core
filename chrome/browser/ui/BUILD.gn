@@ -1256,7 +1256,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
     "//chrome/browser/ui/webui/side_panel/comments:impl",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
-    "//chrome/browser/ui/webui/side_panel/reading_list:impl",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices:impl",
     "//chrome/browser/ui/webui/signin",
     "//chrome/browser/ui/webui/signin:login_ui_service_impl",
@@ -1313,7 +1312,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
     "//chrome/browser/ui/webui/side_panel/history",
     "//chrome/browser/ui/webui/side_panel/history_clusters",
-    "//chrome/browser/ui/webui/side_panel/reading_list",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
     "//chrome/browser/ui/webui/util",
     "//chrome/browser/ui/webui/webnn_internals",
@@ -1351,7 +1349,6 @@ static_library("ui") {
     # //chrome/browser/ui:ui (browser.h, browser_window.h, browser_commands.h,
     # views/frame/browser_view.h).
     "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
-    "//chrome/browser/ui/webui/side_panel/reading_list:impl",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",

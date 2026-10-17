@@ -317,8 +317,6 @@ void CustomizeToolbarHandler::ListActions(ListActionsCallback callback) {
 
   add_action(kActionSidePanelShowBookmarks,
              side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
-  add_action(kActionSidePanelShowReadingList,
-             side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
   add_action(kActionSidePanelShowTabsFromOtherDevices,
              side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
   add_action(kActionSidePanelShowHistoryCluster,

@@ -70,8 +70,6 @@ class TestTabStripModelDelegate : public TabStripModelDelegate {
       content::WebContents* contents) override;
   bool RunUnloadListenerBeforeClosing(content::WebContents* contents) override;
   bool CanReload() const override;
-  void AddToReadLater(std::vector<content::WebContents*> web_contents) override;
-  bool SupportsReadLater() override;
   bool IsForWebApp() override;
   void CopyURL(content::WebContents* web_contents) override;
   void GoBack(content::WebContents* web_contents) override;

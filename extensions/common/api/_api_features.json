@@ -346,7 +346,6 @@
       "chrome://password-manager/*",
       "chrome://personalization/*",
       "chrome://profile-picker/*",
-      "chrome://read-later.top-chrome/*",
       "chrome://settings/*",
       "chrome://sync-confirmation/*",
       "chrome://tab-search.top-chrome/*",

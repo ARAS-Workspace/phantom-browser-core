@@ -409,27 +409,13 @@ void TabMenuModel::Build(int index) {
             ui::kColorMenuIcon, ui::SimpleMenuModel::kDefaultIconSize));
   }
 
-  const bool display_read_later = tab_strip_->delegate()->SupportsReadLater();
   const std::optional<send_tab_to_self::EntryPointDisplayReason>
       send_tab_to_self_reason = send_tab_to_self::GetEntryPointDisplayReason(
           tab_strip_->GetWebContentsAt(index));
   const bool display_send_to_self = send_tab_to_self_reason.has_value();
 
-  if (display_read_later || display_send_to_self) {
+  if (display_send_to_self) {
     AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-
-  if (display_read_later) {
-    AddItemWithIcon(
-        TabStripModel::CommandAddToReadLater,
-        l10n_util::GetPluralStringFUTF16(IDS_TAB_CXMENU_READ_LATER, num_tabs),
-        features::IsRoundedIconsEnabled()
-            ? ui::ImageModel::FromVectorIcon(kListAltIcon)
-            : ui::ImageModel::FromVectorIcon(kMenuBookChromeRefreshOldIcon,
-                                             ui::kColorMenuIcon,
-                                             kTabMenuIconSize));
-    SetEnabledAt(GetItemCount() - 1,
-                 tab_strip_->IsReadLaterSupportedForAny(indices));
   }
 
   if (display_send_to_self) {

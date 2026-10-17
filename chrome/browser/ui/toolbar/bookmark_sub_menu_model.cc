@@ -11,8 +11,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/bookmarks/bookmark_utils.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/toolbar/app_menu_model.h"
-#include "chrome/browser/ui/toolbar/reading_list_sub_menu_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
@@ -25,8 +23,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(BookmarkSubMenuModel,
                                       kShowBookmarkBarMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(BookmarkSubMenuModel,
                                       kShowBookmarkSidePanelItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(BookmarkSubMenuModel,
-                                      kReadingListMenuItem);
 
 // For views and cocoa, we have complex delegate systems to handle
 // injecting the bookmarks to the bookmark submenu. This is done to support
@@ -93,20 +89,6 @@ void BookmarkSubMenuModel::Build(BrowserWindowInterface* browser) {
   }
 
   AddItemWithStringId(IDC_IMPORT_SETTINGS, IDS_IMPORT_SETTINGS_MENU_LABEL);
-
-  AddSeparator(ui::NORMAL_SEPARATOR);
-
-  reading_list_sub_menu_model_ =
-      std::make_unique<ReadingListSubMenuModel>(delegate());
-  AddSubMenuWithStringIdAndIcon(
-      AppMenuModel::kReadingListMenuPlaceholder, IDS_READING_LIST_MENU,
-      reading_list_sub_menu_model_.get(),
-      ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                         ? kListAltIcon
-                                         : kReadingListOldIcon));
-  SetElementIdentifierAt(
-      GetIndexOfCommandId(AppMenuModel::kReadingListMenuPlaceholder).value(),
-      kReadingListMenuItem);
 
   auto set_icon = [this](int command_id, const gfx::VectorIcon& vector_icon) {
     auto index = GetIndexOfCommandId(command_id);

@@ -5,7 +5,6 @@
 #include <memory>
 #include <utility>
 
-#include "base/i18n/base_i18n_switches.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/to_string.h"
 #include "base/strings/utf_string_conversions.h"
@@ -16,11 +15,7 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/side_panel/side_panel_entry.h"
-#include "chrome/browser/ui/toolbar/app_menu_model.h"
-#include "chrome/browser/ui/toolbar/bookmark_sub_menu_model.h"
-#include "chrome/browser/ui/toolbar/reading_list_sub_menu_model.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/side_panel/side_panel.h"
 #include "chrome/browser/ui/views/side_panel/side_panel_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/user_education/user_education_service.h"
@@ -35,14 +30,12 @@
 #include "components/user_education/common/help_bubble/help_bubble.h"
 #include "components/user_education/common/help_bubble/help_bubble_factory_registry.h"
 #include "components/user_education/common/help_bubble/help_bubble_params.h"
-#include "components/user_education/views/help_bubble_view.h"
 #include "components/user_education/webui/help_bubble_handler.h"
 #include "components/webui/chrome_urls/pref_names.h"
 #include "content/public/test/browser_test.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/base/interaction/element_tracker.h"
 #include "ui/views/interaction/element_tracker_views.h"
-#include "ui/views/interaction/view_subregion_anchor.h"
 #include "ui/views/test/widget_test.h"
 #include "ui/webui/tracked_element/tracked_element_handler.h"
 #include "ui/webui/tracked_element/tracked_element_web_ui.h"
@@ -51,34 +44,6 @@ namespace {
 constexpr char16_t kBubbleBodyText[] = u"Bubble body text.";
 constexpr char16_t kBubbleButtonText[] = u"Button";
 constexpr char16_t kCloseButtonAltText[] = u"Close";
-DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kReadLaterWebContentsElementId);
-
-class ViewSizeObserver : public views::ViewObserver,
-                         public ui::test::StateObserver<gfx::Size> {
- public:
-  explicit ViewSizeObserver(raw_ptr<views::View>& view) : view_(view) {
-    observation_.Observe(view);
-  }
-
-  // ui::test::StateObserver:
-  gfx::Size GetStateObserverInitialState() const override {
-    return view_->size();
-  }
-
-  // views::ViewObserver:
-  void OnViewBoundsChanged(views::View* view) override {
-    OnStateObserverStateChanged(view->size());
-  }
-  void OnViewIsDeleting(views::View* view) override {
-    view_ = nullptr;
-    observation_.Reset();
-  }
-
- private:
-  raw_ptr<views::View> view_;
-  base::ScopedObservation<views::View, views::ViewObserver> observation_{this};
-};
-DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ViewSizeObserver, kSidePanelSize);
 }  // namespace
 
 class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
@@ -90,53 +55,6 @@ class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
     InteractiveBrowserTest::SetUpOnMainThread();
     g_browser_process->local_state()->SetBoolean(
         chrome_urls::kInternalOnlyUisEnabled, true);
-  }
-
-  // Opens the side panel and instruments the Read Later WebContents as
-  // kReadLaterWebContentsElementId.
-  auto OpenReadingListSidePanel() {
-    return Steps(
-        PressButton(kToolbarAppMenuButtonElementId),
-        SelectMenuItem(AppMenuModel::kBookmarksMenuItem),
-    // TODO(https://crbug.com/359252812): On Linux, sometimes the bookmarks
-    // submenu randomly loses focus causing it to close.
-#if BUILDFLAG(IS_LINUX)
-        WithoutDelay(
-#endif
-            SelectMenuItem(BookmarkSubMenuModel::kReadingListMenuItem),
-            SelectMenuItem(ReadingListSubMenuModel::kReadingListMenuShowUI)
-#if BUILDFLAG(IS_LINUX)
-                )
-#endif
-            ,
-        AfterShow(kSidePanelElementId,
-                  [this](ui::TrackedElement* el) {
-                    side_panel_ = AsView(el);
-                    ASSERT_TRUE(side_panel_);
-                  }),
-        WaitForShow(kReadLaterSidePanelWebViewElementId),
-        // Ensure that the Reading List side panel loads properly.
-        InstrumentNonTabWebView(kReadLaterWebContentsElementId,
-                                kReadLaterSidePanelWebViewElementId),
-        ObserveState(kSidePanelSize, std::ref(side_panel_)),
-        WaitForState(kSidePanelSize, testing::Ne(gfx::Size())));
-  }
-
-  auto OpenBookmarksSidePanel() {
-    return Steps(
-        PressButton(kToolbarAppMenuButtonElementId),
-    // TODO(https://crbug.com/359252812): On Linux, sometimes the bookmarks
-    // submenu randomly loses focus causing it to close.
-#if BUILDFLAG(IS_LINUX)
-        WithoutDelay(
-#endif
-            SelectMenuItem(AppMenuModel::kBookmarksMenuItem),
-            SelectMenuItem(BookmarkSubMenuModel::kShowBookmarkSidePanelItem)
-#if BUILDFLAG(IS_LINUX)
-                )
-#endif
-            ,
-        WaitForShow(kSidePanelElementId));
   }
 
   auto ShowHelpBubble(ElementSpecifier element) {
@@ -180,10 +98,7 @@ class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
   }
 
   auto Cleanup() {
-    return Do(base::BindLambdaForTesting([this]() {
-      side_panel_ = nullptr;
-      help_bubble_.reset();
-    }));
+    return Do(base::BindLambdaForTesting([this]() { help_bubble_.reset(); }));
   }
 
  protected:
@@ -209,57 +124,7 @@ class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
     return static_cast<user_education::FeaturePromoControllerImpl*>(controller)
         ->bubble_factory_registry();
   }
-
-  raw_ptr<views::View> side_panel_ = nullptr;
 };
-
-// TODO(https://crbug.com/463379523): This test is flaky on CI on Mac.
-// TODO(https://crbug.com/463867599): This test is flaky/failing on CI on
-// Windows, Linux, and ChromeOS.
-IN_PROC_BROWSER_TEST_F(HelpBubbleFactoryWebUIInteractiveUiTest,
-                       DISABLED_ShowFloatingHelpBubble) {
-  const DeepQuery kPathToAddCurrentTabElement{"reading-list-app",
-                                              "#currentPageActionButton"};
-  gfx::Rect bubble_rect;
-  RunTestSequence(
-      OpenReadingListSidePanel(),
-      ShowHelpBubble(kAddCurrentTabToReadingListElementId),
-
-      // Verify that the handler does not believe a WebUI help bubble is
-      // present.
-      CheckHandlerHasHelpBubble(kAddCurrentTabToReadingListElementId, false),
-
-      // Verify that the anchor element is marked.
-      CheckJsResultAt(
-          kReadLaterWebContentsElementId, kPathToAddCurrentTabElement,
-          "el => el.classList.contains('help-anchor-highlight')", true),
-
-      // Expect the help bubble to display with the correct parameters.
-      CheckViewProperty(
-          user_education::HelpBubbleView::kDefaultButtonIdForTesting,
-          &views::LabelButton::GetText, kBubbleButtonText),
-
-      // Expect the bubble to overlap the side panel slightly, as the anchor
-      // element is not flush with the edge of the side panel.
-      WithView(user_education::HelpBubbleView::kHelpBubbleElementIdForTesting,
-               [&bubble_rect](views::View* bubble) {
-                 bubble_rect = bubble->GetWidget()->GetWindowBoundsInScreen();
-               }),
-      CheckElement(kSidePanelElementId,
-                   [&bubble_rect](ui::TrackedElement* side_panel) {
-                     return bubble_rect.Intersects(
-                         side_panel->GetScreenBounds());
-                   }),
-
-      CloseHelpBubble(),
-
-      // Verify that the anchor element is no longer marked.
-      CheckJsResultAt(
-          kReadLaterWebContentsElementId, kPathToAddCurrentTabElement,
-          "el => el.classList.contains('help-anchor-highlight')", false),
-
-      Cleanup());
-}
 
 IN_PROC_BROWSER_TEST_F(HelpBubbleFactoryWebUIInteractiveUiTest,
                        ShowEmbeddedHelpBubbleAndCloseViaExternalApi) {
@@ -313,74 +178,5 @@ IN_PROC_BROWSER_TEST_F(HelpBubbleFactoryWebUIInteractiveUiTest,
       // bubble.
       CheckHandlerHasHelpBubble(kWebUIIPHDemoElementIdentifier, false),
 
-      Cleanup());
-}
-
-// Regression test for item (1) in crbug.com/40897167.
-// TODO(https://crbug.com/463379523): This test is flaky on CI on Mac.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_FloatingHelpBubbleHiddenOnWebUiHidden \
-  DISABLED_FloatingHelpBubbleHiddenOnWebUiHidden
-#else
-#define MAYBE_FloatingHelpBubbleHiddenOnWebUiHidden \
-  FloatingHelpBubbleHiddenOnWebUiHidden
-#endif
-IN_PROC_BROWSER_TEST_F(HelpBubbleFactoryWebUIInteractiveUiTest,
-                       MAYBE_FloatingHelpBubbleHiddenOnWebUiHidden) {
-  RunTestSequence(
-      OpenReadingListSidePanel(),
-      ShowHelpBubble(kAddCurrentTabToReadingListElementId),
-      WaitForShow(
-          user_education::HelpBubbleView::kHelpBubbleElementIdForTesting),
-      // Switch to a different side panel; this removes the Reading List WebView
-      // from its widget and effectively hides the WebContents.
-      OpenBookmarksSidePanel(),
-      WaitForHide(
-          user_education::HelpBubbleView::kHelpBubbleElementIdForTesting),
-      Cleanup());
-}
-
-namespace {
-constexpr char kSidePanelElementName[] = "Side Panel Element";
-}
-
-class HelpBubbleFactoryRtlWebUIInteractiveUiTest
-    : public HelpBubbleFactoryWebUIInteractiveUiTest {
- public:
-  HelpBubbleFactoryRtlWebUIInteractiveUiTest() = default;
-  ~HelpBubbleFactoryRtlWebUIInteractiveUiTest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitchASCII(switches::kForceUIDirection,
-                                    switches::kForceDirectionRTL);
-  }
-};
-
-// This verifies that the "element bounds updated" event gets sent when the side
-// panel is resized, even if none of the elements in the side panel are resized.
-// This is a regression test for crbug.com/40898739.
-// TODO(https://crbug.com/463379523): This test is flaky on CI on Mac.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_ResizeSidePanelSendsUpdate DISABLED_ResizeSidePanelSendsUpdate
-#else
-#define MAYBE_ResizeSidePanelSendsUpdate ResizeSidePanelSendsUpdate
-#endif
-IN_PROC_BROWSER_TEST_F(HelpBubbleFactoryRtlWebUIInteractiveUiTest,
-                       MAYBE_ResizeSidePanelSendsUpdate) {
-  RunTestSequence(
-      OpenReadingListSidePanel(),
-      InAnyContext(
-          AfterShow(kAddCurrentTabToReadingListElementId,
-                    [](ui::InteractionSequence* seq, ui::TrackedElement* el) {
-                      seq->NameElement(el, kSidePanelElementName);
-                    })),
-      ShowHelpBubble(kSidePanelElementName),
-      WithView(kSidePanelElementId,
-               [](SidePanel* side_panel) {
-                 side_panel->OnResize(-50, true);
-                 side_panel->GetWidget()->LayoutRootViewIfNecessary();
-               }),
-      WaitForEvent(kSidePanelElementName,
-                   views::ViewSubregionAnchor::kAnchorBoundsChangedEvent),
       Cleanup());
 }

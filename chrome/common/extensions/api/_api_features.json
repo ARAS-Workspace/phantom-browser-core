@@ -132,8 +132,7 @@
     "contexts": ["webui"],
     "matches": [
       "chrome://bookmarks/*",
-      "chrome://bookmarks-side-panel.top-chrome/*",
-      "chrome://read-later.top-chrome/*"
+      "chrome://bookmarks-side-panel.top-chrome/*"
     ],
     // "desktop_android" is not supported.
     "platforms": ["chromeos", "linux", "mac", "win"]
@@ -148,7 +147,6 @@
     "matches": [
       "chrome://bookmarks/*",
       "chrome://bookmarks-side-panel.top-chrome/*",
-      "chrome://read-later.top-chrome/*",
       "chrome://welcome/*"
     ]
   }],
@@ -854,7 +852,6 @@
     "matches": [
       "chrome://bookmarks/*",
       "chrome://bookmarks-side-panel.top-chrome/*",
-      "chrome://read-later.top-chrome/*",
       "chrome://tab-strip.top-chrome/*"
     ]
   }, {

@@ -92,7 +92,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://process-internals",
       "chrome://profile-internals",
       "chrome://quota-internals",
-      "chrome://read-later.top-chrome",
       "chrome://regional-capabilities-internals",
       "chrome://saved-tab-groups-unsupported",
       "chrome://search-engine-choice",

@@ -1259,15 +1259,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       ExecuteUIDebugCommand(id, browser_);
       break;
 
-    case IDC_READING_LIST_MENU_ADD_TAB:
-      chrome::MoveCurrentTabToReadLater(browser_);
-      break;
-
-    case IDC_READING_LIST_MENU_SHOW_UI:
-      browser_->GetFeatures().side_panel_ui()->Show(
-          SidePanelEntryId::kReadingList, SidePanelOpenTrigger::kAppMenu);
-      break;
-
     case IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL: {
       ShowCustomizeChromeSidePanel(SidePanelOpenTrigger::kAppMenu,
                                    CustomizeChromeSection::kAppearance);
@@ -1670,13 +1661,6 @@ void BrowserCommandController::InitCommandState() {
 
   command_updater_->UpdateCommandEnabled(IDC_SHOW_BOOKMARK_SIDE_PANEL, true);
 
-  if (browser_->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
-    // Reading list commands.
-    command_updater_->UpdateCommandEnabled(kReadingListMenuId, true);
-    command_updater_->UpdateCommandEnabled(IDC_READING_LIST_MENU_ADD_TAB, true);
-    command_updater_->UpdateCommandEnabled(IDC_READING_LIST_MENU_SHOW_UI, true);
-  }
-
   // Initialize other commands whose state changes based on various conditions.
   UpdateCommandsForFullscreenMode();
   UpdateCommandsForContentRestrictionState();
@@ -1826,11 +1810,6 @@ void BrowserCommandController::UpdateCommandsForTabState() {
   command_updater_->UpdateCommandEnabled(
       IDC_OPEN_IN_CHROME,
       IsWebAppOrCustomTab(browser_) && !is_isolated_app && !is_pinned_home_tab);
-
-  command_updater_->UpdateCommandEnabled(
-      IDC_READING_LIST_MENU_ADD_TAB,
-      browser_->tab_strip_model()->IsReadLaterSupportedForAny(
-          {browser_->tab_strip_model()->active_index()}));
 
   command_updater_->UpdateCommandEnabled(
       IDC_TOGGLE_REQUEST_TABLET_SITE,

@@ -251,12 +251,6 @@ void BookmarkCurrentTabInFolder(BrowserWindowInterface* browser,
 bool CanBookmarkCurrentTab(BrowserWindowInterface* browser);
 void BookmarkAllTabs(BrowserWindowInterface* browser);
 bool CanBookmarkAllTabs(BrowserWindowInterface* browser);
-bool CanMoveActiveTabToReadLater(BrowserWindowInterface* browser);
-void MoveCurrentTabToReadLater(BrowserWindowInterface* browser);
-void MoveTabsToReadLater(BrowserWindowInterface* browser,
-                         std::vector<content::WebContents*> web_contentses);
-bool MarkCurrentTabAsReadInReadLater(BrowserWindowInterface* browser);
-bool IsCurrentTabUnreadInReadLater(BrowserWindowInterface* browser);
 void ShowOffersAndRewardsForPage(BrowserWindowInterface* browser);
 void SaveCreditCard(BrowserWindowInterface* browser);
 void SaveIban(BrowserWindowInterface* browser);

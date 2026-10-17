@@ -75,7 +75,6 @@
 #include "chrome/browser/profiles/profile_io_data.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/renderer_context_menu/context_menu_content_type_factory.h"
 #include "chrome/browser/renderer_context_menu/dictation_menu_observer.h"
 #include "chrome/browser/renderer_context_menu/link_to_text_menu_observer.h"
@@ -156,7 +155,6 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
-#include "components/reading_list/core/reading_list_model.h"
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
@@ -510,7 +508,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_VIDEO_FRAME, 163},
        {IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE, 164},
        {IDC_CONTENT_CONTEXT_DICTATION, 165},
-       {IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST, 166},
+       // Removed: {IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST, 166},
        {IDC_SPELLCHECK_REMOVE_FROM_DICTIONARY, 167},
        {IDC_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS, 168},
        {IDC_CONTENT_CONTEXT_OPENLINK_ISOLATED, 169},
@@ -1675,14 +1673,6 @@ void RenderViewContextMenu::AppendCopyLinkLocationItem() {
                                   params_.link_url.SchemeIs(url::kMailToScheme)
                                       ? IDS_CONTENT_CONTEXT_COPYEMAILADDRESS
                                       : IDS_CONTENT_CONTEXT_COPYLINKLOCATION);
-  if (features::IsMenuSimplificationEnabled() && !params_.has_image_contents) {
-    menu_model_.AddItemWithStringIdAndIcon(
-        IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST,
-        IDS_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST,
-        ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                           ? kListAltIcon
-                                           : kReadingListOldIcon));
-  }
 }
 
 void RenderViewContextMenu::AppendOpenWithLinkItems() {
@@ -2383,9 +2373,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_COPYLINKLOCATION:
       return params_.unfiltered_link_url.is_valid();
 
-    case IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST:
-      return params_.link_url.is_valid();
-
     case IDC_CONTENT_CONTEXT_COPYLINKTEXT:
       return true;
 
@@ -2739,23 +2726,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
     case IDC_CONTENT_CONTEXT_COPYLINKLOCATION:
       WriteURLToClipboard(params_.unfiltered_link_url, id);
       break;
-
-    case IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST: {
-      ReadingListModel* model =
-          ReadingListModelFactory::GetForBrowserContext(browser_context_);
-      if (model) {
-        std::u16string title = params_.link_text;
-        if (title.empty()) {
-          title = base::UTF8ToUTF16(params_.link_url.spec());
-        }
-        model->AddOrReplaceEntry(
-            params_.link_url, base::UTF16ToUTF8(title),
-            reading_list::EntrySource::ADDED_VIA_CURRENT_APP,
-            /*estimated_read_time=*/std::nullopt,
-            /*creation_time=*/std::nullopt);
-      }
-      break;
-    }
 
     case IDC_CONTENT_CONTEXT_COPYLINKTEXT:
       ExecCopyLinkText();

@@ -65,8 +65,6 @@ std::string SidePanelEntryIdToTitle(SidePanelEntryId id) {
   switch (id) {
     case SidePanelEntryId::kCustomizeChrome:
       return l10n_util::GetStringUTF8(IDS_SIDE_PANEL_CUSTOMIZE_CHROME_TITLE);
-    case SidePanelEntryId::kReadingList:
-      return l10n_util::GetStringUTF8(IDS_READ_LATER_TITLE);
     case SidePanelEntryId::kBookmarks:
       return l10n_util::GetStringUTF8(IDS_BOOKMARK_MANAGER_TITLE);
     default:

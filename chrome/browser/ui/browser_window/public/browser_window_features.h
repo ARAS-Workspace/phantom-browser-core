@@ -86,7 +86,6 @@ class MemorySaverOptInIPHController;
 class PinnedToolbarActions;
 class ProfileMenuCoordinator;
 class OrganizerPanelStateController;
-class ReadingListSidePanelCoordinator;
 class RecentActivityBubbleCoordinator;
 class ScrimViewController;
 class SessionServiceBrowserHelper;
@@ -573,8 +572,6 @@ class BrowserWindowFeatures {
       organizer_panel_state_controller_;
   std::unique_ptr<qrcode_generator::QRCodeWindowController>
       qrcode_window_controller_;
-  std::unique_ptr<ReadingListSidePanelCoordinator>
-      reading_list_side_panel_coordinator_;
   std::unique_ptr<RecentActivityBubbleCoordinator>
       recent_activity_bubble_coordinator_;
   std::unique_ptr<send_tab_to_self::SendTabToSelfToolbarBubbleController>

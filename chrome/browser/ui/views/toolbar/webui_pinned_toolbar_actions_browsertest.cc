@@ -726,7 +726,7 @@ IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
                        PostOrQueueActionAfterAnimation_MultipleButtons) {
   auto* pinned_actions = GetPinnedToolbarActions();
   actions::ActionId action_id_1 = kActionSidePanelShowBookmarks;
-  actions::ActionId action_id_2 = kActionSidePanelShowReadingList;
+  actions::ActionId action_id_2 = kActionPrint;
 
   ASSERT_FALSE(pinned_actions->IsActionPinned(action_id_1));
   ASSERT_FALSE(pinned_actions->IsActionPinned(action_id_2));

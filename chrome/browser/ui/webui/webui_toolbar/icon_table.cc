@@ -110,8 +110,6 @@ const base::flat_map<const gfx::VectorIcon*, IconInfo>& KnownIcons() {
           {{&kQrCodeChromeRefreshOldIcon},
            {"webui-toolbar:qr_code", IconType::kIconSet}},
           {{&kQrCodeIcon}, {"webui-toolbar:qr_code", IconType::kIconSet}},
-          {{&kReadingListOldIcon},
-           {"webui-toolbar:list_alt", IconType::kIconSet}},
           {{&vector_icons::kShoppingmodeIcon},
            {"webui-toolbar:shoppingmode", IconType::kIconSet}},
           {{&kLocalOfferFlippedRefreshOldIcon},

@@ -17,8 +17,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/side_panel/side_panel_entry_id.h"
-#include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/tab_group_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -51,7 +49,6 @@ class BrowserCommandsTest : public InProcessBrowserTest {
   BrowserCommandsTest() : https_server_(net::EmbeddedTestServer::TYPE_HTTPS) {
     feature_list_.InitWithFeatures(
         {
-            toast_features::kReadingListToast,
             toast_features::kLinkCopiedToast,
         },
         {});
@@ -714,27 +711,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandsTest,
   browser()->tab_strip_model()->CloseAllTabs();
   ConvertPopupToTabbedBrowser(popup_browser);
   EXPECT_EQ(false, browser_shutdown::HasShutdownStarted());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandsTest, AddingToReadingListOpensToast) {
-  GURL main_url(https_server_.GetURL("a.test", "/iframe.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), main_url));
-  chrome::ExecuteCommand(browser(), IDC_READING_LIST_MENU_ADD_TAB);
-  EXPECT_TRUE(browser()->GetFeatures().toast_controller()->IsShowingToast());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandsTest,
-                       AddingToReadingListWithSidePanelShowsNoToast) {
-  GURL main_url(https_server_.GetURL("a.test", "/iframe.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), main_url));
-  auto* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
-  side_panel_ui->Show(SidePanelEntryId::kReadingList);
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return side_panel_ui->IsSidePanelEntryShowing(
-        SidePanelEntryKey(SidePanelEntryId::kReadingList));
-  }));
-  chrome::ExecuteCommand(browser(), IDC_READING_LIST_MENU_ADD_TAB);
-  EXPECT_FALSE(browser()->GetFeatures().toast_controller()->IsShowingToast());
 }
 
 IN_PROC_BROWSER_TEST_F(BrowserCommandsTest, CopyingUrlOpensToast) {

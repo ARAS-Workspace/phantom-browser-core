@@ -184,7 +184,7 @@
     IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS) \
   E(kActionExtensionsSubmenuVisitChromeWebStore, \
     IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE) \
-  E(kActionReadingListMenuAddTab, IDC_READING_LIST_MENU_ADD_TAB) \
+  E(kActionReadingListMenuAddTab) \
   E(kActionRecentTabsLoginForDeviceTabs, \
     IDC_RECENT_TABS_LOGIN_FOR_DEVICE_TABS) \
   E(kActionRecentTabsSeeDeviceTabs, \
@@ -447,7 +447,7 @@
   E(kActionSidePanelShowReadAnything) \
   E(kActionShowReadingModeSidePanel, IDC_SHOW_READING_MODE_SIDE_PANEL) \
   E(kActionShowReadingModeKeyboard, IDC_SHOW_READING_MODE_KEYBOARD) \
-  E(kActionSidePanelShowReadingList, IDC_READING_LIST_MENU_SHOW_UI) \
+  E(kActionSidePanelShowReadingList) \
   E(kActionSidePanelShowSearchCompanion) \
   E(kActionSidePanelShowShoppingInsights) \
   E(kActionSidePanelShowSideSearch) \
@@ -495,7 +495,7 @@
 #define SUBMENU_ACTION_IDS                                                     \
   E(kActionAppMenuRoot)                                                        \
   E(kActionMenuBookmarksSubmenu, kBookmarksMenuId)                             \
-  E(kActionMenuReadingListSubmenu, kReadingListMenuId)                         \
+  E(kActionMenuReadingListSubmenu)                                             \
   E(kActionMenuZoomSubmenu, kZoomMenuId)                                       \
   E(kActionMenuProfileSubmenu, kProfileMenuId)                                 \
   E(kActionMenuFindAndEditSubmenu, kFindAndEditMenuId)                         \

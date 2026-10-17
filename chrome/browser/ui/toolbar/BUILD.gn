@@ -45,7 +45,6 @@ source_set("toolbar") {
     "app_menu_model.h",
     "back_forward_menu_model.h",
     "bookmark_sub_menu_model.h",
-    "reading_list_sub_menu_model.h",
     "toolbar_pref_names.cc",
     "toolbar_pref_names.h",
   ]
@@ -100,7 +99,6 @@ source_set("impl") {
     "app_menu_model.cc",
     "back_forward_menu_model.cc",
     "bookmark_sub_menu_model.cc",
-    "reading_list_sub_menu_model.cc",
   ]
 
   deps += [

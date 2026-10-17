@@ -42,7 +42,6 @@
 #include "chrome/test/interaction/webcontents_interaction_test_util.h"
 #include "chrome/test/user_education/interactive_feature_promo_test.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/reading_list/core/reading_list_entry.h"
 #include "content/public/test/browser_test.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/accessibility/accessibility_features.h"
@@ -305,10 +304,6 @@ class PinnedSidePanelInteractiveTest : public InteractiveFeaturePromoTest {
                              is_active));
   }
 
-  auto ShowSidePanelForKey(SidePanelEntryKey key) {
-    return Do(([&]() { browser()->GetFeatures().side_panel_ui()->Show(key); }));
-  }
-
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
@@ -466,40 +461,6 @@ IN_PROC_BROWSER_TEST_F(PinnedSidePanelInteractiveTest,
       WaitForShow(kPinnedToolbarActionShowSidePanelBookmarksElementId),
       // Toggle side panel
       PressButton(kPinnedToolbarActionShowSidePanelBookmarksElementId),
-      WaitForHide(kSidePanelElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(PinnedSidePanelInteractiveTest,
-                       SwitchBetweenDifferentEntries) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kBookmarksWebContentsId);
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kReadLaterWebContentsId);
-  auto* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
-
-  RunTestSequence(
-      // Ensure the side panel isn't open
-      EnsureNotPresent(kSidePanelElementId),
-      // Click the toolbar button to open the side panel
-      OpenBookmarksSidePanel(), WaitForShow(kSidePanelElementId),
-      InstrumentNonTabWebView(kBookmarksWebContentsId,
-                              kBookmarkSidePanelWebViewElementId),
-
-      CheckResult(([&]() {
-                    return side_panel_ui->IsSidePanelEntryShowing(
-                        SidePanelEntryKey(SidePanelEntryId::kBookmarks));
-                  }),
-                  true),
-      // Switch to the reading list entry.
-      ShowSidePanelForKey(SidePanelEntryKey(SidePanelEntry::Id::kReadingList)),
-      InstrumentNonTabWebView(kReadLaterWebContentsId,
-                              kReadLaterSidePanelWebViewElementId),
-
-      CheckResult(([&]() {
-                    return side_panel_ui->IsSidePanelEntryShowing(
-                        SidePanelEntryKey(SidePanelEntryId::kReadingList));
-                  }),
-                  true),
-      // Click on the close button to dismiss the side panel
-      PressButton(kSidePanelCloseButtonElementId),
       WaitForHide(kSidePanelElementId));
 }
 
@@ -743,44 +704,4 @@ IN_PROC_BROWSER_TEST_F(SidePanelAnimationPerfUiTest,
              },
              testing::Gt(0), "Check fps is nonzero.")),
          Else(Log("Compositor failed to render during test."))));
-}
-
-IN_PROC_BROWSER_TEST_F(PinnedSidePanelInteractiveTest,
-                       PinActiveItemHighlightsButton) {
-  auto* registry = SidePanelRegistry::From(browser());
-  auto* entry = registry->GetEntryForKey(SidePanelEntry::Key(SidePanelEntryId::kReadingList));
-  ASSERT_TRUE(entry);
-  entry->set_should_show_ephemerally_in_toolbar(false);
-
-  RunTestSequence(
-      // Ensure the side panel isn't open and action is not pinned.
-      EnsureNotPresent(kSidePanelElementId),
-      CheckActionPinnedToToolbar(kActionSidePanelShowReadingList, false),
-
-      // Open reading list side panel.
-      ShowSidePanelForKey(SidePanelEntryKey(SidePanelEntry::Id::kReadingList)),
-      WaitForShow(kSidePanelElementId),
-
-      // Since ephemeral is disabled, no button for reading list should be added
-      // yet.
-      CheckActionPinnedToToolbar(kActionSidePanelShowReadingList, false),
-
-      // Pin reading list action.
-      Do(([&]() {
-        PinnedToolbarActionsModel::Get(browser()->GetProfile())
-            ->UpdatePinnedState(kActionSidePanelShowReadingList, true);
-      })),
-
-      // Verify it is pinned and highlighted immediately.
-      CheckActionPinnedToToolbar(kActionSidePanelShowReadingList, true),
-      CheckPinnedToolbarActionsContainerChildInkDropState(0, true),
-
-      // Unpin reading list action while open.
-      Do(([&]() {
-        PinnedToolbarActionsModel::Get(browser()->GetProfile())
-            ->UpdatePinnedState(kActionSidePanelShowReadingList, false);
-      })),
-
-      // Verify it is no longer pinned and is removed from the toolbar.
-      CheckActionPinnedToToolbar(kActionSidePanelShowReadingList, false));
 }

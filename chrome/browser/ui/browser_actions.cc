@@ -317,13 +317,6 @@ void BrowserActions::InitializeSidePanelActions() {
                           : kBookmarksSidePanelRefreshOldIcon,
                       kActionSidePanelShowBookmarks, bwi, true)
           .Build());
-  root_action_item_->AddChild(
-      SidePanelAction(SidePanelEntryId::kReadingList, IDS_READ_LATER_TITLE,
-                      IDS_READ_LATER_TITLE,
-                      features::IsRoundedIconsEnabled() ? kListAltIcon
-                                                        : kReadingListOldIcon,
-                      kActionSidePanelShowReadingList, bwi, true)
-          .Build());
   if (TabsFromOtherDevicesSidePanelCoordinator::IsSupported(profile)) {
     root_action_item_->AddChild(
         SidePanelAction(SidePanelEntryId::kTabsFromOtherDevices,
@@ -2328,17 +2321,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-                chrome::MoveCurrentTabToReadLater(bwi);
-              },
-              bwi))
-          .SetActionId(kActionReadingListMenuAddTab)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
                 chrome::ShowSettingsSubPage(bwi, chrome::kPeopleSubPage);
               },
               bwi))
@@ -3371,19 +3353,6 @@ void BrowserActions::InitializeSubmenuActions() {
           IDS_BOOKMARKS_AND_LISTS_MENU,
           features::IsRoundedIconsEnabled() ? kStarIcon
                                             : kBookmarksListsMenuOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {},
-              bwi),
-          kActionMenuReadingListSubmenu, IDS_READING_LIST_MENU,
-          IDS_READING_LIST_MENU,
-          features::IsRoundedIconsEnabled() ? kListAltIcon
-                                            : kReadingListOldIcon,
           /*is_pinnable=*/false)
           .Build());
 

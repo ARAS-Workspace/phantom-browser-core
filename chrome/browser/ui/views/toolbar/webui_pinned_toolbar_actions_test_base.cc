@@ -55,9 +55,6 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
                kShowPaymentsBubbleOrPage},
           {kActionSidePanelShowBookmarks,
            toolbar_ui_api::mojom::PinnedToolbarAction::kSidePanelShowBookmarks},
-          {kActionSidePanelShowReadingList,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kSidePanelShowReadingList},
           {kActionSidePanelShowHistoryCluster,
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kSidePanelShowHistoryCluster},

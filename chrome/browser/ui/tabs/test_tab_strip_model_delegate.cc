@@ -114,13 +114,6 @@ bool TestTabStripModelDelegate::CanReload() const {
   return true;
 }
 
-void TestTabStripModelDelegate::AddToReadLater(
-    std::vector<content::WebContents*> web_contentses) {}
-
-bool TestTabStripModelDelegate::SupportsReadLater() {
-  return true;
-}
-
 bool TestTabStripModelDelegate::IsForWebApp() {
   return false;
 }

@@ -600,14 +600,6 @@
     "META": {"sizes": {"includes": [5],}},
     "includes": [4860],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/side_panel/reading_list/code_cache_resources.grd": {
-    "META": {"sizes": {"includes": [15],}},
-    "includes": [4890],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/side_panel/reading_list/resources.grd": {
-    "META": {"sizes": {"includes": [15],}},
-    "includes": [4900],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/side_panel/shared/code_cache_resources.grd": {
     "META": {"sizes": {"includes": [15],}},
     "includes": [4910],

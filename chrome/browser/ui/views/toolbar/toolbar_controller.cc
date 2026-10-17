@@ -397,8 +397,6 @@ std::string ToolbarController::GetActionNameFromElementIdentifier(
             "PinnedShowReadAnythingSidePanelButton"},
            {kActionSidePanelShowHistoryCluster,
             "PinnedShowHistorySidePanelButton"},
-           {kActionSidePanelShowReadingList,
-            "PinnedShowReadingListSidePanelButton"},
            {kActionSidePanelShowSearchCompanion,
             "PinnedShowSearchCompanionSidePanelButton"},
            {kActionTaskManager, "PinnedTaskManagerButton"},

@@ -17,7 +17,6 @@
 #include "base/command_line.h"
 #include "base/feature_list.h"
 #include "base/i18n/rtl.h"
-#include "base/memory/scoped_refptr.h"
 #include "base/metrics/field_trial_params.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
@@ -39,7 +38,6 @@
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit_external.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -91,9 +89,6 @@
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
 #include "chrome/browser/ui/sharing_hub/screenshot/screenshot_captured_bubble_controller.h"
 #include "chrome/browser/ui/sharing_hub/sharing_hub_bubble_controller.h"
-#include "chrome/browser/ui/side_panel/side_panel_entry.h"
-#include "chrome/browser/ui/side_panel/side_panel_entry_key.h"
-#include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/startup/startup_tab.h"
 #include "chrome/browser/ui/status_bubble.h"
 #include "chrome/browser/ui/tab_contents/core_tab_helper.h"
@@ -147,9 +142,6 @@
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
-#include "components/reading_list/core/reading_list_entry.h"
-#include "components/reading_list/core/reading_list_model.h"
-#include "components/reading_list/core/reading_list_pref_names.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/services/app_service/public/cpp/app_launch_params.h"
 #include "components/services/app_service/public/cpp/app_launch_util.h"
@@ -270,36 +262,6 @@ void CreateAndShowNewWindowWithContents(
   new_browser->tab_strip_model()->AddWebContents(std::move(contents), -1,
                                                  ui::PAGE_TRANSITION_LINK,
                                                  AddTabTypes::ADD_ACTIVE);
-}
-
-bool GetTabURLAndTitleToSave(content::WebContents* web_contents,
-                             GURL* url,
-                             std::u16string* title) {
-  // |web_contents| can be nullptr if the last tab in the browser was closed
-  // but the browser wasn't closed yet. https://crbug.com/40557069
-  if (!web_contents) {
-    return false;
-  }
-  return chrome::GetURLAndTitleToBookmark(web_contents, url, title);
-}
-
-ReadingListModel* GetReadingListModel(BrowserWindowInterface* browser) {
-  ReadingListModel* model =
-      ReadingListModelFactory::GetForBrowserContext(browser->GetProfile());
-  if (!model || !model->loaded()) {
-    return nullptr;  // Ignore requests until model has loaded.
-  }
-  return model;
-}
-
-bool CanMoveWebContentsToReadLater(BrowserWindowInterface* browser,
-                                   content::WebContents* web_contents,
-                                   ReadingListModel* model,
-                                   GURL* url,
-                                   std::u16string* title) {
-  return model && GetTabURLAndTitleToSave(web_contents, url, title) &&
-         model->IsUrlSupported(*url) &&
-         !browser->GetProfile()->IsGuestSession();
 }
 
 bool BookmarkCurrentTabHelper(BrowserWindowInterface* browser,
@@ -2027,92 +1989,6 @@ void BookmarkAllTabs(BrowserWindowInterface* browser) {
 bool CanBookmarkAllTabs(BrowserWindowInterface* browser) {
   return browser->GetTabStripModel()->count() > 1 &&
          CanBookmarkCurrentTab(browser);
-}
-
-bool CanMoveActiveTabToReadLater(BrowserWindowInterface* browser) {
-  GURL url;
-  std::u16string title;
-  WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  ReadingListModel* model = GetReadingListModel(browser);
-  return CanMoveWebContentsToReadLater(browser, web_contents, model, &url,
-                                       &title);
-}
-
-void MoveCurrentTabToReadLater(BrowserWindowInterface* browser) {
-  MoveTabsToReadLater(browser,
-                      {browser->GetTabStripModel()->GetActiveWebContents()});
-}
-
-void MoveTabsToReadLater(BrowserWindowInterface* browser,
-                         std::vector<content::WebContents*> web_contentses) {
-  int added_to_read_later = 0;
-  for (WebContents* const web_contents : web_contentses) {
-    GURL url;
-    std::u16string title;
-    ReadingListModel* model = GetReadingListModel(browser);
-    if (!CanMoveWebContentsToReadLater(browser, web_contents, model, &url,
-                                       &title)) {
-      continue;
-    }
-    model->AddOrReplaceEntry(url, base::UTF16ToUTF8(title),
-                             reading_list::EntrySource::ADDED_VIA_CURRENT_APP,
-                             /*estimated_read_time=*/std::nullopt,
-                             /*creation_time=*/std::nullopt);
-    BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
-        feature_engagement::kIPHReadingListDiscoveryFeature);
-    added_to_read_later += 1;
-  }
-
-  if (added_to_read_later == 0) {
-    return;
-  }
-
-  if (toast_features::IsEnabled(toast_features::kReadingListToast)) {
-    // Don't show the reading list toast if the side panel is visible.
-    if (browser->GetFeatures().side_panel_ui()->IsSidePanelEntryShowing(
-            SidePanelEntryKey(SidePanelEntryId::kReadingList))) {
-      return;
-    }
-
-    ToastController* const toast_controller =
-        browser->GetFeatures().toast_controller();
-    if (toast_controller) {
-      ToastParams params = ToastParams(ToastId::kAddedToReadingList);
-      params.body_string_cardinality_param = added_to_read_later;
-      toast_controller->MaybeShowToast(std::move(params));
-    }
-  }
-}
-
-bool MarkCurrentTabAsReadInReadLater(BrowserWindowInterface* browser) {
-  GURL url;
-  std::u16string title;
-  ReadingListModel* model = GetReadingListModel(browser);
-  WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  if (!model || !GetTabURLAndTitleToSave(web_contents, &url, &title)) {
-    return false;
-  }
-  scoped_refptr<const ReadingListEntry> entry = model->GetEntryByURL(url);
-  // Mark current tab as read.
-  if (entry && !entry->IsRead()) {
-    model->SetReadStatusIfExists(url, true);
-  }
-  return entry != nullptr;
-}
-
-bool IsCurrentTabUnreadInReadLater(BrowserWindowInterface* browser) {
-  GURL url;
-  std::u16string title;
-  ReadingListModel* model = GetReadingListModel(browser);
-  WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  if (!model || !GetTabURLAndTitleToSave(web_contents, &url, &title)) {
-    return false;
-  }
-  scoped_refptr<const ReadingListEntry> entry = model->GetEntryByURL(url);
-  return entry && !entry->IsRead();
 }
 
 void ShowOffersAndRewardsForPage(BrowserWindowInterface* browser) {

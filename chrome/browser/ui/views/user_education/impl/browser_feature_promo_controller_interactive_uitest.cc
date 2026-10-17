@@ -8,7 +8,6 @@
 #include "base/functional/callback.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/weak_ptr.h"
-#include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -18,7 +17,6 @@
 #include "chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/exclusive_access/fullscreen_controller.h"
@@ -34,7 +32,6 @@
 #include "chrome/browser/ui/views/toolbar/toolbar_controller.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_feature_promo_preconditions.h"
-#include "chrome/browser/ui/views/user_education/impl/browser_user_education_interface_impl.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/common/pref_names.h"
@@ -63,7 +60,6 @@
 #include "omnibox_event.pb.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/interaction/element_tracker.h"
-#include "ui/base/unowned_user_data/user_data_factory.h"
 #include "ui/events/event_modifiers.h"
 #include "ui/events/test/event_generator.h"
 #include "ui/gfx/native_ui_types.h"
@@ -766,97 +762,4 @@ IN_PROC_BROWSER_TEST_F(BrowserFeaturePromoControllerOverflowUiTest,
       MaybeShowPromo(kIPHExemptFromOmniboxFeature,
                      user_education::FeaturePromoResult::kWindowTooSmall),
       MaybeShowPromo(kIPHExemptFromToolbarNotCollapsedFeature));
-}
-
-namespace {
-
-// Class that allows the injection of a startup promo when the browser user
-// education interface is initialized.
-class BrowserUserEducationInterfaceWithStartupPromo
-    : public BrowserUserEducationInterfaceImpl {
- public:
-  BrowserUserEducationInterfaceWithStartupPromo(
-      BrowserWindowInterface* browser,
-      user_education::FeaturePromoParams startup_promo_params)
-      : BrowserUserEducationInterfaceImpl(browser),
-        startup_promo_params_(std::move(startup_promo_params)) {}
-  ~BrowserUserEducationInterfaceWithStartupPromo() override = default;
-
-  void Init(BrowserView* browser_view) override {
-    CHECK(browser_view->GetWidget());
-    BrowserUserEducationInterfaceImpl::Init(browser_view);
-    // This is about the same point where startup promos are queued; when the
-    // BrowserView is added to the widget, but after browser window features are
-    // initialized.
-    MaybeShowStartupFeaturePromo(std::move(startup_promo_params_));
-  }
-
- private:
-  user_education::FeaturePromoParams startup_promo_params_;
-};
-
-}  // namespace
-
-// Regression test for startup promo issues on User Education 2.5.
-// See https://crbug.com/439030167 for more information.
-class BrowserFeaturePromoControllerLiveStartupTest
-    : public InteractiveFeaturePromoTest {
- public:
-  // This will be the feature to use for startup tests below.
-  // It should (a) anchor to something that is visible at/near startup, (b) be a
-  // toast, and (c) not be dependent on any other flags, features, etc.
-  static const base::Feature& GetStartupTestFeature() {
-    return feature_engagement::kIPHReadingListDiscoveryFeature;
-  }
-
-  BrowserFeaturePromoControllerLiveStartupTest()
-      : InteractiveFeaturePromoTest(
-            UseDefaultTrackerAllowingPromos({GetStartupTestFeature()}),
-            ClockMode::kUseDefaultClock,
-            InitialSessionState::kInsideGracePeriod) {}
-  ~BrowserFeaturePromoControllerLiveStartupTest() override = default;
-
-  void SetUp() override {
-    user_ed_override_ =
-        BrowserWindowFeatures::GetUserDataFactoryForTesting()
-            .AddOverrideForTesting(base::BindRepeating(
-                &BrowserFeaturePromoControllerLiveStartupTest::CreateUserEd,
-                base::Unretained(this)));
-    InteractiveFeaturePromoTest::SetUp();
-  }
-
-  void WaitForPromo() {
-    if (!got_result_) {
-      run_loop_ = std::make_unique<base::RunLoop>();
-      run_loop_->Run();
-    }
-  }
-
- private:
-  std::unique_ptr<BrowserUserEducationInterface> CreateUserEd(
-      BrowserWindowInterface& browser) {
-    user_education::FeaturePromoParams params(GetStartupTestFeature());
-    params.show_promo_result_callback = base::BindOnce(
-        &BrowserFeaturePromoControllerLiveStartupTest::OnShowPromoResult,
-        base::Unretained(this));
-    return std::make_unique<BrowserUserEducationInterfaceWithStartupPromo>(
-        &browser, std::move(params));
-  }
-
-  void OnShowPromoResult(user_education::FeaturePromoResult result) {
-    EXPECT_EQ(user_education::FeaturePromoResult::Success(), result);
-    got_result_ = true;
-    if (run_loop_) {
-      run_loop_->Quit();
-    }
-  }
-
-  bool got_result_ = false;
-  std::unique_ptr<base::RunLoop> run_loop_;
-  ui::UserDataFactory::ScopedOverride user_ed_override_;
-};
-
-IN_PROC_BROWSER_TEST_F(BrowserFeaturePromoControllerLiveStartupTest,
-                       CheckStartupPromo) {
-  WaitForPromo();
 }

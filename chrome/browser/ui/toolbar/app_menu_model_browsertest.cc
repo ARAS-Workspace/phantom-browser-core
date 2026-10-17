@@ -480,8 +480,6 @@ INSTANTIATE_TEST_SUITE_P(
                     IDC_OPEN_GUEST_PROFILE,
                     IDC_ADD_NEW_PROFILE,
                     IDC_MANAGE_CHROME_PROFILES,
-                    IDC_READING_LIST_MENU_ADD_TAB,
-                    IDC_READING_LIST_MENU_SHOW_UI,
                     IDC_SHOW_PAYMENT_METHODS,
                     AppMenuModel::kMinOtherProfileCommandId));
 

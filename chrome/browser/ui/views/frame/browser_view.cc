@@ -128,7 +128,6 @@
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
-#include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/view_ids.h"
 #include "chrome/browser/ui/views/accessibility/accessibility_focus_highlight.h"
 #include "chrome/browser/ui/views/accessibility/caret_browsing_dialog_delegate.h"
@@ -236,7 +235,6 @@
 #include "components/collaboration/public/messaging/message.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/feature_engagement/public/event_constants.h"
-#include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/tracker.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/javascript_dialogs/app_modal_dialog_controller.h"
@@ -245,7 +243,6 @@
 #include "components/performance_manager/public/features.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/prefs/pref_service.h"
-#include "components/reading_list/core/reading_list_pref_names.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/search/ntp_features.h"
 #include "components/sessions/core/tab_restore_service.h"
@@ -2716,18 +2713,6 @@ void BrowserView::DidFinishNavigation(
 void BrowserView::TouchModeChanged() {
 }
 
-void BrowserView::MaybeShowReadingListInSidePanelIPH() {
-  // TODO(dfried): This promo is potentially superfluous since the pref is never
-  // set; remove.
-  const PrefService* const pref_service = browser()->GetProfile()->GetPrefs();
-  if (pref_service &&
-      pref_service->GetBoolean(
-          reading_list::prefs::kReadingListDesktopFirstUseExperienceShown)) {
-    BrowserUserEducationInterface::From(browser())->MaybeShowFeaturePromo(
-        feature_engagement::kIPHReadingListInSidePanelFeature);
-  }
-}
-
 bool BrowserView::IsBookmarkBarVisible() const {
   if (!WindowFeatureController::From(browser_)->SupportsWindowFeature(
           WindowFeatureController::WindowFeature::kFeatureBookmarkBar)) {
@@ -4690,13 +4675,6 @@ void BrowserView::AddedToWidget() {
   using_native_frame_ = browser_widget_->ShouldUseNativeFrame();
 
   MaybeShowSignInBenefitsIPH();
-
-  // Want to show this promo, but not right at startup.
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&BrowserView::MaybeShowReadingListInSidePanelIPH,
-                     GetAsWeakPtr()),
-      base::Minutes(5));
 
   // Accessible name of the tab is dependent on the visibility state of the chip
   // view, so it needs to be made aware of any changes.

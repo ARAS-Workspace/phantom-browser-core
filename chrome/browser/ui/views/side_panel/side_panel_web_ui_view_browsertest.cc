@@ -31,7 +31,7 @@
 namespace {
 
 constexpr SidePanelEntry::Id kTestGlobalEntryId =
-    SidePanelEntry::Id::kReadingList;
+    SidePanelEntry::Id::kBookmarks;
 constexpr SidePanelEntry::Id kTestTabEntryId =
     SidePanelEntry::Id::kAboutThisSite;
 

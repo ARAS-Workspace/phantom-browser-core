@@ -199,12 +199,6 @@ ActionItemToPinnedToolbarAction(actions::ActionItem* item) {
                            : kBookmarksSidePanelRefreshOldIcon));
       return toolbar_ui_api::mojom::PinnedToolbarAction::
           kSidePanelShowBookmarks;
-    case kActionSidePanelShowReadingList:
-      CHECK_EQ(icon,
-               &(features::IsRoundedIconsEnabled() ? kListAltIcon
-                                                   : kReadingListOldIcon));
-      return toolbar_ui_api::mojom::PinnedToolbarAction::
-          kSidePanelShowReadingList;
     case kActionSidePanelShowHistoryCluster:
       CHECK_EQ(icon, &(features::IsRoundedIconsEnabled()
                            ? vector_icons::kHistoryIcon

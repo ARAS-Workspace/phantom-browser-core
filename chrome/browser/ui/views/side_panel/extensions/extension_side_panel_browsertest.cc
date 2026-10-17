@@ -661,10 +661,10 @@ IN_PROC_BROWSER_TEST_F(ExtensionSidePanelBrowserTest, SetOptions_Path) {
   ASSERT_TRUE(default_path_listener.WaitUntilSatisfied());
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(extension_key));
 
-  // Switch to the reading list in the side panel and check that the extension
+  // Switch to bookmarks in the side panel and check that the extension
   // view is cached (i.e. the view exists but is not shown, and its web contents
   // still exists).
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
 
   EXPECT_TRUE(global_registry->GetEntryForKey(extension_key)->CachedView());
 
@@ -761,7 +761,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionSidePanelBrowserTest, WindowCloseCalled) {
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(extension_key));
 
   // Show another side panel type so the extension's panel's view gets cached.
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
   EXPECT_TRUE(global_registry->GetEntryForKey(extension_key)->CachedView());
 
   // Calling window.close() from within the panel should invalidate the cached
@@ -773,10 +773,10 @@ IN_PROC_BROWSER_TEST_F(ExtensionSidePanelBrowserTest, WindowCloseCalled) {
                       "window.close();"));
   destroyed_watcher.Wait();
 
-  // The side panel should be open because the reading list entry is still
+  // The side panel should be open because the bookmarks entry is still
   // shown.
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntryId::kReadingList)));
+      SidePanelEntryKey(SidePanelEntryId::kBookmarks)));
 }
 
 // Test that calling window.close() from an extension's side panel deletes the
@@ -849,7 +849,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionSidePanelBrowserTest,
   // extension's side panel web content should still be destroyed and the side
   // panel will close.
   {
-    side_panel_ui->Show(SidePanelEntry::Id::kReadingList);
+    side_panel_ui->Show(SidePanelEntry::Id::kBookmarks);
 
     content::WebContentsDestroyedWatcher destroyed_watcher(
         extension_coordinator->GetHostWebContentsForTesting());
@@ -1153,7 +1153,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionSidePanelBrowserTest,
   }
 
   // Switch over to another side panel entry.
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
 
   {
     TestSidePanelEntryWaiter entry_shown_waiter(
@@ -1471,11 +1471,11 @@ IN_PROC_BROWSER_TEST_F(
   RunSetOptions(*extension, /*tab_id=*/std::nullopt, "panel.html",
                 /*enabled=*/true);
 
-  // Open a different global side panel (reading list).
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  // Open a different global side panel (bookmarks).
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
   SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntryId::kReadingList)));
+      SidePanelEntryKey(SidePanelEntryId::kBookmarks)));
 
   // Call `sidePanel.open()` on the current tab.
   RunOpenPanelForTab(*extension, GetCurrentTabId());
@@ -1499,11 +1499,11 @@ IN_PROC_BROWSER_TEST_F(
   int first_tab_id = GetCurrentTabId();
   OpenNewForegroundTab();
 
-  // Open a different global side panel (reading list).
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  // Open a different global side panel (bookmarks).
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
   SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntryId::kReadingList)));
+      SidePanelEntryKey(SidePanelEntryId::kBookmarks)));
 
   // Call `sidePanel.open()` on the inactive tab.
   RunOpenPanelForTab(*extension, first_tab_id);
@@ -1522,11 +1522,11 @@ IN_PROC_BROWSER_TEST_F(ExtensionOpenSidePanelBrowserTest,
   const Extension* extension = LoadSidePanelExtension();
   ASSERT_TRUE(extension);
 
-  // Open a global side panel (reading list) on the first tab.
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  // Open a global side panel (bookmarks) on the first tab.
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
   SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntryId::kReadingList)));
+      SidePanelEntryKey(SidePanelEntryId::kBookmarks)));
 
   // Open a new tab.
   OpenNewForegroundTab();
@@ -1541,11 +1541,11 @@ IN_PROC_BROWSER_TEST_F(ExtensionOpenSidePanelBrowserTest,
   // The contextual side panel should show on the current tab.
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(GetKey(extension->id())));
 
-  // Switching back to the first tab, the global side panel (reading list)
+  // Switching back to the first tab, the global side panel (bookmarks)
   // should be active.
   browser()->tab_strip_model()->ActivateTabAt(0);
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntryId::kReadingList)));
+      SidePanelEntryKey(SidePanelEntryId::kBookmarks)));
 }
 
 // Tests that calling `sidePanel.open()` for a different tab will not override
@@ -1765,11 +1765,11 @@ IN_PROC_BROWSER_TEST_F(ExtensionOpenSidePanelBrowserTest,
   RunSetOptions(*extension, /*tab_id=*/std::nullopt, "panel.html",
                 /*enabled=*/true);
 
-  // Open a different global side panel (reading list).
-  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kReadingList));
+  // Open a different global side panel (bookmarks).
+  ShowEntryAndWait(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks));
   SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   EXPECT_TRUE(side_panel_ui->IsSidePanelEntryShowing(
-      SidePanelEntryKey(SidePanelEntry::Id::kReadingList)));
+      SidePanelEntryKey(SidePanelEntry::Id::kBookmarks)));
 
   // Call `sidePanel.open()` on the current tab.
   RunOpenPanelForWindow(*extension, GetCurrentWindowId());
@@ -2642,7 +2642,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionOnClosedEventSidePanelBrowserTest,
   // This action should trigger the onClosed event in the extension.
   {
     TestSidePanelEntryWaiter waiter(extension_entry);
-    side_panel_ui->Show(SidePanelEntry::Id::kReadingList);
+    side_panel_ui->Show(SidePanelEntry::Id::kBookmarks);
     waiter.WaitForEntryHidden();
   }
 

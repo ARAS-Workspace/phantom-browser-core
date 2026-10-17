@@ -214,7 +214,6 @@ class AppMenuModel : public ui::SimpleMenuModel,
   static constexpr int kRecentTabsMenuPlaceholder = kRecentTabsMenuId;
   static constexpr int kSharingHubMenuPlaceholder = kSharingHubMenuId;
   static constexpr int kProfileMenuPlaceholder = kProfileMenuId;
-  static constexpr int kReadingListMenuPlaceholder = kReadingListMenuId;
   static constexpr int kExtensionsSubmenuPlaceholder = kExtensionsSubMenuId;
   static constexpr int kBookmarksMenuPlaceholder = kBookmarksMenuId;
   static constexpr int kSavedTabGroupsMenuPlaceholder = kSavedTabGroupsMenuId;
