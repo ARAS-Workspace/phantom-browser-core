@@ -406,8 +406,8 @@ suite('AppTest', () => {
     ([
       [
         false,
-        true,
-        'visible with extension notice shown but extension policy disabled',
+        false,
+        'hidden with extension policy disabled',
       ],
       [
         true,

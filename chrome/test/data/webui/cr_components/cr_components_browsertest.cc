@@ -23,12 +23,12 @@ IN_PROC_BROWSER_TEST_F(CrComponentsTest, CustomizeColorSchemeMode) {
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, HelpBubbleMixin) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIHistoryHost);
   RunTest("cr_components/help_bubble/help_bubble_mixin_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, HelpBubble) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIHistoryHost);
   RunTest("cr_components/help_bubble/help_bubble_test.js", "mocha.run()");
 }
 
@@ -76,25 +76,25 @@ IN_PROC_BROWSER_TEST_F(CrComponentsTest, LocalizedLink) {
 
 typedef WebUIMochaBrowserTest CrComponentsSearchboxTest;
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, RealboxMatchTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_match_test.js", "mocha.run()");
 }
 
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxInputTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_input_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, RealboxPlaceholderTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/placeholder_text_cycler_test.js",
           "runMochaSuite('PlaceholderTextCyclerTest');");
 }
 
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxDropdownTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_dropdown_test.js", "mocha.run()");
 }
 
@@ -104,23 +104,23 @@ IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxSelectionMixin) {
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, KeywordModeManagerTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/keyword_mode_manager_test.js",
           "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxIconTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_icon_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxMixinTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_mixin_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, SearchboxUtilsTest) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUIOmniboxPopupHost);
   RunTest("cr_components/searchbox/searchbox_utils_test.js", "mocha.run()");
 }
 
@@ -154,7 +154,7 @@ IN_PROC_BROWSER_TEST_F(CrComponentsHistoryClustersTest, Cluster) {
 class CrComponentsMostVisitedTest : public WebUIMochaBrowserTest {
  protected:
   CrComponentsMostVisitedTest() {
-    set_test_loader_host(chrome::kChromeUINewTabPageHost);
+    set_test_loader_host(chrome::kChromeUINewTabPageThirdPartyHost);
   }
 };
 

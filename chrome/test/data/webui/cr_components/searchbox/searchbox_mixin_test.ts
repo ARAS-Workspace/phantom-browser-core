@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'chrome://new-tab-page/strings.m.js';
+import 'chrome://omnibox-popup.top-chrome/strings.m.js';
 import 'chrome://resources/cr_components/searchbox/searchbox_dropdown.js';
 import 'chrome://resources/cr_components/searchbox/searchbox_input.js';
 
@@ -136,6 +136,13 @@ function verifyMatch(match: AutocompleteMatch, matchEl: SearchboxMatchElement) {
 suite('SearchboxMixinTest', () => {
   let element: TestSearchboxMixinElement;
   let testProxy: TestSearchboxBrowserProxy;
+
+  suiteSetup(() => {
+    loadTimeData.overrideValues({
+      isTopChromeSearchbox: false,
+      reportMetrics: false,
+    });
+  });
 
   setup(() => {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;

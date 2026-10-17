@@ -15,15 +15,10 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/strings/string_util.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/preloading/chrome_preloading.h"
-#include "chrome/browser/preloading/prefetch/search_prefetch/field_trial_settings.h"
-#include "chrome/browser/preloading/prefetch/search_prefetch/search_prefetch_browser_test_base.h"
-#include "chrome/browser/preloading/prefetch/search_prefetch/search_prefetch_service.h"
-#include "chrome/browser/preloading/prefetch/search_prefetch/search_prefetch_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -47,13 +42,11 @@
 #include "components/omnibox/browser/suggestion_answer.h"
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_starter_pack_data.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/prerender_test_util.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -62,178 +55,6 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/vector_icon_types.h"
 #include "url/gurl.h"
-
-// A sink instance that allows Realbox to make IPC without failing DCHECK.
-class RealboxSearchBrowserTestPage : public searchbox::mojom::Page {
- public:
-  // searchbox::mojom::Page
-  void AutocompleteResultChanged(
-      searchbox::mojom::AutocompleteResultPtr result) override {}
-  void UpdateSelection(
-      searchbox::mojom::OmniboxPopupSelectionPtr old_selection,
-      searchbox::mojom::OmniboxPopupSelectionPtr selection) override {}
-  void SetInputText(const std::string& input_text) override {}
-  void SetThumbnail(const std::string& thumbnail_url,
-                    bool is_deletable) override {}
-  void AddFileContext(
-      const base::UnguessableToken& token,
-      searchbox::mojom::SelectedFileInfoPtr file_info) override {}
-  void OnPermissionPromptChanged(bool is_showing,
-                                 const gfx::Size& prompt_size) override {}
-  MOCK_METHOD(void, UpdateContentSharingPolicy, (bool enabled), (override));
-  MOCK_METHOD(void, UpdateSmartTabSharingActive, (bool active), (override));
-  MOCK_METHOD(void,
-              SetRestoredTabIds,
-              (const std::vector<int32_t>& ids),
-              (override));
-  MOCK_METHOD(void,
-              StepSelection,
-              (searchbox::mojom::SelectionDirection,
-               searchbox::mojom::SelectionStep),
-              (override));
-  MOCK_METHOD(void, OpenCurrentSelection, (WindowOpenDisposition), (override));
-  MOCK_METHOD(void, ResetPopupToInitialState, (), (override));
-
-  mojo::PendingRemote<searchbox::mojom::Page> GetRemotePage() {
-    return receiver_.BindNewPipeAndPassRemote();
-  }
-
- private:
-  mojo::Receiver<searchbox::mojom::Page> receiver_{this};
-};
-
-class RealboxSearchPreloadBrowserTest : public SearchPrefetchBaseBrowserTest {
- public:
-  RealboxSearchPreloadBrowserTest()
-      : prerender_helper_(base::BindRepeating(
-            &RealboxSearchPreloadBrowserTest::GetWebContents,
-            base::Unretained(this))) {
-    std::vector<base::test::FeatureRefAndParams> enabled_features{
-        {kSearchPrefetchServicePrefetching,
-         {{"max_attempts_per_caching_duration", "3"},
-          {"cache_size", "1"},
-          {"device_memory_threshold_MB", "0"}}}};
-    scoped_feature_list_.InitWithFeaturesAndParameters(enabled_features, {});
-  }
-
-  // Starts prefetch and then prerender. Returns a pair of prefetch URL and
-  // prerender URL.
-  std::pair<GURL, GURL> StartPrefetchAndPrerender() {
-    mojo::Remote<searchbox::mojom::PageHandler> remote_page_handler;
-    RealboxSearchBrowserTestPage page;
-    RealboxHandler realbox_handler = RealboxHandler(
-        remote_page_handler.BindNewPipeAndPassReceiver(), page.GetRemotePage(),
-        browser()->GetProfile(), GetWebContents());
-    content::test::PrerenderHostRegistryObserver registry_observer(
-        *GetWebContents());
-
-    std::string input_query = "prerender";
-    std::string search_terms = "prerender";
-    AddNewSuggestionRule(input_query, {search_terms}, /*prefetch_index=*/0,
-                         /*prerender_index=*/0);
-    auto [search_url, prefetch] = GetSearchPrefetchAndNonPrefetch(search_terms);
-    // Fake a WebUI input.
-    remote_page_handler->QueryAutocomplete(
-        0, base::ASCIIToUTF16(input_query),
-        /*prevent_inline_autocomplete=*/false, 0,
-        omnibox::SuggestInventory::SUGGEST_INVENTORY_DEFAULT,
-        /*is_on_focus=*/false, /*keyword=*/"",
-        searchbox::mojom::InputMethod::kKeyboard);
-    remote_page_handler.FlushForTesting();
-
-    // Prefetch should be triggered.
-    WaitUntilStatusChangesTo(GetCanonicalSearchURL(search_url),
-                             SearchPrefetchStatus::kComplete);
-    const GURL prefetch_url =
-        GetRealPrefetchUrlForTesting(GetCanonicalSearchURL(search_url));
-
-    // Prerender should also be triggered.
-    const GURL prerender_url = [&registry_observer]() {
-      base::flat_set<GURL> triggered_urls =
-          registry_observer.GetTriggeredUrls();
-      if (triggered_urls.size() == 1) {
-        // Prerender has already been triggered.
-        return *triggered_urls.begin();
-      }
-      // Prerender hasn't been triggered yet. Wait until it's triggered.
-      EXPECT_TRUE(triggered_urls.empty());
-      return registry_observer.WaitForNextTrigger();
-    }();
-
-    return std::make_pair(prefetch_url, prerender_url);
-  }
-
-  // TODO(crbug.com/40285326): This fails with the field trial testing config.
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    SearchPrefetchBaseBrowserTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitch("disable-field-trial-config");
-  }
-
- private:
-  content::test::PrerenderTestHelper prerender_helper_;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-class RealboxSearchPreloadWithSearchStatsBrowserTest
-    : public RealboxSearchPreloadBrowserTest {
- public:
-  RealboxSearchPreloadWithSearchStatsBrowserTest() {
-    scoped_feature_list_.InitAndDisableFeature(
-        switches::kRemoveSearchboxStatsParamFromPrefetchRequests);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-class RealboxSearchPreloadWithoutSearchStatsBrowserTest
-    : public RealboxSearchPreloadBrowserTest {
- public:
-  RealboxSearchPreloadWithoutSearchStatsBrowserTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        switches::kRemoveSearchboxStatsParamFromPrefetchRequests);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// Tests the realbox input can trigger prerender and prefetch, and those request
-// URLs have appropriate parameters.
-IN_PROC_BROWSER_TEST_F(RealboxSearchPreloadWithSearchStatsBrowserTest,
-                       SearchPreloadSuccess) {
-  auto [prefetch_url, prerender_url] = StartPrefetchAndPrerender();
-
-  // Verify the prefetch and prerender URLs.
-  // Only the prefetch URL should have the "pf=cs".
-  EXPECT_TRUE(prefetch_url.GetQuery().contains("pf=cs&"));
-  EXPECT_FALSE(prerender_url.GetQuery().contains("pf=cs&"));
-  EXPECT_TRUE(prefetch_url.GetQuery().contains("gs_lcrp="));
-  EXPECT_TRUE(prerender_url.GetQuery().contains("gs_lcrp="));
-
-  // The prefetch should match the prerender.
-  EXPECT_TRUE(IsSearchDestinationMatch(GetCanonicalSearchURL(prefetch_url),
-                                       browser()->GetProfile(), prerender_url));
-}
-
-IN_PROC_BROWSER_TEST_F(RealboxSearchPreloadWithoutSearchStatsBrowserTest,
-                       SearchPreloadSuccess) {
-  auto [prefetch_url, prerender_url] = StartPrefetchAndPrerender();
-
-  // Verify the prefetch and prerender URLs.
-  // Only the prefetch URL should have the "pf=cs".
-  EXPECT_TRUE(prefetch_url.GetQuery().contains("pf=cs&"));
-  EXPECT_FALSE(prerender_url.GetQuery().contains("pf=cs&"));
-  // The prefetch URL should not have the "gs_lcrp" if
-  // switches::kRemoveSearchboxStatsParamFromPrefetchRequests is true, while the
-  // prerender URL should always have that.
-  EXPECT_FALSE(prefetch_url.GetQuery().contains("gs_lcrp="));
-  EXPECT_TRUE(prerender_url.GetQuery().contains("gs_lcrp="));
-
-  // The prefetch should match the prerender.
-  EXPECT_TRUE(IsSearchDestinationMatch(GetCanonicalSearchURL(prefetch_url),
-                                       browser()->GetProfile(), prerender_url));
-}
 
 namespace {
 class RealboxHandlerPublic : public RealboxHandler {

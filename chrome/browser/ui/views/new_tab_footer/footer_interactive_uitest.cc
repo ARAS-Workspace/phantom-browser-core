@@ -4,17 +4,10 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/profiles/profile_test_util.h"
-#include "chrome/browser/search/background/ntp_custom_background_service.h"
-#include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
-#include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/extensions/settings_api_bubble_helpers.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
@@ -31,7 +24,6 @@
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
 #include "content/public/test/browser_test.h"
@@ -298,209 +290,6 @@ IN_PROC_BROWSER_TEST_F(FooterInteractiveTest, ContextMenuOpensCustomizeChrome) {
                                  kFooterSection)));
 }
 #endif  // !BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// Tests in this class will have a managed browser, unless the test disables it
-// manually.
-class FooterEnterpriseInteractiveTest : public FooterInteractiveTestBase {
- public:
-  FooterEnterpriseInteractiveTest() {
-    scoped_feature_list_.InitWithFeatureStates(
-        {{ntp_features::kNtpFooter, true}});
-  }
-  ~FooterEnterpriseInteractiveTest() override = default;
-
-  void SetUpOnMainThread() override {
-    scoped_browser_management_ =
-        std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-            policy::ManagementServiceFactory::GetForProfile(
-                browser()->GetProfile()),
-            policy::EnterpriseManagementAuthority::DOMAIN_LOCAL);
-    FooterInteractiveTestBase::SetUpOnMainThread();
-  }
-
-  void TearDownOnMainThread() override {
-    scoped_browser_management_.reset();
-    incognito_scoped_browser_management_.reset();
-    guest_scoped_browser_management_.reset();
-    FooterInteractiveTestBase::TearDownOnMainThread();
-  }
-
-  InteractiveTestApi::MultiStep OpenNewTabAndWaitForFooter(const GURL& url) {
-    return Steps(
-        // Open a new tab for url.
-        AddInstrumentedTab(kNewTabElementId, url),
-        // Wait for footer to show.
-        InstrumentNonTabWebView(kFooterLocalElementId,
-                                kNtpFooterViewElementId));
-  }
-
-  void SetCustomBackground() {
-    auto* ntp_custom_background_service =
-        NtpCustomBackgroundServiceFactory::GetForProfile(
-            browser()->GetProfile());
-    ntp_custom_background_service->AddValidBackdropUrlForTesting(
-        GURL("https://background.com"));
-    ntp_custom_background_service->SetCustomBackgroundInfo(
-        /*background_url=*/GURL("https://background.com"),
-        /*thumbnail_url=*/GURL("https://thumbnail.com"),
-        /*attribution_line_1=*/"line 1",
-        /*attribution_line_2=*/"line 2",
-        /*action_url=*/GURL("https://action.com"),
-        /*collection_id=*/"");
-  }
-
-  Browser* CreateManagedGuestBrowser() {
-    ProfileManager* profile_manager = g_browser_process->profile_manager();
-    base::FilePath guest_path = profile_manager->GetGuestProfilePath();
-    Profile& guest_profile =
-        profiles::testing::CreateProfileSync(profile_manager, guest_path);
-    Profile* guest_profile_otr =
-        guest_profile.GetPrimaryOTRProfile(/*create_if_needed=*/true);
-    guest_scoped_browser_management_ =
-        std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-            policy::ManagementServiceFactory::GetForProfile(guest_profile_otr),
-            policy::EnterpriseManagementAuthority::DOMAIN_LOCAL);
-
-    // Create browser and add tab.
-    Browser* guest_browser =
-        CreateBrowserWindow(
-            BrowserWindowCreateParams(guest_profile_otr,
-                                      /*from_user_gesture=*/true))
-            ->GetBrowserForMigrationOnly();
-    AddBlankTabAndShow(guest_browser);
-    ui_test_utils::BrowserActivationWaiter(guest_browser).WaitForActivation();
-    return guest_browser;
-  }
-
-  Browser* CreateManagedIncognitoBrowser() {
-    Browser* incognito_browser =
-        CreateBrowserWindow(BrowserWindowCreateParams(
-                                browser()->GetProfile()->GetPrimaryOTRProfile(
-                                    /*create_if_needed=*/true),
-                                /*from_user_gesture=*/true))
-            ->GetBrowserForMigrationOnly();
-    incognito_scoped_browser_management_ =
-        std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-            policy::ManagementServiceFactory::GetForProfile(
-                incognito_browser->GetProfile()),
-            policy::EnterpriseManagementAuthority::DOMAIN_LOCAL);
-    AddBlankTabAndShow(incognito_browser);
-    ui_test_utils::BrowserActivationWaiter(incognito_browser)
-        .WaitForActivation();
-    return incognito_browser;
-  }
-
- private:
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      scoped_browser_management_;
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      incognito_scoped_browser_management_;
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      guest_scoped_browser_management_;
-};
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest, FooterShowsOnNtpOnly) {
-  LoadNtpOverridingExtension();
-  RunTestSequence(
-      // Open extension NTP.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId),
-      // Navigate to non-NTP.
-      NavigateWebContents(kNewTabElementId, GURL("https://google.com")),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId),
-      // Navigate to 1P WebUI NTP.
-      NavigateWebContents(kNewTabElementId,
-                          chrome::ChromeUINewTabPageURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       CustomizationTogglesVisibility) {
-  RunTestSequence(
-      // Open NTP.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId),
-      // Toggle off visibility.
-      Do([=, this]() {
-        browser()->GetProfile()->GetPrefs()->SetBoolean(
-            prefs::kNtpFooterVisible, false);
-      }),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId),
-      // Set a custom label policy.
-      Do([=]() {
-        g_browser_process->local_state()->SetString(
-            prefs::kEnterpriseCustomLabelForBrowser, "Custom Label");
-      }),
-      // Ensure footer shows
-      WaitForShow(kNtpFooterViewElementId),
-      // Unset the custom label policy.
-      Do([=]() {
-        g_browser_process->local_state()->SetString(
-            prefs::kEnterpriseCustomLabelForBrowser, "");
-      }),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       FooterShowsInGuestProfile) {
-  // Create browser and add tab.
-  Browser* guest_browser = CreateManagedGuestBrowser();
-  RunTestSequenceInContext(
-      // Run the following steps with the guest browser as the default context.
-      BrowserElements::From(guest_browser)->GetContext(),
-      // Open NTP in guest profile.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       FooterShowsInIncognito) {
-  Browser* incognito_browser = CreateManagedIncognitoBrowser();
-  RunTestSequenceInContext(
-      // Run the following steps with the incognito browser as the default
-      // context.
-      BrowserElements::From(incognito_browser)->GetContext(),
-      // Open NTP in incognito window.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       ThirdPartyNtpHidesCustomizeChromeButton) {
-  RunTestSequence(
-      // Open 3P WebUI NTP and wait for footer to show.
-      OpenNewTabAndWaitForFooter(
-          GURL(chrome::kChromeUINewTabPageThirdPartyURL)),
-      // Ensure customize chrome button hides in footer.
-      EnsureNotPresent(kFooterLocalElementId, kFooterCustomizeChromeButton));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       BackgroundAttributionHidesOnThirdPartyNtp) {
-  const DeepQuery kFooterBackgroundAttribution{
-      "new-tab-footer-app", "#backgroundAttributionContainer"};
-
-  RunTestSequence(
-      // Set a custom background.
-      Do(base::BindOnce(&FooterEnterpriseInteractiveTest::SetCustomBackground,
-                        base::Unretained(this))),
-      // Open 3P WebUI NTP and wait for footer to show.
-      OpenNewTabAndWaitForFooter(
-          GURL(chrome::kChromeUINewTabPageThirdPartyURL)),
-      // Ensure background attribution hides in footer.
-      EnsureNotPresent(kFooterLocalElementId, kFooterBackgroundAttribution));
-}
-
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class FooterSideBySideInteractiveTest : public FooterInteractiveTest {
  public:

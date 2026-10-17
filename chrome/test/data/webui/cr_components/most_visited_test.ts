@@ -1022,10 +1022,13 @@ suite('LoggingAndUpdates', () => {
 suite('Modification', () => {
   suiteSetup(() => {
     loadTimeData.overrideValues({
+      enterpriseShortcutSubtitle:
+          'This setting is managed by your organization',
       invalidUrl: 'Type a valid URL',
       linkAddedMsg: 'Shortcut added',
       linkCantCreate: 'Can\'t create shortcut',
       linkEditedMsg: 'Shortcut edited',
+      restoreDefaultEnterpriseShortcuts: 'Restore organization shortcuts',
       restoreDefaultLinks: 'Restore default shortcuts',
       shortcutAlreadyExists: 'Shortcut already exists',
     });
@@ -2066,7 +2069,16 @@ suite('Preloading', () => {
 });
 
 suite('EnterpriseShortcuts', () => {
-  suiteSetup(() => {});
+  suiteSetup(() => {
+    loadTimeData.overrideValues({
+      editLinkTitle: 'Edit shortcut',
+      enterpriseShortcutSubtitle:
+          'This setting is managed by your organization',
+      restoreDefaultEnterpriseShortcuts: 'Restore organization shortcuts',
+      viewLink: 'Details',
+      viewLinkTitle: 'Shortcut',
+    });
+  });
 
   setup(async () => {
     await setUpTest();

@@ -231,7 +231,6 @@ source_set("browser_tests") {
     "observers/javascript_frameworks_ukm_observer_browsertest.cc",
     "observers/multi_tab_loading_page_load_metrics_observer_browsertest.cc",
     "observers/new_tab_page_initiated_page_load_metrics_observer_browsertest.cc",
-    "observers/new_tab_page_page_load_metrics_observer_browsertest.cc",
     "observers/non_tab_webui_page_load_metrics_observer_browsertest.cc",
     "observers/page_anchors_metrics_observer_browsertest.cc",
     "observers/security_state_page_load_metrics_observer_browsertest.cc",

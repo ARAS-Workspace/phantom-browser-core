@@ -8,8 +8,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/time/time.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
@@ -23,7 +21,6 @@
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
 #include "content/public/test/browser_test.h"
@@ -221,54 +218,6 @@ IN_PROC_BROWSER_TEST_F(FooterControllerExtensionTest, MetricsRecorded) {
 IN_PROC_BROWSER_TEST_F(FooterControllerExtensionTest, ShownTimeRecorded) {
   TestShownTimeRecorded();
 }
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-class FooterControllerEnterpriseTest
-    : public FooterControllerExtensionTestBase,
-      public testing::WithParamInterface<bool> {
- public:
-  FooterControllerEnterpriseTest() {
-    feature_list_.InitWithFeatureStates({{ntp_features::kNtpFooter, true}});
-  }
-  ~FooterControllerEnterpriseTest() override = default;
-
-  bool managed() { return GetParam(); }
-  PrefService* local_state() { return g_browser_process->local_state(); }
-};
-
-INSTANTIATE_TEST_SUITE_P(, FooterControllerEnterpriseTest, testing::Bool());
-
-IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest, NoticePolicyEnabled) {
-  policy::ScopedManagementServiceOverrideForTesting browser_management(
-      policy::ManagementServiceFactory::GetForProfile(profile()),
-      managed() ? policy::EnterpriseManagementAuthority::DOMAIN_LOCAL
-                : policy::EnterpriseManagementAuthority::NONE);
-
-  // Non-NTP
-  ASSERT_FALSE(footer()->GetVisible());
-
-  // Default NTP
-  NavigateCurrentTab(chrome::ChromeUINewTabURLAsGURL());
-  EXPECT_EQ(managed(), footer()->GetVisible());
-
-  // 1P NTP
-  NavigateCurrentTab(chrome::ChromeUINewTabPageURLAsGURL());
-  EXPECT_EQ(managed(), footer()->GetVisible());
-
-  // 3P NTP
-  NavigateCurrentTab(GURL(chrome::kChromeUINewTabPageThirdPartyURL));
-  EXPECT_EQ(managed(), footer()->GetVisible());
-
-  // Extension NTP
-  auto extension = LoadNtpExtension();
-  NavigateCurrentTab(extension->url());
-  EXPECT_TRUE(footer()->GetVisible());
-
-  // Non-NTP
-  NavigateCurrentTab(GURL(kNonNtpUrl));
-  EXPECT_FALSE(footer()->GetVisible());
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 class FooterControllerSplitViewTest : public FooterControllerExtensionTestBase {
  public:

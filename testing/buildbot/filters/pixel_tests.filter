@@ -80,8 +80,6 @@ LocalCardMigrationBrowserUiTest.*
 *MemorySaverFaviconTreatmentTest.*
 *MemorySaverImprovedFaviconTreatmentTest.*
 Mv2DeprecationReEnableDialogBrowserTest.*
-NewTabPageTest.*
-NtpRealboxUiScreenshotTest.*
 OfferNotificationBubbleViewPixelBrowserTest.*
 OmniboxAimWebUiInteractiveTest.QueryWithTabContext*
 OutdatedUpgradeBubbleTest.*

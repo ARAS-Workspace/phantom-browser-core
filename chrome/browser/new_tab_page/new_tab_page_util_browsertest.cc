@@ -7,13 +7,9 @@
 #include <memory>
 #include <string>
 
-#include "base/hash/hash.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/time/time_override.h"
 #include "base/values.h"
-#include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -21,7 +17,6 @@
 #include "chrome/browser/signin/signin_browser_test_base.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
-#include "chrome/test/base/scoped_browser_locale.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
@@ -30,11 +25,8 @@
 #include "components/optimization_guide/core/optimization_guide_switches.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
-#include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
-#include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
-#include "components/variations/service/variations_service.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/test/browser_test.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -94,56 +86,9 @@ class NewTabPageUtilBrowserTest : public SigninBrowserTestBase,
                     testing::HasSubstr(message))));
   }
 
-  base::test::ScopedFeatureList& features() { return features_; }
-  policy::MockConfigurationPolicyProvider& policy_provider() {
-    return policy_provider_;
-  }
-
  private:
-  base::test::ScopedFeatureList features_;
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
 };
-
-class NewTabPageUtilEnableFlagBrowserTest : public NewTabPageUtilBrowserTest {
- public:
-  NewTabPageUtilEnableFlagBrowserTest() {
-    features().InitWithFeatures({ntp_features::kNtpChromeCartModule}, {});
-  }
-};
-
-class NewTabPageUtilDisableFlagBrowserTest : public NewTabPageUtilBrowserTest {
- public:
-  NewTabPageUtilDisableFlagBrowserTest() {
-    features().InitWithFeatures({}, {ntp_features::kNtpChromeCartModule});
-  }
-};
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilBrowserTest, EnableCartByToT) {
-  auto locale = std::make_unique<ScopedBrowserLocale>("en-US");
-  g_browser_process->variations_service()->OverrideStoredPermanentCountry("us");
-#if BUILDFLAG(IS_MAC)
-  EXPECT_TRUE(IsCartModuleEnabled());
-#else
-  EXPECT_FALSE(IsCartModuleEnabled());
-#endif
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilBrowserTest, DisableCartByToT) {
-  auto locale = std::make_unique<ScopedBrowserLocale>("en-US");
-  g_browser_process->variations_service()->OverrideStoredPermanentCountry("ca");
-  EXPECT_FALSE(IsCartModuleEnabled());
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest, EnableCartByFlag) {
-  EXPECT_TRUE(IsCartModuleEnabled());
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
-                       DisableCartByFlag) {
-  auto locale = std::make_unique<ScopedBrowserLocale>("en-US");
-  g_browser_process->variations_service()->OverrideStoredPermanentCountry("us");
-  EXPECT_FALSE(IsCartModuleEnabled());
-}
 
 class NewTabPageUtilTileTypesEnterpriseShortcutsBrowserTest
     : public NewTabPageUtilBrowserTest {
@@ -185,55 +130,6 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilTileTypesEnterpriseShortcutsBrowserTest,
             std::set<ntp_tiles::TileType>({ntp_tiles::TileType::kCustomLinks}));
 }
 
-class NewTabPageUtilFeatureOptimizationModuleRemovalTest :
-  public NewTabPageUtilBrowserTest {
- public:
-  NewTabPageUtilFeatureOptimizationModuleRemovalTest() {
-    features().InitWithFeatures(
-        {ntp_features::kNtpFeatureOptimizationModuleRemoval}, {});
-  }
-};
-
-IN_PROC_BROWSER_TEST_P(
-    NewTabPageUtilFeatureOptimizationModuleRemovalTest,
-    DisableModuleAutoRemoval) {
-  // Arrange.
-  const std::string module_id = ntp_modules::kTabGroupsModuleId;
-
-  // Act.
-  DisableModuleAutoRemoval(browser()->GetProfile(), module_id);
-
-  // Assert.
-  const bool actual_value =
-      browser()
-          ->GetProfile()
-          ->GetPrefs()
-          ->GetDict(ntp_prefs::kNtpModulesAutoRemovalDisabledDict)
-          .FindBool(module_id)
-          .value_or(false);
-  EXPECT_TRUE(actual_value);
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilFeatureOptimizationModuleRemovalTest,
-                       DisableModuleListAutoRemoval) {
-  // Arrange.
-  const std::vector<std::string> module_ids = {
-      ntp_modules::kTabGroupsModuleId,
-      ntp_modules::kMostRelevantTabResumptionModuleId,
-      ntp_modules::kDummyModuleId,
-  };
-
-  // Act.
-  DisableModuleListAutoRemoval(browser()->GetProfile(), module_ids);
-
-  // Assert.
-  const auto& dict_pref = browser()->GetProfile()->GetPrefs()->GetDict(
-      ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  for (const auto& module_id : module_ids) {
-    EXPECT_TRUE(dict_pref.FindBool(module_id).value_or(false));
-  }
-}
-
 class NewTabPageUtilStalenessUpdateBrowserTest
     : public NewTabPageUtilBrowserTest {
  public:
@@ -249,13 +145,6 @@ class NewTabPageUtilStalenessUpdateBrowserTest
     NewTabPageUtilBrowserTest::TearDownOnMainThread();
   }
 
-  void InitMockPrefs() {
-    GetProfile()->GetPrefs()->SetTime(ntp_prefs::kNtpLastModuleStalenessUpdate,
-                                      Time::Now());
-    GetProfile()->GetPrefs()->SetDict(ntp_prefs::kNtpModuleStalenessCountDict,
-                                      base::DictValue());
-  }
-
   void InitMockShortcutsPrefs() {
     GetProfile()->GetPrefs()->SetTime(
         ntp_prefs::kNtpLastShortcutsStalenessUpdate, Time::Now());
@@ -266,15 +155,8 @@ class NewTabPageUtilStalenessUpdateBrowserTest
         ntp_prefs::kNtpShortcutsAutoRemovalDisabled, false);
   }
 
-  void InitMockModules() {
-    loaded_modules = {ntp_modules::kTabGroupsModuleId,
-                      ntp_modules::kMostRelevantTabResumptionModuleId};
-  }
-
   // Advances the mock clock by the given time delta.
   void FastForwardBy(TimeDelta time_delta) { current_time_ += time_delta; }
-
-  std::vector<std::string> GetModules() { return loaded_modules; }
 
   static Time Now() { return current_time_; }
 
@@ -283,284 +165,10 @@ class NewTabPageUtilStalenessUpdateBrowserTest
 
  private:
   static Time current_time_;
-  std::vector<std::string> loaded_modules;
   std::unique_ptr<base::subtle::ScopedTimeClockOverrides> time_override_;
 };
 
 Time NewTabPageUtilStalenessUpdateBrowserTest::current_time_;
-
-// Parameterized to test for null timestamp and non-null timestamp.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldUpdateModuleStalenessWithNullTimestamp) {
-  // Arrange
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_null_timestamp = GetParam();
-  if (is_null_timestamp) {
-    GetProfile()->GetPrefs()->SetTime(ntp_prefs::kNtpLastModuleStalenessUpdate,
-                                      Time());
-  }
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta time_delta = staleness_threshold + base::Seconds(1);
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time = initial_time + time_delta;
-  const int expected_staleness_count = is_null_timestamp ? 0 : 1;
-  const size_t expected_dict_size =
-      is_null_timestamp ? 0u : GetModules().size();
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  if (is_null_timestamp) {
-    EXPECT_NE(updated_time, initial_time);
-  } else {
-    EXPECT_EQ(updated_time, expected_time);
-  }
-
-  const base::DictValue& updated_dict = GetProfile()->GetPrefs()->GetDict(
-      ntp_prefs::kNtpModuleStalenessCountDict);
-  EXPECT_EQ(updated_dict.size(), expected_dict_size);
-  for (const auto& module_id : GetModules()) {
-    std::optional<int> updated_count = updated_dict.FindInt(module_id);
-    EXPECT_EQ(updated_count.value_or(0), expected_staleness_count);
-  }
-}
-
-// Parameterized to test for above and below the staleness update threshold.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldUpdateModuleStalenessWithThreshold) {
-  // Arrange.
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_above_update_threshold = GetParam();
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta additional_time =
-      is_above_update_threshold ? base::Seconds(1) : base::Seconds(-1);
-  const TimeDelta time_delta = staleness_threshold + additional_time;
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time =
-      is_above_update_threshold ? initial_time + time_delta : initial_time;
-  const int expected_staleness_count = is_above_update_threshold ? 1 : 0;
-  const size_t expected_dict_size =
-      is_above_update_threshold ? GetModules().size() : 0u;
-  const int expected_histogram_count = is_above_update_threshold ? 1 : 0;
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  EXPECT_EQ(updated_time, expected_time);
-
-  const base::DictValue& updated_dict = GetProfile()->GetPrefs()->GetDict(
-      ntp_prefs::kNtpModuleStalenessCountDict);
-  EXPECT_EQ(updated_dict.size(), expected_dict_size);
-  for (const auto& module_id : GetModules()) {
-    std::optional<int> updated_count = updated_dict.FindInt(module_id);
-    EXPECT_EQ(updated_count.value_or(0), expected_staleness_count);
-    histogram_tester_.ExpectBucketCount(
-        "NewTabPage.Modules.AutoRemovalSkipped.StaleDaysCount",
-        base::PersistentHash(module_id), expected_histogram_count);
-  }
-}
-
-// Parameterized to test for force disabled all modules and not.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldUpdateModuleStalenessWithForceDisableAllModules) {
-  // Arrange.
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_force_disabled_all_modules = GetParam();
-  if (is_force_disabled_all_modules) {
-    ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
-                                ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-    update->Set(ntp_modules::kAllModulesId, true);
-  }
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta time_delta = staleness_threshold + base::Seconds(1);
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time =
-      is_force_disabled_all_modules ? initial_time : initial_time + time_delta;
-  const int expected_staleness_count = is_force_disabled_all_modules ? 0 : 1;
-  const size_t expected_dict_size =
-      is_force_disabled_all_modules ? 0u : GetModules().size();
-  const int expected_histogram_count = is_force_disabled_all_modules ? 1 : 0;
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  EXPECT_EQ(updated_time, expected_time);
-
-  const base::DictValue& updated_dict = GetProfile()->GetPrefs()->GetDict(
-      ntp_prefs::kNtpModuleStalenessCountDict);
-  EXPECT_EQ(updated_dict.size(), expected_dict_size);
-  for (const auto& module_id : GetModules()) {
-    std::optional<int> updated_count = updated_dict.FindInt(module_id);
-    EXPECT_EQ(updated_count.value_or(0), expected_staleness_count);
-    histogram_tester_.ExpectBucketCount(
-        "NewTabPage.Modules.AutoRemovalSkipped.DisabledAllModules",
-        base::PersistentHash(module_id), expected_histogram_count);
-  }
-}
-
-// Parameterized to test for force disabled on a single module.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldUpdateModuleStalenessWithForceDisableOneModule) {
-  // Arrange.
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_force_disabled_tab_groups = GetParam();
-  if (is_force_disabled_tab_groups) {
-    ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
-                                ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-    update->Set(ntp_modules::kTabGroupsModuleId, true);
-  }
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta time_delta = staleness_threshold + base::Seconds(1);
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time = initial_time + time_delta;
-  const int expected_tab_groups_staleness_count =
-      is_force_disabled_tab_groups ? 0 : 1;
-  const size_t expected_dict_size =
-      is_force_disabled_tab_groups ? 1u : GetModules().size();
-  const int expected_histogram_count = is_force_disabled_tab_groups ? 1 : 0;
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  EXPECT_EQ(updated_time, expected_time);
-
-  const base::DictValue& updated_dict = GetProfile()->GetPrefs()->GetDict(
-      ntp_prefs::kNtpModuleStalenessCountDict);
-  EXPECT_EQ(updated_dict.size(), expected_dict_size);
-
-  std::optional<int> updated_tab_groups_staleness_count =
-      updated_dict.FindInt(ntp_modules::kTabGroupsModuleId);
-  EXPECT_EQ(updated_tab_groups_staleness_count.value_or(0),
-            expected_tab_groups_staleness_count);
-
-  std::optional<int> updated_tab_resumption_staleness_count =
-      updated_dict.FindInt(ntp_modules::kMostRelevantTabResumptionModuleId);
-  EXPECT_EQ(updated_tab_resumption_staleness_count.value_or(0), 1);
-
-  histogram_tester_.ExpectBucketCount(
-      "NewTabPage.Modules.AutoRemovalSkipped.Disabled",
-      base::PersistentHash(ntp_modules::kTabGroupsModuleId),
-      expected_histogram_count);
-}
-
-// Parameterized to test for modules with managed preferences.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldUpdateModuleStalenessWithManagedPreference) {
-  // Arrange.
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_managed_preference = GetParam();
-  if (is_managed_preference) {
-    policy::PolicyMap policies;
-    policies.Set(policy::key::kNTPCardsVisible, policy::POLICY_LEVEL_MANDATORY,
-                 policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_PLATFORM,
-                 base::Value(true), nullptr);
-    policy_provider().UpdateChromePolicy(policies);
-  }
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta time_delta = staleness_threshold + base::Seconds(1);
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time = initial_time + time_delta;
-  const int expected_histogram_count = is_managed_preference ? 1 : 0;
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  EXPECT_EQ(updated_time, expected_time);
-
-  for (const auto& module_id : GetModules()) {
-    histogram_tester_.ExpectBucketCount(
-        "NewTabPage.Modules.AutoRemovalSkipped.ManagedPreference",
-        base::PersistentHash(module_id), expected_histogram_count);
-  }
-}
-
-// Parameterized to test for logging the module staleness count metric.
-// In either case, the module staleness count is always logged.
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
-                       ShouldLogModuleStalenessCountMetric) {
-  // Arrange.
-  InitMockPrefs();
-  InitMockModules();
-  const bool is_above_staleness_count = GetParam();
-  const int tab_groups_staleness_count = is_above_staleness_count ? 10 : 0;
-  const int tab_resumption_staleness_count = is_above_staleness_count ? 5 : 0;
-  if (is_above_staleness_count) {
-    ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
-                                ntp_prefs::kNtpModuleStalenessCountDict);
-    update->Set(ntp_modules::kTabGroupsModuleId, tab_groups_staleness_count);
-    update->Set(ntp_modules::kMostRelevantTabResumptionModuleId,
-                tab_resumption_staleness_count);
-  }
-
-  const TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  const TimeDelta time_delta = staleness_threshold + base::Seconds(1);
-  const Time initial_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-
-  const Time expected_time = initial_time + time_delta;
-
-  // Act.
-  FastForwardBy(time_delta);
-  UpdateModulesStaleness(GetProfile(), GetModules());
-
-  // Assert.
-  const Time updated_time = GetProfile()->GetPrefs()->GetTime(
-      ntp_prefs::kNtpLastModuleStalenessUpdate);
-  EXPECT_EQ(updated_time, expected_time);
-
-  histogram_tester_.ExpectUniqueSample(
-      "NewTabPage.Modules.AutoRemovalStaleDays.tab_groups",
-      tab_groups_staleness_count, 1);
-  histogram_tester_.ExpectUniqueSample(
-      "NewTabPage.Modules.AutoRemovalStaleDays.tab_resumption",
-      tab_resumption_staleness_count, 1);
-}
 
 IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
                        ShouldUpdateShortcutsStalenessWithNullTimestamp) {
@@ -735,22 +343,8 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
       1);
 }
 
-INSTANTIATE_TEST_SUITE_P(All, NewTabPageUtilBrowserTest, testing::Bool());
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         NewTabPageUtilEnableFlagBrowserTest,
-                         testing::Bool());
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         NewTabPageUtilDisableFlagBrowserTest,
-                         testing::Bool());
-
 INSTANTIATE_TEST_SUITE_P(All,
                          NewTabPageUtilTileTypesEnterpriseShortcutsBrowserTest,
-                         testing::Bool());
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         NewTabPageUtilFeatureOptimizationModuleRemovalTest,
                          testing::Bool());
 
 INSTANTIATE_TEST_SUITE_P(All,

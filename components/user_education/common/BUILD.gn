@@ -182,8 +182,6 @@ source_set("unit_tests") {
     "feature_promo/impl/typed_data_collection_unittest.cc",
     "help_bubble/help_bubble_factory_registry_unittest.cc",
     "new_badge/new_badge_controller_unittest.cc",
-    "ntp_promo/ntp_promo_controller_unittest.cc",
-    "ntp_promo/ntp_promo_registry_unittest.cc",
     "session/user_education_session_manager_unittest.cc",
     "tutorial/tutorial_unittest.cc",
     "user_education_storage_service_unittest.cc",

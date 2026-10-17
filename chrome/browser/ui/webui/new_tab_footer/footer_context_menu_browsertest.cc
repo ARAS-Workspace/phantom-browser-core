@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/webui/new_tab_footer/footer_context_menu.h"
 
 #include "base/test/metrics/histogram_tester.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser.h"
@@ -17,13 +16,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
 #include "ui/actions/actions.h"
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "base/test/scoped_feature_list.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/ui/ui_features.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace {
 const auto kCustomizeMenuItem =
@@ -103,40 +95,3 @@ IN_PROC_BROWSER_TEST_F(FooterContextMenuBrowserTest, OpensCustomizeChrome) {
   histogram_tester()->ExpectBucketCount(kMenuClickHistogram, kCustomizeMenuItem,
                                         1);
 }
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-class FooterContextMenuEnterpriseTest : public FooterContextMenuBrowserTest {
- public:
-  void SetUpOnMainThread() override {
-    // Simulate browser management.
-    scoped_browser_management_ =
-        std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-            policy::ManagementServiceFactory::GetForProfile(profile()),
-            policy::EnterpriseManagementAuthority::DOMAIN_LOCAL);
-    FooterContextMenuBrowserTest::SetUpOnMainThread();
-  }
-
-  void TearDownOnMainThread() override {
-    scoped_browser_management_.reset();
-    FooterContextMenuBrowserTest::TearDownOnMainThread();
-  }
-
- private:
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      scoped_browser_management_;
-};
-
-IN_PROC_BROWSER_TEST_F(FooterContextMenuEnterpriseTest,
-  ShowsMenuItemsByDefault) {
-  EXPECT_TRUE(IsCommandIdVisible(kHideMenuItem));
-  EXPECT_TRUE(IsCommandIdVisible(kCustomizeMenuItem));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterContextMenuEnterpriseTest, PolicyDisablesHideMenuOption) {
-  g_browser_process->local_state()->SetString(
-      prefs::kEnterpriseCustomLabelForBrowser, "Custom label");
-
-  EXPECT_FALSE(IsCommandIdVisible(kHideMenuItem));
-  EXPECT_TRUE(IsCommandIdVisible(kCustomizeMenuItem));
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

@@ -10,7 +10,7 @@
 typedef WebUIMochaFocusTest CrComponentsFocusTest;
 
 IN_PROC_BROWSER_TEST_F(CrComponentsFocusTest, MostVisited) {
-  set_test_loader_host(chrome::kChromeUINewTabPageHost);
+  set_test_loader_host(chrome::kChromeUINewTabPageThirdPartyHost);
   RunTest("cr_components/most_visited_focus_test.js", "mocha.run()");
 }
 

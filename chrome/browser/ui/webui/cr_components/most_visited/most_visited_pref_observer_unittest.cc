@@ -293,4 +293,105 @@ TEST_F(MostVisitedPrefObserverTest,
   EXPECT_EQ(nullptr, prefs()->GetUserPrefValue(ntp_prefs::kNtpShortcutsType));
 }
 
+TEST_F(MostVisitedPrefObserverTest,
+       MigrateDeprecatedUseMostVisitedTilesPref_UseMostVisitedTilesNotSet) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the deprecated pref has its default value but not a user-set value.
+  ASSERT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpUseMostVisitedTiles));
+
+  // The function should not crash and should not modify the new pref.
+  MostVisitedPrefObserver::MigrateDeprecatedUseMostVisitedTilesPref(prefs);
+
+  // Check that the old and new pref are not set.
+  EXPECT_EQ(nullptr, prefs->GetUserPrefValue(ntp_prefs::kNtpShortcutsType));
+  EXPECT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpUseMostVisitedTiles));
+}
+
+TEST_F(
+    MostVisitedPrefObserverTest,
+    MigrateDeprecatedUseMostVisitedTilesPref_UseMostVisitedTilesNotSet_ShortcutsTilesTypeSet) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the deprecated pref has its default value but not a user-set value.
+  ASSERT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpUseMostVisitedTiles));
+
+  // Set the value of the new pref.
+  int initial_value = 1;
+  prefs->SetInteger(ntp_prefs::kNtpShortcutsType, initial_value);
+
+  // The function should not crash and should not modify the new pref.
+  MostVisitedPrefObserver::MigrateDeprecatedUseMostVisitedTilesPref(prefs);
+
+  // Check that the new pref is set properly and the old pref is not set.
+  EXPECT_EQ(initial_value, prefs->GetInteger(ntp_prefs::kNtpShortcutsType));
+  EXPECT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpUseMostVisitedTiles));
+}
+
+TEST_F(MostVisitedPrefObserverTest, MigrateDeprecatedShortcutsTypePref_NotSet) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the deprecated pref has its default value but not a user-set value.
+  ASSERT_EQ(nullptr, prefs->GetUserPrefValue(ntp_prefs::kNtpShortcutsType));
+
+  // The function should not crash and should not modify the new pref.
+  MostVisitedPrefObserver::MigrateDeprecatedShortcutsTypePref(prefs);
+
+  // Check that the new prefs are not set by the migration.
+  EXPECT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpCustomLinksVisible));
+  EXPECT_EQ(nullptr,
+            prefs->GetUserPrefValue(ntp_prefs::kNtpEnterpriseShortcutsVisible));
+}
+
+TEST_F(MostVisitedPrefObserverTest,
+       MigrateDeprecatedShortcutsTypePref_NotSet_NewPrefsSet) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the deprecated pref has its default value but not a user-set value.
+  ASSERT_EQ(nullptr, prefs->GetUserPrefValue(ntp_prefs::kNtpShortcutsType));
+
+  // Set the value of the new prefs.
+  prefs->SetBoolean(ntp_prefs::kNtpCustomLinksVisible, true);
+  prefs->SetBoolean(ntp_prefs::kNtpEnterpriseShortcutsVisible, false);
+
+  // The function should not crash and should not modify the new pref.
+  MostVisitedPrefObserver::MigrateDeprecatedShortcutsTypePref(prefs);
+
+  // Check that the new pref is set properly and the old pref is not set.
+  ASSERT_EQ(nullptr, prefs->GetUserPrefValue(ntp_prefs::kNtpShortcutsType));
+  EXPECT_TRUE(prefs->GetBoolean(ntp_prefs::kNtpCustomLinksVisible));
+  EXPECT_FALSE(prefs->GetBoolean(ntp_prefs::kNtpEnterpriseShortcutsVisible));
+}
+
+TEST_F(MostVisitedPrefObserverTest, ShowAllMostVisitedTilesPref_Default_False) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the pref has its default value as false;
+  EXPECT_FALSE(prefs->GetBoolean(ntp_prefs::kNtpShowAllMostVisitedTiles));
+}
+
+TEST_F(MostVisitedPrefObserverTest, ShowAllMostVisitedTilesPref_Set_True) {
+  PrefService* prefs = profile().GetPrefs();
+  bool init_value = prefs->GetBoolean(ntp_prefs::kNtpShowAllMostVisitedTiles);
+  ASSERT_FALSE(init_value);
+
+  // Set the pref to true
+  prefs->SetBoolean(ntp_prefs::kNtpShowAllMostVisitedTiles, true);
+
+  // Check that the pref is set to true
+  EXPECT_TRUE(prefs->GetBoolean(ntp_prefs::kNtpShowAllMostVisitedTiles));
+}
+
+TEST_F(MostVisitedPrefObserverTest, ShortcutsAutoRemovalDisabledPref_Set_True) {
+  PrefService* prefs = profile().GetPrefs();
+  // Ensure the pref has its default value as false.
+  bool init_value =
+      prefs->GetBoolean(ntp_prefs::kNtpShortcutsAutoRemovalDisabled);
+  ASSERT_FALSE(init_value);
+
+  // Set the pref to true.
+  prefs->SetBoolean(ntp_prefs::kNtpShortcutsAutoRemovalDisabled, true);
+  EXPECT_TRUE(prefs->GetBoolean(ntp_prefs::kNtpShortcutsAutoRemovalDisabled));
+}
+
 }  // namespace

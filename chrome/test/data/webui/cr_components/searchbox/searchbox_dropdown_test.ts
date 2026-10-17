@@ -3,10 +3,11 @@
 // found in the LICENSE file.
 
 import 'chrome://resources/cr_components/searchbox/searchbox_dropdown.js';
-import 'chrome://new-tab-page/strings.m.js';
+import 'chrome://omnibox-popup.top-chrome/strings.m.js';
 
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import type {SearchboxDropdownElement} from 'chrome://resources/cr_components/searchbox/searchbox_dropdown.js';
+import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {assertEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {$$, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
@@ -14,6 +15,13 @@ import {$$, microtasksFinished} from 'chrome://webui-test/test_util.js';
 //  into this file.
 suite('SearchboxDropdown', () => {
   let dropdown: SearchboxDropdownElement;
+
+  suiteSetup(() => {
+    loadTimeData.overrideValues({
+      isTopChromeSearchbox: false,
+      reportMetrics: false,
+    });
+  });
 
   setup(() => {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;

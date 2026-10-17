@@ -98,10 +98,6 @@
 # Flaky on most bots: crbug.com/474801547
 -MLPromotionBrowserTest.MLPipelineNoCrashForExistingTracker
 
-# Flaky on most bots: crbug.com/483506389
--NewTabPageAppTest.RealboxNext
--NewTabPageAppTest.RealboxNext__NewTabPageAppTest_RealboxNext_scrim_is_hidden_after_closing_composebox
-
 # Flaky on most bots: crbug.com/483251794
 -PasswordManagerUITest.AddPasswordDialog
 -PasswordManagerUITest.AddPasswordDialog__AddPasswordDialogTest_url_validation_works

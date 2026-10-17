@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'chrome://new-tab-page/new_tab_page.js';
+import 'chrome://omnibox-popup.top-chrome/strings.m.js';
+import 'chrome://resources/cr_components/searchbox/searchbox_match.js';
 
-import {SearchboxBrowserProxy} from 'chrome://new-tab-page/new_tab_page.js';
-import type {SearchboxMatchElement} from 'chrome://new-tab-page/new_tab_page.js';
-import {createAutocompleteMatch, createMatchKeywordModelForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
+import {createAutocompleteMatch, createMatchKeywordModelForTesting, SearchboxBrowserProxy} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
+import type {SearchboxMatchElement} from 'chrome://resources/cr_components/searchbox/searchbox_match.js';
+import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {NavigationPredictor} from 'chrome://resources/mojo/components/omnibox/browser/omnibox.mojom-webui.js';
 import {SelectionLineState} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertArrayEquals, assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
@@ -17,6 +18,13 @@ import {TestSearchboxBrowserProxy} from './test_searchbox_browser_proxy.js';
 suite('CrComponentsRealboxMatchTest', () => {
   let matchEl: SearchboxMatchElement;
   let testProxy: TestSearchboxBrowserProxy;
+
+  suiteSetup(() => {
+    loadTimeData.overrideValues({
+      isTopChromeSearchbox: false,
+      reportMetrics: false,
+    });
+  });
 
   setup(() => {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;

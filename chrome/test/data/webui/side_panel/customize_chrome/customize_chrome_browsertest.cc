@@ -29,10 +29,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, ButtonLabel) {
   RunTest("side_panel/customize_chrome/button_label_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Cards) {
-  RunTest("side_panel/customize_chrome/cards_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Shortcuts) {
   RunTest("side_panel/customize_chrome/shortcuts_test.js", "mocha.run()");
 }

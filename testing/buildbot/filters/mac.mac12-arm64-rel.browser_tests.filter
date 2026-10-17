@@ -101,7 +101,6 @@
 -MetricsServiceBrowserSampledOutTest.FilesRemoved
 -MseEncryptedMediaTest.Playback_VideoOnly_MP4_VP9Profile2/0
 -NativeMessagingLaunchApiTest.Error
--NewTabPageRealboxTest.All
 -OptimizationGuideKeyedServiceBrowserTest.GuestProfileUniqueKeyedService
 -PasswordManagerUISideBarTest.All
 -PDFExtensionJSTest.ViewerThumbnailBar

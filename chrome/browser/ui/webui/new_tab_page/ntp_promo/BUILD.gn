@@ -45,14 +45,3 @@ source_set("ntp_promo") {
     "//ui/base",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "ntp_promo_handler_unittest.cc" ]
-  deps = [
-    ":ntp_promo",
-    "//base/test:test_support",
-    "//chrome/browser/ui/webui:webui_util",
-    "//chrome/test:test_support",
-  ]
-}

@@ -36,8 +36,6 @@ constexpr base::Time kNewActiveTime = kNewSessionTime + base::Minutes(17);
 constexpr base::Time kLastShownTime1 = kSessionTime + base::Minutes(45);
 constexpr base::Time kLastShownTime2 = kSessionTime + base::Minutes(75);
 constexpr int kFirstSessionNumber = 5;
-constexpr char kNtpPromoId[] = "promo";
-constexpr char kNtpPromo2Id[] = "promo2";
 
 }  // namespace
 
@@ -425,54 +423,4 @@ TEST_F(BrowserUserEducationStorageServiceTest, LegacyDataTest) {
 
   // Reset the clock so there is no dangling pointer.
   service().set_clock_for_testing(base::DefaultClock::GetInstance());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoData) {
-  user_education::NtpPromoData data;
-  data.last_clicked = base::Time::FromSecondsSinceUnixEpoch(1);
-  data.completed = base::Time::FromSecondsSinceUnixEpoch(2);
-  data.last_session = 3;
-  data.session_count_in_term = 4;
-  data.term_count = 5;
-  data.term_start_time = base::Time::FromSecondsSinceUnixEpoch(6);
-  data.dismissed_time = base::Time::FromSecondsSinceUnixEpoch(7);
-  service().SaveNtpPromoData(kNtpPromoId, data);
-  EXPECT_EQ(data, service().ReadNtpPromoData(kNtpPromoId).value());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoDataNotPresent) {
-  user_education::NtpPromoData data;
-  EXPECT_FALSE(service().ReadNtpPromoData(kNtpPromoId).has_value());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoDataReset) {
-  user_education::NtpPromoData data;
-  data.last_session = 3;
-  service().SaveNtpPromoData(kNtpPromoId, data);
-  service().SaveNtpPromoData(kNtpPromo2Id, data);
-  service().ResetNtpPromoData(kNtpPromoId);
-  // Ensure only the specified promo is cleared.
-  EXPECT_FALSE(service().ReadNtpPromoData(kNtpPromoId).has_value());
-  EXPECT_TRUE(service().ReadNtpPromoData(kNtpPromo2Id).has_value());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoPreferences) {
-  user_education::NtpPromoPreferences prefs;
-  prefs.disabled = true;
-  service().SaveNtpPromoPreferences(prefs);
-  EXPECT_EQ(prefs, service().ReadNtpPromoPreferences());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoPreferencesNotPresent) {
-  user_education::NtpPromoPreferences prefs;
-  EXPECT_EQ(prefs, service().ReadNtpPromoPreferences());
-}
-
-TEST_F(BrowserUserEducationStorageServiceTest, NtpPromoPreferencesReset) {
-  user_education::NtpPromoPreferences prefs;
-  prefs.disabled = true;
-  service().SaveNtpPromoPreferences(prefs);
-  service().ResetNtpPromoPreferences();
-  prefs = user_education::NtpPromoPreferences();
-  EXPECT_EQ(prefs, service().ReadNtpPromoPreferences());
 }
