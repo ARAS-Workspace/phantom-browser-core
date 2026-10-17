@@ -150,9 +150,6 @@
     'android_ntp': {
       'filepath': 'chrome/android/java/src/org/chromium/chrome/browser/ntp/'
     },
-    'android_ntp_customization': {
-      'filepath': 'chrome/browser/ntp_customization/'
-    },
     'android_omnibox': {
       'filepath': 'chrome/browser/ui/android/omnibox/',
     },
@@ -2446,7 +2443,6 @@
     'android_lint': ['wnwen+watch@chromium.org'],
     'android_magic_stack': ['hanxi+watch@chromium.org'],
     'android_ntp': ['hanxi+watch@chromium.org'],
-    'android_ntp_customization': ['hanxi+watch@chromium.org'],
     'android_omnibox': ['ender+watch@chromium.org'],
     'android_search_widget': ['yusufo+watch@chromium.org'],
     'android_side_panel': ['clhager@google.com',
