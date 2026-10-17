@@ -283,18 +283,17 @@ TEST_F(ChromeContentBrowserClientTest, ShouldStayInParentProcessForNTP) {
       site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
 
   site_instance = content::SiteInstance::CreateForURL(
-      profile(), GURL("chrome://new-tab-page"));
+      profile(), GURL("chrome://new-tab-page-third-party"));
 
-  // chrome://new-tab-page is an NTP replacing local-ntp and supports OOPIFs.
+  // chrome://new-tab-page-third-party is a WebUI NTP and supports OOPIFs.
   // ShouldStayInParentProcessForNTP() should only return true for NTPs hosted
   // under the chrome-search: scheme.
   EXPECT_FALSE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome://new-tab-page"),
+      GURL("chrome://new-tab-page-third-party"),
       site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
 
-  // For now, we also allow chrome-search://most-visited to stay in 1P NTP,
-  // chrome://new-tab-page.  We should consider tightening this to only allow
-  // most-visited tiles to stay in 3P NTP.
+  // For now, we also allow chrome-search://most-visited to stay in the WebUI
+  // NTP, chrome://new-tab-page-third-party.
   EXPECT_TRUE(client.ShouldStayInParentProcessForNTP(
       GURL("chrome-search://most-visited"),
       site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
@@ -338,9 +337,9 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
   is_renderer_initiated = true;
   referrer = kReferrer;
   initiator_origin = kInitiator;
-  client.OverrideNavigationParams(chrome::ChromeUINewTabPageURLAsGURL(),
-                                  &transition, &is_renderer_initiated,
-                                  &referrer, &initiator_origin);
+  client.OverrideNavigationParams(
+      GURL(chrome::kChromeUINewTabPageThirdPartyURL), &transition,
+      &is_renderer_initiated, &referrer, &initiator_origin);
   EXPECT_TRUE(ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_AUTO_BOOKMARK,
                                            transition));
   EXPECT_TRUE(is_renderer_initiated);
@@ -349,9 +348,9 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
 
   // No change for transitions that are not PAGE_TRANSITION_LINK.
   transition = ui::PAGE_TRANSITION_TYPED;
-  client.OverrideNavigationParams(chrome::ChromeUINewTabPageURLAsGURL(),
-                                  &transition, &is_renderer_initiated,
-                                  &referrer, &initiator_origin);
+  client.OverrideNavigationParams(
+      GURL(chrome::kChromeUINewTabPageThirdPartyURL), &transition,
+      &is_renderer_initiated, &referrer, &initiator_origin);
   EXPECT_TRUE(
       ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_TYPED, transition));
 
@@ -396,9 +395,9 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagDisabled) {
   transition = ui::PAGE_TRANSITION_LINK;
   is_renderer_initiated = true;
   initiator_origin = url::Origin::Create(GURL("https://www.example.com"));
-  client.OverrideNavigationParams(chrome::ChromeUINewTabPageURLAsGURL(),
-                                  &transition, &is_renderer_initiated,
-                                  &referrer, &initiator_origin);
+  client.OverrideNavigationParams(
+      GURL(chrome::kChromeUINewTabPageThirdPartyURL), &transition,
+      &is_renderer_initiated, &referrer, &initiator_origin);
   EXPECT_TRUE(ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_AUTO_BOOKMARK,
                                            transition));
   EXPECT_FALSE(is_renderer_initiated);
@@ -406,9 +405,9 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagDisabled) {
 
   // No change for transitions that are not PAGE_TRANSITION_LINK.
   transition = ui::PAGE_TRANSITION_TYPED;
-  client.OverrideNavigationParams(chrome::ChromeUINewTabPageURLAsGURL(),
-                                  &transition, &is_renderer_initiated,
-                                  &referrer, &initiator_origin);
+  client.OverrideNavigationParams(
+      GURL(chrome::kChromeUINewTabPageThirdPartyURL), &transition,
+      &is_renderer_initiated, &referrer, &initiator_origin);
   EXPECT_TRUE(
       ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_TYPED, transition));
 

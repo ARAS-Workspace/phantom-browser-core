@@ -108,8 +108,8 @@ class ChromeLocationBarModelDelegateTest : public InProcessBrowserTest {
 // ChromeLocationBarModelDelegate::IsNewTabPageURL return the expected results
 // for various NTP scenarios.
 IN_PROC_BROWSER_TEST_F(ChromeLocationBarModelDelegateTest, IsNewTabPage) {
-  // Google is selected explicitly: chrome://newtab resolves to the WebUI NTP
-  // only with Google as the default search provider.
+  // Google is selected explicitly: chrome://newtab resolves to the third-party
+  // WebUI NTP with Google as the default search provider as well.
   TemplateURLService* template_url_service =
       TemplateURLServiceFactory::GetForProfile(browser()->GetProfile());
   TemplateURL* google =
@@ -118,11 +118,11 @@ IN_PROC_BROWSER_TEST_F(ChromeLocationBarModelDelegateTest, IsNewTabPage) {
   template_url_service->SetUserSelectedDefaultSearchProvider(google);
 
   chrome::NewTab(browser(), NewTabTypes::kNoUserAction);
-  // New Tab URL with Google DSP resolves to the local or the WebUI NTP URL.
-  const GURL& ntp_url = chrome::ChromeUINewTabPageURLAsGURL();
-  EXPECT_EQ(ntp_url, search::GetNewTabPageURL(browser()->GetProfile()));
+  // New Tab URL with Google DSP resolves to chrome://new-tab-page-third-party/.
+  EXPECT_EQ(GURL(chrome::kChromeUINewTabPageThirdPartyURL),
+            search::GetNewTabPageURL(browser()->GetProfile()));
 
-  EXPECT_TRUE(delegate()->IsNewTabPage());
+  EXPECT_FALSE(delegate()->IsNewTabPage());
   EXPECT_TRUE(delegate()->IsNewTabPageURL(GetURL()));
 
   SetSearchProvider(false);

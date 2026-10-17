@@ -74,7 +74,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://net-export",
       "chrome://net-internals",
       "chrome://network-errors",
-      "chrome://new-tab-page",
       "chrome://newtab-footer",
       "chrome://new-tab-page-third-party",
       "chrome://newtab",

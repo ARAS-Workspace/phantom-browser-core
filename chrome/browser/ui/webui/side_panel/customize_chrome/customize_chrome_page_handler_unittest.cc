@@ -22,8 +22,6 @@
 #include "base/test/mock_callback.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/global_features.h"
-#include "chrome/browser/new_tab_page/modules/modules_constants.h"
-#include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
@@ -163,11 +161,6 @@ class MockPage : public side_panel::mojom::CustomizeChromePage {
 
   void FlushForTesting() { receiver_.FlushForTesting(); }
 
-  MOCK_METHOD3(
-      SetModulesSettings,
-      void(std::vector<side_panel::mojom::ModuleSettingsPtr> modules_settings,
-           bool managed,
-           bool visible));
   MOCK_METHOD(void,
               SetMostVisitedSettings,
               (const std::vector<ntp_tiles::TileType>&,
@@ -299,14 +292,10 @@ class CustomizeChromePageHandlerTest : public testing::Test {
     EXPECT_CALL(mock_ntp_custom_background_service_, AddObserver)
         .Times(1)
         .WillOnce(SaveArg<0>(&ntp_custom_background_service_observer_));
-    const std::vector<ntp::ModuleIdDetail> module_id_details = {
-        {ntp_modules::kMostRelevantTabResumptionModuleId,
-         IDS_NTP_MODULES_MOST_RELEVANT_TAB_RESUMPTION_TITLE},
-        {ntp_modules::kTabGroupsModuleId, IDS_NTP_MODULES_TAB_GROUPS_TITLE}};
     handler_ = std::make_unique<CustomizeChromePageHandler>(
         mojo::PendingReceiver<side_panel::mojom::CustomizeChromePageHandler>(),
         mock_page_.BindAndGetRemote(), &mock_ntp_custom_background_service_,
-        web_contents_, module_id_details, mock_open_url_callback_.Get());
+        web_contents_, mock_open_url_callback_.Get());
     mock_page_.FlushForTesting();
     EXPECT_EQ(handler_.get(), ntp_background_service_observer_);
     EXPECT_EQ(handler_.get(), ntp_custom_background_service_observer_);
@@ -1155,8 +1144,6 @@ TEST_F(CustomizeChromePageHandlerTest, AttachedTabStateUpdated) {
       ntp_types_and_urls = {
           {side_panel::mojom::NewTabPageType::kNone,
            GURL("chrome-extension://someinvaldextension/index.html")},
-          {side_panel::mojom::NewTabPageType::kFirstPartyWebUI,
-           chrome::ChromeUINewTabPageURLAsGURL()},
           {side_panel::mojom::NewTabPageType::kThirdPartyWebUI,
            GURL(chrome::kChromeUINewTabPageThirdPartyURL)},
           {side_panel::mojom::NewTabPageType::kIncognito,

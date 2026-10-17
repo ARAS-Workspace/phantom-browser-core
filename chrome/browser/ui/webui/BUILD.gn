@@ -484,10 +484,6 @@ source_set("chrome_web_ui_controller_factory") {
       "//extensions/common:common_constants",
     ]
   }
-
-  if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/ui/webui/new_tab_page" ]
-  }
 }
 
 if (is_mac || is_linux) {

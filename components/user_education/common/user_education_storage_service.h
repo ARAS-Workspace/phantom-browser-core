@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/time/clock.h"
 #include "base/time/time.h"
-#include "components/user_education/common/ntp_promo/ntp_promo_identifier.h"
 #include "components/user_education/common/user_education_data.h"
 
 // Declare in the global namespace for test purposes.
@@ -109,18 +108,6 @@ class UserEducationStorageService : public UserEducationTimeProvider {
   void set_profile_creation_time_for_testing(base::Time profile_creation_time) {
     set_profile_creation_time(profile_creation_time);
   }
-
-  // Gets or sets individual NTP promo data.
-  virtual std::optional<NtpPromoData> ReadNtpPromoData(
-      const NtpPromoIdentifier& id) const = 0;
-  virtual void SaveNtpPromoData(const NtpPromoIdentifier& id,
-                                const NtpPromoData& data) = 0;
-  virtual void ResetNtpPromoData(const NtpPromoIdentifier& id) = 0;
-
-  // Gets or sets global NTP promo preferences.
-  virtual NtpPromoPreferences ReadNtpPromoPreferences() = 0;
-  virtual void SaveNtpPromoPreferences(const NtpPromoPreferences& data) = 0;
-  virtual void ResetNtpPromoPreferences() = 0;
 
  protected:
   friend UserEducationInternalsPageHandlerImpl;

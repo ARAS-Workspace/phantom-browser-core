@@ -85,7 +85,6 @@
 #include "ui/gfx/vector_icon_types.h"
 #include "url/gurl.h"
 
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"  // nogncheck
 #include "chrome/browser/ui/tabs/tab_strip_model.h"         // nogncheck
 
 namespace searchbox_internal {

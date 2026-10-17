@@ -68,8 +68,6 @@ class TutorialService {
       RestartedCallback restart_callback = base::DoNothing());
 
   void LogIPHLinkClicked(TutorialIdentifier id, bool iph_link_was_clicked);
-  virtual void LogStartedFromWhatsNewPage(TutorialIdentifier id,
-                                          bool iph_link_was_clicked);
 
   // This can be used to dismiss a help bubble in a region where it could cause
   // z-fighting. It does not end the tutorial; if the user performs the correct

@@ -373,8 +373,8 @@ IN_PROC_BROWSER_TEST_F(SearchTest, IsNTPOrRelatedURL) {
 IN_PROC_BROWSER_TEST_F(SearchTest, IsNTPURL) {
   const auto kTestCases = std::to_array<SearchTestCase>({
       {"chrome-search://remote-ntp", true, "Remote NTP URL"},
-      {"chrome://new-tab-page", true, "WebUI NTP"},
-      {"chrome://new-tab-page/path?params", true,
+      {"chrome://new-tab-page-third-party", true, "WebUI NTP"},
+      {"chrome://new-tab-page-third-party/path?params", true,
        "WebUI NTP with path and params"},
       {"invalid-scheme://remote-ntp", false, "Invalid Remote NTP URL"},
       {"chrome-search://most-visited/", false, "Most visited URL"},

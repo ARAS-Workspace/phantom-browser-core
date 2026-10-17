@@ -89,10 +89,6 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUIControllerFactoryBrowserTest,
   auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
 
   EXPECT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), chrome::ChromeUINewTabPageURLAsGURL()));
-  EXPECT_TRUE(web_contents->GetWebUI());
-
-  EXPECT_TRUE(ui_test_utils::NavigateToURL(
       browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL)));
   EXPECT_TRUE(web_contents->GetWebUI());
 }

@@ -92,21 +92,7 @@ interface UserEducationInternalsPageHandler {
   // Retrieves "New" Badge data.
   GetNewBadges() => (array<FeaturePromoDemoPageInfo> new_badges);
 
-  // Retrieves NTP Promo data.
-  GetNtpPromos() => (array<FeaturePromoDemoPageInfo> ntp_promos);
-
-  // Retrieves NTP Promo preferences.
-  GetNtpPromoPreferences() =>
-    (array<FeaturePromoDemoPageData> ntp_promo_preferences);
-
   // Clears "New" Badge data associated with a particular feature.
   // Returns an error message if the operation fails; empty string on success.
   ClearNewBadgeData(string feature_name) => (string error_message);
-
-  // Clears NTP Promo data for the specified promo ID.
-  // Returns an error message if the operation fails; empty string on success.
-  ClearNtpPromoData(string id) => (string error_message);
-
-  // Clears all NTP promo preferences.
-  ClearNtpPromoPreferences() => (string error_message);
 };

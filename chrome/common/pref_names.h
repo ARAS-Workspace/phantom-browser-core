@@ -1177,16 +1177,6 @@ inline constexpr char kDeprecatedNtpCustomBackgroundDictDoNotUse[] =
 // button.
 inline constexpr char kNtpCustomizeChromeButtonOpenCount[] =
     "NewTabPage.CustomizeChromeButtonOpenCount";
-// List keeping track of disabled NTP modules.
-inline constexpr char kNtpDisabledModules[] = "NewTabPage.DisabledModules";
-
-// Dictionary containing the state of the context menu button animation.
-inline constexpr char kContextMenuAnimationState[] =
-    "context_menu_animation_state";
-
-// List keeping track of modules hidden in Customize Chrome.
-inline constexpr char kNtpCustomizeChromeHiddenModules[] =
-    "NewTabPage.CustomizeChromeHiddenModules";
 // Number of how many times Customize Chrome was auto opened on NTP.
 inline constexpr char kNtpCustomizeChromeSidePanelAutoOpeningsCount[] =
     "NewTabPage.CustomizeChromeSidePanelAutoOpeningsCount";
@@ -1196,20 +1186,8 @@ inline constexpr char kNtpCustomizeChromeExplicitlyClosed[] =
 // Whether Customize Chrome IPH was auto opened on NTP.
 inline constexpr char kNtpCustomizeChromeIPHAutoOpened[] =
     "NewTabPage.CustomizeChromeIPHAutoOpened";
-// List keeping track of modules not allowed to show on New Tab Page.
-inline constexpr char kNtpHiddenModules[] = "NewTabPage.HiddenModules";
-// List keeping track of NTP modules order.
-inline constexpr char kNtpModulesOrder[] = "NewTabPage.ModulesOrder";
-// Whether NTP modules are visible.
-inline constexpr char kNtpModulesVisible[] = "NewTabPage.ModulesVisible";
 // Whether the AI action chips are visible in the NTP.
 inline constexpr char kNtpToolChipsVisible[] = "NewTabPage.ToolChipsVisible";
-// Dictionary of number of times a module has loaded.
-inline constexpr char kNtpModulesLoadedCountDict[] =
-    "NewTabPage.ModulesLoadedCountDict";
-// Dictionary of number of times the user has interacted with a module.
-inline constexpr char kNtpModulesInteractedCountDict[] =
-    "NewTabPage.ModulesInteractedCountDict";
 // Number of times NTP wallpaper search button animation has been visible.
 inline constexpr char kNtpWallpaperSearchButtonShownCount[] =
     "NewTabPage.WallpaperSearchButtonShownCount";
@@ -2096,11 +2074,6 @@ inline constexpr char kExplicitlyAllowedNetworkPorts[] =
 // policy.
 inline constexpr char kDesktopSharingHubEnabled[] =
     "sharing_hub.desktop_sharing_hub_enabled";
-
-// A boolean indicating whether the Lens NTP searchbox feature should be enabled
-// if supported.
-inline constexpr char kLensDesktopNTPSearchEnabled[] =
-    "policy.lens_desktop_ntp_search_enabled";
 
 // An integer indicating the number of times the Lens Overlay was started.
 inline constexpr char kLensOverlayStartCount[] =

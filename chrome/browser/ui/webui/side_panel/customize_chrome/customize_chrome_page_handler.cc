@@ -4,7 +4,6 @@
 
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"
 
-#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -18,7 +17,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
-#include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
@@ -37,7 +35,6 @@
 #include "chrome/browser/ui/views/new_tab_footer/footer_controller.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_helper.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 #include "chrome/browser/ui/webui/ntp/new_tab_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
@@ -52,7 +49,6 @@
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
-#include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
 #include "components/search_engines/template_url_service.h"
 #include "content/public/browser/web_contents.h"
@@ -101,7 +97,6 @@ CustomizeChromePageHandler::CustomizeChromePageHandler(
     mojo::PendingRemote<side_panel::mojom::CustomizeChromePage> pending_page,
     NtpCustomBackgroundService* ntp_custom_background_service,
     content::WebContents* web_contents,
-    const std::vector<ntp::ModuleIdDetail> module_id_details,
     std::optional<base::RepeatingCallback<void(const GURL&)>> open_url_callback)
     : ntp_custom_background_service_(ntp_custom_background_service),
       profile_(Profile::FromBrowserContext(web_contents->GetBrowserContext())),
@@ -110,7 +105,6 @@ CustomizeChromePageHandler::CustomizeChromePageHandler(
           NtpBackgroundServiceFactory::GetForProfile(profile_)),
       template_url_service_(TemplateURLServiceFactory::GetForProfile(profile_)),
       theme_service_(ThemeServiceFactory::GetForProfile(profile_)),
-      module_id_details_(module_id_details),
       browser_window_changed_subscription_(
           webui::RegisterBrowserWindowInterfaceChanged(
               web_contents_,
@@ -131,14 +125,6 @@ CustomizeChromePageHandler::CustomizeChromePageHandler(
   OnBrowserWindowInterfaceChanged();
 
   pref_change_registrar_.Init(profile_->GetPrefs());
-  pref_change_registrar_.Add(
-      prefs::kNtpModulesVisible,
-      base::BindRepeating(&CustomizeChromePageHandler::UpdateModulesSettings,
-                          base::Unretained(this)));
-  pref_change_registrar_.Add(
-      prefs::kNtpDisabledModules,
-      base::BindRepeating(&CustomizeChromePageHandler::UpdateModulesSettings,
-                          base::Unretained(this)));
   pref_change_registrar_.Add(
       ntp_prefs::kNtpCustomLinksVisible,
       base::BindRepeating(
@@ -164,10 +150,6 @@ CustomizeChromePageHandler::CustomizeChromePageHandler(
       base::BindRepeating(
           &CustomizeChromePageHandler::UpdateMostVisitedSettings,
           base::Unretained(this)));
-  pref_change_registrar_.Add(
-      prefs::kNtpHiddenModules,
-      base::BindRepeating(&CustomizeChromePageHandler::UpdateModulesSettings,
-                          base::Unretained(this)));
   pref_change_registrar_.Add(
       prefs::kNtpToolChipsVisible,
       base::BindRepeating(&CustomizeChromePageHandler::UpdateToolChipsSettings,
@@ -570,61 +552,6 @@ void CustomizeChromePageHandler::UpdateFooterSettings() {
           prefs::kNTPFooterExtensionAttributionEnabled));
 }
 
-void CustomizeChromePageHandler::SetModulesVisible(bool visible) {
-  DisableModuleAutoRemoval(profile_, ntp_modules::kAllModulesId);
-  profile_->GetPrefs()->SetBoolean(prefs::kNtpModulesVisible, visible);
-}
-
-void CustomizeChromePageHandler::SetModuleDisabled(const std::string& module_id,
-                                                   bool disabled) {
-  DisableModuleAutoRemoval(profile_, module_id);
-  ScopedListPrefUpdate update(profile_->GetPrefs(), prefs::kNtpDisabledModules);
-  base::ListValue& list = update.Get();
-  if (disabled) {
-    if (!list.contains(module_id)) {
-      list.Append(module_id);
-    }
-  } else {
-    list.EraseValue(base::Value(module_id));
-  }
-}
-
-void CustomizeChromePageHandler::UpdateModulesSettings() {
-  std::vector<std::string> disabled_module_ids;
-  for (const auto& id :
-       profile_->GetPrefs()->GetList(prefs::kNtpDisabledModules)) {
-    disabled_module_ids.push_back(id.GetString());
-  }
-
-  std::vector<std::string> hidden_module_ids;
-  for (const auto& id :
-       profile_->GetPrefs()->GetList(prefs::kNtpHiddenModules)) {
-    hidden_module_ids.push_back(id.GetString());
-  }
-
-  std::vector<side_panel::mojom::ModuleSettingsPtr> modules_settings;
-  for (const auto& module_id_detail : module_id_details_) {
-    auto module_settings = side_panel::mojom::ModuleSettings::New();
-    module_settings->id = module_id_detail.id_;
-    module_settings->name =
-        l10n_util::GetStringUTF8(module_id_detail.name_message_id_);
-    auto description_message_id = module_id_detail.description_message_id_;
-    if (description_message_id.has_value()) {
-      module_settings->description =
-          l10n_util::GetStringUTF8(description_message_id.value());
-    }
-    module_settings->enabled =
-        !std::ranges::contains(disabled_module_ids, module_settings->id);
-    module_settings->visible =
-        !std::ranges::contains(hidden_module_ids, module_settings->id);
-    modules_settings.push_back(std::move(module_settings));
-  }
-  page_->SetModulesSettings(
-      std::move(modules_settings),
-      profile_->GetPrefs()->IsManagedPreference(prefs::kNtpModulesVisible),
-      profile_->GetPrefs()->GetBoolean(prefs::kNtpModulesVisible));
-}
-
 void CustomizeChromePageHandler::UpdateScrollToSection() {
   ScrollToSection(last_requested_section_);
 }
@@ -875,9 +802,7 @@ void CustomizeChromePageHandler::FileSelectionCanceled() {
 
 side_panel::mojom::NewTabPageType CustomizeChromePageHandler::GetNewTabPageType(
     const GURL& url) {
-  if (NewTabPageUI::IsNewTabPageOrigin(url)) {
-    return side_panel::mojom::NewTabPageType::kFirstPartyWebUI;
-  } else if (ntp_footer::IsExtensionNtp(url, profile_)) {
+  if (ntp_footer::IsExtensionNtp(url, profile_)) {
     return side_panel::mojom::NewTabPageType::kExtension;
   } else if (NewTabPageThirdPartyUI::IsNewTabPageOrigin(url)) {
     return side_panel::mojom::NewTabPageType::kThirdPartyWebUI;

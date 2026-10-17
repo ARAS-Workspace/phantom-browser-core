@@ -198,7 +198,7 @@ IN_PROC_BROWSER_TEST_F(FooterControllerExtensionTest, TabChanged) {
   NavigateCurrentTab(extension->url());
   EXPECT_TRUE(footer()->GetVisible());
 
-  OpenNewTab(chrome::ChromeUINewTabPageURLAsGURL());
+  OpenNewTab(GURL(chrome::kChromeUINewTabPageThirdPartyURL));
   EXPECT_FALSE(footer()->GetVisible());
 }
 
@@ -260,7 +260,7 @@ IN_PROC_BROWSER_TEST_F(FooterControllerSplitViewSingleTabTest, TabChanged) {
   NavigateCurrentTab(GURL(kNonNtpUrl));
   EXPECT_FALSE(footer()->GetVisible());
 
-  NavigateCurrentTab(chrome::ChromeUINewTabPageURLAsGURL());
+  NavigateCurrentTab(GURL(chrome::kChromeUINewTabPageThirdPartyURL));
   EXPECT_FALSE(footer()->GetVisible());
 
   OpenNewTab(GURL(extension->url()));

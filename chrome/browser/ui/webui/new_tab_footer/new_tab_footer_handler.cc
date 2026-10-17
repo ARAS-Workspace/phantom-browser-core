@@ -17,7 +17,6 @@
 #include "chrome/browser/ui/webui/new_tab_footer/footer_context_menu.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_helper.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
@@ -163,9 +162,7 @@ void NewTabFooterHandler::AttachedTabStateUpdated(const GURL& url) {
   last_source_url_ = url;
   new_tab_footer::mojom::NewTabPageType ntp_type =
       new_tab_footer::mojom::NewTabPageType::kOther;
-  if (NewTabPageUI::IsNewTabPageOrigin(url)) {
-    ntp_type = new_tab_footer::mojom::NewTabPageType::kFirstPartyWebUI;
-  } else if (ntp_footer::IsExtensionNtp(url, profile_)) {
+  if (ntp_footer::IsExtensionNtp(url, profile_)) {
     ntp_type = new_tab_footer::mojom::NewTabPageType::kExtension;
   }
 

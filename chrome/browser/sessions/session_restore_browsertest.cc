@@ -3721,7 +3721,7 @@ IN_PROC_BROWSER_TEST_F(SavedTabGroupSessionRestoreTest,
                        UnsavedGroupDefaultSavedAfterBrowserRestart) {
   // Add a second tab.
   ui_test_utils::NavigateToURLWithDisposition(
-      browser(), chrome::ChromeUINewTabPageURLAsGURL(),
+      browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL),
       WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
 
@@ -3763,7 +3763,7 @@ IN_PROC_BROWSER_TEST_F(SavedTabGroupSessionRestoreTest,
                        NoDuplicatesOfDefaultSavedGroupAfterBrowserRestart) {
   // Add a second tab.
   ui_test_utils::NavigateToURLWithDisposition(
-      browser(), chrome::ChromeUINewTabPageURLAsGURL(),
+      browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL),
       WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
 
@@ -3799,13 +3799,13 @@ IN_PROC_BROWSER_TEST_F(SavedTabGroupSessionRestoreTest,
                        MultipleSavedGroupsAfterBrowserRestart) {
   // Add a second tab.
   ui_test_utils::NavigateToURLWithDisposition(
-      browser(), chrome::ChromeUINewTabPageURLAsGURL(),
+      browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL),
       WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
 
   // Add a third tab.
   ui_test_utils::NavigateToURLWithDisposition(
-      browser(), chrome::ChromeUINewTabPageURLAsGURL(),
+      browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL),
       WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
 

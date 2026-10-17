@@ -14,8 +14,8 @@ class PrefService;
 class Profile;
 
 // Manages and observes 1P preferences (custom links, enterprise shortcuts,
-// visibility) for MostVisitedHandler. Used by 1P surfaces (NewTabPageUI,
-// OmniboxEverywhereUI) so 3P surfaces (NewTabPageThirdPartyUI) remain isolated.
+// visibility) for MostVisitedHandler. Used by 1P surfaces (OmniboxEverywhereUI)
+// so 3P surfaces (NewTabPageThirdPartyUI) remain isolated.
 class MostVisitedPrefObserver {
  public:
   MostVisitedPrefObserver(Profile* profile, MostVisitedHandler* handler);

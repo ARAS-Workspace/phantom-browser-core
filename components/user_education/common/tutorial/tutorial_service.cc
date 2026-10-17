@@ -120,17 +120,6 @@ void TutorialService::LogIPHLinkClicked(TutorialIdentifier id,
   }
 }
 
-void TutorialService::LogStartedFromWhatsNewPage(TutorialIdentifier id,
-                                                 bool success) {
-  const TutorialDescription* const description =
-      tutorial_registry_->GetTutorialDescription(id);
-  CHECK(description);
-
-  if (description->histograms) {
-    description->histograms->RecordStartedFromWhatsNewPage(success);
-  }
-}
-
 void TutorialService::DismissBubbleInRegion(const gfx::Rect& screen_region) {
   if (currently_displayed_bubble_ &&
       currently_displayed_bubble_->GetBoundsInScreen().Intersects(

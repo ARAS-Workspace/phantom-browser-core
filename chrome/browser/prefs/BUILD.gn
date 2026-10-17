@@ -249,8 +249,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser/new_tab_page",
       "//chrome/browser/ui/webui/cr_components/most_visited",
-      "//chrome/browser/ui/webui/new_tab_page",
-      "//chrome/browser/ui/webui/new_tab_page:impl",
     ]
   }
 

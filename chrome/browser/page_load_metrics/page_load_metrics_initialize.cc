@@ -36,7 +36,6 @@
 #include "chrome/browser/page_load_metrics/observers/multi_tab_loading_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/navigation_initiator_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/new_tab_page_initiated_page_load_metrics_observer.h"
-#include "chrome/browser/page_load_metrics/observers/new_tab_page_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/omnibox_suggestion_used_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/optimization_guide_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/page_anchors_metrics_observer.h"
@@ -174,7 +173,6 @@ void PageLoadMetricsEmbedder::RegisterObservers(
   }
 
   if (IsNewTabPageUrl(navigation_handle->GetURL())) {
-    tracker->AddObserver(std::make_unique<NewTabPagePageLoadMetricsObserver>());
     return;
   }
 

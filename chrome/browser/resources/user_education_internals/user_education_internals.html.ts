@@ -43,9 +43,6 @@ export function getHtml(this: UserEducationInternalsElement) {
           Non-IPH Promos
         </a>
         <a role="menuitem" index="4" class="cr-nav-menu-item">
-          NTP Promos
-        </a>
-        <a role="menuitem" index="5" class="cr-nav-menu-item">
           Session and Cooldown
         </a>
       </cr-menu-selector>
@@ -131,41 +128,6 @@ export function getHtml(this: UserEducationInternalsElement) {
             </user-education-internals-card>`)}
           <p class="if-empty">
             No non-IPH promos match the search filter.
-          </p>
-        </div>
-        <div id="ntpPromos" class="promo-list">
-          <h2>NTP Promos</h2>
-          <div id="ntpPromoPreferences">
-            <cr-expand-button
-                ?expanded="${this.ntpPromoPreferencesExpanded_}"
-                @expanded-changed="${this.onNtpPromoPreferencesExpandedChanged_}">
-              <div id="label"><h3>NTP Promo Preferences</h3></div>
-            </cr-expand-button>
-            <div id="ntpPromoPrefData"
-                ?hidden="${!this.ntpPromoPreferencesExpanded_}">
-              ${this.ntpPromoPreferences_.map(item => html`
-                <p><b>${item.name}</b> ${item.value}</p>`)}
-              <p>
-                Clicking the button below will reset all NTP promo preferences
-                not tied to feature flags. These changes may not be reflected on
-                NTP tabs that are already open.
-              </p>
-              <cr-button
-                  id="clearNtpPromoPreferences"
-                  @click="${this.onClearNtpPromoPreferencesClick_}">
-                Clear All
-              </cr-button>
-            </div>
-          </div>
-          ${this.ntpPromos_.map(item => html`
-            <user-education-internals-card
-                id="${item.internalName}"
-                ?hidden="${!this.promoFilter_(item)}"
-                .promo="${item}"
-                @clear-promo-data="${this.onNtpPromoClearPromoData_}">
-            </user-education-internals-card>`)}
-          <p class="if-empty">
-            No NTP Promos match the search filter.
           </p>
         </div>
         <div id="global">

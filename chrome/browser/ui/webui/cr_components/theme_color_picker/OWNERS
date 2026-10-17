@@ -1,4 +1,4 @@
-file://chrome/browser/ui/webui/new_tab_page/OWNERS
+file://chrome/browser/ui/webui/new_tab_page_third_party/OWNERS
 
 per-file *_mojom_traits*.*=set noparent
 per-file *_mojom_traits*.*=file://ipc/SECURITY_OWNERS

@@ -412,7 +412,7 @@ class RecentActivityBubbleDialogViewActionBrowserTest
   }
 
   tabs::TabInterface* CreateTab(
-      GURL tab_url = GURL(chrome::kChromeUINewTabPageURL)) {
+      GURL tab_url = GURL(chrome::kChromeUINewTabPageThirdPartyURL)) {
     auto index = browser()->tab_strip_model()->count();
     CHECK(AddTabAtIndex(index, tab_url, ui::PAGE_TRANSITION_TYPED));
     auto* tab = browser()->tab_strip_model()->GetTabAtIndex(index);

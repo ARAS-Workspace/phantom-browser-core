@@ -13,7 +13,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
-#include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_observer.h"
@@ -84,7 +83,6 @@ class CustomizeChromePageHandler
       mojo::PendingRemote<side_panel::mojom::CustomizeChromePage> pending_page,
       NtpCustomBackgroundService* ntp_custom_background_service,
       content::WebContents* web_contents,
-      const std::vector<ntp::ModuleIdDetail> module_id_details,
       std::optional<base::RepeatingCallback<void(const GURL&)>>
           open_url_callback = std::nullopt);
 
@@ -142,9 +140,6 @@ class CustomizeChromePageHandler
   void UpdateToolChipsSettings() override;
   void SetFooterVisible(bool visible) override;
   void UpdateFooterSettings() override;
-  void SetModulesVisible(bool visible) override;
-  void SetModuleDisabled(const std::string& module_id, bool disabled) override;
-  void UpdateModulesSettings() override;
   void UpdateScrollToSection() override;
   void UpdateAttachedTabState() override;
   void UpdateNtpManagedByName() override;
@@ -206,7 +201,6 @@ class CustomizeChromePageHandler
   base::TimeTicks background_images_request_start_time_;
   raw_ptr<TemplateURLService> template_url_service_;
   raw_ptr<ThemeService> theme_service_;
-  const std::vector<ntp::ModuleIdDetail> module_id_details_;
 
   // Caches a request to scroll to a section in case the front-end queries the
   // last requested section, e.g. during load.

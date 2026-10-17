@@ -9,7 +9,6 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/side_panel/history/history_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
@@ -25,8 +24,6 @@
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 #include "chrome/browser/ui/webui/omnibox/logging/logs.mojom.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
@@ -66,7 +63,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/search/ntp_features.h"
 #include "components/signin/public/base/signin_buildflags.h"
-#include "components/user_education/common/user_education_features.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
@@ -85,16 +81,11 @@
 #include "ui/webui/resources/cr_components/history_embeddings/history_embeddings.mojom.h"
 #include "ui/webui/resources/cr_components/most_visited/most_visited.mojom.h"
 #include "ui/webui/resources/cr_components/theme_color_picker/theme_color_picker.mojom.h"
-#include "ui/webui/resources/js/browser_command/browser_command.mojom.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 #endif
-
-#if !defined(OFFICIAL_BUILD)
-#include "chrome/browser/ui/webui/new_tab_page/foo/foo.mojom.h"  // nogncheck crbug.com/40147906
-#endif  // defined(OFFICIAL_BUILD)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
@@ -135,12 +126,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
     content::RenderFrameHost* render_frame_host) {
   RegisterWebUIControllerInterfaceBinder<downloads::mojom::PageHandlerFactory,
                                          DownloadsUI>(map);
-
-  if (user_education::features::GetNtpBrowserPromoType() !=
-      user_education::features::NtpBrowserPromoType::kNone) {
-    RegisterWebUIControllerInterfaceBinder<
-        ntp_promo::mojom::NtpPromoHandlerFactory, NewTabPageUI>(map);
-  }
 
   if (HistorySidePanelCoordinator::IsSupported()) {
     RegisterWebUIControllerInterfaceBinder<history::mojom::PageHandler,
@@ -202,19 +187,16 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   if (HistorySidePanelCoordinator::IsSupported()) {
     RegisterWebUIControllerInterfaceBinder<
         page_image_service::mojom::PageImageServiceHandler, HistoryUI,
-        HistorySidePanelUI, NewTabPageUI, BookmarksSidePanelUI>(map);
+        HistorySidePanelUI, BookmarksSidePanelUI>(map);
   } else {
     RegisterWebUIControllerInterfaceBinder<
         page_image_service::mojom::PageImageServiceHandler, HistoryUI,
-        HistoryClustersSidePanelUI, NewTabPageUI, BookmarksSidePanelUI>(map);
+        HistoryClustersSidePanelUI, BookmarksSidePanelUI>(map);
   }
 
-  RegisterWebUIControllerInterfaceBinder<
-      browser_command::mojom::CommandHandlerFactory, NewTabPageUI>(map);
-
   RegisterWebUIControllerInterfaceBinder<searchbox::mojom::PageHandlerFactory,
-                                         NewTabPageUI, OmniboxPopupUI,
-                                         OmniboxEverywhereUI>(map);
+                                         OmniboxPopupUI, OmniboxEverywhereUI>(
+      map);
 
   RegisterWebUIControllerInterfaceBinder<
       omnibox_everywhere_debug::mojom::PageHandlerFactory, OmniboxEverywhereUI>(
@@ -234,17 +216,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 
   RegisterWebUIControllerInterfaceBinder<
       help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
-      NewTabPageUI, CustomizeChromeUI, HistoryUI, ProfilePickerUI>(map);
-
-#if !defined(OFFICIAL_BUILD)
-  RegisterWebUIControllerInterfaceBinder<foo::mojom::FooHandler, NewTabPageUI>(
-      map);
-#endif  // !defined(OFFICIAL_BUILD)
-
-  if (base::FeatureList::IsEnabled(ntp_features::kNtpTabGroupsModule)) {
-    RegisterWebUIControllerInterfaceBinder<ntp::tab_groups::mojom::PageHandler,
-                                           NewTabPageUI>(map);
-  }
+      CustomizeChromeUI, HistoryUI, ProfilePickerUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::BookmarksPageHandlerFactory, BookmarksSidePanelUI>(

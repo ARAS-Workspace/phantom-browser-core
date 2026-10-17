@@ -84,8 +84,6 @@ missing_new_fields,chrome/browser/k_anonymity_service/k_anonymity_service_client
 missing_new_fields,chrome/browser/k_anonymity_service/k_anonymity_trust_token_getter.cc
 missing_new_fields,chrome/browser/media/webrtc/webrtc_event_log_uploader.cc
 missing_new_fields,chrome/browser/media/webrtc/webrtc_log_uploader.cc
-missing_new_fields,chrome/browser/new_tab_page/modules/photos/photos_service.cc
-missing_new_fields,chrome/browser/new_tab_page/modules/recipes/recipes_service.cc
 missing_new_fields,chrome/browser/plugins/plugin_observer.cc
 missing_new_fields,chrome/browser/predictors/prefetch_manager.cc
 missing_new_fields,chrome/browser/preloading/prefetch/prefetch_proxy/prefetch_proxy_origin_prober.cc

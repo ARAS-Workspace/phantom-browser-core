@@ -137,7 +137,7 @@ const ui::ThemeProvider* GetThemeProviderDeprecated(
   }
 
   // Fallback 1: get the theme provider from the profile's associated browser.
-  // This is used in newly created tabs, e.g. NewTabPageUI, where theming is
+  // This is used in newly created tabs, e.g. the New Tab Page, where theming is
   // required before the WebContents is attached to a browser window.
   // TODO(crbug.com/40823135): Remove this fallback by associating the
   // WebContents during navigation.

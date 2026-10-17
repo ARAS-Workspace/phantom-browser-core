@@ -34,7 +34,6 @@ if (use_blink) {
 
     public_deps = [
       "//ui/base",
-      "//ui/webui/resources/js/browser_command:mojo_bindings",
       "//ui/webui/resources/js/metrics_reporter:mojo_bindings",
     ]
 

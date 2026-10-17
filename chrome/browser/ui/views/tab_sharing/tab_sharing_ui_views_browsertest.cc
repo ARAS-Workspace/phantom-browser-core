@@ -699,7 +699,7 @@ class TabSharingMessageLinksBrowserTest
   const GURL kCapturedTabUrl = chrome::ChromeUINewTabURLAsGURL();
   const GURL kOtherTabUrl = GURL(chrome::kChromeUIAboutURL);
   const std::string kCapturingTabLinkText = "capturer.com";
-  const std::string kCapturedTabLinkText = "chrome://new-tab-page";
+  const std::string kCapturedTabLinkText = "chrome://new-tab-page-third-party";
 };
 
 IN_PROC_BROWSER_TEST_F(TabSharingMessageLinksBrowserTest,

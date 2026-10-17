@@ -33,7 +33,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
+#include "chrome/browser/ui/webui/cr_components/most_visited/most_visited_pref_observer.h"
 #include "chrome/common/pref_names.h"
 #include "components/browsing_data/content/browsing_data_helper.h"
 #include "components/content_settings/core/browser/content_settings_info.h"
@@ -379,7 +379,7 @@ void ProfileResetter::ResetShortcuts() {
 
 void ProfileResetter::ResetNtpCustomizations() {
   NtpCustomBackgroundService::ResetProfilePrefs(profile_);
-  NewTabPageUI::ResetProfilePrefs(profile_->GetPrefs());
+  MostVisitedPrefObserver::ResetProfilePrefs(profile_->GetPrefs());
   MarkAsDone(NTP_CUSTOMIZATIONS);
 }
 

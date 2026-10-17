@@ -548,7 +548,7 @@ class TestPermissionPromptDelegate
 IN_PROC_BROWSER_TEST_F(OmniboxPopupViewWebUITest,
                        PermissionPromptCreationLocksRegularWebUIPresenter) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), GURL(chrome::kChromeUINewTabPageURL)));
+      browser(), GURL(chrome::kChromeUINewTabPageThirdPartyURL)));
 
   CreatePopupForTestQuery();
 

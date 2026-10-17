@@ -30,7 +30,6 @@ source_set("customize_chrome") {
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
     "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/side_panel",
-    "//chrome/browser/ui/webui/new_tab_page",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
     "//ui/views",
   ]

@@ -124,9 +124,7 @@ template("chrome_extra_paks") {
     if (enable_webui_ntp) {
       sources += [
         "$root_gen_dir/chrome/new_tab_page_instant_resources.pak",
-        "$root_gen_dir/chrome/new_tab_page_resources.pak",
         "$root_gen_dir/chrome/new_tab_page_third_party_resources.pak",
-        "$root_gen_dir/chrome/new_tab_page_untrusted_resources.pak",
         "$root_gen_dir/chrome/new_tab_shared_resources.pak",
       ]
     }

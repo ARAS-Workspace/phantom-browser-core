@@ -47,10 +47,6 @@
 #include "printing/buildflags/buildflags.h"
 #include "ui/webui/buildflags.h"
 
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
-
 #if BUILDFLAG(ENABLE_WEBUI_CERTIFICATE_VIEWER)
 #include "chrome/browser/ui/webui/certificate_viewer/certificate_viewer_ui.h"
 #endif
@@ -177,9 +173,6 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<user_actions_ui::UserActionsUIConfig>());
   map.AddWebUIConfig(std::make_unique<VersionUIConfig>());
   map.AddWebUIConfig(std::make_unique<WebRtcLogsUIConfig>());
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-  map.AddWebUIConfig(std::make_unique<NewTabPageUIConfig>());
-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 
 #if BUILDFLAG(ENABLE_WEBUI_CERTIFICATE_VIEWER)
   map.AddWebUIConfig(std::make_unique<CertificateViewerUIConfig>());

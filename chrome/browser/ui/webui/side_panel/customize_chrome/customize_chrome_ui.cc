@@ -10,16 +10,13 @@
 #include "base/rand_util.h"
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search/background/wallpaper_search/wallpaper_search_background_manager.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
 #include "chrome/browser/ui/webui/cr_components/customize_color_scheme_mode/customize_color_scheme_mode_handler.h"
 #include "chrome/browser/ui/webui/cr_components/theme_color_picker/theme_color_picker_handler.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/sanitized_image/sanitized_image_source.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
@@ -76,9 +73,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       image_decoder_(std::make_unique<ImageDecoderImpl>()),
       profile_(Profile::FromWebUI(web_ui)),
       web_contents_(web_ui->GetWebContents()),
-      module_id_details_(
-          ntp::MakeModuleIdDetails(NewTabPageUI::IsManagedProfile(profile_),
-                                   profile_)),
       page_factory_receiver_(this),
       id_(RandInt64()) {
   const bool wallpaper_search_enabled =
@@ -101,7 +95,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       {"title", IDS_SIDE_PANEL_CUSTOMIZE_CHROME_TITLE},
       // Header strings.
       {"appearanceHeader", IDS_NTP_CUSTOMIZE_APPEARANCE_LABEL},
-      {"cardsHeader", IDS_NTP_CUSTOMIZE_MENU_MODULES_LABEL},
       {"categoriesHeader", IDS_NTP_CUSTOMIZE_THEMES_HEADER},
       {"footerHeader", IDS_NTP_CUSTOMIZE_FOOTER_HEADER},
       {"toolsHeader", IDS_NTP_CUSTOMIZE_TOOLS_HEADER},
@@ -155,8 +148,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
        IDS_NTP_CUSTOMIZE_SHOW_PERSONAL_SHORTCUTS_LABEL},
       {"showPersonalShortcutsToggleDescription",
        IDS_NTP_CUSTOMIZE_SHOW_PERSONAL_SHORTCUTS_DESC},
-      // Card strings.
-      {"showCardsToggleTitle", IDS_NTP_CUSTOMIZE_SHOW_CARDS_LABEL},
       // Footer strings.
       {"showFooterToggleTitle", IDS_NTP_CUSTOMIZE_SHOW_FOOTER_LABEL},
       // Required by <managed-dialog>.
@@ -266,11 +257,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       {"newBadgeLabel", IDS_NEW_BADGE},
   };
   source->AddLocalizedStrings(kLocalizedStrings);
-
-  source->AddBoolean(
-      "modulesEnabled",
-      ntp::HasModulesEnabled(module_id_details_,
-                             IdentityManagerFactory::GetForProfile(profile_)));
 
   source->AddBoolean("showDeviceThemeToggle",
                      false);
@@ -420,8 +406,8 @@ void CustomizeChromeUI::CreatePageHandler(
   DCHECK(pending_page.is_valid());
   customize_chrome_page_handler_ = std::make_unique<CustomizeChromePageHandler>(
       std::move(pending_page_handler), std::move(pending_page),
-      NtpCustomBackgroundServiceFactory::GetForProfile(profile_), web_contents_,
-      module_id_details_);
+      NtpCustomBackgroundServiceFactory::GetForProfile(profile_),
+      web_contents_);
   if (section_.has_value()) {
     customize_chrome_page_handler_->ScrollToSection(*section_);
     section_.reset();

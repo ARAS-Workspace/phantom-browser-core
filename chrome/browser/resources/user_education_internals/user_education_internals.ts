@@ -87,13 +87,6 @@ export class UserEducationInternalsElement extends
         value: false,
       },
 
-      ntpPromoPreferencesExpanded_: {
-        type: Boolean,
-        value: false,
-      },
-
-      ntpPromos_: {type: Array},
-      ntpPromoPreferences_: {type: Array},
       sessionData_: {type: Array},
       initialized_: {type: Boolean},
     };
@@ -105,9 +98,6 @@ export class UserEducationInternalsElement extends
   protected accessor featurePromos_: FeaturePromoDemoPageInfo[] = [];
   protected accessor newBadges_: FeaturePromoDemoPageInfo[] = [];
   protected accessor nonIphPromos_: FeaturePromoDemoPageInfo[] = [];
-  protected accessor ntpPromos_: FeaturePromoDemoPageInfo[] = [];
-  protected accessor ntpPromoPreferences_: FeaturePromoDemoPageData[] = [];
-  protected accessor ntpPromoPreferencesExpanded_: boolean = false;
   protected accessor featurePromoErrorMessage_: string = '';
   protected accessor narrow_: boolean = false;
   protected accessor sessionExpanded_: boolean = false;
@@ -175,14 +165,6 @@ export class UserEducationInternalsElement extends
 
     this.handler_.getNonIphPromos().then(({nonIphPromos}) => {
       this.nonIphPromos_ = nonIphPromos;
-    });
-
-    this.handler_.getNtpPromos().then(({ntpPromos}) => {
-      this.ntpPromos_ = ntpPromos;
-    });
-
-    this.handler_.getNtpPromoPreferences().then(({ntpPromoPreferences}) => {
-      this.ntpPromoPreferences_ = ntpPromoPreferences;
     });
   }
 
@@ -337,36 +319,6 @@ export class UserEducationInternalsElement extends
     });
   }
 
-  protected onNtpPromoClearPromoData_(e: CustomEvent<string>) {
-    const id = e.detail;
-    this.featurePromoErrorMessage_ = '';
-    this.handler_.clearNtpPromoData(id).then(({errorMessage}) => {
-      this.featurePromoErrorMessage_ = errorMessage;
-      if (errorMessage !== '') {
-        this.$.errorMessageToast.show();
-      } else {
-        this.handler_.getNtpPromos().then(({ntpPromos}) => {
-          this.ntpPromos_ = ntpPromos;
-          this.requestUpdate();
-        });
-      }
-    });
-  }
-
-  protected onClearNtpPromoPreferencesClick_() {
-    this.handler_.clearNtpPromoPreferences().then(({errorMessage}) => {
-      this.featurePromoErrorMessage_ = errorMessage;
-      if (errorMessage !== '') {
-        this.$.errorMessageToast.show();
-      } else {
-        this.handler_.getNtpPromoPreferences().then(({ntpPromoPreferences}) => {
-          this.ntpPromoPreferences_ = ntpPromoPreferences;
-          this.requestUpdate();
-        });
-      }
-    });
-  }
-
   protected promoFilter_(promo: FeaturePromoDemoPageInfo) {
     return this.filter === '' ||
         promo.displayTitle.toLowerCase().includes(this.filter) ||
@@ -402,11 +354,6 @@ export class UserEducationInternalsElement extends
 
   protected onSessionExpandedChanged_(e: CustomEvent<{value: boolean}>) {
     this.sessionExpanded_ = e.detail.value;
-  }
-
-  protected onNtpPromoPreferencesExpandedChanged_(
-      e: CustomEvent<{value: boolean}>) {
-    this.ntpPromoPreferencesExpanded_ = e.detail.value;
   }
 }
 

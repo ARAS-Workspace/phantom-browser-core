@@ -37,7 +37,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHDesktopCustomizeChromeAutoOpenFeature,
     &kIPHDesktopCustomizeChromeExperimentFeature,
     &kIPHDesktopPwaInstallFeature,
-    &kIPHDesktopRealboxContextualSearchFeature,
     &kIPHDesktopSharedHighlightingFeature,
     &kIPHDiscardRingFeature,
     &kIPHExplicitBrowserSigninPreferenceRememberedFeature,

@@ -7,8 +7,6 @@
 
 #include <memory>
 #include <ostream>
-#include <string>
-#include <vector>
 
 #include "base/auto_reset.h"
 #include "base/feature_list.h"
@@ -90,48 +88,6 @@ extern base::TimeDelta GetIdleTimeBeforeHeavyweightPromo();
 
 // Returns the polling interval for the promo controller for User Education 2.5.
 extern base::TimeDelta GetPromoControllerPollingInterval();
-
-// Advertises browser features in New Tab Page promos.
-BASE_DECLARE_FEATURE(kEnableNtpBrowserPromos);
-
-// Describes the type of NTP promo that can be shown, if any.
-enum class NtpBrowserPromoType {
-  // Indicates that the flag is disabled.
-  kNone,
-  // Indicates that a simple (single-promo) option is selected.
-  kSimple,
-};
-
-// The parameter that specifies which promo option to use.
-BASE_DECLARE_FEATURE_PARAM(NtpBrowserPromoType, kNtpBrowserPromoType);
-
-// Returns the current NTP promo type, or kNone if it is not enabled.
-extern NtpBrowserPromoType GetNtpBrowserPromoType();
-
-// A list of promo IDs to suppress.
-BASE_DECLARE_FEATURE_PARAM(std::string, kNtpBrowserPromoSuppressList);
-
-// The number of sessions a promo may stay in the top spot before being
-// rotated out.
-BASE_DECLARE_FEATURE_PARAM(int, kNtpBrowserPromoMaxSessionsPerTerm);
-
-// How long a promo is hidden after being clicked.
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
-                           kNtpBrowserPromoClickedHideDuration);
-
-// How long all promos are hidden after being snoozed.
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
-                           kNtpBrowserPromosSnoozedHideDuration);
-
-// Accessors for `kEnableNtpBrowserPromos` parameters.
-extern std::vector<std::string> GetNtpBrowserPromoSuppressList();
-extern int GetNtpBrowserPromoMaxSessionsPerTerm();
-extern int GetNtpBrowserPromoMaxTerms();
-extern base::TimeDelta GetNtpBrowserPromoClickedHideDuration();
-extern base::TimeDelta GetNtpBrowserPromosSnoozedHideDuration();
-
-extern std::ostream& operator<<(std::ostream& os,
-                                NtpBrowserPromoType promo_type);
 
 BASE_DECLARE_FEATURE(kLazilySetCustomActionCaption);
 

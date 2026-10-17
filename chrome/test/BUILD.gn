@@ -1194,8 +1194,6 @@ test("browser_tests") {
     "//chrome/browser/ui/webui/extensions_zero_state_promo:browser_tests",
     "//chrome/browser/ui/webui/image:browser_tests",
     "//chrome/browser/ui/webui/new_tab_footer:browser_tests",
-    "//chrome/browser/ui/webui/new_tab_page",
-    "//chrome/browser/ui/webui/new_tab_page:impl",
     "//chrome/browser/ui/webui/new_tab_page_third_party:browser_tests",
     "//chrome/browser/ui/webui/ntp:browser_tests",
     "//chrome/browser/ui/webui/searchbox",
@@ -3551,7 +3549,6 @@ test("unit_tests") {
     "//chrome/browser/image_fetcher",
     "//chrome/browser/importer:unit_tests",
     "//chrome/browser/media/webrtc:test_support",
-    "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
     "//chrome/browser/notebooks:unit_tests",
     "//chrome/browser/omnibox:unit_tests",
     "//chrome/browser/page_content_annotations",
@@ -3610,7 +3607,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui/cr_components/theme_color_picker:unit_tests",
     "//chrome/browser/ui/webui/discards:unit_tests",
     "//chrome/browser/ui/webui/downloads:unit_tests",
-    "//chrome/browser/ui/webui/new_tab_page:mojo_bindings",
     "//chrome/browser/ui/webui/omnibox_popup:unit_tests",
     "//chrome/browser/ui/webui/omnibox_popup/mojom",
     "//chrome/browser/ui/webui/searchbox",
@@ -3677,7 +3673,6 @@ test("unit_tests") {
     "//ui/native_theme:test_support",
     "//ui/web_dialogs:web_dialogs_unittests",
     "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
-    "//ui/webui/resources/js/browser_command:mojo_bindings",
     "//ui/webui/tracked_element:unit_tests",
   ]
 

@@ -50,15 +50,6 @@ export function getHtml(this: AppElement) {
       </sp-heading>
       <customize-chrome-shortcuts></customize-chrome-shortcuts>
     </div>`: ''}
-    ${(this.modulesEnabled_ && this.isSourceTabFirstPartyNtp_()) ? html`
-      <hr class="sp-cards-separator">
-      <div id="modules" class="section sp-card">
-        <sp-heading hide-back-button>
-          <h2 slot="heading">$i18n{cardsHeader}</h2>
-        </sp-heading>
-        <customize-chrome-cards></customize-chrome-cards>
-      </div>
-    ` : ''}
     ${this.extensionsCardEnabled_ ? html`
       <hr class="sp-cards-separator">
       <div id="extensions" class="section sp-card">

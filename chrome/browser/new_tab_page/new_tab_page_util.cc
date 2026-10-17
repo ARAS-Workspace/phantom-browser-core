@@ -4,48 +4,21 @@
 
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
 
-#include "base/hash/hash.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/common/pref_names.h"
 #include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
-#include "components/optimization_guide/core/optimization_guide_logger.h"
-#include "components/page_content_annotations/core/page_content_annotations_features.h"
 #include "components/prefs/pref_service.h"
-#include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
-#include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/variations/service/variations_service.h"
 
 namespace {
 
-constexpr char kModulesAutoRemovalReasonManagedPreference[] =
-    "NewTabPage.Modules.AutoRemovalSkipped.ManagedPreference";
-constexpr char kModulesAutoRemovalReasonDisabledAllModules[] =
-    "NewTabPage.Modules.AutoRemovalSkipped.DisabledAllModules";
-constexpr char kModulesAutoRemovalReasonDisabled[] =
-    "NewTabPage.Modules.AutoRemovalSkipped.Disabled";
-constexpr char kModulesAutoRemovalReasonStaleDaysCount[] =
-    "NewTabPage.Modules.AutoRemovalSkipped.StaleDaysCount";
-
 constexpr char kShortcutsAutoRemovalReasonHistogram[] =
     "NewTabPage.MostVisited.AutoRemovalSkipped";
-
-bool IsOsSupportedForCart() {
-#if BUILDFLAG(IS_MAC)
-  return true;
-#else
-  return false;
-#endif
-}
 
 bool IsInUS() {
   return g_browser_process->GetApplicationLocale() == "en-US" &&
@@ -55,45 +28,11 @@ bool IsInUS() {
 
 }  // namespace
 
-// If feature is overridden manually or by finch, read the feature flag value.
-// Otherwise filter by os, locale and country code.
-bool IsCartModuleEnabled() {
-  if (base::FeatureList::GetInstance()->IsFeatureOverridden(
-          ntp_features::kNtpChromeCartModule.name)) {
-    return base::FeatureList::IsEnabled(ntp_features::kNtpChromeCartModule);
-  }
-  return IsOsSupportedForCart() && IsInUS();
-}
-
 bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature) {
   if (base::FeatureList::GetInstance()->IsFeatureOverridden(ntp_feature.name)) {
     return base::FeatureList::IsEnabled(ntp_feature);
   }
   return IsInUS();
-}
-
-bool IsMostRelevantTabResumeModuleEnabled(Profile* profile) {
-  if (!IsProfileSignedIn(profile)) {
-    LogModuleEnablement(ntp_features::kNtpMostRelevantTabResumptionModule,
-                        false, "not signed in");
-    return false;
-  }
-
-  return g_browser_process &&
-         page_content_annotations::features::
-             ShouldExecutePageVisibilityModelOnPageContent(
-                 g_browser_process->GetApplicationLocale()) &&
-         base::FeatureList::IsEnabled(
-             ntp_features::kNtpMostRelevantTabResumptionModule);
-}
-
-bool IsProfileSignedIn(Profile* profile) {
-  auto* identity_manager = IdentityManagerFactory::GetForProfile(profile);
-  return !base::FeatureList::IsEnabled(
-             ntp_features::kNtpModuleSignInRequirement) ||
-         (identity_manager && identity_manager->GetAccountsInCookieJar()
-                                      .GetPotentiallyInvalidSignedInAccounts()
-                                      .size() > 0);
 }
 
 std::string GetVariationsServiceCountryCode(
@@ -105,15 +44,6 @@ std::string GetVariationsServiceCountryCode(
   country_code = variations_service->GetStoredPermanentCountry();
   return country_code.empty() ? variations_service->GetLatestCountry()
                               : country_code;
-}
-
-void LogModuleEnablement(const base::Feature& feature,
-                         bool enabled,
-                         const std::string& reason) {
-  OPTIMIZATION_GUIDE_LOGGER(
-      optimization_guide_common::mojom::LogSource::NTP_MODULE,
-      OptimizationGuideLogger::GetInstance())
-      << feature.name << (enabled ? " enabled: " : " disabled: ") << reason;
 }
 
 bool IsTopSitesEnabled(Profile* profile) {
@@ -206,83 +136,9 @@ void UpdateShortcutsStaleness(Profile* profile) {
   RecordShortcutsAutoRemovalMetrics(profile, staleness_count);
 }
 
-void UpdateModulesStaleness(Profile* profile,
-                            const std::vector<std::string>& module_ids) {
-  // (1) If it's the first update, do not update the staleness counters.
-  base::Time module_load_time = base::Time::Now();
-  base::Time prev_update_time =
-      profile->GetPrefs()->GetTime(ntp_prefs::kNtpLastModuleStalenessUpdate);
-  if (prev_update_time.is_null()) {
-    profile->GetPrefs()->SetTime(ntp_prefs::kNtpLastModuleStalenessUpdate,
-                                 module_load_time);
-    return;
-  }
-
-  // (2) Do not update the staleness if time delta is below the threshold.
-  const base::TimeDelta time_since_last_update =
-      module_load_time - prev_update_time;
-  const base::TimeDelta staleness_threshold =
-      ntp_features::kModuleMinStalenessUpdateTimeInterval.Get();
-  if (time_since_last_update <= staleness_threshold) {
-    return;
-  }
-
-  // (3) Do not update staleness if feature is disabled for all modules,
-  // and log the reason for why the auto-removal was skipped for all modules.
-  const base::DictValue& auto_removal_disabled_dict =
-      profile->GetPrefs()->GetDict(
-          ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  const bool is_disabled_for_all_modules =
-      auto_removal_disabled_dict.FindBool(ntp_modules::kAllModulesId)
-          .value_or(false);
-  if (is_disabled_for_all_modules) {
-    for (const std::string& module_id : module_ids) {
-      RecordModuleAutoRemovalMetrics(profile, auto_removal_disabled_dict,
-                                     module_id, /*prev_count=*/0);
-    }
-    return;
-  }
-
-  // The staleness update time is updated as long as both conditions
-  // (2) and (3) are met.
-  profile->GetPrefs()->SetTime(ntp_prefs::kNtpLastModuleStalenessUpdate,
-                               module_load_time);
-
-  // (4) Do not update staleness if feature is disabled for the module.
-  const base::DictValue& staleness_counts_dict =
-      profile->GetPrefs()->GetDict(ntp_prefs::kNtpModuleStalenessCountDict);
-  ScopedDictPrefUpdate update(profile->GetPrefs(),
-                              ntp_prefs::kNtpModuleStalenessCountDict);
-  for (const std::string& module_id : module_ids) {
-    const bool is_disabled_for_module =
-        auto_removal_disabled_dict.FindBool(module_id).value_or(false);
-    const int prev_count = staleness_counts_dict.FindInt(module_id).value_or(0);
-    if (!is_disabled_for_module) {
-      update->Set(module_id, prev_count + 1);
-    }
-    RecordModuleAutoRemovalMetrics(profile, auto_removal_disabled_dict,
-                                   module_id, prev_count);
-  }
-}
-
 void DisableShortcutsAutoRemoval(Profile* profile) {
   profile->GetPrefs()->SetBoolean(ntp_prefs::kNtpShortcutsAutoRemovalDisabled,
                                   true);
-}
-
-void DisableModuleAutoRemoval(Profile* profile, const std::string& module_id) {
-  ScopedDictPrefUpdate update(profile->GetPrefs(),
-                              ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  update->Set(module_id, true);
-}
-
-void DisableModuleListAutoRemoval(Profile* profile,
-                                  const std::vector<std::string>& module_ids) {
-  ScopedDictPrefUpdate update(profile->GetPrefs(),
-                              ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-  for (const auto& module_id : module_ids) {
-    update->Set(module_id, true);
-  }
 }
 
 void RecordShortcutsAutoRemovalMetrics(Profile* profile, int prev_count) {
@@ -321,56 +177,5 @@ void RecordShortcutsAutoRemovalMetrics(Profile* profile, int prev_count) {
         kShortcutsAutoRemovalReasonHistogram,
         NtpShortcutsAutoRemovalReason::kStaleDaysCount);
     return;
-  }
-}
-
-void RecordModuleAutoRemovalMetrics(
-    Profile* profile,
-    const base::DictValue& auto_removal_disabled_dict,
-    const std::string& module_id,
-    const int prev_count) {
-  // Auto-removal skipped due to managed preference.
-  if (profile->GetPrefs()->IsManagedPreference(prefs::kNtpModulesVisible)) {
-    base::UmaHistogramSparse(kModulesAutoRemovalReasonManagedPreference,
-                             base::PersistentHash(module_id));
-    return;
-  }
-
-  // Auto-removal skipped due to it being disabled for all modules.
-  const bool is_disabled_for_all_modules =
-      auto_removal_disabled_dict.FindBool(ntp_modules::kAllModulesId)
-          .value_or(false);
-  if (is_disabled_for_all_modules) {
-    base::UmaHistogramSparse(kModulesAutoRemovalReasonDisabledAllModules,
-                             base::PersistentHash(module_id));
-    return;
-  }
-
-  // Auto-removal skipped due to it being disabled for the module.
-  const bool is_disabled_for_module =
-      auto_removal_disabled_dict.FindBool(module_id).value_or(false);
-  if (is_disabled_for_module) {
-    base::UmaHistogramSparse(kModulesAutoRemovalReasonDisabled,
-                             base::PersistentHash(module_id));
-    return;
-  }
-
-  // Log the new staleness count for this module. We're only logging it here
-  // because the auto-removal will be skipped anyway due to conditions above.
-  // If for whatever reason the logged count is above the threshold, we'll
-  // need to investigate why the auto-removal was not performed.
-  // NOTE: An exclusive max of 101 days was picked as the max staleness
-  // threshold; if the auto-removal threshold is changed to above that, then
-  // the logging should be changed to using COUNT instead.
-  // See: UmaHistogramExactLinear documentation for more details.
-  base::UmaHistogramExactLinear(
-      "NewTabPage.Modules.AutoRemovalStaleDays." + module_id, prev_count, 101);
-
-  // Auto-removal skipped due to the staleness threshold.
-  const int staleness_threshold =
-      ntp_features::kStaleModulesCountThreshold.Get();
-  if (prev_count < staleness_threshold) {
-    base::UmaHistogramSparse(kModulesAutoRemovalReasonStaleDaysCount,
-                             base::PersistentHash(module_id));
   }
 }

@@ -154,43 +154,6 @@ IN_PROC_BROWSER_TEST_F(ContentSettingBubbleModelMediaStreamTest,
 }
 
 // Tests that media bubble content matches the expect layout when the
-// mic is not blocked on NTP
-IN_PROC_BROWSER_TEST_F(ContentSettingBubbleModelMediaStreamTest,
-                       BubbleContentForNonBlockedMic) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(web_contents);
-
-  content::RenderFrameHost* main_rfh =
-      ui_test_utils::NavigateToURLBlockUntilNavigationsComplete(
-          browser(), chrome::ChromeUINewTabURLAsGURL(), 1);
-  content::WebContents::FromRenderFrameHost(main_rfh)->Focus();
-
-  ASSERT_TRUE(main_rfh);
-  EXPECT_EQ(chrome::ChromeUINewTabURLAsGURL(),
-            web_contents->GetLastCommittedURL());
-  EXPECT_EQ(chrome::ChromeUINewTabPageURLAsGURL(),
-            main_rfh->GetLastCommittedOrigin().GetURL());
-
-  // Create a bubble with the given camera and microphone access state.
-  PageSpecificContentSettings::GetForFrame(web_contents->GetPrimaryMainFrame())
-      ->OnMediaStreamPermissionSet(
-          permissions::PermissionUtil::GetCanonicalOrigin(
-              ContentSettingsType::MEDIASTREAM_MIC,
-              web_contents->GetPrimaryMainFrame()
-                  ->GetLastCommittedOrigin()
-                  .GetURL(),
-              web_contents->GetLastCommittedURL()),
-          {PageSpecificContentSettings::kMicrophoneAccessed});
-  std::unique_ptr<ContentSettingBubbleModel> mic_bubble =
-      std::make_unique<ContentSettingMediaStreamBubbleModel>(
-          browser()->GetFeatures().content_setting_bubble_model_delegate(),
-          web_contents->GetPrimaryPage());
-
-  EXPECT_TRUE(mic_bubble->bubble_content().is_user_modifiable);
-}
-
-// Tests that media bubble content matches the expect layout when the
 // microphone is blocked by a custodian.
 IN_PROC_BROWSER_TEST_F(ContentSettingBubbleModelMediaStreamTest,
                        BubbleContentForSupervisedBlockedMic) {

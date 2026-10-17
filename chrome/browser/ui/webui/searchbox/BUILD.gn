@@ -69,8 +69,6 @@ source_set("searchbox") {
   ]
   public_deps += [ "//chrome/browser/ui/webui/top_chrome" ]
   deps += [
-    "//chrome/browser/resources/new_tab_page:resources",
-    "//chrome/browser/resources/new_tab_page:resources_grit",
     "//chrome/browser/ui/bookmarks",
     "//chrome/browser/ui/search",
     "//chrome/browser/ui/tabs:tab_strip",

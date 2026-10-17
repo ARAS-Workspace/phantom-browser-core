@@ -82,7 +82,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIDownloadsHost,
       kChromeUIHelpHost,
       kChromeUIInspectHost,
-      kChromeUINewTabPageHost,
       kChromeUINewTabPageThirdPartyHost,
       kChromeUISettingsHost,
       kChromeUISystemInfoHost,

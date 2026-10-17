@@ -10,7 +10,6 @@ import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import 'chrome://resources/cr_elements/cr_page_selector/cr_page_selector.js';
 import 'chrome://resources/cr_elements/icons.html.js';
 import './appearance.js';
-import './cards.js';
 import './categories.js';
 import './customize_toolbar/toolbar.js';
 import './footer.js';
@@ -81,7 +80,6 @@ export class AppElement extends AppElementBase {
   static override get properties() {
     return {
       page_: {type: String},
-      modulesEnabled_: {type: Boolean},
       selectedCollection_: {type: Object},
       extensionPolicyEnabled_: {type: Boolean},
       extensionsCardEnabled_: {type: Boolean},
@@ -97,8 +95,6 @@ export class AppElement extends AppElementBase {
   }
 
   protected accessor page_: CustomizeChromePage = CustomizeChromePage.OVERVIEW;
-  protected accessor modulesEnabled_: boolean =
-      loadTimeData.getBoolean('modulesEnabled');
   protected accessor selectedCollection_: BackgroundCollection|null = null;
   protected accessor extensionsCardEnabled_: boolean =
       loadTimeData.getBoolean('extensionsCardEnabled');

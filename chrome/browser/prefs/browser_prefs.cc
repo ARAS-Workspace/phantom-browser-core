@@ -190,10 +190,7 @@
 #include "ui/webui/buildflags.h"
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
-#include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h"
 #include "chrome/browser/ui/webui/cr_components/most_visited/most_visited_pref_observer.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_handler.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 
@@ -226,7 +223,6 @@
 #endif  // BUILDFLAG(ENABLE_PDF)
 
 #include "chrome/browser/intranet_redirect_detector.h"
-#include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups_page_handler.h"
 #include "chrome/browser/screen_ai/pref_names.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/task_manager/task_manager_interface.h"
@@ -1250,10 +1246,15 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   UnifiedAutoplayConfig::RegisterProfilePrefs(registry);
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   NewTabFooterUI::RegisterProfilePrefs(registry);
-  NewTabPageHandler::RegisterProfilePrefs(registry);
-  NewTabPageUI::RegisterProfilePrefs(registry);
   MostVisitedPrefObserver::RegisterProfilePrefs(registry);
-  MostRelevantTabResumptionPageHandler::RegisterProfilePrefs(registry);
+  registry->RegisterBooleanPref(prefs::kNtpToolChipsVisible, true);
+  registry->RegisterIntegerPref(prefs::kNtpCustomizeChromeButtonOpenCount, 0);
+  registry->RegisterIntegerPref(prefs::kNtpWallpaperSearchButtonShownCount, 0);
+  registry->RegisterIntegerPref(
+      prefs::kNtpCustomizeChromeSidePanelAutoOpeningsCount, 0);
+  registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeExplicitlyClosed,
+                                false);
+  registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeIPHAutoOpened, false);
 #else
   // Registered here because it is still accessed on Android (which doesn't use
   // WebUI NTP).
@@ -1289,7 +1290,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   send_tab_to_self::RegisterProfilePrefs(registry);
   signin::RegisterProfilePrefs(registry);
   StartupBrowserCreator::RegisterProfilePrefs(registry);
-  TabGroupsPageHandler::RegisterProfilePrefs(registry);
   tab_groups::saved_tab_groups::prefs::RegisterProfilePrefs(registry);
   tab_search_prefs::RegisterProfilePrefs(registry);
   ThemeColorPickerHandler::RegisterProfilePrefs(registry);
@@ -1316,12 +1316,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   RegisterBrowserViewProfilePrefs(registry);
 #endif
 
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-  registry->RegisterBooleanPref(prefs::kLensDesktopNTPSearchEnabled, true);
-#endif
-
   registry->RegisterBooleanPref(prefs::kDisableScreenshots, false);
-  registry->RegisterDictionaryPref(prefs::kContextMenuAnimationState);
   registry->RegisterListPref(
       webauthn::pref_names::kRemoteDesktopAllowedOrigins);
 

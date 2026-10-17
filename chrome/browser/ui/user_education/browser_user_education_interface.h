@@ -21,8 +21,6 @@ class BookmarkBubbleViewPromoHelper;
 class BrowserFeaturePromoController;
 class BrowserView;
 class BrowserWindowInterface;
-class NewTabPageUI;
-class NtpPromoHandler;
 class SidePanelHeaderController;
 
 namespace content {
@@ -58,8 +56,7 @@ class BrowserUserEducationInterface {
   // `UserEducationContext`.
   template <typename T>
     requires std::same_as<T, BrowserFeaturePromoController> ||
-             std::same_as<T, UserEducationInternalsPageHandlerImpl> ||
-             std::same_as<T, NtpPromoHandler> || std::same_as<T, NewTabPageUI>
+             std::same_as<T, UserEducationInternalsPageHandlerImpl>
 
   const user_education::UserEducationContextPtr& GetUserEducationContext(
       base::PassKey<T>) const {

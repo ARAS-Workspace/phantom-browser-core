@@ -60,12 +60,6 @@ source_set("common") {
     "new_badge/new_badge_policy.h",
     "new_badge/new_badge_specification.cc",
     "new_badge/new_badge_specification.h",
-    "ntp_promo/ntp_promo_controller.cc",
-    "ntp_promo/ntp_promo_controller.h",
-    "ntp_promo/ntp_promo_registry.cc",
-    "ntp_promo/ntp_promo_registry.h",
-    "ntp_promo/ntp_promo_specification.cc",
-    "ntp_promo/ntp_promo_specification.h",
     "tutorial/tutorial.cc",
     "tutorial/tutorial.h",
     "tutorial/tutorial_description.cc",
@@ -84,7 +78,6 @@ source_set("common") {
 
   public_deps = [
     ":features",
-    ":ntp_promo_identifier",
     ":session",
     ":storage",
     "//ui/base/interaction",
@@ -114,10 +107,6 @@ source_set("features") {
   deps = [ "//base" ]
 }
 
-source_set("ntp_promo_identifier") {
-  sources = [ "ntp_promo/ntp_promo_identifier.h" ]
-}
-
 source_set("session") {
   sources = [
     "session/user_education_idle_observer.cc",
@@ -142,8 +131,6 @@ source_set("storage") {
     "user_education_storage_service.cc",
     "user_education_storage_service.h",
   ]
-
-  public_deps = [ ":ntp_promo_identifier" ]
 
   deps = [ "//base" ]
 }

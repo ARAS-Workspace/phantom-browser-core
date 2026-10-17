@@ -235,16 +235,12 @@ TEST_F(NewTabFooterHandlerExtensionTest, AttachedTabStateUpdated) {
 
   new_tab_footer::mojom::NewTabPageType ntp_type;
   EXPECT_CALL(document_, AttachedTabStateUpdated)
-      .Times(3)
+      .Times(2)
       .WillRepeatedly(SaveArg<0>(&ntp_type));
 
   handler().AttachedTabStateUpdated(GURL(extension->url()));
   document_.FlushForTesting();
   EXPECT_EQ(ntp_type, new_tab_footer::mojom::NewTabPageType::kExtension);
-
-  handler().AttachedTabStateUpdated(chrome::ChromeUINewTabPageURLAsGURL());
-  document_.FlushForTesting();
-  EXPECT_EQ(ntp_type, new_tab_footer::mojom::NewTabPageType::kFirstPartyWebUI);
 
   handler().AttachedTabStateUpdated(
       GURL(chrome::kChromeUINewTabPageThirdPartyHost));

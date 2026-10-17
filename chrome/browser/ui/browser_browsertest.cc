@@ -1814,7 +1814,8 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, FullscreenBookmarkBar) {
 // See chrome/browser/ui/views/fullscreen_mac_browsertest.cc
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(BrowserTest, BrowserFullscreenShowBookmarkBarSplitView) {
-  chrome::AddTabAt(browser(), GURL("chrome://new-tab-page"), -1, true);
+  chrome::AddTabAt(browser(), GURL("chrome://new-tab-page-third-party"), -1,
+                   true);
   chrome::AddTabAt(browser(), GURL(), -1, true);
 
   browser()->tab_strip_model()->ActivateTabAt(0);
@@ -1838,7 +1839,8 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, BrowserFullscreenShowBookmarkBarSplitView) {
 }
 
 IN_PROC_BROWSER_TEST_F(BrowserTest, TabFullscreenHiddenBookmarkBarSplitView) {
-  chrome::AddTabAt(browser(), GURL("chrome://new-tab-page"), -1, true);
+  chrome::AddTabAt(browser(), GURL("chrome://new-tab-page-third-party"), -1,
+                   true);
   chrome::AddTabAt(browser(), GURL(), -1, true);
 
   browser()->tab_strip_model()->ActivateTabAt(0);

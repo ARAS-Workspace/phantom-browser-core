@@ -892,7 +892,6 @@ source_set("core") {
     "//chrome/browser/ui/webui:chrome_content_browser_client_webui_part",
     "//chrome/browser/ui/webui/history",
     "//chrome/browser/ui/webui/image",
-    "//chrome/browser/ui/webui/new_tab_page",
     "//chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble:mojo_bindings",
     "//chrome/browser/ui/webui/user_education_internals",
     "//chrome/browser/ui/webui/webnn_internals",
@@ -1838,8 +1837,6 @@ source_set("browser") {
   deps += [
     "//chrome/browser/dictation",
     "//chrome/browser/dictation:impl",
-    "//chrome/browser/ui/webui/new_tab_page",
-    "//chrome/browser/ui/webui/new_tab_page:impl",
     "//chrome/browser/ui/webui/new_tab_page_third_party",
     "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
     "//chrome/browser/ui/webui/ntp",
@@ -2421,8 +2418,6 @@ group("browser_generated_files") {
     "//components/webui/chrome_urls/mojom:mojo_bindings",
   ]
   public_deps += [
-    "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
-    "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
     "//chrome/browser/share/proto",
     "//chrome/browser/ui:webui_name_variants",
     "//chrome/browser/ui/webui/customize_buttons:mojo_bindings",
@@ -2431,7 +2426,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/infobar_internals:mojo_bindings",
     "//chrome/browser/ui/webui/multistep_filter_internals:mojo_bindings",
     "//chrome/browser/ui/webui/new_tab_footer:mojo_bindings",
-    "//chrome/browser/ui/webui/new_tab_page:mojo_bindings",
     "//chrome/browser/ui/webui/new_tab_page_third_party:mojo_bindings",
     "//chrome/browser/ui/webui/omnibox_popup/mojom",
     "//chrome/browser/ui/webui/on_device_internals:mojom",
@@ -2446,10 +2440,6 @@ group("browser_generated_files") {
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_strip:mojom",
   ]
-  if (!is_official_build) {
-    public_deps +=
-        [ "//chrome/browser/ui/webui/new_tab_page/foo:mojo_bindings" ]
-  }
   public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
 
   if (is_mac || is_linux) {

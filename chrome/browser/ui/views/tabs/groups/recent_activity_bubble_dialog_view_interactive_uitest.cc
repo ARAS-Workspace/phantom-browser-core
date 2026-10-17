@@ -155,7 +155,7 @@ class RecentActivityBubbleDialogViewInteractiveUiTest
 
   tabs::TabInterface* CreateTab() {
     auto index = browser()->tab_strip_model()->count();
-    CHECK(AddTabAtIndex(index, GURL(chrome::kChromeUINewTabPageURL),
+    CHECK(AddTabAtIndex(index, GURL(chrome::kChromeUINewTabPageThirdPartyURL),
                         ui::PAGE_TRANSITION_TYPED));
     auto* tab = browser()->tab_strip_model()->GetTabAtIndex(index);
     CHECK(tab);

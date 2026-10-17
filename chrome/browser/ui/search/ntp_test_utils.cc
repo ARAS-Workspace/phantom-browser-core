@@ -35,8 +35,8 @@ void SetUserSelectedDefaultSearchProvider(Profile* profile,
 }
 
 GURL GetFinalNtpUrl(Profile* profile) {
-  // chrome://newtab/ maps to a local WebUI NTP (chrome://new-tab-page/ or
-  // chrome://new-tab-page-third-party/), which loads without network. The URL
+  // chrome://newtab/ maps to the local WebUI NTP
+  // (chrome://new-tab-page-third-party/), which loads without network. The URL
   // associated with the WebContents stays chrome://newtab/.
   return chrome::ChromeUINewTabURLAsGURL();
 }

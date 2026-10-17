@@ -65,7 +65,6 @@
 #include "chrome/browser/ui/webui/bookmarks/bookmarks_ui.h"
 #include "chrome/browser/ui/webui/downloads/downloads_ui.h"
 #include "chrome/browser/ui/webui/history/history_ui.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/settings/settings_utils.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/model/web_app_icon_types.h"
@@ -364,12 +363,14 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
 
   if (page_url.host() == chrome::kChromeUINewTabPageHost ||
       page_url.host() == chrome::kChromeUINewTabHost) {
-    return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
+    return ui::ResourceBundle::GetSharedInstance()
+        .LoadDataResourceBytesForScale(IDR_NTP_FAVICON, scale_factor);
   }
 
   // Tab Search hosts the split tab NTP and so leveraging the NTP favicon.
   if (page_url.host() == chrome::kChromeUITabSearchHost) {
-    return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
+    return ui::ResourceBundle::GetSharedInstance()
+        .LoadDataResourceBytesForScale(IDR_NTP_FAVICON, scale_factor);
   }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)

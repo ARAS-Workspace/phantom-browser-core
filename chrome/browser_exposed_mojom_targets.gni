@@ -18,7 +18,6 @@ browser_exposed_mojom_targets = [
   "//cc/mojom:mojom_browser_controls",
   "//cc/mojom:mojom_layer_trees",
   "//chrome/browser/media:mojo_bindings",
-  "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
   "//chrome/browser/resource_coordinator:mojo_bindings",
   "//chrome/browser/resources/certificate_manager:mojom",
   "//chrome/browser/ui/webui/chrome_finds_internals:mojo_bindings",
@@ -271,7 +270,6 @@ browser_exposed_mojom_targets = [
   "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
   "//ui/webui/resources/cr_components/most_visited:mojom",
   "//ui/webui/resources/cr_components/theme_color_picker:mojom",
-  "//ui/webui/resources/js/browser_command:mojo_bindings",
   "//ui/webui/resources/js/metrics_reporter:mojo_bindings",
   "//ui/webui/resources/js/tracked_element:mojo_bindings",
   "//url/mojom:url_mojom_gurl",
@@ -286,10 +284,6 @@ browser_exposed_mojom_targets +=
     [ "//ui/webui/resources/cr_components/signin:mojo_bindings" ]
 
 if (enable_webui_ntp) {
-  browser_exposed_mojom_targets += [
-    "//chrome/browser/ui/webui/new_tab_page_third_party:mojo_bindings",
-    "//chrome/browser/ui/webui/new_tab_page:mojo_bindings",
-    "//chrome/browser/ui/webui/new_tab_page/ntp_promo:mojo_bindings",
-    "//chrome/browser/ui/webui/new_tab_page/foo:mojo_bindings",
-  ]
+  browser_exposed_mojom_targets +=
+      [ "//chrome/browser/ui/webui/new_tab_page_third_party:mojo_bindings" ]
 }

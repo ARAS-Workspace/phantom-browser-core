@@ -580,7 +580,7 @@ IN_PROC_BROWSER_TEST_F(TabDiscardExceptionsSettingsInteractiveTest,
       // Verify that the entry hides since the tab has navigated to a chrome
       // page
       NavigateWebContents(kSecondTabContent,
-                          GURL(chrome::kChromeUINewTabPageURL)),
+                          GURL(chrome::kChromeUINewTabPageThirdPartyURL)),
       WaitForElementToHide(kPerformanceSettingsPage, kExceptionDialogEntry));
 }
 

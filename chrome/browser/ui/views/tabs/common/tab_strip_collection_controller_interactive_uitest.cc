@@ -458,7 +458,8 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
       // that the tab is added in the background and the resulting focus change
       // does not cause the context menu to close.
       Do([this]() {
-        chrome::AddTabAt(browser(), chrome::ChromeUINewTabPageURLAsGURL(), 1,
+        chrome::AddTabAt(browser(),
+                         GURL(chrome::kChromeUINewTabPageThirdPartyURL), 1,
                          /*foreground=*/false);
       }),
       // Select the duplicate tab menu item.

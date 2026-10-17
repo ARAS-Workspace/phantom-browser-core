@@ -63,7 +63,6 @@
 #include "chrome/browser/ui/views/user_education/impl/browser_user_education_context.h"
 #include "chrome/browser/ui/views/web_apps/web_app_install_dialog_delegate.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons_handler.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/settings/settings_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/user_education/tutorial_identifiers.h"
@@ -625,7 +624,7 @@ void MaybeRegisterChromeFeaturePromos(
                   if (web_contents &&
                       web_contents->GetURL() != chrome::GetNewTabURL(browser)) {
                     NavigateParams params(browser->GetProfile(),
-                                          chrome::ChromeUINewTabPageURLAsGURL(),
+                                          chrome::ChromeUINewTabURLAsGURL(),
                                           ui::PAGE_TRANSITION_LINK);
                     params.disposition =
                         WindowOpenDisposition::NEW_FOREGROUND_TAB;
@@ -664,20 +663,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(143, "kbajkiewicz@google.com",
                        "Attempts to trigger when user is on NTP to promote "
                        "customization.")));
-
-  // kIPHDesktopRealboxContextualSearchFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHDesktopRealboxContextualSearchFeature,
-          NewTabPageUI::kRealboxContextualEntrypointElementId,
-          IDS_IPH_REALBOX_CONTEXTUAL_ENTRYPOINT,
-          IDS_IPH_REALBOX_CONTEXTUAL_ENTRYPOINT_SCREENREADER,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetBubbleArrow(HelpBubbleArrow::kTopLeft)
-          .SetInAnyContext(true)
-          .SetMetadata(144, "romanarora@chromium.org",
-                       "Attempts to trigger when a user is on the NTP and the "
-                       "Realbox contextual entrypoint button is displayed.")));
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // kIPHExtensionsMenuFeature:

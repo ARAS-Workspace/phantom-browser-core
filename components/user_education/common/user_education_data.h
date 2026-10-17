@@ -151,59 +151,6 @@ struct ProductMessagingData {
   std::set<std::string> shown_notices;
 };
 
-// Data pertaining to a single NTP promo.
-struct NtpPromoData {
-  NtpPromoData();
-  NtpPromoData(const NtpPromoData&);
-  NtpPromoData(NtpPromoData&&) noexcept;
-  NtpPromoData& operator=(const NtpPromoData&);
-  NtpPromoData& operator=(NtpPromoData&&) noexcept;
-  ~NtpPromoData();
-
-  bool operator<=>(const NtpPromoData& other) const = default;
-
-  // Time at which the promo was most recently clicked.
-  base::Time last_clicked;
-
-  // Time at which the promo was first seen to be complete.
-  base::Time completed;
-
-  // The session in which this promo was last shown in the top spot.
-  int last_session = 0;
-
-  // The number of session this promo has been shown in the top spot, since
-  // it most recently claimed the top spot. When reclaiming top spot,
-  // this value must be reset.
-  int session_count_in_term = 0;
-
-  // The number of times this promo has started a run of sessions in the top
-  // spot.
-  int term_count = 0;
-
-  // Timestamp of when the promo started a run of sessions in the top spot.
-  base::Time term_start_time;
-
-  // Time at which the promo was dismissed by the user.
-  base::Time dismissed_time;
-};
-
-using KeyedNtpPromoDataMap = std::map<std::string, NtpPromoData>;
-
-// Data pertaining to the NTP promo system as a whole.
-struct NtpPromoPreferences {
-  NtpPromoPreferences();
-  NtpPromoPreferences(const NtpPromoPreferences&);
-  NtpPromoPreferences(NtpPromoPreferences&&) noexcept;
-  NtpPromoPreferences& operator=(const NtpPromoPreferences&);
-  NtpPromoPreferences& operator=(NtpPromoPreferences&&) noexcept;
-  ~NtpPromoPreferences();
-
-  bool operator<=>(const NtpPromoPreferences& other) const = default;
-
-  // Whether all promos are disabled.
-  bool disabled = false;
-};
-
 }  // namespace user_education
 
 #endif  // COMPONENTS_USER_EDUCATION_COMMON_USER_EDUCATION_DATA_H_

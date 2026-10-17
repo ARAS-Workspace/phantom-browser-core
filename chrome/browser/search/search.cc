@@ -29,7 +29,6 @@
 
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 
 namespace search {
@@ -134,9 +133,7 @@ struct NewTabURLDetails {
       return NewTabURLDetails(GURL(), NEW_TAB_URL_INCOGNITO);
     }
 
-    const GURL local_url(DefaultSearchProviderIsGoogle(profile)
-                             ? chrome::ChromeUINewTabPageURLAsGURL()
-                             : GURL(chrome::kChromeUINewTabPageThirdPartyURL));
+    const GURL local_url(chrome::kChromeUINewTabPageThirdPartyURL);
     return NewTabURLDetails(local_url, NEW_TAB_URL_VALID);
   }
 
@@ -185,8 +182,7 @@ bool IsNTPURL(const GURL& url) {
       url.host() == chrome::kChromeSearchRemoteNtpHost) {
     return true;
   }
-  return NewTabPageUI::IsNewTabPageOrigin(url) ||
-         NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
+  return NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
 }
 
 bool IsInstantNTP(content::WebContents* contents) {

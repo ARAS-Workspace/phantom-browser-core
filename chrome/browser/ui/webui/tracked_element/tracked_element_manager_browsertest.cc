@@ -79,7 +79,7 @@ IN_PROC_BROWSER_TEST_F(TrackedElementManagerBrowsertest, CheckElementsExist) {
                              })),
       InSameContext(
           // Wait for all menu items to be present.
-          WaitForElementCount(UserEducationInternalsUI::kMenuItemElementId, 7U),
+          WaitForElementCount(UserEducationInternalsUI::kMenuItemElementId, 6U),
           // Grab the menu item for section 2.
           NameElementWithSecondaryId(
               UserEducationInternalsUI::kMenuItemElementId, "index:2",

@@ -68,12 +68,6 @@ class UserEducationInternalsPageHandlerImpl
   void GetNewBadges(GetNewBadgesCallback callback) override;
   void ClearNewBadgeData(const std::string& feature_name,
                          ClearNewBadgeDataCallback callback) override;
-  void GetNtpPromos(GetNtpPromosCallback callback) override;
-  void ClearNtpPromoData(const std::string& id,
-                         ClearNtpPromoDataCallback callback) override;
-  void GetNtpPromoPreferences(GetNtpPromoPreferencesCallback callback) override;
-  void ClearNtpPromoPreferences(
-      ClearNtpPromoPreferencesCallback callback) override;
 
  private:
   void OnFeaturePromoShowResult(user_education::FeaturePromoResult show_result);

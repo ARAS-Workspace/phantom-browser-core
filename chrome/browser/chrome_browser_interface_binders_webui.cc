@@ -42,13 +42,6 @@
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-#include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption.mojom.h"
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"
-#include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#include "components/search/ntp_features.h"
-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
-
 #if BUILDFLAG(ENABLE_WEBUI_NTP) || \
     BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
 #include "ui/webui/resources/cr_components/help_bubble/help_bubble.mojom.h"
@@ -101,15 +94,10 @@ void BindTrackedElementHandlerRestricted(
   auto* controller = web_ui->GetController();
   DCHECK(controller);
 
-  const bool is_allowed =
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-      controller->GetAs<NewTabPageUI>() ||
-#endif
-      controller->GetAs<UserEducationInternalsUI>() ||
-      controller->GetAs<CustomizeChromeUI>() ||
-      controller->GetAs<HistoryUI>() ||
-      controller->GetAs<ProfilePickerUI>() ||
-      false;
+  const bool is_allowed = controller->GetAs<UserEducationInternalsUI>() ||
+                          controller->GetAs<CustomizeChromeUI>() ||
+                          controller->GetAs<HistoryUI>() ||
+                          controller->GetAs<ProfilePickerUI>() || false;
 
   if (!is_allowed) {
     mojo::ReportBadMessage(
@@ -172,19 +160,8 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   content::RegisterWebUIControllerInterfaceBinder<
-      new_tab_page::mojom::PageHandlerFactory, NewTabPageUI>(map);
-  content::RegisterWebUIControllerInterfaceBinder<
-      most_visited::mojom::MostVisitedPageHandlerFactory, NewTabPageUI,
-      OmniboxEverywhereUI>(map);
-  content::RegisterWebUIControllerInterfaceBinder<
-      customize_buttons::mojom::CustomizeButtonsHandlerFactory, NewTabPageUI>(
+      most_visited::mojom::MostVisitedPageHandlerFactory, OmniboxEverywhereUI>(
       map);
-  if (base::FeatureList::IsEnabled(
-          ntp_features::kNtpMostRelevantTabResumptionModule)) {
-    content::RegisterWebUIControllerInterfaceBinder<
-        ntp::most_relevant_tab_resumption::mojom::PageHandler, NewTabPageUI>(
-        map);
-  }
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 
   map->Add<color_change_listener::mojom::PageHandler>(

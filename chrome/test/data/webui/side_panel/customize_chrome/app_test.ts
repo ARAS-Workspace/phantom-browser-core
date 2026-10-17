@@ -283,7 +283,6 @@ suite('AppTest', () => {
   test('source tab type should update the cards', async () => {
     const idsControlledByIsSourceTabFirstPartyNtp = [
       '#shortcuts',
-      '#modules',
       '#categoriesPage',
       '#themesPage',
       '#wallpaperSearchPage',
