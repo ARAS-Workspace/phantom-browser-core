@@ -110,7 +110,6 @@
 #include "components/captive_portal/content/captive_portal_service.h"
 #endif
 
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "components/storage_monitor/test_storage_monitor.h"
 
 #if BUILDFLAG(IS_OZONE)
@@ -370,10 +369,6 @@ void InProcessBrowserTest::SetUp() {
   // to fail. See crbug.com/40672885.
   Tab::SetShowHoverCardOnMouseHoverForTesting(false);
 #endif  // defined(TOOLKIT_VIEWS)
-
-  // Auto-redirect to the NTP, which can happen if remote content is enabled on
-  // What's New for tests that simulate first run, is unexpected by most tests.
-  whats_new::DisableRemoteContentForTests();
 
   EnsureBrowserContextKeyedServiceFactoriesForTestingBuilt();
 

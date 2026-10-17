@@ -353,8 +353,6 @@ inline constexpr char kChromeUIDefaultBrowserModalHost[] =
     "default-browser-modal";
 inline constexpr char kChromeUIWebAppSettingsHost[] = "app-settings";
 inline constexpr char kChromeUIWebAppSettingsURL[] = "chrome://app-settings/";
-inline constexpr char kChromeUIWhatsNewHost[] = "whats-new";
-inline constexpr char kChromeUIWhatsNewURL[] = "chrome://whats-new/";
 #endif
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)

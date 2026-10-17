@@ -12,9 +12,6 @@ source_set("webui") {
   sources += [
     "floating_webui_help_bubble_factory.cc",
     "floating_webui_help_bubble_factory.h",
-    "whats_new_registry.cc",
-    "whats_new_registry.h",
-    "whats_new_storage_service.h",
   ]
 
   deps = [
@@ -35,7 +32,6 @@ source_set("webui") {
     "//components/user_education/views",
     "//ui/views",
     "//ui/views/controls/webview",
-    "//ui/webui/resources/js/browser_command:mojo_bindings",
   ]
 }
 
@@ -43,10 +39,6 @@ source_set("unit_tests") {
   testonly = true
 
   sources = [ "help_bubble_handler_unittest.cc" ]
-  sources += [
-    "whats_new_registry_feature_param_unittest.cc",
-    "whats_new_registry_unittest.cc",
-  ]
 
   deps = [
     ":webui",
@@ -68,24 +60,5 @@ source_set("unit_tests") {
     "//ui/base/interaction:test_support",
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     "//ui/webui/tracked_element",
-  ]
-  deps += [
-    ":test_support",
-    "//ui/webui/resources/js/browser_command:mojo_bindings",
-  ]
-}
-
-source_set("test_support") {
-  testonly = true
-
-  sources = [
-    "mock_whats_new_storage_service.cc",
-    "mock_whats_new_storage_service.h",
-  ]
-
-  deps = [
-    ":webui",
-    "//base",
-    "//testing/gmock",
   ]
 }

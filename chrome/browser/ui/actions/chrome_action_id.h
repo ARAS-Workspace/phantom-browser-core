@@ -178,7 +178,6 @@
   E(kActionShowSearchTools, IDC_SHOW_SEARCH_TOOLS) \
   E(kActionCaretBrowsingToggle, IDC_CARET_BROWSING_TOGGLE) \
   E(kActionChromeTips, IDC_CHROME_TIPS) \
-  E(kActionChromeWhatsNew, IDC_CHROME_WHATS_NEW) \
   E(kActionPerformance, IDC_PERFORMANCE) \
   E(kActionExtensionsSubmenuManageExtensions, \
     IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS) \

@@ -116,10 +116,7 @@ source_set("configs") {
       "//chrome/browser/ui/webui/signin",
     ]
 
-    deps += [
-      "//chrome/browser/ui/webui/signin:profile",
-      "//chrome/browser/ui/webui/whats_new",
-    ]
+    deps += [ "//chrome/browser/ui/webui/signin:profile" ]
   }
 
   if (enable_dice_support) {
@@ -484,10 +481,6 @@ source_set("chrome_web_ui_controller_factory") {
     deps += [ "//chrome/browser/ui/webui/sandbox" ]
   }
 
-  if (is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/webui/whats_new" ]
-  }
-
   if (enable_extensions_core) {
     deps += [
       "//chrome/browser/extensions",
@@ -797,7 +790,6 @@ source_set("browser_tests") {
     deps += [
       ":theme_source",
       "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/webui/whats_new",
       "//chrome/test/data/webui:browser_tests",
       "//components/collaboration/public",
       "//components/history_clusters/core",

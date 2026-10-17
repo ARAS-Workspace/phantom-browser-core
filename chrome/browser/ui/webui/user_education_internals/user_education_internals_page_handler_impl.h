@@ -68,11 +68,6 @@ class UserEducationInternalsPageHandlerImpl
   void GetNewBadges(GetNewBadgesCallback callback) override;
   void ClearNewBadgeData(const std::string& feature_name,
                          ClearNewBadgeDataCallback callback) override;
-  void GetWhatsNewModules(GetWhatsNewModulesCallback callback) override;
-  void GetWhatsNewEditions(GetWhatsNewEditionsCallback callback) override;
-  void ClearWhatsNewData(ClearWhatsNewDataCallback callback) override;
-  void LaunchWhatsNewStaging() override;
-  void UpdateWhatsNewVersionOverride(int32_t version) override;
   void GetNtpPromos(GetNtpPromosCallback callback) override;
   void ClearNtpPromoData(const std::string& id,
                          ClearNtpPromoDataCallback callback) override;

@@ -2124,28 +2124,10 @@ inline constexpr char kExplicitlyAllowedNetworkPorts[] =
 inline constexpr char kDesktopSharingHubEnabled[] =
     "sharing_hub.desktop_sharing_hub_enabled";
 
-// Pref name for the last major version where the What's New page was
-// automatically shown. This indicates that on the next startup within
-// the same major version, the browser should not attempt to auto-open
-// the page again.
-inline constexpr char kLastWhatsNewVersion[] = "browser.last_whats_new_version";
-
 // A boolean indicating whether the Lens NTP searchbox feature should be enabled
 // if supported.
 inline constexpr char kLensDesktopNTPSearchEnabled[] =
     "policy.lens_desktop_ntp_search_enabled";
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-// A dict mapping the edition name with the major version it was shown.
-inline constexpr char kWhatsNewEditionUsed[] = "browser.whats_new.edition_used";
-// A list containing the features of each module in order of when they
-// were first enabled.
-inline constexpr char kWhatsNewFirstEnabledOrder[] =
-    "browser.whats_new.enabled_order";
-// Integer representing the last milestone that successfully showed
-// a version page.
-inline constexpr char kWhatsNewVersionUsed[] = "browser.whats_new.version_used";
-#endif
 
 // An integer indicating the number of times the Lens Overlay was started.
 inline constexpr char kLensOverlayStartCount[] =

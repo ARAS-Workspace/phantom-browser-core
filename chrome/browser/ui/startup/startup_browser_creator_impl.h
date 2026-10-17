@@ -121,8 +121,6 @@ class StartupBrowserCreatorImpl {
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorImplTest,
                            DetermineBrowserOpenBehavior_NotStartup);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorImplTest,
-                           DetermineStartupTabs_NewFeaturesPage);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorImplTest,
                            DetermineNonMilestoneUpdate);
 
   enum class LaunchResult {
@@ -178,9 +176,7 @@ class StartupBrowserCreatorImpl {
       const StartupTabProvider& provider,
       chrome::startup::IsProcessStartup process_startup,
       bool is_ephemeral_profile,
-      bool is_post_crash_launch,
-      bool promotional_tabs_enabled,
-      bool whats_new_enabled);
+      bool is_post_crash_launch);
 
   // Begins an asynchronous session restore if current state allows it (e.g.,
   // this is not process startup) and SessionService indicates that one is

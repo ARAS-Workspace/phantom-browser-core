@@ -1211,7 +1211,6 @@ test("browser_tests") {
     "//chrome/browser/ui/webui/top_chrome:test_support",
     "//chrome/browser/ui/webui/webui_toolbar:browser_tests",
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
-    "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/ui/window_feature_controller",
     "//chrome/browser/ui/zoom",
     "//chrome/browser/unified_consent",
@@ -2332,11 +2331,6 @@ test("browser_tests") {
   deps += [
     "//chrome/browser/page_load_metrics/integration_tests:browser_tests",
     "//chrome/browser/page_load_metrics/observers:browser_tests",
-  ]
-
-  deps += [
-    "//chrome/browser/ui/webui/whats_new:browser_tests",
-    "//chrome/browser/ui/webui/whats_new:mojo_bindings",
   ]
 
   if (chrome_root_store_cert_management_ui) {
@@ -3820,9 +3814,7 @@ test("unit_tests") {
 
   if (is_linux || is_mac) {
     deps += [
-      "../browser/ui/webui/whats_new:mojo_bindings",
       "//chrome/browser/enterprise:impl",
-      "//chrome/browser/ui/webui/whats_new:unit_tests",
       "//components/user_education/webui",
     ]
   }
@@ -4329,7 +4321,6 @@ static_library("test_support_ui") {
     "//chrome/browser/ui/webui",
     "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
     "//chrome/browser/ui/webui/signin",
-    "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/user_education",
     "//chrome/browser/web_applications",
     "//chrome/browser/web_applications:features",
@@ -4695,7 +4686,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/webui/settings:interactive_ui_tests",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:interactive_ui_tests",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search:interactive_ui_tests",
-    "//chrome/browser/ui/webui/whats_new:interactive_ui_tests",
     "//chrome/browser/ui/webui_browser:interactive_ui_tests",
     "//chrome/browser/ui/window_metadata",
     "//chrome/browser/web_applications:features",
@@ -5150,7 +5140,6 @@ test("interactive_ui_tests") {
 
     deps += [
       "//chrome/browser/ui/startup:test_support_ui",
-      "//chrome/browser/ui/webui/whats_new",
       "//services/audio/public/cpp",
     ]
   }

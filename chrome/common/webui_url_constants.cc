@@ -86,7 +86,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUINewTabPageThirdPartyHost,
       kChromeUISettingsHost,
       kChromeUISystemInfoHost,
-      kChromeUIWhatsNewHost,
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       kChromeUIDiscardsHost,
 #endif

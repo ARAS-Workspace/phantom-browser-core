@@ -84,7 +84,6 @@ ts_library("build_ts") {
     "//chrome/browser/resources/webui_gallery:build_ts",
     "//chrome/browser/resources/webui_toolbar:build_ts",
     "//chrome/browser/resources/webui_toolbar_shared:build_ts",
-    "//chrome/browser/resources/whats_new:build_ts",
     "//chrome/test/data/pdf:build_ts",
     "//chrome/test/data/webui/bookmarks:build_ts",
     "//chrome/test/data/webui/certificate_manager:build_ts",

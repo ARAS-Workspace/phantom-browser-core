@@ -81,9 +81,6 @@ PageBlockingUpdate GetPageBlockingUpdate() {
   if (url.IsAboutBlank()) {
     return PageBlockingUpdate::kAboutBlank;
   }
-  if (url == GURL(chrome::kChromeUIWhatsNewURL)) {
-    return PageBlockingUpdate::kWhatsNew;
-  }
   if (url.SchemeIs(content::kChromeUIScheme)) {
     return PageBlockingUpdate::kChromeScheme;
   }

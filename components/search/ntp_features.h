@@ -85,7 +85,6 @@ BASE_DECLARE_FEATURE(kNtpTabGroupsModuleZeroState);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationModuleRemoval);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationShortcutsRemoval);
 BASE_DECLARE_FEATURE(kNtpFeatureOptimizationDismissModulesRemoval);
-BASE_DECLARE_FEATURE(kLightningTakeoverEdition);
 BASE_DECLARE_FEATURE(kNtpShortcutsRedesign);
 BASE_DECLARE_FEATURE(kNtpSimplificationBookmarkBar);
 BASE_DECLARE_FEATURE(kBookmarkBarUpdatesForTesting);

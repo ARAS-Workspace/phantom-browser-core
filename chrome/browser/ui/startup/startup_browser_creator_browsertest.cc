@@ -23,7 +23,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
-#include "base/version_info/version_info.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
@@ -149,12 +148,6 @@ using testing::_;
 using web_app::WebAppProvider;
 
 namespace {
-
-void DisableWhatsNewPage() {
-  PrefService* pref_service = g_browser_process->local_state();
-  pref_service->SetInteger(prefs::kLastWhatsNewVersion,
-                           version_info::GetMajorVersionNumberAsInt());
-}
 
 Browser* OpenNewBrowser(Profile* profile,
                         const std::optional<std::string>&
@@ -328,8 +321,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
 
   Profile* profile = browser()->GetProfile();
 
-  DisableWhatsNewPage();
-
   // Set the startup preference to open these URLs.
   SessionStartupPref pref(SessionStartupPref::URLS);
   pref.urls = urls;
@@ -381,8 +372,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, StartupURLsOnNewWindow) {
   pref.urls = urls;
   SessionStartupPref::SetStartupPref(browser()->GetProfile(), pref);
 
-  DisableWhatsNewPage();
-
   Browser* new_browser = OpenNewBrowser(browser()->GetProfile());
   ASSERT_TRUE(new_browser);
 
@@ -431,8 +420,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   urls.push_back(chrome_test_utils::GetTestUrl(
       base::FilePath(base::FilePath::kCurrentDirectory),
       base::FilePath(FILE_PATH_LITERAL("title3.html"))));
-
-  DisableWhatsNewPage();
 
   // Open a browser window with some preloaded tabs.
   ui_test_utils::NavigateToURLWithDisposition(
@@ -582,8 +569,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, StartupPrefSetAsLastAndURLs) {
   Profile& profile =
       profiles::testing::CreateProfileSync(profile_manager, dest_path);
 
-  DisableWhatsNewPage();
-
   const GURL t1_url = embedded_test_server()->GetURL("/title1.html");
   const GURL t2_url = embedded_test_server()->GetURL("/title2.html");
   const GURL t3_url = embedded_test_server()->GetURL("/title3.html");
@@ -704,8 +689,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, StartupURLsForTwoProfiles) {
   pref2.urls = urls2;
   SessionStartupPref::SetStartupPref(&other_profile, pref2);
 
-  DisableWhatsNewPage();
-
   // Close the browser.
   CloseBrowserAsynchronously(browser());
 
@@ -752,7 +735,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, PRE_UpdateWithTwoProfiles) {
       profile_manager, dest_path.Append(FILE_PATH_LITERAL("New Profile 1")));
   Profile& profile2 = profiles::testing::CreateProfileSync(
       profile_manager, dest_path.Append(FILE_PATH_LITERAL("New Profile 2")));
-  DisableWhatsNewPage();
 
   // Don't delete Profiles too early.
   ScopedProfileKeepAlive profile1_keep_alive(
@@ -880,8 +862,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   Profile& profile_urls =
       profiles::testing::CreateProfileSync(profile_manager, dest_path4);
 
-  DisableWhatsNewPage();
-
   // Set the profiles to open urls, open last visited pages or display the home
   // page.
   SessionStartupPref pref_home(SessionStartupPref::DEFAULT);
@@ -991,7 +971,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, RestoreWithNoStartupWindow) {
       profiles::testing::CreateProfileSync(profile_manager, dest_path1);
   Profile& profile2 =
       profiles::testing::CreateProfileSync(profile_manager, dest_path2);
-  DisableWhatsNewPage();
 
   // Set the profiles to open last visited pages.
   SessionStartupPref pref_last(SessionStartupPref::LAST);
@@ -1464,8 +1443,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorFirstRunTest,
 
   ASSERT_TRUE(embedded_test_server()->Start());
   StartupBrowserCreator browser_creator;
-
-  DisableWhatsNewPage();
 
   // Set the following user policies:
   // * RestoreOnStartup = RestoreOnStartupIsURLs

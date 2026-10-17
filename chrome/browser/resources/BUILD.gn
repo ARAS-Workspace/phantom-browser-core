@@ -67,7 +67,6 @@ group("resources") {
     "webui_gallery:resources",
     "webui_toolbar:resources",
     "webui_toolbar_shared:resources",
-    "whats_new:resources",
     "//components/browser_apis/tab_strip/resources",
   ]
   if (is_chrome_branded) {

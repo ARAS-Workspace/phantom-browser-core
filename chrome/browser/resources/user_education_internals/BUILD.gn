@@ -14,14 +14,11 @@ build_webui("build") {
     "user_education_internals.ts",
     "user_education_internals_card.html.ts",
     "user_education_internals_card.ts",
-    "user_education_whats_new_internals_card.html.ts",
-    "user_education_whats_new_internals_card.ts",
   ]
 
   css_files = [
     "user_education_internals.css",
     "user_education_internals_card.css",
-    "user_education_whats_new_internals_card.css",
   ]
 
   mojo_files_deps = [ "//chrome/browser/ui/webui/user_education_internals:mojo_bindings_ts__generator" ]

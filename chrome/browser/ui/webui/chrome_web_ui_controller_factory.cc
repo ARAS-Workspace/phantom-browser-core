@@ -89,10 +89,6 @@
 #include "chrome/browser/ui/webui/sandbox/sandbox_internals_ui.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/extension_url_overrides.h"
 #include "chrome/browser/ui/webui/extensions/extensions_ui.h"
@@ -370,12 +366,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
       page_url.host() == chrome::kChromeUINewTabHost) {
     return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
   }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  if (page_url.host() == chrome::kChromeUIWhatsNewHost) {
-    return WhatsNewUI::GetFaviconResourceBytes(scale_factor);
-  }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Tab Search hosts the split tab NTP and so leveraging the NTP favicon.
   if (page_url.host() == chrome::kChromeUITabSearchHost) {

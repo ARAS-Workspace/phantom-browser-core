@@ -257,8 +257,6 @@ aggregate_vector_icons("chrome_vector_icons") {
     "qr_code_chrome_refresh_old.icon",
     "qrcode_generator_custom.icon",
     "queue_music.icon",
-    "release_alert.icon",
-    "release_alert_old.icon",
     "reload_touch_old.icon",
     "remove.icon",
     "remove_old.icon",

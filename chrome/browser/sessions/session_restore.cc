@@ -80,7 +80,6 @@
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/browser/ui/window_metadata/window_metadata_controller.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/extensions/extension_metrics.h"
@@ -110,10 +109,6 @@
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_set.h"
 #include "ui/base/mojom/window_show_state.mojom.h"
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/webui/whats_new/whats_new_fetcher.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using content::NavigationController;
 using content::RenderWidgetHost;
@@ -422,12 +417,9 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
         manager->SetWindowCreationInfo(
             waap::NewWindowCreationSource::kBrowserInitiated, now);
       }
-      if (startup_tabs_.empty() ||
-          (startup_tabs_.size() == 1 && whats_new::IsEnabled() &&
-           startup_tabs_[0].url == whats_new::GetWebUIStartupURL())) {
+      if (startup_tabs_.empty()) {
         // No tab browsers were created and no URLs were supplied on the command
-        // line, or only the What's New page is specified at startup and may or
-        // may not add a tab. Open the new tab page.
+        // line. Open the new tab page.
         startup_tabs_.emplace_back(chrome::ChromeUINewTabURLAsGURL());
       }
       AppendURLsToBrowser(browser, startup_tabs_);
@@ -1137,12 +1129,6 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
     bool is_first_tab = true;
     for (const auto& startup_tab : startup_tabs) {
       const GURL& url = startup_tab.url;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      if (url == whats_new::GetWebUIStartupURL()) {
-        whats_new::StartWhatsNewFetch(browser);
-        continue;
-      }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       int add_types = AddTabTypes::ADD_FORCE_INDEX;
       if (is_first_tab) {
         add_types |= AddTabTypes::ADD_ACTIVE;

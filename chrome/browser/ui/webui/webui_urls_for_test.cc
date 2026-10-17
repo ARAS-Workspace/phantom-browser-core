@@ -120,10 +120,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://webxr-internals",
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      "chrome://whats-new",
-#endif
-
       "chrome://profile-picker",
       "chrome://profile-customization/?debug",
       "chrome://signin-email-confirmation",

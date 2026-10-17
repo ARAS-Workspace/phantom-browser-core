@@ -34,7 +34,6 @@
 #include "base/test/with_feature_override.h"
 #include "base/threading/thread_restrictions.h"
 #include "base/values.h"
-#include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_process.h"
@@ -1460,11 +1459,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_OpenLinkInProfile) {
   profiles_signin_required.push_back(1);
   profiles_signin_required.push_back(3);
   profiles_signin_required.push_back(6);
-
-  // Avoid showing What's New.
-  PrefService* pref_service = g_browser_process->local_state();
-  pref_service->SetInteger(prefs::kLastWhatsNewVersion,
-                           version_info::GetMajorVersionNumberAsInt());
 
   // Create the profiles.
   ProfileAttributesStorage& storage =

@@ -106,7 +106,6 @@
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
@@ -416,16 +415,6 @@ class ProfilePickerCreationFlowBrowserTest
                 base::BindRepeating(&ProfilePickerCreationFlowBrowserTest::
                                         OnWillCreateBrowserContextServices,
                                     base::Unretained(this)));
-  }
-
-  void SetUpOnMainThread() override {
-    InteractiveFeaturePromoTestMixin::SetUpOnMainThread();
-
-    // Avoid showing the What's New page. These tests assume this isn't the
-    // first update and the NTP opens after sign in.
-    g_browser_process->local_state()->SetInteger(
-        prefs::kLastWhatsNewVersion,
-        version_info::GetMajorVersionNumberAsInt());
   }
 
   virtual void OnWillCreateBrowserContextServices(

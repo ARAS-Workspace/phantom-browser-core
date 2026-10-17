@@ -1255,8 +1255,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/webui_toolbar",
     "//chrome/browser/ui/webui/webui_toolbar:impl",
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
-    "//chrome/browser/ui/webui/whats_new",
-    "//chrome/browser/ui/webui/whats_new:impl",
     "//chrome/browser/ui/webui_browser",
     "//chrome/browser/ui/webui_browser:impl",
     "//chrome/browser/ui/window_sizer",
@@ -1384,7 +1382,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/signin:signin_impl",
     "//chrome/browser/ui/webui/webui_toolbar:impl",
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
-    "//chrome/browser/ui/webui/whats_new:impl",
 
     "//chrome/browser/ui/window_sizer:impl",
     "//chrome/browser/ui/webui/settings:impl",

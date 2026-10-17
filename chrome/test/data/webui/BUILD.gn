@@ -136,10 +136,6 @@ source_set("browser_tests") {
     sources += [ "discards/discards_browsertest.cc" ]
   }
 
-  if (is_mac || is_linux) {
-    sources += [ "whats_new/whats_new_browsertest.cc" ]
-  }
-
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
   deps += [
@@ -156,7 +152,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/tabs:tabs_public",
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/webui",
-    "//chrome/browser/ui/webui/whats_new",
     "//components/bookmarks/browser",
     "//components/bookmarks/managed",
     "//components/browsing_data/core",
@@ -517,11 +512,6 @@ generate_grd("build_grd") {
     # chrome://webui-test, even though they reside in chrome/test/data/pdf/.
     deps += [ "../pdf:build_grdp" ]
     grdp_files += [ "$target_gen_dir/../pdf/resources.grdp" ]
-  }
-
-  if (is_mac || is_linux) {
-    deps += [ "whats_new:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/whats_new/resources.grdp" ]
   }
 
   deps += [ "signin:build_grdp" ]

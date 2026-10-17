@@ -22,7 +22,6 @@
 #include "printing/buildflags/buildflags.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "components/signin/public/base/signin_switches.h"
 
 WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
@@ -39,10 +38,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   enable_feature(features::kAiOverlayDialog);
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  enable_feature(whats_new::kForceEnabled);
 #endif
 
   enable_feature(features::kTabsFromOtherDevicesSidePanel);

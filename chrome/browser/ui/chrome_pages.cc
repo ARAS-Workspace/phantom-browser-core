@@ -279,12 +279,6 @@ void ShowChromeTips(BrowserWindowInterface* browser) {
   static const char kChromeTipsURL[] = "https://www.google.com/chrome/tips/";
   ShowSingletonTab(browser, GURL(kChromeTipsURL));
 }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-void ShowChromeWhatsNew(BrowserWindowInterface* browser) {
-  ShowSingletonTab(browser, GURL(kChromeUIWhatsNewURL));
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 void LaunchReleaseNotes(Profile* profile, apps::LaunchSource source) {

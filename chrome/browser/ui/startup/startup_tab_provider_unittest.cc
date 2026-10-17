@@ -252,9 +252,7 @@ TEST(StartupTabProviderTest, GetCommandLineTabs) {
     StartupTabs output =
         instance.GetCommandLineTabs(command_line, base::FilePath(), &profile);
     ASSERT_EQ(1u, output.size());
-    EXPECT_EQ(
-        GURL("https://www.google.com/search?q=Foo&sourceid=chrome&ie=UTF-8"),
-        output[0].url);
+    EXPECT_EQ(GURL("https://duckduckgo.com/?q=Foo"), output[0].url);
 
     EXPECT_EQ(CommandLineTabsPresent::kUnknown,
               instance.HasCommandLineTabs(command_line, base::FilePath()));

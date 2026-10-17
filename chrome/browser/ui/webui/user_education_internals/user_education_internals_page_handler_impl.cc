@@ -17,18 +17,14 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/types/pass_key.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/global_features.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals.mojom-forward.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
-#include "chrome/common/webui_url_constants.h"
 #include "components/feature_engagement/public/feature_list.h"
 #include "components/feature_engagement/public/tracker.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
@@ -43,27 +39,16 @@
 #include "components/user_education/common/user_education_features.h"
 #include "components/user_education/common/user_education_metadata.h"
 #include "components/user_education/common/user_education_storage_service.h"
-#include "components/user_education/webui/whats_new_registry.h"
 #include "content/public/browser/web_ui.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/webui/resource_path.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/navigator/browser_navigator.h"
-#include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "net/base/url_util.h"
-#endif
-
 using mojom::user_education_internals::FeaturePromoDemoPageData;
 using mojom::user_education_internals::FeaturePromoDemoPageDataPtr;
 using mojom::user_education_internals::FeaturePromoDemoPageInfo;
 using mojom::user_education_internals::FeaturePromoDemoPageInfoPtr;
-using mojom::user_education_internals::WhatsNewEditionDemoPageInfo;
-using mojom::user_education_internals::WhatsNewEditionDemoPageInfoPtr;
-using mojom::user_education_internals::WhatsNewModuleDemoPageInfo;
-using mojom::user_education_internals::WhatsNewModuleDemoPageInfoPtr;
 
 namespace user_education::features {
 extern bool IsRateLimitingDisabled();
@@ -87,14 +72,6 @@ user_education::NewBadgeRegistry* GetNewBadgeRegistry(Profile* profile) {
   auto* const service =
       UserEducationServiceFactory::GetForBrowserContext(profile);
   return service ? service->new_badge_registry() : nullptr;
-}
-
-whats_new::WhatsNewRegistry* GetWhatsNewRegistry() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  return g_browser_process->GetFeatures()->whats_new_registry();
-#else
-  return nullptr;
-#endif
 }
 
 user_education::UserEducationStorageService* GetStorageService(
@@ -862,42 +839,6 @@ void UserEducationInternalsPageHandlerImpl::GetNewBadges(
   return std::move(callback).Run(std::move(info_list));
 }
 
-void UserEducationInternalsPageHandlerImpl::GetWhatsNewModules(
-    GetWhatsNewModulesCallback callback) {
-  std::vector<WhatsNewModuleDemoPageInfoPtr> info_list;
-  if (const auto* registry = GetWhatsNewRegistry()) {
-    auto* storage_service = registry->storage_service();
-    for (auto& [key, module] : registry->modules()) {
-      if (module.HasFeature()) {
-        info_list.emplace_back(WhatsNewModuleDemoPageInfo::New(
-            RemovePrefixAndCamelCase(module.GetFeatureName(), ""),
-            module.GetFeatureName(), module.browser_command() != std::nullopt,
-            module.IsFeatureEnabled(),
-            storage_service->GetModuleQueuePosition(module.GetFeatureName())));
-      }
-    }
-  }
-  return std::move(callback).Run(std::move(info_list));
-}
-
-void UserEducationInternalsPageHandlerImpl::GetWhatsNewEditions(
-    GetWhatsNewEditionsCallback callback) {
-  std::vector<WhatsNewEditionDemoPageInfoPtr> info_list;
-  if (const auto* registry = GetWhatsNewRegistry()) {
-    auto* storage_service = registry->storage_service();
-    for (auto& [key, edition] : registry->editions()) {
-      auto used_version =
-          storage_service->GetUsedVersion(edition.GetFeatureName());
-      info_list.emplace_back(WhatsNewEditionDemoPageInfo::New(
-          RemovePrefixAndCamelCase(edition.GetFeatureName(), ""),
-          edition.GetFeatureName(), edition.IsFeatureEnabled(),
-          storage_service->IsUsedEdition(edition.GetFeatureName()),
-          used_version.has_value() ? used_version.value() : 0));
-    }
-  }
-  return std::move(callback).Run(std::move(info_list));
-}
-
 void UserEducationInternalsPageHandlerImpl::ClearNewBadgeData(
     const std::string& feature_name,
     ClearNewBadgeDataCallback callback) {
@@ -920,36 +861,6 @@ void UserEducationInternalsPageHandlerImpl::ClearNewBadgeData(
   storage_service->SaveNewBadgeData(*feature, data);
 
   std::move(callback).Run(std::string());
-}
-
-void UserEducationInternalsPageHandlerImpl::ClearWhatsNewData(
-    ClearWhatsNewDataCallback callback) {
-  auto* const registry = GetWhatsNewRegistry();
-  if (!registry) {
-    std::move(callback).Run(std::string("Cannot get registry"));
-    return;
-  }
-  registry->ResetData();
-  std::move(callback).Run(std::string());
-}
-
-void UserEducationInternalsPageHandlerImpl::LaunchWhatsNewStaging() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  GURL url = net::AppendQueryParameter(GURL(chrome::kChromeUIWhatsNewURL),
-                                       "staging", "true");
-  NavigateParams params(profile_, url, ui::PAGE_TRANSITION_TYPED);
-  params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
-  params.browser = GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-      web_ui_->GetWebContents());
-  Navigate(&params);
-#endif
-}
-
-void UserEducationInternalsPageHandlerImpl::UpdateWhatsNewVersionOverride(
-    int32_t version) {
-  auto* const registry = GetWhatsNewRegistry();
-  CHECK(registry);
-  registry->set_version_override(version);
 }
 
 void UserEducationInternalsPageHandlerImpl::GetNtpPromos(

@@ -22,7 +22,6 @@ source_set("user_education_internals") {
   deps = [
     ":mojo_bindings",
     "//base",
-    "//chrome/browser:global_features",
     "//chrome/browser/feature_engagement",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/resources/user_education_internals:resources",
@@ -33,7 +32,6 @@ source_set("user_education_internals") {
     "//chrome/browser/ui/webui:theme_source",
     "//chrome/browser/user_education",
     "//chrome/common",
-    "//chrome/common:version_header",
     "//components/feature_engagement/public",
     "//components/user_education/common",
     "//components/user_education/webui",
@@ -45,9 +43,5 @@ source_set("user_education_internals") {
     "//ui/webui",
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     "//ui/webui/tracked_element",
-  ]
-  deps += [
-    "//chrome/browser/ui/navigator",
-    "//net",
   ]
 }

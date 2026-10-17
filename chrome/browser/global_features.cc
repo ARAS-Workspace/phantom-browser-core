@@ -40,7 +40,6 @@
 // buildflags, so we include it only on platforms where it is used.
 #include "chrome/browser/default_browser/default_browser_manager.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_registrar.h"
 #include "components/user_education/common/user_education_features.h"  // nogncheck
 #endif
 
@@ -137,10 +136,6 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
   }
   system_permissions_platform_handle_ = CreateSystemPermissionsPlatformHandle();
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // TODO(crbug.com/463742800): Migrate WhatsNewRegistry (and other non-core
-  // features) to Init().
-  whats_new_registry_ = CreateWhatsNewRegistry();
-
   default_browser_manager_ =
       GetUserDataFactory()
           .CreateInstance<default_browser::DefaultBrowserManager>(
@@ -200,13 +195,6 @@ std::unique_ptr<system_permission_settings::PlatformHandle>
 GlobalFeatures::CreateSystemPermissionsPlatformHandle() {
   return system_permission_settings::PlatformHandle::Create();
 }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-std::unique_ptr<whats_new::WhatsNewRegistry>
-GlobalFeatures::CreateWhatsNewRegistry() {
-  return whats_new::CreateWhatsNewRegistry();
-}
-#endif
 
 std::unique_ptr<GlobalBrowserCollection>
 GlobalFeatures::CreateGlobalBrowserCollection() {

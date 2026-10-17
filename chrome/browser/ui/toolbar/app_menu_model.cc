@@ -76,7 +76,6 @@
 #include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
@@ -1007,14 +1006,6 @@ void HelpMenuModel::Build(BrowserWindowInterface* browser) {
                                    features::IsRoundedIconsEnabled()
                                        ? vector_icons::kInfoIcon
                                        : vector_icons::kInfoRefreshOldIcon);
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (whats_new::IsEnabled()) {
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_CHROME_WHATS_NEW, IDS_CHROME_WHATS_NEW,
-        features::IsRoundedIconsEnabled() ? kReleaseAlertIcon
-                                          : kReleaseAlertOldIcon);
-  }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1565,13 +1556,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
                                       delta);
       }
       LogMenuAction(MENU_ACTION_CHROME_TIPS);
-      break;
-    case IDC_CHROME_WHATS_NEW:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ChromeWhatsNew",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_CHROME_WHATS_NEW);
       break;
 #endif
 

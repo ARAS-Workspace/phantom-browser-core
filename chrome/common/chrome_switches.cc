@@ -342,11 +342,6 @@ const char kForceAppMode[] = "force-app-mode";
 // whether or not it's actually the First Run (this overrides kNoFirstRun).
 const char kForceFirstRun[] = "force-first-run";
 
-// Displays the What's New experience when the browser is started if it has not
-// yet been shown for the current milestone (this overrides kNoFirstRun, without
-// showing the First Run experience).
-const char kForceWhatsNew[] = "force-whats-new";
-
 // Does not show the crash restore bubble when the browser is started during the
 // system startup phase in ChromeOS, if the ChromeOS full restore feature is
 // enabled, because the ChromeOS full restore notification is shown for the user
@@ -443,13 +438,10 @@ const char kNoExperiments[] = "no-experiments";
 // switch is used by automation (including performance benchmarks) where it's
 // important only a browser window is shown.
 //
-// This may not actually be the first run or the What's New page. Its effect can
-// be partially ignored by adding kForceFirstRun (for FRE) and/or kForceWhatsNew
-// (for What's New). This does not drop the First Run sentinel and thus doesn't
-// prevent first run from occurring the next time chrome is launched without
-// this flag. It also does not update the last What's New milestone, so does not
-// prevent What's New from occurring the next time chrome is launched without
-// this flag.
+// This may not actually be the first run. Its effect can be partially ignored
+// by adding kForceFirstRun (for FRE). This does not drop the First Run sentinel
+// and thus doesn't prevent first run from occurring the next time chrome is
+// launched without this flag.
 const char kNoFirstRun[] = "no-first-run";
 
 // Don't send hyperlink auditing pings
@@ -705,9 +697,6 @@ const char kWebRtcRemoteEventLogUploadNoSuppression[] =
 // Override WebRTC IP handling policy to mimic the behavior when WebRTC IP
 // handling policy is specified in Preferences.
 const char kWebRtcIPHandlingPolicy[] = "webrtc-ip-handling-policy";
-
-// Force What's New on Desktop to request from the staging environment.
-const char kWhatsNewUseStaging[] = "whats-new-use-staging";
 
 // Specify the initial window user title: --window-name="My custom title"
 const char kWindowName[] = "window-name";

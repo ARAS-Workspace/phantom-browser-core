@@ -257,10 +257,6 @@
 #include "chrome/browser/devtools/devtools_window.h"
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/media/webrtc/system_media_capture_permissions_stats_mac.h"
 #include "chrome/browser/ui/cocoa/apps/quit_with_apps_controller_mac.h"
@@ -1020,14 +1016,9 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   StartupBrowserCreator::RegisterLocalStatePrefs(registry);
   task_manager::TaskManagerInterface::RegisterPrefs(registry);
   UpgradeDetector::RegisterPrefs(registry);
-  registry->RegisterIntegerPref(prefs::kLastWhatsNewVersion, 0);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   extensions::ExtensionPrefs::RegisterLocalStatePrefs(registry);
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  WhatsNewUI::RegisterLocalStatePrefs(registry);
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)

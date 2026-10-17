@@ -415,9 +415,6 @@ after discussions on the right group.
     <sender name="Assist Rank">
       <annotation id="ranker_url_fetcher"/>
     </sender>
-    <sender name="Whats New">
-      <annotation id="whats_new_fetcher"/>
-    </sender>
   </group>
   <group name="PlusAddresses">
     <sender name="PlusAddresses">

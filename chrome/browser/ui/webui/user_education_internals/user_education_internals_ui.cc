@@ -7,17 +7,13 @@
 #include <vector>
 
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/global_features.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/webui/theme_source.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_page_handler_impl.h"
-#include "chrome/common/chrome_version.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/grit/user_education_internals_resources.h"
 #include "chrome/grit/user_education_internals_resources_map.h"
-#include "components/user_education/webui/whats_new_registry.h"
 #include "content/public/browser/url_data_source.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_controller.h"
@@ -41,14 +37,6 @@ UserEducationInternalsUI::UserEducationInternalsUI(content::WebUI* web_ui)
   auto* source = content::WebUIDataSource::CreateAndAdd(
       profile, chrome::kChromeUIUserEducationInternalsHost);
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
-
-  int32_t version_to_request = CHROME_VERSION_MAJOR;
-  auto* registry = g_browser_process->GetFeatures()->whats_new_registry();
-  CHECK(registry);
-  version_to_request =
-      registry->version_override().value_or(version_to_request);
-  source->AddInteger("whatsNewVersionToRequest", version_to_request);
-  source->AddInteger("currentChromeVersion", CHROME_VERSION_MAJOR);
 
   webui::SetupWebUIDataSource(source, kUserEducationInternalsResources,
                               IDR_USER_EDUCATION_INTERNALS_INDEX_HTML);

@@ -50,7 +50,6 @@ void ShowExtensions(BrowserWindowInterface* browser,
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 void ShowChromeTips(BrowserWindowInterface* browser);
-void ShowChromeWhatsNew(BrowserWindowInterface* browser);
 #endif
 void LaunchReleaseNotes(Profile* profile, apps::LaunchSource source);
 void ShowChromeEnterpriseReleaseNotes(BrowserWindowInterface* browser);

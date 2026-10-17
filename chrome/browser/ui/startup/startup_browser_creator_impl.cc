@@ -55,7 +55,6 @@
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/chrome_version.h"
 #include "chrome/common/pref_names.h"
@@ -87,7 +86,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/search_integrity/search_integrity.h"
 #include "chrome/browser/search_integrity/search_integrity_factory.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_fetcher.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
@@ -329,17 +327,6 @@ BrowserWindowInterface* StartupBrowserCreatorImpl::OpenTabsInBrowser(
       continue;
     }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    // Start the What's New fetch but don't add the tab at this point. The tab
-    // will open as the foreground tab only if the remote content can be
-    // retrieved successfully. This prevents needing to automatically close the
-    // tab after opening it in the case where What's New does not load.
-    if (tab.url == whats_new::GetWebUIStartupURL()) {
-      whats_new::StartWhatsNewFetch(browser);
-      continue;
-    }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
     // Headless mode is restricted to only one url in the command line, so
     // just grab the first one assuming it's the target.
     if (first_tab && process_headless_commands) {
@@ -462,32 +449,9 @@ void StartupBrowserCreatorImpl::DetermineURLsAndLaunch(
   StartupInfoBarObserver::ObserveProfile(*profile_,
                                          std::move(add_infobars_callback));
 
-  // Presentation of promotional and/or educational tabs may be controlled via
-  // administrative policy.
-  bool promotions_enabled = true;
-  const PrefService::Preference* promotions_enabled_pref = nullptr;
-  PrefService* local_state = g_browser_process->local_state();
-  if (local_state) {
-    promotions_enabled_pref =
-        local_state->FindPreference(prefs::kPromotionsEnabled);
-  }
-  if (promotions_enabled_pref && promotions_enabled_pref->IsManaged()) {
-    // Presentation is managed; obey the policy setting.
-    promotions_enabled = promotions_enabled_pref->GetValue()->GetBool();
-  } else {
-    // Presentation is not managed. Infer an intent to disable if any value for
-    // the RestoreOnStartup policy is mandatory or recommended.
-    promotions_enabled =
-        !SessionStartupPref::TypeIsManaged(profile_->GetPrefs()) &&
-        !SessionStartupPref::TypeHasRecommendedValue(profile_->GetPrefs());
-  }
-
-  const bool whats_new_enabled =
-      whats_new::ShouldShowForState(local_state, promotions_enabled);
-
-  auto result = DetermineStartupTabs(
-      StartupTabProviderImpl(), process_startup, is_incognito_or_guest,
-      is_post_crash_launch, promotions_enabled, whats_new_enabled);
+  auto result =
+      DetermineStartupTabs(StartupTabProviderImpl(), process_startup,
+                           is_incognito_or_guest, is_post_crash_launch);
   StartupTabs tabs = std::move(result.tabs);
 
   // Return immediately if we start an async restore, since the remainder of
@@ -565,18 +529,11 @@ StartupBrowserCreatorImpl::DetermineStartupTabs(
     const StartupTabProvider& provider,
     chrome::startup::IsProcessStartup process_startup,
     bool is_incognito_or_guest,
-    bool is_post_crash_launch,
-    bool promotions_enabled,
-    bool whats_new_enabled) {
+    bool is_post_crash_launch) {
   StartupTabs tabs =
       provider.GetCommandLineTabs(*command_line_, cur_dir_, profile_);
   LaunchResult launch_result =
       tabs.empty() ? LaunchResult::kNormally : LaunchResult::kWithGivenUrls;
-
-  if (whats_new_enabled && (launch_result == LaunchResult::kWithGivenUrls ||
-                            is_incognito_or_guest || is_post_crash_launch)) {
-    whats_new::LogStartupType(whats_new::StartupType::kIneligible);
-  }
 
   // Only the New Tab Page or command line URLs may be shown in incognito mode.
   // A similar policy exists for crash recovery launches, to prevent getting the
@@ -608,30 +565,6 @@ StartupBrowserCreatorImpl::DetermineStartupTabs(
         provider.GetDistributionFirstRunTabs(browser_creator_);
     if (!distribution_tabs.empty()) {
       return {std::move(distribution_tabs), launch_result};
-    }
-
-    // Whether a first run experience was or will be shown as part of this
-    // startup.
-    bool has_first_run_experience = false;
-    if (promotions_enabled) {
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      if (is_first_run_ == chrome::startup::IsFirstRun::kYes) {
-        // We just showed the first run experience in the Desktop FRE window.
-        has_first_run_experience = true;
-      }
-#endif
-
-      // Potentially add the What's New Page. Note that the What's New page
-      // should never be shown in the same session as any first-run onboarding
-      // tabs. It also shouldn't be shown with reset tabs that are required to
-      // always be the first foreground tab.
-      if (!has_first_run_experience && reset_tabs.empty()) {
-        StartupTabs new_features_tabs;
-        new_features_tabs = provider.GetNewFeaturesTabs(whats_new_enabled);
-        AppendTabs(new_features_tabs, &tabs);
-      } else if (whats_new_enabled) {
-        whats_new::LogStartupType(whats_new::StartupType::kOverridden);
-      }
     }
 
     // If the user has set the preference indicating URLs to show on opening,

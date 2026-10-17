@@ -896,7 +896,6 @@ source_set("core") {
     "//chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble:mojo_bindings",
     "//chrome/browser/ui/webui/user_education_internals",
     "//chrome/browser/ui/webui/webnn_internals",
-    "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/ui/webui_browser",
     "//chrome/browser/web_applications",
     "//chrome/browser/web_applications:features",
@@ -1957,8 +1956,6 @@ source_set("browser") {
     "//chrome/browser/ui/webui/top_chrome:impl",
     "//chrome/browser/ui/webui/user_education_internals",
     "//chrome/browser/ui/webui/webui_gallery",
-    "//chrome/browser/ui/webui/whats_new",
-    "//chrome/browser/ui/webui/whats_new:impl",
     "//chrome/browser/ui/webui_browser",
     "//chrome/browser/ui/webui_browser:impl",
     "//chrome/browser/upgrade_detector",
@@ -2453,7 +2450,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/tab_search:mojo_bindings",
     "//chrome/browser/ui/webui/user_education_internals:mojo_bindings",
     "//chrome/browser/ui/webui/webnn_internals:mojo_bindings",
-    "//chrome/browser/ui/webui/whats_new:mojo_bindings",
     "//chrome/browser/ui/webui_browser:browser_mojo_bindings",
     "//components/autofill/core/browser/ml_model/logging:mojo_bindings",
     "//components/browser_apis/tab_drag:mojom",
@@ -2465,9 +2461,6 @@ group("browser_generated_files") {
   }
   public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
 
-  if (is_mac || is_linux) {
-    public_deps += [ "//chrome/browser/ui/webui/whats_new:mojo_bindings" ]
-  }
   if (is_mac || is_linux) {
     public_deps +=
         [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]

@@ -52,7 +52,6 @@
 
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/common/webui_url_constants.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/manifest_handlers/chrome_url_overrides_handler.h"
@@ -174,11 +173,6 @@ CommandLineTabsPresent StartupTabProviderImpl::HasCommandLineTabs(
                     : CommandLineTabsPresent::kNo;
 }
 
-StartupTabs StartupTabProviderImpl::GetNewFeaturesTabs(
-    bool whats_new_enabled) const {
-  return GetNewFeaturesTabsForState(whats_new_enabled);
-}
-
 // static
 StartupTabs StartupTabProviderImpl::GetInitialPrefsTabsForState(
     bool is_first_run,
@@ -253,16 +247,6 @@ StartupTabs StartupTabProviderImpl::GetNewTabPageTabsForState(
   StartupTabs tabs;
   if (!pref.ShouldRestoreLastSession()) {
     tabs.emplace_back(chrome::ChromeUINewTabURLAsGURL());
-  }
-  return tabs;
-}
-
-// static
-StartupTabs StartupTabProviderImpl::GetNewFeaturesTabsForState(
-    bool whats_new_enabled) {
-  StartupTabs tabs;
-  if (whats_new_enabled) {
-    tabs.emplace_back(whats_new::GetWebUIStartupURL());
   }
   return tabs;
 }

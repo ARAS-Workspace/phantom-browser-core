@@ -26,7 +26,6 @@
   --non-iph-promo-section-border-color:
       color-mix(in hsl, var(--google-yellow-300), var(--google-red-300));
   --tutorials-section-border-color: var(--google-red-300);
-  --whats-new-section-border-color: var(--google-grey-300);
   --side-bar-width: 200px;
 }
 
@@ -39,7 +38,6 @@
     --non-iph-promo-section-border-color:
         color-mix(in hsl, var(--google-yellow-700), var(--google-red-700));
     --tutorials-section-border-color: var(--google-red-700);
-    --whats-new-section-border-color: var(--google-grey-700);
   }
 }
 
@@ -53,8 +51,7 @@ cr-toolbar:not([narrow]) {
   --cr-toolbar-left-spacer-width: var(--side-bar-width);
 }
 
-user-education-internals-card.highlighted,
-user-education-whats-new-internals-card.highlighted {
+user-education-internals-card.highlighted {
   background-color: var(--cr-iph-anchor-highlight-color);
 }
 
@@ -71,17 +68,11 @@ p {
   color: var(--cr-fallback-color-error);
 }
 
-.whats-new-section {
-  padding-inline: var(--cr-section-padding);
-}
-
 .if-empty {
   display: block;
 }
 
-.promo-list:has(:is(
-    user-education-internals-card,
-    user-education-whats-new-internals-card):not([hidden])) > .if-empty {
+.promo-list:has(user-education-internals-card:not([hidden])) > .if-empty {
   display: none;
 }
 
@@ -162,20 +153,13 @@ p {
   scroll-margin-top: 16px;
 }
 
-#whatsNew {
-  border-inline-start: 1px solid var(--whats-new-section-border-color);
-  padding-inline: var(--cr-section-padding);
-  scroll-margin-top: 16px;
-}
-
 #ntpPromos {
   border-inline-start: 1px solid var(--ntp-promos-section-border-color);
   padding-inline: var(--cr-section-padding);
   scroll-margin-top: 16px;
 }
 
-user-education-internals-card,
-user-education-whats-new-internals-card {
+user-education-internals-card {
   padding-block: var(--cr-section-vertical-padding);
   padding-inline: var(--cr-section-padding);
 }
@@ -212,22 +196,4 @@ user-education-whats-new-internals-card {
     padding-inline: var(--cr-section-indent-padding);
     width: auto;
   }
-}
-
-.note {
-  font-weight: bold;
-  padding: 4px 0;
-}
-
-.inline-code {
-  font-weight: normal;
-  font-family: monospace;
-}
-
-#whatsNewVersionOverride {
-  padding-inline: var(--cr-section-padding);
-}
-
-#launch-whats-new-staging {
-  margin-inline: var(--cr-section-padding);
 }

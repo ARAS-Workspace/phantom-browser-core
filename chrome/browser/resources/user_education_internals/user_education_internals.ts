@@ -13,28 +13,21 @@ import 'chrome://resources/cr_elements/cr_tabs/cr_tabs.js';
 import 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 import 'chrome://resources/cr_elements/cr_toolbar/cr_toolbar.js';
 import 'chrome://resources/cr_elements/cr_toolbar/cr_toolbar_search_field.js';
-import '//resources/cr_elements/cr_input/cr_input.js';
 import '//resources/cr_elements/icons.html.js';
 import './user_education_internals_card.js';
-import './user_education_whats_new_internals_card.js';
-
-// <if expr="not is_chromeos">
-import type {CrInputElement} from '//resources/cr_elements/cr_input/cr_input.js';
-// </if>
 
 import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
 import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 import type {CrMenuSelectorElement} from 'chrome://resources/cr_elements/cr_menu_selector/cr_menu_selector.js';
 import type {CrPageSelectorElement} from 'chrome://resources/cr_elements/cr_page_selector/cr_page_selector.js';
 import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
-import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {TrackedElementManager} from 'chrome://resources/js/tracked_element/tracked_element_manager.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import {getCss} from './user_education_internals.css.js';
 import {getHtml} from './user_education_internals.html.js';
-import type {FeaturePromoDemoPageData, FeaturePromoDemoPageInfo, UserEducationInternalsPageHandlerInterface, WhatsNewEditionDemoPageInfo, WhatsNewModuleDemoPageInfo} from './user_education_internals.mojom-webui.js';
+import type {FeaturePromoDemoPageData, FeaturePromoDemoPageInfo, UserEducationInternalsPageHandlerInterface} from './user_education_internals.mojom-webui.js';
 import {UserEducationInternalsPageHandler} from './user_education_internals.mojom-webui.js';
 
 export interface UserEducationInternalsElement {
@@ -43,9 +36,6 @@ export interface UserEducationInternalsElement {
     errorMessageToast: CrToastElement,
     menu: CrMenuSelectorElement,
     selector: CrPageSelectorElement,
-    // <if expr="not is_chromeos">
-    whatsNewVersionOverride: CrInputElement,
-    // </if>
   };
 }
 
@@ -102,18 +92,9 @@ export class UserEducationInternalsElement extends
         value: false,
       },
 
-      /**
-       * The current version used to request the What's New page.
-       */
-      whatsNewVersionToRequest_: {
-        type: Number,
-      },
-      whatsNewModules_: {type: Array},
-      whatsNewEditions_: {type: Array},
       ntpPromos_: {type: Array},
       ntpPromoPreferences_: {type: Array},
       sessionData_: {type: Array},
-      currentChromeVersion_: {type: Number},
       initialized_: {type: Boolean},
     };
   }
@@ -124,8 +105,6 @@ export class UserEducationInternalsElement extends
   protected accessor featurePromos_: FeaturePromoDemoPageInfo[] = [];
   protected accessor newBadges_: FeaturePromoDemoPageInfo[] = [];
   protected accessor nonIphPromos_: FeaturePromoDemoPageInfo[] = [];
-  protected accessor whatsNewModules_: WhatsNewModuleDemoPageInfo[] = [];
-  protected accessor whatsNewEditions_: WhatsNewEditionDemoPageInfo[] = [];
   protected accessor ntpPromos_: FeaturePromoDemoPageInfo[] = [];
   protected accessor ntpPromoPreferences_: FeaturePromoDemoPageData[] = [];
   protected accessor ntpPromoPreferencesExpanded_: boolean = false;
@@ -133,10 +112,6 @@ export class UserEducationInternalsElement extends
   protected accessor narrow_: boolean = false;
   protected accessor sessionExpanded_: boolean = false;
   protected accessor sessionData_: FeaturePromoDemoPageData[] = [];
-  protected accessor whatsNewVersionToRequest_: number =
-      loadTimeData.getInteger('whatsNewVersionToRequest');
-  protected accessor currentChromeVersion_: number =
-      loadTimeData.getInteger('currentChromeVersion');
   protected accessor initialized_ = false;
 
   private handler_: UserEducationInternalsPageHandlerInterface;
@@ -200,14 +175,6 @@ export class UserEducationInternalsElement extends
 
     this.handler_.getNonIphPromos().then(({nonIphPromos}) => {
       this.nonIphPromos_ = nonIphPromos;
-    });
-
-    this.handler_.getWhatsNewModules().then(({whatsNewModules}) => {
-      this.whatsNewModules_ = whatsNewModules;
-    });
-
-    this.handler_.getWhatsNewEditions().then(({whatsNewEditions}) => {
-      this.whatsNewEditions_ = whatsNewEditions;
     });
 
     this.handler_.getNtpPromos().then(({ntpPromos}) => {
@@ -370,26 +337,6 @@ export class UserEducationInternalsElement extends
     });
   }
 
-  protected onClearWhatsNewData_() {
-    this.featurePromoErrorMessage_ = '';
-
-    this.handler_.clearWhatsNewData().then(({errorMessage}) => {
-      this.featurePromoErrorMessage_ = errorMessage;
-      if (errorMessage !== '') {
-        this.$.errorMessageToast.show();
-      } else {
-        this.handler_.getWhatsNewModules().then(({whatsNewModules}) => {
-          this.whatsNewModules_ = whatsNewModules;
-          this.requestUpdate();
-        });
-        this.handler_.getWhatsNewEditions().then(({whatsNewEditions}) => {
-          this.whatsNewEditions_ = whatsNewEditions;
-          this.requestUpdate();
-        });
-      }
-    });
-  }
-
   protected onNtpPromoClearPromoData_(e: CustomEvent<string>) {
     const id = e.detail;
     this.featurePromoErrorMessage_ = '';
@@ -431,12 +378,6 @@ export class UserEducationInternalsElement extends
             (platform: string) => platform.toLowerCase().includes(this.filter));
   }
 
-  protected whatsNewFilter_(item: (WhatsNewModuleDemoPageInfo|
-                                   WhatsNewEditionDemoPageInfo)) {
-    return this.filter === '' ||
-        item.displayTitle.toLowerCase().includes(this.filter);
-  }
-
   /**
    * Prevent clicks on sidebar items from navigating.
    */
@@ -467,25 +408,6 @@ export class UserEducationInternalsElement extends
       e: CustomEvent<{value: boolean}>) {
     this.ntpPromoPreferencesExpanded_ = e.detail.value;
   }
-
-  // <if expr="not is_chromeos">
-  protected onLaunchWhatsNewStagingClick_() {
-    this.handler_.launchWhatsNewStaging();
-  }
-
-  protected onWhatsNewVersionOverrideClick_() {
-    if (!this.$.whatsNewVersionOverride.validate()) {
-      return;
-    }
-    const versionOverride: number =
-        Number.parseInt(this.$.whatsNewVersionOverride.value);
-    if (Number.isNaN(versionOverride)) {
-      return;
-    }
-    this.handler_.updateWhatsNewVersionOverride(versionOverride);
-    this.whatsNewVersionToRequest_ = versionOverride;
-  }
-  // </if>
 }
 
 declare global {

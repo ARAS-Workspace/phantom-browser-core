@@ -3150,20 +3150,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .Build());
 #endif
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowChromeWhatsNew(bwi);
-              },
-              bwi))
-          .SetActionId(kActionChromeWhatsNew)
-          .Build());
-#endif
-
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(

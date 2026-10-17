@@ -168,18 +168,6 @@ IN_PROC_BROWSER_TEST_F(UpdateMetricsProviderBrowserTest,
                                        PageBlockingUpdate::kChromeScheme, 1);
 }
 
-IN_PROC_BROWSER_TEST_F(UpdateMetricsProviderBrowserTest,
-                       UpdateAvailableWhatsNew) {
-  SetUpgradeAvailable();
-  NavigateToURL(GURL(chrome::kChromeUIWhatsNewURL));
-
-  provider_.ProvideCurrentSessionData(nullptr);
-  histogram_tester_.ExpectUniqueSample("Chrome.BuildState.PendingUpdateState",
-                                       PendingUpdateState::kOneWindowOneTab, 1);
-  histogram_tester_.ExpectUniqueSample("Chrome.BuildState.PageBlockingUpdate",
-                                       PageBlockingUpdate::kWhatsNew, 1);
-}
-
 IN_PROC_BROWSER_TEST_F(UpdateMetricsProviderBrowserTest, RunInBackground) {
   // Need to use one of the types that outputs the enum.
   auto keep_alive = std::make_unique<ScopedKeepAlive>(

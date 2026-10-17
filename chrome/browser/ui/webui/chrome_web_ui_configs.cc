@@ -109,10 +109,6 @@
 #include "chrome/browser/ui/webui/certificate_manager/certificate_manager_ui.h"
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/sandbox/sandbox_internals_ui.h"
 #endif  // BUILDFLAG(IS_LINUX)
@@ -246,11 +242,6 @@ void RegisterChromeWebUIConfigs() {
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
   map.AddWebUIConfig(std::make_unique<CertificateManagerUIConfig>());
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  map.AddWebUIConfig(std::make_unique<WhatsNewUIConfig>());
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
   map.AddWebUIConfig(std::make_unique<SandboxInternalsUIConfig>());

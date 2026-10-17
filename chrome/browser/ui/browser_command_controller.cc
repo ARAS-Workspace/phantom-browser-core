@@ -1142,15 +1142,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
 #else
       NOTREACHED();
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    case IDC_CHROME_WHATS_NEW:
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
-      ShowChromeWhatsNew(browser_);
-      break;
-#else
-      NOTREACHED();
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && (BUILDFLAG(IS_MAC) ||
-        // BUILDFLAG(IS_LINUX))
     case IDC_CHROME_ENTERPRISE_RELEASE_NOTES:
       if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
         chrome::ShowChromeEnterpriseReleaseNotes(browser_);
@@ -1964,7 +1955,6 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
   command_updater_->UpdateCommandEnabled(IDC_ABOUT, show_main_ui);
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   command_updater_->UpdateCommandEnabled(IDC_CHROME_TIPS, show_main_ui);
-  command_updater_->UpdateCommandEnabled(IDC_CHROME_WHATS_NEW, show_main_ui);
 #endif
   command_updater_->UpdateCommandEnabled(IDC_CONTENT_CONTEXT_SHARING_SUBMENU,
                                          show_main_ui);

@@ -96,7 +96,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
-#include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
 #endif
 
 #if !defined(OFFICIAL_BUILD)
@@ -216,17 +215,8 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
         HistoryClustersSidePanelUI, NewTabPageUI, BookmarksSidePanelUI>(map);
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  RegisterWebUIControllerInterfaceBinder<whats_new::mojom::PageHandlerFactory,
-                                         WhatsNewUI>(map);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
   RegisterWebUIControllerInterfaceBinder<
-      browser_command::mojom::CommandHandlerFactory,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      WhatsNewUI,
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      NewTabPageUI>(map);
+      browser_command::mojom::CommandHandlerFactory, NewTabPageUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<searchbox::mojom::PageHandlerFactory,
                                          NewTabPageUI, OmniboxPopupUI,

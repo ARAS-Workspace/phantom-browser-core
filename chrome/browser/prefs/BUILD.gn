@@ -192,10 +192,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/rlz" ]
   }
 
-  if (is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/webui/whats_new" ]
-  }
-
   deps += [
     "//chrome/browser:intranet_redirect_detector",
     "//chrome/browser/new_tab_page",

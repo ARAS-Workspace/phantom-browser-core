@@ -33,7 +33,6 @@
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/mock_callback.h"
 #include "base/test/run_until.h"
-#include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
@@ -1360,11 +1359,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, RestorePinnedTabs) {
 
   // Write out the pinned tabs.
   PinnedTabCodec::WritePinnedTabs(browser()->GetProfile());
-
-  // Set last What's New version to the current version so there is no What's
-  // New tab shown on launch (for the non-first-run case).
-  g_browser_process->local_state()->SetInteger(
-      prefs::kLastWhatsNewVersion, version_info::GetMajorVersionNumberAsInt());
 
   auto keep_alive = std::make_unique<ScopedKeepAlive>(
       KeepAliveOrigin::SESSION_RESTORE, KeepAliveRestartOption::DISABLED);
