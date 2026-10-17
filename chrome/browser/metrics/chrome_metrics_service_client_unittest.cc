@@ -29,7 +29,6 @@
 #include "components/metrics/test/test_enabled_state_provider.h"
 #include "components/metrics/unsent_log_store.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/regional_capabilities/regional_capabilities_switches.h"
 #include "components/ukm/ukm_service.h"
 #include "components/ukm/ukm_test_helper.h"
 
@@ -118,8 +117,7 @@ class ChromeMetricsServiceClientTest : public testing::Test {
         &prefs_, &enabled_state_provider_, std::wstring(), base::FilePath());
     metrics_state_manager_->InstantiateFieldTrialList();
     ASSERT_TRUE(profile_manager_.SetUp());
-    scoped_feature_list_.InitWithFeatures(
-        {metrics::dwa::kDwaFeature, switches::kDynamicProfileCountry}, {});
+    scoped_feature_list_.InitWithFeatures({metrics::dwa::kDwaFeature}, {});
 
     auto mock_component_updater = std::make_unique<
         testing::NiceMock<component_updater::MockComponentUpdateService>>();
@@ -227,7 +225,7 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   size_t expected_providers = 2;
 
   // This is the number of metrics providers that are outside any #if macros.
-  expected_providers += 23;
+  expected_providers += 22;
 
   int sample_rate;
   if (ChromeMetricsServicesManagerClient::GetSamplingRatePerMille(

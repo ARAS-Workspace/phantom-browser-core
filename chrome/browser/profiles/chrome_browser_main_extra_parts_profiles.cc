@@ -272,7 +272,6 @@
 #include "chrome/browser/record_replay/task_store_factory.h"
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/search/instant_service_factory.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
 #include "chrome/browser/storage/storage_notification_service_factory.h"
 #include "chrome/browser/ui/browser_manager_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
@@ -707,7 +706,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   screen_ai::ScreenAIServiceRouterFactory::EnsureFactoryBuilt();
   SCTReportingServiceFactory::GetInstance();
   search_engines::SearchEngineChoiceServiceFactory::GetInstance();
-  SearchEngineChoiceDialogServiceFactory::GetInstance();
   SearchPrefetchServiceFactory::GetInstance();
   SearchPrewarmProgressServiceFactory::GetInstance();
   if (SearchEnginePreconnector::ShouldBeEnabledAsKeyedService()) {

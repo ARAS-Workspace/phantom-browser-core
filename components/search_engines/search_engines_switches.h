@@ -18,9 +18,6 @@ COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)
 extern const char kExtraSearchQueryParams[];
 
 COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)
-extern const char kIgnoreNoFirstRunForSearchEngineChoiceScreen[];
-
-COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)
 extern const char kDisableSearchEngineChoiceScreen[];
 
 COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)

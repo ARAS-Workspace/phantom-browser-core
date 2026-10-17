@@ -475,7 +475,6 @@ source_set("impl") {
     "//chrome/browser/ui/context_highlight",
     "//chrome/browser/ui/interaction",
     "//chrome/browser/ui/performance_controls",
-    "//chrome/browser/ui/search_engine_choice",
     "//chrome/browser/ui/side_panel",
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
     "//chrome/browser/ui/tabs/alert:tab_alert",

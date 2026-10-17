@@ -25,7 +25,6 @@ class WebUIAllUrlsBrowserTest
       const testing::TestParamInfo<std::string_view>& info);
 
  protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override;
   void WaitBeforeNavigation();
 
  private:

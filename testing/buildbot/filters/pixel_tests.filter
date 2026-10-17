@@ -136,7 +136,6 @@ RelaunchRequiredDialogViewDialogTest.*
 ReopenTabPromoControllerDialogBrowserTest.*
 SafetyTipPageInfoBubbleViewDialogTest.*
 ScreenCaptureNotificationUiBrowserTest.*
-SearchEngineChoiceUIPixelTest.*
 *SendTabToSelfBubbleTest.*
 SendTabToSelfInteractiveUiTest.*
 SendTabToSelfToolbarIconControllerInteractiveUiTest.*

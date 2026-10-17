@@ -110,7 +110,6 @@
 #include "components/captive_portal/content/captive_portal_service.h"
 #endif
 
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "components/storage_monitor/test_storage_monitor.h"
 
@@ -375,12 +374,6 @@ void InProcessBrowserTest::SetUp() {
   // Auto-redirect to the NTP, which can happen if remote content is enabled on
   // What's New for tests that simulate first run, is unexpected by most tests.
   whats_new::DisableRemoteContentForTests();
-
-  // The Search Engine Choice service may attempt to show a modal dialog to the
-  // profile on browser start, which is unexpected by mosts tests. Tests which
-  // expect this can allow the prompt as desired.
-  SearchEngineChoiceDialogService::SetDialogDisabledForTests(
-      /*dialog_disabled=*/true);
 
   EnsureBrowserContextKeyedServiceFactoriesForTestingBuilt();
 

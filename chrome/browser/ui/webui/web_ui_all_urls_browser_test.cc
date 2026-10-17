@@ -8,7 +8,6 @@
 #include "base/test/bind.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/webui_urls_for_test.h"
-#include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/collaboration/public/features.h"
@@ -17,10 +16,7 @@
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/regional_capabilities/regional_capabilities_switches.h"
 #include "components/search/ntp_features.h"
-#include "components/search_engines/search_engines_switches.h"
-#include "components/variations/variations_switches.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "printing/buildflags/buildflags.h"
@@ -69,20 +65,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
 }
 
 WebUIAllUrlsBrowserTest::~WebUIAllUrlsBrowserTest() = default;
-
-void WebUIAllUrlsBrowserTest::SetUpCommandLine(
-    base::CommandLine* command_line) {
-  InProcessBrowserTest::SetUpCommandLine(command_line);
-  if (GetParam() == std::string_view(chrome::kChromeUISearchEngineChoiceURL)) {
-    // Command line arguments needed to render chrome://search-engine-choice.
-    command_line->AppendSwitchASCII(switches::kSearchEngineChoiceCountry, "BE");
-    command_line->AppendSwitchASCII(
-        variations::switches::kVariationsOverrideCountry, "BE");
-    command_line->AppendSwitch(switches::kForceSearchEngineChoiceScreen);
-    command_line->AppendSwitch(
-        switches::kIgnoreNoFirstRunForSearchEngineChoiceScreen);
-  }
-}
 
 void WebUIAllUrlsBrowserTest::WaitBeforeNavigation() {
   // A number of these tests are flaky due to navigating to and from the

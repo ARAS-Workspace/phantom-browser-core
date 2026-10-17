@@ -112,11 +112,6 @@ void BrowserUserEducationContext::CreateSharedPreconditions(
   CHECK(shared_preconditions_.emplace(ptr->GetIdentifier(), std::move(ptr))
             .second);
 
-  // Do not show promos when a critical notice is showing.
-  ptr = std::make_unique<NoCriticalNoticeShowingPrecondition>(*browser_view_);
-  CHECK(shared_preconditions_.emplace(ptr->GetIdentifier(), std::move(ptr))
-            .second);
-
   // Ensure that this uses the same time source as the rest of the User
   // Education system, so tests are consistent.
   ptr = std::make_unique<UserNotActivePrecondition>(*browser_view_,

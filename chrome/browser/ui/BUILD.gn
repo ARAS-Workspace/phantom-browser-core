@@ -976,12 +976,6 @@ static_library("ui") {
     "//chrome/browser/ui/toolbar:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
-    # following headers get componentized:
-    # c/b/ui/browser.h
-    # c/b/ui/views/profiles/profile_customization_bubble_sync_controller.h
-    "//chrome/browser/search_engine_choice:impl",
-
-    # TODO(crbug.com/353332589): Remove this circular dependency when the
     # following header gets componentized:
     # c/b/ui/views/dotted_icon.h
     "//chrome/browser/profiles:profile_util_impl",
@@ -1108,8 +1102,6 @@ static_library("ui") {
     "tab_ui_helper.h",
     "unload_controller.cc",
     "unload_controller.h",
-    "views/search_engine_choice/search_engine_choice_dialog_view.cc",
-    "views/search_engine_choice/search_engine_choice_dialog_view.h",
   ]
 
   # Non-android deps for "ui" target.
@@ -1152,8 +1144,6 @@ static_library("ui") {
     "//chrome/browser/ui/passwords/bubble_controllers:impl",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/performance_controls:impl",
-    "//chrome/browser/ui/search_engine_choice",
-    "//chrome/browser/ui/search_engine_choice:impl",
     "//chrome/browser/ui/shared_highlighting",
     "//chrome/browser/ui/tab_sharing",
     "//chrome/browser/ui/tab_sharing:impl",
@@ -1303,7 +1293,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/data_sharing",
     "//chrome/browser/ui/webui/multistep_filter_internals",
     "//chrome/browser/ui/webui/on_device_internals",
-    "//chrome/browser/ui/webui/search_engine_choice",
     "//chrome/browser/ui/webui/side_panel/bookmarks",
     "//chrome/browser/ui/webui/side_panel/comments",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
@@ -1399,7 +1388,6 @@ static_library("ui") {
 
     "//chrome/browser/ui/window_sizer:impl",
     "//chrome/browser/ui/webui/settings:impl",
-    "//chrome/browser/ui/search_engine_choice:impl",
     "//chrome/browser/ui/global_media_controls:impl",
     "//chrome/browser/ui/tabs:impl",
     "//chrome/browser/ui/tabs:tab_group_impl",

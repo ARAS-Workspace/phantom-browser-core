@@ -45,7 +45,6 @@ class ProfilePickerView;
 class SSLClientCertificateSelector;
 class ScheduledRebootDialog;
 class ScreenCaptureNotificationUIViews;
-class SearchEngineChoiceDialog;
 class ShareThisTabDialogView;
 class SigninViewControllerDelegateViews;
 class SimpleWebViewDialog;
@@ -376,7 +375,6 @@ class VIEWS_EXPORT WidgetDelegate {
     friend class ::ProcessSharingInfobarDelegate;
     friend class ::ProfilePickerView;
     friend class ::ScheduledRebootDialog;
-    friend class ::SearchEngineChoiceDialog;
     friend class ::TabModalConfirmDialogViews;
     friend class ::TestBaseWidgetDelegate;
     friend class ::UpdateRecommendedMessageBox;

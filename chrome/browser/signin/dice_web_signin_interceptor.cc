@@ -38,7 +38,7 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/profiles/profiles_state.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
+#include "chrome/browser/search_engine_choice/search_engine_choice_data.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_pref_names.h"
@@ -1524,7 +1524,7 @@ void DiceWebSigninInterceptor::OnNewSignedInProfileCreated(
 
       // The new profile inherits the default search provider and the search
       // engine choice timestamp from the previous profile.
-      SearchEngineChoiceDialogService::UpdateProfileFromChoiceData(
+      search_engines::UpdateProfileFromChoiceData(
           *new_profile, profile_presets->search_engine_choice_data);
     }
 
@@ -1562,7 +1562,7 @@ void DiceWebSigninInterceptor::ProceedWithProfileCreation(
       profiles::GetDefaultNameForNewSignedInProfile(account_info);
   ProfilePresets profile_presets(profile_color);
   profile_presets.search_engine_choice_data =
-      SearchEngineChoiceDialogService::GetChoiceDataFromProfile(*profile_);
+      search_engines::GetChoiceDataFromProfile(*profile_);
 
   DCHECK(!state_->dice_signed_in_profile_creator_);
   // Unretained is fine because the profile creator is owned by this.

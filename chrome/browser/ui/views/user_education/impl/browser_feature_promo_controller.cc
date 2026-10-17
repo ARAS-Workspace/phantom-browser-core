@@ -64,8 +64,6 @@ void BrowserFeaturePromoController::AddPreconditionProviders(
           user_education::FeaturePromoPreconditionList preconditions;
           preconditions.AddPrecondition(browser_context->GetSharedPrecondition(
               kBrowserNotClosingPrecondition));
-          preconditions.AddPrecondition(browser_context->GetSharedPrecondition(
-              kNoCriticalNoticeShowingPrecondition));
 
           const auto info = policy->GetPromoPriorityInfo(spec);
           if (info.priority == Priority::kLow &&

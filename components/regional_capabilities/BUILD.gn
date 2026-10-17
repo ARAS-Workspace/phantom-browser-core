@@ -5,8 +5,6 @@
 static_library("regional_capabilities") {
   sources = [
     "enums.h",
-    "regional_capabilities_internals_data_holder.cc",
-    "regional_capabilities_internals_data_holder.h",
     "regional_capabilities_metrics.cc",
     "regional_capabilities_metrics.h",
     "regional_capabilities_prefs.cc",
@@ -35,7 +33,6 @@ static_library("regional_capabilities") {
     "//components/prefs",
     "//components/search_engines:search_engine_pref_names",
     "//components/strings",
-    "//components/webui/regional_capabilities_internals:constants",
     "//third_party/abseil-cpp:absl",
     "//third_party/search_engines_data:prepopulated_engines",
     "//third_party/search_engines_data:regional_settings",
@@ -45,9 +42,7 @@ static_library("regional_capabilities") {
 source_set("country_access_reason") {
   visibility = [
     ":*",
-    "//chrome/browser/search_engine_choice:impl",
     "//chrome/browser/ui/webui/profile_internals",
-    "//chrome/browser/ui/webui/regional_capabilities_internals",
     "//components/metrics/private_metrics",
     "//components/search_engines",
   ]
@@ -86,7 +81,6 @@ source_set("switches") {
 source_set("data") {
   visibility = [
     ":*",
-    "//chrome/browser/regional_capabilities:metrics_provider_impl",
     "//components/search_engines",
     "//components/search_engines:unit_tests",
   ]

@@ -1808,13 +1808,6 @@ test("browser_tests") {
     sources += [ "../browser/ui/overscroll_pref_manager_browsertest.cc" ]
   }
 
-  if (!is_chrome_for_testing) {
-    deps += [
-      "//chrome/browser/search_engine_choice",
-      "//chrome/browser/search_engine_choice:browser_tests",
-    ]
-  }
-
   if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/views/hats" ]
   }
@@ -2072,13 +2065,6 @@ test("browser_tests") {
     deps += [
       "//chrome/browser/consent_auditor",
       "//chrome/browser/consent_auditor:test_support",
-    ]
-  }
-
-  if (is_linux) {
-    deps += [
-      "//chrome/browser/ui/search_engine_choice",
-      "//chrome/browser/ui/webui/search_engine_choice:browser_tests",
     ]
   }
 
@@ -4825,13 +4811,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/views/tabs/groups:interactive_ui_tests",
     "//chrome/browser/ui/webui/print_preview:interactive_ui_tests",
   ]
-
-  if (!is_chrome_for_testing) {
-    deps += [
-      "//chrome/browser/search_engine_choice",
-      "//chrome/browser/search_engine_choice:interactive_ui_tests",
-    ]
-  }
 
   if (include_js_tests) {
     deps += [ "//chrome/test/data/webui:interactive_ui_tests" ]

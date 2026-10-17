@@ -32,7 +32,6 @@ source_set("impl") {
   public_deps = [ ":user_education" ]
   deps = [
     "//chrome/browser/feature_engagement",
-    "//chrome/browser/search_engine_choice",
     "//chrome/browser/ui:browser_element_identifiers",
     "//chrome/browser/ui/views/frame",
     "//chrome/browser/user_education",

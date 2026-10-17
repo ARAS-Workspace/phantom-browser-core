@@ -350,8 +350,7 @@
       "chrome://sync-confirmation/*",
       "chrome://tab-search.top-chrome/*",
       "chrome://tab-strip.top-chrome/*",
-      "chrome://vc-background/*",
-      "chrome://search-engine-choice/*"
+      "chrome://vc-background/*"
     ]
   }, {
     "channel": "stable",

@@ -389,7 +389,7 @@ void TurnSyncOnHelper::LoadPolicyWithCachedCredentials() {
 void TurnSyncOnHelper::CreateNewSignedInProfile() {
   // Use the same the default search engine in the new profile.
   std::optional<search_engines::ChoiceData> search_engine_choice_data =
-      SearchEngineChoiceDialogService::GetChoiceDataFromProfile(*profile_);
+      search_engines::GetChoiceDataFromProfile(*profile_);
 
   base::OnceCallback<void(Profile*)> profile_created_callback = base::BindOnce(
       &TurnSyncOnHelper::OnNewSignedInProfileCreated, base::Unretained(this),
@@ -431,8 +431,8 @@ void TurnSyncOnHelper::OnNewSignedInProfileCreated(
 
   // The new profile inherits the default search provider and the search
   // engine choice timestamp from the previous profile.
-  SearchEngineChoiceDialogService::UpdateProfileFromChoiceData(
-      *new_profile, search_engine_choice_data);
+  search_engines::UpdateProfileFromChoiceData(*new_profile,
+                                              search_engine_choice_data);
 
   if (policy_fetch_tracker_) {
     // Load policy for the just-created profile - once policy has finished

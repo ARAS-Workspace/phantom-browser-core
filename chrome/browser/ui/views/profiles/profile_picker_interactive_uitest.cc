@@ -5,25 +5,16 @@
 #include "base/check.h"
 #include "base/run_loop.h"
 #include "base/test/metrics/histogram_tester.h"
-#include "base/test/metrics/user_action_tester.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/profiles/profile_metrics.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_interactive_uitest_base.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_test_base.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_view.h"
-#include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
-#include "components/regional_capabilities/regional_capabilities_switches.h"
-#include "components/search_engines/search_engine_choice/search_engine_choice_utils.h"
-#include "components/search_engines/search_engines_switches.h"
-#include "components/signin/public/base/signin_switches.h"
-#include "components/variations/variations_switches.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
@@ -43,8 +34,6 @@ namespace {
 
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kProfilePickerViewId);
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kPickerWebContentsId);
-DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kButtonEnabled);
-DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kButtonDisabled);
 
 const WebContentsInteractionTestUtil::DeepQuery kContinueWithoutAccountButton =
     {"profile-picker-app", "profile-type-choice", "#notNowButton"};
@@ -99,12 +88,7 @@ class ProfilePickerInteractiveUiTest
     : public InteractiveBrowserTest,
       public WithProfilePickerInteractiveUiTestHelpers {
  public:
-  ProfilePickerInteractiveUiTest() {
-    scoped_chrome_build_override_ = std::make_unique<base::AutoReset<bool>>(
-        SearchEngineChoiceDialogServiceFactory::
-            ScopedChromeBuildOverrideForTesting(
-                /*force_chrome_build=*/true));
-  }
+  ProfilePickerInteractiveUiTest() = default;
 
   ~ProfilePickerInteractiveUiTest() override = default;
 
@@ -166,50 +150,8 @@ class ProfilePickerInteractiveUiTest
     return state_change;
   }
 
-  void SetUpOnMainThread() override {
-    InteractiveBrowserTest::SetUpOnMainThread();
-    SearchEngineChoiceDialogService::SetDialogDisabledForTests(
-        /*dialog_disabled=*/false);
-  }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    InteractiveBrowserTest::SetUpCommandLine(command_line);
-
-    // Change the country to belgium because the search engine choice screen
-    // is only displayed for EEA countries.
-    command_line->AppendSwitchASCII(switches::kSearchEngineChoiceCountry, "BE");
-    command_line->AppendSwitchASCII(
-        variations::switches::kVariationsOverrideCountry, "BE");
-    command_line->AppendSwitch(
-        switches::kIgnoreNoFirstRunForSearchEngineChoiceScreen);
-  }
-
   const base::HistogramTester& HistogramTester() const {
     return histogram_tester_;
-  }
-
-  const base::UserActionTester& UserActionTester() const {
-    return user_action_tester_;
-  }
-
-  auto WaitForButtonEnabled(const ui::ElementIdentifier web_contents_id,
-                            const DeepQuery& button_query) {
-    StateChange button_enabled;
-    button_enabled.event = kButtonEnabled;
-    button_enabled.where = button_query;
-    button_enabled.type = StateChange::Type::kExistsAndConditionTrue;
-    button_enabled.test_function = "(btn) => !btn.disabled";
-    return WaitForStateChange(web_contents_id, button_enabled);
-  }
-
-  auto WaitForButtonDisabled(const ui::ElementIdentifier web_contents_id,
-                             const DeepQuery& button_query) {
-    StateChange button_disabled;
-    button_disabled.event = kButtonDisabled;
-    button_disabled.where = button_query;
-    button_disabled.type = StateChange::Type::kExistsAndConditionTrue;
-    button_disabled.test_function = "(btn) => btn.disabled";
-    return WaitForStateChange(web_contents_id, button_disabled);
   }
 
   auto PressJsButton(const ui::ElementIdentifier web_contents_id,
@@ -219,69 +161,7 @@ class ProfilePickerInteractiveUiTest
                        ExecuteJsMode::kFireAndForget);
   }
 
-  const DeepQuery& GetSearchEngineChoiceActionButtonQuery() {
-    if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
-        base::FeatureList::IsEnabled(
-            switches::kFirstRunDesktopChoiceScreenRefresh)) {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"search-engine-choice-app-refresh", "#actionButton"});
-      return *kQuery;
-    }
-
-    static const base::NoDestructor<DeepQuery> kQuery(
-        {"search-engine-choice-app", "#actionButton"});
-    return *kQuery;
-  }
-
-  const DeepQuery& GetSearchEngineChoiceCrRadioButtonQuery() {
-    if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
-        base::FeatureList::IsEnabled(
-            switches::kFirstRunDesktopChoiceScreenRefresh)) {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"search-engine-choice-app-refresh", "cr-radio-button"});
-      return *kQuery;
-    }
-
-    static const base::NoDestructor<DeepQuery> kQuery(
-        {"search-engine-choice-app", "cr-radio-button"});
-    return *kQuery;
-  }
-
-  auto CompleteSearchEngineChoiceStep() {
-    return Steps(
-        WaitForWebContentsNavigation(
-            kPickerWebContentsId, GURL(chrome::kChromeUISearchEngineChoiceURL)),
-
-        Do([&] {
-          HistogramTester().ExpectBucketCount(
-              search_engines::kSearchEngineChoiceScreenEventsHistogram,
-              search_engines::SearchEngineChoiceScreenEvents::
-                  kProfileCreationChoiceScreenWasDisplayed,
-              1);
-          EXPECT_EQ(UserActionTester().GetActionCount(
-                        "SearchEngineChoiceScreenShown"),
-                    1);
-        }),
-
-        // Click on "More" to scroll to the bottom of the search engine list.
-        PressJsButton(kPickerWebContentsId,
-                      GetSearchEngineChoiceActionButtonQuery()),
-
-        // The button should become disabled because we didn't make a choice.
-        WaitForButtonDisabled(kPickerWebContentsId,
-                              GetSearchEngineChoiceActionButtonQuery()),
-
-        PressJsButton(kPickerWebContentsId,
-                      GetSearchEngineChoiceCrRadioButtonQuery()),
-        WaitForButtonEnabled(kPickerWebContentsId,
-                             GetSearchEngineChoiceActionButtonQuery()),
-        PressJsButton(kPickerWebContentsId,
-                      GetSearchEngineChoiceActionButtonQuery()));
-  }
-
  private:
-  std::unique_ptr<base::AutoReset<bool>> scoped_chrome_build_override_;
-  base::UserActionTester user_action_tester_;
   base::HistogramTester histogram_tester_;
 };
 
@@ -434,18 +314,10 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerInteractiveUiTest, ContinueWithoutAccount) {
       WaitForStateChange(kPickerWebContentsId,
                          Exists(kContinueWithoutAccountButton)),
       PressJsButton(kPickerWebContentsId, kContinueWithoutAccountButton)
-          .SetMustRemainVisible(false),
-
-      CompleteSearchEngineChoiceStep());
+          .SetMustRemainVisible(false));
 
   WaitForPickerClosed();
 
   HistogramTester().ExpectUniqueSample(
       "Profile.AddNewUser", ProfileMetrics::ADD_NEW_PROFILE_PICKER_LOCAL, 1);
-
-  HistogramTester().ExpectBucketCount(
-      search_engines::kSearchEngineChoiceScreenEventsHistogram,
-      search_engines::SearchEngineChoiceScreenEvents::
-          kProfileCreationDefaultWasSet,
-      1);
 }

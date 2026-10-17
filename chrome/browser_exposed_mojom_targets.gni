@@ -38,7 +38,6 @@ browser_exposed_mojom_targets = [
   "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
   "//chrome/browser/ui/webui/omnibox_popup/mojom:mojom",
   "//chrome/browser/ui/webui/on_device_internals:mojom",
-  "//chrome/browser/ui/webui/search_engine_choice:mojo_bindings",
   "//chrome/browser/ui/webui/segmentation_internals:mojo_bindings",
   "//chrome/browser/ui/webui/side_panel/bookmarks:mojo_bindings",
   "//chrome/browser/ui/webui/side_panel/comments:mojo_bindings",

@@ -12,11 +12,6 @@ namespace switches {
 // testing.
 const char kExtraSearchQueryParams[] = "extra-search-query-params";
 
-// Override the --no-first-run dialog suppression for the search dialog
-// for testing
-const char kIgnoreNoFirstRunForSearchEngineChoiceScreen[] =
-    "ignore-no-first-run-for-search-engine-choice-screen";
-
 // Disable the search engine choice screen for testing / autmation.
 const char kDisableSearchEngineChoiceScreen[] =
     "disable-search-engine-choice-screen";

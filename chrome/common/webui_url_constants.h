@@ -327,10 +327,6 @@ inline constexpr char kChromeUINearbyInternalsHost[] = "nearby-internals";
 inline constexpr char kChromeUINearbyShareHost[] = "nearby";
 inline constexpr char kChromeUINearbyShareURL[] = "chrome://nearby/";
 inline constexpr char kChromeUIOnDeviceInternalsHost[] = "on-device-internals";
-inline constexpr char kChromeUISearchEngineChoiceHost[] =
-    "search-engine-choice";
-inline constexpr char kChromeUISearchEngineChoiceURL[] =
-    "chrome://search-engine-choice";
 inline constexpr char kChromeUISearchEngineSettingsPath[] = "/searchEngines";
 inline constexpr char kChromeUISearchSettingsPath[] = "/search";
 inline constexpr char kChromeUITabSearchHost[] = "tab-search.top-chrome";

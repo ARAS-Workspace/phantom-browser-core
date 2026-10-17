@@ -15,8 +15,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
-#include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
 #include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -420,25 +418,6 @@ ProfilePickerFlowController::RegisterPostIdentitySteps(
     PostHostClearedCallback post_host_cleared_callback) {
   CHECK(created_profile_);
   base::queue<ProfileManagementFlowController::Step> post_identity_steps;
-
-  // TODO(crbug.com/40942098): Find another way to fetch the web contents.
-  content::WebContents* web_contents = GetSignedOutFlowWebContents();
-  CHECK(web_contents);
-
-  auto search_engine_choice_step_completed = base::BindOnce(
-      &ProfilePickerFlowController::AdvanceToNextPostIdentityStep,
-      base::Unretained(this));
-  SearchEngineChoiceDialogService* search_engine_choice_dialog_service =
-      SearchEngineChoiceDialogServiceFactory::GetForProfile(
-          created_profile_.get());
-  RegisterStep(
-      Step::kSearchEngineChoice,
-      ProfileManagementStepController::CreateForSearchEngineChoice(
-          host(), search_engine_choice_dialog_service, web_contents,
-          SearchEngineChoiceDialogService::EntryPoint::kProfileCreation,
-          std::move(search_engine_choice_step_completed)));
-  post_identity_steps.emplace(
-      ProfileManagementFlowController::Step::kSearchEngineChoice);
 
   RegisterStep(
       Step::kFinishFlow,

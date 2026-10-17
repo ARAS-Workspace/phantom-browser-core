@@ -70,7 +70,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/omnibox",
     "//chrome/browser/ui/webui/policy",
     "//chrome/browser/ui/webui/predictors",
-    "//chrome/browser/ui/webui/regional_capabilities_internals",
     "//chrome/browser/ui/webui/saved_tab_groups_unsupported",
     "//chrome/browser/ui/webui/segmentation_internals",
     "//chrome/browser/ui/webui/suggest_internals",
