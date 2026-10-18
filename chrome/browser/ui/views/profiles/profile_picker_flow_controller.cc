@@ -15,7 +15,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
@@ -383,13 +382,6 @@ void ProfilePickerFlowController::OnSwitchToProfileComplete(
   if (profile->IsGuestSession()) {
     RecordProfilePickerAction(ProfilePickerAction::kLaunchGuestProfile);
   } else {
-    // Launch a HaTS survey if the user intentionally switched profiles via the
-    // profile picker accessed from the profile menu. This excludes first-run or
-    // startup scenarios.
-    if (entry_point_ == ProfilePicker::EntryPoint::kProfileMenuManageProfiles) {
-      signin::LaunchHatsSurveyForProfile(
-          kHatsSurveyTriggerIdentitySwitchProfileFromProfilePicker, profile);
-    }
     RecordProfilePickerAction(
         open_settings
             ? ProfilePickerAction::kLaunchExistingProfileCustomizeSettings

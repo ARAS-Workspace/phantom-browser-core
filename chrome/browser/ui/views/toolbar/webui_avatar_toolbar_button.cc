@@ -216,12 +216,6 @@ void WebUIAvatarToolbarButton::MaybeShowProfileSwitchIPH() {
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-void WebUIAvatarToolbarButton::MaybeShowSupervisedUserSignInIPH() {
-  if (state_manager_ && delegate_->GetView()->GetWidget()) {
-    state_manager_->MaybeShowSupervisedUserSignInIPH();
-  }
-}
-
 void WebUIAvatarToolbarButton::MaybeShowSignInBenefitsIPH() {
   if (state_manager_ && delegate_->GetView()->GetWidget()) {
     state_manager_->MaybeShowSignInBenefitsIPH();

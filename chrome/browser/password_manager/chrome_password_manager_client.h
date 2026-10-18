@@ -220,8 +220,6 @@ class ChromePasswordManagerClient
   autofill::LogManager* GetCurrentLogManager() override;
   void AnnotateNavigationEntry(bool has_password_field) override;
   autofill::LanguageCode GetPageLanguage() const override;
-  void TriggerUserPerceptionOfPasswordManagerSurvey(
-      const std::string& filling_assistance) override;
 
   ukm::SourceId GetUkmSourceId() override;
   password_manager::PasswordManagerMetricsRecorder* GetMetricsRecorder()

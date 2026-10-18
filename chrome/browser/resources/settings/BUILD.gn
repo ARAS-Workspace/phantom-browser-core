@@ -212,7 +212,6 @@ build_webui("build") {
     "performance_page/tab_discard/exception_validation_mixin.ts",
     "people_page/sync_controls_page.html.ts",
     "people_page/sync_controls_page.ts",
-    "privacy_page/hats_browser_proxy.ts",
     "relaunch_mixin.ts",
     "relaunch_mixin_lit.ts",
     "reset_page/reset_browser_proxy.ts",

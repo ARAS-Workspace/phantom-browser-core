@@ -18,7 +18,6 @@
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/run_until.h"
 #include "base/time/time.h"
-#include "base/version.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -43,9 +42,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/signin/dice_web_signin_interceptor_delegate.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -84,7 +80,6 @@
 #include "components/sync/protocol/sync_enums.pb.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_user_settings.h"
-#include "components/version_info/version_info.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_launcher.h"
 #include "google_apis/gaia/gaia_id.h"
@@ -95,11 +90,8 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "url/gurl.h"
 
-using testing::_;
 using testing::Eq;
 using testing::IsEmpty;
-using testing::Pair;
-using testing::UnorderedElementsAre;
 
 namespace {
 
@@ -812,89 +804,6 @@ class DiceWebSigninInterceptorWithChromeSigninHelpersBrowserTest
     enterprise_util::SetUserAcceptedAccountManagement(GetProfile(), !allow);
   }
 };
-
-class DiceWebSigninInterceptorWithHatsSurveyBrowserTest
-    : public DiceWebSigninInterceptorWithChromeSigninHelpersBrowserTest {
- public:
-  DiceWebSigninInterceptorWithHatsSurveyBrowserTest() {
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/
-        {{switches::kChromeIdentitySurveyDiceWebSigninAccepted,
-          switches::kChromeIdentitySurveyDiceWebSigninDeclined}},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpOnMainThread() override {
-    DiceWebSigninInterceptorBrowserTest::SetUpOnMainThread();
-    mock_hats_service_ = static_cast<MockHatsService*>(
-        HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-            browser()->GetProfile(),
-            base::BindRepeating(&BuildMockHatsService)));
-  }
-
-  void TearDownOnMainThread() override {
-    mock_hats_service_ = nullptr;
-    DiceWebSigninInterceptorBrowserTest::TearDownOnMainThread();
-  }
-
-  MockHatsService* mock_hats_service() { return mock_hats_service_; }
-
- private:
-  raw_ptr<MockHatsService> mock_hats_service_ = nullptr;
-  base::test::ScopedFeatureList feature_list_;
-};
-
-// Tests that a HaTS survey is launched when users accept the intercept signin
-// promo.
-IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorWithHatsSurveyBrowserTest,
-                       ShowHatsSurveyOnChromeSigninInterceptAccepted) {
-  // Setup account for interception.
-  AccountInfo account_info = MakeAccountInfoAvailableAndUpdate(
-      "alice@example.com", /*hosted_domain=*/std::string());
-
-  // Makes sure Chrome is not signed in to trigger the intercept bubble.
-  ASSERT_FALSE(IsChromeSignedIn());
-
-  EXPECT_CALL(
-      *mock_hats_service(),
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentityDiceWebSigninAccepted, _, _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "1"),
-              Pair("Number of Google Accounts", "1"),
-              Pair("Sign-in Status", "Signed In"))));
-  ShowAndCompleteSigninBubbleWithResult(account_info,
-                                        SigninInterceptionResult::kAccepted);
-  EXPECT_TRUE(IsChromeSignedIn());
-}
-
-// Tests that a HaTS survey is launched when users decline the intercept signin
-// promo.
-IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorWithHatsSurveyBrowserTest,
-                       ShowHatsSurveyOnChromeSigninInterceptDeclined) {
-  // Setup account for interception.
-  AccountInfo account_info = MakeAccountInfoAvailableAndUpdate(
-      "alice@example.com", /*hosted_domain=*/std::string());
-
-  // Makes sure Chrome is not signed in to trigger the bubble.
-  ASSERT_FALSE(IsChromeSignedIn());
-
-  EXPECT_CALL(
-      *mock_hats_service(),
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentityDiceWebSigninDeclined, _, _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "1"),
-              Pair("Number of Google Accounts", "1"),
-              Pair("Sign-in Status", "Web Only Signed In"))));
-  ShowAndCompleteSigninBubbleWithResult(account_info,
-                                        SigninInterceptionResult::kDeclined);
-  EXPECT_FALSE(IsChromeSignedIn());
-}
 
 // Test to sign in to Chrome from the Chrome Signin Bubble Intercept.
 class DiceWebSigninInterceptorSigninBubbleBrowserTest

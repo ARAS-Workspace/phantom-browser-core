@@ -94,9 +94,6 @@ class SettingsUI
   void AddSettingsPageUIHandler(
       std::unique_ptr<content::WebUIMessageHandler> handler);
 
-  // Makes a request to show a HaTS survey.
-  void TryShowHatsSurveyWithTimeout();
-
   // theme_color_picker::mojom::ThemeColorPickerHandlerFactory:
   void CreateThemeColorPickerHandler(
       mojo::PendingRemote<theme_color_picker::mojom::ThemeColorPickerClient>

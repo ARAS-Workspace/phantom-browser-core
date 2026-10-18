@@ -18,7 +18,6 @@
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
 #include "base/notreached.h"
-#include "base/rand_util.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
@@ -32,7 +31,6 @@
 #include "chrome/browser/autocomplete/shortcuts_backend_factory.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/command_updater.h"
 #include "chrome/browser/extensions/api/omnibox/omnibox_api.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
@@ -60,18 +58,14 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/omnibox/chrome_omnibox_navigation_observer.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/omnibox/omnibox_tab_helper.h"
-#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_closer.h"
 #include "chrome/browser/ui/views/search_engines/dse_reset_dialog.h"
-#include "chrome/common/channel_info.h"
 #include "chrome/common/pref_names.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/favicon/content/content_favicon_driver.h"
@@ -81,12 +75,8 @@
 #include "components/omnibox/browser/autocomplete_result.h"
 #include "components/omnibox/browser/base_search_provider.h"
 #include "components/omnibox/browser/location_bar_model.h"
-#include "components/omnibox/browser/most_visited_sites_provider.h"
-#include "components/omnibox/browser/omnibox_prefs.h"
-#include "components/omnibox/browser/page_classification_functions.h"
 #include "components/omnibox/browser/search_provider.h"
 #include "components/omnibox/browser/shortcuts_backend.h"
-#include "components/omnibox/browser/zero_suggest_provider.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/page_load_metrics/browser/navigation_handle_user_data.h"
@@ -510,126 +500,6 @@ void ChromeOmniboxClient::OnFocusChanged(OmniboxFocusState state,
   if (auto* helper =
           OmniboxTabHelper::FromWebContents(location_bar_->GetWebContents())) {
     helper->OnFocusChanged(state, reason);
-  }
-}
-
-void ChromeOmniboxClient::MaybeShowOnFocusHatsSurvey(
-    AutocompleteProviderClient* client) {
-  if (!g_browser_process ||
-      !base::StartsWith(g_browser_process->GetApplicationLocale(), "en")) {
-    return;
-  }
-
-  // Check zero-suggest eligibility criteria.
-  auto classification = GetPageClassification(/*is_prefetch=*/false);
-  AutocompleteInput input(
-      GetNavigationEntryURL().IsAboutBlank()
-          ? u""
-          : base::UTF8ToUTF16(GetNavigationEntryURL().spec()),
-      classification, GetSchemeClassifier());
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  input.set_current_url(GetNavigationEntryURL());
-  if (!ZeroSuggestProvider::GetResultTypeAndEligibility(client, input).second ||
-      !MostVisitedSitesProvider::AllowMostVisitedSitesSuggestions(client,
-                                                                  input)) {
-    return;
-  }
-
-  // If the content is for an SRP or Web Page.
-  if (!omnibox::IsSearchResultsPage(classification) &&
-      !omnibox::IsOtherWebPage(classification)) {
-    return;
-  }
-
-  auto focus_count = GetPrefs()->GetInteger(omnibox::kFocusedSrpWebCount);
-  focus_count += 1;
-
-  if (focus_count <
-      static_cast<int>(omnibox_feature_configs::
-                           HappinessTrackingSurveyForOmniboxOnFocusZps::Get()
-                               .focus_threshold)) {
-    GetPrefs()->SetInteger(omnibox::kFocusedSrpWebCount, focus_count);
-    return;
-  }
-
-  const auto survey_delay_time_ms =
-      omnibox_feature_configs::HappinessTrackingSurveyForOmniboxOnFocusZps::
-          Get()
-              .survey_delay;
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&ChromeOmniboxClient::CheckConditionsAndLaunchSurvey,
-                     weak_factory_.GetWeakPtr()),
-      base::Milliseconds(survey_delay_time_ms));
-}
-
-void ChromeOmniboxClient::CheckConditionsAndLaunchSurvey() {
-  // Roll the dice as we want to show one of two surveys to the treatment
-  // group but only one survey to the control group.
-  bool show_happiness_survey = base::RandIntInclusive(0, 1) == 0;
-
-  // Don't show the suggestions utility survey to control group.
-  if (!omnibox_feature_configs::OmniboxUrlSuggestionsOnFocus::Get().enabled &&
-      !show_happiness_survey) {
-    return;
-  }
-
-  // Get channel string to return as PSD.
-  std::string channel;
-  switch (chrome::GetChannel()) {
-    case version_info::Channel::STABLE:
-      channel = "stable";
-      break;
-    case version_info::Channel::BETA:
-      channel = "beta";
-      break;
-    case version_info::Channel::DEV:
-      channel = "dev";
-      break;
-    case version_info::Channel::CANARY:
-      channel = "canary";
-      break;
-    default:
-      channel = "unknown";
-  }
-
-  const std::string& survey_trigger =
-      show_happiness_survey ? kHatsSurveyTriggerOnFocusZpsSuggestionsHappiness
-                            : kHatsSurveyTriggerOnFocusZpsSuggestionsUtility;
-
-  const std::string& trigger_id =
-      show_happiness_survey
-          ? omnibox_feature_configs::
-                HappinessTrackingSurveyForOmniboxOnFocusZps::Get()
-                    .happiness_trigger_id
-          : omnibox_feature_configs::
-                HappinessTrackingSurveyForOmniboxOnFocusZps::Get()
-                    .utility_trigger_id;
-
-  HatsService* hats_service =
-      HatsServiceFactory::GetForProfile(profile_, /*create_if_necessary=*/true);
-
-  if (!browser_) {
-    return;
-  }
-
-  auto* browser_view = BrowserView::GetBrowserViewForBrowser(browser_);
-
-  if (!browser_view) {
-    return;
-  }
-
-  auto* location_bar = browser_view->GetLocationBar();
-
-  // Don't show the HaTS survey if the location bar has focus.
-  if (location_bar && !location_bar->IsFocusWithin()) {
-    hats_service->LaunchSurvey(
-        survey_trigger, base::DoNothing(), base::DoNothing(), {},
-        {{"page classification",
-          metrics::OmniboxEventProto::PageClassification_Name(
-              GetPageClassification(/*is_prefetch=*/false))},
-         {"channel", channel}},
-        trigger_id, HatsService::SurveyOptions());
   }
 }
 

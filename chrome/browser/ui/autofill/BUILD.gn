@@ -175,7 +175,6 @@ source_set("impl") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/autofill/payments",
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/page_info",
     "//chrome/browser/ui/passwords",
     "//chrome/browser/webdata_services",

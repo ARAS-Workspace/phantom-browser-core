@@ -35,7 +35,6 @@
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
@@ -45,7 +44,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
@@ -148,29 +146,9 @@ ProfileMenuView::ProfileMenuView(views::BubbleAnchor anchor_element,
     : ProfileMenuViewBase(anchor_element, browser),
       browser_(raw_ref<BrowserWindowInterface>::from_ptr(browser)) {
   set_close_on_deactivate(close_on_deactivate_for_testing_);
-
-  // Set the callback to launch a HaTS survey upon menu dismissal.
-  // We use `SetCloseCallback` instead of `SetCancelCallback` because the close
-  // callback is also executed when users dismiss the menu by clicking outside,
-  // unlike the cancel callback.
-  SetCloseCallback(
-      base::BindOnce(&ProfileMenuView::OnClose, base::Unretained(this)));
 }
 
 ProfileMenuView::~ProfileMenuView() = default;
-
-void ProfileMenuView::OnClose() {
-  bool is_browser_window_active =
-      skip_window_active_check_for_testing_ ||
-      (browser().GetWindow() && browser().GetWindow()->IsActive());
-  if (!actionable_item_clicked() && is_browser_window_active) {
-    // Launch a HaTS survey only if the user dismissed the menu without
-    // selecting an item (e.g., by clicking outside or pressing ESC), and the
-    // browser window remains active.
-    signin::LaunchHatsSurveyForProfile(
-        kHatsSurveyTriggerIdentityProfileMenuDismissed, &profile());
-  }
-}
 
 void ProfileMenuView::BuildMenu() {
   if (profile().IsGuestSession()) {
@@ -386,18 +364,7 @@ void ProfileMenuView::OnOtherProfileSelected(
   }
 
   GetWidget()->CloseWithReason(views::Widget::ClosedReason::kUnspecified);
-  // Switch to the selected profile and launch a HaTS survey for the
-  // associated non-webapp browser.
-  profiles::SwitchToProfile(
-      profile_path, /*always_create=*/false,
-      base::BindOnce([](BrowserWindowInterface* browser) {
-        if (!browser) {
-          return;
-        }
-        signin::LaunchHatsSurveyForProfile(
-            kHatsSurveyTriggerIdentitySwitchProfileFromProfileMenu,
-            browser->GetProfile());
-      }));
+  profiles::SwitchToProfile(profile_path, /*always_create=*/false);
 }
 
 void ProfileMenuView::OnAddNewProfileButtonClicked() {

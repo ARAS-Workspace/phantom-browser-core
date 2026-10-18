@@ -16,7 +16,6 @@
 #include "base/path_service.h"
 #include "base/run_loop.h"
 #include "base/strings/escape.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -26,8 +25,6 @@
 #include "base/test/with_feature_override.h"
 #include "base/threading/thread_restrictions.h"
 #include "base/time/time.h"
-#include "base/version.h"
-#include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
@@ -61,9 +58,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/signin/account_preview_utils.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
@@ -142,10 +136,7 @@
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 namespace {
-using testing::_;
 using testing::Eq;
-using testing::Pair;
-using testing::UnorderedElementsAre;
 
 constexpr char kTestEmail[] = "foo@example.com";
 
@@ -372,8 +363,7 @@ class ProfileMenuViewExtensionsTest : public ProfileMenuViewTestBase,
  public:
   ProfileMenuViewExtensionsTest()
       : InteractiveFeaturePromoTestMixin(UseDefaultTrackerAllowingPromos(
-            {feature_engagement::kIPHProfileSwitchFeature,
-             feature_engagement::kIPHSupervisedUserProfileSigninFeature})) {}
+            {feature_engagement::kIPHProfileSwitchFeature})) {}
 
   // InteractiveFeaturePromoTestMixin:
   void SetUpOnMainThread() override {
@@ -494,8 +484,7 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuViewExtensionsTest,
 }
 
 // Opening the profile menu dismisses any existing IPH.
-// Regression test for crbug.com/40180664 (Profile Switch IPH)
-// and for crbug.com/378449081 (Supervised User IPH).
+// Regression test for crbug.com/40180664 (Profile Switch IPH).
 class ProfileMenuViewExtensionsIphDismissTest
     : public ProfileMenuViewExtensionsTest,
       public testing::WithParamInterface<base::test::FeatureRef> {
@@ -503,18 +492,11 @@ class ProfileMenuViewExtensionsIphDismissTest
   const base::Feature& GetIphFeature() { return *GetParam(); }
 };
 
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    ProfileMenuViewExtensionsIphDismissTest,
-    testing::Values(
-        base::test::FeatureRef(feature_engagement::kIPHProfileSwitchFeature),
-        base::test::FeatureRef(
-            feature_engagement::kIPHSupervisedUserProfileSigninFeature)),
-    [](const auto& info) {
-      return info.param == feature_engagement::kIPHProfileSwitchFeature
-                 ? "_ProfileSwitch"
-                 : "_SupervisedUser";
-    });
+INSTANTIATE_TEST_SUITE_P(All,
+                         ProfileMenuViewExtensionsIphDismissTest,
+                         testing::Values(base::test::FeatureRef(
+                             feature_engagement::kIPHProfileSwitchFeature)),
+                         [](const auto&) { return "_ProfileSwitch"; });
 
 IN_PROC_BROWSER_TEST_P(ProfileMenuViewExtensionsIphDismissTest, CloseIPH) {
   // Display the IPH.
@@ -2066,221 +2048,3 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_GuestProfile,
 
   RunTest();
 }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-class ProfileMenuHatsSurveyTest : public ProfileMenuViewTestBase,
-                                  public InProcessBrowserTest {
- public:
-  ProfileMenuHatsSurveyTest() {
-    feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/
-        {{switches::kChromeIdentitySurveySwitchProfileFromProfileMenu, {}},
-         {switches::kChromeIdentitySurveyProfileMenuDismissed, {}},
-         {switches::kChromeIdentitySurveyLaunchWithDelay,
-          {{switches::kChromeIdentitySurveyLaunchWithDelayDuration.name,
-            base::NumberToString(kLaunchDelayDuration.InMilliseconds()) +
-                "ms"}}}},
-        /*disabled_features=*/{});
-  }
-
-  static constexpr base::TimeDelta kLaunchDelayDuration =
-      base::Milliseconds(5000);
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-// List of actionable items in the correct order as they appear in the menu. If
-// a new button is added to the menu, it should also be added to this list.
-// This list is NOT for setting up a click test, and rather for anchoring the
-// "Other Profile" item for selection.
-constexpr std::array kActionableItems_WithAnotherProfile = {
-    ProfileMenuViewBase::ActionableItem::kSigninButton,
-    ProfileMenuViewBase::ActionableItem::kEditProfileButton,
-    ProfileMenuViewBase::ActionableItem::kOtherProfileButton,
-    ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
-    ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
-    ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
-    // The first button is added again to finish the cycle and test that
-    // there are no other buttons at the end.
-    ProfileMenuViewBase::ActionableItem::kSigninButton};
-
-// Tests that the HaTS service will attempt to launch a survey when users
-// switch profile from the profile menu.
-IN_PROC_BROWSER_TEST_F(ProfileMenuHatsSurveyTest,
-                       SurveyLaunchedOnSwitchingProfile) {
-  // Setup a new profile and its mock HatsService.
-  Profile* other_profile = CreateAdditionalProfile();
-  MockHatsService* other_profile_hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          other_profile, base::BindRepeating(&BuildMockHatsService)));
-  CreateBrowserWindow(
-      BrowserWindowCreateParams(other_profile, /*from_user_gesture=*/true));
-
-  // The survey should be launched for the other profile after switching.
-  EXPECT_CALL(
-      *other_profile_hats_service,
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentitySwitchProfileFromProfileMenu,
-          kLaunchDelayDuration.InMilliseconds(), _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "2"),
-              Pair("Number of Google Accounts", "0"),
-              Pair("Sign-in Status", "Signed Out"))));
-
-  // Open the profile menu and select the other profile.
-  SetTargetBrowser(browser());
-  OpenProfileMenu();
-  ASSERT_TRUE(profile_menu_view());
-  static_cast<ProfileMenuView*>(profile_menu_view())
-      ->set_skip_window_active_check_for_testing(true);
-  for (const auto& item : kActionableItems_WithAnotherProfile) {
-    profile_menu_view()->GetFocusManager()->AdvanceFocus(/*reverse=*/false);
-    if (item == ProfileMenuViewBase::ActionableItem::kOtherProfileButton) {
-      break;
-    }
-  }
-  views::View* focused_item =
-      profile_menu_view()->GetFocusManager()->GetFocusedView();
-  ASSERT_TRUE(focused_item);
-  Click(focused_item);
-  base::RunLoop().RunUntilIdle();
-}
-
-// Tests that the HaTS service will attempt to launch a survey when users
-// dismiss the profile menu without clicking any buttons.
-IN_PROC_BROWSER_TEST_F(ProfileMenuHatsSurveyTest,
-                       SurveyLaunchedOnProfileMenuDismissed) {
-  MockHatsService* hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          GetProfile(), base::BindRepeating(&BuildMockHatsService)));
-
-  EXPECT_CALL(
-      *hats_service,
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentityProfileMenuDismissed,
-          kLaunchDelayDuration.InMilliseconds(), _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "1"),
-              Pair("Number of Google Accounts", "0"),
-              Pair("Sign-in Status", "Signed Out"))));
-
-  // Open the profile menu.
-  SetTargetBrowser(browser());
-  OpenProfileMenu();
-  ASSERT_TRUE(profile_menu_view());
-  static_cast<ProfileMenuView*>(profile_menu_view())
-      ->set_skip_window_active_check_for_testing(true);
-
-  // Dismiss the profile menu.
-  profile_menu_view()->GetWidget()->Close();
-  base::RunLoop().RunUntilIdle();
-  auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-  EXPECT_FALSE(coordinator->IsShowing());
-}
-
-// Tests that when the number of profiles or accounts is larger than 5, the
-// data sent to the HaTS service is bucketed to "5+" for privacy.
-IN_PROC_BROWSER_TEST_F(ProfileMenuHatsSurveyTest, SurveyProductDataBucketed) {
-  // Create 5 extra profiles.
-  CreateAdditionalProfile();
-  CreateAdditionalProfile();
-  CreateAdditionalProfile();
-  CreateAdditionalProfile();
-  CreateAdditionalProfile();
-
-  // Add 6 accounts to the current profile.
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(browser()->GetProfile());
-  signin::MakePrimaryAccountAvailable(identity_manager, kTestEmail,
-                                      signin::ConsentLevel::kSignin);
-  signin::MakeAccountAvailable(identity_manager, "test1@example.com");
-  signin::MakeAccountAvailable(identity_manager, "test2@example.com");
-  signin::MakeAccountAvailable(identity_manager, "test3@example.com");
-  signin::MakeAccountAvailable(identity_manager, "test4@example.com");
-  signin::MakeAccountAvailable(identity_manager, "test5@example.com");
-
-  MockHatsService* hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          GetProfile(), base::BindRepeating(&BuildMockHatsService)));
-
-  EXPECT_CALL(
-      *hats_service,
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentityProfileMenuDismissed,
-          kLaunchDelayDuration.InMilliseconds(), _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "5+"),
-              Pair("Number of Google Accounts", "5+"),
-              Pair("Sign-in Status", "Signed In"))));
-
-  // Open the profile menu.
-  SetTargetBrowser(browser());
-  OpenProfileMenu();
-  ASSERT_TRUE(profile_menu_view());
-  static_cast<ProfileMenuView*>(profile_menu_view())
-      ->set_skip_window_active_check_for_testing(true);
-
-  // Dismiss the profile menu.
-  profile_menu_view()->GetWidget()->Close();
-  base::RunLoop().RunUntilIdle();
-  auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-  EXPECT_FALSE(coordinator->IsShowing());
-}
-
-// Tests that the HaTS service will NOT attempt to launch a survey when a user
-// clicks an actionable item within the profile menu, causing it to close.
-IN_PROC_BROWSER_TEST_F(ProfileMenuHatsSurveyTest,
-                       SurveyNotLaunchedOnActionableItemClick) {
-  MockHatsService* hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          GetProfile(), base::BindRepeating(&BuildMockHatsService)));
-
-  // Set up another profile.
-  Profile* other_profile = CreateAdditionalProfile();
-  CreateBrowserWindow(
-      BrowserWindowCreateParams(other_profile, /*from_user_gesture=*/true));
-
-  // Attempt to select every actionable item in the menu.
-  for (const auto& selected_item : kActionableItems_WithAnotherProfile) {
-    EXPECT_CALL(*hats_service,
-                LaunchDelayedSurvey(
-                    kHatsSurveyTriggerIdentityProfileMenuDismissed, _, _, _))
-        .Times(0);
-
-    SetTargetBrowser(browser());
-
-    // Open the profile menu.
-    OpenProfileMenu();
-    ASSERT_TRUE(profile_menu_view());
-    static_cast<ProfileMenuView*>(profile_menu_view())
-        ->set_skip_window_active_check_for_testing(true);
-    profile_menu_view()->set_perform_menu_actions_for_testing(false);
-
-    // Click on the selected item.
-    for (const auto& item : kActionableItems_WithAnotherProfile) {
-      profile_menu_view()->GetFocusManager()->AdvanceFocus(/*reverse=*/false);
-      if (item == selected_item) {
-        break;
-      }
-    }
-    views::View* focused_item =
-        profile_menu_view()->GetFocusManager()->GetFocusedView();
-    ASSERT_TRUE(focused_item);
-    Click(focused_item);
-
-    // Make sure that the profile menu is closed.
-    profile_menu_view()->GetWidget()->Close();
-    base::RunLoop().RunUntilIdle();
-    auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-    EXPECT_FALSE(coordinator->IsShowing());
-  }
-}
-
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

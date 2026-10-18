@@ -63,6 +63,7 @@ source_set("tab_search") {
     "//components/browser_apis/tab_strip/aggregation",
     "//components/browser_apis/tab_strip/observation",
     "//components/favicon_base",
+    "//components/pref_registry",
     "//components/prefs",
     "//components/sessions",
     "//components/signin/public/identity_manager",

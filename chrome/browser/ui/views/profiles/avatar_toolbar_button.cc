@@ -406,10 +406,6 @@ void AvatarToolbarButton::MaybeShowProfileSwitchIPH() {
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-void AvatarToolbarButton::MaybeShowSupervisedUserSignInIPH() {
-  state_manager_.MaybeShowSupervisedUserSignInIPH();
-}
-
 void AvatarToolbarButton::MaybeShowSignInBenefitsIPH() {
   state_manager_.MaybeShowSignInBenefitsIPH();
 }

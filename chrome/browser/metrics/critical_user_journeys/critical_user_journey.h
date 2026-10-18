@@ -5,10 +5,7 @@
 #ifndef CHROME_BROWSER_METRICS_CRITICAL_USER_JOURNEYS_CRITICAL_USER_JOURNEY_H_
 #define CHROME_BROWSER_METRICS_CRITICAL_USER_JOURNEYS_CRITICAL_USER_JOURNEY_H_
 
-#include <map>
 #include <memory>
-#include <optional>
-#include <string>
 #include <type_traits>
 #include <variant>
 #include <vector>
@@ -48,22 +45,6 @@ struct Branch {
   int metric_id;
 };
 
-// Configuration parameters for triggering a HaTS survey upon journey
-// completion.
-struct HatsParams {
-  HatsParams();
-  HatsParams(const HatsParams&);
-  HatsParams& operator=(const HatsParams&);
-  ~HatsParams();
-
-  std::string trigger;
-  base::RepeatingClosure success_callback;
-  base::RepeatingClosure failure_callback;
-  std::map<std::string, bool> product_specific_bits_data;
-  std::map<std::string, std::string> product_specific_string_data;
-  std::optional<std::string> supplied_trigger_id;
-};
-
 // Defines a sequence of user-UI interactions representing a critical task.
 // Used to track progress, completion, and drop-off rates for key user
 // workflows.
@@ -90,7 +71,6 @@ class CriticalUserJourney {
 
     Builder& AddAnyOf(const std::vector<Branch>& branches);
     Builder& AddCustomCompletionCallback(base::RepeatingClosure callback);
-    Builder& LaunchHatsSurveyOnCompletion(HatsParams params);
 
     std::unique_ptr<CriticalUserJourney> Build();
 
@@ -98,14 +78,12 @@ class CriticalUserJourney {
     const raw_ptr<const base::Feature> feature_;
     std::vector<std::unique_ptr<CriticalUserJourneyStep>> steps_;
     base::RepeatingClosure completion_callback_;
-    std::optional<HatsParams> hats_params_;
   };
 
   CriticalUserJourney(
       const base::Feature* feature,
       std::vector<std::unique_ptr<CriticalUserJourneyStep>> steps,
-      base::RepeatingClosure completion_callback,
-      std::optional<HatsParams> hats_params);
+      base::RepeatingClosure completion_callback);
   ~CriticalUserJourney();
 
   // The name is automatically provided by the feature.
@@ -120,13 +98,11 @@ class CriticalUserJourney {
   base::RepeatingClosure completion_callback() const {
     return completion_callback_;
   }
-  const std::optional<HatsParams>& hats_params() const { return hats_params_; }
 
  private:
   const raw_ptr<const base::Feature> feature_;
   std::vector<std::unique_ptr<CriticalUserJourneyStep>> steps_;
   base::RepeatingClosure completion_callback_;
-  std::optional<HatsParams> hats_params_;
 };
 
 }  // namespace metrics

@@ -17,7 +17,6 @@
 #include "chrome/browser/pdf/pdf_extension_test_base.h"
 #include "chrome/browser/pdf/pdf_extension_test_util.h"
 #include "chrome/browser/pdf/pdf_pref_names.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/save_to_drive/content_reader.h"
 #include "chrome/browser/save_to_drive/drive_uploader.h"
 #include "chrome/browser/save_to_drive/multipart_drive_uploader.h"
@@ -26,8 +25,6 @@
 #include "chrome/browser/save_to_drive/save_to_drive_recorder.h"
 #include "chrome/browser/save_to_drive/save_to_drive_utils.h"
 #include "chrome/browser/save_to_drive/time_remaining_calculator.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
 #include "chrome/browser/ui/save_to_drive/get_account.h"
 #include "chrome/common/extensions/api/pdf_viewer_private.h"
 #include "chrome/test/base/chrome_test_utils.h"
@@ -43,7 +40,6 @@
 using extensions::api::pdf_viewer_private::SaveToDriveErrorType;
 using extensions::api::pdf_viewer_private::SaveToDriveProgress;
 using extensions::api::pdf_viewer_private::SaveToDriveStatus;
-using testing::_;
 using testing::AllOf;
 using testing::Field;
 using testing::Return;
@@ -111,17 +107,6 @@ class SaveToDriveFlowBrowserTest : public base::test::WithFeatureOverride,
 
   bool UseOopif() const override { return GetParam(); }
 
-  std::vector<base::test::FeatureRefAndParams> GetEnabledFeatures()
-      const override {
-    std::vector<base::test::FeatureRefAndParams> enabled_features =
-        PDFExtensionTestBase::GetEnabledFeatures();
-    enabled_features.push_back(
-        {chrome_pdf::features::kPdfSaveToDriveSurvey,
-         {{"enterprise-trigger-id", "EnterpriseTriggerId"},
-          {"consumer-trigger-id", "ConsumerTriggerId"}}});
-    return enabled_features;
-  }
-
   void SetUpOnMainThread() override {
     PDFExtensionTestBase::SetUpOnMainThread();
 
@@ -140,21 +125,16 @@ class SaveToDriveFlowBrowserTest : public base::test::WithFeatureOverride,
     auto account_chooser =
         std::make_unique<testing::StrictMock<MockAccountChooser>>();
     account_chooser_ = account_chooser.get();
-    hats_service_ = static_cast<MockHatsService*>(
-        HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-            browser()->GetProfile(),
-            base::BindRepeating(&BuildMockHatsService)));
 
-    SaveToDriveFlow::CreateForCurrentDocument(
-        rfh, std::move(event_dispatcher), std::move(content_reader),
-        std::move(account_chooser), hats_service_);
+    SaveToDriveFlow::CreateForCurrentDocument(rfh, std::move(event_dispatcher),
+                                              std::move(content_reader),
+                                              std::move(account_chooser));
     test_api_ = std::make_unique<SaveToDriveFlow::TestApi>(
         SaveToDriveFlow::GetForCurrentDocument(rfh));
   }
 
   void TearDownOnMainThread() override {
     account_chooser_ = nullptr;
-    hats_service_ = nullptr;
     test_api_.reset();
     PDFExtensionTestBase::TearDownOnMainThread();
   }
@@ -229,7 +209,6 @@ class SaveToDriveFlowBrowserTest : public base::test::WithFeatureOverride,
  protected:
   std::unique_ptr<SaveToDriveFlow::TestApi> test_api_;
   raw_ptr<MockAccountChooser> account_chooser_ = nullptr;
-  raw_ptr<MockHatsService> hats_service_ = nullptr;
 };
 
 IN_PROC_BROWSER_TEST_P(SaveToDriveFlowBrowserTest, AccountChooserCanceled) {
@@ -322,22 +301,6 @@ IN_PROC_BROWSER_TEST_P(SaveToDriveFlowBrowserTest,
   // 5 MB + 1 byte to ensure it's greater than the threshold.
   EXPECT_CALL(content_reader(), GetSize).WillOnce(Return(5 * 1024 * 1024 + 1));
   SaveToDriveFlow::GetForCurrentDocument(rfh())->Run();
-}
-
-IN_PROC_BROWSER_TEST_P(SaveToDriveFlowBrowserTest,
-                       ShowConsumerSurveyAfterUpload) {
-  EXPECT_CALL(
-      *hats_service_,
-      LaunchDelayedSurvey(kHatsSurveyConsumerTriggerPdfSaveToDrive, _, _, _));
-  TestCreateMultipartUploaderForSmallFile(/*is_managed=*/false);
-}
-
-IN_PROC_BROWSER_TEST_P(SaveToDriveFlowBrowserTest,
-                       ShowEnterpriseSurveyAfterUpload) {
-  EXPECT_CALL(
-      *hats_service_,
-      LaunchDelayedSurvey(kHatsSurveyEnterpriseTriggerPdfSaveToDrive, _, _, _));
-  TestCreateMultipartUploaderForSmallFile(/*is_managed=*/true);
 }
 
 IN_PROC_BROWSER_TEST_P(SaveToDriveFlowBrowserTest, FailsForDisallowedAccounts) {

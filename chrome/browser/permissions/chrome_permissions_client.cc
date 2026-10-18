@@ -10,7 +10,6 @@
 
 #include "base/check_deref.h"
 #include "base/feature_list.h"
-#include "base/functional/callback_helpers.h"
 #include "base/no_destructor.h"
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
@@ -35,11 +34,7 @@
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/page_info/page_info_infobar_delegate.h"
-#include "chrome/common/channel_info.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -55,7 +50,6 @@
 #include "components/permissions/constants.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_actions_history.h"
-#include "components/permissions/permission_hats_trigger_helper.h"
 #include "components/permissions/permission_request.h"
 #include "components/permissions/permission_uma_util.h"
 #include "components/permissions/permission_util.h"
@@ -67,8 +61,6 @@
 #include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/unified_consent/pref_names.h"
-#include "components/version_info/version_info.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/render_frame_host.h"
@@ -97,7 +89,6 @@ namespace {
 using permissions::PermissionPromptDisposition;
 using permissions::PermissionPromptDispositionReason;
 using permissions::PermissionRequest;
-using permissions::PermissionRequestGestureType;
 
 const url::Origin& GetNewTabOrigin() {
   static const base::NoDestructor<url::Origin> origin(
@@ -324,71 +315,6 @@ permissions::IconId ChromePermissionsClient::GetOverrideIconId(
   return PermissionsClient::GetOverrideIconId(request_type);
 }
 
-// Triggers the prompt HaTS survey if enabled by field trials for this
-// combination of prompt parameters.
-void ChromePermissionsClient::TriggerPromptHatsSurveyIfEnabled(
-    content::WebContents* web_contents,
-    permissions::RequestType request_type,
-    std::optional<permissions::PermissionAction> action,
-    PermissionPromptDisposition prompt_disposition,
-    PermissionPromptDispositionReason prompt_disposition_reason,
-    PermissionRequestGestureType gesture_type,
-    std::optional<base::TimeDelta> prompt_display_duration,
-    bool is_post_prompt,
-    const GURL& gurl,
-    std::optional<permissions::feature_params::PermissionElementPromptPosition>
-        pepc_prompt_position,
-    ContentSetting initial_permission_status,
-    base::OnceCallback<void()> hats_shown_callback,
-    PromptOptions prompt_options) {
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  std::optional<GURL> recorded_gurl =
-      profile->GetPrefs()->GetBoolean(
-          unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled)
-          ? std::make_optional(gurl)
-          : std::nullopt;
-
-  auto prompt_parameters =
-      permissions::PermissionHatsTriggerHelper::PromptParametersForHats(
-          request_type, action, prompt_disposition, prompt_disposition_reason,
-          gesture_type,
-          std::string(version_info::GetChannelString(chrome::GetChannel())),
-          is_post_prompt ? permissions::kOnPromptResolved
-                         : permissions::kOnPromptAppearing,
-          prompt_display_duration,
-          permissions::PermissionHatsTriggerHelper::
-              GetOneTimePromptsDecidedBucket(profile->GetPrefs()),
-          recorded_gurl, pepc_prompt_position, initial_permission_status,
-          prompt_options);
-
-  if (!permissions::PermissionHatsTriggerHelper::
-          ArePromptTriggerCriteriaSatisfied(prompt_parameters)) {
-    return;
-  }
-
-  std::optional<
-      permissions::PermissionHatsTriggerHelper::SurveyParametersForHats>
-      survey_parameters = permissions::PermissionHatsTriggerHelper::
-          GetSurveyParametersForRequestType(request_type);
-
-  auto* hats_service =
-      HatsServiceFactory::GetForProfile(profile,
-                                        /*create_if_necessary=*/true);
-  if (!hats_service || !survey_parameters.has_value()) {
-    return;
-  }
-
-  auto survey_data = permissions::PermissionHatsTriggerHelper::
-      SurveyProductSpecificData::PopulateFrom(prompt_parameters);
-
-  hats_service->LaunchSurvey(
-      kHatsSurveyTriggerPermissionsPrompt, std::move(hats_shown_callback),
-      base::DoNothing(), survey_data.survey_bits_data,
-      survey_data.survey_string_data, survey_parameters->supplied_trigger_id,
-      HatsService::SurveyOptions(survey_parameters->custom_survey_invitation));
-}
-
 permissions::PermissionIgnoredReason
 ChromePermissionsClient::DetermineIgnoreReason(
     content::WebContents* web_contents) {
@@ -430,7 +356,6 @@ void ChromePermissionsClient::OnPromptResolved(
     ContentSetting initial_permission_status,
     content::WebContents* web_contents) {
   permissions::RequestType request_type = request->request_type();
-  PermissionRequestGestureType gesture_type = request->GetGestureType();
 
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
@@ -463,21 +388,6 @@ void ChromePermissionsClient::OnPromptResolved(
   if (should_show_infobar) {
     ShowInfobar(web_contents);
   }
-
-  auto content_setting_type = RequestTypeToContentSettingsType(request_type);
-  if (content_setting_type.has_value()) {
-    permissions::PermissionHatsTriggerHelper::
-        IncrementOneTimePermissionPromptsDecidedIfApplicable(
-            content_setting_type.value(), profile->GetPrefs());
-  }
-
-  TriggerPromptHatsSurveyIfEnabled(
-      web_contents, request_type, std::make_optional(action),
-      prompt_disposition, prompt_disposition_reason, gesture_type,
-      std::make_optional(prompt_display_duration), /*is_post_prompt=*/true,
-      web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin().GetURL(),
-      pepc_prompt_position, initial_permission_status, base::DoNothing(),
-      prompt_options);
 }
 
 std::optional<bool>

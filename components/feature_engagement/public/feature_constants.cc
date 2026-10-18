@@ -357,10 +357,6 @@ BASE_FEATURE(kIPHSignInBenefitsFeature,
 BASE_FEATURE(kIPHSignInBenefitsNewSigninFeature,
              "IPH_SignInBenefitsNewSignin",
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHSupervisedUserProfileSigninFeature,
-             "IPH_SupervisedUserProfileSignin",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 BASE_FEATURE(kIPHResumptionRailFeature,

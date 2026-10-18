@@ -150,7 +150,6 @@ class TestBrowserWindow : public BrowserWindow,
       content::WebContents* web_contents) override;
   void ShowAvatarBubbleFromAvatarButton(bool is_source_keyboard) override {}
   void MaybeShowProfileSwitchIPH() override {}
-  void MaybeShowSupervisedUserProfileSignInIPH() override {}
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void ShowHatsDialog(

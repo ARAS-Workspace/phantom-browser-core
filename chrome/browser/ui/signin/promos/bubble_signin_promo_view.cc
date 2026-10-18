@@ -19,12 +19,10 @@
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_pref_names.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_delegate.h"
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_signin_button_view.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
@@ -522,11 +520,6 @@ void BubbleSignInPromoView::OnWidgetDestroying(views::Widget* widget) {
     IncrementContextualPromoDismissCountPerAccount(profile, access_point_,
                                                    account);
   }
-
-  // Launch a HaTS survey if the user actively dismissed the promo.
-  signin::LaunchHatsSurveyForProfile(
-      kHatsSurveyTriggerIdentitySigninPromoBubbleDismissed, profile,
-      /*defer_if_no_browser=*/false, access_point_);
 
   base::UmaHistogramEnumeration(
       base::StrCat({"Signin.SignInPromo.Dismissed", dismiss_action}),

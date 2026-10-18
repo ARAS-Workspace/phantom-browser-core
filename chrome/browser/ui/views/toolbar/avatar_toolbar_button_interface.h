@@ -88,10 +88,6 @@ class AvatarToolbarButtonInterface {
   virtual void MaybeShowProfileSwitchIPH() = 0;
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // Attempts showing the In-Product-Help when a supervised user signs-in in a
-  // profile.
-  virtual void MaybeShowSupervisedUserSignInIPH() = 0;
-
   // Attempts showing the In-Product-Help listing benefits for signed-in users
   // after the sync-to-signin migration.
   virtual void MaybeShowSignInBenefitsIPH() = 0;

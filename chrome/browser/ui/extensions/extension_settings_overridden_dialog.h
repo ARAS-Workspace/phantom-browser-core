@@ -66,10 +66,6 @@ class ExtensionSettingsOverriddenDialog
     // The text and similar content required for the dialog.
     ShowParams content;
 
-    // The HaTS survey trigger to use, if any. If specified, will attempt to
-    // show a survey for the specified trigger.
-    std::optional<std::string> hats_survey_trigger;
-
     // If set, the dialog will be shown repeatedly, until a choice is made.
     // Otherwise, it will be shown only once per user session.
     bool unlimited_shows = false;
@@ -111,29 +107,6 @@ class ExtensionSettingsOverriddenDialog
       base::OnceCallback<void(std::optional<DialogResult> result)>;
   void SetDialogResultCallback(DialogResultCallback callback);
 
-  // Potentially triggers a HaTS survey, for the trigger value supplied in
-  // dialog parameters.
-  static void MaybeShowHatsSurvey(Profile* profile,
-                                  const std::string& survey_trigger,
-                                  DialogResult result,
-                                  base::TimeDelta duration,
-                                  const std::string& extension_name,
-                                  const std::string& extension_id);
-
-  // Constants for HaTS survey PSD keys and values.
-  static constexpr char kHatsPsdChannel[] = "Channel";
-  static constexpr char kHatsPsdUserChoice[] = "User choice";
-  static constexpr char kHatsPsdTimeDialogVisible[] =
-      "Duration dialog was visible";
-  static constexpr char kHatsPsdNewExtensionName[] = "New extension name";
-  static constexpr char kHatsPsdNewExtensionId[] = "New extension ID";
-
-  static constexpr char kHatsUserChoiceNewProvider[] = "New provider";
-  static constexpr char kHatsUserChoicePreviousProvider[] = "Previous provider";
-  static constexpr char kHatsUserChoiceDismissed[] = "Dismissed";
-  static constexpr char kHatsUserChoiceClosedWithoutUserAction[] =
-      "Closed without user action";
-
  private:
   // Disables the extension that controls the setting.
   void DisableControllingExtension();
@@ -148,9 +121,6 @@ class ExtensionSettingsOverriddenDialog
   const raw_ref<Profile> profile_;
 
   DialogResultCallback dialog_result_callback_;
-
-  // Time the dialog was shown.
-  base::TimeTicks show_time_;
 };
 
 #endif  // CHROME_BROWSER_UI_EXTENSIONS_EXTENSION_SETTINGS_OVERRIDDEN_DIALOG_H_

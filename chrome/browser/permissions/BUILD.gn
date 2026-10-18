@@ -70,7 +70,6 @@ source_set("permissions") {
     "//chrome/browser/tab_contents",
     "//chrome/browser/top_level_storage_access_api:permissions",
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/page_info",
     "//chrome/common",
     "//chrome/common:chrome_features",
@@ -93,7 +92,6 @@ source_set("permissions") {
     "//components/segmentation_platform/internal:optimization_guide_segmentation_handler",
     "//components/site_engagement/content",
     "//components/subresource_filter/content/browser",
-    "//components/unified_consent",
     "//components/vector_icons",
     "//content/public/browser",
     "//extensions/buildflags",
@@ -165,16 +163,11 @@ source_set("unit_tests") {
     "//components/passage_embeddings/core",
     "//components/site_engagement/content",
     "//components/ukm/content",
-    "//components/unified_consent",
     "//testing/gmock",
     "//testing/gtest",
   ]
 
-  sources += [
-    "permission_hats_trigger_unittest.cc",
-    "system/system_media_permission_cache_unittest.cc",
-  ]
-  deps += [ "//chrome/browser/ui/hats" ]
+  sources += [ "system/system_media_permission_cache_unittest.cc" ]
   if (enable_extensions) {
     deps += [
       "//extensions/browser/mime_handler:stream_container",

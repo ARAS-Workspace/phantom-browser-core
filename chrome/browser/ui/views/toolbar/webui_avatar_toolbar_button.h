@@ -56,7 +56,6 @@ class WebUIAvatarToolbarButton : public AvatarToolbarButtonInterface {
   bool HasExplicitButtonState() const override;
   void MaybeShowProfileSwitchIPH() override;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  void MaybeShowSupervisedUserSignInIPH() override;
   void MaybeShowSignInBenefitsIPH() override;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 

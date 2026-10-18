@@ -116,7 +116,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser/profiles:profile_util",
       "//chrome/browser/signin:signin_promo",
-      "//chrome/browser/ui/hats",
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/views:layout_provider",
       "//chrome/browser/ui/views/controls",
@@ -158,8 +157,6 @@ source_set("interactive_ui_tests") {
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/extensions:extension_post_install_dialog",
-    "//chrome/browser/ui/hats",
-    "//chrome/browser/ui/hats:test_support",
     "//chrome/browser/ui/passwords:test_support",
     "//chrome/browser/ui/views/autofill:address_sign_in_promo_view",
     "//chrome/browser/ui/views/bookmarks",

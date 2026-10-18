@@ -136,7 +136,6 @@ source_set("impl") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/actions:actions_headers",
     "//chrome/browser/ui/autofill",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/location_bar",
     "//chrome/browser/ui/page_action:icon_type",
     "//chrome/browser/ui/toasts",

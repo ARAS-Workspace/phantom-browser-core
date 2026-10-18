@@ -33,7 +33,6 @@ import type {Route} from '../router.js';
 import {SettingsViewMixin} from '../settings_page/settings_view_mixin.js';
 import {CookieControlsMode} from '../site_settings/constants.js';
 
-import {HatsBrowserProxyImpl, TrustSafetyInteraction} from './hats_browser_proxy.js';
 import {getTemplate} from './privacy_page.html.js';
 
 export interface SettingsPrivacyPageElement {
@@ -89,14 +88,10 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
   }
 
   private onClearBrowsingDataClick_() {
-    this.interactedWithPage_();
-
     Router.getInstance().navigateTo(routes.CLEAR_BROWSER_DATA);
   }
 
   private onCookiesClick_() {
-    this.interactedWithPage_();
-
     Router.getInstance().navigateTo(routes.COOKIES);
   }
 
@@ -124,21 +119,13 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
   }
 
   private onSiteSettingsLinkRowClick_() {
-    this.interactedWithPage_();
-
     Router.getInstance().navigateTo(routes.SITE_SETTINGS);
   }
 
   private onSecurityPageClick_() {
-    this.interactedWithPage_();
     this.metricsBrowserProxy_.recordAction(
         'SafeBrowsing.Settings.ShowedFromParentSettings');
     Router.getInstance().navigateTo(routes.SECURITY);
-  }
-
-  private interactedWithPage_() {
-    HatsBrowserProxyImpl.getInstance().trustSafetyInteractionOccurred(
-        TrustSafetyInteraction.USED_PRIVACY_CARD);
   }
 
   private computeThirdPartyCookiesSublabel_(): string {

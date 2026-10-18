@@ -8,7 +8,6 @@
 
 #include <algorithm>
 
-#include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
 #include "base/strings/utf_string_conversions.h"
@@ -21,7 +20,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/affiliations/core/browser/affiliation_utils.h"
-#include "components/autofill/core/common/autofill_features.h"
 #include "components/password_manager/core/browser/leak_detection_dialog_utils.h"
 #include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/password_manager/core/browser/origin_credential_store.h"
@@ -49,8 +47,6 @@
 #include "url/origin.h"
 
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/hats/hats_service.h"          // nogncheck
-#include "chrome/browser/ui/hats/hats_service_factory.h"  // nogncheck
 #include "chrome/browser/ui/user_education/show_promo_in_page.h"
 
 namespace {
@@ -208,27 +204,6 @@ std::string GetGooglePasswordManagerSubPageURLStr() {
                        chrome::kPasswordManagerSubPage});
 }
 
-void TriggerManagePasswordsPerceptionSurvey(BrowserWindowInterface* browser,
-                                            ManagePasswordsReferrer referrer) {
-  Profile* profile = browser->GetProfile();
-  if (!base::FeatureList::IsEnabled(
-          autofill::features::kManagePasswordsPerceptionSurvey) ||
-      profile->IsOffTheRecord()) {
-    return;
-  }
-  HatsService* hats_service =
-      HatsServiceFactory::GetForProfile(profile, /*create_if_necessary=*/false);
-  if (!hats_service) {
-    return;
-  }
-  const SurveyBitsData product_specific_bits_data = {
-      {"Visit from Your saved info",
-       referrer == ManagePasswordsReferrer::kChromeSettings},
-  };
-  hats_service->LaunchDelayedSurvey(kHatsSurveyTriggerManagePasswordsPerception,
-                                    10000, product_specific_bits_data);
-}
-
 void NavigateToManagePasswordsPage(BrowserWindowInterface* browser,
                                    ManagePasswordsReferrer referrer) {
   if (!browser) {
@@ -236,7 +211,6 @@ void NavigateToManagePasswordsPage(BrowserWindowInterface* browser,
   }
   base::UmaHistogramEnumeration("PasswordManager.ManagePasswordsReferrer",
                                 referrer);
-  TriggerManagePasswordsPerceptionSurvey(browser, referrer);
   chrome::ShowPasswordManager(browser);
 }
 

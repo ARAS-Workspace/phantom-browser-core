@@ -30,8 +30,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -47,7 +45,6 @@
 #include "chrome/browser/ui/webui/settings/dictation_handler.h"
 #include "chrome/browser/ui/webui/settings/downloads_handler.h"
 #include "chrome/browser/ui/webui/settings/font_handler.h"
-#include "chrome/browser/ui/webui/settings/hats_handler.h"
 #include "chrome/browser/ui/webui/settings/import_data_handler.h"
 #include "chrome/browser/ui/webui/settings/metrics_reporting_handler.h"
 #include "chrome/browser/ui/webui/settings/on_startup_handler.h"
@@ -181,7 +178,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<ExtensionControlHandler>());
   AddSettingsPageUIHandler(std::make_unique<FontHandler>(profile));
   AddSettingsPageUIHandler(std::make_unique<ImportDataHandler>());
-  AddSettingsPageUIHandler(std::make_unique<HatsHandler>());
 
   AddSettingsPageUIHandler(
       std::make_unique<MediaDevicesSelectionHandler>(profile));
@@ -379,8 +375,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
                 kGlicOsToggleElementId,
                 kGlicOsWidgetKeyboardShortcutElementId,
             });
-
-  TryShowHatsSurveyWithTimeout();
 }
 
 SettingsUI::~SettingsUI() = default;
@@ -418,20 +412,6 @@ void SettingsUI::AddSettingsPageUIHandler(
     std::unique_ptr<content::WebUIMessageHandler> handler) {
   DCHECK(handler);
   web_ui()->AddMessageHandler(std::move(handler));
-}
-
-void SettingsUI::TryShowHatsSurveyWithTimeout() {
-  HatsService* hats_service =
-      HatsServiceFactory::GetForProfile(Profile::FromWebUI(web_ui()),
-                                        /* create_if_necessary = */ true);
-  if (hats_service) {
-    int timeout_ms =
-        features::kHappinessTrackingSurveysForDesktopSettingsTime.Get()
-            .InMilliseconds();
-    hats_service->LaunchDelayedSurveyForWebContents(
-        kHatsSurveyTriggerSettings, web_ui()->GetWebContents(), timeout_ms, {},
-        {}, HatsService::NavigationBehavior::REQUIRE_SAME_ORIGIN);
-  }
 }
 
 void SettingsUI::CreateThemeColorPickerHandler(

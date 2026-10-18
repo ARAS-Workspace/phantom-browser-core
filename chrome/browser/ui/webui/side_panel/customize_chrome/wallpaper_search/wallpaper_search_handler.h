@@ -99,7 +99,6 @@ class WallpaperSearchHandler
   void SetUserFeedback(side_panel::customize_chrome::mojom::UserFeedback
                            selected_option) override;
   void OpenHelpArticle() override;
-  void LaunchHatsSurvey() override;
 
   // WallpaperSearchBackgroundManagerObserver:
   void OnHistoryUpdated() override;
@@ -136,7 +135,6 @@ class WallpaperSearchHandler
       base::ElapsedTimer timer,
       side_panel::customize_chrome::mojom::ResultDescriptorsPtr descriptors,
       const gfx::Image& image);
-  void LaunchDelayedHatsSurvey();
 
   raw_ptr<Profile> profile_;
   std::unique_ptr<network::SimpleURLLoader> descriptors_simple_url_loader_;

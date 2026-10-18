@@ -216,6 +216,9 @@ IN_PROC_BROWSER_TEST_F(ClearBrowsingDataHandlerBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(ClearBrowsingDataHandlerBrowserTest,
                        UpdateSyncState_GoogleDse) {
+  AddSearchEngine(u"Google",
+                  GURL("https://www.google.com/search?q={searchTerms}"), 0,
+                  true);
   handler_->UpdateSyncState();
   VerifySearchHistoryWebUIUpdate(false, u"");
 }

@@ -211,7 +211,6 @@ static_library("devtools") {
       "//chrome/browser/signin",
       "//chrome/browser/task_manager",
       "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/hats",
       "//chrome/browser/ui/prefs",
       "//components/infobars/content",
       "//components/infobars/core",

@@ -810,8 +810,6 @@ void ProfileMenuViewBase::AddBottomMargin() {
 }
 
 void ProfileMenuViewBase::OnActionableItemClicked(ActionableItem item) {
-  actionable_item_clicked_ = true;
-
   // TODO(tangltom): Separate metrics for incognito and guest menu.
   base::UmaHistogramEnumeration(kProfileMenuClickedActionableItemHistogram,
                                 item);

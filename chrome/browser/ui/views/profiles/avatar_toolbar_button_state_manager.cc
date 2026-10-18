@@ -1943,55 +1943,6 @@ void AvatarToolbarButtonStateManager::MaybeShowProfileSwitchIPH() {
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-void AvatarToolbarButtonStateManager::MaybeShowSupervisedUserSignInIPH() {
-  if (!base::FeatureList::IsEnabled(
-          feature_engagement::kIPHSupervisedUserProfileSigninFeature)) {
-    return;
-  }
-  if (!browser_) {
-    return;
-  }
-  signin::IdentityManager* const identity_manager =
-      IdentityManagerFactory::GetForProfile(browser_->GetProfile());
-  CHECK(identity_manager);
-  if (!identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
-    return;
-  }
-
-  auto account_info = identity_manager->FindExtendedAccountInfoByAccountId(
-      identity_manager->GetPrimaryAccountId(signin::ConsentLevel::kSignin));
-  if (account_info.GetAccountCapabilities().is_subject_to_parental_controls() !=
-      signin::Tribool::kTrue) {
-    return;
-  }
-  if (account_info.IsEmpty()) {
-    return;
-  }
-
-  // Prevent showing the promo right when the browser was created.
-  // This is not just used for smoother animation, but it gives the anchor
-  // element enough time to become visible and display the IPH.
-  // TODO(crbug.com/372689164): investigate alternative rescheduling,
-  // using `WouldShowFeaturePromo`.
-  base::TimeDelta time_since_creation = base::TimeTicks::Now() - creation_time_;
-  if (time_since_creation < g_iph_min_delay_after_creation) {
-    base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-        FROM_HERE,
-        base::BindOnce(
-            &AvatarToolbarButtonStateManager::MaybeShowSupervisedUserSignInIPH,
-            weak_ptr_factory_.GetWeakPtr()),
-        g_iph_min_delay_after_creation - time_since_creation);
-    return;
-  }
-
-  user_education::FeaturePromoParams params(
-      feature_engagement::kIPHSupervisedUserProfileSigninFeature);
-  params.title_params =
-      base::UTF8ToUTF16(account_info.GetGivenName().value_or(""));
-  BrowserUserEducationInterface::From(browser_)->MaybeShowFeaturePromo(
-      std::move(params));
-}
-
 void AvatarToolbarButtonStateManager::MaybeShowSignInBenefitsIPH() {
   const bool show_new_signin =
       base::FeatureList::IsEnabled(

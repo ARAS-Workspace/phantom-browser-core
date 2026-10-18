@@ -24,11 +24,10 @@
 #include "chrome/browser/privacy_sandbox/mock_privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
+#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/file_system_access/file_system_access_ui_helpers.h"
-#include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/immersive/immersive_mode_controller.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_delegate.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
@@ -181,12 +180,6 @@ class PageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
   }
 
   void SetUpOnMainThread() override {
-    mock_sentiment_service_ = static_cast<MockTrustSafetySentimentService*>(
-        TrustSafetySentimentServiceFactory::GetInstance()
-            ->SetTestingFactoryAndUse(
-                browser()->GetProfile(),
-                base::BindRepeating(&BuildMockTrustSafetySentimentService)));
-
     host_resolver()->AddRule("*", "127.0.0.1");
 
     bad_https_server_.SetSSLConfig(net::EmbeddedTestServer::CERT_EXPIRED);
@@ -196,11 +189,6 @@ class PageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
     HttpsUpgradesInterceptor::SetHttpPortForTesting(
         embedded_test_server()->port());
     HttpsUpgradesInterceptor::SetHttpsPortForTesting(bad_https_server_.port());
-  }
-
-  void TearDownOnMainThread() override {
-    mock_sentiment_service_ = nullptr;
-    InProcessBrowserTest::TearDownOnMainThread();
   }
 
   content::WebContents* web_contents() {
@@ -291,16 +279,6 @@ class PageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
     return static_cast<RichHoverButton*>(button)->GetTitleText();
   }
 
-  void SetupSentimentServiceExpectations(bool interacted) {
-    testing::InSequence sequence;
-    EXPECT_CALL(*mock_sentiment_service_, PageInfoOpened);
-    EXPECT_CALL(*mock_sentiment_service_, InteractedWithPageInfo)
-        .Times(interacted ? testing::Exactly(1) : testing::Exactly(0));
-    EXPECT_CALL(*mock_sentiment_service_, PageInfoClosed);
-  }
-
-  raw_ptr<MockTrustSafetySentimentService> mock_sentiment_service_;
-
  private:
   std::vector<PageInfoViewFactory::PageInfoViewID> expected_identifiers_;
 
@@ -311,7 +289,6 @@ class PageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
 };
 
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, ShowBubble) {
-  SetupSentimentServiceExpectations(/*interacted=*/false);
   OpenPageInfoBubble(browser());
   EXPECT_EQ(PageInfoBubbleView::BUBBLE_PAGE_INFO,
             PageInfoBubbleView::GetShownBubbleType());
@@ -369,7 +346,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, ViewSourceURL) {
 // Test opening "Site Details" via Page Info from an ASCII origin does the
 // correct URL canonicalization.
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, SiteSettingsLink) {
-  SetupSentimentServiceExpectations(/*interacted=*/true);
   GURL url = GURL("https://www.google.com/");
   std::string expected_url =
       base::StrCat({chrome::kChromeUISettingsURL, chrome::kSiteDetailsSubpage});
@@ -449,20 +425,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
   // happened.
   EXPECT_EQ(PageInfoBubbleView::BUBBLE_INTERNAL_PAGE,
             PageInfoBubbleView::GetShownBubbleType());
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       InteractedWithCookiesButton) {
-  SetupSentimentServiceExpectations(/*interacted=*/true);
-
-  base::RunLoop run_loop;
-  GetPageInfoDialogCreatedCallbackForTesting() = run_loop.QuitClosure();
-  OpenPageInfoBubble(browser());
-  run_loop.Run();
-
-  views::View* cookies_button = GetView(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_COOKIES_SUBPAGE);
-  PerformMouseClickOnView(cookies_button);
 }
 
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
@@ -605,8 +567,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTestWithAutoupgradesDisabled,
 // Ensure a page with an invalid certificate shows the not secure summary and a
 // "Certificate Details" button.
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, InvalidCert) {
-  SetupSentimentServiceExpectations(/*interacted=*/true);
-
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
   https_server.AddDefaultHandlers(
       base::FilePath(FILE_PATH_LITERAL("chrome/test/data")));
@@ -632,12 +592,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, InvalidCert) {
   std::u16string invalid_text;
   invalid_text = l10n_util::GetStringUTF16(IDS_PAGE_INFO_CERTIFICATE_DETAILS);
   EXPECT_EQ(GetCertificateButtonTitle(), invalid_text);
-
-  // Check that clicking the certificate viewer button is reported to the
-  // sentiment service.
-  views::View* certificates_button = GetView(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_CERTIFICATE_VIEWER);
-  PerformMouseClickOnView(certificates_button);
 }
 
 // Ensure a page that has an EV certificate *and* triggers a lookalike Safety

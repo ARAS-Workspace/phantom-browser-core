@@ -39,9 +39,6 @@ class BrowserWindowInterface;
 // If `explicit_signin_access_point` is provided, it will be used as the access
 // point for the signin (or sync) flow. This is used to track the real source of
 // the signin (or sync), e.g. history sync opt-in identity pill promo.
-//
-// Dismissing the menu without clicking an actionable item will trigger a HaTS
-// survey.
 class ProfileMenuView : public ProfileMenuViewBase {
  public:
   // `browser` must not be nullptr.
@@ -55,10 +52,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   // ProfileMenuViewBase:
   void BuildMenu() override;
 
-  void set_skip_window_active_check_for_testing(bool skip) {
-    skip_window_active_check_for_testing_ = skip;
-  }
-
  private:
   friend class ProfileMenuViewExtensionsTest;
   friend class ProfileMenuViewSigninPendingTest;
@@ -70,9 +63,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
 
   // views::BubbleDialogDelegateView:
   std::u16string GetAccessibleWindowTitle() const override;
-
-  // Callback invoked whenever the view is being closed.
-  void OnClose();
 
   // Button/link actions.
   void OnManageGoogleAccountButtonClicked();
@@ -97,11 +87,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   // to flaky tests where unexpected UI events are triggering this behavior.
   // Tests set this to "false" for more consistent operation.
   static bool close_on_deactivate_for_testing_;
-
-  // Prevents flaky tests by skipping the browser window active check within
-  // `ProfileMenuView::OnClose`. Window active status is often unpredictable
-  // during automated tests.
-  bool skip_window_active_check_for_testing_ = false;
 
   // Helper methods for building the menu.
   void SetMenuTitleForAccessibility();

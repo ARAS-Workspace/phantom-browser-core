@@ -18,7 +18,6 @@
 #include "base/json/json_reader.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
-#include "base/task/sequenced_task_runner.h"
 #include "base/task/thread_pool.h"
 #include "base/time/time.h"
 #include "base/timer/elapsed_timer.h"
@@ -31,8 +30,6 @@
 #include "chrome/browser/search/background/wallpaper_search/wallpaper_search_background_manager.h"
 #include "chrome/browser/search/background/wallpaper_search/wallpaper_search_data.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
@@ -546,16 +543,6 @@ void WallpaperSearchHandler::OpenHelpArticle() {
   Navigate(&navigate_params);
 }
 
-void WallpaperSearchHandler::LaunchHatsSurvey() {
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&WallpaperSearchHandler::LaunchDelayedHatsSurvey,
-                     weak_ptr_factory_.GetWeakPtr()),
-      base::GetFieldTrialParamByFeatureAsTimeDelta(
-          features::kHappinessTrackingSurveysForWallpaperSearch,
-          ntp_features::kWallpaperSearchHatsDelayParam, base::TimeDelta()));
-}
-
 void WallpaperSearchHandler::OnHistoryUpdated() {
   WallpaperSearchHandler::UpdateHistory();
 }
@@ -1048,11 +1035,4 @@ void WallpaperSearchHandler::OnWallpaperSearchResultsDecoded(
       "NewTabPage.WallpaperSearch.GetResultProcessingLatency",
       processing_timer.Elapsed());
   std::move(callback).Run(WallpaperSearchStatus::kOk, std::move(thumbnails));
-}
-
-void WallpaperSearchHandler::LaunchDelayedHatsSurvey() {
-  HatsService* hats_service =
-      HatsServiceFactory::GetForProfile(profile_, /*create_if_necessary=*/true);
-  CHECK(hats_service);
-  hats_service->LaunchSurvey(kHatsSurveyTriggerWallpaperSearch);
 }

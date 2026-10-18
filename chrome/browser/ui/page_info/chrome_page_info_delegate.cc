@@ -59,8 +59,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/page_info/page_info_infobar_delegate.h"
 #include "chrome/browser/ui/tab_dialogs.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
@@ -103,8 +101,6 @@ ChromePageInfoDelegate::ChromePageInfoDelegate(
     : get_browser_callback_(std::move(get_browser_callback)),
       web_contents_(web_contents) {
   CHECK(get_browser_callback_);
-  sentiment_service_ =
-      TrustSafetySentimentServiceFactory::GetForProfile(GetProfile());
   base::UmaHistogramBoolean("Security.PageInfo.AboutThisSiteLanguageSupported",
                             page_info::IsAboutThisSiteFeatureEnabled(
                                 g_browser_process->GetApplicationLocale()));
@@ -313,21 +309,9 @@ void ChromePageInfoDelegate::OpenContentSettingsExceptions(
 }
 
 void ChromePageInfoDelegate::OnPageInfoActionOccurred(
-    page_info::PageInfoAction action) {
-  if (sentiment_service_) {
-    if (action == page_info::PAGE_INFO_OPENED) {
-      sentiment_service_->PageInfoOpened();
-    } else {
-      sentiment_service_->InteractedWithPageInfo();
-    }
-  }
-}
+    page_info::PageInfoAction action) {}
 
-void ChromePageInfoDelegate::OnUIClosing() {
-  if (sentiment_service_) {
-    sentiment_service_->PageInfoClosed();
-  }
-}
+void ChromePageInfoDelegate::OnUIClosing() {}
 
 std::u16string ChromePageInfoDelegate::GetSubjectName(const GURL& url) {
   CHECK(web_contents_);

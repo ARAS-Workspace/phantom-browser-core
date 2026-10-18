@@ -319,7 +319,6 @@ source_set("interactive_ui_tests") {
     "//chrome/browser/themes:test_support",
     "//chrome/browser/ui",
     "//chrome/browser/ui:ui_features",
-    "//chrome/browser/ui/hats:test_support",
     "//chrome/browser/ui/location_bar",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/permission_bubble",

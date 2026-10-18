@@ -85,8 +85,6 @@ BASE_FEATURE(kNtpSimplificationBookmarkBar, base::FEATURE_DISABLED_BY_DEFAULT);
 // the NTP before auto-hiding is decreased for testing.
 BASE_FEATURE(kBookmarkBarUpdatesForTesting, base::FEATURE_DISABLED_BY_DEFAULT);
 
-const char kWallpaperSearchHatsDelayParam[] = "WallpaperSearchHatsDelayParam";
-
 const base::FeatureParam<bool> kNtpNextDisablementParam(
     &ntp_features::kNtpNextFeatures,
     "NtpNextDisablementParam",

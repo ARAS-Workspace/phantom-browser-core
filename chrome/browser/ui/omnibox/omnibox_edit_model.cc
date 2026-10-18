@@ -111,8 +111,6 @@
 
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/omnibox/chrome_omnibox_client.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -1040,13 +1038,6 @@ void OmniboxEditModel::OnSetFocus(bool control_down) {
 
   if (user_input_in_progress_ || !in_revert_) {
     controller_->client()->OnInputStateChanged();
-  }
-
-  if (omnibox_feature_configs::HappinessTrackingSurveyForOmniboxOnFocusZps::
-          Get()
-              .enabled) {
-    controller_->client()->MaybeShowOnFocusHatsSurvey(
-        autocomplete_controller()->autocomplete_provider_client());
   }
 }
 

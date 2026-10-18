@@ -635,13 +635,6 @@ IN_PROC_BROWSER_TEST_F(SettingsPrivacyPageTest, CookiesSubpage) {
   RunTest("settings/privacy_page_test.js", "runMochaSuite('CookiesSubpage')");
 }
 
-// TODO(crbug.com/40710522): flaky failure on multiple platforms
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyPageTest,
-                       DISABLED_HappinessTrackingSurveys) {
-  RunTest("settings/privacy_page_test.js",
-          "runMochaSuite('HappinessTrackingSurveys')");
-}
-
 class SettingsNotificationsPageTest : public SettingsBrowserTest {};
 
 IN_PROC_BROWSER_TEST_F(SettingsNotificationsPageTest, NotificationsPage) {

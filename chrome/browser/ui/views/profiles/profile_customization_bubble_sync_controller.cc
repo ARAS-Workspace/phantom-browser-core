@@ -36,10 +36,6 @@ void ShowBubble(BrowserWindowInterface* bwi,
       // the IPH will be shown after the customization bubble.
       if (BrowserView* const browser_view =
               BrowserView::GetBrowserViewForBrowser(bwi)) {
-        // Attempts to show first the Supervised user IPH (which has higher
-        // priority), then the profile switch IPH. Whether the IPH will show (if
-        // all conditions are met) is decided by the IPH framework.
-        browser_view->MaybeShowSupervisedUserProfileSignInIPH();
         browser_view->MaybeShowProfileSwitchIPH();
       }
 

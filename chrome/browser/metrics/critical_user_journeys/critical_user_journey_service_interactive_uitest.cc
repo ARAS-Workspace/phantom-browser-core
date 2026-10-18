@@ -27,8 +27,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/webui/test_support/webui_interactive_test_mixin.h"
@@ -42,7 +40,6 @@
 #include "content/public/browser/download_manager.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/download_test_observer.h"
-#include "testing/gmock/include/gmock/gmock.h"
 #include "ui/actions/actions.h"
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/base/interaction/element_identifier.h"
@@ -76,15 +73,12 @@ class TestCriticalUserJourneyService : public CriticalUserJourneyService {
   void RegisterJourneys(CriticalUserJourneyRegistry* registry) override {
     // Simple Journey: Click App Menu button (triggers start), then click New
     // Tab button (triggers end).
-    HatsParams params;
-    params.trigger = "TestHatsTrigger";
     registry->AddJourney(
         CriticalUserJourney::Builder(&kAppMenuJourney)
             .AddStep(kToolbarAppMenuButtonElementId,
                      ui::InteractionSequence::StepType::kActivated, 1)
             .AddStep(kNewTabButtonElementId,
                      ui::InteractionSequence::StepType::kActivated, 2)
-            .LaunchHatsSurveyOnCompletion(params)
             .Build());
 
     // Branching Journey: Click App Menu button (triggers start), then click
@@ -134,8 +128,6 @@ class CriticalUserJourneyServiceInteractiveTest
   }
 
   void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    HatsServiceFactory::GetInstance()->SetTestingFactory(
-        context, base::BindRepeating(&BuildMockHatsService));
     CriticalUserJourneyServiceFactory::GetInstance()->SetTestingFactory(
         context, base::BindRepeating([](content::BrowserContext* context)
                                          -> std::unique_ptr<KeyedService> {
@@ -159,22 +151,6 @@ IN_PROC_BROWSER_TEST_F(CriticalUserJourneyServiceInteractiveTest,
       base::StrCat({GetMetricJourneyPrefix(kAppMenuJourney), ".StepReached"});
   const std::string result =
       base::StrCat({GetMetricJourneyPrefix(kAppMenuJourney), ".Result"});
-
-  auto* mock_hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetForProfile(browser()->GetProfile(), true));
-  EXPECT_CALL(*mock_hats_service,
-              LaunchSurvey("TestHatsTrigger", testing::_, testing::_,
-                           testing::_, testing::_, testing::_, testing::_))
-      .WillOnce([](const std::string& trigger,
-                   base::OnceClosure success_callback,
-                   base::OnceClosure failure_callback,
-                   const SurveyBitsData& product_specific_bits_data,
-                   const SurveyStringData& product_specific_string_data,
-                   const std::optional<std::string>& supplied_trigger_id,
-                   const HatsService::SurveyOptions& survey_options) {
-        std::move(success_callback).Run();
-        return HatsService::LaunchError::kNone;
-      });
 
   RunTestSequence(
       // Step 1: Click App Menu.
@@ -204,25 +180,6 @@ IN_PROC_BROWSER_TEST_F(CriticalUserJourneyServiceInteractiveTest,
       base::StrCat(
           {GetMetricJourneyPrefix(kAppMenuJourney), ".OverallDuration"}),
       1);
-
-  // Verify HaTS survey metrics are recorded.
-  const std::string hats_event_histogram = base::StrCat(
-      {GetMetricJourneyPrefix(kAppMenuJourney), ".HaTSSurveyEvent"});
-  histograms.ExpectBucketCount(
-      hats_event_histogram,
-      static_cast<int>(
-          CriticalUserJourneyService::CriticalUserJourneyHaTSEvent::kTriggered),
-      1);
-  histograms.ExpectBucketCount(
-      hats_event_histogram,
-      static_cast<int>(
-          CriticalUserJourneyService::CriticalUserJourneyHaTSEvent::kShown),
-      1);
-  histograms.ExpectBucketCount(
-      hats_event_histogram,
-      static_cast<int>(
-          CriticalUserJourneyService::CriticalUserJourneyHaTSEvent::kFailed),
-      0);
 }
 
 IN_PROC_BROWSER_TEST_F(CriticalUserJourneyServiceInteractiveTest,

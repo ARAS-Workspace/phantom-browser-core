@@ -19,8 +19,6 @@ namespace content {
 class RenderFrameHost;
 }  // namespace content
 
-class HatsService;
-
 namespace save_to_drive {
 
 class AccountChooser;
@@ -40,8 +38,7 @@ class SaveToDriveFlow : public content::DocumentUserData<SaveToDriveFlow> {
       content::RenderFrameHost* render_frame_host,
       std::unique_ptr<SaveToDriveEventDispatcher> event_dispatcher,
       std::unique_ptr<ContentReader> content_reader,
-      std::unique_ptr<AccountChooser> account_chooser,
-      HatsService* hats_service)>;
+      std::unique_ptr<AccountChooser> account_chooser)>;
 
   // Factory method to create a new instance of `SaveToDriveFlow`. This is
   // used to allow for creating a mock flow in tests through
@@ -50,8 +47,7 @@ class SaveToDriveFlow : public content::DocumentUserData<SaveToDriveFlow> {
       content::RenderFrameHost* render_frame_host,
       std::unique_ptr<SaveToDriveEventDispatcher> event_dispatcher,
       std::unique_ptr<ContentReader> content_reader,
-      std::unique_ptr<AccountChooser> account_chooser,
-      HatsService* hats_service);
+      std::unique_ptr<AccountChooser> account_chooser);
 
   // Sets the callback to create a new instance of `SaveToDriveFlow`. This
   // is used to create a mock flow in tests.
@@ -99,8 +95,7 @@ class SaveToDriveFlow : public content::DocumentUserData<SaveToDriveFlow> {
   SaveToDriveFlow(content::RenderFrameHost* render_frame_host,
                   std::unique_ptr<SaveToDriveEventDispatcher> event_dispatcher,
                   std::unique_ptr<ContentReader> content_reader,
-                  std::unique_ptr<AccountChooser> account_chooser,
-                  HatsService* hats_service);
+                  std::unique_ptr<AccountChooser> account_chooser);
 
  private:
   friend class content::DocumentUserData<SaveToDriveFlow>;
@@ -119,22 +114,16 @@ class SaveToDriveFlow : public content::DocumentUserData<SaveToDriveFlow> {
   void OnOpenContent(AccountInfo account_info, bool success);
   void OnUploadProgress(
       extensions::api::pdf_viewer_private::SaveToDriveProgress progress);
-  void ShowHatsSurveyWithDelay();
-  std::string GetHatsSurveyTriggerId();
 
   std::unique_ptr<SaveToDriveEventDispatcher> event_dispatcher_;
   std::unique_ptr<ContentReader> content_reader_;
   std::unique_ptr<DriveUploader> drive_uploader_;
   std::unique_ptr<AccountChooser> account_chooser_;
-  raw_ptr<HatsService> hats_service_ = nullptr;
 
   // This is set when an account is chosen.
   std::optional<SaveToDriveAccountInfo> save_to_drive_account_info_;
   // This is the title of the document that is being saved to Drive.
   std::string upload_title_;
-  // This is set after the upload starts.
-  std::optional<extensions::api::pdf_viewer_private::SaveToDriveProgress>
-      upload_progress_;
 
   base::WeakPtrFactory<SaveToDriveFlow> weak_ptr_factory_{this};
 

@@ -72,7 +72,6 @@ source_set("impl") {
     "//chrome/browser/subresource_filter",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui:url_identity",
-    "//chrome/browser/ui/hats",
     "//chrome/common",
     "//chrome/common:chrome_features",
     "//chrome/common:constants",

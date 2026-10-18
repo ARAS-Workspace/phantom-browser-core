@@ -36,9 +36,6 @@ BASE_DECLARE_FEATURE(kNtpShortcutsRedesign);
 BASE_DECLARE_FEATURE(kNtpSimplificationBookmarkBar);
 BASE_DECLARE_FEATURE(kBookmarkBarUpdatesForTesting);
 
-// Parameter determining the trigger delay of the Wallpaper Search HaTS survey.
-extern const char kWallpaperSearchHatsDelayParam[];
-
 // Parameter for the maximum number of times to automatically show
 // Customize Chrome.
 extern const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount;

@@ -29,8 +29,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
 #include "chrome/common/url_constants.h"
@@ -437,10 +435,6 @@ void SaveCardBubbleControllerImpl::OnSaveButton(
   switch (current_bubble_type_) {
     case PaymentsBubbleType::kUploadSave: {
       CHECK(!upload_save_card_prompt_callback_.is_null());
-      if (auto* sentiment_service =
-              TrustSafetySentimentServiceFactory::GetForProfile(GetProfile())) {
-        sentiment_service->SavedCard();
-      }
       std::u16string name_provided_by_user;
       if (!user_provided_card_details.cardholder_name.empty()) {
         // Log whether the name was changed by the user or simply accepted
@@ -483,10 +477,6 @@ void SaveCardBubbleControllerImpl::OnSaveButton(
     }
     case PaymentsBubbleType::kUploadCvcSave: {
       CHECK(!upload_save_card_prompt_callback_.is_null());
-      if (auto* sentiment_service =
-              TrustSafetySentimentServiceFactory::GetForProfile(GetProfile())) {
-        sentiment_service->SavedCard();
-      }
       std::move(upload_save_card_prompt_callback_)
           .Run(payments::PaymentsAutofillClient::SaveCardOfferUserDecision::
                    kAccepted,
@@ -496,10 +486,6 @@ void SaveCardBubbleControllerImpl::OnSaveButton(
     case PaymentsBubbleType::kLocalSave:
     case PaymentsBubbleType::kLocalCvcSave:
       CHECK(!local_save_card_prompt_callback_.is_null());
-      if (auto* sentiment_service =
-              TrustSafetySentimentServiceFactory::GetForProfile(GetProfile())) {
-        sentiment_service->SavedCard();
-      }
       // Show an animated card saved confirmation message next time
       // UpdatePageActionIcon() is called.
       should_show_card_saved_label_animation_ = true;

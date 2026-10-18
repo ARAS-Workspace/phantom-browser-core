@@ -198,49 +198,26 @@ BASE_FEATURE(kHaTSDesktopDevToolsIssuesCSP, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables or disables the Happiness Tracking System for Desktop Privacy Guide.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopPrivacyGuide,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopPrivacyGuideTime{
-        &kHappinessTrackingSurveysForDesktopPrivacyGuide, "settings-time",
-        base::Seconds(20)};
 
 // Enables or disables the Happiness Tracking System for Desktop History Page in
 // the Experiment group.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopHistoryPageExperiment,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopHistoryPageExperimentTime{
-        &kHappinessTrackingSurveysForDesktopHistoryPageExperiment,
-        "history-page-time", base::Seconds(5)};
 
 // Enables or disables the Happiness Tracking System for Desktop History Page in
 // the Control group.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopHistoryPageControl,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopHistoryPageControlTime{
-        &kHappinessTrackingSurveysForDesktopHistoryPageControl,
-        "history-page-time", base::Seconds(5)};
 
 // Enables or disables the Happiness Tracking System for Desktop Chrome
 // Settings.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopSettings,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopSettingsTime{
-        &kHappinessTrackingSurveysForDesktopSettings, "settings-time",
-        base::Seconds(20)};
 
 // Enables or disables the Happiness Tracking System for Desktop Chrome
 // Privacy Settings.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopSettingsPrivacy,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<bool>
-    kHappinessTrackingSurveysForDesktopSettingsPrivacyNoGuide{
-        &kHappinessTrackingSurveysForDesktopSettingsPrivacy, "no-guide", false};
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopSettingsPrivacyTime{
-        &kHappinessTrackingSurveysForDesktopSettingsPrivacy, "settings-time",
-        base::Seconds(20)};
 
 // Enables or disables the Happiness Tracking System for Desktop Chrome
 // NTP Modules.
@@ -255,11 +232,6 @@ BASE_FEATURE(kHappinessTrackingSurveysForDesktopNextPanel,
 // Enables or disables the Happiness Tracking System for History Embeddings.
 BASE_FEATURE(kHappinessTrackingSurveysForHistoryEmbeddings,
              base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForHistoryEmbeddingsDelayTime(
-        &kHappinessTrackingSurveysForHistoryEmbeddings,
-        "HappinessTrackingSurveysForHistoryEmbeddingsDelayTime",
-        base::Seconds(20));
 
 BASE_FEATURE(kHappinessTrackingSurveysForNtpPhotosOptOut,
              "HappinessTrackingSurveysForrNtpPhotosOptOut",
@@ -272,10 +244,6 @@ BASE_FEATURE(kHappinessTrackingSurveysForWallpaperSearch,
 // Enables or disables the Happiness Tracking System for Chrome What's New.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopWhatsNew,
              base::FEATURE_ENABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForDesktopWhatsNewTime{
-        &kHappinessTrackingSurveysForDesktopWhatsNew, "whats-new-time",
-        base::Seconds(20)};
 
 // Enables or disables the Happiness Tracking System for SE Hijacking.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopSEHijacking,

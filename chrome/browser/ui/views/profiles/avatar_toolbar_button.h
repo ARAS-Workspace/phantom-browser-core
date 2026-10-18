@@ -66,7 +66,6 @@ class AvatarToolbarButton : public ToolbarButton,
       base::OnceCallback<void(std::u16string)> callback) override;
   void MaybeShowProfileSwitchIPH() override;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  void MaybeShowSupervisedUserSignInIPH() override;
   void MaybeShowSignInBenefitsIPH() override;
 #endif
   void ClearActiveStateForTesting() override;

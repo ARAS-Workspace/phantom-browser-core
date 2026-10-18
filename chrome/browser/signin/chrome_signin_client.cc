@@ -32,9 +32,7 @@
 #include "chrome/browser/signin/account_consistency_mode_manager.h"
 #include "chrome/browser/signin/chrome_device_id_helper.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_hats_util.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_features.h"
@@ -137,32 +135,6 @@ signin_metrics::ProfileSignout kAlwaysAllowedSignoutSources[] = {
     // Allowed as the user declined the enterprise management disclaimer.
     signin_metrics::ProfileSignout::kUserDeclinedEnterpriseManagementDisclaimer,
 };
-
-// Returns the HaTS survey trigger corresponding to the given AccessPoint, or
-// the empty string if there is no such survey.
-std::string HatsSurveyTriggerForAccessPoint(
-    signin_metrics::AccessPoint access_point) {
-  switch (access_point) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    case signin_metrics::AccessPoint::kAddressBubble:
-      return kHatsSurveyTriggerIdentityAddressBubbleSignin;
-    case signin_metrics::AccessPoint::kAvatarBubbleSignIn:
-    case signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo:
-      return kHatsSurveyTriggerIdentityProfileMenuSignin;
-    case signin_metrics::AccessPoint::kForYouFre:
-      return kHatsSurveyTriggerIdentityFirstRunSignin;
-    case signin_metrics::AccessPoint::kPasswordBubble:
-      return kHatsSurveyTriggerIdentityPasswordBubbleSignin;
-    case signin_metrics::AccessPoint::kSigninInterceptFirstRunExperience:
-      return kHatsSurveyTriggerIdentitySigninInterceptProfileSeparation;
-    case signin_metrics::AccessPoint::kUserManager:
-      return kHatsSurveyTriggerIdentityProfilePickerAddProfileSignin;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    default:
-      // No HaTS survey is defined for the rest of the access point.
-      return std::string();
-  }
-}
 
 class ChromeOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
  protected:
@@ -394,12 +366,6 @@ void ChromeSigninClient::OnPrimaryAccountChanged(
         CHECK(event_details.GetSetPrimaryAccountAccessPoint().has_value());
         signin_metrics::AccessPoint access_point =
             event_details.GetSetPrimaryAccountAccessPoint().value();
-
-        if (consent_level == signin::ConsentLevel::kSignin) {
-          std::string trigger = HatsSurveyTriggerForAccessPoint(access_point);
-          signin::LaunchHatsSurveyForProfile(trigger, profile_,
-                                             /*defer_if_no_browser=*/true);
-        }
 
         RecordOpenTabCount(access_point, consent_level);
 

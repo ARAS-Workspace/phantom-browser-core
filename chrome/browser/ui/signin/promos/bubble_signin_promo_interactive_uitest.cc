@@ -5,8 +5,6 @@
 #include "base/path_service.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/test_future.h"
-#include "base/version.h"
-#include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
@@ -22,9 +20,6 @@
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/extensions/extension_post_install_dialog.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/passwords/manage_passwords_test.h"
 #include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_signin_button_view.h"
@@ -88,11 +83,8 @@ using extensions::Extension;
 
 constexpr char kButton[] = "SignInButton";
 
-using testing::_;
 using testing::Eq;
-using testing::Pair;
 using testing::Return;
-using testing::UnorderedElementsAre;
 
 std::unique_ptr<KeyedService> BuildTestSyncService(
     content::BrowserContext* context) {
@@ -133,7 +125,6 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/
         {switches::kSyncEnableBookmarksInTransportMode,
-         switches::kChromeIdentitySurveySigninPromoBubbleDismissed,
          syncer::kUnoPhase2FollowUp},
         /*disabled_features=*/{});
   }
@@ -161,15 +152,9 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
 
     // Test Sync Service is signed in by default.
     test_sync_service().SetSignedOut();
-
-    mock_hats_service_ = static_cast<MockHatsService*>(
-        HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-            browser()->GetProfile(),
-            base::BindRepeating(&BuildMockHatsService)));
   }
 
   void TearDownOnMainThread() override {
-    mock_hats_service_ = nullptr;
     ManagePasswordsTest::TearDownOnMainThread();
   }
 
@@ -262,7 +247,6 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
   }
 
  protected:
-  raw_ptr<MockHatsService> mock_hats_service_ = nullptr;
   base::test::ScopedFeatureList scoped_feature_list_;
 
   ChromeSigninClientWithURLLoaderHelper url_loader_factory_helper_;
@@ -1016,13 +1000,6 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
   ExtendAccountInfo(info);
   signin::SetInvalidRefreshTokenForPrimaryAccount(identity_manager());
 
-  // Verify that the HaTS service launches a survey when the user actively
-  // dismisses the sign-in promo bubble with the escape key.
-  EXPECT_CALL(
-      *mock_hats_service_,
-      LaunchDelayedSurvey(kHatsSurveyTriggerIdentitySigninPromoBubbleDismissed,
-                          _, _, _));
-
   // Trigger the address save bubble.
   AutofillProfile address = autofill::test::GetFullProfile();
   TriggerSaveLocalAddressBubble(address);
@@ -1055,20 +1032,6 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
       identity_manager(), "test@email.com", signin::ConsentLevel::kSignin);
   ExtendAccountInfo(info);
   signin::SetInvalidRefreshTokenForPrimaryAccount(identity_manager());
-
-  // Verify that the HaTS service launches a survey when the user actively
-  // dismisses the sign-in promo bubble with the close button.
-  EXPECT_CALL(
-      *mock_hats_service_,
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentitySigninPromoBubbleDismissed, _, _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "1"),
-              Pair("Number of Google Accounts", "1"),
-              Pair("Data type Sign-in Bubble Dismissed", "Address Bubble"),
-              Pair("Sign-in Status", "Sign-in Pending"))));
 
   // Trigger the address save bubble.
   AutofillProfile address = autofill::test::GetFullProfile();
@@ -1847,8 +1810,7 @@ class BubbleSignInPromoInteractiveUITestWithoutPhase2FollowUp
   BubbleSignInPromoInteractiveUITestWithoutPhase2FollowUp() {
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/
-        {switches::kSyncEnableBookmarksInTransportMode,
-         switches::kChromeIdentitySurveySigninPromoBubbleDismissed},
+        {switches::kSyncEnableBookmarksInTransportMode},
         /*disabled_features=*/{syncer::kUnoPhase2FollowUp});
   }
 

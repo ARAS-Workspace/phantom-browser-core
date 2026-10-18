@@ -18,15 +18,12 @@
 #include "chrome/browser/permissions/system/system_permission_settings.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
-#include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/views/controls/hover_button.h"
 #include "chrome/browser/ui/views/controls/rich_controls_container_view.h"
 #include "chrome/browser/ui/views/controls/rich_hover_button.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_specification.h"
 #include "chrome/browser/ui/views/page_info/page_info_main_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_permission_content_view.h"
-#include "chrome/browser/ui/views/page_info/page_info_security_content_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/page_info/permission_toggle_row_view.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -413,12 +410,6 @@ class PageInfoBubbleViewTest : public testing::Test {
     parent_window_ = new views::Widget();
     parent_window_->Init(std::move(parent_params));
 
-    mock_sentiment_service_ = static_cast<MockTrustSafetySentimentService*>(
-        TrustSafetySentimentServiceFactory::GetInstance()
-            ->SetTestingFactoryAndUse(
-                web_contents_helper_->profile(),
-                base::BindRepeating(&BuildMockTrustSafetySentimentService)));
-
     content::WebContents* web_contents = web_contents_helper_->web_contents();
     content_settings::PageSpecificContentSettings::CreateForWebContents(
         web_contents,
@@ -437,7 +428,6 @@ class PageInfoBubbleViewTest : public testing::Test {
 
   std::unique_ptr<ScopedWebContentsTestHelper> web_contents_helper_;
   std::unique_ptr<views::ScopedViewsTestHelper> views_helper_;
-  raw_ptr<MockTrustSafetySentimentService> mock_sentiment_service_;
 
   raw_ptr<views::Widget, DanglingUntriaged> parent_window_ =
       nullptr;  // Weak. Owned by the NativeWidget.
@@ -605,9 +595,6 @@ class PageInfoBubbleViewOffTheRecordTest : public PageInfoBubbleViewTest {
 
 // Test resetting blocked in Incognito permission.
 TEST_F(PageInfoBubbleViewOffTheRecordTest, ResetBlockedInIncognitoPermission) {
-  // No sentiment service in incognito.
-  EXPECT_FALSE(mock_sentiment_service_);
-
   PermissionInfoList list(1);
   list.back().type = ContentSettingsType::NOTIFICATIONS;
   list.back().setting = CONTENT_SETTING_BLOCK;
@@ -744,19 +731,6 @@ TEST_F(PageInfoBubbleViewTest, EnsureCloseCallback) {
   EXPECT_EQ(false, api_->reload_prompt());
   EXPECT_EQ(views::Widget::ClosedReason::kCloseButtonClicked,
             api_->closed_reason());
-}
-
-TEST_F(PageInfoBubbleViewTest, CheckHeaderInteractions) {
-  // Confirm that interactions with the header tips are reported to the
-  // sentiment service correctly.
-  const ui::MouseEvent event(ui::EventType::kMousePressed, gfx::Point(),
-                             gfx::Point(), ui::EventTimeForNow(), 0, 0);
-  // Navigating to the security page constitutes an interaction.
-  EXPECT_CALL(*mock_sentiment_service_, InteractedWithPageInfo).Times(2);
-  api_->navigation_handler()->OpenSecurityPage();
-  auto* page_view = static_cast<PageInfoSecurityContentView*>(
-      api_->current_view()->children()[1]);
-  page_view->ResetDecisionsClicked();
 }
 
 TEST_F(PageInfoBubbleViewTest, CertificateButtonShowsEvCertDetails) {

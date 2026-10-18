@@ -10,7 +10,6 @@
 
 #include "base/compiler_specific.h"
 #include "base/feature_list.h"
-#include "base/memory/raw_ptr.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -28,10 +27,6 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
@@ -44,7 +39,6 @@
 #include "chrome/browser/ui/views/omnibox/omnibox_placeholder_util.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_view_views.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/interactive_test_utils.h"
@@ -56,10 +50,8 @@
 #include "components/omnibox/browser/omnibox_pref_names.h"
 #include "components/omnibox/browser/omnibox_triggered_feature_service.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
-#include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/security_interstitials/core/omnibox_https_upgrade_metrics.h"
-#include "components/unified_consent/pref_names.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
@@ -101,9 +93,6 @@
 #include "ui/aura/window.h"
 #include "ui/aura/window_tree_host.h"
 #endif
-
-using ::testing::_;
-using ::testing::Return;
 
 namespace {
 
@@ -1084,105 +1073,6 @@ IN_PROC_BROWSER_TEST_F(
   PressEnterAndWaitForNavigations(1);
   histograms.ExpectTotalCount(
       security_interstitials::omnibox_https_upgrades::kEventHistogram, 0);
-}
-
-class OmniboxViewViewsOnFocusZpsTest : public OmniboxViewViewsTest {
- public:
-  OmniboxViewViewsOnFocusZpsTest() = default;
-
-  // OmniboxViewViewsTest:
-  void SetUp() override {
-    omnibox_feature_configs::ScopedConfigForTesting<
-        omnibox_feature_configs::HappinessTrackingSurveyForOmniboxOnFocusZps>
-        survey_config;
-    survey_config.Get().enabled = true;
-    survey_config.Get().survey_delay = 0;
-
-    omnibox_feature_configs::ScopedConfigForTesting<
-        omnibox_feature_configs::OmniboxUrlSuggestionsOnFocus>
-        suggest_config;
-    suggest_config.Get().enabled = true;
-
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndEnableFeature(
-        omnibox::kFocusTriggersWebAndSRPZeroSuggest);
-
-    InProcessBrowserTest::SetUp();
-  }
-
-  void SetUpOnMainThread() override {
-    OmniboxViewViewsTest::SetUpOnMainThread();
-    mock_hats_service_ = static_cast<MockHatsService*>(
-        HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-            browser()->GetProfile(),
-            base::BindRepeating(&BuildMockHatsService)));
-    ON_CALL(*mock_hats_service_, CanShowAnySurvey(_))
-        .WillByDefault(Return(true));
-    browser()->GetProfile()->GetPrefs()->SetBoolean(
-        unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled, true);
-    browser()->GetProfile()->GetPrefs()->SetBoolean(
-        prefs::kSearchSuggestEnabled, true);
-  }
-
-  void TearDownOnMainThread() override { mock_hats_service_ = nullptr; }
-
- protected:
-  MockHatsService* mock_hats_service() { return mock_hats_service_.get(); }
-
- private:
-  raw_ptr<MockHatsService> mock_hats_service_;
-};
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsOnFocusZpsTest, ShowHatsSurvey) {
-  EXPECT_CALL(*mock_hats_service(), LaunchSurvey(_, _, _, _, _, _, _))
-      .Times(1)
-      .WillOnce([](const std::string& trigger,
-                   base::OnceClosure success_callback,
-                   base::OnceClosure failure_callback,
-                   const SurveyBitsData& product_specific_bits_data,
-                   const SurveyStringData& product_specific_string_data,
-                   const std::optional<std::string>& supplied_trigger_id,
-                   const HatsService::SurveyOptions& survey_options)
-                    -> HatsService::LaunchError {
-        EXPECT_TRUE(trigger ==
-                        kHatsSurveyTriggerOnFocusZpsSuggestionsHappiness ||
-                    trigger == kHatsSurveyTriggerOnFocusZpsSuggestionsUtility);
-        return HatsService::LaunchError::kNone;
-      });
-
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("https://test.com/")));
-
-  auto* location_bar = BrowserView::GetBrowserViewForBrowser(browser())
-                           ->toolbar()
-                           ->location_bar_view();
-
-  // After 5 focuses of the omnibox, the HaTS survey should show if the omnibox
-  // isn't still focused after the survey delay.
-  for (int i = 0; i < 5; i++) {
-    location_bar->omnibox_view()->RequestFocus();
-    location_bar->GetFocusManager()->ClearFocus();
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsOnFocusZpsTest,
-                       DontShowHatsSurveyIfOmniboxFocused) {
-  EXPECT_CALL(*mock_hats_service(), LaunchSurvey(_, _, _, _, _, _, _)).Times(0);
-
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("https://test.com/")));
-
-  auto* location_bar = BrowserView::GetBrowserViewForBrowser(browser())
-                           ->toolbar()
-                           ->location_bar_view();
-
-  for (int i = 0; i < 4; i++) {
-    location_bar->omnibox_view()->RequestFocus();
-    location_bar->GetFocusManager()->ClearFocus();
-  }
-  // On the fifth focus of the omnibox, the HaTS survey should not show since
-  // the omnibox is still focused.
-  location_bar->omnibox_view()->RequestFocus();
 }
 
 // OmniboxViewViewsPlaceholderTest

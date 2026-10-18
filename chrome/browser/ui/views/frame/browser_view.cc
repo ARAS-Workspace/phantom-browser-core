@@ -5254,17 +5254,6 @@ void BrowserView::MaybeShowProfileSwitchIPH() {
       ->MaybeShowProfileSwitchIPH();
 }
 
-void BrowserView::MaybeShowSupervisedUserProfileSignInIPH() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  if (!ShouldShowAvatarToolbarIPH()) {
-    return;
-  }
-  ToolbarButtonProvider::From(browser_)
-      ->GetAvatarToolbarButtonInterface()
-      ->MaybeShowSupervisedUserSignInIPH();
-#endif
-}
-
 void BrowserView::MaybeShowSignInBenefitsIPH() {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!ShouldShowAvatarToolbarIPH()) {

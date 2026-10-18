@@ -145,9 +145,6 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "components/password_manager/core/browser/password_counter.h"
 #include "components/policy/core/common/features.h"
 
@@ -260,24 +257,6 @@ bool ChromePasswordManagerClient::IsAutoSignInEnabled() const {
       PasswordManagerSettingsServiceFactory::GetForProfile(GetProfile());
   return settings_service && settings_service->IsSettingEnabled(
                                  PasswordManagerSetting::kAutoSignIn);
-}
-
-void ChromePasswordManagerClient::TriggerUserPerceptionOfPasswordManagerSurvey(
-    const std::string& filling_assistance) {
-  if (filling_assistance.empty()) {
-    return;
-  }
-
-  HatsService* hats_service = HatsServiceFactory::GetForProfile(
-      GetProfile(), /*create_if_necessary=*/true);
-  if (!hats_service) {
-    return;
-  }
-
-  hats_service->LaunchDelayedSurveyForWebContents(
-      kHatsSurveyTriggerAutofillPasswordUserPerception, web_contents(),
-      /*timeout_ms=*/5000, /*product_specific_bits_data=*/
-      {}, {{"Filling assistance", filling_assistance}});
 }
 
 bool ChromePasswordManagerClient::PromptUserToSaveOrUpdatePassword(

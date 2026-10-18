@@ -33,7 +33,6 @@
 #include "base/test/with_feature_override.h"
 #include "base/time/time.h"
 #include "base/values.h"
-#include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_browser_main.h"
@@ -82,9 +81,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/hats/mock_hats_service.h"
-#include "chrome/browser/ui/hats/survey_config.h"
 #include "chrome/browser/ui/profiles/profile_customization_util.h"
 #include "chrome/browser/ui/profiles/profile_ui_test_utils.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
@@ -130,7 +126,6 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/base/signin_pref_names.h"
-#include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_capabilities.h"
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/signin/public/identity_manager/account_info.h"
@@ -178,10 +173,7 @@
 namespace {
 
 using signin::constants::kNoHostedDomainFound;
-using testing::_;
 using testing::Eq;
-using testing::Pair;
-using testing::UnorderedElementsAre;
 
 // Sets up account capabilities so that the History Sync Opt-in is shown without
 // any pending UI updates.
@@ -396,8 +388,7 @@ class ProfilePickerCreationFlowBrowserTest
  public:
   ProfilePickerCreationFlowBrowserTest()
       : InteractiveFeaturePromoTestMixin(UseDefaultTrackerAllowingPromos(
-            {feature_engagement::kIPHProfileSwitchFeature,
-             feature_engagement::kIPHSupervisedUserProfileSigninFeature})) {
+            {feature_engagement::kIPHProfileSwitchFeature})) {
 #if BUILDFLAG(IS_MAC)
     // Ensure the platform is unmanaged
     platform_management_ =
@@ -619,8 +610,6 @@ class ProfilePickerCreationFlowBrowserTest
   std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
       platform_management_;
 #endif
-  base::test::ScopedFeatureList feature_list_{
-      switches::kChromeIdentitySurveySwitchProfileFromProfilePicker};
 };
 
 IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest, ShowPicker) {
@@ -752,26 +741,6 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
   ASSERT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
   // Create a second profile.
   base::FilePath other_path = CreateNewProfileWithoutBrowser();
-
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-  Profile* other_profile = profile_manager->GetProfile(other_path);
-  MockHatsService* hats_service = static_cast<MockHatsService*>(
-      HatsServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          other_profile, base::BindRepeating(&BuildMockHatsService)));
-
-  // Verify that a HaTS survey is launched when the user switch profile with the
-  // profile picker.
-  EXPECT_CALL(
-      *hats_service,
-      LaunchDelayedSurvey(
-          kHatsSurveyTriggerIdentitySwitchProfileFromProfilePicker, _, _,
-          UnorderedElementsAre(
-              Pair("Channel", _),
-              Pair("Chrome Version", version_info::GetVersion().GetString()),
-              Pair("Number of Chrome Profiles", "2"),
-              Pair("Number of Google Accounts", "0"),
-              Pair("Sign-in Status", "Signed Out"))))
-      .Times(2);
 
   // Open the picker.
   ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(

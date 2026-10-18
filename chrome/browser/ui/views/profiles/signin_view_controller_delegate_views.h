@@ -67,8 +67,7 @@ class SigninViewControllerDelegateViews
   static std::unique_ptr<views::WebView> CreateProfileCustomizationWebView(
       BrowserWindowInterface* browser,
       bool is_local_profile_creation,
-      bool show_profile_switch_iph = false,
-      bool show_supervised_user_iph = false);
+      bool show_profile_switch_iph = false);
 
   static std::unique_ptr<views::WebView> CreateSignoutConfirmationWebView(
       BrowserWindowInterface* browser,

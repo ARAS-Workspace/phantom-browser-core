@@ -4,20 +4,15 @@
 
 #include "chrome/browser/ui/webui/cr_components/history_embeddings/history_embeddings_handler.h"
 
-#include "base/check.h"
 #include "base/i18n/time_formatting.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/ui/hats/hats_service.h"
-#include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "components/history_clusters/core/history_clusters_util.h"
 #include "components/history_embeddings/content/history_embeddings_service.h"
@@ -229,25 +224,6 @@ void HistoryEmbeddingsHandler::RecordSearchResultsMetrics(
     record_histograms("History.Embeddings.UserActions.SidePanel");
   } else {
     record_histograms("History.Embeddings.UserActions.HistoryPage");
-  }
-
-  if (answer_shown &&
-      base::FeatureList::IsEnabled(
-          features::kHappinessTrackingSurveysForHistoryEmbeddings)) {
-    HatsService* hats_service = HatsServiceFactory::GetForProfile(
-        profile_.get(), /*create_if_necessary=*/true);
-    CHECK(hats_service);
-
-    base::TimeDelta delay_time =
-        features::kHappinessTrackingSurveysForHistoryEmbeddingsDelayTime.Get();
-    hats_service->LaunchDelayedSurvey(
-        kHatsSurveyTriggerHistoryEmbeddings, delay_time.InMilliseconds(),
-        {{"non empty results", non_empty_results},
-         {"best matches result clicked", user_clicked_results},
-         {"result clicked", other_history_result_clicked},
-         {"answer shown", answer_shown},
-         {"answer citation clicked", answer_citation_clicked}},
-        {{"query word count", base::NumberToString(query_word_count)}});
   }
 }
 

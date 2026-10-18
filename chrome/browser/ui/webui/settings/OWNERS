@@ -6,7 +6,6 @@ per-file people_handler*=msalama@chromium.org
 per-file people_handler*=treib@chromium.org
 per-file people_handler*=amelies@google.com
 
-per-file hats_handler*=msramek@google.com
 per-file *site_settings*=msramek@chromium.org
 per-file *site_settings*=fsenra@google.com
 per-file search_engines_handler*=file://components/search_engines/OWNERS
