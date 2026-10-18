@@ -15,11 +15,6 @@ namespace search {
 // Returns the omnibox controller from the browser instance associated with
 // `web_contents`, if any, or nullptr otherwise.
 OmniboxController* GetOmniboxController(content::WebContents* web_contents);
-// Focus or unfocus the omnibox if |focus| is true or false respectively.
-void FocusOmnibox(bool focus, content::WebContents* web_contents);
-// Returns whether input is in progress, i.e. if the omnibox has focus and the
-// active tab is in mode SEARCH_SUGGESTIONS.
-bool IsOmniboxInputInProgress(content::WebContents* web_contents);
 
 }  // namespace search
 

@@ -50,10 +50,6 @@ void InstantBrowserTestBase::TearDownOnMainThread() {
   InProcessBrowserTest::TearDownOnMainThread();
 }
 
-ntp_tiles::MostVisitedSites* InstantBrowserTestBase::most_visited_sites() {
-  return instant_service_->most_visited_sites_.get();
-}
-
 void InstantBrowserTestBase::SetUserSelectedDefaultSearchProvider(
     const std::string& base_url) {
   TemplateURLData data;

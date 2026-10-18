@@ -287,7 +287,6 @@ source_set("browser_instant_controller") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search",
     "//chrome/browser/search_engines",
-    "//chrome/browser/ui/search",
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/common",
     "//components/infobars/content",

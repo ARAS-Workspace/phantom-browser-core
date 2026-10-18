@@ -1505,11 +1505,6 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
     }
   }
 
-  if (search::ShouldUseProcessPerSiteForSecurityPrincipal(security_principal,
-                                                          profile)) {
-    return true;
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (ChromeContentBrowserClientExtensionsPart::ShouldUseProcessPerSite(
           profile, security_principal)) {
@@ -1634,24 +1629,6 @@ bool ChromeContentBrowserClient::
     return false;
   }
 #endif
-  return true;
-}
-
-bool ChromeContentBrowserClient::DoesWebUIUrlRequireProcessLock(
-    const GURL& url) {
-  // Note: This method can be called from multiple threads. It is not safe to
-  // assume it runs only on the UI thread.
-
-  // We only allow the most visited tiles on third-party NTPs to not require a
-  // process lock. Everything else, including the actual third-party NTP which
-  // embeds those tiles, should be locked.  This allows most visited tiles to
-  // stay in their parent (i.e., third-party NTP's) process.
-  if (url.SchemeIs(chrome::kChromeSearchScheme) &&
-      url.host() == chrome::kChromeSearchMostVisitedHost) {
-    return false;
-  }
-
-  // All other WebUIs must be locked to origin.
   return true;
 }
 
@@ -1881,25 +1858,6 @@ void ChromeContentBrowserClient::CrossProcessSubframeRenderProcessGone(
           GetFrameNodeForRenderFrameHost(render_frame_host)) {
     frame_node->CrossProcessSubframeRenderProcessGone();
   }
-}
-
-bool ChromeContentBrowserClient::ShouldStayInParentProcessForNTP(
-    const GURL& url,
-    const GURL& parent_site_url) {
-  // Allow most visited iframes to stay in the parent process but only if that
-  // process is for NTP.
-  //
-  // TODO(alexmos): Consider further tightening this exception to just the
-  // third-party remote NTP in the parent, rather than any NTP.
-  //
-  // TODO(crbug.com/40447789): place those iframes into OOPIFs and remove this
-  // exception. Relaxing site isolation like this is a bad idea and should be
-  // avoided.
-  //
-  // TODO(crbug.com/41261582): clean up the logic for detecting NTP.
-  return url.SchemeIs(chrome::kChromeSearchScheme) &&
-         url.host() == chrome::kChromeSearchMostVisitedHost &&
-         search::IsNTPURL(parent_site_url);
 }
 
 bool ChromeContentBrowserClient::IsSuitableHost(
@@ -4772,10 +4730,7 @@ void AddChromeSchemeFactories(
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   InstantService* instant_service =
       InstantServiceFactory::GetForProfile(profile);
-  // The test below matches when a remote 3P NTP is loaded. The effective
-  // URL is chrome-search://remote-ntp. This is to allow the use of the NTP
-  // public api and to embed most-visited tiles
-  // (chrome-search://most-visited/title.html).
+  // Instant renderer processes can load chrome-search: subresources.
   //
   // InstantService might be null for some irregular profiles, e.g. the System
   // Profile.

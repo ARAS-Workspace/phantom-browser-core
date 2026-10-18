@@ -33,7 +33,6 @@ source_set("most_visited") {
     "//chrome/browser/search_engines",
     "//chrome/browser/ui/tabs:tabs_public",
     "//chrome/browser/ui/webui:webui_util",
-    "//chrome/common/search:mojo_bindings",
     "//components/history/core/browser",
     "//components/ntp_tiles",
     "//components/ntp_tiles:pref_names",

@@ -68,7 +68,6 @@
 
 #include "chrome/browser/badging/badge_manager.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
-#include "chrome/browser/ui/search/search_tab_helper.h"
 #include "chrome/browser/ui/webui_browser/webui_browser_ui.h"
 #include "components/record_replay/core/common/record_replay.mojom.h"
 
@@ -418,15 +417,6 @@ void ChromeContentBrowserClient::
         &render_frame_host));
   }
 #endif  // BUILDFLAG(ENABLE_PDF)
-  associated_registry.AddInterface<search::mojom::EmbeddedSearchConnector>(
-      base::BindRepeating(
-          [](content::RenderFrameHost* render_frame_host,
-             mojo::PendingAssociatedReceiver<
-                 search::mojom::EmbeddedSearchConnector> receiver) {
-            SearchTabHelper::BindEmbeddedSearchConnecter(std::move(receiver),
-                                                         render_frame_host);
-          },
-          &render_frame_host));
 #if BUILDFLAG(ENABLE_PRINTING)
   associated_registry.AddInterface<printing::mojom::PrintManagerHost>(
       base::BindRepeating(

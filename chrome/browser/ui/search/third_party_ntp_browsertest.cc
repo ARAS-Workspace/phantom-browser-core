@@ -57,7 +57,7 @@ class ThirdPartyNTPBrowserTest : public InProcessBrowserTest,
     auto response = std::make_unique<net::test_server::BasicHttpResponse>();
     response->set_code(net::HTTP_FOUND);
     response->AddCustomHeader("Location",
-                              "chrome-search://most-visited/title.html");
+                              "chrome-search://theme/current-channel-logo");
     response->set_content_type("text/html");
     response->set_content("<p>Redirecting to chrome-search</p>");
     return response;
@@ -80,10 +80,10 @@ IN_PROC_BROWSER_TEST_P(ThirdPartyNTPBrowserTest,
   content::WebContents* contents =
       browser()->tab_strip_model()->GetActiveWebContents();
 
-  // Add a chrome-search://most-visited/title.html?rid=1&fs=0 subframe and
+  // Add a chrome-search://theme/current-channel-logo subframe and
   // verify that the resource is not allowed to load.
   const char kChromeSearchIframeUrl[] =
-      "chrome-search://most-visited/title.html?rid=1&fs=0";
+      "chrome-search://theme/current-channel-logo";
 
   // The test script string is the same for both branches, so define it once.
   std::string script =
@@ -133,8 +133,7 @@ IN_PROC_BROWSER_TEST_P(
 
   // Start a renderer initiated navigation to the chrome-search://
   // url and verify that the resource is not allowed to load.
-  const char kChromeSearchUrl[] =
-      "chrome-search://most-visited/title.html?rid=1&fs=0";
+  const char kChromeSearchUrl[] = "chrome-search://theme/current-channel-logo";
 
   if (InstantUsesSpareRenderer()) {
     // When feature is enabled: browser-side blocking via NavigationThrottle.
@@ -205,7 +204,7 @@ IN_PROC_BROWSER_TEST_P(ThirdPartyNTPBrowserTest,
     (async () => {
       return new Promise((resolve) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'chrome-search://most-visited/title.html?rid=1&fs=0');
+        xhr.open('GET', 'chrome-search://theme/current-channel-logo');
         xhr.onload = () => resolve('success');
         xhr.onerror = () => resolve('error: Failed to fetch');
         xhr.send();

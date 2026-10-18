@@ -123,8 +123,6 @@ TEST_P(PermissionManagerTest, GetCanonicalOriginSearch) {
   const GURL other_url("https://other.url");
   const GURL google_base = GURL(UIThreadSearchTermsData().GoogleBaseURLValue())
                                .DeprecatedGetOriginAsURL();
-  const GURL remote_ntp = GURL(std::string("chrome-search://") +
-                               chrome::kChromeSearchRemoteNtpHost);
   const GURL other_chrome_search = GURL("chrome-search://not-local-ntp");
   const GURL& top_level_ntp = chrome::ChromeUINewTabURLAsGURL();
   const GURL webui_ntp = chrome::ChromeUINewTabPageURLAsGURL();
@@ -148,10 +146,7 @@ TEST_P(PermissionManagerTest, GetCanonicalOriginSearch) {
                              content_settings::GeolocationContentSettingsType(),
                              webui_ntp, top_level_ntp));
 
-  // chrome-search://remote-ntp and other URLs are not affected.
-  EXPECT_EQ(remote_ntp, permissions::PermissionUtil::GetCanonicalOrigin(
-                            content_settings::GeolocationContentSettingsType(),
-                            remote_ntp, top_level_ntp));
+  // chrome-search: and other URLs are not affected.
   EXPECT_EQ(google_com, permissions::PermissionUtil::GetCanonicalOrigin(
                             content_settings::GeolocationContentSettingsType(),
                             google_com, top_level_ntp));

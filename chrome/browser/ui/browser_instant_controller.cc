@@ -29,9 +29,7 @@
 BrowserInstantController::BrowserInstantController(
     Profile* profile,
     TabStripModel* tab_strip_model)
-    : profile_(profile),
-      tab_strip_model_(tab_strip_model),
-      instant_(profile, tab_strip_model) {
+    : profile_(profile), tab_strip_model_(tab_strip_model) {
   TemplateURLService* template_url_service =
       TemplateURLServiceFactory::GetForProfile(profile_.get());
   // TemplateURLService can be null in tests.

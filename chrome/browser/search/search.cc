@@ -6,8 +6,6 @@
 
 #include <stddef.h>
 
-#include <string>
-
 #include "base/check_deref.h"
 #include "base/feature_list.h"
 #include "base/metrics/histogram_macros.h"
@@ -34,8 +32,6 @@
 namespace search {
 
 namespace {
-
-const char kServiceWorkerFileName[] = "newtab-serviceworker.js";
 
 bool MatchesOrigin(const GURL& my_url, const GURL& other_url) {
   return my_url.scheme() == other_url.scheme() &&
@@ -82,40 +78,14 @@ enum NewTabURLState {
   NEW_TAB_URL_MAX
 };
 
-bool IsMatchingServiceWorker(const GURL& my_url, const GURL& document_url) {
-  // The origin should match.
-  if (!MatchesOrigin(my_url, document_url)) {
-    return false;
-  }
-
-  // The url filename should be the new tab page ServiceWorker.
-  std::string my_filename = my_url.ExtractFileName();
-  if (my_filename != kServiceWorkerFileName) {
-    return false;
-  }
-
-  // The paths up to the filenames should be the same.
-  std::string my_path_without_filename = my_url.GetPath();
-  my_path_without_filename.erase(my_path_without_filename.length() -
-                                 my_filename.length());
-  std::string document_filename = document_url.ExtractFileName();
-  std::string document_path_without_filename = document_url.GetPath();
-  document_path_without_filename.erase(document_path_without_filename.length() -
-                                       document_filename.length());
-
-  return my_path_without_filename == document_path_without_filename;
-}
-
-// Returns true if |url| matches the NTP URL or the URL of the NTP's associated
-// service worker.
+// Returns true if |url| matches the NTP URL.
 bool IsNTPOrRelatedURLHelper(const GURL& url, Profile* profile) {
   if (!url.is_valid()) {
     return false;
   }
 
   const GURL new_tab_url(GetNewTabPageURL(profile));
-  return new_tab_url.is_valid() && (MatchesOriginAndPath(url, new_tab_url) ||
-                                    IsMatchingServiceWorker(url, new_tab_url));
+  return new_tab_url.is_valid() && MatchesOriginAndPath(url, new_tab_url);
 }
 
 // Used to look up the URL to use for the New Tab page. Also tracks how we
@@ -178,10 +148,6 @@ bool IsNTPOrRelatedURL(const GURL& url, Profile* profile) {
 }
 
 bool IsNTPURL(const GURL& url) {
-  if (url.SchemeIs(chrome::kChromeSearchScheme) &&
-      url.host() == chrome::kChromeSearchRemoteNtpHost) {
-    return true;
-  }
   return NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
 }
 
@@ -259,14 +225,6 @@ bool ShouldAssignSecurityPrincipalToInstantRenderer(
   return security_principal.SchemeIs(chrome::kChromeSearchScheme);
 }
 
-bool ShouldUseProcessPerSiteForSecurityPrincipal(
-    const content::SecurityPrincipal& security_principal,
-    Profile* profile) {
-  return ShouldAssignSecurityPrincipalToInstantRenderer(security_principal,
-                                                        profile) &&
-         security_principal.GetHost() == chrome::kChromeSearchRemoteNtpHost;
-}
-
 std::optional<GURL> GetEffectiveURLForInstant(const GURL& url,
                                               Profile* profile) {
   CHECK(ShouldAssignURLToInstantRenderer(url, profile))
@@ -281,16 +239,6 @@ std::optional<GURL> GetEffectiveURLForInstant(const GURL& url,
   GURL::Replacements replacements;
   replacements.SetSchemeStr(chrome::kChromeSearchScheme);
   replacements.ClearPort();
-
-  // If this is the URL for a server-provided NTP, replace the host with
-  // "remote-ntp".
-  std::string_view remote_ntp_host = chrome::kChromeSearchRemoteNtpHost;
-  NewTabURLDetails details = NewTabURLDetails::ForProfile(profile);
-  if (details.state == NEW_TAB_URL_VALID &&
-      (MatchesOriginAndPath(url, details.url) ||
-       IsMatchingServiceWorker(url, details.url))) {
-    replacements.SetHostStr(remote_ntp_host);
-  }
 
   return url.ReplaceComponents(replacements);
 }

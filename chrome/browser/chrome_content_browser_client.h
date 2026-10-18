@@ -198,7 +198,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::BrowserContext* browser_context,
       const GURL& precursor,
       const GURL& url) override;
-  bool DoesWebUIUrlRequireProcessLock(const GURL& url) override;
   bool ShouldTreatAsFirstPartyWhenTopLevel(
       const url::Origin& top_frame_origin,
       bool is_embedded_origin_secure) override;
@@ -240,8 +239,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       std::optional<url::Origin>* initiator_origin) override;
   void CrossProcessSubframeRenderProcessGone(
       content::RenderFrameHost* render_frame_host) override;
-  bool ShouldStayInParentProcessForNTP(const GURL& url,
-                                       const GURL& parent_site_url) override;
   bool IsSuitableHost(
       content::RenderProcessHost* process_host,
       const content::SecurityPrincipal& security_principal) override;

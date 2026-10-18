@@ -1507,59 +1507,6 @@ class OmniboxPedalCustomizeChromeFonts : public OmniboxPedal {
 
 // =============================================================================
 
-class OmniboxPedalManageChromeThemes : public OmniboxPedal {
- public:
-  OmniboxPedalManageChromeThemes()
-      : OmniboxPedal(
-            OmniboxPedalId::MANAGE_CHROME_THEMES,
-            LabelStrings(
-                IDS_OMNIBOX_PEDAL_MANAGE_CHROME_THEMES_HINT,
-                IDS_OMNIBOX_PEDAL_MANAGE_CHROME_THEMES_SUGGESTION_CONTENTS,
-                IDS_ACC_OMNIBOX_PEDAL_MANAGE_CHROME_THEMES_SUFFIX,
-                IDS_ACC_OMNIBOX_PEDAL_MANAGE_CHROME_THEMES),
-            GURL("chrome://new-tab-page/?customize=backgrounds")) {}
-
-  std::vector<SynonymGroupSpec> SpecifySynonymGroups(
-      bool locale_is_english) const override {
-    if (locale_is_english) {
-      return {
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_CHROME_THEMES_ONE_OPTIONAL_CUSTOMIZE,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_CHROME_THEMES_ONE_REQUIRED_CHROME_BACKGROUNDS,
-          },
-      };
-    } else {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_CHROME_THEMES_ONE_REQUIRED_CUSTOMIZE_CHROME_APPEARANCE,
-          },
-      };
-    }
-  }
-
-  bool IsReadyToTrigger(
-      const AutocompleteInput& input,
-      const AutocompleteProviderClient& client) const override {
-    // The URL for this pedal is specific to Google/Chrome. Avoid confusion
-    // with user's default engine & new tab page when another is selected.
-    return search::DefaultSearchProviderIsGoogle(
-        client.GetTemplateURLService());
-  }
-
- protected:
-  ~OmniboxPedalManageChromeThemes() override = default;
-};
-
-// =============================================================================
-
 class OmniboxPedalCustomizeSearchEngines : public OmniboxPedal {
  public:
   OmniboxPedalCustomizeSearchEngines()
@@ -1727,7 +1674,6 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   add(new OmniboxPedalManageChromeAccessibility());
   add(new OmniboxPedalSetChromeAsDefaultBrowser());
   add(new OmniboxPedalCustomizeChromeFonts());
-  add(new OmniboxPedalManageChromeThemes());
   add(new OmniboxPedalCustomizeSearchEngines());
 
   return pedals;

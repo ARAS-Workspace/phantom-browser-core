@@ -18,9 +18,7 @@ source_set("new_tab_page") {
     "//chrome/common:constants",
     "//components/ntp_tiles",
     "//components/search",
-    "//components/visited_url_ranking/public",
     "//content/public/browser",
-    "//mojo/public/mojom/base",
     "//skia",
   ]
 

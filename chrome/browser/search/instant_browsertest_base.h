@@ -15,7 +15,6 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/ntp_tiles/most_visited_sites.h"
 #include "components/search_engines/template_url_service.h"
 #include "content/public/test/browser_test.h"
 
@@ -29,8 +28,6 @@ class InstantBrowserTestBase : public InProcessBrowserTest {
 
   void SetUpOnMainThread() override;
   void TearDownOnMainThread() override;
-
-  ntp_tiles::MostVisitedSites* most_visited_sites();
 
   // Adds and sets the default search provider using the base_url.
   // The base_url should have the http[s]:// prefix and a trailing / after the

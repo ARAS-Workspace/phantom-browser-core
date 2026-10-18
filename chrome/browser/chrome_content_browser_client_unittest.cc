@@ -259,46 +259,6 @@ TEST_F(ChromeContentBrowserClientTest, ShouldAssignSiteForURL) {
 using ChromeContentBrowserClientTestWithWebContents =
     ChromeRenderViewHostTestHarness;
 
-// TODO(crbug.com/40447789): Remove the need for
-// ShouldStayInParentProcessForNTP()
-//    and associated test.
-TEST_F(ChromeContentBrowserClientTest, ShouldStayInParentProcessForNTP) {
-  ChromeContentBrowserClient client;
-  // Remote 3P NTPs effectively have a URL chrome-search://remote-ntp. This
-  // is so an iframe with the src of chrome-search://most-visited/title.html can
-  // be embedded within the remote NTP.
-  scoped_refptr<content::SiteInstance> site_instance =
-      content::SiteInstance::CreateForURL(profile(),
-                                          GURL("chrome-search://remote-ntp"));
-  EXPECT_TRUE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome-search://most-visited/title.html"),
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
-
-  // Only the most visited tiles host is allowed to stay in the 3P NTP.
-  EXPECT_FALSE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome-search://foo/"),
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
-  EXPECT_FALSE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome://new-tab-page"),
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
-
-  site_instance = content::SiteInstance::CreateForURL(
-      profile(), GURL("chrome://new-tab-page-third-party"));
-
-  // chrome://new-tab-page-third-party is a WebUI NTP and supports OOPIFs.
-  // ShouldStayInParentProcessForNTP() should only return true for NTPs hosted
-  // under the chrome-search: scheme.
-  EXPECT_FALSE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome://new-tab-page-third-party"),
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
-
-  // For now, we also allow chrome-search://most-visited to stay in the WebUI
-  // NTP, chrome://new-tab-page-third-party.
-  EXPECT_TRUE(client.ShouldStayInParentProcessForNTP(
-      GURL("chrome-search://most-visited"),
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL()));
-}
-
 TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(
@@ -314,25 +274,10 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
   const content::Referrer kReferrer(GURL("https://www.example.com/page"),
                                     network::mojom::ReferrerPolicy::kDefault);
 
-  // Link transition from a remote NTP process is rewritten to AUTO_BOOKMARK
-  // so the destination contributes to TopSites segments, matching native
-  // NTP tile-click behavior. With the feature enabled, other fields are
+  // Link transition from a chrome:// NTP is rewritten to AUTO_BOOKMARK so the
+  // destination contributes to TopSites segments, matching native NTP
+  // tile-click behavior. With the feature enabled, other fields are
   // intentionally left untouched.
-  GURL remote_ntp_url("chrome-search://remote-ntp");
-  transition = ui::PAGE_TRANSITION_LINK;
-  is_renderer_initiated = true;
-  referrer = kReferrer;
-  initiator_origin = kInitiator;
-  client.OverrideNavigationParams(remote_ntp_url, &transition,
-                                  &is_renderer_initiated, &referrer,
-                                  &initiator_origin);
-  EXPECT_TRUE(ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_AUTO_BOOKMARK,
-                                           transition));
-  EXPECT_TRUE(is_renderer_initiated);
-  EXPECT_EQ(kReferrer.url, referrer.url);
-  EXPECT_EQ(kInitiator, initiator_origin);
-
-  // Same for a chrome:// NTP.
   transition = ui::PAGE_TRANSITION_LINK;
   is_renderer_initiated = true;
   referrer = kReferrer;
@@ -375,25 +320,13 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagDisabled) {
   content::Referrer referrer = content::Referrer();
   std::optional<url::Origin> initiator_origin;
 
-  // Link transition from a remote NTP process is rewritten to AUTO_BOOKMARK
-  // and the other three fields are reset to "browser-initiated" defaults
-  // (the legacy behavior; see crbug.com/518853220).
-  GURL remote_ntp_url("chrome-search://remote-ntp");
+  // Link transition from a chrome:// NTP is rewritten to AUTO_BOOKMARK and the
+  // other three fields are reset to "browser-initiated" defaults (the legacy
+  // behavior; see crbug.com/518853220).
   transition = ui::PAGE_TRANSITION_LINK;
   is_renderer_initiated = true;
   // The origin is a placeholder to test that |initiator_origin| is set to
   // std::nullopt and is not meant to represent what would happen in practice.
-  initiator_origin = url::Origin::Create(GURL("https://www.example.com"));
-  client.OverrideNavigationParams(remote_ntp_url, &transition,
-                                  &is_renderer_initiated, &referrer,
-                                  &initiator_origin);
-  EXPECT_TRUE(ui::PageTransitionCoreTypeIs(ui::PAGE_TRANSITION_AUTO_BOOKMARK,
-                                           transition));
-  EXPECT_FALSE(is_renderer_initiated);
-  EXPECT_EQ(std::nullopt, initiator_origin);
-
-  transition = ui::PAGE_TRANSITION_LINK;
-  is_renderer_initiated = true;
   initiator_origin = url::Origin::Create(GURL("https://www.example.com"));
   client.OverrideNavigationParams(
       GURL(chrome::kChromeUINewTabPageThirdPartyURL), &transition,

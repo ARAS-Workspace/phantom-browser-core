@@ -300,7 +300,7 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest, SpecialSchemeDevtools) {
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest,
                        SpecialSchemeChromeSearch) {
   EXPECT_TRUE(content::NavigateToURL(
-      web_contents(), GURL("chrome-search://most-visited/title.html")));
+      web_contents(), GURL("chrome-search://theme/current-channel-logo")));
   ASSERT_TRUE(
       web_contents()->GetPrimaryMainFrame()->GetLastCommittedURL().SchemeIs(
           chrome::kChromeSearchScheme));

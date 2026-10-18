@@ -32,7 +32,6 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_view_host.h"
-#include "content/public/browser/security_principal.h"
 #include "content/public/browser/site_instance.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
@@ -192,32 +191,6 @@ IN_PROC_BROWSER_TEST_F(SearchTest, ShouldAssignURLToInstantRenderer) {
   }
 }
 
-IN_PROC_BROWSER_TEST_F(SearchTest,
-                       ShouldUseProcessPerSiteForSecurityPrincipal) {
-  const auto kTestCases = std::to_array<SearchTestCase>({
-      {"chrome-search://remote-ntp", true, "Remote NTP"},
-      {"invalid-scheme://online-ntp", false, "Invalid Online NTP URL"},
-      {"chrome-search://foo.com", false, "Search result page"},
-      {"https://foo.com/instant", false, ""},
-      {"https://foo.com/url", false, ""},
-      {"https://foo.com/alt", false, ""},
-      {"https://foo.com:80/instant", false, "HTTPS with port"},
-      {"http://foo.com/instant", false, "Non-HTTPS"},
-      {"http://foo.com:443/instant", false, "Non-HTTPS"},
-      {"https://foo.com/instant", false, "No search terms replacement"},
-      {"https://foo.com/", false, "Non-exact path"},
-  });
-
-  for (size_t i = 0; i < std::size(kTestCases); ++i) {
-    const SearchTestCase& test = kTestCases[i];
-    std::unique_ptr<content::SecurityPrincipal> principal =
-        content::SecurityPrincipal::CreateForTesting(profile(), GURL(test.url));
-    EXPECT_EQ(test.expected_result, ShouldUseProcessPerSiteForSecurityPrincipal(
-                                        *principal, profile()))
-        << test.url << " " << test.comment;
-  }
-}
-
 IN_PROC_BROWSER_TEST_F(SearchTest, ProcessIsolation) {
   for (size_t i = 0; i < std::size(kProcessIsolationTestCases); ++i) {
     const ProcessIsolationTestCase& test = kProcessIsolationTestCases[i];
@@ -372,7 +345,7 @@ IN_PROC_BROWSER_TEST_F(SearchTest, IsNTPOrRelatedURL) {
 // See search::IsNTPURL(const GURL& url);
 IN_PROC_BROWSER_TEST_F(SearchTest, IsNTPURL) {
   const auto kTestCases = std::to_array<SearchTestCase>({
-      {"chrome-search://remote-ntp", true, "Remote NTP URL"},
+      {"chrome-search://remote-ntp", false, "Remote NTP URL"},
       {"chrome://new-tab-page-third-party", true, "WebUI NTP"},
       {"chrome://new-tab-page-third-party/path?params", true,
        "WebUI NTP with path and params"},

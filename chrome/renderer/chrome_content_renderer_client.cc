@@ -65,7 +65,6 @@
 #include "chrome/renderer/net/net_error_helper.h"
 #include "chrome/renderer/plugins/non_loadable_plugin_placeholder.h"
 #include "chrome/renderer/plugins/pdf_plugin_placeholder.h"
-#include "chrome/renderer/process_state.h"
 #include "chrome/renderer/trusted_vault_encryption_keys_extension.h"
 #include "chrome/renderer/url_loader_throttle_provider_impl.h"
 #include "chrome/renderer/v8_unwinder.h"
@@ -181,8 +180,6 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#include "chrome/renderer/searchbox/searchbox.h"
-#include "chrome/renderer/searchbox/searchbox_extension.h"
 #include "components/record_replay/content/renderer/record_replay_agent.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #include "components/search/ntp_features.h"  // nogncheck
@@ -656,12 +653,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
     subresource_filter_agent->Initialize();
   }
 
-  if (process_state::IsInstantProcess() && render_frame->IsMainFrame()) {
-    new SearchBox(render_frame);
-  }
-
-
-
   if (base::FeatureList::IsEnabled(features::kWebium)) {
     WebUIBrowserRendererExtension::Create(render_frame);
   }
@@ -1124,23 +1115,7 @@ void ChromeContentRendererClient::WillSendRequest(
   extensions::ExtensionsRendererClient::Get()->WillSendRequest(
       frame, transition_type, upstream_url, target_url, site_for_cookies,
       initiator_origin, new_url);
-  if (!new_url->is_empty())
-    return;
 #endif
-
-  if (!target_url.ProtocolIs(chrome::kChromeSearchScheme)) {
-    return;
-  }
-
-  SearchBox* search_box =
-      SearchBox::Get(content::RenderFrame::FromWebFrame(frame->LocalRoot()));
-  if (search_box) {
-    // Note: this GURL copy could be avoided if host() were added to WebURL.
-    GURL gurl(target_url);
-    if (gurl.host() == chrome::kChromeUIFaviconHost) {
-      search_box->GenerateImageURLFromTransientURL(target_url, new_url);
-    }
-  }
 }
 
 bool ChromeContentRendererClient::IsPrefetchOnly(

@@ -9,7 +9,6 @@
 
 #include "base/functional/bind.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/strings/stringprintf.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/platform_browser_test.h"
 #include "content/public/browser/browser_thread.h"
@@ -22,7 +21,6 @@
 #include "net/test/embedded_test_server/http_request.h"
 #include "net/test/embedded_test_server/http_response.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/blink/public/web/web_local_frame.h"
 #include "url/gurl.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -30,52 +28,7 @@
 #include "extensions/common/extensions_client.h"
 #endif
 
-#include "chrome/renderer/searchbox/searchbox.h"
-#include "chrome/test/base/chrome_render_view_test.h"
-#include "content/public/renderer/render_frame.h"
-
 namespace {
-
-using ChromeContentRendererClientSearchBoxTest = ChromeRenderViewTest;
-
-const char kHtmlWithIframe[] ="<iframe srcdoc=\"Nothing here\"></iframe>";
-
-TEST_F(ChromeContentRendererClientSearchBoxTest, RewriteThumbnailURL) {
-  // Instantiate a SearchBox for the main render frame.
-  content::RenderFrame* render_frame =
-      content::RenderFrame::FromWebFrame(GetMainFrame());
-  new SearchBox(render_frame);
-
-  // Load a page that contains an iframe.
-  LoadHTML(kHtmlWithIframe);
-
-  ChromeContentRendererClient* client =
-      static_cast<ChromeContentRendererClient*>(content_renderer_client_.get());
-
-  // Create a thumbnail URL containing the correct render frame ID and an
-  // arbitrary instant restricted ID.
-  GURL thumbnail_url(base::StringPrintf(
-      "chrome-search:/thumb/%s/1",
-      render_frame->GetWebFrame()->GetLocalFrameToken().ToString().c_str()));
-
-  GURL result;
-  // Make sure the SearchBox rewrites a thumbnail request from the main frame.
-  client->WillSendRequest(GetMainFrame(), ui::PAGE_TRANSITION_LINK,
-                          /*upstream_url=*/GURL(), blink::WebURL(thumbnail_url),
-                          net::SiteForCookies(), nullptr, &result);
-  EXPECT_NE(result, thumbnail_url);
-
-  // Make sure the SearchBox rewrites a thumbnail request from the iframe.
-  blink::WebFrame* child_frame = GetMainFrame()->FirstChild();
-  ASSERT_TRUE(child_frame);
-  ASSERT_TRUE(child_frame->IsWebLocalFrame());
-  blink::WebLocalFrame* local_child =
-      static_cast<blink::WebLocalFrame*>(child_frame);
-  client->WillSendRequest(local_child, ui::PAGE_TRANSITION_LINK,
-                          /*upstream_url=*/GURL(), blink::WebURL(thumbnail_url),
-                          net::SiteForCookies(), nullptr, &result);
-  EXPECT_NE(result, thumbnail_url);
-}
 
 // The tests below examine Youtube requests that use the Flash API and ensure
 // that the requests have been modified to instead use HTML5. The tests also

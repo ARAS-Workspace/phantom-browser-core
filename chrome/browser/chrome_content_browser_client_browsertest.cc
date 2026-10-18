@@ -410,7 +410,7 @@ IN_PROC_BROWSER_TEST_P(PrefersColorSchemeTest, ChromeSearchTheme) {
   Browser* incognito_browser =
       CreateIncognitoBrowser(GetBrowser()->GetProfile());
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      incognito_browser, GURL("chrome-search://most-visited/title.html")));
+      incognito_browser, GURL("chrome-search://theme/current-channel-logo")));
 
   auto* tab_list = TabListInterface::From(incognito_browser);
   ASSERT_TRUE(tab_list);

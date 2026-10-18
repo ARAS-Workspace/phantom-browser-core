@@ -136,7 +136,6 @@ static_library("common_lib") {
     "pref_names_util.cc",
     "pref_names_util.h",
     "ref_counted_util.h",
-    "search/instant_mojom_traits.h",
     "search/instant_types.cc",
     "search/instant_types.h",
     "search/ntp_logging_events.h",
@@ -172,7 +171,6 @@ static_library("common_lib") {
     "//chrome/common/net",
     "//chrome/common/platform_runtime",
     "//chrome/common/profiler",
-    "//chrome/common/search:mojo_bindings",
     "//chrome/installer/util:with_no_strings",
     "//components/client_hints/common",
     "//components/cloud_devices/common",
@@ -514,21 +512,15 @@ static_library("test_support") {
   testonly = true
   visibility = [ "//chrome/test:*" ]
 
-  sources = [
-    "search/mock_embedded_search_client.cc",
-    "search/mock_embedded_search_client.h",
-  ]
-
   deps = [
     ":common",
     "//base",
-    "//chrome/common/search:mojo_bindings",
     "//testing/gmock",
     "//testing/gtest",
   ]
 
   if (enable_extensions_core) {
-    sources += [
+    sources = [
       "extensions/extension_test_util.cc",
       "extensions/extension_test_util.h",
     ]

@@ -31,20 +31,12 @@ inline constexpr char kBrowserSettingsSearchEngineURL[] =
 // widgets instead of using HTML.
 inline constexpr char kChromeNativeScheme[] = "chrome-native";
 
-// Host and URL for most visited iframes used on the Instant Extended NTP.
-inline constexpr char kChromeSearchMostVisitedHost[] = "most-visited";
-inline constexpr char kChromeSearchMostVisitedUrl[] =
-    "chrome-search://most-visited/";
-
 // URL for NTP custom background image selected from the user's machine and
 // filename for the version of the file in the Profile directory
 inline constexpr char kChromeUIUntrustedNewTabPageBackgroundUrl[] =
     "chrome-untrusted://new-tab-page/background.jpg";
 inline constexpr char kChromeUIUntrustedNewTabPageBackgroundFilename[] =
     "background.jpg";
-
-// Page under chrome-search.
-inline constexpr char kChromeSearchRemoteNtpHost[] = "remote-ntp";
 
 // The chrome-search: scheme is served by the same backend as chrome:.  However,
 // only specific URLDataSources are enabled to serve requests via the

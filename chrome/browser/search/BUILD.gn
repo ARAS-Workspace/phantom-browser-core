@@ -32,10 +32,6 @@ source_set("search") {
     "instant_service.h",
     "instant_service_factory.cc",
     "instant_service_factory.h",
-    "instant_service_observer.cc",
-    "instant_service_observer.h",
-    "most_visited_iframe_source.cc",
-    "most_visited_iframe_source.h",
     "search_engine_base_url_tracker.cc",
     "search_engine_base_url_tracker.h",
   ]
@@ -59,12 +55,9 @@ source_set("search") {
   deps += [
     "//chrome/app/theme:theme_resources",
     "//chrome/app/theme:theme_resources_grit",
-    "//chrome/browser/resources/new_tab_page_instant:resources",
-    "//chrome/browser/resources/new_tab_page_instant:resources_grit",
     "//chrome/browser/ui/webui:theme_source",
     "//chrome/common:constants",
     "//chrome/common:non_code_constants",
-    "//chrome/common/search:mojo_bindings",
     "//components/favicon_base",
     "//components/page_image_service/mojom:mojo_bindings",
     "//components/policy:generated",
@@ -93,14 +86,12 @@ source_set("unit_tests") {
   sources += [
     "background/ntp_custom_background_service_unittest.cc",
     "background/wallpaper_search/wallpaper_search_background_manager_unittest.cc",
-    "most_visited_iframe_source_unittest.cc",
   ]
 
   deps += [
     ":search",
     "//base",
     "//base/test:test_support",
-    "//chrome/browser/resources/new_tab_page_instant:resources_grit",
     "//chrome/browser/search/background",
     "//chrome/browser/search_engines",
     "//chrome/test:test_support",
@@ -145,7 +136,6 @@ source_set("browser_tests") {
 
   sources = [
     "background/wallpaper_search/wallpaper_search_browsertest.cc",
-    "instant_service_browsertest.cc",
     "ntp_custom_background_enabled_policy_handler_browsertest.cc",
     "search_browsertest.cc",
     "search_engine_base_url_tracker_browsertest.cc",

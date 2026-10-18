@@ -10,7 +10,6 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 #include "chrome/browser/search/search_engine_base_url_tracker.h"
-#include "chrome/browser/ui/search/instant_controller.h"
 
 class Profile;
 class TabStripModel;
@@ -35,8 +34,6 @@ class BrowserInstantController {
   const raw_ptr<Profile> profile_;
 
   const raw_ptr<TabStripModel> tab_strip_model_;
-
-  InstantController instant_;
 
   std::unique_ptr<SearchEngineBaseURLTracker> search_engine_base_url_tracker_;
 };

@@ -27,7 +27,7 @@ extern const void* const kIsNTPProcessKey;
 // Returns whether Google is selected as the default search engine.
 bool DefaultSearchProviderIsGoogle(Profile* profile);
 
-// Returns true if |url| corresponds to a New Tab page or its service worker.
+// Returns true if |url| corresponds to a New Tab page.
 bool IsNTPOrRelatedURL(const GURL& url, Profile* profile);
 
 // Returns whether a |url| corresponds to a New Tab page.
@@ -71,12 +71,6 @@ bool ShouldAssignSecurityPrincipalToInstantRenderer(
     const content::SecurityPrincipal& security_principal,
     Profile* profile);
 
-// Returns true if |security_principal| represents an Instant NTP URL
-// (chrome-search://remote-ntp) that should use process-per-site mode.
-bool ShouldUseProcessPerSiteForSecurityPrincipal(
-    const content::SecurityPrincipal& security_principal,
-    Profile* profile);
-
 // Returns the "effective URL" based on the input |url|. |url| must be an
 // Instant URL, i.e. ShouldAssignURLToInstantRenderer must return true. The
 // returned URL facilitates grouping process-per-site. The |url| is transformed,
@@ -91,10 +85,6 @@ bool ShouldUseProcessPerSiteForSecurityPrincipal(
 // Notice the scheme change.
 //
 // If the input is already a privileged URL then std::nullopt is returned.
-//
-// If |url| is that of the online NTP, its host is replaced with "remote-ntp".
-// This forces the NTP and search results pages to have different SiteIntances,
-// and hence different processes.
 std::optional<GURL> GetEffectiveURLForInstant(const GURL& url,
                                               Profile* profile);
 

@@ -76,7 +76,6 @@ static_library("renderer") {
     "google_accounts_private_api_extension.h",
     "google_accounts_private_api_util.cc",
     "google_accounts_private_api_util.h",
-    "instant_restricted_id_cache.h",
     "loadtimes_bindings.cc",
     "loadtimes_bindings.h",
     "media/flash_embed_rewrite.cc",
@@ -120,7 +119,6 @@ static_library("renderer") {
     "//chrome/common",
     "//chrome/common:mojo_bindings",
     "//chrome/common/net",
-    "//chrome/common/search:mojo_bindings",
     "//components/autofill/content/renderer",
     "//components/autofill/core/common:features",
     "//components/base32",
@@ -273,13 +271,6 @@ static_library("renderer") {
   if (enable_paint_preview) {
     deps += [ "//components/paint_preview/renderer" ]
   }
-
-  sources += [
-    "searchbox/searchbox.cc",
-    "searchbox/searchbox.h",
-    "searchbox/searchbox_extension.cc",
-    "searchbox/searchbox_extension.h",
-  ]
 
   deps += [
     "//chrome/renderer/webui_browser",

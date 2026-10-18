@@ -149,7 +149,6 @@ source_set("impl") {
   ]
   deps += [
     "//chrome/browser/dictation",
-    "//chrome/browser/new_tab_page",
     "//components/webapps/isolated_web_apps",
     "//third_party/zxcvbn-cpp",
   ]

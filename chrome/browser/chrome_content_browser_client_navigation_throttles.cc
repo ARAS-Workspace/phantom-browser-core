@@ -70,7 +70,6 @@
 #include "chrome/browser/page_info/web_view_side_panel_throttle.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/search/chrome_search_navigation_throttle.h"
-#include "chrome/browser/ui/search/new_tab_page_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/tabbed_web_app_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/webui_web_app_navigation_throttle.h"
 #include "chrome/browser/ui/webui/image/image_navigation_throttle.h"
@@ -317,8 +316,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
     ChromeSearchNavigationThrottle::MaybeCreateAndAdd(registry);
   }
-
-  NewTabPageNavigationThrottle::MaybeCreateAndAdd(registry);
 
   web_app::TabbedWebAppNavigationThrottle::MaybeCreateAndAdd(registry);
 

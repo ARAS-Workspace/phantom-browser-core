@@ -32,7 +32,6 @@
 #include "chrome/renderer/chrome_content_settings_agent_delegate.h"
 #include "chrome/renderer/loadtimes_bindings.h"
 #include "chrome/renderer/media/media_feeds.h"
-#include "chrome/renderer/process_state.h"
 #include "components/crash/core/common/crash_key.h"
 #include "components/guest_view/buildflags/buildflags.h"
 #include "components/guest_view/renderer/slim_web_view/slim_web_view_bindings.h"
@@ -70,8 +69,6 @@
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/geometry/size_f.h"
 #include "url/gurl.h"
-
-#include "chrome/renderer/searchbox/searchbox_extension.h"
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
 #include "chrome/common/mhtml_page_notifier.mojom.h"
@@ -277,9 +274,6 @@ void ChromeRenderFrameObserver::DidCommitProvisionalLoad(
 }
 
 void ChromeRenderFrameObserver::DidClearWindowObject() {
-  if (process_state::IsInstantProcess()) {
-    SearchBoxExtension::Install(render_frame()->GetWebFrame());
-  }
 #if BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   guest_view::SlimWebViewBindings::MaybeInstall(*render_frame());
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)

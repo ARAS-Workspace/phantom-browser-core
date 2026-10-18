@@ -75,7 +75,6 @@
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
-#include "chrome/browser/ui/search/search_tab_helper.h"
 #include "chrome/browser/ui/startup/launch_mode_recorder.h"
 #include "chrome/browser/ui/startup/startup_browser_creator_impl.h"
 #include "chrome/browser/ui/startup/startup_types.h"
@@ -110,7 +109,6 @@
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #include "components/language_detection/core/language_detection_details.h"
-#include "components/omnibox/common/omnibox_focus_state.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/template_url_service.h"
@@ -1322,15 +1320,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, ReattachDevToolsWindow) {
   observer.Wait();
   ASSERT_EQ(1u, ProfileBrowserCollection::GetForProfile(browser()->GetProfile())
                     ->GetSize());
-
-  // Do something that will make SearchTabHelper access its OmniboxView. This
-  // should not crash, even though the Browser association and thus the
-  // OmniboxView* has changed, and the old OmniboxView has been deleted.
-  SearchTabHelper* search_tab_helper =
-      SearchTabHelper::FromWebContents(devtools_main_web_contents);
-  SearchIPCRouter::Delegate* search_ipc_router_delegate =
-      static_cast<SearchIPCRouter::Delegate*>(search_tab_helper);
-  search_ipc_router_delegate->FocusOmnibox(OMNIBOX_FOCUS_INVISIBLE);
 
   DevToolsWindowTesting::CloseDevToolsWindowSync(devtools_window);
 }

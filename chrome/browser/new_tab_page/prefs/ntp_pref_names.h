@@ -50,20 +50,6 @@ inline constexpr char kNtpShortcutsStalenessCount[] =
 inline constexpr char kNtpShortcutsAutoRemovalDisabled[] =
     "ntp.shortcuts_auto_removal_disabled";
 
-// Tracks the last time the staleness counter was updated for modules.
-inline constexpr char kNtpLastModuleStalenessUpdate[] =
-    "ntp.last_module_staleness_update";
-
-// Tracks the staleness counter for each module id.
-inline constexpr char kNtpModuleStalenessCountDict[] =
-    "ntp.module_staleness_count_dict";
-
-// Tracks whether module auto-removal for inactivity is disabled for each
-// module. A special key of "all_modules" indicates that the auto-removal is
-// disabled for all modules.
-inline constexpr char kNtpModulesAutoRemovalDisabledDict[] =
-    "ntp.modules_auto_removal_disabled";
-
 // Tracks how many times a user hovers on a NewTabPage tile link.
 inline constexpr char kNtpMostVisitedTileHoverCount[] =
     "ntp.most_visited_tile_hover_count";
