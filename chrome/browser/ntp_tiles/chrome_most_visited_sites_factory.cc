@@ -4,26 +4,16 @@
 
 #include "chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.h"
 
-#include <utility>
-
 #include "build/build_config.h"
-#include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/favicon/large_icon_service_factory.h"
 #include "chrome/browser/history/top_sites_factory.h"
-#include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/ntp_tiles/chrome_custom_links_manager_factory.h"
 #include "chrome/browser/ntp_tiles/chrome_enterprise_shortcuts_manager_factory.h"
-#include "chrome/browser/ntp_tiles/chrome_popular_sites_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/history/core/browser/top_sites.h"
-#include "components/image_fetcher/core/image_fetcher_impl.h"
-#include "components/ntp_tiles/features.h"
-#include "components/ntp_tiles/icon_cacher_impl.h"
+#include "components/ntp_tiles/icon_cacher.h"
 #include "components/ntp_tiles/metrics.h"
 #include "components/ntp_tiles/most_visited_sites.h"
-#include "content/public/browser/storage_partition.h"
-#include "services/data_decoder/public/cpp/data_decoder.h"
 
 namespace {
 
@@ -49,8 +39,6 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
     return nullptr;
   }
 
-  std::unique_ptr<data_decoder::DataDecoder> data_decoder;
-
   auto most_visited_sites = std::make_unique<ntp_tiles::MostVisitedSites>(
       profile->GetPrefs(), IdentityManagerFactory::GetForProfile(profile),
       TopSitesFactory::GetForProfile(profile), nullptr,
@@ -60,14 +48,6 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
       ShouldCreateEnterpriseShortcutsManager()
           ? ChromeEnterpriseShortcutsManagerFactory::NewForProfile(profile)
           : nullptr,
-      std::make_unique<ntp_tiles::IconCacherImpl>(
-          FaviconServiceFactory::GetForProfile(
-              profile, ServiceAccessType::IMPLICIT_ACCESS),
-          LargeIconServiceFactory::GetForBrowserContext(profile),
-          std::make_unique<image_fetcher::ImageFetcherImpl>(
-              std::make_unique<ImageDecoderImpl>(),
-              profile->GetDefaultStoragePartition()
-                  ->GetURLLoaderFactoryForBrowserProcess()),
-          std::move(data_decoder)));
+      nullptr);
   return most_visited_sites;
 }

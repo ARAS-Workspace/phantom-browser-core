@@ -15,7 +15,6 @@
 #include "chrome/browser/ui/webui/cr_components/most_visited/most_visited_handler.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/ntp_tiles/constants.h"
-#include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/most_visited_sites.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/ntp_tiles/tile_type.h"

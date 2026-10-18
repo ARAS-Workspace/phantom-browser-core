@@ -18,7 +18,6 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/ntp_tiles/tile_type.h"
 #include "components/optimization_guide/core/optimization_guide_logger.h"

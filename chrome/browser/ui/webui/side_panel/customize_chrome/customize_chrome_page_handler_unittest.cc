@@ -41,7 +41,6 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/application_locale_storage/application_locale_storage.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/ntp_tiles/tile_type.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"

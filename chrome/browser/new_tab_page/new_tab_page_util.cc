@@ -9,7 +9,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"

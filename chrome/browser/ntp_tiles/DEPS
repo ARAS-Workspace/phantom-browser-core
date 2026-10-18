@@ -4,16 +4,10 @@
 
 include_rules = [
   "-chrome",
-  "+chrome/browser/browser_process.h",
-  "+chrome/browser/favicon/favicon_service_factory.h",
-  "+chrome/browser/favicon/large_icon_service_factory.h",
-  "+chrome/browser/flags/android/chrome_feature_list.h",
   "+chrome/browser/history/history_service_factory.h",
   "+chrome/browser/history/top_sites_factory.h",
-  "+chrome/browser/image_fetcher/image_decoder_impl.h",
   "+chrome/browser/ntp_tiles",
   "+chrome/browser/profiles/profile.h",
-  "+chrome/browser/search_engines/template_url_service_factory.h",
   "+chrome/browser/signin/identity_manager_factory.h",
 ]
 

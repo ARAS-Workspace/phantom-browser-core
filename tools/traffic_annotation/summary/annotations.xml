@@ -78,8 +78,6 @@ Refer to README.md for content description and update process.
  <item id="history_notice_utils_popup" added_in_milestone="62" type="partial" second_id="web_history_service" content_hash_code="01d3338e" os_list="linux,windows,chromeos,android" semantics_fields="2,3,4" policy_fields="4" file_path="components/browsing_data/core/history_notice_utils.cc" />
  <item id="history_ui_favicon_request_handler_get_favicon" added_in_milestone="77" content_hash_code="03d16565" os_list="linux,windows,chromeos,android" file_path="components/favicon/core/history_ui_favicon_request_handler_impl.cc" />
  <item id="http_server_error_response" added_in_milestone="66" content_hash_code="03a40a76" os_list="linux,windows,chromeos,android" file_path="net/server/http_server.cc" />
- <item id="icon_cacher" added_in_milestone="62" content_hash_code="06efa3dc" os_list="linux,windows,chromeos,android" file_path="components/ntp_tiles/icon_cacher_impl.cc" />
- <item id="icon_catcher_get_large_icon" added_in_milestone="62" content_hash_code="05db5c15" os_list="linux,windows,chromeos,android" file_path="components/ntp_tiles/icon_cacher_impl.cc" />
  <item id="indexed_db_internals_handler" added_in_milestone="62" content_hash_code="0384abe6" os_list="linux,windows,chromeos,android" file_path="content/browser/indexed_db/indexed_db_internals_ui.cc" />
  <item id="intranet_redirect_detector" added_in_milestone="62" content_hash_code="03b26f7b" os_list="linux,windows,chromeos" file_path="chrome/browser/intranet_redirect_detector.cc" />
  <item id="lib_address_input" added_in_milestone="62" content_hash_code="0374aae8" os_list="linux,windows,chromeos,android" file_path="third_party/libaddressinput/chromium/chrome_metadata_source.cc" />
@@ -105,7 +103,6 @@ Refer to README.md for content description and update process.
  <item id="password_requirements_spec_fetch" added_in_milestone="69" content_hash_code="005550dc" os_list="linux,windows,chromeos,android" file_path="components/password_manager/core/browser/generation/password_requirements_spec_fetcher_impl.cc" />
  <item id="payments_sync_cards" added_in_milestone="62" content_hash_code="047ff35d" os_list="linux,windows,chromeos,android" file_path="components/autofill/core/browser/payments/payments_network_interface_base.cc" />
  <item id="pdf_plugin_placeholder" added_in_milestone="63" content_hash_code="0101fbd5" os_list="linux,windows,chromeos" file_path="chrome/browser/plugins/plugin_observer.cc" />
- <item id="popular_sites_fetch" added_in_milestone="62" content_hash_code="00697083" os_list="linux,windows,chromeos,android" file_path="components/ntp_tiles/popular_sites_impl.cc" />
  <item id="port_forwarding_controller_socket" added_in_milestone="65" content_hash_code="074810e4" os_list="linux,windows,chromeos" file_path="chrome/browser/devtools/device/port_forwarding_controller.cc" />
  <item id="predictive_prefetch" added_in_milestone="85" content_hash_code="00ebd1fd" os_list="linux,windows,chromeos,android" file_path="chrome/browser/predictors/prefetch_manager.cc" />
  <item id="profile_avatar" added_in_milestone="62" content_hash_code="06c4a5fd" os_list="linux,windows,chromeos,android" file_path="chrome/browser/profiles/profile_avatar_downloader.cc" />

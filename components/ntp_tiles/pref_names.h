@@ -31,13 +31,6 @@ inline constexpr char kPopularSitesOverrideCountry[] =
 inline constexpr char kPopularSitesOverrideVersion[] =
     "popular_sites.override_version";
 
-// Prefs used to cache suggested sites and store caching meta data.
-inline constexpr char kPopularSitesLastDownloadPref[] =
-    "popular_sites_last_download";
-inline constexpr char kPopularSitesURLPref[] = "popular_sites_url";
-inline constexpr char kPopularSitesJsonPref[] = "suggested_sites_json";
-inline constexpr char kPopularSitesVersionPref[] = "suggested_sites_version";
-
 // Prefs used to cache custom links.
 inline constexpr char kCustomLinksList[] = "custom_links.list";
 inline constexpr char kCustomLinksInitialized[] = "custom_links.initialized";
