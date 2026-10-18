@@ -176,12 +176,6 @@ class ComponentLoader : public KeyedService {
 
   void AddNetworkSpeechSynthesisExtension();
 
-  void AddWithNameAndDescription(int manifest_resource_id,
-                                 const base::FilePath& root_directory,
-                                 const std::string& name_string,
-                                 const std::string& description_string);
-  void AddWebStoreApp();
-
   scoped_refptr<const Extension> CreateExtension(
       const ComponentExtensionInfo& info,
       std::u16string* error);

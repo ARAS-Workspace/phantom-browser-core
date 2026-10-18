@@ -55,17 +55,6 @@ DECLARE_ELEMENT_IDENTIFIER_VALUE(
 DECLARE_ELEMENT_IDENTIFIER_VALUE(
     kConfirmProtocolHandlerDialogRememberMeCheckbox);
 
-// Shows a dialog to notify the user that the extension installation is
-// blocked due to policy. It also shows additional information from
-// administrator if it exists.
-void ShowExtensionInstallBlockedDialog(
-    const ExtensionId& extension_id,
-    const std::string& extension_name,
-    const std::u16string& custom_error_message,
-    const gfx::ImageSkia& icon,
-    content::WebContents* web_contents,
-    base::OnceClosure done_callback);
-
 // Shows a dialog to notify the user when an extension has changed the home
 // page.
 void ShowControlledHomeDialog(

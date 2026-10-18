@@ -34,10 +34,8 @@
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/extensions/extension_constants.h"
-#include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/component_extension_resources.h"
-#include "chrome/grit/generated_resources.h"
 #include "components/crx_file/id_util.h"
 #include "components/version_info/version_info.h"
 #include "content/public/browser/browser_thread.h"
@@ -50,7 +48,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/extension_l10n_util.h"
 #include "extensions/common/file_util.h"
@@ -58,7 +55,6 @@
 #include "pdf/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 #include "ui/accessibility/accessibility_features.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/resource/resource_bundle.h"
 
 #if BUILDFLAG(ENABLE_PDF)
@@ -328,41 +324,6 @@ void ComponentLoader::AddNetworkSpeechSynthesisExtension() {
   }
 }
 
-void ComponentLoader::AddWithNameAndDescription(
-    int manifest_resource_id,
-    const base::FilePath& root_directory,
-    const std::string& name_string,
-    const std::string& description_string) {
-  if (!ignore_allowlist_for_testing_ &&
-      !IsComponentExtensionAllowlisted(manifest_resource_id)) {
-    return;
-  }
-
-  std::string manifest_contents =
-      ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
-          manifest_resource_id);
-
-  // The Value is kept for the lifetime of the ComponentLoader. This is
-  // required in case LoadAll() is called again.
-  std::optional<base::DictValue> manifest = ParseManifest(manifest_contents);
-
-  if (manifest) {
-    manifest->Set(manifest_keys::kName, name_string);
-    manifest->Set(manifest_keys::kDescription, description_string);
-    Add(std::move(*manifest), root_directory, true);
-  }
-}
-
-void ComponentLoader::AddWebStoreApp() {
-
-  if (base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp)) {
-    AddWithNameAndDescription(
-        IDR_WEBSTORE_MANIFEST, base::FilePath(FILE_PATH_LITERAL("web_store")),
-        l10n_util::GetStringUTF8(IDS_WEBSTORE_NAME_STORE),
-        l10n_util::GetStringUTF8(IDS_WEBSTORE_APP_DESCRIPTION));
-  }
-}
-
 scoped_refptr<const Extension> ComponentLoader::CreateExtension(
     const ComponentExtensionInfo& info,
     std::u16string* error) {
@@ -387,7 +348,6 @@ void ComponentLoader::AddDefaultComponentExtensions(
   DCHECK(!skip_session_components);
 
   if (!skip_session_components) {
-    AddWebStoreApp();
 #if BUILDFLAG(ENABLE_PDF)
     Add(pdf_extension_util::GetManifest(),
         base::FilePath(FILE_PATH_LITERAL("pdf")));

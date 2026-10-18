@@ -176,8 +176,6 @@ source_set("extensions") {
     "api/tabs/windows_util.h",
     "api/top_sites/top_sites_api.cc",
     "api/top_sites/top_sites_api.h",
-    "api/webstore_private/chrome_webstore_private_api_delegate.cc",
-    "api/webstore_private/chrome_webstore_private_api_delegate.h",
     "blocklist_factory.cc",
     "blocklist_factory.h",
     "bookmarks/bookmarks_error_constants.cc",
@@ -749,8 +747,6 @@ source_set("extensions") {
       "warning_badge_service.h",
       "warning_badge_service_factory.cc",
       "warning_badge_service_factory.h",
-      "webstore_install_with_prompt.cc",
-      "webstore_install_with_prompt.h",
     ]
 
     allow_circular_includes_from += [
@@ -1361,8 +1357,6 @@ source_set("unit_tests") {
     "api/web_request/web_request_api_unittest.cc",
     "api/web_request/web_request_event_details_unittest.cc",
     "api/web_request/web_request_permissions_unittest.cc",
-    "api/webstore_private/extension_install_status_unittest.cc",
-    "api/webstore_private/webstore_private_unittest.cc",
     "bookmarks/bookmarks_helpers_unittest.cc",
     "chrome_component_extension_resource_manager_unittest.cc",
     "chrome_content_verifier_unittest.cc",
@@ -1658,7 +1652,6 @@ source_set("browser_tests") {
     "api/web_request/web_request_apitest.cc",
     "api/webrtc_logging_private/webrtc_logging_private_apitest.cc",
     "api/webrtc_logging_private/webrtc_logging_private_browsertest.cc",
-    "api/webstore_private/webstore_private_apitest.cc",
     "back_forward_cache_browsertest.cc",
     "background_color_provider_browsertest.cc",
     "background_header_browsertest.cc",

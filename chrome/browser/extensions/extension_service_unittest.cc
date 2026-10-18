@@ -80,7 +80,6 @@
 #include "chrome/common/extensions/manifest_handlers/app_launch_info.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
-#include "chrome/grit/browser_resources.h"
 #include "chrome/test/base/scoped_browser_locale.h"
 #include "components/crx_file/id_util.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
@@ -2983,19 +2982,6 @@ TEST_F(ExtensionServiceTest, UpdateAppsRetainOrdinals) {
   // Verify that the ordinals match.
   ASSERT_TRUE(new_page_ordinal.Equals(sorting->GetPageOrdinal(id)));
   ASSERT_TRUE(new_launch_ordinal.Equals(sorting->GetAppLaunchOrdinal(id)));
-}
-
-// Ensures that the CWS has properly initialized ordinals.
-// Skipped on desktop Android as there's no app sorting.
-TEST_F(ExtensionServiceTest, EnsureCWSOrdinalsInitialized) {
-  InitializeEmptyExtensionService();
-  ComponentLoader::Get(profile())->Add(
-      IDR_WEBSTORE_MANIFEST, base::FilePath(FILE_PATH_LITERAL("web_store")));
-  service()->Init();
-
-  AppSorting* sorting = ExtensionSystem::Get(profile())->app_sorting();
-  EXPECT_TRUE(sorting->GetPageOrdinal(kWebStoreAppId).IsValid());
-  EXPECT_TRUE(sorting->GetAppLaunchOrdinal(kWebStoreAppId).IsValid());
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 

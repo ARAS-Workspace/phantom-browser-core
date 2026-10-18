@@ -50,7 +50,6 @@
 #include "chrome/browser/extensions/chrome_url_request_util.h"
 #include "chrome/browser/extensions/event_router_forwarder.h"
 #include "chrome/browser/extensions/extension_action_runner.h"
-#include "chrome/browser/extensions/extension_install_prompt.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/extensions/extension_util.h"
@@ -69,8 +68,6 @@
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"
-#include "chrome/browser/policy/cloud/extension_install_policy_service.h"
-#include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/prefetch/pref_names.h"
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
@@ -118,7 +115,6 @@
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/extensions_browser_interface_binders.h"
-#include "extensions/browser/install_prompt_data.h"
 #include "extensions/browser/permissions/active_tab_permission_granter.h"
 #include "extensions/browser/permissions/site_permissions_helper.h"
 #include "extensions/browser/pref_names.h"
@@ -1153,30 +1149,6 @@ bool ChromeExtensionsBrowserClient::CanUseNonComponentExtensions(
     content::BrowserContext* context) {
   return profile_util::ProfileCanUseNonComponentExtensions(
       Profile::FromBrowserContext(context));
-}
-
-void ChromeExtensionsBrowserClient::CanInstallExtensionByPolicy(
-    content::BrowserContext* context,
-    const ExtensionId& extension_id,
-    const base::Version& extension_version,
-    base::OnceCallback<void(bool, std::u16string)> callback) {
-  policy::ExtensionInstallPolicyService* extension_install_policy_service =
-      policy::ExtensionInstallPolicyServiceFactory::GetForBrowserContext(
-          Profile::FromBrowserContext(context));
-  if (extension_install_policy_service) {
-    extension_install_policy_service->CanInstallExtension(
-        {extension_id, extension_version.GetString()}, std::move(callback));
-  } else {
-    std::move(callback).Run(/*can_install=*/true, std::u16string());
-  }
-}
-
-std::unique_ptr<ExtensionInstallPromptClient>
-ChromeExtensionsBrowserClient::CreateInstallPrompt(
-    content::WebContents* web_contents,
-    std::unique_ptr<InstallPromptData> prompt) {
-  return std::make_unique<ExtensionInstallPrompt>(web_contents,
-                                                  std::move(prompt));
 }
 
 void ChromeExtensionsBrowserClient::SetAPIClientForTest(

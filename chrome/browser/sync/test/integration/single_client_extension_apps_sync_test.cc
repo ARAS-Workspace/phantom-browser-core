@@ -18,8 +18,6 @@
 #include "components/sync/test/fake_server.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
-#include "extensions/common/constants.h"
-#include "extensions/common/extension_features.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -43,12 +41,7 @@ std::ostream& operator<<(std::ostream& os,
 class FakeServerAppChecker : public fake_server::FakeServerMatchStatusChecker {
  public:
   // Waits for the APPS entities in the server to be those with ids `app_ids`.
-  // Depending on the platform some apps are auto-installed and synced, so they
-  // are implicitly added to the expected set of ids.
   explicit FakeServerAppChecker(std::vector<std::string> expected_app_ids) {
-    if (base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp)) {
-      expected_app_ids.push_back(extensions::kWebStoreAppId);
-    }
     expected_app_ids_ = base::MakeFlatSet<std::string>(expected_app_ids);
   }
 

@@ -119,7 +119,6 @@ std::vector<const char*> GetExpectedDelegatedFeaturesForTest() {
 
       // Webstore override:
       "management",
-      "webstorePrivate",
 
       // userScripts availability:
       "userScripts",

@@ -177,9 +177,6 @@ BASE_DECLARE_FEATURE(kExperimentalOmniboxLabs);
 
 // Reports Extensions.WebRequest.KeepaliveRequestFinished when enabled.
 
-// Controls whether the component webstore hosted app is loaded.
-BASE_DECLARE_FEATURE(kWebstoreHostedApp);
-
 ///////////////////////////////////////////////////////////////////////////////
 // STOP!
 // Please don't just add your new feature down here.

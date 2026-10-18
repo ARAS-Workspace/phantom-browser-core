@@ -36,7 +36,6 @@
 #include "extensions/browser/extension_host.h"
 #include "extensions/browser/process_manager.h"
 #include "extensions/browser/process_map.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/manifest_handlers/web_accessible_resources_info.h"
 #include "extensions/common/switches.h"
 #include "net/dns/mock_host_resolver.h"
@@ -554,10 +553,8 @@ IN_PROC_BROWSER_TEST_P(ChromeWebStoreProcessTest,
   if (GetParam() == kWebstoreURL) {
     // The webstore should be in the process map if and only if the hosted app
     // is loaded.
-    EXPECT_EQ(
-        base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp),
-        extensions::ProcessMap::Get(profile())->Contains(
-            extensions::kWebStoreAppId, new_process_host->GetID()));
+    EXPECT_FALSE(extensions::ProcessMap::Get(profile())->Contains(
+        extensions::kWebStoreAppId, new_process_host->GetID()));
   }
 
   // Verify that Webstore is isolated in a separate renderer process.
@@ -595,12 +592,11 @@ IN_PROC_BROWSER_TEST_P(ChromeWebStoreInIsolatedOriginTest,
   // We only expect the API to be available to the new (or overridden) URLs.
   // The old URL was granted access via the component hosted app, which is no
   // longer supported.
-  bool expect_private_api =
+  bool expect_management_api =
       GetParam() == kNewWebstoreURL || GetParam() == kWebstoreURLOverride;
 
-  EXPECT_EQ(
-      expect_private_api,
-      content::EvalJs(web_contents, "!!chrome && !!chrome.webstorePrivate"));
+  EXPECT_EQ(expect_management_api,
+            content::EvalJs(web_contents, "!!chrome && !!chrome.management"));
 
   // Verify that we have the Webstore hosted app loaded into the Web Contents if
   // this is for the old Webstore URL. Note: The new Webstore and the Webstore
@@ -611,10 +607,8 @@ IN_PROC_BROWSER_TEST_P(ChromeWebStoreInIsolatedOriginTest,
         web_contents->GetPrimaryMainFrame()->GetProcess();
     // The webstore should be in the process map if and only if the hosted app
     // is loaded.
-    EXPECT_EQ(
-        base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp),
-        extensions::ProcessMap::Get(profile())->Contains(
-            extensions::kWebStoreAppId, render_process_host->GetID()));
+    EXPECT_FALSE(extensions::ProcessMap::Get(profile())->Contains(
+        extensions::kWebStoreAppId, render_process_host->GetID()));
   }
 }
 

@@ -51,7 +51,6 @@ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
 #endif
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST:
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3:
-    case IDR_WEBSTORE_MANIFEST:
 
       return true;
   }

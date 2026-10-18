@@ -26,10 +26,10 @@ namespace {
 
 // The set of features which this delegated availability check should apply to,
 // which correspond to the features used by the webstore.
-constexpr static std::array<std::string_view, 2> kWebstoreOverrideFeatureList =
+constexpr static std::array<std::string_view, 1> kWebstoreOverrideFeatureList =
     {
         // LINT.IfChange
-        "webstorePrivate", "management",
+        "management",
         // LINT.ThenChange(chrome/common/extensions/extension_test_util.cc)
 };
 

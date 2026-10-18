@@ -15,7 +15,6 @@
 #include "extensions/browser/extension_event_histogram_value.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/api/management.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/switches.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -76,12 +75,12 @@ class WebstoreDomainBrowserTest : public ExtensionApiTest,
   }
 };
 
-// Tests that webstorePrivate, management and runtime are exposed to the
-// webstore domain, but not to a non-webstore domain.
+// Tests that management and runtime are exposed to the webstore domain, but not
+// to a non-webstore domain.
 // Note: Although we don't explicitly provide runtime to the webstore domain in
 // the case of it being a "web page" context, it is granted implicitly by the
-// NativeExtensionBindingsSystem due to other extension APIs (webstorePrivate
-// and management) being exposed to the web page.
+// NativeExtensionBindingsSystem due to another extension API (management)
+// being exposed to the web page.
 IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, ExpectedAvailability) {
   const GURL webstore_url = GetParam().Resolve("/webstore/mock_store.html");
   const GURL not_webstore_url = GURL(kNonWebstoreURL1).Resolve("/empty.html");
@@ -98,33 +97,27 @@ IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, ExpectedAvailability) {
   EXPECT_EQ(web_contents->GetPrimaryMainFrame()->GetLastCommittedURL(),
             webstore_url);
 
-  // The webstorePrivate and management APIs are only available on the new
-  // webstore domain. The old site gained access to them via the hosted app,
-  // which is no longer allowed to access webstorePrivate or management (since
-  // the hosted app isn't used).
+  // The management API is only available on the new webstore domain. The old
+  // site gained access to it via the hosted app, which is no longer allowed to
+  // access management (since the hosted app isn't used).
   // The runtime API is still available since it's always available to all
   // items, but it doesn't really have any capabilities (and the hosted app is
   // still safe; just unused).
   bool expect_fun_apis = GetParam() == GURL(kNewWebstoreURL) ||
                          GetParam() == GURL(kWebstoreOverrideURL);
 
-  EXPECT_EQ(expect_fun_apis, is_api_available("webstorePrivate"));
   EXPECT_EQ(expect_fun_apis, is_api_available("management"));
 
-  // Even runtime shouldn't be available for the old hosted app URL if the
+  // Even runtime shouldn't be available for the old hosted app URL since the
   // hosted app isn't installed.
-  bool expect_runtime =
-      GetParam() == GURL(kNewWebstoreURL) ||
-      GetParam() == GURL(kWebstoreOverrideURL) ||
-      (GetParam() == GURL(kWebstoreAppBaseURL) &&
-       base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp));
+  bool expect_runtime = GetParam() == GURL(kNewWebstoreURL) ||
+                        GetParam() == GURL(kWebstoreOverrideURL);
   EXPECT_EQ(expect_runtime, is_api_available("runtime"));
 
   ASSERT_TRUE(NavigateToURL(web_contents, not_webstore_url));
   EXPECT_EQ(web_contents->GetPrimaryMainFrame()->GetLastCommittedURL(),
             not_webstore_url);
   EXPECT_FALSE(is_api_available("management"));
-  EXPECT_FALSE(is_api_available("webstorePrivate"));
   EXPECT_FALSE(is_api_available("runtime"));
 }
 
