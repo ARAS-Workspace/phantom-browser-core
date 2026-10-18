@@ -32,13 +32,7 @@
   #
   # chrome/ and ios/chrome/ must start at the same id.
   # App only use one file depending on whether it is iOS or other platform.
-  # Chromium strings and Google Chrome strings must start at the same id.
-  # We only use one file depending on whether we're building Chromium or
-  # Google Chrome.
   "chrome/app/chromium_strings.grd": {
-    "messages": [800],
-  },
-  "chrome/app/google_chrome_strings.grd": {
     "messages": [800],
   },
 
@@ -46,7 +40,7 @@
   # strings.
   "chrome/app/generated_resources.grd": {
     # Big alignment since strings (previous item) are frequently added.
-    "META": {"join": 2, "align": 200},
+    "META": {"align": 200},
     "messages": [1000],
   },
 

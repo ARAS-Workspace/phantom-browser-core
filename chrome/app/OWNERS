@@ -10,7 +10,6 @@ per-file bookmarks_strings.grdp=*
 per-file chromeos_strings.grdp=*
 per-file chromium_strings.grd=*
 per-file generated_resources.grd=*
-per-file google_chrome_strings.grd=*
 per-file extensions_strings.grdp=*
 per-file os_settings_strings.grdp=*
 per-file os_settings_search_tag_strings.grdp=file://chrome/browser/resources/ash/settings/OWNERS
