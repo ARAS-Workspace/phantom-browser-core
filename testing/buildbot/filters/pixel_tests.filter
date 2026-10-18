@@ -63,7 +63,6 @@ ExtensionUninstallDialogViewInteractiveBrowserTest.*
 FeaturePromoDialogTest.InvokeUi_*
 FileSystemAccessUsageBubbleViewTest.*
 FirstRunDialogTest.*
-HatsBubbleTest.*
 HomeButtonUiTest.*
 HungRendererDialogViewBrowserTest.*
 ImportLockDialogViewBrowserTest.*

@@ -107,7 +107,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kAudioFocusDuckFlash);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoPictureInPictureOnWindowOccluded);
 // Enables showing auto picture-in-picture permission details in page info.
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoPictureInPicturePageInfoDetails);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoPictureInPictureSurveys);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoplayBypassForMicCamera);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoplayDisableSettings);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoplayPoliciesAndroid);

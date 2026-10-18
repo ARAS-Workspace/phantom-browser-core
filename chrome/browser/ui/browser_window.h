@@ -18,7 +18,6 @@
 #include "chrome/browser/ui/bookmarks/bookmark_bar.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_bubble_type.h"
-#include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
 #include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/webui/tab_search/tab_search.mojom.h"
@@ -386,27 +385,6 @@ class BrowserWindow : public ui::BaseWindow {
   // after creating a new profile or opening an existing profile. If the profile
   // customization bubble is shown, the IPH should be shown after.
   virtual void MaybeShowProfileSwitchIPH() = 0;
-
-  // Shows User Happiness Tracking Survey's dialog after the survey associated
-  // with |site_id| has been successfully loaded. Failure to load the survey
-  // will result in the dialog not being shown. |product_specific_bits_data| and
-  // |product_specific_string_data| should contain key-value pairs where the
-  // keys match the field names set for the survey in hats_service.cc, and the
-  // values are those which will be associated with the survey response.
-  // The parameters |hats_histogram_name| and |hats_survey_ukm_id| allows HaTS
-  // to log to UMA and UKM, respectively. These values are are populated in
-  // chrome/browser/ui/hats/survey_config.cc and can be configured in finch.
-  // Surveys that opt-in to UMA and UKM will need to have surveys reviewed by
-  // privacy to ensure they are appropriate to log to UMA and/or UKM. This is
-  // enforced through the OWNERS mechanism.
-  virtual void ShowHatsDialog(
-      const std::string& site_id,
-      const std::optional<std::string>& hats_histogram_name,
-      const std::optional<uint64_t> hats_survey_ukm_id,
-      base::OnceClosure success_callback,
-      base::OnceClosure failure_callback,
-      const SurveyBitsData& product_specific_bits_data,
-      const SurveyStringData& product_specific_string_data) = 0;
 
   // Returns object implementing ExclusiveAccessContext interface.
   virtual ExclusiveAccessContext* GetExclusiveAccessContext() = 0;

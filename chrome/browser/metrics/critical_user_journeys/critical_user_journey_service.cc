@@ -15,8 +15,7 @@
 
 namespace metrics {
 
-CriticalUserJourneyService::CriticalUserJourneyService(Profile* profile)
-    : profile_(profile) {}
+CriticalUserJourneyService::CriticalUserJourneyService() = default;
 
 CriticalUserJourneyService::~CriticalUserJourneyService() = default;
 

@@ -423,16 +423,6 @@ class PasswordManagerClient {
   // Returns the current best guess as to the page's display language.
   virtual autofill::LanguageCode GetPageLanguage() const;
 
-  // Maybe triggers a hats survey that measures the user's perception of
-  // Autofill for passwords. When triggering happens, the survey dialog will be
-  // displayed with a 5s delay. This survey should be triggered after form
-  // submissions.
-  // `filling_assistance` will be logged together with the responses as
-  // in-product data and should be a string representation of the
-  // `FillingAssistance` enum, i.e "Manually filled".
-  virtual void TriggerUserPerceptionOfPasswordManagerSurvey(
-      const std::string& filling_assistance);
-
   // If the feature is enabled send an event to the enterprise reporting
   // connector server indicating that the user signed in to a website.
   virtual void MaybeReportEnterpriseLoginEvent(

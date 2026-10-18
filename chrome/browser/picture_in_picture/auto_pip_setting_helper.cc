@@ -8,7 +8,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
-#include "chrome/browser/profiles/profile.h"
 #include "components/content_settings/core/browser/content_settings_utils.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
@@ -22,8 +21,6 @@
 #include "services/metrics/public/cpp/ukm_recorder.h"
 
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
-#include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service.h"
-#include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 
 // static
 std::unique_ptr<AutoPipSettingHelper>
@@ -39,8 +36,7 @@ AutoPipSettingHelper::AutoPipSettingHelper(
     content::WebContents* web_contents,
     HostContentSettingsMap* settings_map,
     permissions::PermissionDecisionAutoBlockerBase* auto_blocker)
-    : web_contents_(web_contents),
-      origin_(web_contents->GetLastCommittedURL()),
+    : origin_(web_contents->GetLastCommittedURL()),
       settings_map_(settings_map),
       auto_blocker_(auto_blocker) {}
 
@@ -199,15 +195,6 @@ void AutoPipSettingHelper::RecordResult(
     PromptResult result,
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
     std::optional<ukm::SourceId> source_id) {
-  if (web_contents_) {
-    if (auto* hats_service =
-            AutoPictureInPictureHatsServiceFactory::GetForProfile(
-                Profile::FromBrowserContext(
-                    web_contents_->GetBrowserContext()))) {
-      hats_service->SetPromptResult(result);
-    }
-  }
-
   base::UmaHistogramEnumeration("Media.AutoPictureInPicture.PromptResultV2",
                                 result);
   switch (auto_pip_reason) {

@@ -1083,8 +1083,6 @@ test("browser_tests") {
     "//chrome/browser/ui/extensions:extension_post_install_dialog",
     "//chrome/browser/ui/feature_first_run:browser_tests",
     "//chrome/browser/ui/fullscreen",
-    "//chrome/browser/ui/hats",
-    "//chrome/browser/ui/hats:browser_tests",
     "//chrome/browser/ui/javascript_dialogs:browser_tests",
     "//chrome/browser/ui/login",
     "//chrome/browser/ui/login:browser_tests",
@@ -1686,7 +1684,6 @@ test("browser_tests") {
     "../browser/ui/views/frame/multi_contents_view_drop_target_controller_browsertest.cc",
     "../browser/ui/views/frame/system_menu_model_builder_browsertest.cc",
     "../browser/ui/views/frame/vertical_tab_strip_region_view_browsertest.cc",
-    "../browser/ui/views/hats/hats_browsertest.cc",
     "../browser/ui/views/incognito_clear_browsing_data_dialog_browsertest.cc",
     "../browser/ui/views/infobars/confirm_infobar_custom_layout_browsertest.cc",
     "../browser/ui/views/side_panel/history_clusters/history_clusters_side_panel_coordinator_browsertest.cc",
@@ -1802,10 +1799,6 @@ test("browser_tests") {
 
   if (use_aura) {
     sources += [ "../browser/ui/overscroll_pref_manager_browsertest.cc" ]
-  }
-
-  if (is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/views/hats" ]
   }
 
   if (is_mac || is_linux) {
@@ -2196,7 +2189,6 @@ test("browser_tests") {
       "//chrome/browser/ui/find_bar",
       "//chrome/browser/ui/find_bar:browser_tests",
       "//chrome/browser/ui/global_error:browser_tests",
-      "//chrome/browser/ui/hats:test_support",
       "//chrome/browser/ui/page_action:icon_type",
       "//chrome/browser/ui/passwords:test_support",
       "//chrome/browser/ui/passwords:test_support_ui",
@@ -2863,7 +2855,6 @@ test("unit_tests") {
     "//chrome/browser/ui/cookie_controls:unit_tests",
     "//chrome/browser/ui/file_system_access:unit_tests",
     "//chrome/browser/ui/find_bar:unit_tests",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/login:unit_tests",
     "//chrome/browser/ui/navigator:unit_tests",
     "//chrome/browser/ui/page_info:unit_tests",
@@ -3240,7 +3231,6 @@ test("unit_tests") {
   if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/multistep_filter:unit_tests",
-      "//chrome/browser/ui/views/hats",
       "//chrome/browser/ui/webui/multistep_filter_internals:unit_tests",
     ]
   }
@@ -3576,8 +3566,6 @@ test("unit_tests") {
     "//chrome/browser/ui/frame",
     "//chrome/browser/ui/global_error:unit_tests",
     "//chrome/browser/ui/global_media_controls:unit_tests",
-    "//chrome/browser/ui/hats:test_support",
-    "//chrome/browser/ui/hats:unit_tests",
     "//chrome/browser/ui/javascript_dialogs:unit_tests",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/omnibox:test_support",
@@ -4005,7 +3993,6 @@ test("unit_tests") {
       "../browser/ui/views/frame/multi_contents_drop_target_view_unittest.cc",
       "../browser/ui/views/frame/multi_contents_view_drop_target_controller_unittest.cc",
       "../browser/ui/views/frame/web_contents_close_handler_unittest.cc",
-      "../browser/ui/views/hats/hats_next_web_dialog_unittest.cc",
       "../browser/ui/views/hover_button_unittest.cc",
       "../browser/ui/views/layout_provider_unittest.cc",
       "../browser/ui/views/location_bar/selected_keyword_view_unittest.cc",
@@ -4930,8 +4917,6 @@ test("interactive_ui_tests") {
       "//chrome/browser/ui/extensions:test_support",
       "//chrome/browser/ui/find_bar",
       "//chrome/browser/ui/frame",
-      "//chrome/browser/ui/hats",
-      "//chrome/browser/ui/hats:test_support",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/passwords:test_support",
       "//chrome/browser/ui/performance_controls/test_support",

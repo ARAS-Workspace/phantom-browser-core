@@ -182,7 +182,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
         {
           features::kInitialWebUI,
           features::kWebUIReloadButton,
-          features::kTrustSafetySentimentSurvey,
           network::features::kBrowsingTopics,
           extensions_features::kForceWebRequestProxyForTest,
           network::features::kReduceAcceptLanguage,

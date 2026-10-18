@@ -15,10 +15,6 @@ namespace prefs {
 // types.
 const char kPermissionActions[] = "profile.content_settings.permission_actions";
 
-// The number of one time permission prompts a user has seen.
-const char kOneTimePermissionPromptsDecidedCount[] =
-    "profile.one_time_permission_prompts_decided_count";
-
 }  // namespace prefs
 
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {

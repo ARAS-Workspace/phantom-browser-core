@@ -16,8 +16,6 @@
 #include "chrome/browser/metrics/critical_user_journeys/critical_user_journey_session.h"
 #include "components/keyed_service/core/keyed_service.h"
 
-class Profile;
-
 namespace ui {
 class TrackedElement;
 }
@@ -31,7 +29,7 @@ class CriticalUserJourney;
 // sessions.
 class CriticalUserJourneyService : public KeyedService {
  public:
-  explicit CriticalUserJourneyService(Profile* profile);
+  CriticalUserJourneyService();
   ~CriticalUserJourneyService() override;
 
   CriticalUserJourneyService(const CriticalUserJourneyService&) = delete;
@@ -59,7 +57,6 @@ class CriticalUserJourneyService : public KeyedService {
   void OnJourneyEnded(CriticalUserJourneySession* session,
                       CriticalUserJourneySession::JourneyResult result);
 
-  const raw_ptr<Profile> profile_;
   CriticalUserJourneyRegistry registry_;
   std::vector<std::unique_ptr<CriticalUserJourneySession>> active_sessions_;
   std::vector<base::CallbackListSubscription> subscriptions_;

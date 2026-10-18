@@ -160,7 +160,6 @@ class AutoPipSettingHelper {
       std::optional<ukm::SourceId> source_id,
       PromptResult result) const;
 
-  const raw_ptr<content::WebContents> web_contents_;
   GURL origin_;
   const raw_ptr<HostContentSettingsMap> settings_map_ = nullptr;
   const raw_ptr<permissions::PermissionDecisionAutoBlockerBase> auto_blocker_ =

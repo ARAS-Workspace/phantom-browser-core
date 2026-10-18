@@ -66,8 +66,7 @@ const std::string GetMetricJourneyPrefix(const base::Feature& feature) {
 
 class TestCriticalUserJourneyService : public CriticalUserJourneyService {
  public:
-  explicit TestCriticalUserJourneyService(Profile* profile)
-      : CriticalUserJourneyService(profile) {}
+  TestCriticalUserJourneyService() = default;
 
  protected:
   void RegisterJourneys(CriticalUserJourneyRegistry* registry) override {
@@ -131,8 +130,7 @@ class CriticalUserJourneyServiceInteractiveTest
     CriticalUserJourneyServiceFactory::GetInstance()->SetTestingFactory(
         context, base::BindRepeating([](content::BrowserContext* context)
                                          -> std::unique_ptr<KeyedService> {
-          auto service = std::make_unique<TestCriticalUserJourneyService>(
-              Profile::FromBrowserContext(context));
+          auto service = std::make_unique<TestCriticalUserJourneyService>();
           service->Initialize();
           return service;
         }));

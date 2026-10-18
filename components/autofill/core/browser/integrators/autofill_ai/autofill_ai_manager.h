@@ -11,7 +11,6 @@
 #include <optional>
 #include <vector>
 
-#include "base/containers/lru_cache.h"
 #include "base/containers/span.h"
 #include "base/functional/callback.h"
 #include "base/memory/raw_ref.h"
@@ -120,13 +119,6 @@ class AutofillAiManager
 
  private:
   friend class AutofillAiManagerTestApi;
-  struct UserSuggestionInteractionDetails {
-    std::optional<EntityType> entity_type_accepted;
-    std::optional<EntityInstance::RecordType> accepted_entity_record_type;
-    // The types of the field where the suggestion was shown or accepted.
-    FieldTypeSet autofill_ai_field_types;
-  };
-  const size_t kSuggestionInteractionCacheMaxSize = 5;
 
   // Strike database related methods:
   void AddOrClearImportPromptStrikes(
@@ -263,12 +255,6 @@ class AutofillAiManager
   // A strike database for update prompts keyed by the guid of the entity that
   // is to be updated.
   std::unique_ptr<AutofillAiUpdateStrikeDatabase> update_strike_db_;
-
-  // Keeps suggestions details about the five most recent forms the user has
-  // interacted with.
-  base::LRUCache<FormGlobalId, UserSuggestionInteractionDetails>
-      user_suggestion_interactions_per_form_{
-          kSuggestionInteractionCacheMaxSize};
 
   // Tracks the UKM source ID for which the suggestions shown timing metric was
   // last logged, ensuring it is logged at most once per page.

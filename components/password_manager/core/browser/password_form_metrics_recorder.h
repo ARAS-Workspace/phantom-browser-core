@@ -515,12 +515,6 @@ class PasswordFormMetricsRecorder
   // during parsing and saving.
   void CalculateParsingDifferenceOnSavingAndFilling(const PasswordForm& form);
 
-  // Returns a string representation of the calculated `FillingAssistance` to be
-  // used as part of hats survey answers information.
-  // If the assistance holds a different variant type (i.e
-  // `SingleUsernameFillingAssistance`), returns an empty string.
-  std::string FillingAssinstanceToHatsInProductDataString();
-
   void set_username_updated_in_bubble(bool value) {
     username_updated_in_bubble_ = value;
   }

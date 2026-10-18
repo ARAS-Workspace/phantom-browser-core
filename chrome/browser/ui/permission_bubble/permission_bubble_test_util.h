@@ -47,7 +47,6 @@ class TestPermissionBubbleViewDelegate
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
-  void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
   void SwitchToLoudPrompt() override {}
 
   std::optional<permissions::PermissionUiSelector::QuietUiReason>

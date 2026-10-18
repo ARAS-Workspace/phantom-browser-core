@@ -46,8 +46,6 @@ inline constexpr char kDismissedHistoryEmbeddingsSettingsPromo[] =
 inline constexpr char kDismissedHistoryScopePromo[] =
     "omnibox.dismissed_history_scope_promo";
 
-inline constexpr char kFocusedSrpWebCount[] = "omnibox.focused_srp_web_count";
-
 // Boolean that specifies whether the omnibox should be positioned at the bottom
 // of the screen.
 inline constexpr char kIsOmniboxInBottomPosition[] =

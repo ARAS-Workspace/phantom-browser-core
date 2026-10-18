@@ -520,32 +520,6 @@ struct OmniboxUrlSuggestionsOnFocus : Config<OmniboxUrlSuggestionsOnFocus> {
   bool MostVisitedPrefetchingEnabled() const;
 };
 
-// Enables the HaTS for On-Focus ZPS so that it may show up for a user.
-struct HappinessTrackingSurveyForOmniboxOnFocusZps
-    : Config<HappinessTrackingSurveyForOmniboxOnFocusZps> {
-  DECLARE_FEATURE(kHappinessTrackingSurveyForOmniboxOnFocusZps);
-  HappinessTrackingSurveyForOmniboxOnFocusZps();
-  HappinessTrackingSurveyForOmniboxOnFocusZps(
-      const HappinessTrackingSurveyForOmniboxOnFocusZps&);
-  HappinessTrackingSurveyForOmniboxOnFocusZps(
-      HappinessTrackingSurveyForOmniboxOnFocusZps&&);
-  HappinessTrackingSurveyForOmniboxOnFocusZps& operator=(
-      const HappinessTrackingSurveyForOmniboxOnFocusZps&);
-  HappinessTrackingSurveyForOmniboxOnFocusZps& operator=(
-      HappinessTrackingSurveyForOmniboxOnFocusZps&&);
-  ~HappinessTrackingSurveyForOmniboxOnFocusZps();
-  bool enabled;
-  // Number of times the omnibox must be focused on SRP/Web before the survey
-  // may be shown
-  size_t focus_threshold;
-  // Number of ms before the survey may be shown.
-  size_t survey_delay;
-  // Trigger ID of Intent and Satisfaction survey.
-  std::string happiness_trigger_id;
-  // Trigger ID of Usefulness and Distraction survey.
-  std::string utility_trigger_id;
-};
-
 struct ComposeboxSuggestionLimit : Config<ComposeboxSuggestionLimit> {
   DECLARE_FEATURE(kComposeboxSuggestionLimit);
   ComposeboxSuggestionLimit();

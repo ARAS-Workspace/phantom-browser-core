@@ -257,9 +257,6 @@ BASE_FEATURE(kAutoPictureInPictureOnWindowOccluded,
 BASE_FEATURE(kAutoPictureInPicturePageInfoDetails,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Enables Happiness Tracking Surveys for Auto Picture-in-Picture.
-BASE_FEATURE(kAutoPictureInPictureSurveys, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Allows media to autoplay without a user gesture if the site has been
 // granted microphone or camera permissions.
 BASE_FEATURE(kAutoplayBypassForMicCamera, base::FEATURE_ENABLED_BY_DEFAULT);

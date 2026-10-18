@@ -420,14 +420,6 @@ base::flat_map<FieldRendererId, FieldType> KeyPredictionsByRendererIds(
       });
 }
 
-bool HasManuallyFilledFields(const PasswordForm& form) {
-  return std::ranges::any_of(
-      form.form_data.fields(), [&](const autofill::FormFieldData& field) {
-        return field.properties_mask() &
-               autofill::FieldPropertiesFlags::kAutofilledOnUserTrigger;
-      });
-}
-
 void RecordProvisionalSaveFailure(
     password_manager::PasswordManagerClient* client,
     PasswordManagerMetricsRecorder::ProvisionalSaveFailure failure,
@@ -1322,8 +1314,6 @@ void PasswordManager::OnLoginSuccessful() {
   const PasswordForm* submitted_form = submitted_manager->GetSubmittedForm();
   CHECK(submitted_form);
 
-  MaybeTriggerHatsSurvey(*submitted_manager);
-
   // User might fill several login flows during their user journey. For example,
   // Forgot Password Flow followed by sign-in flow. To not suggest usernames
   // from the old flow, clear after successful login.
@@ -1463,7 +1453,6 @@ void PasswordManager::OnLoginFailed(PasswordManagerDriver* driver,
   CHECK(submitted_manager);
   submitted_manager->GetMetricsRecorder()->LogSubmitFailed();
 
-  MaybeTriggerHatsSurvey(*submitted_manager);
   HandleFailedLoginDetectionForPasswordChange(client_, driver,
                                               *submitted_manager);
 
@@ -1750,18 +1739,6 @@ bool PasswordManager::IsFormManagerPendingPasswordUpdate() const {
   }
   return owned_submitted_form_manager_ &&
          owned_submitted_form_manager_->IsPasswordUpdate();
-}
-
-void PasswordManager::MaybeTriggerHatsSurvey(
-    PasswordFormManager& form_manager) {
-  const PasswordForm* submitted_form = form_manager.GetSubmittedForm();
-  if (submitted_form && HasManuallyFilledFields(*submitted_form) &&
-      base::FeatureList::IsEnabled(
-          features::kAutofillPasswordUserPerceptionSurvey)) {
-    client_->TriggerUserPerceptionOfPasswordManagerSurvey(
-        form_manager.GetMetricsRecorder()
-            ->FillingAssinstanceToHatsInProductDataString());
-  }
 }
 
 }  // namespace password_manager

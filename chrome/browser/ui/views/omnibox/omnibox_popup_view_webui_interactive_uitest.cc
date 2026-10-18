@@ -513,7 +513,6 @@ class TestPermissionPromptDelegate
   void OpenHelpCenterLink(const ui::Event&) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
-  void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
   std::optional<permissions::PermissionUiSelector::QuietUiReason>
   ReasonForUsingQuietUi() const override {
     return std::nullopt;

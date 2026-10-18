@@ -402,10 +402,6 @@ class PasswordManager : public PasswordManagerInterface {
   // predictions.
   void ResetFormsAndPredictionsCache();
 
-  // Triggers a user survey to rate Password Manager, if the user actively
-  // engaged with Password Manager (filled a form manually).
-  void MaybeTriggerHatsSurvey(PasswordFormManager& form_manager);
-
   // PasswordFormManager transition schemes:
   // 1. HTML submission with navigation afterwads.
   // form "seen"

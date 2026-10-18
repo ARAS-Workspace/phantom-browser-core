@@ -183,7 +183,6 @@ class MockPermissionRequestManager
 
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void SetManageClicked() override { requests_.clear(); }
-  void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
 
   bool RecreateView() override { return false; }
   const permissions::PermissionPrompt* GetCurrentPrompt() const override {

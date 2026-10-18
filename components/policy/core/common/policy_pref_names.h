@@ -45,11 +45,6 @@ inline constexpr char kEnterpriseMDMManagementMac[] =
     "management.platform.enterprise_mdm_mac";
 #endif
 
-// Enterprise policy controlled value representing whether the user may be shown
-// HaTS surveys.
-inline constexpr char kFeedbackSurveysEnabled[] =
-    "policy.feedback_surveys_enabled";
-
 // 64-bit serialization of the time last policy usage statistics were collected
 // by UMA_HISTOGRAM_ENUMERATION.
 inline constexpr char kLastPolicyStatisticsUpdate[] =

@@ -1486,8 +1486,6 @@ source_set("browser") {
     "//chrome/browser/ui/autofill/payments:impl",
     "//chrome/browser/ui/blocked_content",
     "//chrome/browser/ui/blocked_content:impl",
-    "//chrome/browser/ui/hats",
-    "//chrome/browser/ui/hats:impl",
     "//chrome/browser/ui/javascript_dialogs",
     "//chrome/browser/ui/javascript_dialogs:impl",
     "//chrome/browser/ui/login",

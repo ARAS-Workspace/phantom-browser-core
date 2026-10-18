@@ -325,15 +325,6 @@ void ChipController::ShowPermissionUi(
 
   InitializePermissionPrompt(delegate);
 
-  // HaTS surveys may be triggered while a quiet chip is displayed. If that
-  // happens, the quiet chip should not collapse anymore, because otherwise a
-  // user answering a survey would no longer be able to click on the chip. To
-  // enable the PRM to handle this case, we pass a callback to stop the timers.
-  if (delegate->ReasonForUsingQuietUi().has_value()) {
-    delegate->SetHatsShownCallback(base::BindOnce(&ChipController::ResetTimers,
-                                                  weak_factory_.GetWeakPtr()));
-  }
-
   // The permission prompt bubble has its own accessibility announcement. We
   // should not announce the chip.
   if (!permission_prompt_model_->ShouldBubbleStartOpen()) {

@@ -137,23 +137,6 @@ class PermissionsClient {
 
   using QuietUiReason = PermissionUiSelector::QuietUiReason;
 
-  virtual void TriggerPromptHatsSurveyIfEnabled(
-      content::WebContents* web_contents,
-      permissions::RequestType request_type,
-      std::optional<permissions::PermissionAction> action,
-      permissions::PermissionPromptDisposition prompt_disposition,
-      permissions::PermissionPromptDispositionReason prompt_disposition_reason,
-      permissions::PermissionRequestGestureType gesture_type,
-      std::optional<base::TimeDelta> prompt_display_duration,
-      bool is_post_prompt,
-      const GURL& gurl,
-      std::optional<
-          permissions::feature_params::PermissionElementPromptPosition>
-          pepc_prompt_position,
-      ContentSetting initial_permission_status,
-      base::OnceCallback<void()> hats_shown_callback_,
-      PromptOptions prompt_options);
-
   // Called for each request type when a permission prompt is resolved.
   virtual void OnPromptResolved(
       const PermissionRequest* request,

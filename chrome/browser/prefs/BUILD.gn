@@ -100,7 +100,6 @@ source_set("impl") {
     "//chrome/browser/tips/core",
     "//chrome/browser/tracing",
     "//chrome/browser/ui:browser_ui_prefs",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/prefs",
     "//chrome/browser/ui/profiles",
     "//chrome/browser/ui/search_engines",

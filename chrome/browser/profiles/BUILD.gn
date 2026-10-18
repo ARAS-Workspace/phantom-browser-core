@@ -676,7 +676,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/autofill",
     "//chrome/browser/ui/find_bar",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/prefs",
     "//chrome/browser/ui/startup",
@@ -886,6 +885,7 @@ source_set("unit_tests") {
     "profile_statistics_aggregator_unittest.cc",
   ]
   deps += [
+    "//chrome/browser/metrics/desktop_session_duration",
     "//chrome/browser/ui/browser_window/test:test_support",
     "//chrome/browser/ui/tabs:test_support",
   ]

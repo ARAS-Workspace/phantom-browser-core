@@ -291,8 +291,6 @@ class PermissionRequestManager
     return !pending_permission_requests_.IsEmpty();
   }
 
-  void SetHatsShownCallback(base::OnceCallback<void()> callback) override;
-
   // For permissions that have visible views, we should only record
   // PromptResolved metrics, for ask prompts.
   bool ShouldRecordUmaForCurrentPrompt() const;
@@ -462,9 +460,8 @@ class PermissionRequestManager
       PermissionAction permission_action);
 
   // Take a snapshot of the content setting status for the current requests,
-  // which can change based on the user's decision. Used in HaTS as a filter.
-  // This defaults to "DEFAULT" if there's no ContentSettingsType associated
-  // with the PermissionType.
+  // which can change based on the user's decision. This defaults to "DEFAULT"
+  // if there's no ContentSettingsType associated with the PermissionType.
   void SetCurrentRequestsInitialStatuses();
 
   ContentSetting GetRequestInitialStatus(PermissionRequest* request);
@@ -631,8 +628,6 @@ class PermissionRequestManager
   // A timer is used to pre-ignore the permission request if it's been displayed
   // as a quiet chip.
   base::OneShotTimer preignore_timer_;
-
-  std::optional<base::OnceCallback<void()>> hats_shown_callback_;
 
   // Holds the position of the current prompt, only relevant for permission
   // element prompts.

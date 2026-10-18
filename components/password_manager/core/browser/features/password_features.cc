@@ -27,9 +27,6 @@ BASE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes,
 BASE_FEATURE(kAutoApproveSharedPasswordUpdatesFromSameSender,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kAutofillPasswordUserPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kAwaitPageStabilityForPasswordChange,
              base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<base::TimeDelta> kAwaitPageStabilityTimeout = {

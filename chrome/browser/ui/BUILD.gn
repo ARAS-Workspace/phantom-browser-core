@@ -631,7 +631,6 @@ static_library("ui") {
     "//chrome/browser/ui/file_system_access:impl",
     "//chrome/browser/ui/find_bar",
     "//chrome/browser/ui/find_bar:impl",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/javascript_dialogs",
     "//chrome/browser/ui/javascript_dialogs:impl",
     "//chrome/browser/ui/login",
@@ -1497,12 +1496,8 @@ static_library("ui") {
       "//chrome/browser/ui/frame",
       "//chrome/browser/ui/frame:impl",
       "//chrome/browser/ui/views:close_bubble_on_tab_activation_helper",
-      "//chrome/browser/ui/views/hats",
-      "//chrome/browser/ui/views/hats:impl",
       "//chrome/browser/ui/views/profiles:avatar_badge_view",
     ]
-
-    allow_circular_includes_from += [ "//chrome/browser/ui/views/hats:impl" ]
   }
 
   deps += [ "//chrome/browser/ui/webui/downloads" ]

@@ -16,8 +16,6 @@ namespace prefs {
 
 extern const char kPermissionActions[];
 
-extern const char kOneTimePermissionPromptsDecidedCount[];
-
 }  // namespace prefs
 
 // Registers user preferences related to permissions.

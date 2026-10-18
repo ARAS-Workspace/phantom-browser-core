@@ -7,14 +7,12 @@
 
 #include <stdint.h>
 
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "base/compiler_specific.h"
-#include "base/containers/flat_set.h"
 #include "base/containers/span.h"
 #include "base/functional/callback_forward.h"
 #include "base/i18n/rtl.h"
@@ -25,8 +23,6 @@
 #include "build/build_config.h"
 #include "components/autofill/core/browser/country_type.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
-#include "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
-#include "components/autofill/core/browser/data_model/autofill_ai/entity_type_names.h"
 #include "components/autofill/core/browser/field_types.h"
 #include "components/autofill/core/browser/ui/popup_open_enums.h"
 #include "components/autofill/core/common/aliases.h"
@@ -656,35 +652,6 @@ class AutofillClient {
   // specific `FillingProduct`.
   virtual void HideSuggestions(SuggestionHidingReason reason,
                                std::optional<FillingProduct> product) = 0;
-
-  // Maybe triggers a hats survey that measures the user's perception of
-  // Autofill. When triggering happens, the survey dialog will be displayed with
-  // a 5s delay. Note:  This survey should be triggered after form submissions.
-  // `field_filling_stats_data` contains a key-value string representation of
-  // `autofill_metrics::FormGroupFillingStats`. See
-  // chrome/browser/ui/hats/survey_config.cc for details on what values should
-  // be present.
-  // `filling_product` defines whether an address or payments survey will be
-  // displayed.
-  virtual void TriggerUserPerceptionOfAutofillSurvey(
-      FillingProduct filling_product,
-      const std::map<std::string, std::string>& field_filling_stats_data);
-
-  // Triggers a survey to ask the user why they declined saving an address.
-  virtual void TriggerDeclinedSaveAddressReasonSurvey();
-
-  // Triggers a survey after the user sees an Autofill AI suggestion and submits
-  // a form. The triggering happens only if the uses sees an Autofill AI
-  // suggestion, regardless of whether they accepted it or not.
-  // `suggestion_accepted` defines whether the suggestion seen by the user was
-  // accepted. `entity_type` defines the type of entity used to generate the
-  // suggestion.
-  virtual void TriggerAutofillAiFillingJourneySurvey(
-      bool suggestion_accepted,
-      EntityType entity_type,
-      const base::flat_set<EntityTypeName>& saved_entities,
-      const FieldTypeSet& triggering_field_types);
-
 
   // Returns whether there is an active actor task for this client's tab (if
   // one exists).

@@ -170,7 +170,6 @@
 #include "chrome/browser/ui/views/frame/web_contents_close_handler.h"
 #include "chrome/browser/ui/views/fullscreen_control/fullscreen_control_host.h"
 #include "chrome/browser/ui/views/global_media_controls/media_toolbar_button_view.h"
-#include "chrome/browser/ui/views/hats/hats_next_web_dialog.h"
 #include "chrome/browser/ui/views/incognito_clear_browsing_data_dialog_coordinator.h"
 #include "chrome/browser/ui/views/infobars/infobar_container_view.h"
 #include "chrome/browser/ui/views/interaction/browser_elements_views.h"
@@ -5263,21 +5262,6 @@ void BrowserView::MaybeShowSignInBenefitsIPH() {
       ->GetAvatarToolbarButtonInterface()
       ->MaybeShowSignInBenefitsIPH();
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-}
-
-void BrowserView::ShowHatsDialog(
-    const std::string& site_id,
-    const std::optional<std::string>& hats_histogram_name,
-    const std::optional<uint64_t> hats_survey_ukm_id,
-    base::OnceClosure success_callback,
-    base::OnceClosure failure_callback,
-    const SurveyBitsData& product_specific_bits_data,
-    const SurveyStringData& product_specific_string_data) {
-  // Self deleting on close.
-  new HatsNextWebDialog(browser(), site_id, hats_histogram_name,
-                        hats_survey_ukm_id, std::move(success_callback),
-                        std::move(failure_callback), product_specific_bits_data,
-                        product_specific_string_data);
 }
 
 void BrowserView::ShowIncognitoClearBrowsingDataDialog() {

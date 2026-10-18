@@ -102,7 +102,6 @@ class TestDelegate : public permissions::PermissionPrompt::Delegate {
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
-  void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
   void SwitchToLoudPrompt() override {}
 
   bool WasCurrentRequestAlreadyDisplayed() override { return false; }

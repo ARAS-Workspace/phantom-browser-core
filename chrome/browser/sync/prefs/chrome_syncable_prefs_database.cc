@@ -51,7 +51,7 @@ enum {
   // kAccessibilityReadAnythingLineSpacing = 100010,  // deprecated
   // kAccessibilityReadAnythingLetterSpacing = 100011,  // deprecated
   // kLensRegionSearchEnabled = 100012,  (obsolete).
-  kHatsSurveyMetadata = 100013,
+  // kHatsSurveyMetadata = 100013,  // deprecated
   kHomePage = 100014,
   kHomePageIsNewTabPage = 100015,
   kNtpCustomBackgroundDict = 100016,
@@ -444,10 +444,6 @@ enum {
 constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
     std::string_view,
     sync_preferences::SyncablePrefMetadata>({
-    {prefs::kHatsSurveyMetadata,
-     {syncable_prefs_ids::kHatsSurveyMetadata, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
     {prefs::kHomePage,
      {syncable_prefs_ids::kHomePage, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,

@@ -14,7 +14,6 @@
 #include "base/check_op.h"
 #include "base/command_line.h"
 #include "base/functional/bind.h"
-#include "base/functional/callback_helpers.h"
 #include "base/logging.h"
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
@@ -1173,25 +1172,6 @@ void PermissionRequestManager::ShowPrompt() {
       base::RecordAction(base::UserMetricsAction(
           "Notifications.Quiet.PermissionRequestShown"));
     }
-
-    PermissionsClient::Get()->TriggerPromptHatsSurveyIfEnabled(
-        web_contents(), requests_[0]->request_type(), std::nullopt,
-        DetermineCurrentRequestUIDisposition(),
-        DetermineCurrentRequestUIDispositionReasonForUMA(),
-        requests_[0]->GetGestureType(),
-        /*prompt_display_duration=*/std::nullopt, /*is_post_prompt=*/false,
-        web_contents()
-            ->GetPrimaryMainFrame()
-            ->GetLastCommittedOrigin()
-            .GetURL(),
-        current_request_pepc_prompt_position_,
-        GetRequestInitialStatus(requests_[0].get()),
-        hats_shown_callback_.has_value()
-            ? std::move(hats_shown_callback_.value())
-            : base::DoNothing(),
-        /*prompt_options=*/std::monostate());
-
-    hats_shown_callback_.reset();
   }
   current_request_already_displayed_ = true;
   current_request_first_display_time_ = base::Time::Now();
@@ -1208,11 +1188,6 @@ void PermissionRequestManager::ShowPrompt() {
   if (auto_response_for_test_ != NONE) {
     DoAutoResponseForTesting();
   }
-}
-
-void PermissionRequestManager::SetHatsShownCallback(
-    base::OnceCallback<void()> callback) {
-  hats_shown_callback_ = std::move(callback);
 }
 
 void PermissionRequestManager::DeletePrompt() {
@@ -1238,7 +1213,6 @@ void PermissionRequestManager::ResetViewStateForCurrentRequest() {
   should_dismiss_current_request_ = false;
   did_show_prompt_ = false;
   did_click_manage_ = false;
-  hats_shown_callback_.reset();
   current_request_pepc_prompt_position_.reset();
   current_requests_initial_statuses_.clear();
   if (view_) {

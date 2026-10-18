@@ -152,15 +152,6 @@ class TestBrowserWindow : public BrowserWindow,
   void MaybeShowProfileSwitchIPH() override {}
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  void ShowHatsDialog(
-      const std::string& site_id,
-      const std::optional<std::string>& hats_histogram_name,
-      const std::optional<uint64_t> hats_survey_ukm_id,
-      base::OnceClosure success_callback,
-      base::OnceClosure failure_callback,
-      const SurveyBitsData& product_specific_bits_data,
-      const SurveyStringData& product_specific_string_data) override {}
-
   void ShowIncognitoClearBrowsingDataDialog() override {}
   void ShowIncognitoHistoryDisclaimerDialog() override {}
 #endif

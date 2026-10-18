@@ -36,15 +36,6 @@ BASE_DECLARE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes);
 // auto-approved.
 BASE_DECLARE_FEATURE(kAutoApproveSharedPasswordUpdatesFromSameSender);
 
-// Feature flag to control the displaying of an ongoing hats survey that
-// measures users perception of autofilling password forms. Differently from
-// other surveys, the Autofill user perception surveys will not have a specific
-// target number of answers where it will be fully stop, instead, it will run
-// indefinitely. A target number of full answers exists, but per quarter. The
-// goal is to have a go to place to understand how users are perceiving autofill
-// across quarters.
-BASE_DECLARE_FEATURE(kAutofillPasswordUserPerceptionSurvey);
-
 // Waits for the page to reach stability before triggering any password change
 // actions.
 BASE_DECLARE_FEATURE(kAwaitPageStabilityForPasswordChange);

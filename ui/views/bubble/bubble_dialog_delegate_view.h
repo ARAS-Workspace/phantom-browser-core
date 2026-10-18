@@ -66,7 +66,6 @@ class FlyingIndicator;
 class GlobalErrorBubbleView;
 class HomePageUndoBubble;
 class MediaDialogView;
-class HatsNextWebDialog;
 class IncognitoClearBrowsingDataDialog;
 class LocationBarBubbleDelegateView;
 class NetworkProfileBubbleView;
@@ -849,7 +848,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   friend class ::GlobalErrorBubbleView;
   friend class ::HomePageUndoBubble;
   friend class ::MediaDialogView;
-  friend class ::HatsNextWebDialog;
   friend class ::IncognitoClearBrowsingDataDialog;
   friend class ::LocationBarBubbleDelegateView;
   friend class ::NetworkProfileBubbleView;

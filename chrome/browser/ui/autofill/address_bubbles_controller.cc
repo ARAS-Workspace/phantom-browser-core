@@ -23,7 +23,6 @@
 #include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/autofill/autofill_bubble_handler.h"
-#include "chrome/browser/ui/autofill/chrome_autofill_client.h"
 #include "chrome/browser/ui/autofill/edit_address_profile_dialog_controller_impl.h"
 #include "chrome/browser/ui/autofill/save_address_bubble_controller.h"
 #include "chrome/browser/ui/autofill/update_address_bubble_controller.h"
@@ -37,7 +36,6 @@
 #include "components/autofill/core/browser/field_types.h"
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/browser/ui/addresses/autofill_address_util.h"
-#include "components/autofill/core/common/autofill_features.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/base/user_selectable_type.h"
@@ -112,7 +110,6 @@ void AddressBubblesController::SetUpAndShowSaveOrUpdateAddressBubble(
     const AutofillProfile& profile,
     const AutofillProfile* original_profile,
     AutofillClient::SaveAddressBubbleType save_address_bubble_type,
-    bool user_has_any_profile_saved,
     AutofillClient::AddressProfileSavePromptCallback callback) {
   AddressBubblesController::CreateForWebContents(web_contents);
   auto* controller = AddressBubblesController::FromWebContents(web_contents);
@@ -133,9 +130,9 @@ void AddressBubblesController::SetUpAndShowSaveOrUpdateAddressBubble(
                             : IDS_AUTOFILL_SAVE_ADDRESS_PROMPT_TITLE)
                      : IDS_AUTOFILL_UPDATE_ADDRESS_PROMPT_TITLE);
 
-  controller->SetUpAndShowBubble(
-      std::move(show_bubble_view_impl), std::move(page_action_icon_tooltip),
-      is_migration_to_account, user_has_any_profile_saved, std::move(callback));
+  controller->SetUpAndShowBubble(std::move(show_bubble_view_impl),
+                                 std::move(page_action_icon_tooltip),
+                                 is_migration_to_account, std::move(callback));
 }
 
 void AddressBubblesController::ShowEditor(
@@ -167,16 +164,6 @@ void AddressBubblesController::OnUserDecision(
   if (address_profile_save_prompt_callback_) {
     std::move(address_profile_save_prompt_callback_).Run(decision, profile);
     MaybeShowSignInPromo(profile);
-  }
-
-  if (decision == AutofillClient::AddressPromptUserDecision::kDeclined &&
-      !user_has_any_profile_saved_ &&
-      base::FeatureList::IsEnabled(
-          features::kAutofillAddressUserDeclinedSaveSurvey)) {
-    if (auto* autofill_client =
-            ChromeAutofillClient::FromWebContents(web_contents())) {
-      autofill_client->TriggerDeclinedSaveAddressReasonSurvey();
-    }
   }
 }
 
@@ -253,7 +240,6 @@ void AddressBubblesController::SetUpAndShowBubble(
     ShowBubbleViewCallback show_bubble_view_callback,
     std::u16string page_action_icon_tooltip,
     bool is_migration_to_account,
-    bool user_has_any_profile_saved,
     AutofillClient::AddressProfileSavePromptCallback
         address_profile_save_prompt_callback) {
   // Don't show the bubble if it's already visible, and inform the backend.
@@ -281,7 +267,6 @@ void AddressBubblesController::SetUpAndShowBubble(
 
   SetUpBubble(std::move(show_bubble_view_callback),
               std::move(page_action_icon_tooltip), is_migration_to_account,
-              user_has_any_profile_saved,
               std::move(address_profile_save_prompt_callback));
 
   QueueOrShowBubble();
@@ -291,7 +276,6 @@ void AddressBubblesController::SetUpBubble(
     ShowBubbleViewCallback show_bubble_view_callback,
     std::u16string page_action_icon_tooltip,
     bool is_migration_to_account,
-    bool user_has_any_profile_saved,
     AutofillClient::AddressProfileSavePromptCallback
         address_profile_save_prompt_callback) {
   show_bubble_view_callback_ = std::move(show_bubble_view_callback);
@@ -300,7 +284,6 @@ void AddressBubblesController::SetUpBubble(
       std::move(address_profile_save_prompt_callback);
   shown_by_user_gesture_ = false;
   is_migration_to_account_ = is_migration_to_account;
-  user_has_any_profile_saved_ = user_has_any_profile_saved;
 }
 
 void AddressBubblesController::MaybeShowSignInPromo(

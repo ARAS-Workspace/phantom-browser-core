@@ -74,20 +74,6 @@ PasswordAccountStorageUserState ComputePasswordAccountStorageUserState(
 PasswordAccountStorageUsageLevel ComputePasswordAccountStorageUsageLevel(
     const syncer::SyncService* sync_service);
 
-// Password change HaTS product-specific data fields.
-//
-// Note: Counts and runtime should use bucketing.
-inline constexpr char kPasswordChangeSuggestedPasswordsAdoption[] =
-    "Has user ever adopted suggested passwords";
-inline constexpr char kPasswordChangeBreachedPasswordsCount[] =
-    "Number of breached passwords";
-inline constexpr char kPasswordChangeSavedPasswordsCount[] =
-    "Number of saved passwords";
-inline constexpr char kPasswordChangeRuntime[] =
-    "Password change feature runtime, in milliseconds";
-inline constexpr char kPasswordChangeBlockingChallengeDetected[] =
-    "Was there a blocking challenge (e.g. OTP) in the flow";
-
 }  // namespace password_manager::features_util
 
 #endif  // COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_FEATURES_PASSWORD_MANAGER_FEATURES_UTIL_H_

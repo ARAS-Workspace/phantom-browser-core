@@ -39,8 +39,7 @@ CriticalUserJourneyServiceFactory::BuildServiceInstanceForBrowserContext(
     return nullptr;
   }
 
-  auto service = std::make_unique<CriticalUserJourneyService>(
-      Profile::FromBrowserContext(context));
+  auto service = std::make_unique<CriticalUserJourneyService>();
   service->Initialize();
   return service;
 }

@@ -733,7 +733,6 @@ void ChromeAutofillClient::ConfirmSaveAddressProfile(
     AddressProfileSavePromptCallback callback) {
   AddressBubblesController::SetUpAndShowSaveOrUpdateAddressBubble(
       web_contents(), profile, original_profile, save_address_bubble_type,
-      !GetPersonalDataManager().address_data_manager().GetProfiles().empty(),
       std::move(callback));
 }
 

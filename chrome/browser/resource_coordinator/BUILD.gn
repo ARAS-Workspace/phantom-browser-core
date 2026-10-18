@@ -203,6 +203,7 @@ source_set("unit_tests") {
   ]
 
   deps += [
+    "//chrome/browser/metrics/desktop_session_duration",
     "//chrome/browser/ui",
     "//chrome/browser/ui/tabs:test_support",
     "//components/performance_manager",

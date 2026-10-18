@@ -43,9 +43,8 @@ class BrowserAutofillManager;
 // the `FieldSignature` and its `FieldType`, and further metadata. See
 // autofill_crowdsourcing_encoding.h for further details.
 //
-// In VotesUploader, "to vote" also includes "to emit quality metrics" and
-// "to potentially display an Autofill survey". For brevity, function names
-// don't mention this explicitly.
+// In VotesUploader, "to vote" also includes "to emit quality metrics". For
+// brevity, function names don't mention this explicitly.
 //
 // VotesUploader enqueues votes that are cast before form submission are
 // enqueued. New votes for a form signature replace already-enqueued ones for
@@ -117,8 +116,8 @@ class VotesUploader : public AutofillDriverFactory::Observer {
       ukm::SourceId ukm_source_id);
 
  protected:
-  // Logs quality metrics, perhaps displays an Autofill survey, and uploads the
-  // vote. All these three activities depend on the determined field types.
+  // Logs quality metrics and uploads the vote. Both activities depend on the
+  // determined field types.
   //
   // `initial_interaction_timestamp` is the last interaction with the form
   // passed to MaybeStartVoteUploadProcess(). `submission_timestamp` is the time

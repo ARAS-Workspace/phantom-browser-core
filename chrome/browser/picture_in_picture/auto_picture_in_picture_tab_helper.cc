@@ -32,8 +32,6 @@
 #include "third_party/blink/public/common/frame/user_activation_state.h"
 
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
-#include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service.h"
-#include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 
 using OcclusionState =
     AutoPictureInPictureWindowOcclusionHelperBase::OcclusionState;
@@ -317,12 +315,6 @@ void AutoPictureInPictureTabHelper::MaybeRecordTotalPipTimeForSession() {
   total_browser_initiated_pip_time_for_session_ = std::nullopt;
 }
 
-AutoPictureInPictureHatsService* AutoPictureInPictureTabHelper::GetHatsService()
-    const {
-  return AutoPictureInPictureHatsServiceFactory::GetForProfile(
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext()));
-}
-
 void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
     bool is_in_picture_in_picture) {
   if (is_in_picture_in_picture_ == is_in_picture_in_picture) {
@@ -332,17 +324,6 @@ void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
   blocked_due_to_content_setting_ = false;
 
   if (!is_in_picture_in_picture_) {
-    if (auto* hats_service = GetHatsService()) {
-      // This call will be a no-op for non-autopip windows, since the autopip
-      // HaTS service active window context (`active_window_context_`) is only
-      // set for autopip windows. Without an active window context, calling
-      // `AutoPictureInPictureWindowClosed` or `MaybeLaunchSurvey` is a no-op.
-      hats_service->AutoPictureInPictureWindowClosed();
-      if (tab_observer_helper_->IsTabActivated()) {
-        hats_service->MaybeLaunchSurvey(web_contents());
-      }
-    }
-
     is_in_auto_picture_in_picture_ = false;
     MaybeRecordPictureInPictureChanged(false);
     MaybeStartOrStopObservers();
@@ -355,11 +336,6 @@ void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
     current_pip_playback_time_ = base::TimeDelta();
     is_in_auto_picture_in_picture_ = true;
     auto_picture_in_picture_activation_time_ = base::TimeTicks();
-
-    if (auto* hats_service = GetHatsService()) {
-      hats_service->AutoPictureInPictureWindowOpened(
-          auto_pip_trigger_reason_, web_contents()->GetLastCommittedURL());
-    }
 
     MaybeRecordPictureInPictureChanged(true);
 
@@ -931,14 +907,6 @@ void AutoPictureInPictureTabHelper::OnTabBecameActive() {
   // As a result, the outgoing tab notifies the incoming tab unconditionally, so
   // that the incoming tab has the opportunity to close pip.
   MaybeExitAutoPictureInPicture();
-
-  // This call will be a no-op for non-autopip windows, since the autopip HaTS
-  // service active window context (`active_window_context_`) is only set for
-  // autopip windows. Without an active window context, calling
-  // `MaybeLaunchSurvey` is a no-op.
-  if (auto* hats_service = GetHatsService()) {
-    hats_service->MaybeLaunchSurvey(web_contents());
-  }
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(AutoPictureInPictureTabHelper);

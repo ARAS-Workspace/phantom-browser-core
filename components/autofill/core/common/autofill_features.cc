@@ -144,28 +144,6 @@ BASE_FEATURE_PARAM(bool,
 BASE_FEATURE(kAutofillAddressSuggestionsOnTypingHasStrikeDatabase,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Feature flag controlling the display of surveys when a user declines the
-// save prompt of Autofill address and a user does not have any address stored.
-// The goal is to understand the reason and work towards improving acceptance.
-BASE_FEATURE(kAutofillAddressUserDeclinedSaveSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Feature flag controlling the display of surveys when a user does not
-// accept an Autofill suggestion. The goal is to understand the reason and work
-// towards improving acceptance.
-BASE_FEATURE(kAutofillAddressUserDeclinedSuggestionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Feature flag to control the displaying of an ongoing hats survey that
-// measures users perception of Autofill. Differently from other surveys,
-// the Autofill user perception survey will not have a specific target
-// number of answers where it will be fully stop, instead, it will run
-// indefinitely. A target number of full answers exists, but per quarter. The
-// goal is to have a go to place to understand how users are perceiving autofill
-// across quarters.
-BASE_FEATURE(kAutofillAddressUserPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // If enabled (and if `AutofillAiServerModel` is also enabled), this ignores
 // the `may_run_server_model` boolean sent by the Autofill server and, instead,
 // queries the server model for every encountered form that is not already
@@ -180,11 +158,6 @@ BASE_FEATURE(kAutofillAiAlwaysTriggerServerModel,
 
 // If enabled, AutofillAi entities will be deduped on every major milestone.
 DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiDedupeEntities);
-
-// When enabled, a HaTS survey is shown after a walletable suggestion is
-// displayed and the form submitted. The survey does not require the suggestion
-// to be accepted.
-BASE_FEATURE(kAutofillAiFillingSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, no GeoIp requirements are imposed for AutofillAi.
 // Note that this feature can be modified as follows (all assuming that
@@ -251,22 +224,6 @@ BASE_FEATURE(kAutofillAiPrivateAiShadowMetric,
 // suggestion generation time.
 // TODO(crbug.com/468236932): Remove once feature is launched.
 DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiReauthRequired);
-
-// When enabled, a HaTS survey is shown after the save prompt for a walletable
-// entity was interacted with.
-BASE_FEATURE(kAutofillAiSavePromptSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE_PARAM(
-    std::string,
-    kAutofillAiSavePromptSurveyAcceptedTriggerId,
-    &kAutofillAiSavePromptSurvey,
-    "autofill_ai_walletable_entity_save_prompt_survey_accepted_trigger_id",
-    "");
-BASE_FEATURE_PARAM(
-    std::string,
-    kAutofillAiSavePromptSurveyDeclinedTriggerId,
-    &kAutofillAiSavePromptSurvey,
-    "autofill_ai_walletable_entity_save_prompt_survey_declined_trigger_id",
-    "");
 
 // If enabled, the client may trigger the server model for AutofillAI type
 // predictions.
@@ -526,10 +483,6 @@ BASE_FEATURE(kAutofillCheckTriggeringFieldDoesNotChangeDuringFilling,
 // When enabled, deduce country of a new address profile based on the phone
 // number if not explicitly observed.
 BASE_FEATURE(kAutofillComplementCountryUsingPhoneNumber,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Same as `kAutofillAddressUserPerceptionSurvey` but for credit card forms.
-BASE_FEATURE(kAutofillCreditCardUserPerceptionSurvey,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, `FormPredictionsTracker` will wait up to 1 second
@@ -1001,35 +954,6 @@ BASE_FEATURE(kAutofillUseStructuralSignatureInsteadOfSecondary,
 // TODO(crbug.com/371933424). Clean up when launched, if not used for Autofill
 // experiments.
 BASE_FEATURE(kFieldClassificationModelCaching,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited "Contact info"
-// settings page.
-BASE_FEATURE(kManageContactInfoPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited "Identity docs"
-// settings page.
-BASE_FEATURE(kManageIdentityDocsPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited Password Manager
-// management surface.
-BASE_FEATURE(kManagePasswordsPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited "Payments"
-// settings page.
-BASE_FEATURE(kManagePaymentsPerceptionSurvey,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited "Travel"
-// settings page.
-BASE_FEATURE(kManageTravelPerceptionSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, a HaTS survey is shown after the user visited "Your saved info"
-// settings page.
-BASE_FEATURE(kManageYourSavedInfoPerceptionSurvey,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, the AuthenticatorSelectionDialogBridge will reset the native

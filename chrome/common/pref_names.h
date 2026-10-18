@@ -2019,9 +2019,6 @@ inline constexpr char kSilentPrintingEnabled[] =
 inline constexpr char kCACertificateManagementAllowed[] =
     "ca_certificate_management_allowed";
 
-// Dictionary that contains all of the Hats Survey Metadata for desktop surveys.
-inline constexpr char kHatsSurveyMetadata[] = "hats.survey_metadata";
-
 inline constexpr char kExternalProtocolDialogShowAlwaysOpenCheckbox[] =
     "external_protocol_dialog.show_always_open_checkbox";
 

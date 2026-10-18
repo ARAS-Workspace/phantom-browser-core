@@ -58,10 +58,6 @@ class MockPermissionPromptDelegate : public PermissionPrompt::Delegate {
   MOCK_METHOD(void, SetPromptShown, (), (override));
   MOCK_METHOD(void, SetDecisionTime, (), (override));
   MOCK_METHOD(void, SetManageClicked, (), (override));
-  MOCK_METHOD(void,
-              SetHatsShownCallback,
-              (base::OnceCallback<void()>),
-              (override));
   MOCK_METHOD(content::WebContents*, GetAssociatedWebContents, (), (override));
   MOCK_METHOD(base::WeakPtr<Delegate>, GetWeakPtr, (), (override));
   MOCK_METHOD(bool, RecreateView, (), (override));

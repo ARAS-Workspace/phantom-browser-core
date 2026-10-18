@@ -6,21 +6,17 @@
 
 #include <stdint.h>
 
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "base/containers/flat_set.h"
 #include "base/containers/span.h"
 #include "base/i18n/rtl.h"
 #include "base/notimplemented.h"
 #include "build/build_config.h"
 #include "components/autofill/core/browser/country_type.h"
-#include "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
-#include "components/autofill/core/browser/data_model/autofill_ai/entity_type_names.h"
 #include "components/autofill/core/browser/field_types.h"
 #include "components/autofill/core/browser/filling/filling_product.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
@@ -262,25 +258,6 @@ const AutofillAblationStudy& AutofillClient::GetAblationStudy() const {
 bool AutofillClient::IsAndroidLargeFormFactor() const {
   return false;
 }
-
-void AutofillClient::TriggerUserPerceptionOfAutofillSurvey(
-    FillingProduct filling_product,
-    const std::map<std::string, std::string>& field_filling_stats_data) {
-  NOTIMPLEMENTED();
-}
-
-void AutofillClient::TriggerDeclinedSaveAddressReasonSurvey() {
-  NOTIMPLEMENTED();
-}
-
-void AutofillClient::TriggerAutofillAiFillingJourneySurvey(
-    bool suggestion_accepted,
-    EntityType entity_type,
-    const base::flat_set<EntityTypeName>& saved_entities,
-    const FieldTypeSet& triggering_field_types) {
-  NOTIMPLEMENTED();
-}
-
 
 bool AutofillClient::IsTabInActorMode() const {
   return false;

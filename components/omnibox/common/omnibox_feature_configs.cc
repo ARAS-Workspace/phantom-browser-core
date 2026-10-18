@@ -641,48 +641,6 @@ bool OmniboxUrlSuggestionsOnFocus::MostVisitedPrefetchingEnabled() const {
   return enabled && prefetch_most_visited_sites;
 }
 
-BASE_FEATURE(HappinessTrackingSurveyForOmniboxOnFocusZps::
-                 kHappinessTrackingSurveyForOmniboxOnFocusZps,
-             "HappinessTrackingSurveyForOmniboxOnFocusZps",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-HappinessTrackingSurveyForOmniboxOnFocusZps::
-    HappinessTrackingSurveyForOmniboxOnFocusZps() {
-  enabled = base::FeatureList::IsEnabled(
-      kHappinessTrackingSurveyForOmniboxOnFocusZps);
-  focus_threshold =
-      base::FeatureParam<size_t>(&kHappinessTrackingSurveyForOmniboxOnFocusZps,
-                                 "FocusThreshold", 5)
-          .Get();
-  survey_delay =
-      base::FeatureParam<size_t>(&kHappinessTrackingSurveyForOmniboxOnFocusZps,
-                                 "SurveyDelay", 7000)
-          .Get();
-  happiness_trigger_id = base::FeatureParam<std::string>(
-                             &kHappinessTrackingSurveyForOmniboxOnFocusZps,
-                             "HappinessTriggerId", "")
-                             .Get();
-  utility_trigger_id =
-      base::FeatureParam<std::string>(
-          &kHappinessTrackingSurveyForOmniboxOnFocusZps, "UtilityTriggerId", "")
-          .Get();
-}
-
-HappinessTrackingSurveyForOmniboxOnFocusZps::
-    HappinessTrackingSurveyForOmniboxOnFocusZps(
-        const HappinessTrackingSurveyForOmniboxOnFocusZps&) = default;
-HappinessTrackingSurveyForOmniboxOnFocusZps::
-    HappinessTrackingSurveyForOmniboxOnFocusZps(
-        HappinessTrackingSurveyForOmniboxOnFocusZps&&) = default;
-HappinessTrackingSurveyForOmniboxOnFocusZps&
-HappinessTrackingSurveyForOmniboxOnFocusZps::operator=(
-    const HappinessTrackingSurveyForOmniboxOnFocusZps&) = default;
-HappinessTrackingSurveyForOmniboxOnFocusZps&
-HappinessTrackingSurveyForOmniboxOnFocusZps::operator=(
-    HappinessTrackingSurveyForOmniboxOnFocusZps&&) = default;
-
-HappinessTrackingSurveyForOmniboxOnFocusZps::
-    ~HappinessTrackingSurveyForOmniboxOnFocusZps() = default;
-
 BASE_FEATURE(ComposeboxSuggestionLimit::kComposeboxSuggestionLimit,
              "ComposeboxSuggestionLimit",
              base::FEATURE_ENABLED_BY_DEFAULT);
