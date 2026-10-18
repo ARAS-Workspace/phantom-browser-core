@@ -77,8 +77,6 @@
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
 #include "chrome/browser/extensions/api/file_system/chrome_file_system_delegate.h"
-#include "chrome/browser/search/instant_service.h"
-#include "chrome/browser/search/instant_service_factory.h"
 
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "chrome/browser/printing/printing_init.h"
@@ -159,17 +157,6 @@ bool ChromeExtensionsAPIClient::ShouldHideBrowserNetworkRequest(
       is_browser_request &&
       request.initiator ==
           url::Origin::Create(chrome::ChromeUINewTabPageURLAsGURL());
-
-  // Hide requests made by the NTP Instant renderer.
-  auto* instant_service =
-      context
-          ? InstantServiceFactory::GetForProfile(static_cast<Profile*>(context))
-          : nullptr;
-  if (instant_service) {
-    // TODO(crbug.com/379869738): Remove GetUnsafeValue.
-    is_sensitive_request |= instant_service->IsInstantProcess(
-        request.global_id.child_id.GetUnsafeValue());
-  }
 
   return is_sensitive_request;
 }
@@ -397,13 +384,6 @@ ChromeExtensionsAPIClient::GetAutomationInternalApiDelegate() {
         std::make_unique<ChromeAutomationInternalApiDelegate>();
   }
   return extensions_automation_api_delegate_.get();
-}
-
-std::vector<KeyedServiceBaseFactory*>
-ChromeExtensionsAPIClient::GetFactoryDependencies() {
-  std::vector<KeyedServiceBaseFactory*> dependencies;
-  dependencies.push_back(InstantServiceFactory::GetInstance());
-  return dependencies;
 }
 
 std::unique_ptr<NativeMessagePortDispatcher>

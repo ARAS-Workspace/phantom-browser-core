@@ -38,8 +38,6 @@
 #include "extensions/common/extension.h"
 #endif
 
-#include "chrome/common/chrome_features.h"
-#include "chrome/renderer/process_state.h"  // nogncheck
 #include "components/record_replay/content/renderer/record_replay_agent.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 
@@ -65,13 +63,6 @@ void ChromeRenderViewTest::SetUp() {
   ChromeUnitTestSuite::InitializeResourceBundle();
 
   registry_ = std::make_unique<service_manager::BinderRegistry>();
-
-  // Initialize instant process state since tests bypass normal process setup.
-  // When kInstantUsesSpareRenderer is enabled, IsInstantProcess() requires the
-  // optional value to be initialized, otherwise it will CHECK-fail.
-  if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
-    process_state::SetIsInstantProcess(false);
-  }
 
   // TODO(crbug.com/41401202): Before this SetUp, the test agents defined at the
   // end of this method should be injected into the creation of RenderViewImpl.

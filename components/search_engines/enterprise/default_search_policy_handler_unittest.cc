@@ -149,7 +149,6 @@ TEST_F(DefaultSearchPolicyHandlerTest, InvalidType) {
       key::kDefaultSearchProviderImageURL,
       key::kDefaultSearchProviderImageURLPostParams,
       key::kDefaultSearchProviderKeyword,
-      key::kDefaultSearchProviderNewTabURL,
   };
 
   PolicyMap policy;
@@ -235,6 +234,9 @@ TEST_F(DefaultSearchPolicyHandlerTest, FullyDefined) {
   EXPECT_TRUE(value = dictionary->FindString(
                   DefaultSearchManager::kSuggestionsURLPostParams));
   EXPECT_EQ(std::string(), *value);
+
+  // Phantom does not map the DefaultSearchProviderNewTabURL policy.
+  EXPECT_FALSE(dictionary->FindString(DefaultSearchManager::kNewTabURL));
 }
 
 // Checks that disabling default search is properly reflected the dictionary

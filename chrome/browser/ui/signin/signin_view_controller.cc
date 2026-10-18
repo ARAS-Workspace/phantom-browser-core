@@ -59,7 +59,6 @@
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/browser/signin/account_consistency_mode_manager.h"
 #include "chrome/browser/signin/dice_tab_helper.h"
@@ -147,7 +146,7 @@ void ShowTabOverwritingNTP(BrowserWindowInterface* browser,
   if (contents) {
     const GURL& contents_url = contents->GetVisibleURL();
     if (contents_url == chrome::ChromeUINewTabURLAsGURL() ||
-        search::IsInstantNTP(contents) || contents_url == url::kAboutBlankURL) {
+        contents_url == url::kAboutBlankURL) {
       params.disposition = WindowOpenDisposition::CURRENT_TAB;
     }
   }
@@ -334,7 +333,7 @@ bool SigninViewController::IsNTPTab(content::WebContents* contents) {
   }
   const GURL& contents_url = contents->GetVisibleURL();
   return contents_url == chrome::ChromeUINewTabURLAsGURL() ||
-         search::IsInstantNTP(contents) || contents_url == url::kAboutBlankURL;
+         contents_url == url::kAboutBlankURL;
 }
 
 void SigninViewController::ShowSignin(signin_metrics::AccessPoint access_point,

@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/singleton_tabs.h"
 
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
@@ -54,7 +53,7 @@ void ShowSingletonTabOverwritingNTP(NavigateParams* params) {
   if (contents) {
     const GURL& contents_url = contents->GetVisibleURL();
     if (contents_url == chrome::ChromeUINewTabURLAsGURL() ||
-        search::IsInstantNTP(contents) || contents_url == url::kAboutBlankURL) {
+        contents_url == url::kAboutBlankURL) {
       int tab_index =
           GetIndexOfExistingTabMatchingURL(params->browser, *params);
       if (tab_index < 0) {

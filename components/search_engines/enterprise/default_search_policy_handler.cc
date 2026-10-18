@@ -87,8 +87,6 @@ const PolicyToPreferenceMapEntry kDefaultSearchPolicyDataMap[] = {
      base::Value::Type::BOOLEAN},
     {key::kDefaultSearchProviderKeyword, DefaultSearchManager::kKeyword,
      base::Value::Type::STRING},
-    {key::kDefaultSearchProviderNewTabURL, DefaultSearchManager::kNewTabURL,
-     base::Value::Type::STRING},
 };
 
 // DefaultSearchPolicyHandler implementation -----------------------------------
@@ -181,9 +179,7 @@ void DefaultSearchPolicyHandler::ApplyPolicySettings(const PolicyMap& policies,
                    prefs::kDefaultSearchProviderContextMenuAccessAllowed, dict);
   SetStringInPref(policies, key::kDefaultSearchProviderKeyword,
                   DefaultSearchManager::kKeyword, dict);
-  SetStringInPref(policies, key::kDefaultSearchProviderNewTabURL,
-                  DefaultSearchManager::kNewTabURL, dict);
-  size_t policyCount = 13;
+  size_t policyCount = 12;
 
   CHECK_EQ(policyCount, std::size(kDefaultSearchPolicyDataMap));
 

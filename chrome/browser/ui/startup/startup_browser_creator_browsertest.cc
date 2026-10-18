@@ -1138,7 +1138,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
 
   // The new browser should have only the NTP.
   ASSERT_EQ(1, tab_strip->count());
-  EXPECT_TRUE(search::IsInstantNTP(tab_strip->GetWebContentsAt(0)));
+  EXPECT_TRUE(
+      search::IsNTPURL(tab_strip->GetWebContentsAt(0)->GetLastCommittedURL()));
 
   EnsureRestoreUIWasShown(tab_strip->GetWebContentsAt(0));
 
@@ -1149,7 +1150,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   ASSERT_TRUE(new_browser);
   tab_strip = new_browser->GetTabStripModel();
   ASSERT_EQ(1, tab_strip->count());
-  EXPECT_TRUE(search::IsInstantNTP(tab_strip->GetWebContentsAt(0)));
+  EXPECT_TRUE(
+      search::IsNTPURL(tab_strip->GetWebContentsAt(0)->GetLastCommittedURL()));
   EnsureRestoreUIWasShown(tab_strip->GetWebContentsAt(0));
 
   // The profile which normally opens URLs displays the new tab page.
@@ -1159,7 +1161,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   ASSERT_TRUE(new_browser);
   tab_strip = new_browser->GetTabStripModel();
   ASSERT_EQ(1, tab_strip->count());
-  EXPECT_TRUE(search::IsInstantNTP(tab_strip->GetWebContentsAt(0)));
+  EXPECT_TRUE(
+      search::IsNTPURL(tab_strip->GetWebContentsAt(0)->GetLastCommittedURL()));
   EnsureRestoreUIWasShown(tab_strip->GetWebContentsAt(0));
 
 #if !BUILDFLAG(IS_MAC) && !BUILDFLAG(GOOGLE_CHROME_BRANDING)

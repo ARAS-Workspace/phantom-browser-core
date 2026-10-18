@@ -181,7 +181,7 @@ static const char* const kChromeStandardURLSchemes[] = {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     webapps::kIsolatedAppScheme,
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    chrome::kChromeNativeScheme,        chrome::kChromeSearchScheme,
+    chrome::kChromeNativeScheme,
     dom_distiller::kDomDistillerScheme,
 };
 
@@ -200,11 +200,7 @@ void ChromeContentClient::AddAdditionalSchemes(Schemes* schemes) {
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   schemes->savable_schemes.push_back(extensions::kExtensionScheme);
 #endif
-  schemes->savable_schemes.push_back(chrome::kChromeSearchScheme);
   schemes->savable_schemes.push_back(dom_distiller::kDomDistillerScheme);
-
-  // chrome-search: resources shouldn't trigger insecure content warnings.
-  schemes->secure_schemes.push_back(chrome::kChromeSearchScheme);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // Treat extensions as secure because communication with them is entirely in

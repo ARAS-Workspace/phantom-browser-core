@@ -17,16 +17,8 @@
 #include "components/search/search.h"
 #include "components/search_engines/search_engine_type.h"
 #include "components/search_engines/template_url_service.h"
-#include "content/public/browser/navigation_controller.h"
-#include "content/public/browser/navigation_entry.h"
-#include "content/public/browser/render_frame_host.h"
-#include "content/public/browser/render_process_host.h"
-#include "content/public/browser/security_principal.h"
-#include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
-#include "chrome/browser/search/instant_service.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 
 namespace search {
@@ -111,23 +103,6 @@ struct NewTabURLDetails {
   const NewTabURLState state;
 };
 
-bool IsRenderedInInstantProcess(content::WebContents* contents,
-                                Profile* profile) {
-  content::RenderProcessHost* process_host =
-      contents->GetPrimaryMainFrame()->GetProcess();
-  if (!process_host) {
-    return false;
-  }
-
-  const InstantService* instant_service =
-      InstantServiceFactory::GetForProfile(profile);
-  if (!instant_service) {
-    return false;
-  }
-
-  return instant_service->IsInstantProcess(process_host->GetDeprecatedID());
-}
-
 }  // namespace
 
 bool DefaultSearchProviderIsGoogle(Profile* profile) {
@@ -149,33 +124,6 @@ bool IsNTPOrRelatedURL(const GURL& url, Profile* profile) {
 
 bool IsNTPURL(const GURL& url) {
   return NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
-}
-
-bool IsInstantNTP(content::WebContents* contents) {
-  if (!contents) {
-    return false;
-  }
-
-  content::NavigationEntry* entry =
-      contents->GetController().GetLastCommittedEntry();
-  if (!entry) {
-    entry = contents->GetController().GetVisibleEntry();
-  }
-  return NavEntryIsInstantNTP(contents, entry);
-}
-
-bool NavEntryIsInstantNTP(content::WebContents* contents,
-                          content::NavigationEntry* entry) {
-  if (!contents || !entry || !IsInstantExtendedAPIEnabled()) {
-    return false;
-  }
-
-  Profile* profile = Profile::FromBrowserContext(contents->GetBrowserContext());
-  if (!IsRenderedInInstantProcess(contents, profile)) {
-    return false;
-  }
-
-  return IsInstantNTPURL(entry->GetURL(), profile);
 }
 
 bool IsInstantNTPURL(const GURL& url, Profile* profile) {
@@ -201,46 +149,6 @@ bool IsSplitViewNewTabPage(const GURL& url) {
 
 GURL GetNewTabPageURL(Profile* profile) {
   return NewTabURLDetails::ForProfile(profile).url;
-}
-
-bool ShouldAssignURLToInstantRenderer(const GURL& url, Profile* profile) {
-  if (!url.is_valid() || !profile || !IsInstantExtendedAPIEnabled() ||
-      url.SchemeIs(content::kChromeUIScheme)) {
-    return false;
-  }
-
-  return IsNTPOrRelatedURLHelper(url, profile) ||
-         url.SchemeIs(chrome::kChromeSearchScheme);
-}
-
-bool ShouldAssignSecurityPrincipalToInstantRenderer(
-    const content::SecurityPrincipal& security_principal,
-    Profile* profile) {
-  if (!profile || !IsInstantExtendedAPIEnabled()) {
-    return false;
-  }
-  // No need to check IsNTPOrRelatedURLHelper here: security_principal
-  // contains the effective URL produced by GetEffectiveURLForInstant(),
-  // which always uses the chrome-search: scheme.
-  return security_principal.SchemeIs(chrome::kChromeSearchScheme);
-}
-
-std::optional<GURL> GetEffectiveURLForInstant(const GURL& url,
-                                              Profile* profile) {
-  CHECK(ShouldAssignURLToInstantRenderer(url, profile))
-      << "Error granting Instant access.";
-
-  if (url.SchemeIs(chrome::kChromeSearchScheme)) {
-    return std::nullopt;
-  }
-
-  // Replace the scheme with "chrome-search:", and clear the port, since
-  // chrome-search is a scheme without port.
-  GURL::Replacements replacements;
-  replacements.SetSchemeStr(chrome::kChromeSearchScheme);
-  replacements.ClearPort();
-
-  return url.ReplaceComponents(replacements);
 }
 
 bool HandleNewTabURLRewrite(GURL* url,
@@ -285,7 +193,5 @@ bool HandleNewTabURLReverseRewrite(GURL* url,
 
   return false;
 }
-
-const void* const kIsNTPProcessKey = &kIsNTPProcessKey;
 
 }  // namespace search

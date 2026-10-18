@@ -315,8 +315,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionBrowserTest,
 
   content::WebContents* tab = GetActiveWebContents();
 
-  // Navigate to the non-web-accessible URL from chrome:// and
-  // chrome-search:// pages.  Verify that the page loads correctly.
+  // Navigate to the non-web-accessible URL from a chrome:// page.  Verify that
+  // the page loads correctly.
   GURL history_url(chrome::kChromeUIHistoryURL);
   ASSERT_TRUE(history_url.SchemeIs(content::kChromeUIScheme));
   ASSERT_TRUE(NavigateToURL(tab, history_url));

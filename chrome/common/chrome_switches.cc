@@ -392,9 +392,6 @@ const char kInstallIsolatedWebAppFromFile[] =
 const char kInstallIsolatedWebAppFromUrl[] =
     "install-isolated-web-app-from-url";
 
-// Marks a renderer as an Instant process.
-const char kInstantProcess[] = "instant-process";
-
 // Used for testing - keeps browser alive after last browser window closes.
 const char kKeepAliveForTest[] = "keep-alive-for-test";
 

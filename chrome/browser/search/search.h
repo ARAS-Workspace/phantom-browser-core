@@ -5,8 +5,6 @@
 #ifndef CHROME_BROWSER_SEARCH_SEARCH_H_
 #define CHROME_BROWSER_SEARCH_SEARCH_H_
 
-#include <optional>
-
 #include "build/build_config.h"
 
 class GURL;
@@ -14,15 +12,9 @@ class Profile;
 
 namespace content {
 class BrowserContext;
-class NavigationEntry;
-class SecurityPrincipal;
-class WebContents;
 }
 
 namespace search {
-
-// UserData key to tag RenderProcessHosts hosting the NTP in chrome/.
-extern const void* const kIsNTPProcessKey;
 
 // Returns whether Google is selected as the default search engine.
 bool DefaultSearchProviderIsGoogle(Profile* profile);
@@ -32,16 +24,6 @@ bool IsNTPOrRelatedURL(const GURL& url, Profile* profile);
 
 // Returns whether a |url| corresponds to a New Tab page.
 bool IsNTPURL(const GURL& url);
-
-// Returns true if the active navigation entry of |contents| is a New Tab page
-// rendered in an Instant process. This is the last committed entry if it
-// exists, and otherwise the visible entry.
-bool IsInstantNTP(content::WebContents* contents);
-
-// Same as IsInstantNTP but uses |nav_entry| to determine the URL for the page
-// instead of using the visible entry.
-bool NavEntryIsInstantNTP(content::WebContents* contents,
-                          content::NavigationEntry* nav_entry);
 
 // Returns true if |url| corresponds to a New Tab page that would get rendered
 // in an Instant process.
@@ -57,39 +39,8 @@ bool IsSplitViewNewTabPage(const GURL& url);
 // Returns the New Tab page URL for the given |profile|.
 GURL GetNewTabPageURL(Profile* profile);
 
-// Returns true if |url| should be rendered in the Instant renderer process.
-// Use this version for navigation URLs (before effective URL translation),
-// e.g. in GetEffectiveURL where the URL has not yet been converted to a
-// chrome-search:// site URL.
-bool ShouldAssignURLToInstantRenderer(const GURL& url, Profile* profile);
-
-// Returns true if |security_principal| instance should be rendered in the
-// Instant renderer process. Use this version when working with SiteInstances
-// or SecurityPrincipal(after effective URL translation), where instant URLs
-// have already been converted to chrome-search:// scheme.
-bool ShouldAssignSecurityPrincipalToInstantRenderer(
-    const content::SecurityPrincipal& security_principal,
-    Profile* profile);
-
-// Returns the "effective URL" based on the input |url|. |url| must be an
-// Instant URL, i.e. ShouldAssignURLToInstantRenderer must return true. The
-// returned URL facilitates grouping process-per-site. The |url| is transformed,
-// for example, from
-//
-//   https://www.google.com/search?espv=1&q=tractors
-//
-// to the privileged URL
-//
-//   chrome-search://www.google.com/search?espv=1&q=tractors
-//
-// Notice the scheme change.
-//
-// If the input is already a privileged URL then std::nullopt is returned.
-std::optional<GURL> GetEffectiveURLForInstant(const GURL& url,
-                                              Profile* profile);
-
 // Rewrites |url| to the actual NTP URL to use if
-//   1. |url| is "chrome://newtab" or starts with "chrome-search://local-ntp",
+//   1. |url| is "chrome://newtab",
 //   2. InstantExtended is enabled, and
 //   3. |browser_context| doesn't correspond to an incognito profile.
 // chrome://new-tab-page or chrome://new-tab-page-third-party to handle

@@ -17,7 +17,6 @@
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
@@ -154,9 +153,6 @@ bool IsValidBookmarkDropLocation(
 
 GURL GetURLToBookmark(content::WebContents* web_contents) {
   DCHECK(web_contents);
-  if (search::IsInstantNTP(web_contents)) {
-    return GURL(kChromeUINewTabURL);
-  }
   // Users cannot bookmark Reader Mode pages directly, so the bookmark
   // interaction is as if it were with the original page.
   if (dom_distiller::url_utils::IsDistilledPage(

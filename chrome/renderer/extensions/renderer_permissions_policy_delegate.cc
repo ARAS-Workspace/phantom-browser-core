@@ -7,7 +7,6 @@
 #include "base/command_line.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/extensions/extension_constants.h"
-#include "chrome/renderer/process_state.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extensions_client.h"
 #include "extensions/common/manifest_constants.h"
@@ -35,12 +34,6 @@ bool RendererPermissionsPolicyDelegate::IsRestrictedUrl(
     return true;
   }
 
-  if (process_state::IsInstantProcess()) {
-    if (error) {
-      *error = errors::kCannotScriptNtp;
-    }
-    return true;
-  }
   return false;
 }
 

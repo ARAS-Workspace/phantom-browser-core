@@ -194,9 +194,6 @@ BASE_FEATURE(kHttpsFirstModeIncognito, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIncomingCallNotifications,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// A feature that controls whether Instant uses a spare renderer.
-BASE_FEATURE(kInstantUsesSpareRenderer, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enables Isolated Web App Developer Mode, which allows developers to
 // install untrusted Isolated Web Apps.
 BASE_FEATURE(kIsolatedWebAppDevMode, base::FEATURE_DISABLED_BY_DEFAULT);

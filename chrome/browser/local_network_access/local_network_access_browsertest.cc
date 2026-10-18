@@ -295,23 +295,6 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest, SpecialSchemeDevtools) {
   EXPECT_TRUE(nav_manager.was_successful());
 }
 
-// This test verifies that the chrome-search:// scheme is considered loopback
-// for the purpose of Local Network Access.
-IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest,
-                       SpecialSchemeChromeSearch) {
-  EXPECT_TRUE(content::NavigateToURL(
-      web_contents(), GURL("chrome-search://theme/current-channel-logo")));
-  ASSERT_TRUE(
-      web_contents()->GetPrimaryMainFrame()->GetLastCommittedURL().SchemeIs(
-          chrome::kChromeSearchScheme));
-
-  GURL fetch_url = https_server().GetURL("/cors-ok.txt");
-
-  EXPECT_EQ(true, content::EvalJs(web_contents(), FetchScript(fetch_url),
-                                  content::EXECUTE_SCRIPT_DEFAULT_OPTIONS,
-                                  content::ISOLATED_WORLD_ID_CONTENT_END));
-}
-
 // This test verifies that the chrome-extension:// scheme is considered local
 // for the purpose of Local Network Access.
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest,

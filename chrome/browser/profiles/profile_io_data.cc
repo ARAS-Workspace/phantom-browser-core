@@ -47,7 +47,6 @@ bool ProfileIOData::IsHandledProtocol(std::string_view scheme) {
       url::kAboutScheme,
       url::kBlobScheme,
       url::kFileSystemScheme,
-      chrome::kChromeSearchScheme,
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       webapps::kIsolatedAppScheme,
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

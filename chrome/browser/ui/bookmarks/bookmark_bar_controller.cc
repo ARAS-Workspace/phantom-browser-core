@@ -9,7 +9,6 @@
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/bookmarks/bookmark_utils.h"
 #include "chrome/browser/ui/browser.h"
@@ -58,8 +57,7 @@ bool IsShowingNTP(content::WebContents* web_contents) {
   }
   const GURL& url = entry->GetURL();
   return NewTabUI::IsNewTab(url) ||
-         NewTabPageThirdPartyUI::IsNewTabPageOrigin(url) ||
-         search::NavEntryIsInstantNTP(web_contents, entry);
+         NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
 }
 
 }  // namespace

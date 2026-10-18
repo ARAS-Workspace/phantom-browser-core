@@ -420,12 +420,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   WebSecurityPolicy::RegisterURLSchemeAsNotAllowingJavascriptURLs(
       native_scheme);
 
-  // chrome-search: and chrome-distiller: pages  should not be accessible by
-  // normal content, and should also be unable to script anything but themselves
-  // (to help limit the damage that a corrupt page could cause).
-  WebString chrome_search_scheme(
-      WebString::FromAscii(chrome::kChromeSearchScheme));
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // IWAs can be enabled by either the feature flag or by enterprise
   // policy. In either case the kEnableIsolatedWebAppsInRenderer flag is passed
@@ -447,31 +441,9 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-  // The Instant process can only display the content but not read it. Other
-  // processes can't display it or read it. (see http://crbug.com/40309067 for
-  // more context on why chrome-search scheme registration is skipped for the
-  // instant process).
-  // TODO(crbug.com/40309067): When kInstantUsesSpareRenderer is shipped, the
-  // kInstantProcess command-line switch and all code that depends on it will be
-  // removed. Remove this display-isolation policy block as part of that
-  // cleanup.
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  bool should_restrict_chrome_search_scheme =
-      !command_line->HasSwitch(switches::kInstantProcess);
-
-  // If the feature is enabled, the `kInstantProcess` command line switch is
-  // replaced by the `is_instant_process` flag, which is set later. As a result,
-  // we cannot perform chrome-search scheme registration at this stage. This
-  // registration will instead be handled in
-  // `SetConfigurationOnProcessLockUpdate()` where the instant process flag
-  // has been set.
-  if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
-    should_restrict_chrome_search_scheme = false;
-  }
-  if (should_restrict_chrome_search_scheme) {
-    WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(chrome_search_scheme);
-  }
-
+  // chrome-distiller: pages should not be accessible by normal content, and
+  // should also be unable to script anything but themselves (to help limit
+  // the damage that a corrupt page could cause).
   WebString dom_distiller_scheme(
       WebString::FromAscii(dom_distiller::kDomDistillerScheme));
   // TODO(nyquist): Add test to ensure this happens when the flag is set.
@@ -488,11 +460,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
 #endif
   }
 #endif
-
-  // chrome-search: pages should not be accessible by bookmarklets
-  // or javascript: URLs typed in the omnibox.
-  WebSecurityPolicy::RegisterURLSchemeAsNotAllowingJavascriptURLs(
-      chrome_search_scheme);
 
   for (auto& scheme :
        secure_origin_allowlist::GetSchemesBypassingSecureContextCheck()) {

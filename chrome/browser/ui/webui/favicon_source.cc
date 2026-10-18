@@ -35,7 +35,6 @@
 #include "ui/resources/grit/ui_resources.h"
 #include "url/gurl.h"
 
-#include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
 
 namespace {
@@ -224,18 +223,6 @@ bool FaviconSource::ShouldReplaceExistingSource() {
   // Leave the existing DataSource in place, otherwise we'll drop any pending
   // requests on the floor.
   return false;
-}
-
-bool FaviconSource::ShouldServiceRequest(
-    const GURL& url,
-    content::BrowserContext* browser_context,
-    int render_process_id) {
-  if (url.SchemeIs(chrome::kChromeSearchScheme)) {
-    return InstantService::ShouldServiceRequest(url, browser_context,
-                                                render_process_id);
-  }
-  return URLDataSource::ShouldServiceRequest(url, browser_context,
-                                             render_process_id);
 }
 
 ui::NativeTheme* FaviconSource::GetNativeTheme(

@@ -50,7 +50,6 @@ TEST(ChromeContentClientTest, AdditionalSchemes) {
       // The schemes below are registered as secure (but not as no-access).
       "chrome://foo/",
       "chrome-untrusted://foo/",
-      "chrome-search://foo/",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "isolated-app://foo/",
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -66,6 +65,10 @@ TEST(ChromeContentClientTest, AdditionalSchemes) {
         std::ranges::contains(url::GetSecureSchemes(), url.GetScheme()));
     EXPECT_TRUE(network::IsUrlPotentiallyTrustworthy(url));
   }
+
+  // chrome-search: is not registered by the Chrome layer.
+  EXPECT_FALSE(url::IsStandard("chrome-search"));
+  EXPECT_FALSE(std::ranges::contains(url::GetSecureSchemes(), "chrome-search"));
 
   GURL chrome_url(content::GetWebUIURL("dummyurl"));
   EXPECT_TRUE(network::IsUrlPotentiallyTrustworthy(chrome_url));

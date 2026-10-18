@@ -710,15 +710,6 @@ void ChromeExtensionsBrowserClient::SignalContentScriptsLoaded(
   user_script_listener_->OnScriptsLoaded(context);
 }
 
-bool ChromeExtensionsBrowserClient::ShouldSchemeBypassNavigationChecks(
-    const std::string& scheme) const {
-  if (scheme == chrome::kChromeSearchScheme) {
-    return true;
-  }
-
-  return ExtensionsBrowserClient::ShouldSchemeBypassNavigationChecks(scheme);
-}
-
 bool ChromeExtensionsBrowserClient::IsDefaultSearchEngineRedirect(
     content::BrowserContext* context,
     const GURL& request_url,

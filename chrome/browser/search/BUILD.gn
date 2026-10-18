@@ -27,14 +27,6 @@ source_set("search") {
     "//content/public/browser",
     "//url",
   ]
-  sources += [
-    "instant_service.cc",
-    "instant_service.h",
-    "instant_service_factory.cc",
-    "instant_service_factory.h",
-    "search_engine_base_url_tracker.cc",
-    "search_engine_base_url_tracker.h",
-  ]
   public_deps += [
     "//base",
     "//chrome/browser/ntp_tiles",
@@ -55,10 +47,8 @@ source_set("search") {
   deps += [
     "//chrome/app/theme:theme_resources",
     "//chrome/app/theme:theme_resources_grit",
-    "//chrome/browser/ui/webui:theme_source",
     "//chrome/common:constants",
     "//chrome/common:non_code_constants",
-    "//components/favicon_base",
     "//components/page_image_service/mojom:mojo_bindings",
     "//components/policy:generated",
     "//components/policy:policy_code_generate",
@@ -70,11 +60,6 @@ source_set("search") {
     "//ui/base",
     "//ui/gfx:color_utils",
   ]
-
-  # InstantService constructs ThemeSource while theme_source.cc includes
-  # instant_service.h (InstantService::ShouldServiceRequest) — a genuine
-  # bidirectional pair, with the real dep edge owned here.
-  allow_circular_includes_from = [ "//chrome/browser/ui/webui:theme_source" ]
 }
 
 source_set("unit_tests") {
@@ -105,30 +90,6 @@ source_set("unit_tests") {
   ]
 }
 
-source_set("test_support") {
-  testonly = true
-
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-  sources = [
-    "instant_browsertest_base.cc",
-    "instant_browsertest_base.h",
-  ]
-
-  public_deps = [ "//chrome/test:test_support_ui" ]
-
-  deps = [
-    ":search",
-    "//base",
-    "//chrome/browser/profiles:profile",
-    "//chrome/browser/search_engines",
-    "//chrome/browser/ui",
-    "//chrome/test:test_support",
-    "//content/test:test_support",
-    "//testing/gtest",
-  ]
-}
-
 source_set("browser_tests") {
   testonly = true
 
@@ -138,12 +99,10 @@ source_set("browser_tests") {
     "background/wallpaper_search/wallpaper_search_browsertest.cc",
     "ntp_custom_background_enabled_policy_handler_browsertest.cc",
     "search_browsertest.cc",
-    "search_engine_base_url_tracker_browsertest.cc",
   ]
 
   deps = [
     ":search",
-    ":test_support",
     "//base",
     "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/search/background",

@@ -232,7 +232,6 @@ if (enable_extensions_core || enable_webui_ntp ||
       "//chrome/browser/favicon",
       "//chrome/browser/history",
       "//chrome/browser/profiles:profile",
-      "//chrome/browser/search",
       "//chrome/browser/search_engines",
       "//chrome/common",
       "//components/favicon_base",
@@ -252,11 +251,6 @@ if (enable_extensions_core || enable_webui_ntp ||
     if (is_mac || is_linux) {
       deps += [ "//chrome/browser/ui/webui/util" ]
     }
-
-    # InstantService (//chrome/browser/search) constructs FaviconSource, so it
-    # includes favicon_source.h while FaviconSource calls
-    # InstantService::ShouldServiceRequest() — a genuine bidirectional pair.
-    allow_circular_includes_from = [ "//chrome/browser/search" ]
   }
 }
 
@@ -326,12 +320,29 @@ source_set("theme_source") {
     "//chrome/browser/themes",
     "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
   ]
+}
 
-  # ThemeSource uses InstantService::ShouldServiceRequest() and InstantService
-  # (//chrome/browser/search) constructs ThemeSource — a genuine
-  # bidirectional pair. //chrome/browser/search owns the real dep edge and the
-  # corresponding allow_circular_includes_from, since search transitively
-  # reaches theme_source via the NTP targets.
+source_set("theme_favicon_source_service") {
+  sources = [
+    "theme_favicon_source_service.cc",
+    "theme_favicon_source_service_factory.cc",
+  ]
+  public = [
+    "theme_favicon_source_service.h",
+    "theme_favicon_source_service_factory.h",
+  ]
+  public_deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//components/keyed_service/core",
+  ]
+  deps = [
+    ":favicon_source",
+    ":theme_source",
+    "//chrome/browser/themes",
+    "//components/favicon_base",
+    "//content/public/browser",
+  ]
 }
 
 source_set("theme_handler") {

@@ -266,7 +266,6 @@
 #include "chrome/browser/record_replay/task_service_factory.h"
 #include "chrome/browser/record_replay/task_store_factory.h"
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/storage/storage_notification_service_factory.h"
 #include "chrome/browser/ui/browser_manager_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
@@ -275,6 +274,7 @@
 #include "chrome/browser/ui/waap/initial_webui_profile_service_factory.h"
 #include "chrome/browser/ui/waap/waap_ui_metrics_service_factory.h"
 #include "chrome/browser/ui/webui/theme_colors_source_manager_factory.h"
+#include "chrome/browser/ui/webui/theme_favicon_source_service_factory.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service_factory.h"
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
@@ -574,7 +574,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ImmediateRequestRateLimiterFactory::GetInstance();
   InMemoryURLIndexFactory::GetInstance();
   visited_url_ranking::VisitedURLRankingServiceFactory::GetInstance();
-  InstantServiceFactory::GetInstance();
   LanguageModelManagerFactory::GetInstance();
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
@@ -738,6 +737,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   TemplateURLServiceFactory::GetInstance();
   tips::TipsServiceFactory::GetInstance();
   ThemeColorsSourceManagerFactory::GetInstance();
+  ThemeFaviconSourceServiceFactory::GetInstance();
   ThemeServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   ToolbarActionsModelFactory::GetInstance();

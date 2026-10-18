@@ -708,7 +708,7 @@ class OmniboxEditModel {
   void NotifyObserversInputInProgress(bool in_progress);
 
   // If focus_state_ does not match |state|, we update it and notify the
-  // InstantController about the change (passing along the |reason| for the
+  // omnibox client about the change (passing along the |reason| for the
   // change). If the caret visibility changes, we call ApplyCaretVisibility() on
   // the view.
   void SetFocusState(OmniboxFocusState state, OmniboxFocusChangeReason reason);

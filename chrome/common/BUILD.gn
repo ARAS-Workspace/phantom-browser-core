@@ -136,8 +136,6 @@ static_library("common_lib") {
     "pref_names_util.cc",
     "pref_names_util.h",
     "ref_counted_util.h",
-    "search/instant_types.cc",
-    "search/instant_types.h",
     "search/ntp_logging_events.h",
     "secure_origin_allowlist.cc",
     "secure_origin_allowlist.h",

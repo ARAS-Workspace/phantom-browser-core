@@ -329,7 +329,6 @@
 #include "extensions/common/switches.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "gpu/config/gpu_switches.h"
-#include "ipc/ipc_channel_proxy.h"
 #include "media/base/media_switches.h"
 #include "media/media_buildflags.h"
 #include "media/mojo/buildflags.h"
@@ -405,8 +404,6 @@
 #include "chrome/browser/metrics/usage_scenario/chrome_responsiveness_calculator_delegate.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
 #include "chrome/browser/screen_ai/screen_ai_install_state.h"
-#include "chrome/browser/search/instant_service.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -417,6 +414,7 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/waap/waap_utils.h"
 #include "chrome/browser/ui/webui/chrome_content_browser_client_webui_part.h"
+#include "chrome/browser/ui/webui/theme_favicon_source_service_factory.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
 #include "chrome/browser/web_applications/isolated_web_apps/chrome_content_browser_client_isolated_web_apps_part.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_error_page.h"
@@ -818,15 +816,6 @@ GetNoStatePrefetchCanceler(
       ->AddNoStatePrefetchCancelerReceiver(
           canceler.InitWithNewPipeAndPassReceiver());
   return canceler;
-}
-
-mojo::AssociatedRemote<chrome::mojom::RendererConfiguration>
-GetRendererConfiguration(content::RenderProcessHost* render_process_host) {
-  IPC::ChannelProxy* channel = render_process_host->GetChannel();
-  mojo::AssociatedRemote<chrome::mojom::RendererConfiguration>
-      renderer_configuration;
-  channel->GetRemoteAssociatedInterface(&renderer_configuration);
-  return renderer_configuration;
 }
 
 bool ShouldHonorPolicies() {
@@ -1413,14 +1402,6 @@ std::optional<GURL> ChromeContentBrowserClient::GetEffectiveURL(
     return std::nullopt;
   }
 
-  // If the input |url| should be assigned to the Instant renderer, make its
-  // effective URL distinct from other URLs on the search provider's domain.
-  // This needs to happen even if |url| corresponds to an isolated origin; see
-  // https://crbug.com/41339429.
-  if (search::ShouldAssignURLToInstantRenderer(url, profile)) {
-    return search::GetEffectiveURLForInstant(url, profile);
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (ChromeContentBrowserClientExtensionsPart::AreExtensionsDisabledForProfile(
           profile)) {
@@ -1432,32 +1413,6 @@ std::optional<GURL> ChromeContentBrowserClient::GetEffectiveURL(
 #else
   return std::nullopt;
 #endif
-}
-
-void ChromeContentBrowserClient::OnRendererProcessLockedStateUpdated(
-    content::RenderProcessHost* host,
-    const GURL& site_url) {
-  // If the feature `kInstantUsesSpareRenderer` is not enabled, we continue
-  // relying on the `kInstantProcess` command line switch to handle instant
-  // process related logic.
-  if (!base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
-    return;
-  }
-  Profile* profile = Profile::FromBrowserContext(host->GetBrowserContext());
-  const bool is_instant_process =
-      search::ShouldAssignURLToInstantRenderer(site_url, profile);
-  if (is_instant_process) {
-    // Grant commit scheme access to chrome-search for instant processes.
-    // Browser-side enforcement ensures non-instant processes cannot access
-    // chrome-search URLs.
-    content::ChildProcessSecurityPolicy::GetInstance()->GrantCommitScheme(
-        host->GetDeprecatedID(), chrome::kChromeSearchScheme);
-  }
-  chrome::mojom::StaticParamsPtr params = chrome::mojom::StaticParams::New();
-  params->is_instant_process = is_instant_process;
-  auto renderer_configuration = GetRendererConfiguration(host);
-  renderer_configuration->SetConfigurationOnProcessLockUpdate(
-      std::move(params));
 }
 
 bool ChromeContentBrowserClient::
@@ -1571,23 +1526,6 @@ bool ChromeContentBrowserClient::ShouldUseSpareRenderProcessHost(
   Profile* profile = Profile::FromBrowserContext(browser_context);
   if (!profile) {
     refused_reason = SpareProcessRefusedByEmbedderReason::NoProfile;
-    return false;
-  }
-
-  // Instant renderers passed by command line should not use a spare process,
-  // because they require passing switches::kInstantProcess to the renderer
-  // process when it launches. A spare process is launched earlier, before
-  // it is known which navigation will use it, so it lacks this flag. But
-  // with the feature kInstantUsesSpareRenderer enabled, the instant process
-  // is passed later in ProcessLock status changed, we can pass the flag
-  // to spare process.
-  if (search::ShouldAssignURLToInstantRenderer(site_url, profile) &&
-      !base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
-    // The NTP page chrome://new-tab-page and chrome://new-tab-page-third-party
-    // are using WebUI and will not use instant renderer.
-    // The only usecase is chrome-search:// URLs.
-    refused_reason =
-        SpareProcessRefusedByEmbedderReason::InstantRendererForNewTabPage;
     return false;
   }
 
@@ -1705,7 +1643,6 @@ void ChromeContentBrowserClient::OverrideURLLoaderFactoryParams(
 // view-source is allowed for these schemes.
 void ChromeContentBrowserClient::GetAdditionalWebUISchemes(
     std::vector<std::string>* additional_schemes) {
-  additional_schemes->emplace_back(chrome::kChromeSearchScheme);
   additional_schemes->emplace_back(dom_distiller::kDomDistillerScheme);
   additional_schemes->emplace_back(content::kChromeDevToolsScheme);
 }
@@ -1728,9 +1665,6 @@ void ChromeContentBrowserClient::GetAdditionalViewSourceSchemes(
 
 network::mojom::IPAddressSpace
 ChromeContentBrowserClient::DetermineAddressSpaceFromURL(const GURL& url) {
-  if (url.SchemeIs(chrome::kChromeSearchScheme)) {
-    return network::mojom::IPAddressSpace::kLoopback;
-  }
   if (url.SchemeIs(dom_distiller::kDomDistillerScheme)) {
     return network::mojom::IPAddressSpace::kPublic;
   }
@@ -1869,31 +1803,6 @@ bool ChromeContentBrowserClient::IsSuitableHost(
     return true;
   }
 
-  // Instant URLs should only be in the instant process and instant process
-  // should only have Instant URLs.
-  InstantService* instant_service =
-      InstantServiceFactory::GetForProfile(profile);
-  if (instant_service) {
-    bool is_instant_process =
-        instant_service->IsInstantProcess(process_host->GetDeprecatedID());
-    bool should_be_in_instant_process =
-        search::ShouldAssignSecurityPrincipalToInstantRenderer(
-            security_principal, profile);
-    if (is_instant_process) {
-      return should_be_in_instant_process;
-    }
-    if (should_be_in_instant_process) {
-      // If the host is a spare process that was used for instant URLs,
-      // `IsInstantProcess` is false as `InstantService::AddInstantProcess`
-      // hasn't been called yet. In this case, it's safe to allow the site
-      // to be in the spare process.
-      bool is_spare_taken =
-          (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer) &&
-           process_host->HostHasNotBeenUsed());
-      return is_instant_process || is_spare_taken;
-    }
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   return ChromeContentBrowserClientExtensionsPart::IsSuitableHost(
       profile, process_host, security_principal);
@@ -1973,16 +1882,6 @@ bool ChromeContentBrowserClient::ShouldEmbeddedFramesTryToReuseExistingProcess(
 #endif
 }
 
-namespace {
-
-class NTPUserData : public base::SupportsUserData::Data {
- public:
-  NTPUserData() = default;
-  ~NTPUserData() override = default;
-};
-
-}  // namespace
-
 void ChromeContentBrowserClient::SiteInstanceGotProcessAndSite(
     SiteInstance* site_instance) {
   CHECK(site_instance->HasProcess());
@@ -1991,24 +1890,6 @@ void ChromeContentBrowserClient::SiteInstanceGotProcessAndSite(
       Profile::FromBrowserContext(site_instance->GetBrowserContext());
   if (!profile) {
     return;
-  }
-
-  const GURL& site_url =
-      site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL();
-  if (search::IsNTPURL(site_url)) {
-    site_instance->GetProcess()->SetUserData(search::kIsNTPProcessKey,
-                                             std::make_unique<NTPUserData>());
-  }
-
-  // Remember the ID of the Instant process to signal the renderer process
-  // on startup in |AppendExtraCommandLineSwitches| below.
-  if (search::ShouldAssignSecurityPrincipalToInstantRenderer(
-          site_instance->GetSecurityPrincipal(), profile)) {
-    InstantService* instant_service =
-        InstantServiceFactory::GetForProfile(profile);
-    if (instant_service) {
-      instant_service->AddInstantProcess(site_instance->GetProcess());
-    }
   }
 
   for (auto& part : extra_parts_) {
@@ -2435,13 +2316,9 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
             blink::switches::kDisableReduceAcceptLanguage);
       }
 
-      InstantService* instant_service =
-          InstantServiceFactory::GetForProfile(profile);
-      if (instant_service &&
-          instant_service->IsInstantProcess(process->GetDeprecatedID()) &&
-          !base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
-        command_line->AppendSwitch(switches::kInstantProcess);
-      }
+      // ThemeFaviconSourceService adds the theme and favicon data sources of
+      // the profile.
+      ThemeFaviconSourceServiceFactory::GetForProfile(profile);
 
       // Enable SharedArrayBuffer on desktop if allowed by Enterprise Policy.
       // TODO(crbug.com/40155376) Remove when migration to COOP+COEP is
@@ -4719,26 +4596,10 @@ void InitializeFileURLLoaderFactoryForExtension(
   }
 }
 void AddChromeSchemeFactories(
-    int render_process_id,
     content::RenderFrameHost* frame_host,
     content::WebContents* web_contents,
     const extensions::Extension* extension,
     ChromeContentBrowserClient::NonNetworkURLLoaderFactoryMap* factories) {
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  InstantService* instant_service =
-      InstantServiceFactory::GetForProfile(profile);
-  // Instant renderer processes can load chrome-search: subresources.
-  //
-  // InstantService might be null for some irregular profiles, e.g. the System
-  // Profile.
-  if (instant_service && instant_service->IsInstantProcess(render_process_id)) {
-    factories->emplace(chrome::kChromeSearchScheme,
-                       content::CreateWebUIURLLoaderFactory(
-                           frame_host, chrome::kChromeSearchScheme,
-                           /*allowed_hosts=*/base::flat_set<std::string>()));
-  }
-
   extensions::ExtensionWebContentsObserver* web_observer =
       extensions::ExtensionWebContentsObserver::GetForWebContents(web_contents);
 
@@ -4855,8 +4716,7 @@ void ChromeContentBrowserClient::
   // This logic should match
   // ChromeExtensionWebContentsObserver::RenderFrameCreated.
   if (web_contents) {
-    AddChromeSchemeFactories(render_process_id, frame_host, web_contents,
-                             extension, factories);
+    AddChromeSchemeFactories(frame_host, web_contents, extension, factories);
   } else {
     AddChromeSchemeFactoriesForWorker(browser_context, request_initiator_origin,
                                       factories);

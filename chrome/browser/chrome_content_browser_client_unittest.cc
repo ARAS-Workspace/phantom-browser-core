@@ -1255,29 +1255,10 @@ TEST_F(ChromeContentBrowserClientTest, ShouldUseSpareRenderProcessHost) {
       nullptr, GURL("https://www.example.com"), refused_reason));
   EXPECT_EQ(SpareProcessRefusedByEmbedderReason::NoProfile, refused_reason);
 
-  {
-    // Disable kInstantUsesSpareRenderer flag to verify
-    // that Chrome-search URLs are not using the spare renderer.
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndDisableFeature(
-        features::kInstantUsesSpareRenderer);
-    // Chrome-search URL
-    EXPECT_FALSE(browser_client.ShouldUseSpareRenderProcessHost(
-        &profile_, GURL("chrome-search://test"), refused_reason));
-    EXPECT_EQ(SpareProcessRefusedByEmbedderReason::InstantRendererForNewTabPage,
-              refused_reason);
-  }
-  {
-    // Enable kInstantUsesSpareRenderer flag to verify
-    // that Chrome-search URLs can use the spare renderer.
-    base::test::ScopedFeatureList scoped_feature_list;
-    scoped_feature_list.InitAndEnableFeature(
-        features::kInstantUsesSpareRenderer);
-    // Chrome-search URL
-    EXPECT_TRUE(browser_client.ShouldUseSpareRenderProcessHost(
-        &profile_, GURL("chrome-search://test"), refused_reason));
-    EXPECT_FALSE(refused_reason.has_value());
-  }
+  // chrome-search: URLs are not Instant URLs and can use the spare renderer.
+  EXPECT_TRUE(browser_client.ShouldUseSpareRenderProcessHost(
+      &profile_, GURL("chrome-search://test"), refused_reason));
+  EXPECT_FALSE(refused_reason.has_value());
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // Extension URL

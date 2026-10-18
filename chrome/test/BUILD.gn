@@ -1012,7 +1012,6 @@ test("browser_tests") {
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/search",
     "//chrome/browser/search:browser_tests",
-    "//chrome/browser/search:test_support",
     "//chrome/browser/search_engines",
     "//chrome/browser/search_engines:browser_tests",
     "//chrome/browser/segmentation_platform:test_utils",
@@ -1666,7 +1665,6 @@ test("browser_tests") {
     "../browser/ui/browser_command_controller_browsertest.cc",
     "../browser/ui/browser_commands_browsertest.cc",
     "../browser/ui/browser_finder_browsertest.cc",
-    "../browser/ui/browser_instant_controller_browsertest.cc",
     "../browser/ui/browser_tab_strip_model_delegate_browsertest.cc",
     "../browser/ui/browser_tabrestore_browsertest.cc",
     "../browser/ui/native_window_tracker_browsertest.cc",
@@ -2337,7 +2335,6 @@ test("browser_tests") {
   deps += [
     "//chrome/browser/signin:signin_browser_test_base",
     "//chrome/browser/ui:breadcrumb_manager_browser_agent",
-    "//chrome/browser/ui:browser_instant_controller",
     "//chrome/browser/ui:chrome_pages",
   ]
 }

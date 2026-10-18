@@ -6,9 +6,9 @@
 
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/omnibox/omnibox_tab_helper.h"
+#include "chrome/browser/ui/webui/theme_favicon_source_service_factory.h"
 #include "chrome/common/url_constants.h"
 #include "components/search/search.h"
 #include "components/strings/grit/components_strings.h"
@@ -63,8 +63,9 @@ SearchTabHelper::SearchTabHelper(content::WebContents* web_contents)
       content::WebContentsUserData<SearchTabHelper>(*web_contents) {
   DCHECK(search::IsInstantExtendedAPIEnabled());
 
-  // InstantService adds the theme and favicon data sources of the profile.
-  InstantServiceFactory::GetForProfile(profile());
+  // ThemeFaviconSourceService adds the theme and favicon data sources of the
+  // profile.
+  ThemeFaviconSourceServiceFactory::GetForProfile(profile());
 
   OmniboxTabHelper::CreateForWebContents(web_contents, profile());
 }

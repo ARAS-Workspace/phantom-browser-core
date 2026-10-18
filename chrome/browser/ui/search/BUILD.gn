@@ -19,7 +19,6 @@ source_set("search") {
     "//content/public/browser",
   ]
   sources += [
-    "chrome_search_navigation_throttle.h",
     "omnibox_utils.h",
     "search_tab_helper.h",
   ]
@@ -49,8 +48,6 @@ source_set("impl") {
     "//components/search",
   ]
   sources += [
-    "chrome_search_navigation_throttle.cc",
-
     # The two files below cause circular dependencies against //c/b:b or
     # //c/b/ui:ui.
     "omnibox_utils.cc",
@@ -71,6 +68,7 @@ source_set("impl") {
     "//chrome/browser/ui/tab_contents",
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/webui:theme_favicon_source_service",
     "//components/bookmarks/browser",
     "//components/feature_engagement/public:feature_constants",
     "//components/navigation_metrics",
@@ -85,8 +83,6 @@ source_set("impl") {
 source_set("test_support_ui") {
   testonly = true
   sources = [
-    "instant_test_base.cc",
-    "instant_test_base.h",
     "ntp_test_utils.cc",
     "ntp_test_utils.h",
   ]
@@ -107,10 +103,7 @@ source_set("test_support_ui") {
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [
-    "new_tab_page_navigation_throttle_browsertest.cc",
-    "third_party_ntp_browsertest.cc",
-  ]
+  sources = [ "new_tab_page_navigation_throttle_browsertest.cc" ]
 
   public_deps = [ "//net:test_support" ]
   deps = [
@@ -137,7 +130,6 @@ source_set("browser_tests") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "chrome_search_navigation_throttle_unittest.cc",
     "most_visited_metrics_logger_unittest.cc",
     "ntp_user_data_logger_unittest.cc",
   ]

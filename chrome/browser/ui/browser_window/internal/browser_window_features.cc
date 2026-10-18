@@ -35,7 +35,6 @@
 #include "chrome/browser/ui/browser_content_setting_bubble_model_delegate.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_init_state.h"
-#include "chrome/browser/ui/browser_instant_controller.h"
 #include "chrome/browser/ui/browser_live_tab_context.h"
 #include "chrome/browser/ui/browser_location_bar_model_delegate.h"
 #include "chrome/browser/ui/browser_select_file_dialog_controller.h"
@@ -157,7 +156,6 @@
 #include "components/profile_metrics/browser_profile_type.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/search/ntp_features.h"
-#include "components/search/search.h"
 #include "content/public/common/content_constants.h"
 #include "extensions/common/extension_features.h"
 #include "ui/views/interaction/element_highlighter_views.h"
@@ -473,11 +471,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   // into consideration buildflags, repeating buildflags is ok):
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
     initial_web_ui_manager_ = std::make_unique<InitialWebUIManager>(browser);
-
-    if (search::IsInstantExtendedAPIEnabled()) {
-      instant_controller_ = std::make_unique<BrowserInstantController>(
-          profile, browser->GetTabStripModel());
-    }
 
     if (profile->IsRegularProfile() &&
         browser->GetTabStripModel()->SupportsTabGroups() &&

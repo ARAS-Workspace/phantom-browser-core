@@ -14,8 +14,6 @@
 #include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
-#include "chrome/browser/search/instant_service.h"
-#include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
@@ -29,14 +27,8 @@
 #include "components/search_engines/template_url_service.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
-#include "content/public/browser/render_frame_host.h"
-#include "content/public/browser/render_process_host.h"
-#include "content/public/browser/render_view_host.h"
-#include "content/public/browser/site_instance.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/browser_test_utils.h"
-#include "content/public/test/test_navigation_observer.h"
 #include "content/public/test/test_utils.h"
 #include "content/public/test/url_loader_interceptor.h"
 #include "content/public/test/web_contents_tester.h"
@@ -121,44 +113,6 @@ class SearchTest : public MixinBasedInProcessBrowserTest {
     template_url_service->SetUserSelectedDefaultSearchProvider(template_url);
   }
 
-  bool InInstantProcess(content::WebContents* contents) {
-    InstantService* instant_service =
-        InstantServiceFactory::GetForProfile(profile());
-    return instant_service->IsInstantProcess(
-        contents->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID());
-  }
-
-  // Each test case represents a navigation to |start_url| followed by a
-  // navigation to |end_url|. We will check whether each navigation lands in an
-  // Instant process, and also whether the navigation from start to end re-uses
-  // the same SiteInstance, RenderViewHost, etc.
-  // Note that we need to define this here because the flags needed to check
-  // content::CanSameSiteMainFrameNavigationsChangeSiteInstances() etc might not
-  // be set yet if we define this immediately (e.g. outside of the test class).
-  struct ProcessIsolationTestCase {
-    const char* description;
-    const char* start_url;
-    bool start_in_instant_process;
-    const char* end_url;
-    bool end_in_instant_process;
-    bool same_site_instance;
-    bool same_rvh;
-    bool same_process;
-  };
-  const std::array<ProcessIsolationTestCase, 3> kProcessIsolationTestCases = {{
-      {"SRP -> SRP", "https://foo.com/url", false, "https://foo.com/url", false,
-       true,
-       !content::WillSameSiteNavigationChangeRenderFrameHosts(
-           /*is_main_frame=*/true),
-       true},
-      {"SRP -> Regular", "https://foo.com/url", false, "https://foo.com/other",
-       false, !content::CanSameSiteMainFrameNavigationsChangeSiteInstances(),
-       !content::CanSameSiteMainFrameNavigationsChangeRenderFrameHosts(), true},
-      {"Regular -> SRP", "https://foo.com/other", false, "https://foo.com/url",
-       false, !content::CanSameSiteMainFrameNavigationsChangeSiteInstances(),
-       !content::CanSameSiteMainFrameNavigationsChangeRenderFrameHosts(), true},
-  }};
-
  private:
   std::unique_ptr<content::URLLoaderInterceptor> url_loader_interceptor_;
 };
@@ -168,109 +122,6 @@ struct SearchTestCase {
   bool expected_result;
   const char* comment;
 };
-
-IN_PROC_BROWSER_TEST_F(SearchTest, ShouldAssignURLToInstantRenderer) {
-  // Only chrome-search: URLs (e.g. most-visited tiles) should be assigned to
-  // Instant renderers.
-  const auto kTestCases = std::to_array<SearchTestCase>({
-      {"chrome-search://most-visited/title.html?bar=abc", true,
-       "Most-visited tile"},
-      {"https://foo.com/instant", false, "Instant support was removed"},
-      {"https://foo.com/url", false, "Instant support was removed"},
-      {"https://foo.com/alt", false, "Instant support was removed"},
-      {"http://foo.com/instant", false, "Instant support was removed"},
-      {"https://foo.com/instant", false, "Instant support was removed"},
-      {"https://foo.com/", false, "Instant support was removed"},
-  });
-
-  for (size_t i = 0; i < std::size(kTestCases); ++i) {
-    const SearchTestCase& test = kTestCases[i];
-    EXPECT_EQ(test.expected_result,
-              ShouldAssignURLToInstantRenderer(GURL(test.url), profile()))
-        << test.url << " " << test.comment;
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(SearchTest, ProcessIsolation) {
-  for (size_t i = 0; i < std::size(kProcessIsolationTestCases); ++i) {
-    const ProcessIsolationTestCase& test = kProcessIsolationTestCases[i];
-    ASSERT_TRUE(
-        ui_test_utils::NavigateToURL(browser(), GURL("chrome://blank")));
-    content::WebContents* contents =
-        browser()->tab_strip_model()->GetActiveWebContents();
-
-    // Navigate to start URL.
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL(test.start_url)));
-    EXPECT_EQ(test.start_in_instant_process, InInstantProcess(contents))
-        << test.description;
-
-    // Save state.
-    const scoped_refptr<content::SiteInstance> start_site_instance =
-        contents->GetSiteInstance();
-    const content::RenderProcessHost* start_rph =
-        contents->GetPrimaryMainFrame()->GetProcess();
-    const content::RenderViewHost* start_rvh =
-        contents->GetPrimaryMainFrame()->GetRenderViewHost();
-
-    // Navigate to end URL.
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL(test.end_url)));
-
-    EXPECT_EQ(test.end_in_instant_process, InInstantProcess(contents))
-        << test.description;
-
-    EXPECT_EQ(test.same_site_instance,
-              start_site_instance.get() == contents->GetSiteInstance())
-        << test.description;
-    EXPECT_EQ(test.same_rvh,
-              start_rvh == contents->GetPrimaryMainFrame()->GetRenderViewHost())
-        << test.description;
-    EXPECT_EQ(test.same_process,
-              start_rph == contents->GetPrimaryMainFrame()->GetProcess())
-        << test.description;
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(SearchTest, ProcessIsolation_RendererInitiated) {
-  for (size_t i = 0; i < std::size(kProcessIsolationTestCases); ++i) {
-    const ProcessIsolationTestCase& test = kProcessIsolationTestCases[i];
-    ASSERT_TRUE(
-        ui_test_utils::NavigateToURL(browser(), GURL("chrome://blank")));
-    content::WebContents* contents =
-        browser()->tab_strip_model()->GetActiveWebContents();
-
-    // Navigate to start URL.
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL(test.start_url)));
-    EXPECT_EQ(test.start_in_instant_process, InInstantProcess(contents))
-        << test.description;
-
-    // Save state.
-    const scoped_refptr<content::SiteInstance> start_site_instance =
-        contents->GetSiteInstance();
-    const content::RenderProcessHost* start_rph =
-        contents->GetPrimaryMainFrame()->GetProcess();
-    const content::RenderViewHost* start_rvh =
-        contents->GetPrimaryMainFrame()->GetRenderViewHost();
-
-    // Navigate to end URL via a renderer-initiated navigation.
-    content::TestNavigationObserver observer(contents);
-    ASSERT_TRUE(content::ExecJs(
-        contents, content::JsReplace("location.href = $1;", test.end_url)));
-    observer.Wait();
-
-    EXPECT_EQ(test.end_in_instant_process, InInstantProcess(contents))
-        << test.description;
-
-    EXPECT_EQ(test.same_site_instance,
-              start_site_instance.get() == contents->GetSiteInstance())
-        << test.description;
-    EXPECT_EQ(test.same_rvh,
-              start_rvh == contents->GetPrimaryMainFrame()->GetRenderViewHost())
-        << test.description;
-    EXPECT_EQ(test.same_process,
-              start_rph == contents->GetPrimaryMainFrame()->GetProcess())
-        << test.description;
-  }
-}
 
 IN_PROC_BROWSER_TEST_F(SearchTest,
                        InstantCacheableNTPNavigationEntryNewProfile) {

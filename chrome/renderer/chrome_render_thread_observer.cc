@@ -144,14 +144,6 @@ void ChromeRenderThreadObserver::SetConfiguration(
   dynamic_params_ = std::move(params);
 }
 
-void ChromeRenderThreadObserver::SetConfigurationOnProcessLockUpdate(
-    chrome::mojom::StaticParamsPtr params) {
-  // Ensure static renderer configuration parameters are set once.
-  CHECK(!static_renderer_params_set_);
-  static_renderer_params_set_ = true;
-  process_state::SetIsInstantProcess(params->is_instant_process);
-}
-
 void ChromeRenderThreadObserver::OnRendererConfigurationAssociatedRequest(
     mojo::PendingAssociatedReceiver<chrome::mojom::RendererConfiguration>
         receiver) {

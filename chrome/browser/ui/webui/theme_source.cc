@@ -48,7 +48,6 @@
 #include "ui/gfx/image/image_skia_rep.h"
 #include "url/gurl.h"
 
-#include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/themes/browser_theme_pack.h"
 
 namespace {
@@ -160,17 +159,6 @@ std::string ThemeSource::GetMimeType(const GURL& url) {
 
 bool ThemeSource::AllowCaching() {
   return false;
-}
-
-bool ThemeSource::ShouldServiceRequest(const GURL& url,
-                                       content::BrowserContext* browser_context,
-                                       int render_process_id) {
-  if (url.SchemeIs(chrome::kChromeSearchScheme)) {
-    return InstantService::ShouldServiceRequest(url, browser_context,
-                                                render_process_id);
-  }
-  return URLDataSource::ShouldServiceRequest(url, browser_context,
-                                             render_process_id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -48,7 +48,6 @@
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/session_restore_delegate.h"
 #include "chrome/browser/sessions/session_service.h"
 #include "chrome/browser/sessions/session_service_factory.h"
@@ -124,8 +123,7 @@ bool HasSingleNewTabPage(BrowserWindowInterface* browser) {
   }
   content::WebContents* active_tab =
       browser->GetTabStripModel()->GetWebContentsAt(0);
-  return active_tab->GetURL() == chrome::ChromeUINewTabURLAsGURL() ||
-         search::IsInstantNTP(active_tab);
+  return active_tab->GetURL() == chrome::ChromeUINewTabURLAsGURL();
 }
 
 // Records the difference in the number of tabs and windows for a given type.

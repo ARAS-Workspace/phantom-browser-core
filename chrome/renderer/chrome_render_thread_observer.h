@@ -84,8 +84,6 @@ class ChromeRenderThreadObserver : public content::RenderThreadObserver,
       mojo::PendingRemote<chrome::mojom::BoundSessionRequestThrottledHandler>
           bound_session_request_throttled_handler) override;
   void SetConfiguration(chrome::mojom::DynamicParamsPtr params) override;
-  void SetConfigurationOnProcessLockUpdate(
-      chrome::mojom::StaticParamsPtr params) override;
   void OnRendererConfigurationAssociatedRequest(
       mojo::PendingAssociatedReceiver<chrome::mojom::RendererConfiguration>
           receiver);
@@ -101,8 +99,6 @@ class ChromeRenderThreadObserver : public content::RenderThreadObserver,
   chrome::mojom::DynamicParamsPtr dynamic_params_
       GUARDED_BY(dynamic_params_lock_);
   mutable base::Lock dynamic_params_lock_;
-
-  bool static_renderer_params_set_ = false;
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
   scoped_refptr<BoundSessionRequestThrottledInRendererManager>

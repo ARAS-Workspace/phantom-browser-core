@@ -34,7 +34,6 @@
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/search/instant_test_base.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/chrome_features.h"
@@ -291,8 +290,6 @@ class PrefersColorSchemeTest
     : public testing::WithParamInterface<std::tuple<bool, bool>>,
       public PrefersColorSchemeTestBase {
  public:
-  using PlatformBrowserTest::CreateIncognitoBrowser;
-
   BrowserWindowInterface* GetBrowser() { return GetBrowserWindowInterface(); }
 
   void SetUpOnMainThread() override {
@@ -399,33 +396,6 @@ IN_PROC_BROWSER_TEST_P(PrefersColorSchemeTest, FeatureOverridesChromeSchemes) {
              base::StringPrintf(
                  "window.matchMedia('(prefers-color-scheme: %s)').matches",
                  ExpectedColorScheme())));
-}
-
-// chrome-search:// is now recognized as WebUI by SecurityPrincipal::IsWebUI(),
-// so incognito pages with this scheme should follow the browser incognito mode
-// theme - always dark for incognito, not the OS theme(dark or light) or
-// browser theme.
-IN_PROC_BROWSER_TEST_P(PrefersColorSchemeTest, ChromeSearchTheme) {
-  // Open an incognito browser and navigate to search scheme.
-  Browser* incognito_browser =
-      CreateIncognitoBrowser(GetBrowser()->GetProfile());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      incognito_browser, GURL("chrome-search://theme/current-channel-logo")));
-
-  auto* tab_list = TabListInterface::From(incognito_browser);
-  ASSERT_TRUE(tab_list);
-  auto* incognito_ntp_web_contents = tab_list->GetActiveTab()->GetContents();
-  auto& security_principal = incognito_ntp_web_contents->GetPrimaryMainFrame()
-                                 ->GetSiteInstance()
-                                 ->GetSecurityPrincipal();
-
-  ASSERT_TRUE(security_principal.SchemeIs(chrome::kChromeSearchScheme));
-  ASSERT_TRUE(security_principal.IsWebUI());
-
-  EXPECT_EQ(
-      true,
-      EvalJs(incognito_ntp_web_contents,
-             "window.matchMedia('(prefers-color-scheme: dark)').matches"));
 }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -688,8 +658,7 @@ IN_PROC_BROWSER_TEST_F(ProtocolHandlerTest, HandlersIgnoredWhenDisabled) {
   EXPECT_EQ(u"about:blank", tab_title);
 }
 
-class KeepaliveDurationOnShutdownTest : public InProcessBrowserTest,
-                                        public InstantTestBase {
+class KeepaliveDurationOnShutdownTest : public InProcessBrowserTest {
  public:
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
@@ -1044,6 +1013,36 @@ IN_PROC_BROWSER_TEST_F(ChromeContentBrowserClientBrowserTest, OpenURL) {
   }
 
   EXPECT_EQ(previous_count + 2, browser()->tab_strip_model()->count());
+}
+
+// chrome-search: is not a registered scheme, so a browser-initiated
+// navigation to a chrome-search: URL does not commit.
+IN_PROC_BROWSER_TEST_F(ChromeContentBrowserClientBrowserTest,
+                       ChromeSearchSchemeNavigationDoesNotCommit) {
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  const GURL url("chrome-search://theme/current-channel-logo");
+  EXPECT_FALSE(content::NavigateToURL(web_contents, url));
+  EXPECT_NE(url, web_contents->GetPrimaryMainFrame()->GetLastCommittedURL());
+  EXPECT_FALSE(web_contents->GetPrimaryMainFrame()
+                   ->GetSiteInstance()
+                   ->GetSecurityPrincipal()
+                   .SchemeIs("chrome-search"));
+}
+
+// ThemeFaviconSourceService adds the theme and the legacy favicon data
+// sources of every profile, so they load before any WebUI that adds them
+// itself is opened.
+using ThemeFaviconSourceServiceBrowserTest = InProcessBrowserTest;
+
+IN_PROC_BROWSER_TEST_F(ThemeFaviconSourceServiceBrowserTest,
+                       ThemeAndLegacyFaviconSourcesLoad) {
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  EXPECT_TRUE(content::NavigateToURL(
+      web_contents, GURL("chrome://theme/current-channel-logo")));
+  EXPECT_TRUE(content::NavigateToURL(
+      web_contents, GURL("chrome://favicon/https://example.com/")));
 }
 
 }  // namespace

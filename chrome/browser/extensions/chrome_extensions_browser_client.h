@@ -206,8 +206,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
   network::mojom::NetworkContext* GetSystemNetworkContext() override;
   UserScriptListener* GetUserScriptListener() override;
   void SignalContentScriptsLoaded(content::BrowserContext* context) override;
-  bool ShouldSchemeBypassNavigationChecks(
-      const std::string& scheme) const override;
   bool IsDefaultSearchEngineRedirect(content::BrowserContext* context,
                                      const GURL& request_url,
                                      const GURL& redirect_url) const override;

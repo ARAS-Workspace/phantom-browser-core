@@ -199,7 +199,6 @@ ChromeMainDelegate::GetNonWildcardDomainNonPortSchemes() {
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
       extensions::kExtensionScheme,
 #endif
-      chrome::kChromeSearchScheme,
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       webapps::kIsolatedAppScheme,
 #endif

@@ -56,10 +56,6 @@
 -CrElementsTest.CrToast
 -CrElementsTest.CrToast__cr_toast_stop_and_restart_auto_hide_depending_when_toast_focus_changes
 
-# Flaky on Linux: crbug.com/483413078
--CrComponentsSearchboxTest.SearchboxFocusTest
--CrComponentsSearchboxTest.SearchboxFocusTest__SearchboxFocusTest_tabbing_with_inline_autocompletion
-
 # Flaky on multiple bots: crbug.com/476255536
 -DefaultIsolation/TaskManagerOOPIFBrowserTest.LeavePageWithCrossSiteIframes/0
 

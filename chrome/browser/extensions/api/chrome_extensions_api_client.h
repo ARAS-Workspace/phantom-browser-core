@@ -93,8 +93,6 @@ class ChromeExtensionsAPIClient : public ExtensionsAPIClient {
   FileSystemDelegate* GetFileSystemDelegate() override;
   AutomationInternalApiDelegate* GetAutomationInternalApiDelegate() override;
 
-  std::vector<KeyedServiceBaseFactory*> GetFactoryDependencies() override;
-
   std::unique_ptr<NativeMessagePortDispatcher>
   CreateNativeMessagePortDispatcher(std::unique_ptr<NativeMessageHost> host,
                                     base::WeakPtr<NativeMessagePort> port,
