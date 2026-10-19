@@ -12,7 +12,6 @@
 #include "base/values.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/pref_names.h"
-#include "chrome/common/url_constants.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -20,10 +19,13 @@
 
 namespace {
 
+// Filename of the local NTP custom background image in the Profile directory.
+constexpr char kLocalBackgroundImageFilename[] = "background.jpg";
+
 void RemoveLocalBackgroundImageCopy(Profile* profile) {
   // Delete uploaded image.
-  base::FilePath path = profile->GetPath().AppendASCII(
-      chrome::kChromeUIUntrustedNewTabPageBackgroundFilename);
+  base::FilePath path =
+      profile->GetPath().AppendASCII(kLocalBackgroundImageFilename);
   base::ThreadPool::PostTask(
       FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
       base::GetDeleteFileCallback(path));

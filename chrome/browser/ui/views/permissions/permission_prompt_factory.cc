@@ -62,9 +62,8 @@ LocationBar* GetLocationBar(content::WebContents* web_contents) {
 }
 
 // A permission request should be auto-ignored if:
-//    - a user interacts with the LocationBar. The only exception is the NTP
-//      page where the user needs to press on a microphone icon to get a
-//      permission request.
+//    - a user interacts with the LocationBar. The only exception is the WebUI
+//      pages listed below.
 //    - The Lens Overlay is open covering the context. We suppress permission
 //      prompts until the Lens Overlay is closed.
 bool ShouldIgnorePermissionRequest(
@@ -82,8 +81,6 @@ bool ShouldIgnorePermissionRequest(
   const url::Origin committed_origin =
       web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin();
   if (committed_origin.IsSameOriginWith(chrome::ChromeUINewTabURLAsGURL()) ||
-      committed_origin.IsSameOriginWith(
-          chrome::ChromeUINewTabPageURLAsGURL()) ||
       committed_origin.IsSameOriginWith(
           GURL(chrome::kChromeUIOmniboxPopupURL)) ||
       committed_origin.IsSameOriginWith(

@@ -407,7 +407,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsInteractionTestUtilTest,
   const GURL url = embedded_test_server()->GetURL(kDocumentWithTitle1URL);
 
   // Open a new browser, and immediately navigate to a new page. Even though the
-  // original chrome://new-tab-page might not have finished loading, the
+  // original chrome://newtab might not have finished loading, the
   // element should not be created until the new URL is loaded.
   BrowserWindowInterface* browser2 = chrome::OpenEmptyWindow(
       browser()->GetProfile(), /*should_trigger_session_restore=*/false);

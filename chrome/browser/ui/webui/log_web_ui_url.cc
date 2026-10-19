@@ -24,7 +24,7 @@ namespace {
 
 const GURL& GetWebUIUrlForLogging(content::WebUI* web_ui) {
   // This returns the actual WebUI url which can differ from the visible
-  // URL (e.g. chrome://newtab can be rewrote to chrome://new-tab-page or
+  // URL (e.g. chrome://newtab can be rewrote to
   // chrome://new-tab-page-third-party)
   return web_ui->GetRenderFrameHost()
       ->GetSiteInstance()

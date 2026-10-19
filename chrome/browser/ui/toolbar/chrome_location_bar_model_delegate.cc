@@ -23,7 +23,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
-#include "components/search/ntp_features.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
 #include "components/security_state/core/security_state.h"
 #include "content/public/browser/navigation_controller.h"
@@ -126,7 +125,7 @@ bool ChromeLocationBarModelDelegate::ShouldDisplayURL() const {
   }
 
   Profile* profile = GetProfile();
-  return !profile || !search::IsInstantNTPURL(url, profile);
+  return !profile || !search::IsNTPOrRelatedURL(url, profile);
 }
 
 security_state::SecurityLevel ChromeLocationBarModelDelegate::GetSecurityLevel()
@@ -205,26 +204,6 @@ bool ChromeLocationBarModelDelegate::IsOfflinePage() const {
 #else
   return false;
 #endif
-}
-
-bool ChromeLocationBarModelDelegate::IsNewTabPage() const {
-  content::NavigationEntry* const entry = GetNavigationEntry();
-  if (!entry || entry->IsInitialEntry()) {
-    return false;
-  }
-
-  Profile* const profile = GetProfile();
-  if (!profile) {
-    return false;
-  }
-
-  if (!search::DefaultSearchProviderIsGoogle(profile)) {
-    return false;
-  }
-
-  const GURL& ntp_url = chrome::ChromeUINewTabPageURLAsGURL();
-  return ntp_url.scheme() == entry->GetURL().scheme() &&
-         ntp_url.host() == entry->GetURL().host();
 }
 
 bool ChromeLocationBarModelDelegate::IsNewTabPageURL(const GURL& url) const {

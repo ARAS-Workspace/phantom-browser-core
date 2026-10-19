@@ -754,10 +754,8 @@ bool TabSearchPageHandler::AddRecentlyClosedTab(
       GetRecentlyClosedTab(tab, close_time);
 
   DedupKey dedup_id(recently_closed_tab->url, recently_closed_tab->group_id);
-  // Ignore NTP entries, duplicate entries and tabs with invalid URLs such as
-  // empty URLs.
+  // Ignore duplicate entries and tabs with invalid URLs such as empty URLs.
   if (tab_dedup_keys.contains(dedup_id) ||
-      recently_closed_tab->url == chrome::ChromeUINewTabPageURLAsGURL() ||
       !recently_closed_tab->url.is_valid()) {
     return false;
   }

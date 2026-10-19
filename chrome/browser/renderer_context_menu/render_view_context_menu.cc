@@ -1279,12 +1279,6 @@ void RenderViewContextMenu::RecordUsedItem(int id) {
     } else if (doc_url == GURL(chrome::kChromeUIDownloadsURL)) {
       base::RecordAction(base::UserMetricsAction(
           "Downloads_OpenUrlOfDownloadedItemFromContextMenu"));
-    } else if (doc_url.DeprecatedGetOriginAsURL() ==
-                   chrome::ChromeUINewTabPageURLAsGURL() ||
-               doc_url.DeprecatedGetOriginAsURL() ==
-                   GURL(chrome::kChromeUIUntrustedNewTabPageUrl)) {
-      base::RecordAction(base::UserMetricsAction(
-          "NewTabPage.LinkOpenedFromContextMenu.WebUI"));
     }
   }
 

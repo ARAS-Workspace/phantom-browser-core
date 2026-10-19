@@ -332,7 +332,7 @@ bool PageLoadMetricsEmbedder::IsNewTabPageUrl(const GURL& url) {
   if (!profile) {
     return false;
   }
-  return search::IsInstantNTPURL(url, profile);
+  return search::IsNTPOrRelatedURL(url, profile);
 }
 
 bool PageLoadMetricsEmbedder::IsNoStatePrefetch(

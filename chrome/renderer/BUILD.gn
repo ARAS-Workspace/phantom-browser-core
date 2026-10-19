@@ -46,8 +46,6 @@ static_library("process_state") {
     "process_state.cc",
     "process_state.h",
   ]
-
-  deps = [ "//build:chromeos_buildflags" ]
 }
 
 static_library("renderer") {

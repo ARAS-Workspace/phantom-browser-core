@@ -89,18 +89,6 @@ using permissions::PermissionPromptDisposition;
 using permissions::PermissionPromptDispositionReason;
 using permissions::PermissionRequest;
 
-const url::Origin& GetNewTabOrigin() {
-  static const base::NoDestructor<url::Origin> origin(
-      url::Origin::Create(chrome::ChromeUINewTabURLAsGURL()));
-  return *origin;
-}
-
-const url::Origin& GetNtpOrigin() {
-  static const base::NoDestructor<url::Origin> origin(
-      url::Origin::Create(chrome::ChromeUINewTabPageURLAsGURL()));
-  return *origin;
-}
-
 const url::Origin& GetOmniboxPopupOrigin() {
   static const base::NoDestructor<url::Origin> origin(
       url::Origin::Create(GURL(chrome::kChromeUIOmniboxPopupURL)));
@@ -458,13 +446,6 @@ bool ChromePermissionsClient::CanBypassEmbeddingOriginCheck(
 #endif
   url::Origin embedder = url::Origin::Create(embedding_origin);
 
-  // New Tab Page:
-  // Bypass embedding origin check as the `requesting_origin` will later be
-  // transformed to the DSE origin in `GetCanonicalOriginOverride()`.
-  if (embedder == GetNewTabOrigin() || embedder == GetNtpOrigin()) {
-    return true;
-  }
-
   // Omnibox Popup and Omnibox Everywhere:
   // Bypass embedding origin check as the `requesting_origin` will later be
   // transformed to the DSE origin in `GetCanonicalOriginOverride()`.
@@ -483,20 +464,6 @@ std::optional<GURL> ChromePermissionsClient::GetCanonicalOriginOverride(
   // GURL directly.
   url::Origin requester = url::Origin::Create(requesting_origin);
   url::Origin embedder = url::Origin::Create(embedding_origin);
-
-  // New Tab Page:
-  // Transform chrome:// origins to the DSE origin so that permissions are
-  // stored under and shared with the DSE. If the embedder is new tab without
-  // without the requester being the new tab page, do not override the URL.
-  // Only if the embedder is the new tab AND the requester is the new tab page,
-  // override the canonical origin to be 'Google.com'.
-  if (embedder == GetNewTabOrigin() || embedder == GetNtpOrigin()) {
-    if (requester == GetNtpOrigin() || requester == GetNewTabOrigin()) {
-      return GURL(UIThreadSearchTermsData().GoogleBaseURLValue())
-          .DeprecatedGetOriginAsURL();
-    }
-    return requesting_origin;
-  }
 
   // Omnibox:
   // Transform chrome:// origins to the DSE origin so that permissions are
@@ -529,15 +496,6 @@ std::optional<GURL> ChromePermissionsClient::GetEmbeddingOriginOverride(
       web_contents->GetOutermostWebContents();
   url::Origin embedder =
       embedder_web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin();
-
-  // New Tab Page:
-  // Use the WebContents origin as the embedding origin when the requesting
-  // origin is the NTP (chrome://new-tab-page).
-  // Note that the embedding origin is later transformed to the DSE origin via
-  // `GetCanonicalOriginOverride()`.
-  if (embedder == GetNewTabOrigin() || embedder == GetNtpOrigin()) {
-    return embedder.GetURL();
-  }
 
   if (embedder == GetOmniboxPopupOrigin() ||
       embedder == GetOmniboxEverywhereOrigin()) {
@@ -577,37 +535,6 @@ std::optional<GURL> ChromePermissionsClient::GetEmbeddingOriginOverride(
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   return std::nullopt;
-}
-
-// Considers any `new tab page` or `new tab` origins as being from the new tab
-// page.
-bool ChromePermissionsClient::IsFromNewTabPage(
-    content::WebContents* web_contents,
-    const GURL& requester,
-    bool already_overrode_requester) {
-  url::Origin embedding_origin = GetEmbeddingOrigin(web_contents);
-  url::Origin requesting_origin = url::Origin::Create(requester);
-
-  // A page is not from the new tab page if its embedder is not a new tab page
-  // type.
-  if (embedding_origin != GetNtpOrigin() &&
-      embedding_origin != GetNewTabOrigin()) {
-    return false;
-  }
-
-  // If the PEPC flag is enabled, then checking that the final
-  // `requesting_origin` is equal to 'Google' URL after overriding the requester
-  // origin is allowed.
-  if (already_overrode_requester &&
-      ChromePermissionsClient::
-          AllowEmbeddedPermissionPromptForAllowlistedSurfaces()) {
-    return requesting_origin == GetGoogleURLOrigin();
-  }
-  // Since the embedder is from the new tab page at this point, a page
-  // is definitely from new tab page if the requester is of new tab or new tab
-  // page origin.
-  return requesting_origin == GetNtpOrigin() ||
-         requesting_origin == GetNewTabOrigin();
 }
 
 bool ChromePermissionsClient::IsPrivilegedInternalWebUI(

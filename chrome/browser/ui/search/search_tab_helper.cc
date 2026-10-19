@@ -37,11 +37,8 @@ enum class NewTabPageConcretePage {
 void RecordConcreteNtp(content::NavigationHandle* navigation_handle) {
   NewTabPageConcretePage concrete_page = NewTabPageConcretePage::kOther;
   if (navigation_handle->GetURL().DeprecatedGetOriginAsURL() ==
-      chrome::ChromeUINewTabPageURLAsGURL().DeprecatedGetOriginAsURL()) {
-    concrete_page = NewTabPageConcretePage::k1PWebUiNtp;
-  } else if (navigation_handle->GetURL().DeprecatedGetOriginAsURL() ==
-             GURL(chrome::kChromeUINewTabPageThirdPartyURL)
-                 .DeprecatedGetOriginAsURL()) {
+      GURL(chrome::kChromeUINewTabPageThirdPartyURL)
+          .DeprecatedGetOriginAsURL()) {
     concrete_page = NewTabPageConcretePage::k3PWebUiNtp;
   } else if (navigation_handle->GetURL().SchemeIs(
                  extensions::kExtensionScheme)) {

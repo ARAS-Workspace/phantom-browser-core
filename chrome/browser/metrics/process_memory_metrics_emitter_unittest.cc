@@ -1327,7 +1327,7 @@ TEST_F(ProcessMemoryMetricsEmitterTest, FirstPartyNtpMemoryMetrics) {
     page_node->SetUkmSourceId(ukm::UkmRecorder::GetNewSourceID());
     page_node->SetIsVisible(true);
     page_node->OnMainFrameNavigationCommitted(false, base::TimeTicks::Now(), 1,
-                                              GURL("chrome://new-tab-page/"),
+                                              GURL("chrome://newtab/"),
                                               "text/html", std::nullopt);
     auto frame_node =
         CreateFrameNodeAutoId(process_node.get(), page_node.get());
@@ -1437,7 +1437,7 @@ TEST_F(ProcessMemoryMetricsEmitterTest, FirstPartyNtpMemoryMetrics) {
     page_node->SetUkmSourceId(ukm::UkmRecorder::GetNewSourceID());
     page_node->SetIsVisible(false);
     page_node->OnMainFrameNavigationCommitted(false, base::TimeTicks::Now(), 3,
-                                              GURL("chrome://new-tab-page/"),
+                                              GURL("chrome://newtab/"),
                                               "text/html", std::nullopt);
     auto frame_node =
         CreateFrameNodeAutoId(process_node.get(), page_node.get());

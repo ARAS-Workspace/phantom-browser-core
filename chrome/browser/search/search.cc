@@ -126,19 +126,6 @@ bool IsNTPURL(const GURL& url) {
   return NewTabPageThirdPartyUI::IsNewTabPageOrigin(url);
 }
 
-bool IsInstantNTPURL(const GURL& url, Profile* profile) {
-  if (MatchesOrigin(url, chrome::ChromeUINewTabPageURLAsGURL())) {
-    return true;
-  }
-
-  if (!IsInstantExtendedAPIEnabled()) {
-    return false;
-  }
-
-  GURL new_tab_url(GetNewTabPageURL(profile));
-  return new_tab_url.is_valid() && MatchesOriginAndPath(url, new_tab_url);
-}
-
 bool IsWebUiNtpEnabledForDesktopAndroid() {
   return false;
 }
@@ -186,7 +173,7 @@ bool HandleNewTabURLReverseRewrite(GURL* url,
     return false;
   }
 
-  if (IsInstantNTPURL(*url, profile)) {
+  if (IsNTPOrRelatedURL(*url, profile)) {
     *url = chrome::ChromeUINewTabURLAsGURL();
     return true;
   }

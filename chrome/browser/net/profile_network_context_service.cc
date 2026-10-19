@@ -976,10 +976,7 @@ ProfileNetworkContextService::CreateCookieManagerParams(
   out->block_third_party_cookies =
       cookie_settings.ShouldBlockThirdPartyCookies();
   // This allows cookies to be sent on https requests from chrome:// pages,
-  // ignoring SameSite attribute rules. For example, this is needed for browser
-  // UI to interact with SameSite cookies on accounts.google.com, which is used
-  // for displaying a list of available accounts on the NTP
-  // (chrome://new-tab-page), etc.
+  // ignoring SameSite attribute rules.
   out->secure_origin_cookies_allowed_schemes.push_back(
       content::kChromeUIScheme);
 

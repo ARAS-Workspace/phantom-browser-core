@@ -603,8 +603,6 @@ TEST_F(NTPUserDataLoggerTest, ShouldNotRecordCustomizationActionFromNTPOther) {
                   delta_tiles_loaded);
 
   EXPECT_THAT(histogram_tester.GetAllSamples("NewTabPage.LoadTime"), SizeIs(1));
-  EXPECT_THAT(histogram_tester.GetAllSamples("NewTabPage.LoadTime.WebUINTP"),
-              IsEmpty());
 
   EXPECT_THAT(histogram_tester.GetAllSamples(
                   "NewTabPage.CustomizeChromeBackgroundAction"),

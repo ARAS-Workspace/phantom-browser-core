@@ -158,11 +158,9 @@ TEST_F(ChromePermissionsClientTest, CanBypassEmbeddingOriginCheckWebUI) {
   auto* client = ChromePermissionsClient::GetInstance();
   GURL dummy_requesting("about:blank");
 
-  // NTP / New Tab:
-  EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
+  // New Tab: the embedding origin check is not bypassed.
+  EXPECT_FALSE(client->CanBypassEmbeddingOriginCheck(
       dummy_requesting, chrome::ChromeUINewTabURLAsGURL()));
-  EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
-      dummy_requesting, chrome::ChromeUINewTabPageURLAsGURL()));
 
   // Omnibox Popup and Omnibox Everywhere:
   EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
@@ -182,18 +180,10 @@ TEST_F(ChromePermissionsClientTest,
   auto* client = ChromePermissionsClient::GetInstance();
   GURL dummy_requesting("about:blank");
 
-  // New Tab, NTP, and Omnibox Popup with subpaths/query strings:
-  GURL newtab_subpath =
-      chrome::ChromeUINewTabURLAsGURL().Resolve("subpath/page?param=1#hash");
-  GURL ntp_subpath = GURL(chrome::ChromeUINewTabPageURLAsGURL().spec())
-                         .Resolve("subpath/page?param=1#hash");
+  // Omnibox Popup with subpaths/query strings:
   GURL omnibox_subpath = GURL(chrome::kChromeUIOmniboxPopupURL)
                              .Resolve("subpath/page?param=1#hash");
 
-  EXPECT_TRUE(
-      client->CanBypassEmbeddingOriginCheck(dummy_requesting, newtab_subpath));
-  EXPECT_TRUE(
-      client->CanBypassEmbeddingOriginCheck(dummy_requesting, ntp_subpath));
   EXPECT_TRUE(
       client->CanBypassEmbeddingOriginCheck(dummy_requesting, omnibox_subpath));
 }
@@ -201,15 +191,8 @@ TEST_F(ChromePermissionsClientTest,
 TEST_F(ChromePermissionsClientTest, GetCanonicalOriginOverrideWebUI) {
   auto* client = ChromePermissionsClient::GetInstance();
 
-  GURL ntp_url = chrome::ChromeUINewTabPageURLAsGURL();
   GURL newtab_url = chrome::ChromeUINewTabURLAsGURL();
   GURL omnibox_url(chrome::kChromeUIOmniboxPopupURL);
-
-  // NTP embedder + NTP requester -> Overridden to DSE (Google) origin:
-  std::optional<GURL> ntp_override =
-      client->GetCanonicalOriginOverride(ntp_url, newtab_url);
-  EXPECT_TRUE(ntp_override.has_value());
-  EXPECT_EQ(ntp_override->host(), "www.google.com");
 
   // Omnibox popup embedder + requester -> Overridden to DSE (Google) origin:
   std::optional<GURL> omnibox_override =
@@ -225,11 +208,11 @@ TEST_F(ChromePermissionsClientTest, GetCanonicalOriginOverrideWebUI) {
   EXPECT_TRUE(everywhere_override.has_value());
   EXPECT_EQ(everywhere_override->host(), "www.google.com");
 
-  // Unmatched requester:
+  // Unmatched requester under New Tab -> Not overridden:
   GURL other_url("about:blank");
   std::optional<GURL> other_override =
       client->GetCanonicalOriginOverride(other_url, newtab_url);
-  EXPECT_EQ(other_override, other_url);
+  EXPECT_FALSE(other_override.has_value());
 }
 
 // Test that GURL is converted to origin so that way subpaths are ignored
@@ -238,22 +221,8 @@ TEST_F(ChromePermissionsClientTest,
        GetCanonicalOriginOverrideWebUIWithSubpaths) {
   auto* client = ChromePermissionsClient::GetInstance();
 
-  GURL newtab_subpath =
-      chrome::ChromeUINewTabURLAsGURL().Resolve("subpath/page?param=1#hash");
-
-  // Add trailing slash via spec since `ChromeUINewTabPageAsGURL()` does not
-  // have trailing slash.
-  GURL ntp_subpath = GURL(chrome::ChromeUINewTabPageURLAsGURL().spec())
-                         .Resolve("subpath/page?param=1#hash");
   GURL omnibox_subpath = GURL(chrome::kChromeUIOmniboxPopupURL)
                              .Resolve("subpath/page?param=1#hash");
-
-  // NTP subpath embedder + NTP subpath requester -> Overridden to DSE (Google)
-  // origin:
-  std::optional<GURL> ntp_override =
-      client->GetCanonicalOriginOverride(ntp_subpath, newtab_subpath);
-  EXPECT_TRUE(ntp_override.has_value());
-  EXPECT_EQ(ntp_override->host(), "www.google.com");
 
   // Omnibox popup subpath embedder + requester -> Overridden to DSE (Google)
   // origin:
@@ -261,27 +230,6 @@ TEST_F(ChromePermissionsClientTest,
       client->GetCanonicalOriginOverride(omnibox_subpath, omnibox_subpath);
   EXPECT_TRUE(omnibox_override.has_value());
   EXPECT_EQ(omnibox_override->host(), "www.google.com");
-}
-
-// Test that GURL is converted to origin so that way subpaths are ignored
-// and only identity is compared.
-TEST_F(ChromePermissionsClientTest, IsFromNewTabPageWebUIWithSubpaths) {
-  auto* client = ChromePermissionsClient::GetInstance();
-
-  // Add trailing slash via spec since `ChromeUINewTabPageAsGURL()` does not
-  // have trailing slash.
-  GURL ntp_subpath = GURL(chrome::ChromeUINewTabPageURLAsGURL().spec())
-                         .Resolve("subpath/page?param=1#hash");
-  GURL newtab_subpath =
-      chrome::ChromeUINewTabURLAsGURL().Resolve("subpath/page?param=1#hash");
-
-  content::OverrideLastCommittedOrigin(web_contents()->GetPrimaryMainFrame(),
-                                       url::Origin::Create(ntp_subpath));
-
-  EXPECT_TRUE(client->IsFromNewTabPage(web_contents(), ntp_subpath,
-                                       /*already_overrode_requester=*/false));
-  EXPECT_TRUE(client->IsFromNewTabPage(web_contents(), newtab_subpath,
-                                       /*already_overrode_requester=*/false));
 }
 
 // Test that GURL is converted to origin so that way subpaths are ignored

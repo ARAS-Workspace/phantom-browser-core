@@ -263,12 +263,9 @@ void OneTimePermissionsTracker::NotifyLastPageFromOriginClosed(
 }
 
 bool OneTimePermissionsTracker::ShouldIgnoreOrigin(const url::Origin& origin) {
-  // There are cases where chrome://newtab/ and chrome://new-tab-page/ are
-  // used synonymously causing inconsistencies in the map. So we just ignore
-  // them.
+  // Opaque origins and chrome://newtab/ are not tracked.
   return origin.opaque() ||
-         origin == url::Origin::Create(GURL("chrome://newtab/")) ||
-         origin == url::Origin::Create(GURL("chrome://new-tab-page/"));
+         origin == url::Origin::Create(GURL("chrome://newtab/"));
 }
 
 void OneTimePermissionsTracker::NotifyBackgroundTimerExpired(

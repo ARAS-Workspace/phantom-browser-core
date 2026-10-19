@@ -183,7 +183,7 @@ IN_PROC_BROWSER_TEST_F(TabDataObserverBrowserTest, FaviconAndIconFlags) {
     content::WebContents* const wc_actual = tab_interface->GetContents();
     auto* entry_actual = wc_actual->GetController().GetLastCommittedEntry();
     ASSERT_NE(nullptr, entry_actual);
-    const GURL themeable_url("chrome://new-tab-page/");
+    const GURL themeable_url("chrome://newtab/");
     entry_actual->SetURL(themeable_url);
     auto tab_data_observer = std::make_unique<TabDataObserver>(tab_interface);
     const TabData& actual_data = tab_data_observer->tab_data();
@@ -220,7 +220,6 @@ IN_PROC_BROWSER_TEST_F(TabDataObserverBrowserTest,
       {GURL("https://example.com"), true},
       {GURL(chrome::kChromeUIVersionURL), true},
       {chrome::ChromeUINewTabURLAsGURL(), false},
-      {chrome::ChromeUINewTabPageURLAsGURL(), false},
       {GURL(chrome::kChromeUITabSearchURL), false},
   };
 

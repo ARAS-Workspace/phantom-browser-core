@@ -34,8 +34,7 @@
 namespace {
 
 bool IsNTPUrl(const GURL& url) {
-  return url == chrome::ChromeUINewTabURLAsGURL() ||
-         url == chrome::ChromeUINewTabPageURLAsGURL();
+  return url == chrome::ChromeUINewTabURLAsGURL();
 }
 
 }  // namespace

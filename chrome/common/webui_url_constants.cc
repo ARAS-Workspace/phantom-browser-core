@@ -150,11 +150,6 @@ base::span<const base::cstring_view> ChromeDebugURLs() {
   return base::span(kChromeDebugURLs);
 }
 
-const GURL& ChromeUINewTabPageURLAsGURL() {
-  static base::NoDestructor<GURL> instance(kChromeUINewTabPageURL);
-  return *instance;
-}
-
 const GURL& ChromeUINewTabURLAsGURL() {
   static base::NoDestructor<GURL> instance(kChromeUINewTabURL);
   return *instance;

@@ -71,8 +71,8 @@ const std::vector<TestItem>& TestItems() {
       },
       {
           GURL(std::string("view-source:") + chrome::kChromeUINewTabURL),
-          "view-source:" +
-              content::GetWebUIURLString(chrome::kChromeUINewTabHost),
+          // The address bar shows the chrome: scheme as phantom:.
+          "view-source:phantom://newtab",
       },
       {
           GURL("chrome-extension://fooooooooooooooooooooooooooooooo/bar.html"),
@@ -260,9 +260,9 @@ IN_PROC_BROWSER_TEST_F(LocationBarModelTest, ShouldElideLongURLs) {
 }
 
 // Regression test for crbug.com/40553422 (and crbug.com/517847434): on the
-// WebUI NTP (e.g., chrome://new-tab-page), renderer-initiated link clicks
-// are forked to the browser via OpenURL. The omnibox should show the
-// destination URL while the navigation is pending.
+// WebUI NTP (e.g., chrome://new-tab-page-third-party), renderer-initiated
+// link clicks are forked to the browser via OpenURL. The omnibox should show
+// the destination URL while the navigation is pending.
 
 IN_PROC_BROWSER_TEST_F(LocationBarModelTest,
                        ShouldDisplayURLWhileNavigatingAwayFromWebUiNTP) {

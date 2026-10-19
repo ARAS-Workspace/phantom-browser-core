@@ -104,7 +104,7 @@ class ChromeLocationBarModelDelegateTest : public InProcessBrowserTest {
   std::unique_ptr<TestChromeLocationBarModelDelegate> delegate_;
 };
 
-// Tests whether ChromeLocationBarModelDelegate::IsNewTabPage and
+// Tests whether IsNewTabPage (the LocationBarModelDelegate default) and
 // ChromeLocationBarModelDelegate::IsNewTabPageURL return the expected results
 // for various NTP scenarios.
 IN_PROC_BROWSER_TEST_F(ChromeLocationBarModelDelegateTest, IsNewTabPage) {

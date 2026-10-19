@@ -41,10 +41,6 @@ class ExtensionURLRewriteBrowserTest : public extensions::ExtensionBrowserTest {
                                  ->GetText());
   }
 
-  GURL GetLocationBarTextAsURL() const {
-    return GURL(GetLocationBarText());
-  }
-
   content::NavigationController* GetNavigationController() const {
     return &browser()
                 ->tab_strip_model()
@@ -61,12 +57,13 @@ class ExtensionURLRewriteBrowserTest : public extensions::ExtensionBrowserTest {
         AppendASCII(extension_name);
   }
 
-  // Navigates to |url| and tests that the location bar and the |virtual_url|
-  // correspond to |url|, while the real URL of the navigation entry uses the
-  // chrome-extension:// scheme.
-  void TestExtensionURLOverride(const GURL& url) {
+  // Navigates to |url| and tests that the location bar shows
+  // |location_bar_text| and the |virtual_url| corresponds to |url|, while the
+  // real URL of the navigation entry uses the chrome-extension:// scheme.
+  void TestExtensionURLOverride(const GURL& url,
+                                const std::string& location_bar_text) {
     ASSERT_TRUE(NavigateToURL(GetActiveWebContents(), url));
-    EXPECT_EQ(url, GetLocationBarTextAsURL());
+    EXPECT_EQ(location_bar_text, GetLocationBarText());
     EXPECT_EQ(url, GetNavigationEntry()->GetVirtualURL());
     EXPECT_TRUE(
         GetNavigationEntry()->GetURL().SchemeIs(extensions::kExtensionScheme));
@@ -108,7 +105,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionURLRewriteBrowserTest, NewTabPageURLOverride) {
 IN_PROC_BROWSER_TEST_F(ExtensionURLRewriteBrowserTest, BookmarksURLOverride) {
   // Load an extension that overrides chrome://bookmarks.
   ASSERT_TRUE(LoadExtension(GetTestExtensionPath("bookmarks")));
-  // Navigate to chrome://bookmarks and check that the location bar URL is what
-  // was entered and the internal URL uses the chrome-extension:// scheme.
-  TestExtensionURLOverride(GURL(chrome::kChromeUIBookmarksURL));
+  // Navigate to chrome://bookmarks and check that the location bar shows the
+  // entered URL with the chrome: scheme displayed as phantom: and the internal
+  // URL uses the chrome-extension:// scheme.
+  TestExtensionURLOverride(GURL(chrome::kChromeUIBookmarksURL),
+                           "phantom://bookmarks");
 }

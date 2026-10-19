@@ -12,7 +12,6 @@
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/pref_names.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
@@ -87,8 +86,7 @@ TEST_F(NtpCustomBackgroundServiceTest, ResetRemovesLocalBackgroundImageCopy) {
       profile().GetTestingPrefService();
 
   base::FilePath profile_path = profile().GetPath();
-  base::FilePath path(profile_path.AppendASCII(
-      chrome::kChromeUIUntrustedNewTabPageBackgroundFilename));
+  base::FilePath path(profile_path.AppendASCII("background.jpg"));
   base::WriteFile(path, "background_image");
   pref_service->SetBoolean(prefs::kNtpCustomBackgroundLocalToDevice, true);
   ASSERT_TRUE(custom_background_service_->IsCustomBackgroundSet());
@@ -138,8 +136,7 @@ TEST_F(NtpCustomBackgroundServiceTest, SyncPrefOverridesAndRemovesLocalImage) {
       profile().GetTestingPrefService();
 
   base::FilePath profile_path = profile().GetPath();
-  base::FilePath path(profile_path.AppendASCII(
-      chrome::kChromeUIUntrustedNewTabPageBackgroundFilename));
+  base::FilePath path(profile_path.AppendASCII("background.jpg"));
   base::WriteFile(path, "background_image");
   base::ThreadPoolInstance::Get()->FlushForTesting();
 

@@ -80,10 +80,6 @@ TEST_F(OneTimePermissionsTrackerTest, ShouldIgnoreOrigin_ChromePages) {
   GURL page_1("chrome://newtab/");
   url::Origin page_1_origin = url::Origin::Create(page_1);
   EXPECT_TRUE(tracker()->ShouldIgnoreOrigin(page_1_origin));
-
-  GURL page_2("chrome://new-tab-page/");
-  url::Origin page_2_origin = url::Origin::Create(page_2);
-  EXPECT_TRUE(tracker()->ShouldIgnoreOrigin(page_2_origin));
 }
 
 TEST_F(OneTimePermissionsTrackerTest, NotifyAfterShortTimeout) {

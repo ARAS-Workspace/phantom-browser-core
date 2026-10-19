@@ -880,8 +880,7 @@ class SessionRestoreAcrossStagesTest : public RestoreAcrossStagesTestBase {
     // Tab 2 should show GetUrl(2) and be active
     EXPECT_EQ(1, w2_model->active_index());
     content::WebContents* w2_tab2 = w2_model->GetWebContentsAt(1);
-    if (w2_tab2->GetURL() == GURL("chrome://newtab/") ||
-        w2_tab2->GetURL() == GURL("chrome://new-tab-page/")) {
+    if (w2_tab2->GetURL() == GURL("chrome://newtab/")) {
       w2_tab2->GetController().GoBack();
       content::WaitForLoadStop(w2_tab2);
     }

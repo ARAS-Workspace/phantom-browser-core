@@ -125,7 +125,7 @@ class CustomizeChromePageHandler
 
   // Caches the attached tab state provided to the handler, in cases where the
   // value needs to be requeried by the page.
-  GURL last_source_url_{chrome::ChromeUINewTabPageURLAsGURL()};
+  GURL last_source_url_;
 
   base::ScopedObservation<ui::NativeTheme, ui::NativeThemeObserver>
       native_theme_observation_{this};

@@ -46,8 +46,7 @@ namespace {
 bool IsNTP(const GURL& url) {
   return url.SchemeIs(content::kChromeUIScheme) &&
          (url.host() == chrome::kChromeUINewTabHost ||
-          url.host() == chrome::kChromeUITabSearchHost ||
-          url.host() == chrome::kChromeUINewTabPageHost);
+          url.host() == chrome::kChromeUITabSearchHost);
 }
 
 web_app::WebAppBrowserController* GetWebAppBrowserController(

@@ -31,19 +31,6 @@ inline constexpr char kBrowserSettingsSearchEngineURL[] =
 // widgets instead of using HTML.
 inline constexpr char kChromeNativeScheme[] = "chrome-native";
 
-// URL for NTP custom background image selected from the user's machine and
-// filename for the version of the file in the Profile directory
-inline constexpr char kChromeUIUntrustedNewTabPageBackgroundUrl[] =
-    "chrome-untrusted://new-tab-page/background.jpg";
-inline constexpr char kChromeUIUntrustedNewTabPageBackgroundFilename[] =
-    "background.jpg";
-
-// This is the base URL of content that can be embedded in chrome://new-tab-page
-// using an <iframe>. The embedded untrusted content can make web requests and
-// can include content that is from an external source.
-inline constexpr char kChromeUIUntrustedNewTabPageUrl[] =
-    "chrome-untrusted://new-tab-page/";
-
 // URL of the Google Account.
 inline constexpr char kGoogleAccountURL[] = "https://myaccount.google.com";
 

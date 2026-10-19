@@ -157,12 +157,6 @@ _NATIVE_ALLOWLIST = {
   'network.mojom.P2PSocketOption',
   'network.mojom.P2PSocketType',
   'network.mojom.URLRequestRedirectInfo',
-  'search.mojom.InstantMostVisitedInfo',
-  'search.mojom.NTPLoggingEventType',
-  'search.mojom.NtpTheme',
-  'search.mojom.NTPTileImpression',
-  'search.mojom.OmniboxFocusChangeReason',
-  'search.mojom.OmniboxFocusState',
   'ui.mojom.EventPointerType',
   'ui.mojom.ScrollGranularity',
 }

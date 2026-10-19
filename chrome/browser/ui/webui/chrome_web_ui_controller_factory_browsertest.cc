@@ -76,10 +76,6 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUIControllerFactoryBrowserTest,
       incognito_browser->tab_strip_model()->GetActiveWebContents();
 
   EXPECT_TRUE(ui_test_utils::NavigateToURL(
-      incognito_browser, chrome::ChromeUINewTabPageURLAsGURL()));
-  EXPECT_FALSE(web_contents->GetWebUI());
-
-  EXPECT_TRUE(ui_test_utils::NavigateToURL(
       incognito_browser, GURL(chrome::kChromeUINewTabPageThirdPartyURL)));
   EXPECT_FALSE(web_contents->GetWebUI());
 }

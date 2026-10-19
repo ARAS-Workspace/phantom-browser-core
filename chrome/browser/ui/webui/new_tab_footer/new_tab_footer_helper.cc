@@ -30,9 +30,7 @@ bool IsExtensionNtp(const GURL& url, Profile* profile) {
   return extension_managing_ntp->id() == url.GetHost();
 }
 
-bool IsNtp(const GURL& url,
-           content::WebContents* web_contents,
-           Profile* profile) {
+bool IsNtp(const GURL& url, Profile* profile) {
   return NewTabUI::IsNewTab(url) ||
          NewTabPageThirdPartyUI::IsNewTabPageOrigin(url) ||
          ntp_footer::IsExtensionNtp(url, profile);

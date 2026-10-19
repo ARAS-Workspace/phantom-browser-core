@@ -1452,7 +1452,6 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
   if (security_principal.SchemeIs(content::kChromeUIScheme)) {
     const std::string_view host = security_principal.GetHost();
     if (host == chrome::kChromeUINewTabHost ||
-        host == chrome::kChromeUINewTabPageHost ||
         host == chrome::kChromeUINewTabPageThirdPartyHost) {
       return true;
     }
@@ -1573,9 +1572,7 @@ bool ChromeContentBrowserClient::ShouldTreatAsFirstPartyWhenTopLevel(
     bool is_embedded_origin_secure) {
   // This is needed to bypass the normal SameSite rules for any chrome:// page
   // embedding a secure origin, regardless of the registrable domains of any
-  // intervening frames. For example, this is needed for browser UI to interact
-  // with SameSite cookies on accounts.google.com, which is used for displaying
-  // a list of available accounts on the NTP (chrome://new-tab-page), etc.
+  // intervening frames.
   if (is_embedded_origin_secure &&
       top_frame_origin.scheme() == content::kChromeUIScheme) {
     return true;
@@ -6629,8 +6626,7 @@ bool ChromeContentBrowserClient::ShouldSuppressAXLoadComplete(
   WebContents* web_contents = WebContents::FromRenderFrameHost(rfh);
 
   const GURL& url = web_contents->GetVisibleURL();
-  return url == chrome::ChromeUINewTabURLAsGURL() ||
-         url == chrome::ChromeUINewTabPageURLAsGURL();
+  return url == chrome::ChromeUINewTabURLAsGURL();
 }
 
 void ChromeContentBrowserClient::ShowCaptionSettings(

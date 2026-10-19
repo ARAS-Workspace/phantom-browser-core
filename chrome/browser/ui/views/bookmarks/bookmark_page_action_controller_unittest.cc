@@ -165,12 +165,4 @@ TEST_F(BookmarkPageActionControllerTest, HiddenOnNTP) {
   // Hidden on NTP page context ("chrome://newtab/").
   EXPECT_CALL(page_action_controller(), Hide(kActionBookmarkThisTab)).Times(1);
   navigate_to_url(chrome::ChromeUINewTabURLAsGURL());
-
-  // Shown on non-NTP page context.
-  EXPECT_CALL(page_action_controller(), Show(kActionBookmarkThisTab)).Times(1);
-  navigate_to_url(GURL("https://www.example.com"));
-
-  // Hidden on NTP page context ("chrome://new-tab-page/").
-  EXPECT_CALL(page_action_controller(), Hide(kActionBookmarkThisTab)).Times(1);
-  navigate_to_url(chrome::ChromeUINewTabPageURLAsGURL());
 }

@@ -361,8 +361,7 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
         .LoadDataResourceBytesForScale(IDR_DOWNLOADS_FAVICON, scale_factor);
   }
 
-  if (page_url.host() == chrome::kChromeUINewTabPageHost ||
-      page_url.host() == chrome::kChromeUINewTabHost) {
+  if (page_url.host() == chrome::kChromeUINewTabHost) {
     return ui::ResourceBundle::GetSharedInstance()
         .LoadDataResourceBytesForScale(IDR_NTP_FAVICON, scale_factor);
   }

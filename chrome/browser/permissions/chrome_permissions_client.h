@@ -98,10 +98,6 @@ class ChromePermissionsClient : public permissions::PermissionsClient {
       const GURL& requesting_origin,
       content::RenderFrameHost* render_frame_host) override;
 
-  bool IsFromNewTabPage(content::WebContents* web_contents,
-                        const GURL& requester,
-                        bool already_overrode_requester) override;
-
   bool IsPrivilegedInternalWebUI(content::WebContents* web_contents,
                                  const GURL& requester,
                                  bool already_overrode_requester) override;

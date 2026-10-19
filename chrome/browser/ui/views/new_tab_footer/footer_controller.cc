@@ -135,7 +135,7 @@ void NewTabFooterController::ContentsViewFooterCotroller::
     return;
   }
 
-  if (ntp_footer::IsNtp(url, web_contents(), owner_->profile_)) {
+  if (ntp_footer::IsNtp(url, owner_->profile_)) {
     base::UmaHistogramBoolean("NewTabPage.Footer.VisibleOnLoad", show);
   }
   if (show_extension) {

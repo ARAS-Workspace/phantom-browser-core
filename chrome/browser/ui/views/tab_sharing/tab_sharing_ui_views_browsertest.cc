@@ -598,7 +598,7 @@ IN_PROC_BROWSER_TEST_F(TabSharingUIViewsBrowserTest,
 
   CreateUiAndStartSharing(browser(), kCapturingTab, kCapturedTab);
   ASSERT_THAT(base::UTF16ToUTF8(GetInfobarMessageText(browser(), 0)),
-              ::testing::HasSubstr(chrome::kChromeUINewTabPageHost));
+              ::testing::HasSubstr(chrome::kChromeUINewTabPageThirdPartyHost));
 
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(),
                                            GURL(chrome::kChromeUIVersionURL)));

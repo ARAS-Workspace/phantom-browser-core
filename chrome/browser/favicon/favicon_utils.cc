@@ -199,10 +199,9 @@ bool ShouldThemifyFaviconForEntry(content::NavigationEntry* entry) {
     return true;
   }
 
-  // Themify favicon for the default NTP and incognito NTP.
+  // Themify favicon for the incognito and guest NTP.
   if (actual_url.SchemeIs(content::kChromeUIScheme)) {
-    return actual_url.host() == chrome::kChromeUINewTabPageHost ||
-           actual_url.host() == chrome::kChromeUINewTabHost;
+    return actual_url.host() == chrome::kChromeUINewTabHost;
   }
 
   return false;

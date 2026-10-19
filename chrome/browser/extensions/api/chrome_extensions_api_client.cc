@@ -152,12 +152,6 @@ bool ChromeExtensionsAPIClient::ShouldHideBrowserNetworkRequest(
       request.initiator ==
           url::Origin::Create(chrome::ChromeUINewTabURLAsGURL());
 
-  // Hide requests made by the browser on behalf of the 1P WebUI NTP.
-  is_sensitive_request |=
-      is_browser_request &&
-      request.initiator ==
-          url::Origin::Create(chrome::ChromeUINewTabPageURLAsGURL());
-
   return is_sensitive_request;
 }
 

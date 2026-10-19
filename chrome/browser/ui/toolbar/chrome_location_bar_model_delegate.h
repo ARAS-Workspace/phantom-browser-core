@@ -45,7 +45,6 @@ class ChromeLocationBarModelDelegate : public LocationBarModelDelegate {
   scoped_refptr<net::X509Certificate> GetCertificate() const override;
   const gfx::VectorIcon* GetVectorIconOverride() const override;
   bool IsOfflinePage() const override;
-  bool IsNewTabPage() const override;
   bool IsNewTabPageURL(const GURL& url) const override;
   bool IsHomePage(const GURL& url) const override;
   AutocompleteClassifier* GetAutocompleteClassifier() override;

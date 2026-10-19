@@ -1359,10 +1359,10 @@ IN_PROC_BROWSER_TEST_F(DiceBrowserTest, SignInAfterToken) {
       base::BindLambdaForTesting(
           [&ntp_run_loop](content::NavigationHandle* navigation_handle) {
             const GURL& url = navigation_handle->GetURL();
-            // Some test flags (e.g. ForceWebRequestProxyForTest) can change
-            // whether the reported NTP URL is chrome://newtab or
-            // chrome://new-tab-page.
-            if (url == chrome::ChromeUINewTabPageURLAsGURL() ||
+            // chrome://newtab is rewritten to the local third-party NTP; some
+            // test flags (e.g. ForceWebRequestProxyForTest) can change whether
+            // the reported NTP URL is chrome://newtab.
+            if (url == GURL(chrome::kChromeUINewTabPageThirdPartyURL) ||
                 url == chrome::ChromeUINewTabURLAsGURL()) {
               ntp_run_loop.Quit();
             }

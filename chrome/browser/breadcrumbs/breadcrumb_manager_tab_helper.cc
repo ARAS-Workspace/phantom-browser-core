@@ -19,7 +19,6 @@ namespace {
 bool IsNtpUrl(const GURL& url) {
   const GURL origin = url.DeprecatedGetOriginAsURL();
   return origin == chrome::ChromeUINewTabURLAsGURL() ||
-         origin == chrome::ChromeUINewTabPageURLAsGURL() ||
          origin.spec() == chrome::kChromeUINewTabPageThirdPartyURL;
 }
 

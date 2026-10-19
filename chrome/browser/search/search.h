@@ -25,10 +25,6 @@ bool IsNTPOrRelatedURL(const GURL& url, Profile* profile);
 // Returns whether a |url| corresponds to a New Tab page.
 bool IsNTPURL(const GURL& url);
 
-// Returns true if |url| corresponds to a New Tab page that would get rendered
-// in an Instant process.
-bool IsInstantNTPURL(const GURL& url, Profile* profile);
-
 // Returns whether the Web UI NTP is enabled for Desktop Android. In all other
 // cases and platforms, it returns false.
 bool IsWebUiNtpEnabledForDesktopAndroid();
@@ -43,8 +39,7 @@ GURL GetNewTabPageURL(Profile* profile);
 //   1. |url| is "chrome://newtab",
 //   2. InstantExtended is enabled, and
 //   3. |browser_context| doesn't correspond to an incognito profile.
-// chrome://new-tab-page or chrome://new-tab-page-third-party to handle
-// unexplained usage.
+// The actual NTP URL is chrome://new-tab-page-third-party.
 bool HandleNewTabURLRewrite(GURL* url,
                             content::BrowserContext* browser_context);
 // Reverses the operation from HandleNewTabURLRewrite.

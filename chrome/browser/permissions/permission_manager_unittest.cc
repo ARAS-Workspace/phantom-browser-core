@@ -7,7 +7,6 @@
 #include "base/test/with_feature_override.h"
 #include "chrome/browser/permissions/permission_manager_factory.h"
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -123,9 +122,7 @@ TEST_P(PermissionManagerTest, GetCanonicalOriginSearch) {
   const GURL other_url("https://other.url");
   const GURL google_base = GURL(UIThreadSearchTermsData().GoogleBaseURLValue())
                                .DeprecatedGetOriginAsURL();
-  const GURL other_chrome_search = GURL("chrome-search://not-local-ntp");
   const GURL& top_level_ntp = chrome::ChromeUINewTabURLAsGURL();
-  const GURL webui_ntp = chrome::ChromeUINewTabPageURLAsGURL();
 
   // "Normal" URLs are not affected by GetCanonicalOrigin.
   EXPECT_EQ(google_com, permissions::PermissionUtil::GetCanonicalOrigin(
@@ -141,19 +138,16 @@ TEST_P(PermissionManagerTest, GetCanonicalOriginSearch) {
                              content_settings::GeolocationContentSettingsType(),
                              google_base, google_base));
 
-  // The WebUI NTP URL gets mapped to the Google base URL.
-  EXPECT_EQ(google_base, permissions::PermissionUtil::GetCanonicalOrigin(
-                             content_settings::GeolocationContentSettingsType(),
-                             webui_ntp, top_level_ntp));
-
-  // chrome-search: and other URLs are not affected.
-  EXPECT_EQ(google_com, permissions::PermissionUtil::GetCanonicalOrigin(
-                            content_settings::GeolocationContentSettingsType(),
-                            google_com, top_level_ntp));
-  EXPECT_EQ(other_chrome_search,
+  // The New Tab URL is not mapped to the Google base URL; geolocation is
+  // delegated, so the embedding origin is returned.
+  EXPECT_EQ(top_level_ntp,
             permissions::PermissionUtil::GetCanonicalOrigin(
                 content_settings::GeolocationContentSettingsType(),
-                other_chrome_search, top_level_ntp));
+                top_level_ntp, top_level_ntp));
+  EXPECT_EQ(top_level_ntp,
+            permissions::PermissionUtil::GetCanonicalOrigin(
+                content_settings::GeolocationContentSettingsType(), google_com,
+                top_level_ntp));
 }
 
 TEST_P(PermissionManagerTest, GetCanonicalOriginPermissionDelegation) {

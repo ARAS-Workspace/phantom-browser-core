@@ -425,7 +425,6 @@ std::optional<ExtensionSettingsOverriddenDialog::Params> GetNtpOverriddenParams(
   if (possible_rewrites.size() > 1) {
     default_ntp_is_secondary =
         possible_rewrites[1] == ntp_url ||
-        possible_rewrites[1] == chrome::ChromeUINewTabPageURLAsGURL() ||
         possible_rewrites[1] == GURL(chrome::kChromeUINewTabPageThirdPartyURL);
   }
   // Check if there's another extension that would take over (this isn't
