@@ -7,10 +7,7 @@
 
 #include <optional>
 
-#include "base/containers/flat_map.h"
 #include "base/memory/raw_ptr.h"
-#include "base/memory/raw_ref.h"
-#include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/themes/theme_service.h"
@@ -18,17 +15,13 @@
 #include "chrome/browser/ui/views/new_tab_footer/footer_controller_observer.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
-#include "chrome/common/search/ntp_logging_events.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/themes/ntp_background_service.h"
-#include "components/themes/ntp_background_service_observer.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "ui/native_theme/native_theme.h"
 #include "ui/native_theme/native_theme_observer.h"
-#include "ui/shell_dialogs/select_file_dialog.h"
 
 namespace content {
 class WebContents;
@@ -58,11 +51,9 @@ enum class NtpChromeWebStoreOpen {
 
 class CustomizeChromePageHandler
     : public side_panel::mojom::CustomizeChromePageHandler,
-      public NtpBackgroundServiceObserver,
       public ui::NativeThemeObserver,
       public ThemeServiceObserver,
       public NtpCustomBackgroundServiceObserver,
-      public ui::SelectFileDialog::Listener,
       public new_tab_footer::NewTabFooterControllerObserver {
  public:
   // Returns whether the page handler can be constructed. Used to decide whether
@@ -94,26 +85,8 @@ class CustomizeChromePageHandler
 
   // side_panel::mojom::CustomizeChromePageHandler:
   void SetDefaultColor() override;
-  void SetFollowDeviceTheme(bool follow) override;
-  void SetBackgroundImage(const std::string& attribution_1,
-                          const std::string& attribution_2,
-                          const GURL& attribution_url,
-                          const GURL& image_url,
-                          const GURL& thumbnail_url,
-                          const std::string& collection_id) override;
-  void SetDailyRefreshCollectionId(const std::string& collection_id) override;
-  void GetBackgroundCollections(
-      GetBackgroundCollectionsCallback callback) override;
-  void GetReplacementCollectionPreviewImage(
-      const std::string& collection_id,
-      GetReplacementCollectionPreviewImageCallback callback) override;
-  void GetBackgroundImages(const std::string& collection_id,
-                           GetBackgroundImagesCallback callback) override;
-  void ChooseLocalCustomBackground(
-      ChooseLocalCustomBackgroundCallback callback) override;
   void RemoveBackgroundImage() override;
   void UpdateTheme() override;
-  void UpdateThemeEditable(bool is_theme_editable) override;
   void OpenNtpManagedByPage() override;
   void SetFooterVisible(bool visible) override;
   void UpdateFooterSettings() override;
@@ -122,8 +95,6 @@ class CustomizeChromePageHandler
   void UpdateNtpManagedByName() override;
 
  private:
-  void LogEvent(NTPLoggingEventType event);
-
   // Returns the type of New Tab Page the SidePanel is attached to.
   side_panel::mojom::NewTabPageType GetNewTabPageType(const GURL& url);
 
@@ -136,33 +107,15 @@ class CustomizeChromePageHandler
   // NtpCustomBackgroundServiceObserver:
   void OnCustomBackgroundImageUpdated() override;
 
-  // NtpBackgroundServiceObserver:
-  void OnCollectionInfoAvailable() override;
-  void OnCollectionImagesAvailable() override;
-  void OnNextCollectionImageAvailable() override;
-  void OnNtpBackgroundServiceShuttingDown() override;
-
-  // SelectFileDialog::Listener:
-  void FileSelected(const ui::SelectedFileInfo& file, int index) override;
-  void FileSelectionCanceled() override;
-
   // new_tab_footer::NewTabFooterControllerObserver:
   void OnFooterVisibilityUpdated(bool visible) override;
 
   // Called when the embedding BrowserWindowInterface has changed.
   void OnBrowserWindowInterfaceChanged();
 
-  ChooseLocalCustomBackgroundCallback choose_local_custom_background_callback_;
   raw_ptr<NtpCustomBackgroundService> ntp_custom_background_service_;
   raw_ptr<Profile> profile_;
-  scoped_refptr<ui::SelectFileDialog> select_file_dialog_;
   raw_ptr<content::WebContents> web_contents_;
-  raw_ptr<NtpBackgroundService> ntp_background_service_;
-  GetBackgroundCollectionsCallback background_collections_callback_;
-  base::TimeTicks background_collections_request_start_time_;
-  std::string images_request_collection_id_;
-  GetBackgroundImagesCallback background_images_callback_;
-  base::TimeTicks background_images_request_start_time_;
   raw_ptr<ThemeService> theme_service_;
 
   // Caches a request to scroll to a section in case the front-end queries the
@@ -193,8 +146,6 @@ class CustomizeChromePageHandler
 
   // Callback used to open a URL.
   base::RepeatingCallback<void(const GURL&)> open_url_callback_;
-
-  base::WeakPtrFactory<CustomizeChromePageHandler> weak_ptr_factory_{this};
 };
 
 #endif  // CHROME_BROWSER_UI_WEBUI_SIDE_PANEL_CUSTOMIZE_CHROME_CUSTOMIZE_CHROME_PAGE_HANDLER_H_

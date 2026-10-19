@@ -8,25 +8,10 @@ generate_grd("build_grdp") {
   grd_prefix = "side_panel_customize_chrome"
   out_grd = "$target_gen_dir/resources.grdp"
   input_files = [
-    "collapse_carets.svg",
-    "collapse_carets_old.svg",
-    "corner_new_tab_page.svg",
-    "delete.svg",
-    "delete_old.svg",
     "domain.svg",
-    "expand_carets.svg",
-    "expand_carets_old.svg",
-    "generated_image.svg",
-    "generated_image_old.svg",
-    "image.svg",
-    "image_old.svg",
     "lightbulb_outline.svg",
     "mini_toolbar.svg",
     "reset.svg",
-    "sparkle.svg",
-    "sparkle_old.svg",
-    "upload.svg",
-    "upload_old.svg",
   ]
   input_files_base_dir = rebase_path(".", "//")
   resource_path_prefix = "icons"

@@ -9,7 +9,6 @@ import type {Action, Category, CustomizeToolbarClientRemote, CustomizeToolbarHan
 import {CustomizeToolbarClientCallbackRouter, CustomizeToolbarHandlerRemote} from 'chrome://customize-chrome-side-panel.top-chrome/customize_toolbar.mojom-webui.js';
 import {CustomizeToolbarApiProxy} from 'chrome://customize-chrome-side-panel.top-chrome/customize_toolbar/customize_toolbar_api_proxy.js';
 import type {ToolbarElement} from 'chrome://customize-chrome-side-panel.top-chrome/customize_toolbar/toolbar.js';
-import {WindowProxy} from 'chrome://customize-chrome-side-panel.top-chrome/window_proxy.js';
 import {assertEquals, assertFalse, assertGE, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -20,7 +19,6 @@ suite('CustomizerToolbarTest', () => {
   let handler: TestMock<CustomizeToolbarHandlerInterface>;
   let customizeToolbarCallbackRouterRemote: CustomizeToolbarClientRemote;
   let toolbarElement: ToolbarElement;
-  let windowProxy: TestMock<WindowProxy>;
 
   function createToolbarElement(
       actions: Action[] = [], categories: Category[] = []) {
@@ -60,8 +58,6 @@ suite('CustomizerToolbarTest', () => {
 
   setup(() => {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    windowProxy = installMock(WindowProxy);
-    windowProxy.setResultFor('onLine', true);
     handler = installMock(
         CustomizeToolbarHandlerRemote,
         (mock: CustomizeToolbarHandlerRemote) =>

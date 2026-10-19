@@ -8,10 +8,8 @@
 #include "base/run_loop.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
-#include "base/task/single_thread_task_runner.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
-#include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
@@ -142,7 +140,6 @@ class ModelExecutionBrowserTestBase : public InProcessBrowserTest {
     model_quality_logs_server_->RegisterRequestHandler(base::BindRepeating(
         &ModelExecutionBrowserTestBase::HandleGetModelQualityLogsUploadRequest,
         base::Unretained(this)));
-    num_logs_requests_ = 0;
 
     ASSERT_TRUE(model_execution_server_->Start());
     ASSERT_TRUE(model_quality_logs_server_->Start());
@@ -244,16 +241,6 @@ class ModelExecutionBrowserTestBase : public InProcessBrowserTest {
     scoped_metrics_consent_.emplace(consent);
   }
 
-  void WaitForModelQualityLogsUpload(int expected_num_logs_requests) {
-    while (num_logs_requests_ < expected_num_logs_requests) {
-      base::RunLoop run_loop;
-      base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-          FROM_HERE, run_loop.QuitClosure(), base::Milliseconds(100));
-      run_loop.Run();
-    }
-    EXPECT_EQ(num_logs_requests_, expected_num_logs_requests);
-  }
-
  protected:
   void OnModelExecutionResponse(
       base::OnceClosure on_model_execution_closure,
@@ -350,7 +337,6 @@ class ModelExecutionBrowserTestBase : public InProcessBrowserTest {
     response->set_code(net::HTTP_OK);
     response->set_content(serialized_response);
 
-    num_logs_requests_++;
     return std::move(response);
   }
 
@@ -376,9 +362,6 @@ class ModelExecutionBrowserTestBase : public InProcessBrowserTest {
 
   // The expected authorization header holding the bearer access token.
   std::string expected_bearer_access_token_;
-
-  // The number of requests received by the model quality logs server.
-  std::atomic<int> num_logs_requests_ = 0;
 };
 
 class ModelExecutionDisabledBrowserTest : public ModelExecutionBrowserTestBase {
@@ -498,27 +481,6 @@ IN_PROC_BROWSER_TEST_F(ModelExecutionEnabledBrowserTest,
   histogram_tester_.ExpectUniqueSample(
       "OptimizationGuide.ModelQualityLogsUploaderService.UploadStatus.Compose",
       ModelQualityLogsUploadStatus::kMetricsReportingDisabled, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(ModelExecutionEnabledBrowserTest,
-                       ModelExecutionSuccess_WithMetricsConsent) {
-  EnableSignin();
-  SetMetricsConsent(true);
-  SetExpectedBearerAccessToken("Bearer access_token");
-
-  proto::ComposeRequest request;
-  request.mutable_generate_params()->set_user_input("a user typed this");
-  ExecuteModel(UserVisibleFeatureKey::kCompose, request);
-  EXPECT_TRUE(model_execution_result_.has_value());
-  EXPECT_TRUE(model_execution_result_->response.has_value());
-  auto response = ParsedAnyMetadata<proto::ComposeResponse>(
-      model_execution_result_->response.value());
-  EXPECT_EQ("foo response", response->output());
-
-  WaitForModelQualityLogsUpload(1);
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelQualityLogsUploaderService.UploadStatus.Compose",
-      ModelQualityLogsUploadStatus::kUploadSuccessful, 1);
 }
 
 IN_PROC_BROWSER_TEST_F(ModelExecutionEnabledBrowserTest,
@@ -653,51 +615,6 @@ class ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin
         {});
   }
 };
-
-IN_PROC_BROWSER_TEST_F(
-    ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin,
-    PRE_EnableFeatureViaPref) {
-  EnableSignin();
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtStartup.Compose", false,
-      1);
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtStartup."
-      "WallpaperSearch",
-      false, 1);
-  histogram_tester_.ExpectTotalCount(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtSettingsChange.Compose",
-      0);
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtSettingsChange."
-      "WallpaperSearch",
-      true, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(
-    ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin,
-    EnableFeatureViaPref) {
-  EXPECT_TRUE(IsSignedIn());
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtStartup.Compose", false,
-      1);
-  histogram_tester_.ExpectUniqueSample(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtStartup."
-      "WallpaperSearch",
-      false, 1);
-  histogram_tester_.ExpectTotalCount(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtSettingsChange.Compose",
-      0);
-  histogram_tester_.ExpectTotalCount(
-      "OptimizationGuide.ModelExecution.FeatureEnabledAtSettingsChange."
-      "WallpaperSearch",
-      0);
-}
 
 IN_PROC_BROWSER_TEST_F(
     ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin,
@@ -893,53 +810,6 @@ IN_PROC_BROWSER_TEST_F(ModelExecutionEnterprisePolicyBrowserTest,
       optimization_guide::ModelQualityLogsUploadStatus::
           kDisabledDueToEnterprisePolicy,
       1);
-}
-
-IN_PROC_BROWSER_TEST_F(ModelExecutionEnterprisePolicyBrowserTest,
-                       DisableThenEnableWallpaperSearch) {
-  EnableSignin();
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  base::RunLoop().RunUntilIdle();
-
-  // Default policy value allows the feature.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-  EXPECT_TRUE(ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  // Disable via the enterprise policy.
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kCreateThemesSettings,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_CLOUD,
-               base::Value(static_cast<int>(
-                   model_execution::prefs::ModelExecutionEnterprisePolicyValue::
-                       kDisable)),
-               nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-  EXPECT_FALSE(ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  // Enable via the enterprise policy.
-  policies.Set(
-      policy::key::kCreateThemesSettings, policy::POLICY_LEVEL_MANDATORY,
-      policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-      base::Value(static_cast<int>(
-          model_execution::prefs::ModelExecutionEnterprisePolicyValue::kAllow)),
-      nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-  EXPECT_TRUE(ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
 }
 
 }  // namespace optimization_guide

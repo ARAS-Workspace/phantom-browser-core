@@ -26,9 +26,6 @@
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
             "value": 0
           },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
-            "value": 0
-          },
           "browser.gemini_settings": {
             "value": 0
           },
@@ -55,9 +52,6 @@
             "value": 1
           },
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
-            "value": 1
-          },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
             "value": 1
           },
           "browser.gemini_settings": {
@@ -88,9 +82,6 @@
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
             "value": 2
           },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
-            "value": 2
-          },
           "browser.gemini_settings": {
             "value": 1
           },
@@ -117,9 +108,6 @@
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
             "default_value": 0
           },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
-            "default_value": 0
-          },
           "browser.gemini_settings": {
             "default_value": 0
           },
@@ -132,7 +120,6 @@
         "policies": {
           "GenAiDefaultSettings": 1,
           "AutofillPredictionSettings": 2,
-          "CreateThemesSettings": 2,
           "DevToolsGenAiSettings": 2,
           "HelpMeWriteSettings": 2,
           "HistorySearchSettings": 2,
@@ -158,9 +145,6 @@
             "value": 2
           },
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
-            "value": 2
-          },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
             "value": 2
           },
           "browser.gemini_settings": {
@@ -219,9 +203,6 @@
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
             "value": 0
           },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
-            "value": 0
-          },
           "settings.managed.help_me_read": {
             "value": 0
           },
@@ -278,9 +259,6 @@
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
             "value": 1
           },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
-            "value": 1
-          },
           "settings.managed.help_me_read": {
             "value": 1
           },
@@ -314,7 +292,6 @@
         "policies": {
           "GenAiDefaultSettings": 0,
           "AutofillPredictionSettings": 2,
-          "CreateThemesSettings": 2,
           "DevToolsGenAiSettings": 2,
           "GenAiChromeOsSmartActionsSettings": 2,
           "GenAIInlineImageSettings": 2,
@@ -362,9 +339,6 @@
             "value": 2
           },
           "optimization_guide.model_execution.tab_compare_settings_enterprise_policy": {
-            "value": 2
-          },
-          "optimization_guide.model_execution.wallpaper_search_enterprise_policy_allowed": {
             "value": 2
           },
           "settings.managed.help_me_read": {

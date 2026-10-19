@@ -20,10 +20,6 @@ namespace prefs {
 const char kComposeEnterprisePolicyAllowed[] =
     "optimization_guide.model_execution.compose_enterprise_policy_allowed";
 
-const char kWallpaperSearchEnterprisePolicyAllowed[] =
-    "optimization_guide.model_execution.wallpaper_search_enterprise_policy_"
-    "allowed";
-
 const char kHistorySearchEnterprisePolicyAllowed[] =
     "optimization_guide.model_execution.history_search_"
     "enterprise_policy_allowed";
@@ -73,8 +69,6 @@ namespace features {
 BASE_FEATURE(kActorLoginMqlsLogging, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kComposeMqlsLogging, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kWallpaperSearchMqlsLogging, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kHistorySearchMqlsLogging, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -139,28 +133,6 @@ void RegisterCompose() {
 
   auto ui_metadata = std::make_unique<SettingsUiMetadata>(
       kComposeName, UserVisibleFeatureKey::kCompose, enterprise_policy);
-  SettingsUiRegistry::GetInstance().Register(std::move(ui_metadata));
-}
-
-void RegisterWallpaperSearch() {
-  const char kWallpaperSearchName[] = "WallpaperSearch";
-  EnterprisePolicyPref enterprise_policy =
-      EnterprisePolicyRegistry::GetInstance().Register(
-          prefs::kWallpaperSearchEnterprisePolicyAllowed);
-
-  UserFeedbackCallback logging_callback =
-      base::BindRepeating([](proto::LogAiDataRequest& request_proto) {
-        return request_proto.wallpaper_search().quality().user_feedback();
-      });
-  auto mqls_metadata = std::make_unique<MqlsFeatureMetadata>(
-      kWallpaperSearchName,
-      proto::LogAiDataRequest::FeatureCase::kWallpaperSearch, enterprise_policy,
-      &features::kWallpaperSearchMqlsLogging, logging_callback);
-  MqlsFeatureRegistry::GetInstance().Register(std::move(mqls_metadata));
-
-  auto ui_metadata = std::make_unique<SettingsUiMetadata>(
-      kWallpaperSearchName, UserVisibleFeatureKey::kWallpaperSearch,
-      enterprise_policy);
   SettingsUiRegistry::GetInstance().Register(std::move(ui_metadata));
 }
 
@@ -338,7 +310,6 @@ void RegisterGenAiFeatures(PrefRegistrySimple* pref_registry) {
     // program (rather than once per profile).
     RegisterActorLogin();
     RegisterCompose();
-    RegisterWallpaperSearch();
     RegisterHistorySearch();
     RegisterProductSpecifications();
     RegisterAutofillPredictions();

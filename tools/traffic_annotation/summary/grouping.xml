@@ -119,7 +119,6 @@ after discussions on the right group.
     <sender name="Recently Added">
       <annotation id="download_bubble_retry_download"/>
       <annotation id="fenced_frame_reporting_beacon"/>
-      <annotation id="ntp_custom_background"/>
       <annotation id="iwa_policy_update_manifest"/>
       <annotation id="iwa_installer_view_controller"/>
       <annotation id="iwa_policy_signed_web_bundle"/>
@@ -129,7 +128,6 @@ after discussions on the right group.
       <annotation id="back_navigation_cache_query"/>
       <annotation id="cws_info_service"/>
       <annotation id="password_sharing_recipients"/>
-      <annotation id="ntp_image_url_verification"/>
       <annotation id="iwa_update_discovery_update_manifest"/>
       <annotation id="iwa_update_discovery_web_bundle"/>
       <annotation id="blink_fetch_later_manager"/>
@@ -138,9 +136,6 @@ after discussions on the right group.
       <annotation id="metrics_report_ukm_and_appkm"/>
       <annotation id="search_engine_adapter"/>
       <annotation id="prewarm_http_disk_cache"/>
-      <annotation id="wallpaper_search_handler_descriptors_fetcher"/>
-      <annotation id="wallpaper_search_handler_inspirations_fetcher"/>
-      <annotation id="wallpaper_search_handler_inspiration_image_downloader"/>
       <annotation id="model_quality_logging"/>
       <annotation id="wallpaper_create_themes_model_execution"/>
       <annotation id="help_me_write_model_execution"/>
@@ -387,11 +382,7 @@ after discussions on the right group.
     <sender name="Early Hints">
       <annotation id="early_hints_preload"/>
     </sender>
-    <sender name="New Tab Page">
-      <annotation id="backdrop_collection_images_download"/>
-      <annotation id="backdrop_collection_names_download"/>
-      <annotation id="backdrop_next_image_download"/>
-    </sender>
+    <sender name="New Tab Page"/>
     <sender name="Speech Recognition"/>
     <sender name="Spellcheck">
       <annotation id="spellcheck_hunspell_dictionary"/>

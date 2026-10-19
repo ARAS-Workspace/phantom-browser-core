@@ -139,7 +139,6 @@ enum class UserVisibleFeatureKey {
 inline constexpr auto kAllUserVisibleFeatureKeys =
     std::to_array<UserVisibleFeatureKey>({
         UserVisibleFeatureKey::kCompose,
-        UserVisibleFeatureKey::kWallpaperSearch,
         UserVisibleFeatureKey::kHistorySearch,
         UserVisibleFeatureKey::kPasswordChangeSubmission,
         UserVisibleFeatureKey::kFinds,

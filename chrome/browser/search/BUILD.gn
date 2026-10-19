@@ -68,10 +68,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  sources += [
-    "background/ntp_custom_background_service_unittest.cc",
-    "background/wallpaper_search/wallpaper_search_background_manager_unittest.cc",
-  ]
+  sources += [ "background/ntp_custom_background_service_unittest.cc" ]
 
   deps += [
     ":search",
@@ -80,7 +77,6 @@ source_set("unit_tests") {
     "//chrome/browser/search/background",
     "//chrome/browser/search_engines",
     "//chrome/test:test_support",
-    "//components/application_locale_storage",
     "//components/search",
     "//components/sync_preferences:test_support",
     "//components/themes",
@@ -96,7 +92,6 @@ source_set("browser_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
   sources = [
-    "background/wallpaper_search/wallpaper_search_browsertest.cc",
     "ntp_custom_background_enabled_policy_handler_browsertest.cc",
     "search_browsertest.cc",
   ]
@@ -104,7 +99,6 @@ source_set("browser_tests") {
   deps = [
     ":search",
     "//base",
-    "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/search/background",
     "//chrome/browser/search_engines",
     "//chrome/browser/ui",

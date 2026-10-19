@@ -20,8 +20,6 @@ import {$$, hasStyle, microtasksFinished} from 'chrome://webui-test/test_util.js
 
 function createTheme(isDarkMode = false): Theme {
   return {
-    hasBackgroundImage: false,
-    hasThirdPartyTheme: false,
     backgroundImageMainColor: null,
     isDarkMode,
     seedColor: {value: 0xff0000ff},
@@ -390,26 +388,20 @@ suite('CrComponentsThemeColorPickerTest', () => {
     assertEquals(colorsElement.$.customColor, indexedColors[0]);
   });
 
-  [false, true].forEach(hasBackgroundImage => {
-    test(
-        `background color visible if theme has image ${hasBackgroundImage}`,
-        async () => {
-          initializeElement();
-          const theme = createTheme();
-          theme.hasBackgroundImage = hasBackgroundImage;
-          callbackRouter.setTheme(theme);
-          await callbackRouter.$.flushForTesting();
+  test('background color visible', async () => {
+    initializeElement();
+    const theme = createTheme();
+    callbackRouter.setTheme(theme);
+    await callbackRouter.$.flushForTesting();
 
-          const colors =
-              colorsElement.shadowRoot.querySelectorAll('cr-theme-color');
-          for (const color of colors) {
-            if (color.id === 'customColor') {
-              assertTrue(color.backgroundColorHidden);
-            } else {
-              assertFalse(color.backgroundColorHidden);
-            }
-          }
-        });
+    const colors = colorsElement.shadowRoot.querySelectorAll('cr-theme-color');
+    for (const color of colors) {
+      if (color.id === 'customColor') {
+        assertTrue(color.backgroundColorHidden);
+      } else {
+        assertFalse(color.backgroundColorHidden);
+      }
+    }
   });
 
   ([
@@ -438,7 +430,6 @@ suite('CrComponentsThemeColorPickerTest', () => {
           if (foregroundColor) {
             theme.foregroundColor = {value: foregroundColor};
           }
-          theme.hasBackgroundImage = true;
           theme.colorsManagedByPolicy = true;
           callbackRouter.setTheme(theme);
           await callbackRouter.$.flushForTesting();

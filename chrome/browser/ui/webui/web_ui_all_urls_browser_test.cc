@@ -16,7 +16,6 @@
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/search/ntp_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "printing/buildflags/buildflags.h"
@@ -31,7 +30,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
     enabled_features.push_back({feature, std::move(params)});
   };
 
-  enable_feature(ntp_features::kCustomizeChromeWallpaperSearch);
   enable_feature(
       optimization_guide::features::kOptimizationGuideModelExecution);
   enable_feature(collaboration::features::kCollaborationComments);

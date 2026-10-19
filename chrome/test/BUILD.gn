@@ -3772,7 +3772,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui/side_panel/bookmarks:unit_tests",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:unit_tests",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar:unit_tests",
-    "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search:unit_tests",
     "//components/webauthn/core/browser:test_support",
     "//ui/webui/resources/cr_components/history:mojo_bindings",
   ]

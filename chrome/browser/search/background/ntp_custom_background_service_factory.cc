@@ -6,7 +6,6 @@
 
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
@@ -36,9 +35,7 @@ NtpCustomBackgroundServiceFactory::NtpCustomBackgroundServiceFactory()
               // TODO(crbug.com/41488885): Check if this service is needed for
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOriginalOnly)
-              .Build()) {
-  DependsOn(NtpBackgroundServiceFactory::GetInstance());
-}
+              .Build()) {}
 
 NtpCustomBackgroundServiceFactory::~NtpCustomBackgroundServiceFactory() =
     default;

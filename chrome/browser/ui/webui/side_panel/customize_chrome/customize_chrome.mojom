@@ -4,80 +4,14 @@
 
 module side_panel.mojom;
 
-import "mojo/public/mojom/base/token.mojom";
-import "skia/public/mojom/skcolor.mojom";
-import "url/mojom/url.mojom";
-
-// The background image URL and styling.
-struct BackgroundImage {
-  // URL to the background image. Can point to untrusted content.
-  url.mojom.Url url;
-  // URL to snapshot of the background image. Can point to untrusted content.
-  url.mojom.Url snapshot_url;
-  // Whether the image is a local resource.
-  bool is_uploaded_image;
-  // Id for local resource. It is empty if it is an uploaded image and set if
-  // it is a local wallpaper search resource.
-  mojo_base.mojom.Token? local_background_id;
-  // Title of the background image.
-  string title;
-  // Collection id of the background image.
-  string collection_id;
-  // Whether daily refresh is enabled.
-  bool daily_refresh_enabled;
-};
-
-// Additional info for third-party themes.
-struct ThirdPartyThemeInfo {
-  // ID in the Chrome Web Store.
-  string id;
-  // Human-readable theme name.
-  string name;
-};
-
 // A generic theme.
 struct Theme {
-  // The background image.
-  BackgroundImage? background_image;
-  // User's third party theme info.
-  ThirdPartyThemeInfo? third_party_theme_info;
-  // The current theme background color.
-  skia.mojom.SkColor background_color;
-  // The current theme foreground color. If not set, we use the default theme.
-  skia.mojom.SkColor? foreground_color;
+  // Whether the user has a background image applied.
+  bool has_background_image;
+  // Whether the user has a third party theme applied.
+  bool has_third_party_theme;
   // True if the background is managed by a policy.
   bool background_managed_by_policy;
-  // True if we are following the OS theme.
-  bool follow_device_theme;
-};
-
-// A collection of background images.
-struct BackgroundCollection {
-  // Collection identifier.
-  string id;
-  // Localized string of the collection name.
-  string label;
-  // URL to a preview image for the collection. Can point to untrusted content.
-  url.mojom.Url preview_image_url;
-  // True if the collection's preview image is valid (loads correctly).
-  bool image_verified;
-};
-
-// A background image in a collection.
-struct CollectionImage {
-  // Human readable attributions of the background image.
-  string attribution_1;
-  string attribution_2;
-  // URL associated with the background image. Used for href.
-  url.mojom.Url attribution_url;
-  // URL of image. Can point to untrusted content.
-  url.mojom.Url image_url;
-  // URL to a preview of the image. Can point to untrusted content.
-  url.mojom.Url preview_image_url;
-  // Collection id of the image;
-  string collection_id;
-  // True if the theme's preview image is valid (loads correctly).
-  bool image_verified;
 };
 
 enum CustomizeChromeSection {
@@ -91,8 +25,6 @@ enum CustomizeChromeSection {
 enum NewTabPageType {
   kThirdPartyWebUI,
   kExtension,
-  kIncognito,
-  kGuestMode,
   kNone,
 };
 
@@ -105,42 +37,14 @@ interface CustomizeChromePageHandlerFactory {
 
 // Browser-side handler for requests from WebUI page.
 interface CustomizeChromePageHandler {
-  // Returns the collections of background images.
-  GetBackgroundCollections() => (array<BackgroundCollection> collections);
-
-  // Returns a valid collection preview image for |collection_id|.
-  GetReplacementCollectionPreviewImage(string collection_id)
-      => (url.mojom.Url? preview_image_url);
-
-  // Returns the images of a collection identified by |collection_id|.
-  GetBackgroundImages(string collection_id) => (array<CollectionImage> images);
-
   // Triggers a call to |CustomizeChromePage.SetTheme()|.
   UpdateTheme();
-
-  // Triggers a call to |CustomizeChromePage.SetThemeEditable()|.
-  UpdateThemeEditable(bool is_theme_editable);
 
   // Sets Chrome's theme according to the default color.
   SetDefaultColor();
 
-  // Set that the theme should follow the device's.
-  SetFollowDeviceTheme(bool follow);
-
   // Removes background image.
   RemoveBackgroundImage();
-
-  // Choose custom background from local file system.
-  ChooseLocalCustomBackground() => (bool success);
-
-  // Sets the background image and notifies all NTPs of the change.
-  SetBackgroundImage(string attribution_1, string attribution_2,
-      url.mojom.Url attribution_url, url.mojom.Url image_url,
-      url.mojom.Url thumbnail_url, string collection_id);
-
-  // Sets collection id for daily refresh. When |collection_id| is empty, the
-  // daily refresh is turned off.
-  SetDailyRefreshCollectionId(string collection_id);
 
   // Opens the extensions details page of the extension that manages the NTP,
   // if there is one.
@@ -169,8 +73,6 @@ interface CustomizeChromePage {
 
   // Sets the current theme.
   SetTheme(Theme theme);
-  // Sets whether edit theme should be enabled.
-  SetThemeEditable(bool is_theme_editable);
   // Scrolls side panel to |section|. Possibly a response to a call to
   // |CustomizeChromePageHandler.UpdateScrollToSection()|.
   ScrollToSection(side_panel.mojom.CustomizeChromeSection section);

@@ -13,6 +13,7 @@ namespace optimization_guide {
 namespace {
 
 using features::internal::GetAllowedFeaturesForUnsignedUser;
+using testing::IsEmpty;
 using testing::UnorderedElementsAre;
 
 TEST(ModelExecutionFeature, GetAllowedFeaturesForUnsignedUser) {
@@ -29,8 +30,7 @@ TEST(ModelExecutionFeature, GetAllowedFeaturesForUnsignedUser) {
         {});
     EXPECT_THAT(GetAllowedFeaturesForUnsignedUser(),
                 UnorderedElementsAre(UserVisibleFeatureKey::kHistorySearch,
-                                     UserVisibleFeatureKey::kCompose,
-                                     UserVisibleFeatureKey::kWallpaperSearch));
+                                     UserVisibleFeatureKey::kCompose));
   }
   {
     base::test::ScopedFeatureList scoped_feature_list;
@@ -42,8 +42,7 @@ TEST(ModelExecutionFeature, GetAllowedFeaturesForUnsignedUser) {
          {features::internal::kWallpaperSearchSettingsVisibility,
           {{"allow_unsigned_user", "true"}}}},
         {});
-    EXPECT_THAT(GetAllowedFeaturesForUnsignedUser(),
-                UnorderedElementsAre(UserVisibleFeatureKey::kWallpaperSearch));
+    EXPECT_THAT(GetAllowedFeaturesForUnsignedUser(), IsEmpty());
   }
 }
 

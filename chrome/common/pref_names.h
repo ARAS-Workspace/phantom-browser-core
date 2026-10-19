@@ -1166,16 +1166,11 @@ inline constexpr char kNtpCustomBackgroundLocalToDevice[] =
     "ntp.custom_background_local_to_device";
 inline constexpr char kNtpCustomBackgroundLocalToDeviceId[] =
     "ntp.custom_background_local_to_device_id";
-inline constexpr char kNtpCustomBackgroundInspiration[] =
-    "ntp.custom_background_inspiration";
 
 // Holds info for New Tab Page custom background
 // Use `kNtpCustomBackgroundDict` only.
 inline constexpr char kDeprecatedNtpCustomBackgroundDictDoNotUse[] =
     "ntp.custom_background_dict";
-// List of ids for past wallpaper search themes.
-inline constexpr char kNtpWallpaperSearchHistory[] =
-    "ntp.wallpaper_search_history";
 // Number of times the seed color has been changed via the Customize Chrome
 // panel across NTP tabs. Incremented at most once per NTP tab.
 inline constexpr char kSeedColorChangeCount[] =

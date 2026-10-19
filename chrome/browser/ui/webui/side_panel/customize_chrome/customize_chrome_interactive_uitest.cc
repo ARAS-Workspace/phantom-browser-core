@@ -12,7 +12,6 @@
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
-#include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/new_tab_footer/footer_web_view.h"
 #include "chrome/browser/ui/webui/test_support/webui_interactive_test_mixin.h"
 #include "chrome/common/pref_names.h"
@@ -21,9 +20,7 @@
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
-#include "components/themes/ntp_background_data.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/url_loader_interceptor.h"
 #include "extensions/browser/install_verifier.h"
 #include "extensions/test/test_extension_dir.h"
 #include "ui/actions/actions.h"
@@ -37,8 +34,7 @@ class CustomizeChromeInteractiveTest
  public:
   void SetUp() override {
     scoped_feature_list_.InitWithFeatures(
-        {ntp_features::kNtpFooter},
-        {ntp_features::kNtpBackgroundImageErrorDetection});
+        /*enabled_features=*/{ntp_features::kNtpFooter}, {});
     InteractiveBrowserTest::SetUp();
   }
 
@@ -58,17 +54,6 @@ class CustomizeChromeInteractiveTest
     element_exists.event = kElementExists;
     element_exists.where = element;
     return WaitForStateChange(contents_id, element_exists);
-  }
-
-  InteractiveTestApi::MultiStep WaitForElementDoesNotExist(
-      const ui::ElementIdentifier& contents_id,
-      const DeepQuery& element) {
-    StateChange element_does_not_exist;
-    element_does_not_exist.type =
-        WebContentsInteractionTestUtil::StateChange::Type::kDoesNotExist;
-    element_does_not_exist.event = kElementExists;
-    element_does_not_exist.where = element;
-    return WaitForStateChange(contents_id, element_does_not_exist);
   }
 
   InteractiveTestApi::MultiStep OpenCustomizeChromeSidePanel(
@@ -127,48 +112,6 @@ class CustomizeChromeInteractiveTest
     const extensions::Extension* extension =
         extension_loader.LoadExtension(extension_dir.Pack()).get();
     ASSERT_TRUE(extension);
-  }
-
-  std::unique_ptr<content::URLLoaderInterceptor> SetUpThemesResponses() {
-    return std::make_unique<content::URLLoaderInterceptor>(
-        base::BindLambdaForTesting(
-            [&](content::URLLoaderInterceptor::RequestParams* params) -> bool {
-              if (params->url_request.url.GetPath() ==
-                  "/cast/chromecast/home/wallpaper/collections") {
-                std::string headers =
-                    "HTTP/1.1 200 OK\nContent-Type: application/json\n\n";
-                ntp::background::Collection collection;
-                collection.set_collection_id("shapes");
-                collection.set_collection_name("Shapes");
-                collection.add_preview()->set_image_url(
-                    "https://wallpapers.co/some_image");
-                ntp::background::GetCollectionsResponse response;
-                *response.add_collections() = collection;
-                std::string response_string;
-                response.SerializeToString(&response_string);
-                content::URLLoaderInterceptor::WriteResponse(
-                    headers, response_string, params->client.get(),
-                    std::optional<net::SSLInfo>());
-                return true;
-              } else if (params->url_request.url.GetPath() ==
-                         "/cast/chromecast/home/wallpaper/collection-images") {
-                std::string headers =
-                    "HTTP/1.1 200 OK\nContent-Type: application/json\n\n";
-                ntp::background::Image image;
-                image.set_asset_id(12345);
-                image.set_image_url("https://wallpapers.co/some_image");
-                image.add_attribution()->set_text("attribution text");
-                ntp::background::GetImagesInCollectionResponse response;
-                *response.add_images() = image;
-                std::string response_string;
-                response.SerializeToString(&response_string);
-                content::URLLoaderInterceptor::WriteResponse(
-                    headers, response_string, params->client.get(),
-                    std::optional<net::SSLInfo>());
-                return true;
-              }
-              return false;
-            }));
   }
 
  protected:
@@ -234,54 +177,6 @@ IN_PROC_BROWSER_TEST_F(CustomizeChromeInteractiveTest,
       ClickElement(kLocalCustomizeChromeElementId, kFooterToggle),
       // Ensure footer shows.
       WaitForShow(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(CustomizeChromeInteractiveTest,
-                       EditThemeDisablesExtensionNtps) {
-  std::unique_ptr<content::URLLoaderInterceptor> fetch_interceptor =
-      SetUpThemesResponses();
-
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLocalCustomizeChromeElementId);
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLocalNewTabElementId);
-
-  DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kNtpHasBackgroundEvent);
-  StateChange ntp_has_background;
-  ntp_has_background.type = StateChange::Type::kExistsAndConditionTrue;
-  ntp_has_background.where = {"body"};
-  ntp_has_background.event = kNtpHasBackgroundEvent;
-  ntp_has_background.test_function =
-      "(el) => el.hasAttribute('show-background-image')";
-
-  const DeepQuery kEditThemeButton = {"customize-chrome-app",
-                                      "#appearanceElement", "#editThemeButton"};
-  const DeepQuery kCollectionButton = {"customize-chrome-app",
-                                       "#categoriesPage", ".collection"};
-  const DeepQuery kThemeButton = {"customize-chrome-app", "#themesPage",
-                                  ".theme"};
-  const DeepQuery kFooterSection = {"customize-chrome-app", "#footer",
-                                    "customize-chrome-footer",
-                                    "#showToggleContainer"};
-
-  // Install multiple extensions that override the new tab page.
-  LoadNtpOverridingExtension(0);
-  LoadNtpOverridingExtension(1);
-  RunTestSequence(
-      // Open extension NTP.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Choose a 1P NTP theme from Customize Chrome.
-      Steps(OpenCustomizeChromeSidePanel(kLocalCustomizeChromeElementId),
-            ClickElement(kLocalCustomizeChromeElementId, kEditThemeButton),
-            ClickElement(kLocalCustomizeChromeElementId, kCollectionButton),
-            ClickElement(kLocalCustomizeChromeElementId, kThemeButton)),
-      // Ensure that both extensions were disabled, and the tab redirected to 1P
-      // NTP with background.
-      Steps(WaitForWebContentsNavigation(kNewTabElementId,
-                                         chrome::ChromeUINewTabURLAsGURL()),
-            WaitForStateChange(kNewTabElementId, ntp_has_background)),
-      // Ensure that opening a new tab redirects to the 1P NTP.
-      Steps(AddInstrumentedTab(kLocalNewTabElementId,
-                               chrome::ChromeUINewTabURLAsGURL()),
-            WaitForStateChange(kLocalNewTabElementId, ntp_has_background)));
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

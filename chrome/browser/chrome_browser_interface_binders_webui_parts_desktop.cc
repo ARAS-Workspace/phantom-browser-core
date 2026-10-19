@@ -36,7 +36,6 @@
 #include "chrome/browser/ui/webui/side_panel/comments/comments_side_panel_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
-#include "chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/history/history_side_panel_ui.h"
 #include "chrome/browser/ui/webui/side_panel/history_clusters/history_clusters_side_panel_ui.h"
 #include "chrome/browser/ui/webui/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_ui.h"
@@ -58,7 +57,6 @@
 #include "components/history_clusters/core/history_clusters_service.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/page_image_service/mojom/page_image_service.mojom.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/search/ntp_features.h"
@@ -227,15 +225,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::CustomizeChromePageHandlerFactory, CustomizeChromeUI>(
       map);
-
-  if (base::FeatureList::IsEnabled(
-          ntp_features::kCustomizeChromeWallpaperSearch) &&
-      base::FeatureList::IsEnabled(
-          optimization_guide::features::kOptimizationGuideModelExecution)) {
-    RegisterWebUIControllerInterfaceBinder<
-        side_panel::customize_chrome::mojom::WallpaperSearchHandlerFactory,
-        CustomizeChromeUI>(map);
-  }
 
   RegisterWebUIControllerInterfaceBinder<
       side_panel::customize_chrome::mojom::CustomizeToolbarHandlerFactory,

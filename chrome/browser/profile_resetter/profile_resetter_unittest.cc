@@ -133,20 +133,6 @@ const char kXmlConfig[] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 using extensions::Extension;
 using extensions::Manifest;
 
-class FakeNtpCustomBackgroundService : public NtpCustomBackgroundService {
- public:
-  using NtpCustomBackgroundService::NtpCustomBackgroundService;
-  void FetchCustomBackgroundAndExtractBackgroundColor(
-      const GURL& image_url,
-      const GURL& fetch_url) override {}
-};
-
-std::unique_ptr<KeyedService> CreateFakeNtpCustomBackgroundService(
-    content::BrowserContext* context) {
-  Profile* profile = Profile::FromBrowserContext(context);
-  return std::make_unique<FakeNtpCustomBackgroundService>(profile);
-}
-
 // ProfileResetterTest --------------------------------------------------------
 
 // ProfileResetterTest sets up the extension, WebData and TemplateURL services.
@@ -171,9 +157,6 @@ void ProfileResetterTest::SetUp() {
   extensions::ExtensionServiceTestBase::SetUp();
   ExtensionServiceInitParams params;
   params.testing_factories = {
-      TestingProfile::TestingFactory(
-          NtpCustomBackgroundServiceFactory::GetInstance(),
-          base::BindRepeating(&CreateFakeNtpCustomBackgroundService)),
       TestingProfile::TestingFactory(
           TemplateURLServiceFactory::GetInstance(),
           TemplateURLServiceTestUtil::GetTemplateURLServiceTestingFactory()),
@@ -772,15 +755,10 @@ TEST_F(ConfigParserTest, InvalidResponseDeleteFromCallback) {
 TEST_F(ProfileResetterTest, ResetNTPCustomizationsTest) {
   auto* ntp_custom_background_service =
       NtpCustomBackgroundServiceFactory::GetForProfile(profile());
-  ntp_custom_background_service->AddValidBackdropUrlForTesting(
-      GURL("https://background.com"));
-  ntp_custom_background_service->SetCustomBackgroundInfo(
-      /*background_url=*/GURL("https://background.com"),
-      /*thumbnail_url=*/GURL("https://thumbnail.com"),
-      /*attribution_line_1=*/"line 1",
-      /*attribution_line_2=*/"line 2",
-      /*action_url=*/GURL("https://action.com"),
-      /*collection_id=*/"");
+  // Sync writes the background dictionary directly.
+  profile()->GetPrefs()->SetDict(
+      prefs::kNtpCustomBackgroundDict,
+      base::DictValue().Set("background_url", "https://background.com"));
   EXPECT_TRUE(ntp_custom_background_service->GetCustomBackground().has_value());
   ResetAndWait(ProfileResetter::NTP_CUSTOMIZATIONS);
   EXPECT_FALSE(

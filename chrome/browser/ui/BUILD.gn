@@ -1275,7 +1275,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/comments",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
-    "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
     "//chrome/browser/ui/webui/side_panel/history",
     "//chrome/browser/ui/webui/side_panel/history_clusters",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
@@ -1313,7 +1312,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
     "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
-    "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
 
     # //chrome/browser/ui/webui/util/webui_util_desktop.h is included by
     # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.

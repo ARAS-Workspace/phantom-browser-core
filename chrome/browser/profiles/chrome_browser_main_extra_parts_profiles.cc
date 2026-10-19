@@ -161,7 +161,6 @@
 #include "chrome/browser/profiles/renderer_updater_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
-#include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
 #include "chrome/browser/search_engines/template_url_fetcher_factory.h"
@@ -609,7 +608,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(USE_NSS_CERTS)
   NssServiceFactory::GetInstance();
 #endif
-  NtpBackgroundServiceFactory::GetInstance();
   NtpCustomBackgroundServiceFactory::GetInstance();
   NTPResourceCacheFactory::GetInstance();
   OfflineItemModelManagerFactory::GetInstance();

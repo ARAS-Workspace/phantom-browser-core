@@ -47,7 +47,6 @@ source_set("impl") {
     "//components/ntp_tiles:pref_names",
     "//components/prefs",
     "//components/search",
-    "//components/variations/service",
     "//content/public/browser",
     "//ui/base",
   ]

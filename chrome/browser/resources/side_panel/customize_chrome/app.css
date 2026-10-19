@@ -54,9 +54,6 @@ sp-heading {
 }
 
 customize-chrome-appearance,
-customize-chrome-categories,
-customize-chrome-themes,
-customize-chrome-wallpaper-search,
 customize-chrome-toolbar {
   display: block;
   max-width: 360px;

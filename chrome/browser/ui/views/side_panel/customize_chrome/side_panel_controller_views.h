@@ -33,9 +33,6 @@ class SidePanelControllerViews : public SidePanelControllerBase {
   // SidePanelControllerBase:
   void OnEntryRegisteredForUrl(const GURL& url) override;
 
-  // Returns true for 1P NTP or extension NTP, otherwise returns false.
-  bool ShouldEnableEditTheme(const GURL& url) const;
-
   // Generates the view for the SidePanel contents. This is the WebUI for the
   // SidePanel. Used by the SidepanelRegistry to create the view.
   SidePanelNativeView CreateCustomizeChromeView(

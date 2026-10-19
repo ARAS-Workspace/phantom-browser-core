@@ -1089,9 +1089,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kHelpMeWriteSettings,
     optimization_guide::prefs::kComposeEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
-  { key::kCreateThemesSettings,
-    optimization_guide::prefs::kWallpaperSearchEnterprisePolicyAllowed,
-    base::Value::Type::INTEGER},
   { key::kHistorySearchSettings,
     optimization_guide::prefs::kHistorySearchEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
@@ -1612,9 +1609,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   gen_ai_default_policies.emplace_back(
       key::kHelpMeWriteSettings,
       optimization_guide::prefs::kComposeEnterprisePolicyAllowed);
-  gen_ai_default_policies.emplace_back(
-      key::kCreateThemesSettings,
-      optimization_guide::prefs::kWallpaperSearchEnterprisePolicyAllowed);
   gen_ai_default_policies.emplace_back(key::kDevToolsGenAiSettings,
                                        prefs::kDevToolsGenAiSettings);
   gen_ai_default_policies.emplace_back(

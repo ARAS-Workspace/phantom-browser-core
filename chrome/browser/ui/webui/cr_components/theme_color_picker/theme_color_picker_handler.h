@@ -54,7 +54,6 @@ class ThemeColorPickerHandler
   void SetSeedColorFromHue(float hue) override;
   void GetChromeColors(bool is_dark_mode,
                        GetChromeColorsCallback callback) override;
-  void RemoveBackgroundImage() override;
   void UpdateTheme() override;
 
  private:

@@ -17,7 +17,6 @@
 #include "chrome/browser/ui/views/frame/multi_contents_view.h"
 #include "chrome/browser/ui/views/new_tab_footer/footer_web_view.h"
 #include "chrome/browser/ui/webui/new_tab_footer/footer_context_menu.h"
-#include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_handler.h"
 #include "chrome/browser/ui/webui/test_support/webui_interactive_test_mixin.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"

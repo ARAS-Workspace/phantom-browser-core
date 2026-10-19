@@ -18,6 +18,8 @@
 #include "chrome/browser/themes/theme_syncable_service.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/common/extensions/extension_test_util.h"
+#include "chrome/common/pref_names.h"
+#include "components/prefs/pref_service.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/test/test_sync_service.h"
 #include "content/public/test/browser_task_environment.h"
@@ -185,10 +187,9 @@ TEST_F(ProfileCustomizationBubbleSyncControllerTest,
 
   ApplyColorAndShowBubbleWhenNoValueSynced(show_bubble.Get());
   // Set account ntp background.
-  ntp_custom_background_service_->AddValidBackdropUrlForTesting(
-      GURL(kBackgroundUrl));
-  ntp_custom_background_service_->SetCustomBackgroundInfo(
-      GURL(kBackgroundUrl), GURL(), "", "", GURL(), "");
+  profile()->GetPrefs()->SetDict(
+      prefs::kNtpCustomBackgroundDict,
+      base::DictValue().Set("background_url", kBackgroundUrl));
   ASSERT_TRUE(
       ntp_custom_background_service_->GetCustomBackground().has_value());
   NotifyOnSyncStarted();

@@ -359,11 +359,9 @@ void ThemeService::Init() {
   theme_syncable_service_ =
       std::make_unique<ThemeSyncableService>(profile_, this);
 
-  ntp_custom_background_service_ =
-      NtpCustomBackgroundServiceFactory::GetForProfile(profile_);
-  if (ntp_custom_background_service_) {
-    ntp_custom_background_service_->SetThemeDelegate(this);
-  }
+  // Creates the NTP custom background service with the profile so that its
+  // pref observer handles background updates received via sync.
+  NtpCustomBackgroundServiceFactory::GetForProfile(profile_);
 
   // TODO(gayane): Temporary entry point for Chrome Colors. Remove once UI is
   // there.
@@ -410,10 +408,6 @@ void ThemeService::Shutdown() {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   theme_observer_.reset();
 #endif
-  if (ntp_custom_background_service_) {
-    ntp_custom_background_service_->RemoveThemeDelegate();
-    ntp_custom_background_service_ = nullptr;
-  }
   theme_syncable_service_.reset();
 }
 
@@ -493,15 +487,6 @@ bool ThemeService::UsingDefaultTheme() const {
 
 bool ThemeService::UsingSystemTheme() const {
   return UsingDefaultTheme();
-}
-
-void ThemeService::OnBackgroundColorExtracted(SkColor color) {
-  SetUserColorAndBrowserColorVariant(
-      color, ui::mojom::BrowserColorVariant::kTonalSpot);
-}
-
-void ThemeService::OnNtpCustomBackgroundServiceShuttingDown() {
-  ntp_custom_background_service_ = nullptr;
 }
 
 bool ThemeService::UsingExtensionTheme() const {

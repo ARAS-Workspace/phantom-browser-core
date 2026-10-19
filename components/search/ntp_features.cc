@@ -11,20 +11,6 @@
 
 namespace ntp_features {
 
-// If enabled, shows wallpaper search within the Customize Chrome Side Panel.
-// This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kCustomizeChromeWallpaperSearch, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, shows entry point on Customize Chrome Side Panel's Appearance
-// page for Wallpaper Search.";
-BASE_FEATURE(kCustomizeChromeWallpaperSearchButton,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, shows inspiration card in Customize Chrome Side Panel Wallpaper
-// Search.
-BASE_FEATURE(kCustomizeChromeWallpaperSearchInspirationCard,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // If enabled, the EnergyEffect for Realbox will be shown.
 BASE_FEATURE(kEnergyEffect, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -32,15 +18,6 @@ BASE_FEATURE(kEnergyEffect, base::FEATURE_DISABLED_BY_DEFAULT);
 // matching omnibox theme and increased realbox shadow.
 BASE_FEATURE(kRealboxCr23Theming,
              "NtpRealboxCr23Theming",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, alpha NTP backgrounds will show in Customize Chrome.
-// This is a development switch. Keep indefinitely.
-BASE_FEATURE(kNtpAlphaBackgroundCollections, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, NTP background image links will be checked for HTTP status
-// errors."
-BASE_FEATURE(kNtpBackgroundImageErrorDetection,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // When enabled, ChromeContentBrowserClient::OverrideNavigationParams no

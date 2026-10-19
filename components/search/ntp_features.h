@@ -17,13 +17,8 @@ namespace ntp_features {
 // The features should be documented alongside the definition of their values in
 // the .cc file.
 
-BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearch);
-BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearchButton);
-BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearchInspirationCard);
 BASE_DECLARE_FEATURE(kEnergyEffect);
 BASE_DECLARE_FEATURE(kRealboxCr23Theming);
-BASE_DECLARE_FEATURE(kNtpAlphaBackgroundCollections);
-BASE_DECLARE_FEATURE(kNtpBackgroundImageErrorDetection);
 BASE_DECLARE_FEATURE(kNtpDisableBrowserInitiatedLinks);
 BASE_DECLARE_FEATURE(kNtpShortcuts);
 BASE_DECLARE_FEATURE(kNtpMostVisitedHighDpiFavicons);

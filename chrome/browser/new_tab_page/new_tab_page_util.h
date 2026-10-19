@@ -7,15 +7,10 @@
 
 #include <set>
 
-#include "base/feature_list.h"
 #include "base/values.h"
 #include "components/ntp_tiles/tile_type.h"
 
 class Profile;
-
-namespace variations {
-class VariationsService;
-}  // namespace variations
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -28,12 +23,6 @@ enum class NtpShortcutsAutoRemovalReason {
   kMaxValue = kStaleDaysCount,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/new_tab_page/enums.xml:NtpShortcutsAutoRemovalReason)
-
-bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature);
-
-// Return the country code as provided by the variations service.
-std::string GetVariationsServiceCountryCode(
-    variations::VariationsService* variations_service);
 
 bool IsTopSitesEnabled(Profile* profile);
 bool IsCustomLinksEnabled(Profile* profile);

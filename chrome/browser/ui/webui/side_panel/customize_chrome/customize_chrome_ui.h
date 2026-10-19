@@ -10,11 +10,9 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
-#include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar/customize_toolbar.mojom.h"
-#include "chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search.mojom.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_webui_config.h"
 #include "chrome/common/webui_url_constants.h"
@@ -35,9 +33,6 @@ class CustomizeColorSchemeModeHandler;
 class CustomizeToolbarHandler;
 class Profile;
 class ThemeColorPickerHandler;
-class WallpaperSearchBackgroundManager;
-class WallpaperSearchHandler;
-class WallpaperSearchStringMap;
 
 class CustomizeChromeUIConfig
     : public DefaultTopChromeWebUIConfig<CustomizeChromeUI> {
@@ -54,7 +49,6 @@ class CustomizeChromeUI
       public customize_color_scheme_mode::mojom::
           CustomizeColorSchemeModeHandlerFactory,
       public theme_color_picker::mojom::ThemeColorPickerHandlerFactory,
-      public side_panel::customize_chrome::mojom::WallpaperSearchHandlerFactory,
       public side_panel::mojom::CustomizeChromePageHandlerFactory,
       public side_panel::customize_chrome::mojom::
           CustomizeToolbarHandlerFactory {
@@ -70,9 +64,6 @@ class CustomizeChromeUI
 
   // Passthrough that calls the CustomizeChromePage's AttachedTabStateUpdated.
   void AttachedTabStateUpdated(const GURL& url);
-
-  // Passthrough that calls to CustomizeChromePage's UpdateThemeEditable.
-  void UpdateThemeEditable(bool is_theme_editable);
 
   // Gets a weak pointer to this object.
   base::WeakPtr<CustomizeChromeUI> GetWeakPtr();
@@ -92,11 +83,6 @@ class CustomizeChromeUI
   void BindInterface(mojo::PendingReceiver<
                      theme_color_picker::mojom::ThemeColorPickerHandlerFactory>
                          pending_receiver);
-
-  void BindInterface(
-      mojo::PendingReceiver<
-          side_panel::customize_chrome::mojom::WallpaperSearchHandlerFactory>
-          pending_receiver);
 
   void BindInterface(
       mojo::PendingReceiver<
@@ -128,14 +114,6 @@ class CustomizeChromeUI
       mojo::PendingReceiver<theme_color_picker::mojom::ThemeColorPickerHandler>
           handler) override;
 
-  // side_panel::customize_chrome::mojom::WallpaperSearchHandlerFactory:
-  void CreateWallpaperSearchHandler(
-      mojo::PendingRemote<
-          side_panel::customize_chrome::mojom::WallpaperSearchClient> client,
-      mojo::PendingReceiver<
-          side_panel::customize_chrome::mojom::WallpaperSearchHandler> handler)
-      override;
-
   // side_panel::mojom::CustomizeToolbarPageHandlerFactory
   void CreateCustomizeToolbarHandler(
       mojo::PendingRemote<
@@ -144,12 +122,6 @@ class CustomizeChromeUI
           side_panel::customize_chrome::mojom::CustomizeToolbarHandler> handler)
       override;
 
-  // image_decoder_ needs to be initialized before
-  // wallpaper_search_handler_ so that the image decoder will be
-  // deconstructed after the handler. Otherwise, we will get a dangling pointer
-  // error from the raw_ptr in the handler not pointing to anything after
-  // image_decoder_ object is deleted.
-  std::unique_ptr<ImageDecoderImpl> image_decoder_;
   std::unique_ptr<CustomizeChromePageHandler> customize_chrome_page_handler_;
   raw_ptr<Profile> profile_;
   raw_ptr<content::WebContents> web_contents_;
@@ -159,7 +131,6 @@ class CustomizeChromeUI
   // the front-end is ready to receive the request.
   std::optional<CustomizeChromeSection> section_;
   GURL source_tab_url_;
-  std::optional<bool> is_theme_editable_;
 
   std::unique_ptr<CustomizeColorSchemeModeHandler>
       customize_color_scheme_mode_handler_;
@@ -169,18 +140,10 @@ class CustomizeChromeUI
   std::unique_ptr<ThemeColorPickerHandler> theme_color_picker_handler_;
   mojo::Receiver<theme_color_picker::mojom::ThemeColorPickerHandlerFactory>
       theme_color_picker_handler_factory_receiver_{this};
-  std::unique_ptr<WallpaperSearchBackgroundManager>
-      wallpaper_search_background_manager_;
-  std::unique_ptr<WallpaperSearchStringMap> wallpaper_search_string_map_;
-  std::unique_ptr<WallpaperSearchHandler> wallpaper_search_handler_;
-  mojo::Receiver<
-      side_panel::customize_chrome::mojom::WallpaperSearchHandlerFactory>
-      wallpaper_search_handler_factory_receiver_{this};
   std::unique_ptr<CustomizeToolbarHandler> customize_toolbar_handler_;
   mojo::Receiver<
       side_panel::customize_chrome::mojom::CustomizeToolbarHandlerFactory>
       customize_toolbar_handler_factory_receiver_{this};
-  const int64_t id_;
 
   base::WeakPtrFactory<CustomizeChromeUI> weak_ptr_factory_{this};
 

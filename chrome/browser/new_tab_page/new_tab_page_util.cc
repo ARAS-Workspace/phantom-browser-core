@@ -6,44 +6,18 @@
 
 #include "base/metrics/histogram_functions.h"
 #include "base/time/time.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
-#include "components/variations/service/variations_service.h"
 
 namespace {
 
 constexpr char kShortcutsAutoRemovalReasonHistogram[] =
     "NewTabPage.MostVisited.AutoRemovalSkipped";
 
-bool IsInUS() {
-  return g_browser_process->GetApplicationLocale() == "en-US" &&
-         GetVariationsServiceCountryCode(
-             g_browser_process->variations_service()) == "us";
-}
-
 }  // namespace
-
-bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature) {
-  if (base::FeatureList::GetInstance()->IsFeatureOverridden(ntp_feature.name)) {
-    return base::FeatureList::IsEnabled(ntp_feature);
-  }
-  return IsInUS();
-}
-
-std::string GetVariationsServiceCountryCode(
-    variations::VariationsService* variations_service) {
-  std::string country_code;
-  if (!variations_service) {
-    return country_code;
-  }
-  country_code = variations_service->GetStoredPermanentCountry();
-  return country_code.empty() ? variations_service->GetLatestCountry()
-                              : country_code;
-}
 
 bool IsTopSitesEnabled(Profile* profile) {
   return !IsCustomLinksEnabled(profile);

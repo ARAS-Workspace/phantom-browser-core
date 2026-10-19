@@ -7,10 +7,6 @@
 #include "base/feature_list.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
-#include "chrome/browser/new_tab_page/new_tab_page_util.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/search/ntp_features.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_registrar.h"
@@ -19,19 +15,6 @@
 #include "extensions/common/extension.h"
 
 namespace customize_chrome {
-
-bool IsWallpaperSearchEnabledForProfile(Profile* profile) {
-  OptimizationGuideKeyedService* optimization_guide_keyed_service =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
-  return IsEnUSLocaleOnlyFeatureEnabled(
-             ntp_features::kCustomizeChromeWallpaperSearch) &&
-         base::FeatureList::IsEnabled(
-             optimization_guide::features::kOptimizationGuideModelExecution) &&
-         (optimization_guide_keyed_service &&
-          optimization_guide_keyed_service
-              ->ShouldFeatureBeCurrentlyEnabledForUser(
-                  optimization_guide::UserVisibleFeatureKey::kWallpaperSearch));
-}
 
 // TODO(crbug.com/415116961): Add unit tests for this function.
 void MaybeDisableExtensionOverridingNtp(

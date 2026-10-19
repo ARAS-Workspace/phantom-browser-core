@@ -806,19 +806,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   run_loop->Run();
 }
 
-class TestSettingsEnabledObserver : public SettingsEnabledObserver {
- public:
-  explicit TestSettingsEnabledObserver(UserVisibleFeatureKey feature)
-      : SettingsEnabledObserver(feature) {}
-  void OnChangeInFeatureCurrentlyEnabledState(bool is_now_enabled) override {
-    count_feature_enabled_state_changes_++;
-    is_currently_enabled_ = is_now_enabled;
-  }
-
-  int count_feature_enabled_state_changes_ = 0;
-  bool is_currently_enabled_ = false;
-};
-
 class OptimizationGuideKeyedServiceUnsignedUserBrowserTest
     : public OptimizationGuideKeyedServiceBrowserTest {
  public:
@@ -847,178 +834,13 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceUnsignedUserBrowserTest,
   // User is not signed-in, compose is not visible.
   EXPECT_FALSE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
 
-  // Visibility of wallpaper search is allowed for unsigned users.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-
   // kCompose should now be visible after sign-in.
   EnableSignIn();
 
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-
   EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
 
   SignOut();
-  // Wallpaper Search is visible to unsigned users.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
   EXPECT_FALSE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
-}
-
-// Verifies that Model Execution Features Controller is available for incognito
-// profiles and the visibility of settings is correct.
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       SettingsVisibilityUpdatedCorrectly) {
-  EnableSignIn();
-
-  // Visibility of wallpaper search is enabled on ToT.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-
-  // Visibility of compose is enabled via finch.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-
-  // Restarting the browser should cause wallpaper setting to be visible since
-  // the feature is enabled.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
-
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kDisabled));
-
-  // Restarting the browser should cause wallpaper setting to still be visible
-  // since the feature is still enabled.
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
-}
-
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       SettingsOptInRevokedAfterSignOut) {
-  OptimizationGuideKeyedService* ogks =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile());
-
-  EnableSignIn();
-
-  TestSettingsEnabledObserver wallpaper_search_observer(
-      UserVisibleFeatureKey::kWallpaperSearch);
-  TestSettingsEnabledObserver compose_observer(UserVisibleFeatureKey::kCompose);
-
-  ogks->AddModelExecutionSettingsEnabledObserver(&wallpaper_search_observer);
-  ogks->AddModelExecutionSettingsEnabledObserver(&compose_observer);
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  EXPECT_EQ(1, wallpaper_search_observer.count_feature_enabled_state_changes_);
-  EXPECT_TRUE(wallpaper_search_observer.is_currently_enabled_);
-  EXPECT_EQ(0, compose_observer.count_feature_enabled_state_changes_);
-
-  EXPECT_TRUE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-
-  SignOut();
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-
-  EXPECT_EQ(2, wallpaper_search_observer.count_feature_enabled_state_changes_);
-  EXPECT_FALSE(wallpaper_search_observer.is_currently_enabled_);
-}
-
-// Verifies that Model Execution Features Controller is available for incognito
-// profiles and the setting opt-in toggle and pref is updated correctly.
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       SettingsOptInUpdatedCorrectly) {
-  OptimizationGuideKeyedService* ogks =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile());
-
-  EnableSignIn();
-
-  TestSettingsEnabledObserver wallpaper_search_observer(
-      UserVisibleFeatureKey::kWallpaperSearch);
-  TestSettingsEnabledObserver compose_observer(UserVisibleFeatureKey::kCompose);
-
-  ogks->AddModelExecutionSettingsEnabledObserver(&wallpaper_search_observer);
-  ogks->AddModelExecutionSettingsEnabledObserver(&compose_observer);
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  EXPECT_EQ(1, wallpaper_search_observer.count_feature_enabled_state_changes_);
-  EXPECT_TRUE(wallpaper_search_observer.is_currently_enabled_);
-  EXPECT_EQ(0, compose_observer.count_feature_enabled_state_changes_);
-
-  EXPECT_TRUE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kDisabled));
-  EXPECT_EQ(2, wallpaper_search_observer.count_feature_enabled_state_changes_);
-  EXPECT_FALSE(wallpaper_search_observer.is_currently_enabled_);
-  EXPECT_EQ(0, compose_observer.count_feature_enabled_state_changes_);
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-
-  EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kCompose));
-}
-
-// Verifies that Model Execution Features Controller returns null for incognito
-// profiles.
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       SettingsVisibilityIncognito) {
-  EnableSignIn();
-
-  // Set up incognito browser and incognito OptimizationGuideKeyedService
-  // consumer.
-  Browser* otr_browser = CreateIncognitoBrowser(browser()->GetProfile());
-  EXPECT_TRUE(otr_browser);
-
-  // Instantiate off the record Optimization Guide Service.
-  OptimizationGuideKeyedService* otr_ogks =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile()->GetPrimaryOTRProfile(
-              /*create_if_needed=*/true));
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-
-  EXPECT_FALSE(otr_ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
 }
 
 // CreateGuestBrowser() is not supported for Android out of the box.
@@ -1035,68 +857,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   EXPECT_TRUE(guest_ogks);
   EXPECT_TRUE(ogks);
   EXPECT_NE(guest_ogks, ogks);
-
-  auto* prefs = browser()->GetProfile()->GetPrefs();
-  auto* guest_prefs = guest_browser->GetProfile()->GetPrefs();
-
-  EnableSignIn();
-
-  prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  guest_prefs->SetInteger(
-      prefs::GetSettingEnabledPrefName(UserVisibleFeatureKey::kWallpaperSearch),
-      static_cast<int>(prefs::FeatureOptInState::kEnabled));
-
-  EXPECT_TRUE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-  EXPECT_FALSE(guest_ogks->ShouldFeatureBeCurrentlyEnabledForUser(
-      UserVisibleFeatureKey::kWallpaperSearch));
-}
-
-// Test the visibility of features with `kOptimizationGuideModelExecution`
-// enabled or disabled.
-class OptimizationGuideKeyedServiceBrowserWithModelExecutionFeatureDisabledTest
-    : public ::testing::WithParamInterface<bool>,
-      public OptimizationGuideKeyedServiceBrowserTest {
- public:
-  OptimizationGuideKeyedServiceBrowserWithModelExecutionFeatureDisabledTest()
-      : OptimizationGuideKeyedServiceBrowserTest() {
-    // Enable visibility of WallpaperSearch feature.
-    scoped_feature_list_.Reset();
-
-    if (ShouldFeatureBeEnabled()) {
-      scoped_feature_list_.InitWithFeatures(
-          {features::kOptimizationHints,
-           // Enabled.
-           features::kOptimizationGuideModelExecution,
-           features::internal::kWallpaperSearchSettingsVisibility},
-          {features::internal::kWallpaperSearchGraduated});
-    } else {
-      scoped_feature_list_.InitWithFeatures(
-          {features::kOptimizationHints,
-           features::internal::kWallpaperSearchSettingsVisibility},
-          // Disabled.
-          {features::kOptimizationGuideModelExecution,
-           features::internal::kWallpaperSearchGraduated});
-    }
-  }
-
-  bool ShouldFeatureBeEnabled() const { return GetParam(); }
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    OptimizationGuideKeyedServiceBrowserWithModelExecutionFeatureDisabledTest,
-    ::testing::Bool());
-
-IN_PROC_BROWSER_TEST_P(
-    OptimizationGuideKeyedServiceBrowserWithModelExecutionFeatureDisabledTest,
-    SettingsNotVisible) {
-  EnableSignIn();
-
-  EXPECT_EQ(ShouldFeatureBeEnabled(),
-            IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
 }
 
 class OptimizationGuideKeyedServicePermissionsCheckDisabledTest
@@ -1536,63 +1296,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
 
   EXPECT_TRUE(service()->ShouldFeatureBeCurrentlyAllowedForFeedback(
       proto::LogAiDataRequest::FeatureCase::kCompose));
-}
-
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       CheckModelQualityLogsUploadOnDestruction) {
-  // Enable metrics consent and sign in.
-  SetMetricsConsent(true);
-  EnableSignIn();
-
-  auto* profile = browser()->GetProfile();
-  OptimizationGuideKeyedService* ogks =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
-  auto compose_feature = UserVisibleFeatureKey::kCompose;
-  auto* prefs = profile->GetPrefs();
-  policy::PolicyMap policies;
-
-  // Enable logging via via the enterprise policy to state kAllow this shouldn't
-  // stop upload and should return
-  // ChromeModelQualityLogsUploaderService::CanUploadLogs to true.
-  policies.Set(
-      policy::key::kHelpMeWriteSettings, policy::POLICY_LEVEL_MANDATORY,
-      policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-      base::Value(static_cast<int>(
-          model_execution::prefs::ModelExecutionEnterprisePolicyValue::kAllow)),
-      nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-  prefs->SetInteger(prefs::GetSettingEnabledPrefName(compose_feature),
-                    static_cast<int>(prefs::FeatureOptInState::kEnabled));
-  base::RunLoop().RunUntilIdle();
-
-  const MqlsFeatureMetadata* metadata =
-      MqlsFeatureRegistry::GetInstance().GetFeature(
-          proto::LogAiDataRequest::FeatureCase::kCompose);
-  EXPECT_TRUE(model_execution_features_controller()
-                  ->ShouldFeatureBeCurrentlyAllowedForLogging(metadata));
-
-  EXPECT_TRUE(
-      ogks->GetModelQualityLogsUploaderService()->CanUploadLogs(metadata));
-
-  // Intercept network requests.
-  network::TestURLLoaderFactory url_loader_factory;
-  service()
-      ->GetModelQualityLogsUploaderService()
-      ->SetUrlLoaderFactoryForTesting(
-          base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
-              &url_loader_factory));
-
-  // Create a new ModelQualityLogEntry for compose.
-  std::unique_ptr<ModelQualityLogEntry> log_entry =
-      GetModelQualityLogEntryForCompose();
-
-  // Destruct the log entry, this should upload the logs.
-  log_entry.reset();
-
-  // Logs should be uploaded on destruction.
-  base::RunLoop().RunUntilIdle();
-  content::RunAllTasksUntilIdle();
-  EXPECT_EQ(1, url_loader_factory.NumPending());
 }
 
 }  // namespace optimization_guide

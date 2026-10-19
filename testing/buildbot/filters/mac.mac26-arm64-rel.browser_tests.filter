@@ -24,6 +24,5 @@
 -LaunchWebAuthFlowFunctionTestWithBrowserTab.PopupBoundsComeFromDelegate
 -LaunchWebAuthFlowFunctionTestWithPopupWindow.PopupBoundsComeFromDelegate
 -NativeMessagingLaunchBackgroundModeApiTest.Success
--SidePanelCustomizeChromeTest.Themes
 -SimpleWebViewDialogTest.HttpAuthWebDialog
 -TabSearchPageHandlerTest.GetTabs

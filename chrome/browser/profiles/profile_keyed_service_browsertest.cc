@@ -570,7 +570,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "NetworkingPrivateEventRouter",
 #endif  // BUILDFLAG(IS_LINUX)
     "NotificationDisplayService",
-    "NtpBackgroundService",
     "NtpCustomBackgroundService",
     "OmniboxAPI",
     "OmniboxSuggestionsWatcher",

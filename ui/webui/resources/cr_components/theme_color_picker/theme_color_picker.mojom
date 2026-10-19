@@ -9,10 +9,6 @@ import "ui/base/mojom/themes.mojom";
 
 // A generic theme.
 struct Theme {
-  // Whether the user has a background image applied.
-  bool has_background_image;
-  // Whether the user has a third party theme applied.
-  bool has_third_party_theme;
   // The background image main color.
   skia.mojom.SkColor? background_image_main_color;
   // Whether the browser theming is dark mode.
@@ -79,9 +75,6 @@ interface ThemeColorPickerHandler {
 
   // Sets a Chrome theme generated from |hue|.
   SetSeedColorFromHue(float hue);
-
-  // Removes background image.
-  RemoveBackgroundImage();
 };
 
 // WebUI-side handler for requests from the browser.

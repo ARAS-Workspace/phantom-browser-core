@@ -25,6 +25,7 @@
 #include "ui/color/color_provider.h"
 #include "ui/color/color_provider_key.h"
 #include "ui/color/dynamic_color/palette_factory.h"
+#include "ui/gfx/color_utils.h"
 #include "ui/native_theme/native_theme.h"
 
 namespace {
@@ -126,22 +127,12 @@ void ThemeColorPickerHandler::GetChromeColors(
   std::move(callback).Run(std::move(colors));
 }
 
-void ThemeColorPickerHandler::RemoveBackgroundImage() {
-  if (ntp_custom_background_service_) {
-    ntp_custom_background_service_->ResetCustomBackgroundInfo();
-  }
-}
-
 void ThemeColorPickerHandler::UpdateTheme() {
-  if (ntp_custom_background_service_) {
-    ntp_custom_background_service_->RefreshBackgroundIfNeeded();
-  }
   auto theme = theme_color_picker::mojom::Theme::New();
   auto custom_background =
       ntp_custom_background_service_
           ? ntp_custom_background_service_->GetCustomBackground()
           : std::nullopt;
-  theme->has_background_image = custom_background.has_value();
   if (custom_background.has_value() &&
       custom_background->custom_background_main_color.has_value()) {
     theme->background_image_main_color =
@@ -193,7 +184,6 @@ void ThemeColorPickerHandler::UpdateTheme() {
   } else {
     theme->colors_managed_by_policy = false;
   }
-  theme->has_third_party_theme = theme_service_->UsingExtensionTheme();
 
   theme->is_dark_mode = theme_service_->BrowserUsesDarkColors();
   client_->SetTheme(std::move(theme));

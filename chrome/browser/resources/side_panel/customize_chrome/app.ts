@@ -8,11 +8,8 @@ import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import 'chrome://resources/cr_elements/cr_page_selector/cr_page_selector.js';
 import 'chrome://resources/cr_elements/icons.html.js';
 import './appearance.js';
-import './categories.js';
 import './customize_toolbar/toolbar.js';
 import './footer.js';
-import './themes.js';
-import './wallpaper_search/wallpaper_search.js';
 
 import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
 import {assert, assertNotReached, assertNotReachedCase} from 'chrome://resources/js/assert.js';
@@ -23,11 +20,8 @@ import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
 import type {AppearanceElement} from './appearance.js';
-import type {CategoriesElement} from './categories.js';
-import type {BackgroundCollection} from './customize_chrome.mojom-webui.js';
 import {CustomizeChromeSection, NewTabPageType} from './customize_chrome.mojom-webui.js';
 import {CustomizeChromeApiProxy} from './customize_chrome_api_proxy.js';
-import type {ThemesElement} from './themes.js';
 
 const SECTION_TO_SELECTOR = {
   [CustomizeChromeSection.kUnspecified]: '',
@@ -37,18 +31,14 @@ const SECTION_TO_SELECTOR = {
 
 export enum CustomizeChromePage {
   OVERVIEW = 'overview',
-  CATEGORIES = 'categories',
-  THEMES = 'themes',
   TOOLBAR = 'toolbar',
-  WALLPAPER_SEARCH = 'wallpaper-search',
 }
 
 export interface AppElement {
   $: {
     overviewPage: HTMLElement,
-    categoriesPage: CategoriesElement,
-    themesPage: ThemesElement,
     appearanceElement: AppearanceElement,
+    toolbarButton: HTMLElement,
   };
 }
 
@@ -68,25 +58,18 @@ export class AppElement extends CrLitElement {
   static override get properties() {
     return {
       page_: {type: String},
-      selectedCollection_: {type: Object},
       extensionPolicyEnabled_: {type: Boolean},
       footerEnabled_: {type: Boolean},
-      wallpaperSearchEnabled_: {type: Boolean},
       newTabPageType_: {type: Number},
-      showEditTheme_: {type: Boolean},
       showFooter_: {type: Boolean},
     };
   }
 
   protected accessor page_: CustomizeChromePage = CustomizeChromePage.OVERVIEW;
-  protected accessor selectedCollection_: BackgroundCollection|null = null;
   protected accessor extensionPolicyEnabled_: boolean = false;
   protected accessor footerEnabled_: boolean =
       loadTimeData.getBoolean('footerEnabled');
-  protected accessor wallpaperSearchEnabled_: boolean =
-      loadTimeData.getBoolean('wallpaperSearchEnabled');
   protected accessor newTabPageType_: NewTabPageType = NewTabPageType.kNone;
-  protected accessor showEditTheme_: boolean = false;
   protected accessor showFooter_: boolean = false;
 
   private listenerIds_: number[] = [];
@@ -101,8 +84,6 @@ export class AppElement extends CrLitElement {
           this.onScrollToSection_.bind(this)),
       this.apiProxy_.callbackRouter.attachedTabStateUpdated.addListener(
           this.onAttachedTabStateUpdated_.bind(this)),
-      this.apiProxy_.callbackRouter.setThemeEditable.addListener(
-          this.onSetThemeEditable_.bind(this)),
       this.apiProxy_.callbackRouter.setFooterSettings.addListener(
           this.onSetFooterSettings_.bind(this)),
     ];
@@ -161,29 +142,17 @@ export class AppElement extends CrLitElement {
     element.scrollIntoView({behavior: 'auto'});
   }
 
-
   private onAttachedTabStateUpdated_(newTabPageType: NewTabPageType) {
     if (this.newTabPageType_ === newTabPageType) {
       return;
     }
 
     this.newTabPageType_ = newTabPageType;
-
-    // Only the toolbar page does not depend on the attached tab, so change any
-    // other page back to the overview.
-    if (this.page_ !== CustomizeChromePage.TOOLBAR) {
-      this.page_ = CustomizeChromePage.OVERVIEW;
-    }
-  }
-
-  private onSetThemeEditable_(isThemeEditable: boolean) {
-    this.showEditTheme_ = isThemeEditable;
   }
 
   private onSetFooterSettings_(_: boolean, extensionPolicyEnabled: boolean) {
     this.extensionPolicyEnabled_ = extensionPolicyEnabled;
   }
-
 
   protected computeShowFooter_(): boolean {
     return this.footerEnabled_ && this.extensionPolicyEnabled_ &&
@@ -192,55 +161,16 @@ export class AppElement extends CrLitElement {
 
   protected async onBackClick_() {
     switch (this.page_) {
-      case CustomizeChromePage.CATEGORIES:
       case CustomizeChromePage.TOOLBAR:
         this.page_ = CustomizeChromePage.OVERVIEW;
         await this.updateComplete;
-        this.$.appearanceElement.focusOnThemeButton();
-        break;
-      case CustomizeChromePage.THEMES:
-      case CustomizeChromePage.WALLPAPER_SEARCH:
-        this.page_ = CustomizeChromePage.CATEGORIES;
-        await this.updateComplete;
-        this.$.categoriesPage.focusOnBackButton();
+        this.$.toolbarButton.focus();
         break;
       case CustomizeChromePage.OVERVIEW:
         assertNotReached();
       default:
         assertNotReachedCase(this.page_);
     }
-  }
-
-  protected async onEditThemeClick_() {
-    this.page_ = CustomizeChromePage.CATEGORIES;
-    await this.updateComplete;
-    this.$.categoriesPage.focusOnBackButton();
-  }
-
-  protected async onCollectionSelect_(
-      event: CustomEvent<BackgroundCollection>) {
-    this.selectedCollection_ = event.detail;
-    this.page_ = CustomizeChromePage.THEMES;
-    await this.updateComplete;
-    this.$.themesPage.focusOnBackButton();
-  }
-
-  protected async onLocalImageUpload_() {
-    this.page_ = CustomizeChromePage.OVERVIEW;
-    await this.updateComplete;
-    this.$.appearanceElement.focusOnThemeButton();
-  }
-
-  protected onWallpaperSearchClick_() {
-    this.onWallpaperSearchSelect_();
-  }
-
-  protected onWallpaperSearchSelect_() {
-    this.page_ = CustomizeChromePage.WALLPAPER_SEARCH;
-    const page =
-        this.shadowRoot.querySelector('customize-chrome-wallpaper-search');
-    assert(page);
-    page.focusOnBackButton();
   }
 
   protected onToolbarCustomizationButtonClick_() {

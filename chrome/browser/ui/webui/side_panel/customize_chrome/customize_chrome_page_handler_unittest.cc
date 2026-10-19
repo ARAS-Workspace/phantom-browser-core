@@ -11,32 +11,20 @@
 #include <utility>
 #include <vector>
 
-#include "base/files/file.h"
-#include "base/files/file_path.h"
 #include "base/memory/raw_ptr.h"
-#include "base/test/bind.h"
 #include "base/test/gmock_move_support.h"
-#include "base/test/metrics/user_action_tester.h"
 #include "base/test/mock_callback.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/global_features.h"
-#include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory_test_util.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/browser/ui/select_file_policy/chrome_select_file_policy.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "chrome/common/webui_url_constants.h"
-#include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/application_locale_storage/application_locale_storage.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
-#include "components/search/ntp_features.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/themes/ntp_background_data.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
@@ -51,12 +39,7 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "ui/base/ui_base_features.h"
-#include "ui/color/color_provider.h"
-#include "ui/native_theme/mock_os_settings_provider.h"
 #include "ui/native_theme/native_theme.h"
-#include "ui/shell_dialogs/select_file_dialog_factory.h"
-#include "ui/shell_dialogs/selected_file_info.h"
 
 namespace content {
 class BrowserContext;
@@ -64,73 +47,10 @@ class BrowserContext;
 
 namespace {
 
-using testing::_;
-using testing::An;
 using testing::DoAll;
 using testing::Mock;
 using testing::Return;
-using testing::ReturnRef;
 using testing::SaveArg;
-
-// A test SelectFileDialog to go straight to calling the listener.
-class TestSelectFileDialog : public ui::SelectFileDialog {
- public:
-  TestSelectFileDialog(Listener* listener,
-                       std::unique_ptr<ui::SelectFilePolicy> policy,
-                       const bool auto_cancel)
-      : ui::SelectFileDialog(listener, std::move(policy)),
-        auto_cancel_(auto_cancel) {}
-
-  TestSelectFileDialog(const TestSelectFileDialog&) = delete;
-  TestSelectFileDialog& operator=(const TestSelectFileDialog&) = delete;
-
- protected:
-  ~TestSelectFileDialog() override = default;
-
-  void SelectFileImpl(Type type,
-                      const std::u16string& title,
-                      const base::FilePath& default_path,
-                      const FileTypeInfo* file_types,
-                      int file_type_index,
-                      const base::FilePath::StringType& default_extension,
-                      gfx::NativeWindow owning_window,
-                      const GURL* caller) override {
-    if (auto_cancel_) {
-      listener_->FileSelectionCanceled();
-    } else {
-      base::FilePath path(FILE_PATH_LITERAL("/test/path"));
-      listener_->FileSelected(ui::SelectedFileInfo(path), file_type_index);
-    }
-  }
-  // Pure virtual methods that need to be implemented.
-  bool IsRunning(gfx::NativeWindow owning_window) const override {
-    return false;
-  }
-  void ListenerDestroyed() override { listener_ = nullptr; }
-  bool HasMultipleFileTypeChoicesImpl() override { return false; }
-
- private:
-  bool auto_cancel_;
-};
-
-// A test SelectFileDialogFactory so that the TestSelectFileDialog is used.
-class TestSelectFileDialogFactory : public ui::SelectFileDialogFactory {
- public:
-  explicit TestSelectFileDialogFactory(bool auto_cancel)
-      : auto_cancel_(auto_cancel) {}
-
-  TestSelectFileDialogFactory& operator=(const TestSelectFileDialogFactory&) =
-      delete;
-
-  ui::SelectFileDialog* Create(
-      ui::SelectFileDialog::Listener* listener,
-      std::unique_ptr<ui::SelectFilePolicy> policy) override {
-    return new TestSelectFileDialog(listener, nullptr, auto_cancel_);
-  }
-
- private:
-  bool auto_cancel_;
-};
 
 class MockPage : public side_panel::mojom::CustomizeChromePage {
  public:
@@ -146,7 +66,6 @@ class MockPage : public side_panel::mojom::CustomizeChromePage {
   void FlushForTesting() { receiver_.FlushForTesting(); }
 
   MOCK_METHOD(void, SetTheme, (side_panel::mojom::ThemePtr));
-  MOCK_METHOD(void, SetThemeEditable, (bool));
   MOCK_METHOD(void, ScrollToSection, (CustomizeChromeSection));
   MOCK_METHOD(void,
               AttachedTabStateUpdated,
@@ -169,35 +88,8 @@ class MockNtpCustomBackgroundService : public NtpCustomBackgroundService {
       : NtpCustomBackgroundService(profile) {}
   MOCK_METHOD(std::optional<CustomBackground>, GetCustomBackground, ());
   MOCK_METHOD(void, ResetCustomBackgroundInfo, ());
-  MOCK_METHOD(void, SelectLocalBackgroundImage, (const base::FilePath&));
   MOCK_METHOD(void, AddObserver, (NtpCustomBackgroundServiceObserver*));
-  MOCK_METHOD(void,
-              SetCustomBackgroundInfo,
-              (const GURL&,
-               const GURL&,
-               const std::string&,
-               const std::string&,
-               const GURL&,
-               const std::string&));
   MOCK_METHOD(bool, IsCustomBackgroundDisabledByPolicy, ());
-};
-
-class MockNtpBackgroundService : public NtpBackgroundService {
- public:
-  explicit MockNtpBackgroundService(
-      ApplicationLocaleStorage* application_locale_storage,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
-      : NtpBackgroundService(application_locale_storage, url_loader_factory) {}
-  MOCK_CONST_METHOD0(collection_info, std::vector<CollectionInfo>&());
-  MOCK_CONST_METHOD0(collection_images, std::vector<CollectionImage>&());
-  MOCK_METHOD(void, FetchCollectionInfo, (const std::string& filtering_label));
-  MOCK_METHOD(void, FetchCollectionInfo, ());
-  MOCK_METHOD(void, FetchCollectionImageInfo, (const std::string&));
-  MOCK_METHOD(void,
-              FetchReplacementCollectionPreviewImage,
-              (const std::string&,
-               NtpBackgroundService::FetchReplacementImageCallback));
-  MOCK_METHOD(void, AddObserver, (NtpBackgroundServiceObserver*));
 };
 
 class MockThemeService : public ThemeService {
@@ -210,29 +102,14 @@ class MockThemeService : public ThemeService {
   MOCK_CONST_METHOD0(UsingSystemTheme, bool());
   MOCK_CONST_METHOD0(UsingExtensionTheme, bool());
   MOCK_CONST_METHOD0(GetThemeID, std::string());
-  MOCK_CONST_METHOD0(GetUserColor, std::optional<SkColor>());
-  MOCK_CONST_METHOD0(UsingDeviceTheme, bool());
 
  private:
   ThemeHelper theme_helper_;
 };
 
 std::unique_ptr<TestingProfile> MakeTestingProfile(
-    ApplicationLocaleStorage* application_locale_storage,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   TestingProfile::Builder profile_builder;
-  profile_builder.AddTestingFactory(
-      NtpBackgroundServiceFactory::GetInstance(),
-      base::BindRepeating(
-          [](ApplicationLocaleStorage* application_locale_storage,
-             scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
-             content::BrowserContext* context)
-              -> std::unique_ptr<KeyedService> {
-            return std::make_unique<
-                testing::NiceMock<MockNtpBackgroundService>>(
-                application_locale_storage, url_loader_factory);
-          },
-          application_locale_storage, url_loader_factory));
   profile_builder.AddTestingFactory(
       ThemeServiceFactory::GetInstance(),
       base::BindRepeating([](content::BrowserContext* context)
@@ -249,23 +126,14 @@ std::unique_ptr<TestingProfile> MakeTestingProfile(
 class CustomizeChromePageHandlerTest : public testing::Test {
  public:
   CustomizeChromePageHandlerTest()
-      : application_locale_storage_(TestingBrowserProcess::GetGlobal()
-                                        ->GetFeatures()
-                                        ->application_locale_storage()),
-        profile_(
-            MakeTestingProfile(application_locale_storage_.get(),
-                               test_url_loader_factory_.GetSafeWeakWrapper())),
+      : profile_(
+            MakeTestingProfile(test_url_loader_factory_.GetSafeWeakWrapper())),
         mock_ntp_custom_background_service_(profile_.get()),
-        mock_ntp_background_service_(static_cast<MockNtpBackgroundService*>(
-            NtpBackgroundServiceFactory::GetForProfile(profile_.get()))),
         web_contents_(web_contents_factory_.CreateWebContents(profile_.get())),
         mock_theme_service_(static_cast<MockThemeService*>(
             ThemeServiceFactory::GetForProfile(profile_.get()))) {}
 
   void SetUp() override {
-    EXPECT_CALL(mock_ntp_background_service(), AddObserver)
-        .Times(1)
-        .WillOnce(SaveArg<0>(&ntp_background_service_observer_));
     EXPECT_CALL(mock_ntp_custom_background_service_, AddObserver)
         .Times(1)
         .WillOnce(SaveArg<0>(&ntp_custom_background_service_observer_));
@@ -274,10 +142,7 @@ class CustomizeChromePageHandlerTest : public testing::Test {
         mock_page_.BindAndGetRemote(), &mock_ntp_custom_background_service_,
         web_contents_, mock_open_url_callback_.Get());
     mock_page_.FlushForTesting();
-    EXPECT_EQ(handler_.get(), ntp_background_service_observer_);
     EXPECT_EQ(handler_.get(), ntp_custom_background_service_observer_);
-
-    application_locale_storage_->Set("foo");
 
     scoped_feature_list_.Reset();
     task_environment_.RunUntilIdle();
@@ -287,41 +152,28 @@ class CustomizeChromePageHandlerTest : public testing::Test {
     test_url_loader_factory_.ClearResponses();
   }
 
-  TestingProfile& profile() { return *profile_; }
-  content::WebContents& web_contents() { return *web_contents_; }
   CustomizeChromePageHandler& handler() { return *handler_; }
   NtpCustomBackgroundServiceObserver& ntp_custom_background_service_observer() {
     return *ntp_custom_background_service_observer_;
   }
-  MockNtpBackgroundService& mock_ntp_background_service() {
-    return *mock_ntp_background_service_;
-  }
-  NtpBackgroundServiceObserver& ntp_background_service_observer() {
-    return *ntp_background_service_observer_;
-  }
   MockThemeService& mock_theme_service() { return *mock_theme_service_; }
-  base::UserActionTester& user_action_tester() { return user_action_tester_; }
 
  protected:
   // NOTE: The initialization order of these members matters.
   content::BrowserTaskEnvironment task_environment_;
   network::TestURLLoaderFactory test_url_loader_factory_;
-  raw_ptr<ApplicationLocaleStorage> application_locale_storage_;
   std::unique_ptr<TestingProfile> profile_;
   testing::NiceMock<MockNtpCustomBackgroundService>
       mock_ntp_custom_background_service_;
-  raw_ptr<MockNtpBackgroundService> mock_ntp_background_service_;
   content::TestWebContentsFactory web_contents_factory_;
   raw_ptr<content::WebContents> web_contents_;
   testing::NiceMock<MockPage> mock_page_;
   raw_ptr<MockThemeService> mock_theme_service_;
   base::test::ScopedFeatureList scoped_feature_list_;
-  base::UserActionTester user_action_tester_;
   base::MockRepeatingCallback<void(const GURL& gurl)> mock_open_url_callback_;
   std::unique_ptr<CustomizeChromePageHandler> handler_;
   raw_ptr<NtpCustomBackgroundServiceObserver>
       ntp_custom_background_service_observer_;
-  raw_ptr<NtpBackgroundServiceObserver> ntp_background_service_observer_;
 };
 
 enum class ThemeUpdateSource {
@@ -368,103 +220,22 @@ class CustomizeChromePageHandlerSetThemeTest
 };
 
 TEST_P(CustomizeChromePageHandlerSetThemeTest, SetTheme) {
-  ui::MockOsSettingsProvider os_settings_provider;
   CustomBackground custom_background;
-  custom_background.custom_background_url = GURL("https://foo.com/img.png");
-  custom_background.custom_background_attribution_line_1 = "foo line";
-  custom_background.is_uploaded_image = false;
-  custom_background.collection_id = "test_collection";
-  custom_background.daily_refresh_enabled = false;
   ON_CALL(mock_ntp_custom_background_service_, GetCustomBackground())
       .WillByDefault(Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_service(), GetUserColor())
-      .WillByDefault(Return(std::optional<SkColor>()));
-  ON_CALL(mock_theme_service(), UsingDefaultTheme())
-      .WillByDefault(Return(false));
-  ON_CALL(mock_theme_service(), UsingSystemTheme())
-      .WillByDefault(Return(false));
-  ON_CALL(mock_theme_service(), UsingDeviceTheme())
-      .WillByDefault(Return(false));
   ON_CALL(mock_ntp_custom_background_service_,
           IsCustomBackgroundDisabledByPolicy())
       .WillByDefault(Return(true));
-  os_settings_provider.SetPreferredColorScheme(
-      ui::NativeTheme::PreferredColorScheme::kDark);
 
   side_panel::mojom::ThemePtr theme = UpdateTheme();
   ASSERT_TRUE(theme);
-  ASSERT_TRUE(theme->background_image);
-  EXPECT_EQ("https://foo.com/img.png", theme->background_image->url);
-  EXPECT_FALSE(theme->background_image->is_uploaded_image);
-  EXPECT_FALSE(theme->background_image->daily_refresh_enabled);
-  EXPECT_EQ("foo line", theme->background_image->title);
-  EXPECT_EQ("test_collection", theme->background_image->collection_id);
-  EXPECT_EQ(
-      web_contents().GetColorProvider().GetColor(kColorNewTabPageBackground),
-      theme->background_color);
-  EXPECT_EQ(web_contents().GetColorProvider().GetColor(ui::kColorFrameActive),
-            theme->foreground_color);
+  EXPECT_TRUE(theme->has_background_image);
   EXPECT_TRUE(theme->background_managed_by_policy);
-  EXPECT_FALSE(theme->follow_device_theme);
-}
-
-TEST_P(CustomizeChromePageHandlerSetThemeTest, SetThemeWithDailyRefresh) {
-  CustomBackground custom_background;
-  custom_background.custom_background_url = GURL("https://foo.com/img.png");
-  custom_background.daily_refresh_enabled = true;
-  custom_background.collection_id = "test_collection";
-  ON_CALL(mock_ntp_custom_background_service_, GetCustomBackground())
-      .WillByDefault(Return(std::make_optional(custom_background)));
-
-  side_panel::mojom::ThemePtr theme = UpdateTheme();
-  ASSERT_TRUE(theme);
-  ASSERT_TRUE(theme->background_image);
-  EXPECT_TRUE(theme->background_image->daily_refresh_enabled);
-  EXPECT_EQ("test_collection", theme->background_image->collection_id);
-}
-
-TEST_P(CustomizeChromePageHandlerSetThemeTest, SetUploadedImage) {
-  CustomBackground custom_background;
-  custom_background.custom_background_url = GURL("https://foo.com/img.png");
-  custom_background.is_uploaded_image = true;
-  ON_CALL(mock_ntp_custom_background_service_, GetCustomBackground())
-      .WillByDefault(Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_service(), UsingDefaultTheme())
-      .WillByDefault(Return(false));
-  ON_CALL(mock_theme_service(), UsingSystemTheme())
-      .WillByDefault(Return(false));
-
-  side_panel::mojom::ThemePtr theme = UpdateTheme();
-  ASSERT_TRUE(theme);
-  ASSERT_TRUE(theme->background_image);
-  EXPECT_EQ("https://foo.com/img.png", theme->background_image->url);
-  ASSERT_TRUE(theme->background_image->is_uploaded_image);
-}
-
-TEST_P(CustomizeChromePageHandlerSetThemeTest, SetWallpaperSearchImage) {
-  CustomBackground custom_background;
-  base::Token token = base::Token::CreateRandom();
-  custom_background.custom_background_url = GURL("https://foo.com/img.png");
-  custom_background.is_uploaded_image = true;
-  custom_background.local_background_id = token;
-  ON_CALL(mock_ntp_custom_background_service_, GetCustomBackground())
-      .WillByDefault(Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_service(), UsingDefaultTheme())
-      .WillByDefault(Return(false));
-  ON_CALL(mock_theme_service(), UsingSystemTheme())
-      .WillByDefault(Return(false));
-
-  side_panel::mojom::ThemePtr theme = UpdateTheme();
-  ASSERT_TRUE(theme);
-  ASSERT_TRUE(theme->background_image);
-  EXPECT_TRUE(theme->background_image->is_uploaded_image);
-  EXPECT_EQ("https://foo.com/img.png", theme->background_image->url);
-  EXPECT_EQ(token, theme->background_image->local_background_id);
+  EXPECT_FALSE(theme->has_third_party_theme);
 }
 
 TEST_P(CustomizeChromePageHandlerSetThemeTest, SetThirdPartyTheme) {
   CustomBackground custom_background;
-  custom_background.custom_background_url = GURL("https://foo.com/img.png");
 
   auto* extension_registry = extensions::ExtensionRegistry::Get(profile_.get());
   scoped_refptr<const extensions::Extension> extension;
@@ -489,11 +260,8 @@ TEST_P(CustomizeChromePageHandlerSetThemeTest, SetThirdPartyTheme) {
 
   side_panel::mojom::ThemePtr theme = UpdateTheme();
   ASSERT_TRUE(theme);
-  ASSERT_TRUE(theme->background_image);
-  EXPECT_EQ("https://foo.com/img.png", theme->background_image->url);
-  ASSERT_TRUE(theme->third_party_theme_info);
-  EXPECT_EQ("foo", theme->third_party_theme_info->id);
-  EXPECT_EQ("Foo Extension", theme->third_party_theme_info->name);
+  EXPECT_TRUE(theme->has_background_image);
+  EXPECT_TRUE(theme->has_third_party_theme);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -503,73 +271,6 @@ INSTANTIATE_TEST_SUITE_P(
                       ThemeUpdateSource::kThemeService,
                       ThemeUpdateSource::kNativeTheme,
                       ThemeUpdateSource::kCustomBackgroundService));
-
-TEST_F(CustomizeChromePageHandlerTest, GetBackgroundCollections) {
-  std::vector<CollectionInfo> test_collection_info;
-  CollectionInfo test_collection;
-  test_collection.collection_id = "test_id";
-  test_collection.collection_name = "test_name";
-  test_collection.preview_image_url = GURL("https://test.jpg");
-  test_collection_info.push_back(test_collection);
-  ON_CALL(mock_ntp_background_service(), collection_info())
-      .WillByDefault(ReturnRef(test_collection_info));
-
-  std::vector<side_panel::mojom::BackgroundCollectionPtr> collections;
-  base::MockCallback<
-      CustomizeChromePageHandler::GetBackgroundCollectionsCallback>
-      callback;
-  EXPECT_CALL(callback, Run(_)).Times(1).WillOnce(MoveArg(&collections));
-  EXPECT_CALL(mock_ntp_background_service(), FetchCollectionInfo()).Times(1);
-  handler().GetBackgroundCollections(callback.Get());
-  ntp_background_service_observer().OnCollectionInfoAvailable();
-
-  EXPECT_EQ(collections.size(), test_collection_info.size());
-  EXPECT_EQ(test_collection_info[0].collection_id, collections[0]->id);
-  EXPECT_EQ(test_collection_info[0].collection_name, collections[0]->label);
-  EXPECT_EQ(test_collection_info[0].preview_image_url,
-            collections[0]->preview_image_url);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, GetBackgroundImages) {
-  std::vector<CollectionImage> test_collection_images;
-  CollectionImage test_image;
-  std::vector<std::string> attribution{"test1", "test2"};
-  test_image.attribution = attribution;
-  test_image.attribution_action_url = GURL("https://action.com");
-  test_image.image_url = GURL("https://test_image.jpg");
-  test_image.thumbnail_image_url = GURL("https://test_thumbnail.jpg");
-  test_collection_images.push_back(test_image);
-  ON_CALL(mock_ntp_background_service(), collection_images())
-      .WillByDefault(ReturnRef(test_collection_images));
-
-  std::vector<side_panel::mojom::CollectionImagePtr> images;
-  base::MockCallback<CustomizeChromePageHandler::GetBackgroundImagesCallback>
-      callback;
-  EXPECT_CALL(callback, Run(_)).Times(1).WillOnce(MoveArg(&images));
-  EXPECT_CALL(mock_ntp_background_service(), FetchCollectionImageInfo).Times(1);
-  handler().GetBackgroundImages("test_id", callback.Get());
-  ntp_background_service_observer().OnCollectionImagesAvailable();
-
-  EXPECT_EQ(images.size(), test_collection_images.size());
-  EXPECT_EQ(test_collection_images[0].attribution[0], images[0]->attribution_1);
-  EXPECT_EQ(test_collection_images[0].attribution[1], images[0]->attribution_2);
-  EXPECT_EQ(test_collection_images[0].attribution_action_url,
-            images[0]->attribution_url);
-  EXPECT_EQ(test_collection_images[0].image_url, images[0]->image_url);
-  EXPECT_EQ(test_collection_images[0].thumbnail_image_url,
-            images[0]->preview_image_url);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, GetReplacementCollectionPreviewImage) {
-  base::MockCallback<
-      CustomizeChromePageHandler::GetReplacementCollectionPreviewImageCallback>
-      callback;
-  EXPECT_CALL(mock_ntp_background_service(),
-              FetchReplacementCollectionPreviewImage)
-      .Times(1);
-
-  handler().GetReplacementCollectionPreviewImage("test_id", callback.Get());
-}
 
 TEST_F(CustomizeChromePageHandlerTest, SetDefaultColor) {
   EXPECT_CALL(mock_theme_service(), UseDefaultTheme).Times(1);
@@ -585,72 +286,11 @@ TEST_F(CustomizeChromePageHandlerTest, RemoveBackgroundImage) {
   handler().RemoveBackgroundImage();
 }
 
-TEST_F(CustomizeChromePageHandlerTest, ChooseLocalCustomBackgroundSuccess) {
-  bool success;
-  base::MockCallback<
-      CustomizeChromePageHandler::ChooseLocalCustomBackgroundCallback>
-      callback;
-  ui::SelectFileDialog::SetFactory(
-      std::make_unique<TestSelectFileDialogFactory>(false));
-  EXPECT_CALL(callback, Run(_)).Times(1).WillOnce(SaveArg<0>(&success));
-  EXPECT_CALL(mock_ntp_custom_background_service_,
-              SelectLocalBackgroundImage(An<const base::FilePath&>()))
-      .Times(1);
-  ASSERT_EQ(0, user_action_tester().GetActionCount(
-                   "NTPRicherPicker.Backgrounds.UploadConfirmed"));
-  handler().ChooseLocalCustomBackground(callback.Get());
-  EXPECT_TRUE(success);
-  EXPECT_EQ(1, user_action_tester().GetActionCount(
-                   "NTPRicherPicker.Backgrounds.UploadConfirmed"));
-}
-
-TEST_F(CustomizeChromePageHandlerTest, ChooseLocalCustomBackgroundCancel) {
-  bool success;
-  base::MockCallback<
-      CustomizeChromePageHandler::ChooseLocalCustomBackgroundCallback>
-      callback;
-  ui::SelectFileDialog::SetFactory(
-      std::make_unique<TestSelectFileDialogFactory>(true));
-  EXPECT_CALL(callback, Run(_)).Times(1).WillOnce(SaveArg<0>(&success));
-  ASSERT_EQ(0, user_action_tester().GetActionCount(
-                   "NTPRicherPicker.Backgrounds.UploadCanceled"));
-  handler().ChooseLocalCustomBackground(callback.Get());
-  EXPECT_TRUE(!success);
-  EXPECT_EQ(1, user_action_tester().GetActionCount(
-                   "NTPRicherPicker.Backgrounds.UploadCanceled"));
-}
-
-TEST_F(CustomizeChromePageHandlerTest, SetBackgroundImage) {
-  EXPECT_CALL(mock_ntp_custom_background_service_, SetCustomBackgroundInfo)
-      .Times(1);
-  handler().SetBackgroundImage(
-      "attribution1", "attribution2", GURL("https://attribution.com"),
-      GURL("https://image.jpg"), GURL("https://thumbnail.jpg"), "collectionId");
-}
-
 // Without an extension overriding the new tab page nothing manages it, so no
 // page is opened.
 TEST_F(CustomizeChromePageHandlerTest, OpenNtpManagedByPage) {
   EXPECT_CALL(mock_open_url_callback_, Run).Times(0);
   handler().OpenNtpManagedByPage();
-}
-
-TEST_F(CustomizeChromePageHandlerTest, SetDailyRefreshCollectionId) {
-  EXPECT_CALL(mock_ntp_custom_background_service_, SetCustomBackgroundInfo)
-      .Times(1);
-  handler().SetDailyRefreshCollectionId("test_id");
-}
-
-TEST_F(CustomizeChromePageHandlerTest, SetFollowDeviceTheme_On) {
-  EXPECT_CALL(mock_theme_service(), UseDeviceTheme(true)).Times(1);
-
-  handler().SetFollowDeviceTheme(true);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, SetUseDeviceTheme_Off) {
-  EXPECT_CALL(mock_theme_service(), UseDeviceTheme(false)).Times(1);
-
-  handler().SetFollowDeviceTheme(false);
 }
 
 TEST_F(CustomizeChromePageHandlerTest, ScrollToSection) {
@@ -676,17 +316,10 @@ TEST_F(CustomizeChromePageHandlerTest, AttachedTabStateUpdated) {
            GURL("chrome-extension://someinvaldextension/index.html")},
           {side_panel::mojom::NewTabPageType::kThirdPartyWebUI,
            GURL(chrome::kChromeUINewTabPageThirdPartyURL)},
-          {side_panel::mojom::NewTabPageType::kIncognito,
-           chrome::ChromeUINewTabURLAsGURL()},
-          {side_panel::mojom::NewTabPageType::kGuestMode,
+          {side_panel::mojom::NewTabPageType::kNone,
            chrome::ChromeUINewTabURLAsGURL()}};
 
   for (const auto& ntp_type_and_url : ntp_types_and_urls) {
-    if (ntp_type_and_url.first ==
-        side_panel::mojom::NewTabPageType::kGuestMode) {
-      profile().SetGuestSession(true);
-    }
-
     side_panel::mojom::NewTabPageType source_tab;
     EXPECT_CALL(mock_page_, AttachedTabStateUpdated)
         .Times(1)
@@ -716,48 +349,6 @@ TEST_F(CustomizeChromePageHandlerTest, UpdateScrollToSection) {
 
   EXPECT_EQ(CustomizeChromeSection::kAppearance, section);
 }
-
-class CustomizeChromePageHandlerWallpaperSearchTest
-    : public CustomizeChromePageHandlerTest,
-      public ::testing::WithParamInterface<bool> {
- public:
-  CustomizeChromePageHandlerWallpaperSearchTest() {
-    std::vector<base::test::FeatureRef> kWallpaperSearchFeatures = {
-        ntp_features::kCustomizeChromeWallpaperSearch,
-        optimization_guide::features::kOptimizationGuideModelExecution};
-
-    if (WallpaperSearchEnabled()) {
-      scoped_feature_list_.InitWithFeatures(kWallpaperSearchFeatures, {});
-    } else {
-      scoped_feature_list_.InitWithFeatures({}, kWallpaperSearchFeatures);
-    }
-  }
-  bool WallpaperSearchEnabled() const { return GetParam(); }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_P(CustomizeChromePageHandlerWallpaperSearchTest,
-       ChooseLocalCustomBackground) {
-  base::MockCallback<
-      CustomizeChromePageHandler::ChooseLocalCustomBackgroundCallback>
-      callback;
-  ui::SelectFileDialog::SetFactory(
-      std::make_unique<TestSelectFileDialogFactory>(false));
-
-  if (WallpaperSearchEnabled()) {
-    EXPECT_CALL(mock_theme_service(), UseDefaultTheme).Times(0);
-  } else {
-    EXPECT_CALL(mock_theme_service(), UseDefaultTheme).Times(1);
-  }
-
-  handler().ChooseLocalCustomBackground(callback.Get());
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         CustomizeChromePageHandlerWallpaperSearchTest,
-                         ::testing::Bool());
 
 class CustomizeChromePageHandlerWithTemplateURLServiceTest
     : public CustomizeChromePageHandlerTest {
