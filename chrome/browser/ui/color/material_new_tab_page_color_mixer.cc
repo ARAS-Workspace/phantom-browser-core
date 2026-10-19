@@ -43,11 +43,7 @@ void AddMaterialNewTabPageColorMixer(ui::ColorProvider* provider,
   // LINT.IfChange
   mixer[kColorNewTabPageActiveBackground] = {
       ui::kColorSysStateRippleNeutralOnSubtle};
-  mixer[kColorNewTabPageAddShortcutBackground] = {ui::kColorSysTonalContainer};
-  mixer[kColorNewTabPageAddShortcutForeground] = {
-      ui::kColorSysOnTonalContainer};
   mixer[kColorNewTabPageBackground] = {ui::kColorSysBase};
-  mixer[kColorNewTabPageBorder] = {ui::kColorSysBaseContainer};
   mixer[kColorNewTabPageButtonBackground] = {ui::kColorSysTonalContainer};
   mixer[kColorNewTabPageButtonBackgroundHovered] = {
       ui::kColorSysStateHoverOnSubtle};
@@ -56,96 +52,13 @@ void AddMaterialNewTabPageColorMixer(ui::ColorProvider* provider,
 
   mixer[kColorNewTabPageControlBackgroundHovered] = {
       ui::kColorSysStateHoverOnSubtle};
-  mixer[kColorNewTabPageFocusRing] = {ui::kColorSysStateFocusRing};
   mixer[kColorNewTabPageLink] = {ui::kColorSysPrimary};
-  mixer[kColorNewTabPageLogo] = {ui::kColorSysPrimary};
 
-  if (base::FeatureList::IsEnabled(ntp_features::kNtpNextFeatures)) {
-    mixer[kColorNewTabPageMostVisitedTileBackground] = {
-        ui::kColorSysBaseContainer};
-  } else {
-    mixer[kColorNewTabPageMostVisitedTileBackground] = {
-        ui::kColorSysSurfaceVariant};
-  }
-  mixer[kColorNewTabPageMostVisitedForeground] = {ui::kColorSysOnSurfaceSubtle};
-
-  mixer[kColorNewTabPageHistoryClustersModuleItemBackground] = {
-      ui::kColorSysBaseContainerElevated};
-
-  // Action chips colors.
-  mixer[kColorNewTabPageActionChipBackground] = {ui::kColorSysBaseContainer};
-  mixer[kColorNewTabPageActionChipBackgroundHover] = {
-      ui::kColorSysStateRippleNeutralOnSubtle};
-
-  mixer[kColorNewTabPageActionChipTextTitle] = {ui::kColorSysOnSurface};
-  mixer[kColorNewTabPageActionChipTextBody] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorNewTabPageActionChipDeepSearchIcon] = {
-      ui::kColorSysOnSurfaceSubtle};
-
-  // Threads rail colors.
-  mixer[kColorNewTabPageThreadsRailBackground] = {ui::kColorSysSurface2};
-  mixer[kColorNewTabPageThreadsRailIconButton] = {ui::kColorSysOnSurfaceSubtle};
-
-  mixer[kColorNewTabPageModuleBackground] = {ui::kColorSysBaseContainer};
-  mixer[kColorNewTabPageModuleIconBackground] = {ui::kColorSysNeutralContainer};
-  // Styling for Doodle Share Button.
-  mixer[kColorNewTabPageDoodleShareButtonBackground] = {
+  mixer[kColorNewTabPageMostVisitedTileBackground] = {
       ui::kColorSysBaseContainer};
-  mixer[kColorNewTabPageDoodleShareButtonIcon] = {ui::kColorSysOnSurface};
-
-  mixer[kColorNewTabPageModuleItemBackground] = {
-      ui::kColorSysBaseContainerElevated};
-  mixer[kColorNewTabPageModuleItemBackgroundHovered] = {
-      ui::kColorSysStateHoverBrightBlendProtection};
-
-  mixer[kColorNewTabPageModuleElementDivider] = {ui::kColorSysDivider};
-  mixer[kColorNewTabPageModuleContextMenuDivider] = {ui::kColorSysDivider};
-
-  mixer[kColorNewTabPageModuleCalendarEventTimeStatusBackground] = {
-      ui::kColorSysNeutralContainer};
-  mixer[kColorNewTabPageModuleCalendarAttachmentScrollbarThumb] = {
-      ui::kColorSysTonalOutline};
-  mixer[kColorNewTabPageModuleCalendarDividerColor] = {ui::kColorSysDivider};
-
-  // Tab group colors.
-  mixer[kColorNewTabPageModuleTabGroupsGrey] = {kColorTabGroupBookmarkBarGrey};
-  mixer[kColorNewTabPageModuleTabGroupsBlue] = {kColorTabGroupBookmarkBarBlue};
-  mixer[kColorNewTabPageModuleTabGroupsRed] = {kColorTabGroupBookmarkBarRed};
-  mixer[kColorNewTabPageModuleTabGroupsYellow] = {
-      kColorTabGroupBookmarkBarYellow};
-  mixer[kColorNewTabPageModuleTabGroupsGreen] = {
-      kColorTabGroupBookmarkBarGreen};
-  mixer[kColorNewTabPageModuleTabGroupsPink] = {kColorTabGroupBookmarkBarPink};
-  mixer[kColorNewTabPageModuleTabGroupsPurple] = {
-      kColorTabGroupBookmarkBarPurple};
-  mixer[kColorNewTabPageModuleTabGroupsCyan] = {kColorTabGroupBookmarkBarCyan};
-  mixer[kColorNewTabPageModuleTabGroupsOrange] = {
-      kColorTabGroupBookmarkBarOrange};
-
-  mixer[kColorNewTabPageModuleTabGroupsDotGrey] = {
-      kColorTabGroupTabStripFrameActiveGrey};
-  mixer[kColorNewTabPageModuleTabGroupsDotBlue] = {
-      kColorTabGroupTabStripFrameActiveBlue};
-  mixer[kColorNewTabPageModuleTabGroupsDotRed] = {
-      kColorTabGroupTabStripFrameActiveRed};
-  mixer[kColorNewTabPageModuleTabGroupsDotYellow] = {
-      kColorTabGroupTabStripFrameActiveYellow};
-  mixer[kColorNewTabPageModuleTabGroupsDotGreen] = {
-      kColorTabGroupTabStripFrameActiveGreen};
-  mixer[kColorNewTabPageModuleTabGroupsDotPink] = {
-      kColorTabGroupTabStripFrameActivePink};
-  mixer[kColorNewTabPageModuleTabGroupsDotPurple] = {
-      kColorTabGroupTabStripFrameActivePurple};
-  mixer[kColorNewTabPageModuleTabGroupsDotOrange] = {
-      kColorTabGroupTabStripFrameActiveOrange};
-
-  mixer[kColorNewTabPagePromoBackground] = {ui::kColorSysBase};
-  mixer[kColorNewTabPagePrimaryForeground] = {ui::kColorSysOnSurface};
-  mixer[kColorNewTabPageSecondaryForeground] = {ui::kColorSysOnSurfaceSubtle};
 
   // Realbox is at this time always themed light, so we use custom color values
   // defined instead of using GM3 color variables.
-  mixer[kColorNewTabPageCommonInputPlaceholder] = {SkColorSetARGB(0x60, 0x1F, 0x1F, 0x1F)};
   mixer[kColorNewTabPageRealboxNextIconHover] = {kColorSysStateHoverOnSubtle_Light};
   if (base::FeatureList::IsEnabled(ntp_features::kEnergyEffect)) {
     mixer[kColorNewTabPageComposeboxSubmitButtonBackground] = {
@@ -235,12 +148,6 @@ void AddMaterialNewTabPageColorMixer(ui::ColorProvider* provider,
       SkColorSetARGB(0x0F, 0x1F, 0x1F, 0x1F)};
   mixer[kColorComposeboxLink] = {gfx::kGoogleBlue700};
 
-  mixer[kColorNewTabPageWallpaperSearchButtonBackground] = {
-      ui::kColorSysPrimary};
-  mixer[kColorNewTabPageWallpaperSearchButtonBackgroundHovered] = {
-      kColorNewTabPageButtonBackgroundHovered};
-  mixer[kColorNewTabPageWallpaperSearchButtonForeground] = {
-      ui::kColorSysOnPrimary};
   if (base::FeatureList::IsEnabled(ntp_features::kRealboxCr23Theming)) {
     // Steady state theme colors.
     mixer[kColorSearchboxBackground] = {kColorToolbarBackgroundSubtleEmphasis};

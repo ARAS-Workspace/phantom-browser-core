@@ -1500,7 +1500,6 @@ class AvatarToolbarButtonProfileColorBrowserTest
         break;
       case ColorThemeType::kUserColor:
         service->SetUserColorAndBrowserColorVariant(color, kColorVariant);
-        service->UseDeviceTheme(false);
         break;
     }
   }
@@ -1514,7 +1513,6 @@ class AvatarToolbarButtonProfileColorBrowserTest
       case ColorThemeType::kUserColor:
         service->SetUserColorAndBrowserColorVariant(SK_ColorTRANSPARENT,
                                                     kColorVariant);
-        service->UseDeviceTheme(false);
         break;
     }
   }

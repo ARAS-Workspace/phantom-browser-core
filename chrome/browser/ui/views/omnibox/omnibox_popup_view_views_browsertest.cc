@@ -287,7 +287,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupViewViewsTest, ThemeIntegration) {
   ThemeService* theme_service =
       ThemeServiceFactory::GetForProfile(browser()->GetProfile());
   UseDefaultTheme();
-  SetUseDeviceTheme(false);
 
   os_settings_provider().SetPreferredColorScheme(
       ui::NativeTheme::PreferredColorScheme::kDark);
@@ -338,7 +337,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupViewViewsTest, ThemeIntegrationInIncognito) {
   ThemeService* theme_service =
       ThemeServiceFactory::GetForProfile(browser()->GetProfile());
   UseDefaultTheme();
-  SetUseDeviceTheme(false);
 
   os_settings_provider().SetPreferredColorScheme(
       ui::NativeTheme::PreferredColorScheme::kDark);

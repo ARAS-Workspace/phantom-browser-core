@@ -201,11 +201,6 @@ class BrowserWidgetColorProviderTest : public BrowserWidgetTest {
     GetThemeService(profile)->SetIsGrayscale(is_grayscale);
   }
 
-  // Sets the `kBrowserFollowsSystemThemeColors` pref for `profile`.
-  void SetFollowDevice(Profile* profile, bool follow_device) {
-    GetThemeService(profile)->UseDeviceTheme(follow_device);
-  }
-
   // Sets the `kBrowserColorVariant` pref for the `profile`.
   void SetBrowserColorVariant(Profile* profile,
                               ui::mojom::BrowserColorVariant color_variant) {
@@ -233,8 +228,6 @@ class BrowserWidgetColorProviderTest : public BrowserWidgetTest {
 // Verifies the BrowserWidget honors the BrowserColorScheme pref.
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        TracksBrowserColorScheme) {
-  SetFollowDevice(profile(), false);
-
   // Assert the browser follows the system color scheme.
   EXPECT_EQ(ui::ColorProviderKey::ColorMode::kLight,
             GetColorProviderKey(browser()).color_mode);
@@ -312,7 +305,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        UserColorProfilePrefTrackedCorrectly) {
   // The Browser should initially have its user_color unset.
-  SetFollowDevice(profile(), false);
   EXPECT_FALSE(GetColorProviderKey(browser()).user_color.has_value());
   EXPECT_EQ(ui::ColorProviderKey::UserColorSource::kBaseline,
             GetColorProviderKey(browser()).user_color_source);
@@ -365,7 +357,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
 // Verifies the BrowserWidget's user_color tracks the is_grayscale theme pref.
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        BrowserWidgetTracksIsGrayscale) {
-  SetFollowDevice(profile(), false);
   const auto initial_source = GetColorProviderKey(browser()).user_color_source;
   EXPECT_NE(ui::ColorProviderKey::UserColorSource::kGrayscale, initial_source);
 
@@ -382,8 +373,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
 
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        GrayscaleIgnoresUserColor) {
-  SetFollowDevice(profile(), false);
-
   // Set OS user color to an obviously different color.
   os_settings_provider().SetAccentColor(SK_ColorMAGENTA);
 
@@ -415,7 +404,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
 // pref.
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        BrowserWidgetTracksBrowserColorVariant) {
-  SetFollowDevice(profile(), false);
   using enum ui::mojom::BrowserColorVariant;
 
   // The browser should honor the scheme variant pref.
@@ -427,28 +415,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
   }
 }
 
-// Verifies the BrowserWidget's ColorProviderKey tracks the user color on
-// ChromeOS and the color from `ThemeService` on platforms where the toggle is
-// not available.
-IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest, UseDeviceIgnoresTheme) {
-  static constexpr SkColor kNativeThemeColor = SK_ColorMAGENTA;
-  static constexpr SkColor kThemeServiceColor = SK_ColorGREEN;
-
-  // Set OS user color to an obviously different color.
-  os_settings_provider().SetAccentColor(kNativeThemeColor);
-
-  // Set the color in `ThemeService`.
-  SetUserColor(profile(), kThemeServiceColor);
-  // Prefer color from NativeTheme.
-  SetFollowDevice(profile(), true);
-
-  // Platforms that do not support the follow device pref instead use the user
-  // color.
-  EXPECT_EQ(kThemeServiceColor, GetColorProviderKey(browser()).user_color);
-  EXPECT_EQ(ui::ColorProviderKey::UserColorSource::kAccent,
-            GetColorProviderKey(browser()).user_color_source);
-}
-
 IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
                        BaselineThemeIgnoresNativeThemeColor) {
   // Set OS user color to an obviously different color.
@@ -456,8 +422,6 @@ IN_PROC_BROWSER_TEST_F(BrowserWidgetColorProviderTest,
 
   // Set the color in `ThemeService` to nullopt to indicate the Baseline theme.
   SetUserColor(profile(), std::nullopt);
-  // Prevent follow pref from overriding theme.
-  SetFollowDevice(profile(), false);
 
   EXPECT_EQ(ui::ColorProviderKey::UserColorSource::kBaseline,
             GetColorProviderKey(browser()).user_color_source);

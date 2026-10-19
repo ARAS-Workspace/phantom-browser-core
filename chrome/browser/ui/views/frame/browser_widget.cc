@@ -336,8 +336,7 @@ ui::ColorProviderKey::ThemeInitializerSupplier* BrowserWidget::GetCustomTheme()
   }
   auto* theme_service =
       ThemeServiceFactory::GetForProfile(browser->GetProfile());
-  return theme_service->UsingDeviceTheme() ? nullptr
-                                           : theme_service->GetThemeSupplier();
+  return theme_service->GetThemeSupplier();
 }
 
 void BrowserWidget::OnNativeWidgetWorkspaceChanged() {

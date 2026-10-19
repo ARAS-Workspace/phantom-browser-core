@@ -3210,8 +3210,7 @@ std::optional<SkColor> GetRootScrollbarThemeColor(WebContents* web_contents) {
   if (ThemeService* theme_service = ThemeServiceFactory::GetForProfile(
           Profile::FromBrowserContext(web_contents->GetBrowserContext()));
       !theme_service || (theme_service->UsingDefaultTheme() &&
-                         !theme_service->GetUserColor().has_value() &&
-                         !theme_service->UsingDeviceTheme())) {
+                         !theme_service->GetUserColor().has_value())) {
     return std::nullopt;
   }
 

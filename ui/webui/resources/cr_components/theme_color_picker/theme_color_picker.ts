@@ -150,9 +150,6 @@ export class ThemeColorPickerElement extends ThemeColorPickerElementBase {
     if (!this.colors_ || !this.theme_) {
       return {type: ColorType.NONE};
     }
-    if (this.theme_.followDeviceTheme) {
-      return {type: ColorType.CUSTOM};
-    }
     if (this.theme_.isGreyBaseline) {
       return {type: ColorType.GREY};
     }

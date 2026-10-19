@@ -126,13 +126,6 @@ class ThemeService : public KeyedService, public BrowserThemeProviderDelegate {
   // Reset the theme to default.
   virtual void UseDefaultTheme();
 
-  // Toggle whether the browser follows its own theme or from the OS. For now,
-  // this is distinct from the ui::SystemTheme.
-  virtual void UseDeviceTheme(bool follow);
-
-  // Returns true if the browser should follow the OS theme.
-  virtual bool UsingDeviceTheme() const;
-
   // Set the current theme to the system theme. On some platforms, the system
   // theme is the default theme.
   virtual void UseSystemTheme();
@@ -267,7 +260,7 @@ class ThemeService : public KeyedService, public BrowserThemeProviderDelegate {
   virtual ui::SystemTheme GetDefaultSystemTheme() const;
 
   // Clears override fields and saves the dictionary. When `reset_all_settings`
-  // is true, also resets NTP background and follows system theme colors.
+  // is true, also resets NTP background.
   virtual void ClearThemeData(bool reset_all_settings);
 
   // Initialize current theme state data from preferences.

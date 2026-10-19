@@ -84,50 +84,6 @@ void AddMaterialSidePanelColorMixer(ui::ColorProvider* provider,
   mixer[kColorSidePanelBookmarksActiveFolderBackground] = {
       ui::kColorSysPrimaryContainer};
 
-  /* Customize Chrome */
-  mixer[kColorSidePanelCustomizeChromeClassicChromeTileBorder] = {
-      ui::kColorSysTonalContainer};
-  mixer[kColorSidePanelCustomizeChromeCornerNtpBorder] = {
-      ui::kColorSysTonalContainer};
-  mixer[kColorSidePanelCustomizeChromeCustomOptionBackground] = {
-      ui::kColorSysTertiaryContainer};
-  mixer[kColorSidePanelCustomizeChromeCustomOptionForeground] = {
-      ui::kColorSysOnTertiaryContainer};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpActiveTab] = {ui::kColorSysBase};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpArrowsAndRefreshButton] = {
-      ui::kColorSysOnSurfaceSecondary};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpBackground] = {ui::kColorSysBase};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpBorder] = {
-      ui::kColorSysSurfaceVariant};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpCaron] = {
-      ui::kColorSysOnSurfacePrimary};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpCaronContainer] = {
-      ui::kColorSysHeaderContainer};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpChromeLogo] = {
-      ui::kColorSysOnSurface};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpOmnibox] = {
-      ui::kColorSysOmniboxContainer};
-  mixer[kColorSidePanelCustomizeChromeMiniNtpTabStripBackground] = {
-      ui::kColorSysHeader};
-  mixer[kColorSidePanelCustomizeChromeThemeBackground] = {
-      ui::kColorSysBaseContainerElevated};
-  mixer[kColorSidePanelCustomizeChromeThemeCheckmarkBackground] = {
-      ui::kColorSysPrimary};
-  mixer[kColorSidePanelCustomizeChromeThemeCheckmarkForeground] = {
-      ui::kColorSysOnPrimary};
-  mixer[kColorSidePanelCustomizeChromeThemeSnapshotBackground] = {
-      ui::kColorSysTonalContainer};
-  mixer[kColorSidePanelCustomizeChromeWebStoreBorder] = {
-      ui::kColorSysNeutralOutline};
-  /*Customize Chrome Wallpaper Search*/
-  mixer[kColorSidePanelWallpaperSearchErrorButtonBackground] = {
-      ui::kColorSysTonalContainer};
-  mixer[kColorSidePanelWallpaperSearchErrorButtonText] = {
-      ui::kColorSysOnTonalContainer};
-  mixer[kColorSidePanelWallpaperSearchTileBackground] = {ui::kColorSysSurface2};
-  mixer[kColorSidePanelWallpaperSearchInspirationDescriptors] = {
-      ui::kColorSysPrimary};
-
   /* Commerce */
   mixer[kColorSidePanelCommerceGraphAxis] = {ui::kColorSysDivider};
   mixer[kColorSidePanelCommerceGraphBubbleBackground] = {

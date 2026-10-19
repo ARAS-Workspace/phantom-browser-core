@@ -282,29 +282,12 @@
   E_CPONLY(kColorNewTabButtonCRBackgroundFrameActive) \
   E_CPONLY(kColorNewTabButtonCRBackgroundFrameInactive) \
   /* New Tab Page colors. */ \
-  E_CPONLY(kColorNewTabPageActionButtonBackground) \
-  E_CPONLY(kColorNewTabPageActionButtonBorder) \
-  E_CPONLY(kColorNewTabPageActionButtonBorderHovered) \
-  E_CPONLY(kColorNewTabPageActionButtonForeground) \
   E_CPONLY(kColorNewTabPageActiveBackground) \
-  E_CPONLY(kColorNewTabPageAddShortcutBackground) \
-  E_CPONLY(kColorNewTabPageAddShortcutForeground) \
-  E_CPONLY(kColorNewTabPageAttributionForeground) \
   E_CPONLY(kColorNewTabPageBackground) \
   E_CPONLY(kColorNewTabPageBackgroundOverride) \
-  E_CPONLY(kColorNewTabPageBorder) \
   E_CPONLY(kColorNewTabPageButtonBackground) \
   E_CPONLY(kColorNewTabPageButtonBackgroundHovered) \
   E_CPONLY(kColorNewTabPageButtonForeground) \
-  E_CPONLY(kColorNewTabPageCartModuleDiscountChipBackground) \
-  E_CPONLY(kColorNewTabPageCartModuleDiscountChipForeground) \
-  E_CPONLY(kColorNewTabPageActionChipTextBody) \
-  E_CPONLY(kColorNewTabPageActionChipTextTitle) \
-  E_CPONLY(kColorNewTabPageActionChipDeepSearchIcon) \
-  E_CPONLY(kColorNewTabPageThreadsRailBackground) \
-  E_CPONLY(kColorNewTabPageThreadsRailIconButton) \
-  E_CPONLY(kColorNewTabPageChipBackground) \
-  E_CPONLY(kColorNewTabPageChipForeground) \
   E_CPONLY(kColorNewTabPageComposeboxSubmitButtonBackground) \
   E_CPONLY(kColorComposeboxBackground) \
   E_CPONLY(kColorComposeboxFileChipSpinner) \
@@ -347,81 +330,15 @@
   E_CPONLY(kColorComposeboxLink) \
   E_CPONLY(kColorComposeboxToolChipBackground) \
   E_CPONLY(kColorComposeboxVoiceButtonHoverBackground) \
-  E_CPONLY(kColorNewTabPageCommonInputPlaceholder) \
   E_CPONLY(kColorNewTabPageControlBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageControlBackgroundSelected) \
-  E_CPONLY(kColorNewTabPageFirstRunBackground) \
-  E_CPONLY(kColorNewTabPageFocusRing) \
   E_CPONLY(kColorNewTabPageHeader) \
-  E_CPONLY(kColorNewTabPageHistoryClustersModuleItemBackground) \
-  E_CPONLY(kColorNewTabPagePromoBackground) \
-  E_CPONLY(kColorNewTabPagePromoImageBackground) \
-  E_CPONLY(kColorNewTabPageIconButtonBackground) \
-  E_CPONLY(kColorNewTabPageIconButtonBackgroundActive) \
   E_CPONLY(kColorNewTabPageLink) \
-  E_CPONLY(kColorNewTabPageLogo) \
-  E_CPONLY(kColorNewTabPageLogoUnthemedDark) \
-  E_CPONLY(kColorNewTabPageLogoUnthemedLight) \
-  E_CPONLY(kColorNewTabPageMenuInnerShadow) \
-  E_CPONLY(kColorNewTabPageMenuOuterShadow) \
-  E_CPONLY(kColorNewTabPageMicBorderColor) \
-  E_CPONLY(kColorNewTabPageMicIconColor) \
-  E_CPONLY(kColorNewTabPageModuleControlBorder) \
-  E_CPONLY(kColorNewTabPageModuleContextMenuDivider) \
-  E_CPONLY(kColorNewTabPageModuleBackground) \
-  E_CPONLY(kColorNewTabPageModuleCalendarEventTimeStatusBackground) \
-  E_CPONLY(kColorNewTabPageModuleCalendarAttachmentScrollbarThumb) \
-  E_CPONLY(kColorNewTabPageModuleCalendarDividerColor) \
-  E_CPONLY(kColorNewTabPageModuleIconBackground) \
-  E_CPONLY(kColorNewTabPageModuleElementDivider) \
-  E_CPONLY(kColorNewTabPageModuleIconContainerBackground) \
-  E_CPONLY(kColorNewTabPageModuleItemBackground) \
-  E_CPONLY(kColorNewTabPageModuleItemBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageModuleScrollButtonBackground) \
-  E_CPONLY(kColorNewTabPageModuleScrollButtonBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsGrey) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsBlue) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsRed) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsYellow) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsGreen) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsPink) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsPurple) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsCyan) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsOrange) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotGrey) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotBlue) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotRed) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotYellow) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotGreen) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotPink) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotPurple) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotCyan) \
-  E_CPONLY(kColorNewTabPageModuleTabGroupsDotOrange) \
-  E_CPONLY(kColorNewTabPageMostVisitedForeground) \
   E_CPONLY(kColorNewTabPageMostVisitedTileBackground) \
-  E_CPONLY(kColorNewTabPageMostVisitedTileBackgroundThemed) \
   E_CPONLY(kColorNewTabPageMostVisitedTileBackgroundUnthemed) \
-  E_CPONLY(kColorNewTabPageOnThemeForeground) \
-  E_CPONLY(kColorNewTabPageOverlayBackground) \
-  E_CPONLY(kColorNewTabPageOverlayForeground) \
-  E_CPONLY(kColorNewTabPageOverlaySecondaryForeground) \
-  E_CPONLY(kColorNewTabPagePrimaryForeground) \
   E_CPONLY(kColorNewTabPageRealboxNextIconHover) \
-  E_CPONLY(kColorNewTabPageSearchBoxBackground) \
-  E_CPONLY(kColorNewTabPageSearchBoxBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageSearchBoxResultsTextDimmedSelected) \
-  E_CPONLY(kColorNewTabPageSecondaryForeground) \
   E_CPONLY(kColorNewTabPageSectionBorder) \
-  E_CPONLY(kColorNewTabPageTagBackground) \
   E_CPONLY(kColorNewTabPageText) \
-  E_CPONLY(kColorNewTabPageTextUnthemed) \
   E_CPONLY(kColorNewTabPageTextLight) \
-  E_CPONLY(kColorNewTabPageWallpaperSearchButtonBackground) \
-  E_CPONLY(kColorNewTabPageWallpaperSearchButtonBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageWallpaperSearchButtonForeground) \
-  /* New Tab Page Colors for Doodle Share Button. */ \
-  E_CPONLY(kColorNewTabPageDoodleShareButtonBackground) \
-  E_CPONLY(kColorNewTabPageDoodleShareButtonIcon) \
   /* New Tab Footer colors. */ \
   E_CPONLY(kColorNewTabFooterBackground) \
   E_CPONLY(kColorNewTabFooterText) \
@@ -621,9 +538,6 @@
   E_CPONLY(kColorSearchboxSelectionBackground) \
   E_CPONLY(kColorSearchboxSelectionForeground) \
   E_CPONLY(kColorSearchboxShadow) \
-  /* Action chips colors. */ \
-  E_CPONLY(kColorNewTabPageActionChipBackground) \
-  E_CPONLY(kColorNewTabPageActionChipBackgroundHover) \
   /* The colors used for saved tab group chips on the bookmark bar. */ \
   E_CPONLY(kColorSavedTabGroupForegroundGrey) \
   E_CPONLY(kColorSavedTabGroupForegroundBlue) \
@@ -676,24 +590,6 @@
   E_CPONLY(kColorSidePanelCommerceGraphLine) \
   E_CPONLY(kColorSidePanelContentAreaSeparator) \
   E_CPONLY(kColorSidePanelContentBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeClassicChromeTileBorder) \
-  E_CPONLY(kColorSidePanelCustomizeChromeCornerNtpBorder) \
-  E_CPONLY(kColorSidePanelCustomizeChromeCustomOptionBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeCustomOptionForeground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpActiveTab) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpArrowsAndRefreshButton) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpBorder) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpCaron) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpCaronContainer) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpChromeLogo) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpOmnibox) \
-  E_CPONLY(kColorSidePanelCustomizeChromeMiniNtpTabStripBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeThemeBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeThemeCheckmarkBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeThemeCheckmarkForeground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeThemeSnapshotBackground) \
-  E_CPONLY(kColorSidePanelCustomizeChromeWebStoreBorder) \
   E_CPONLY(kColorSidePanelDialogBackground) \
   E_CPONLY(kColorSidePanelDialogDivider) \
   E_CPONLY(kColorSidePanelDialogPrimaryForeground) \
@@ -718,10 +614,6 @@
   E_CPONLY(kColorSidePanelResizeAreaHandle) \
   E_CPONLY(kColorSidePanelScrollbarThumb) \
   E_CPONLY(kColorSidePanelTextfieldBorder) \
-  E_CPONLY(kColorSidePanelWallpaperSearchTileBackground) \
-  E_CPONLY(kColorSidePanelWallpaperSearchErrorButtonBackground) \
-  E_CPONLY(kColorSidePanelWallpaperSearchErrorButtonText) \
-  E_CPONLY(kColorSidePanelWallpaperSearchInspirationDescriptors) \
   /* Slider colors. */ \
   E_CPONLY(kColorSliderActive) \
   E_CPONLY(kColorSliderActiveContainer) \

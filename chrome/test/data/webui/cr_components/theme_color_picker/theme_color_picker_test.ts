@@ -30,7 +30,6 @@ function createTheme(isDarkMode = false): Theme {
     colorsManagedByPolicy: false,
     isGreyBaseline: false,
     browserColorVariant: BrowserColorVariant.kTonalSpot,
-    followDeviceTheme: false,
   };
 }
 
@@ -447,11 +446,10 @@ suite('CrComponentsThemeColorPickerTest', () => {
       });
 
   // New tests covering grey baseline selection logic.
-  test('grey baseline selected when not following device theme', async () => {
+  test('grey baseline selected', async () => {
     initializeElement();
     const theme = createTheme();
     theme.isGreyBaseline = true;
-    theme.followDeviceTheme = false;
     theme.foregroundColor = null;  // Ensure not Chrome/custom color.
     callbackRouter.setTheme(theme);
     await callbackRouter.$.flushForTesting();
@@ -468,29 +466,5 @@ suite('CrComponentsThemeColorPickerTest', () => {
       colorsElement.shadowRoot.querySelectorAll('[tabindex="0"]');
     assertEquals(1, indexedColors.length);
     assertEquals(greyDefaultColorElement, indexedColors[0]);
-  });
-
-  test('grey baseline ignored when following device theme', async () => {
-    initializeElement();
-    const theme = createTheme();
-    theme.isGreyBaseline = true;
-    theme.followDeviceTheme = true;
-    theme.seedColor = {value: 0xff556677};
-    theme.foregroundColor = {value: 0xff00ff00};
-    theme.backgroundImageMainColor = {value: theme.seedColor.value};
-    callbackRouter.setTheme(theme);
-    await callbackRouter.$.flushForTesting();
-
-    const customColorElement = colorsElement.$.customColor;
-    const checkedColors =
-        colorsElement.shadowRoot.querySelectorAll<ThemeColorElement>('[checked]');
-    assertEquals(1, checkedColors.length);
-    assertEquals(customColorElement, checkedColors[0]);
-    assertEquals('true', customColorElement.getAttribute('aria-checked'));
-
-    const indexedColors =
-        colorsElement.shadowRoot.querySelectorAll('[tabindex="0"]');
-    assertEquals(1, indexedColors.length);
-    assertEquals(customColorElement, indexedColors[0]);
   });
 });

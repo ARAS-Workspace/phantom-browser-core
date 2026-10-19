@@ -29,13 +29,16 @@ class MaterialNewTabPageColorMixerTest : public testing::Test {
   ui::ColorProviderKey color_provider_key_;
 };
 
-TEST_F(MaterialNewTabPageColorMixerTest, NtpModulesRedesignedEnabled) {
+TEST_F(MaterialNewTabPageColorMixerTest, NewTabPageColorsUseMaterialTokens) {
   AddMaterialColorMixers();
 
-  EXPECT_EQ(color_provider().GetColor(kColorNewTabPageModuleBackground),
-            color_provider().GetColor(ui::kColorSysBaseContainer));
-  EXPECT_EQ(color_provider().GetColor(kColorNewTabPageModuleItemBackground),
-            color_provider().GetColor(ui::kColorSysSurface));
+  EXPECT_EQ(color_provider().GetColor(kColorNewTabPageBackground),
+            color_provider().GetColor(ui::kColorSysBase));
+  EXPECT_EQ(color_provider().GetColor(kColorNewTabPageButtonBackground),
+            color_provider().GetColor(ui::kColorSysTonalContainer));
+  EXPECT_EQ(
+      color_provider().GetColor(kColorNewTabPageMostVisitedTileBackground),
+      color_provider().GetColor(ui::kColorSysBaseContainer));
 }
 
 }  // namespace

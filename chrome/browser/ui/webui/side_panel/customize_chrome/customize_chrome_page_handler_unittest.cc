@@ -97,7 +97,6 @@ class MockThemeService : public ThemeService {
   MockThemeService() : ThemeService(nullptr, theme_helper_) { set_ready(); }
   using ThemeService::NotifyThemeChanged;
   MOCK_METHOD(void, UseDefaultTheme, ());
-  MOCK_METHOD(void, UseDeviceTheme, (bool));
   MOCK_CONST_METHOD0(UsingDefaultTheme, bool());
   MOCK_CONST_METHOD0(UsingSystemTheme, bool());
   MOCK_CONST_METHOD0(UsingExtensionTheme, bool());
@@ -274,7 +273,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_F(CustomizeChromePageHandlerTest, SetDefaultColor) {
   EXPECT_CALL(mock_theme_service(), UseDefaultTheme).Times(1);
-  EXPECT_CALL(mock_theme_service(), UseDeviceTheme(false)).Times(1);
 
   handler().SetDefaultColor();
 }

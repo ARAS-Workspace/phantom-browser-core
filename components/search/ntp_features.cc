@@ -33,9 +33,6 @@ BASE_FEATURE(kNtpShortcuts, base::FEATURE_ENABLED_BY_DEFAULT);
 // If enabled, high-DPI favicons are fetched for Most Visited tiles.
 BASE_FEATURE(kNtpMostVisitedHighDpiFavicons, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// If enabled, the features of NTP Next (AI action chips etc.) will be shown.
-BASE_FEATURE(kNtpNextFeatures, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // If enabled, a footer will show on the NTP.
 BASE_FEATURE(kNtpFooter, base::FEATURE_ENABLED_BY_DEFAULT);
 

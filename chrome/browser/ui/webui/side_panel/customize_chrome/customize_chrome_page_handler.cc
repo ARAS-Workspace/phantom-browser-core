@@ -109,7 +109,6 @@ void CustomizeChromePageHandler::AttachedTabStateUpdated(const GURL& url) {
 }
 
 void CustomizeChromePageHandler::SetDefaultColor() {
-  theme_service_->UseDeviceTheme(false);
   theme_service_->UseDefaultTheme();
 }
 

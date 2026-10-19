@@ -936,15 +936,6 @@ TEST_F(ThemeServiceTest, ThemeResetClearsBrowserColorVariant) {
   EXPECT_EQ(ThemeHelper::kDefaultThemeID, theme_service()->GetThemeID());
 }
 
-TEST_F(ThemeServiceTest, UseDeviceTheme_DefaultValue) {
-  EXPECT_FALSE(theme_service()->UsingDeviceTheme());
-}
-
-TEST_F(ThemeServiceTest, SetUseDeviceTheme) {
-  theme_service()->UseDeviceTheme(false);
-  EXPECT_FALSE(theme_service()->UsingDeviceTheme());
-}
-
 TEST_F(ThemeServiceTest, SetBrowserColorScheme) {
   // Default without anything explicitly set should be kSystem.
   ThemeService::BrowserColorScheme color_scheme =

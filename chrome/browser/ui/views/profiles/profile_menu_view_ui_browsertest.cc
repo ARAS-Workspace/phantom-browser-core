@@ -495,7 +495,6 @@ class ProfileMenuViewPixelTest
                      SkColor color = SK_ColorTRANSPARENT,
                      bool dark_mode = false) {
     ThemeService* service = ThemeServiceFactory::GetForProfile(&profile);
-    service->UseDeviceTheme(false);
 
     if (color != SK_ColorTRANSPARENT) {
       service->SetUserColorAndBrowserColorVariant(

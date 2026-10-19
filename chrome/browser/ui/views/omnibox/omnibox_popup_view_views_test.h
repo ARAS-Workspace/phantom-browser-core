@@ -89,11 +89,6 @@ class OmniboxPopupViewViewsTest : public InProcessBrowserTest {
         ->SetIsGrayscale(is_grayscale);
   }
 
-  void SetUseDeviceTheme(bool use_device_theme) {
-    ThemeServiceFactory::GetForProfile(browser()->GetProfile())
-        ->UseDeviceTheme(use_device_theme);
-  }
-
   // Some tests relies on the light/dark variants of the result background to be
   // different. But when using the system theme on Linux, these colors will be
   // the same. Ensure we're not using the system theme, which may be

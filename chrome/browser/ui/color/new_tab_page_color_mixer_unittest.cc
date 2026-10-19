@@ -37,14 +37,6 @@ TEST(NewTabPageColorMixer, LightAndDarkThemeColors) {
     EXPECT_EQ(provider.GetColor(kColorNewTabPageBackground), toolbar_color);
     EXPECT_EQ(provider.GetColor(kColorNewTabPageButtonBackground),
               toolbar_color);
-
-    if (toolbar_color == SK_ColorWHITE) {
-      EXPECT_EQ(provider.GetColor(kColorNewTabPageModuleBackground),
-                gfx::kGoogleGrey100);
-    } else {
-      EXPECT_EQ(provider.GetColor(kColorNewTabPageModuleBackground),
-                gfx::kGoogleGrey800);
-    }
   }
 }
 
