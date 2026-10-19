@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import './theme_snapshot.js';
 import './hover_button.js';
 import '/strings.m.js'; // Required by <managed-dialog>.
 import 'chrome://resources/cr_components/customize_color_scheme_mode/customize_color_scheme_mode.js';
@@ -30,9 +29,7 @@ export interface AppearanceElement {
   $: {
     chromeColors: HTMLElement,
     editThemeButton: HTMLButtonElement,
-    themeSnapshot: HTMLElement,
     setClassicChromeButton: HTMLButtonElement,
-    thirdPartyThemeLinkButton: HTMLButtonElement,
     followThemeToggle: HTMLElement,
     followThemeToggleControl: CrToggleElement,
     uploadedImageButton: HTMLButtonElement,
@@ -60,21 +57,10 @@ export class AppearanceElement extends AppearanceElementBase {
       theme_: {type: Object},
       editThemeButtonText_: {type: String},
 
-      thirdPartyThemeId_: {
-        type: String,
-        reflect: true,
-      },
-
-      thirdPartyThemeName_: {
-        type: String,
-        reflect: true,
-      },
-
       showBottomDivider_: {type: Boolean},
       showClassicChromeButton_: {type: Boolean},
       showColorPicker_: {type: Boolean},
       showDeviceThemeToggle_: {type: Boolean},
-      showThemeSnapshot_: {type: Boolean},
       showUploadedImageButton_: {type: Boolean},
       showSearchedImageButton_: {type: Boolean},
       showManagedButton_: {type: Boolean},
@@ -96,13 +82,10 @@ export class AppearanceElement extends AppearanceElementBase {
 
   protected accessor theme_: Theme|undefined;
   protected accessor editThemeButtonText_: string = '';
-  protected accessor thirdPartyThemeId_: string|null = null;
-  protected accessor thirdPartyThemeName_: string|null = null;
   protected accessor showBottomDivider_: boolean = false;
   protected accessor showClassicChromeButton_: boolean = false;
   protected accessor showColorPicker_: boolean = false;
   protected accessor showDeviceThemeToggle_: boolean = false;
-  protected accessor showThemeSnapshot_: boolean = false;
   protected accessor showUploadedImageButton_: boolean = false;
   protected accessor showSearchedImageButton_: boolean = false;
   protected accessor showManagedButton_: boolean = false;
@@ -113,9 +96,8 @@ export class AppearanceElement extends AppearanceElementBase {
       loadTimeData.getBoolean('wallpaperSearchEnabled');
   private accessor footerEnabled_: boolean =
       loadTimeData.getBoolean('footerEnabled');
-  protected accessor newTabPageType_: NewTabPageType =
-      NewTabPageType.kFirstPartyWebUI;
-  protected accessor showEditTheme_: boolean = true;
+  protected accessor newTabPageType_: NewTabPageType = NewTabPageType.kNone;
+  protected accessor showEditTheme_: boolean = false;
   protected accessor managedByName_: string = '';
   protected accessor managedByDesc_: string = '';
   private listenerIds_: number[] = [];
@@ -168,18 +150,14 @@ export class AppearanceElement extends AppearanceElementBase {
 
     if (changedPrivateProperties.has('theme_') ||
         changedPrivateProperties.has('newTabPageType_')) {
-      this.thirdPartyThemeId_ = this.computeThirdPartyThemeId_();
-      this.thirdPartyThemeName_ = this.computeThirdPartyThemeName_();
       this.showClassicChromeButton_ = this.computeShowClassicChromeButton_();
       this.showColorPicker_ = this.computeShowColorPicker_();
       this.showDeviceThemeToggle_ = this.computeShowDeviceThemeToggle_();
-      this.showThemeSnapshot_ = this.computeShowThemeSnapshot_();
       this.showUploadedImageButton_ = this.computeShowUploadedImageButton_();
       this.showSearchedImageButton_ = this.computeShowSearchedImageButton_();
     }
 
-    if (changedPrivateProperties.has('newTabPageType_') ||
-        changedPrivateProperties.has('managedByName_') ||
+    if (changedPrivateProperties.has('managedByName_') ||
         changedPrivateProperties.has('managedByDesc_')) {
       this.showManagedButton_ = this.computeShowManagedButton_();
     }
@@ -213,22 +191,6 @@ export class AppearanceElement extends AppearanceElementBase {
                                              'changeTheme');
   }
 
-  private computeThirdPartyThemeId_(): string|null {
-    if (this.theme_ && this.theme_.thirdPartyThemeInfo) {
-      return this.theme_.thirdPartyThemeInfo.id;
-    } else {
-      return null;
-    }
-  }
-
-  private computeThirdPartyThemeName_(): string|null {
-    if (this.theme_ && this.theme_.thirdPartyThemeInfo) {
-      return this.theme_.thirdPartyThemeInfo.name;
-    } else {
-      return null;
-    }
-  }
-
   private computeShowBottomDivider_(): boolean {
     return this.showClassicChromeButton_ || this.showDeviceThemeToggle_;
   }
@@ -237,8 +199,7 @@ export class AppearanceElement extends AppearanceElementBase {
     if (this.footerEnabled_) {
       return !!(
           this.theme_ && this.theme_.backgroundImage &&
-          (this.newTabPageType_ === NewTabPageType.kFirstPartyWebUI ||
-           this.newTabPageType_ === NewTabPageType.kThirdPartyWebUI));
+          this.newTabPageType_ === NewTabPageType.kThirdPartyWebUI);
     }
     return !!(
         this.theme_ &&
@@ -252,15 +213,6 @@ export class AppearanceElement extends AppearanceElementBase {
   private computeShowDeviceThemeToggle_(): boolean {
     return loadTimeData.getBoolean('showDeviceThemeToggle') &&
         !(!!this.theme_ && !!this.theme_.thirdPartyThemeInfo);
-  }
-
-  private computeShowThemeSnapshot_(): boolean {
-    return !!this.theme_ && !this.theme_.thirdPartyThemeInfo &&
-        (!(this.theme_.backgroundImage &&
-           this.theme_.backgroundImage.isUploadedImage)) &&
-        // TODO(crbug.com/404247286) Enable snapshots for extension NTP with 1P
-        // theme.
-        this.newTabPageType_ === NewTabPageType.kFirstPartyWebUI;
   }
 
   private computeShowUploadedImageButton_(): boolean {
@@ -277,15 +229,7 @@ export class AppearanceElement extends AppearanceElementBase {
   }
 
   private computeShowManagedButton_(): boolean {
-    return this.newTabPageType_ !== NewTabPageType.kFirstPartyWebUI &&
-        !!this.managedByName_;
-  }
-
-  protected onThemeSnapshotKeydown_(e: KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      this.onEditThemeClick_();
-    }
+    return !!this.managedByName_;
   }
 
   protected onEditThemeClick_() {
@@ -303,12 +247,6 @@ export class AppearanceElement extends AppearanceElementBase {
       return;
     }
     this.dispatchEvent(new Event('wallpaper-search-click'));
-  }
-
-  protected onThirdPartyThemeLinkButtonClick_() {
-    if (this.thirdPartyThemeId_) {
-      this.apiProxy_.handler.openThirdPartyThemePage(this.thirdPartyThemeId_);
-    }
   }
 
   protected onUploadedImageButtonClick_() {

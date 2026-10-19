@@ -34,8 +34,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHCompanionSidePanelRegionSearchFeature,
     &kIPHComposeMSBBSettingsFeature,
     &kIPHComposeNewBadgeFeature,
-    &kIPHDesktopCustomizeChromeAutoOpenFeature,
-    &kIPHDesktopCustomizeChromeExperimentFeature,
     &kIPHDesktopPwaInstallFeature,
     &kIPHDesktopSharedHighlightingFeature,
     &kIPHDiscardRingFeature,

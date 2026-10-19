@@ -15,8 +15,6 @@
 #include "chrome/browser/ui/side_panel/side_panel_registry.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui_provider.h"
-#include "chrome/common/pref_names.h"
-#include "components/prefs/pref_service.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -61,20 +59,6 @@ void SidePanelControllerBase::OnEntryShown(SidePanelEntry* entry) {
 void SidePanelControllerBase::OnEntryHidden(SidePanelEntry* entry) {
   if (entry_state_changed_callback_) {
     entry_state_changed_callback_.Run(/*is_showing=*/false);
-  }
-}
-
-void SidePanelControllerBase::OnEntryWillHide(SidePanelEntry* entry,
-                                              SidePanelEntryHideReason reason) {
-  // Only count explicit user action to close the SidePanel here.
-  // The SidePanel may be hidden if the user opens a new tab or navigates away
-  // without explicitly closing it. In those cases the view of the SidePanel
-  // still exists, therefore we do not count those events. Also closing the
-  // browser with an opened SidePanel does not trigger this call.
-  if (reason == SidePanelEntryHideReason::kSidePanelClosed) {
-    Profile* const profile = tab_->GetProfile();
-    profile->GetPrefs()->SetBoolean(prefs::kNtpCustomizeChromeExplicitlyClosed,
-                                    true);
   }
 }
 

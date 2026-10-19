@@ -11,7 +11,6 @@ import '/strings.m.js';
 import './wallpaper_search/wallpaper_search_tile.js';
 
 import type {SpHeadingElement} from 'chrome://customize-chrome-side-panel.top-chrome/shared/sp_heading.js';
-import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 import {getInstance as getAnnouncerInstance} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import {I18nMixinLit} from 'chrome://resources/cr_elements/i18n_mixin_lit.js';
 import {assert} from 'chrome://resources/js/assert.js';
@@ -36,21 +35,15 @@ export enum CategoryType {
   WALLPAPER_SEARCH,
 }
 
-export const CHROME_THEME_COLLECTION_ELEMENT_ID =
-    'CustomizeChromeUI::kChromeThemeCollectionElementId';
-export const CHANGE_CHROME_THEME_CLASSIC_ELEMENT_ID =
-    'CustomizeChromeUI::kChangeChromeThemeClassicElementId';
-
 export interface SelectedCategory {
   type: CategoryType;
   collectionId?: string;
 }
 
-const CategoriesElementBase = I18nMixinLit(HelpBubbleMixinLit(CrLitElement));
+const CategoriesElementBase = I18nMixinLit(CrLitElement);
 
 export interface CategoriesElement {
   $: {
-    chromeWebStoreTile: HTMLElement,
     classicChromeTile: HTMLElement,
     heading: SpHeadingElement,
     uploadImageTile: HTMLElement,
@@ -134,33 +127,8 @@ export class CategoriesElement extends CategoriesElementBase {
         this.selectedCategory_.type === CategoryType.WALLPAPER_SEARCH;
   }
 
-  override firstUpdated() {
-    this.registerHelpBubble(
-        CHANGE_CHROME_THEME_CLASSIC_ELEMENT_ID, '#classicChromeTile');
-  }
-
-  override updated(changedProperties: PropertyValues<this>) {
-    super.updated(changedProperties);
-
-    const changedPrivateProperties =
-        changedProperties as Map<PropertyKey, unknown>;
-
-    if (changedPrivateProperties.has('collections_') &&
-        this.collections_.length > 0) {
-      this.onCollectionsRendered_();
-    }
-  }
-
   focusOnBackButton() {
     this.$.heading.getBackButton().focus();
-  }
-
-  private onCollectionsRendered_() {
-    const collections = this.shadowRoot.querySelectorAll('.collection');
-    if (collections.length >= 5) {
-      this.registerHelpBubble(
-          CHROME_THEME_COLLECTION_ELEMENT_ID, collections[4]!);
-    }
   }
 
   protected shouldShowCollection_(itemLoaded: boolean) {
@@ -266,10 +234,6 @@ export class CategoriesElement extends CategoriesElementBase {
         CustomizeChromeAction.CATEGORIES_FIRST_PARTY_COLLECTION_SELECTED);
     this.dispatchEvent(new CustomEvent<BackgroundCollection>(
         'collection-select', {detail: this.collections_[index]}));
-  }
-
-  protected onChromeWebStoreClick_() {
-    this.apiProxy_.handler.openChromeWebStore();
   }
 
   protected onBackButtonClick_() {

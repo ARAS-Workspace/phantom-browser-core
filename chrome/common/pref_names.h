@@ -1173,24 +1173,6 @@ inline constexpr char kNtpCustomBackgroundInspiration[] =
 // Use `kNtpCustomBackgroundDict` only.
 inline constexpr char kDeprecatedNtpCustomBackgroundDictDoNotUse[] =
     "ntp.custom_background_dict";
-// Number of times the user has opened the side panel with the customize chrome
-// button.
-inline constexpr char kNtpCustomizeChromeButtonOpenCount[] =
-    "NewTabPage.CustomizeChromeButtonOpenCount";
-// Number of how many times Customize Chrome was auto opened on NTP.
-inline constexpr char kNtpCustomizeChromeSidePanelAutoOpeningsCount[] =
-    "NewTabPage.CustomizeChromeSidePanelAutoOpeningsCount";
-// Whether user has explicitly canceled Customize Chrome side panel.
-inline constexpr char kNtpCustomizeChromeExplicitlyClosed[] =
-    "NewTabPage.CustomizeChromeExplicitlyClosed";
-// Whether Customize Chrome IPH was auto opened on NTP.
-inline constexpr char kNtpCustomizeChromeIPHAutoOpened[] =
-    "NewTabPage.CustomizeChromeIPHAutoOpened";
-// Whether the AI action chips are visible in the NTP.
-inline constexpr char kNtpToolChipsVisible[] = "NewTabPage.ToolChipsVisible";
-// Number of times NTP wallpaper search button animation has been visible.
-inline constexpr char kNtpWallpaperSearchButtonShownCount[] =
-    "NewTabPage.WallpaperSearchButtonShownCount";
 // List of ids for past wallpaper search themes.
 inline constexpr char kNtpWallpaperSearchHistory[] =
     "ntp.wallpaper_search_history";

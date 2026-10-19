@@ -8,21 +8,6 @@ include_rules = [
   "+chrome/browser/search_engines/template_url_service_factory.h",
   "+chrome/browser/themes/theme_service_factory.h",
   "+chrome/browser/ui/webui/cr_components/theme_color_picker/customize_chrome_colors.h",
-  "+chrome/browser/search/background/ntp_custom_background_service.h",
-  "+chrome/browser/search/background/ntp_custom_background_service_factory.h",
-  "+chrome/browser/search/search.h",
-  "+chrome/browser/ui/actions/chrome_action_id.h",
-  "+chrome/browser/ui/browser_window.h",
-  "+chrome/browser/ui/browser_window/public/browser_window_features.h",
-  "+chrome/browser/ui/browser_window/public/browser_window_interface.h",
-  "+chrome/browser/ui/browser_window/public/global_browser_collection.h",
-  "+chrome/browser/ui/side_panel/side_panel_action_callback.h",
-  "+chrome/browser/ui/side_panel/side_panel_enums.h",
-  "+chrome/browser/ui/side_panel/side_panel_ui.h",
-  "+chrome/browser/ui/signin/signin_view_controller.h",
-  "+chrome/browser/ui/user_education/browser_user_education_interface.h",
-  "+chrome/browser/ui/webui/webui_embedding_context.h",
-  "+chrome/browser/user_education/user_education_service.h",
   "+chrome/browser/ui/tabs/tab_strip_model.h",
 ]
 
@@ -36,9 +21,6 @@ test_rules = [
   "+chrome/browser/optimization_guide/optimization_guide_keyed_service.h",
   "+chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h",
   "+chrome/browser/signin/signin_browser_test_base.h",
-  "+chrome/browser/ui/views/user_education/browser_user_education_service.h",
-  "+chrome/browser/user_education/user_education_service_factory.h",
-  "+chrome/browser/ui/views",
 ]
 
 specific_include_rules = {

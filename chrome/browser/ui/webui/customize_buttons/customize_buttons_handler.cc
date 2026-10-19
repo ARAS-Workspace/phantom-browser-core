@@ -7,19 +7,12 @@
 #include <utility>
 
 #include "base/logging.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
-#include "chrome/common/pref_names.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/prefs/pref_service.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_ui.h"
-
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeButtonsHandler,
-                                      kCustomizeChromeButtonElementId);
 
 CustomizeButtonsHandler::CustomizeButtonsHandler(
     mojo::PendingReceiver<customize_buttons::mojom::CustomizeButtonsHandler>
@@ -27,17 +20,12 @@ CustomizeButtonsHandler::CustomizeButtonsHandler(
     mojo::PendingRemote<customize_buttons::mojom::CustomizeButtonsDocument>
         pending_page,
     content::WebUI* web_ui,
-    tabs::TabInterface* tab_interface,
-    std::unique_ptr<NewTabPageFeaturePromoHelper>
-        customize_chrome_feature_promo_helper)
-    : profile_(Profile::FromWebUI(web_ui)),
-      web_ui_(web_ui),
+    tabs::TabInterface* tab_interface)
+    : web_ui_(web_ui),
       tab_interface_(tab_interface),
-      feature_promo_helper_(std::move(customize_chrome_feature_promo_helper)),
       page_{std::move(pending_page)},
       receiver_{this, std::move(pending_handler)} {
   CHECK(web_ui_);
-  CHECK(feature_promo_helper_);
 
   if (tab_interface_) {
     tab_subscriptions_.push_back(tab_interface_->RegisterWillDetach(
@@ -120,9 +108,6 @@ void CustomizeButtonsHandler::SetCustomizeChromeSidePanelVisible(
 
   SidePanelOpenTrigger trigger_enum;
   switch (trigger) {
-    case customize_buttons::mojom::SidePanelOpenTrigger::kNewTabPage:
-      trigger_enum = SidePanelOpenTrigger::kNewTabPage;
-      break;
     case customize_buttons::mojom::SidePanelOpenTrigger::kNewTabFooter:
       trigger_enum = SidePanelOpenTrigger::kNewTabFooter;
       break;
@@ -130,36 +115,6 @@ void CustomizeButtonsHandler::SetCustomizeChromeSidePanelVisible(
 
   NotifyCustomizeChromeSidePanelVisibilityChanged(true);
   customize_chrome_side_panel_controller->OpenSidePanel(trigger_enum, section);
-
-  // Record usage for customize chrome promo.
-  if (feature_promo_helper_) {
-    auto* tab = GetActiveTab();
-    CHECK(tab);
-    auto* contents = tab->GetContents();
-    feature_promo_helper_->RecordPromoFeatureUsageAndClosePromo(
-        feature_engagement::kIPHDesktopCustomizeChromeExperimentFeature,
-        contents);
-    feature_promo_helper_->RecordPromoFeatureUsageAndClosePromo(
-        feature_engagement::kIPHDesktopCustomizeChromeAutoOpenFeature,
-        contents);
-  }
-}
-
-void CustomizeButtonsHandler::IncrementCustomizeChromeButtonOpenCount() {
-  CHECK(profile_);
-  CHECK(profile_->GetPrefs());
-  profile_->GetPrefs()->SetInteger(
-      prefs::kNtpCustomizeChromeButtonOpenCount,
-      profile_->GetPrefs()->GetInteger(
-          prefs::kNtpCustomizeChromeButtonOpenCount) +
-          1);
-}
-
-void CustomizeButtonsHandler::IncrementWallpaperSearchButtonShownCount() {
-  const auto shown_count = profile_->GetPrefs()->GetInteger(
-      prefs::kNtpWallpaperSearchButtonShownCount);
-  profile_->GetPrefs()->SetInteger(prefs::kNtpWallpaperSearchButtonShownCount,
-                                   shown_count + 1);
 }
 
 void CustomizeButtonsHandler::OnTabWillDetach(

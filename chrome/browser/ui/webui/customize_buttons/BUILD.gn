@@ -34,12 +34,10 @@ source_set("impl") {
   sources = [ "customize_buttons_handler.cc" ]
   deps = [
     ":customize_buttons",
-    "//chrome/browser/profiles",
     "//chrome/browser/tab_list",
     "//chrome/browser/ui/customize_chrome",
     "//chrome/browser/ui/side_panel",
     "//chrome/browser/ui/webui:webui_util",
-    "//components/feature_engagement/public:feature_constants",
     "//components/tabs:public",
   ]
 }

@@ -18,13 +18,11 @@
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_webui_config.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/user_education/webui/help_bubble_handler.h"
 #include "content/public/browser/web_ui_controller.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "ui/webui/resources/cr_components/customize_color_scheme_mode/customize_color_scheme_mode.mojom.h"
-#include "ui/webui/resources/cr_components/help_bubble/help_bubble.mojom.h"
 #include "ui/webui/resources/cr_components/theme_color_picker/theme_color_picker.mojom.h"
 
 namespace content {
@@ -53,7 +51,6 @@ class CustomizeChromeUIConfig
 // WebUI controller for chrome://customize-chrome-side-panel.top-chrome
 class CustomizeChromeUI
     : public TopChromeWebUIController,
-      public help_bubble::mojom::HelpBubbleHandlerFactory,
       public customize_color_scheme_mode::mojom::
           CustomizeColorSchemeModeHandlerFactory,
       public theme_color_picker::mojom::ThemeColorPickerHandlerFactory,
@@ -67,12 +64,6 @@ class CustomizeChromeUI
   CustomizeChromeUI& operator=(const CustomizeChromeUI&) = delete;
 
   ~CustomizeChromeUI() override;
-
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChangeChromeThemeButtonElementId);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChangeChromeThemeClassicElementId);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChromeThemeBackElementId);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChromeThemeCollectionElementId);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChromeThemeElementId);
 
   // Passthrough that calls the CustomizeChromePage's ScrollToSection.
   void ScrollToSection(CustomizeChromeSection section);
@@ -92,10 +83,6 @@ class CustomizeChromeUI
   void BindInterface(
       mojo::PendingReceiver<
           side_panel::mojom::CustomizeChromePageHandlerFactory> receiver);
-
-  void BindInterface(
-      mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
-          pending_receiver);
 
   void BindInterface(
       mojo::PendingReceiver<customize_color_scheme_mode::mojom::
@@ -124,12 +111,6 @@ class CustomizeChromeUI
       mojo::PendingRemote<side_panel::mojom::CustomizeChromePage> pending_page,
       mojo::PendingReceiver<side_panel::mojom::CustomizeChromePageHandler>
           pending_page_handler) override;
-
-  // help_bubble::mojom::HelpBubbleHandlerFactory:
-  void CreateHelpBubbleHandler(
-      mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
-      mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler)
-      override;
 
   // customize_color_scheme_mode::mojom::CustomizeColorSchemeModeHandlerFactory:
   void CreateCustomizeColorSchemeModeHandler(
@@ -180,9 +161,6 @@ class CustomizeChromeUI
   GURL source_tab_url_;
   std::optional<bool> is_theme_editable_;
 
-  std::unique_ptr<user_education::HelpBubbleHandler> help_bubble_handler_;
-  mojo::Receiver<help_bubble::mojom::HelpBubbleHandlerFactory>
-      help_bubble_handler_factory_receiver_{this};
   std::unique_ptr<CustomizeColorSchemeModeHandler>
       customize_color_scheme_mode_handler_;
   mojo::Receiver<customize_color_scheme_mode::mojom::

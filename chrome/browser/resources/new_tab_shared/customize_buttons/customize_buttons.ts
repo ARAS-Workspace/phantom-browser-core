@@ -39,45 +39,15 @@ export class CustomizeButtonsElement extends CrLitElement {
         reflect: true,
         type: Boolean,
       },
-      modulesShownToUser: {
-        reflect: true,
-        type: Boolean,
-      },
-      showBackgroundImage: {
-        reflect: true,
-        type: Boolean,
-      },
       showCustomize: {type: Boolean},
       showCustomizeChromeText: {type: Boolean},
-      showShadow: {
-        reflect: true,
-        type: Boolean,
-      },
-      showWallpaperSearch: {
-        reflect: true,
-        type: Boolean,
-      },
-      showWallpaperSearchButton: {
-        reflect: true,
-        type: Boolean,
-      },
-      wallpaperSearchButtonAnimationEnabled: {
-        reflect: true,
-        type: Boolean,
-      },
       webuiRoundedIconsEnabled_: {type: Boolean},
     };
   }
 
   accessor infoShownToUser: boolean = false;
-  accessor modulesShownToUser: boolean = false;
-  accessor showBackgroundImage: boolean = false;
   accessor showCustomize: boolean = false;
   accessor showCustomizeChromeText: boolean = false;
-  accessor showShadow: boolean = false;
-  accessor showWallpaperSearch: boolean = false;
-  accessor showWallpaperSearchButton: boolean = false;
-  accessor wallpaperSearchButtonAnimationEnabled: boolean = false;
   protected accessor webuiRoundedIconsEnabled_: boolean =
       loadTimeData.getBoolean('webuiRoundedIconsEnabled');
 
@@ -89,10 +59,6 @@ export class CustomizeButtonsElement extends CrLitElement {
 
   protected onCustomizeClick_() {
     this.fire('customize-click');
-  }
-
-  protected onWallpaperSearchClick_() {
-    this.fire('wallpaper-search-click');
   }
 }
 

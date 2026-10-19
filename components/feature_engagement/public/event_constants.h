@@ -25,8 +25,6 @@ extern const char kReadingListItemAdded[];
 extern const char kReadingListMenuOpened[];
 // Bookmark star button was clicked opening the menu.
 extern const char kBookmarkStarMenuOpened[];
-// Customize chrome was opened.
-extern const char kCustomizeChromeOpened[];
 
 // A tab with playing media was sent to the background.
 extern const char kMediaBackgrounded[];

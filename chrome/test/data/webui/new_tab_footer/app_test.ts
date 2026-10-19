@@ -3,31 +3,18 @@
 // found in the LICENSE file.
 
 import type {NewTabFooterAppElement} from 'chrome://newtab-footer/app.js';
-import {CustomizeDialogPage, FooterCustomizeChromeEntryPoint, FooterElement} from 'chrome://newtab-footer/app.js';
+import {FooterCustomizeChromeEntryPoint, FooterElement} from 'chrome://newtab-footer/app.js';
 import type {CustomizeButtonsDocumentRemote} from 'chrome://newtab-footer/customize_buttons.mojom-webui.js';
 import {browserProxyFactory as customizeButtonsproxyFactory, CustomizeButtonsHandlerRemote, SidePanelOpenTrigger} from 'chrome://newtab-footer/customize_buttons.mojom-webui.js';
 import {CustomizeChromeSection} from 'chrome://newtab-footer/customize_chrome.mojom-webui.js';
-import type {BackgroundAttribution, NewTabFooterDocumentRemote} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
+import type {NewTabFooterDocumentRemote} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
 import {browserProxyFactory as newTabFooterproxyFactory, NewTabFooterHandlerRemote, NewTabPageType} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
-import {WindowProxy} from 'chrome://newtab-footer/window_proxy.js';
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {MetricsTracker} from 'chrome://webui-test/metrics_test_support.js';
 import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {$$, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
-
-type Constructor<T> = new (...args: any[]) => T;
-type Installer<T> = (instance: T) => void;
-
-function installMock<T extends object>(
-    clazz: Constructor<T>, installer?: Installer<T>): TestMock<T> {
-  installer = installer ||
-      (clazz as unknown as {setInstance: Installer<T>}).setInstance;
-  const mock = TestMock.fromClass(clazz);
-  installer(mock);
-  return mock;
-}
 
 suite('NewTabFooterAppTest', () => {
   let element: NewTabFooterAppElement;
@@ -37,9 +24,6 @@ suite('NewTabFooterAppTest', () => {
   let customizeButtonsHandler: TestMock<CustomizeButtonsHandlerRemote>&
       CustomizeButtonsHandlerRemote;
   let metrics: MetricsTracker;
-  let windowProxy: TestMock<WindowProxy>;
-
-  const url: URL = new URL(location.href);
 
   async function setupFooter(ntpType: NewTabPageType = NewTabPageType.kOther) {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
@@ -54,8 +38,6 @@ suite('NewTabFooterAppTest', () => {
     customizeButtonsCallbackRouterRemote = customizeRemote;
     customizeButtonsproxyFactory.setInstance(customizeInstance);
     metrics = fakeMetricsPrivate();
-    windowProxy = installMock(WindowProxy);
-    windowProxy.setResultFor('url', url);
 
     element = document.createElement('new-tab-footer-app');
     document.body.appendChild(element);
@@ -114,7 +96,6 @@ suite('NewTabFooterAppTest', () => {
 
     ([
       [NewTabPageType.kExtension, true],
-      [NewTabPageType.kFirstPartyWebUI, false],
       [NewTabPageType.kOther, false],
     ] as Array<[NewTabPageType, boolean]>)
         .forEach(([pageType, expected]) => {
@@ -135,7 +116,7 @@ suite('NewTabFooterAppTest', () => {
 
   suite('CustomizeChromeButton', () => {
     setup(async () => {
-      await setupFooter(NewTabPageType.kFirstPartyWebUI);
+      await setupFooter(NewTabPageType.kExtension);
     });
 
     function getCustomizeButton(): CrButtonElement {
@@ -164,10 +145,6 @@ suite('NewTabFooterAppTest', () => {
           metrics.count(
               'NewTabPage.Footer.CustomizeChromeOpened',
               FooterCustomizeChromeEntryPoint.CUSTOMIZE_BUTTON));
-      assertEquals(
-          1,
-          customizeButtonsHandler.getCallCount(
-              'incrementCustomizeChromeButtonOpenCount'));
     });
 
     test(`clicking #customizeButton records click`, () => {
@@ -205,10 +182,6 @@ suite('NewTabFooterAppTest', () => {
           metrics.count(
               'NewTabPage.Footer.CustomizeChromeOpened',
               FooterCustomizeChromeEntryPoint.CUSTOMIZE_BUTTON));
-      assertEquals(
-          0,
-          customizeButtonsHandler.getCallCount(
-              'incrementCustomizeChromeButtonOpenCount'));
     });
 
     test('clicking customize button is accessible', async () => {
@@ -223,67 +196,7 @@ suite('NewTabFooterAppTest', () => {
     });
 
     ([
-      [
-        CustomizeDialogPage.BACKGROUNDS,
-        CustomizeChromeSection.kAppearance,
-        'BACKGROUNDS',
-      ],
-      [
-        CustomizeDialogPage.THEMES,
-        CustomizeChromeSection.kAppearance,
-        'THEMES',
-      ],
-      [
-        CustomizeDialogPage.SHORTCUTS,
-        CustomizeChromeSection.kShortcuts,
-        'SHORTCUTS',
-      ],
-      [
-        CustomizeDialogPage.MODULES,
-        CustomizeChromeSection.kModules,
-        'MODULES',
-      ],
-    ] as Array<[CustomizeDialogPage, CustomizeChromeSection, string]>)
-        .forEach(([page, section, label]) => {
-          test(
-              `page ${label} maps to section ${
-                  CustomizeChromeSection[section]}`,
-              () => {
-                element.setSelectedCustomizeDialogPageForTesting(page);
-                const returnedSection =
-                    element.setCustomizeChromeSidePanelVisible(true);
-                assertEquals(section, returnedSection);
-              });
-        });
-
-    suite('customize URL', () => {
-      suiteSetup(() => {
-        // We inject the URL param in this suite setup so that the URL is
-        // updated before the app element gets created.
-        url.searchParams.append('customize', 'themes');
-      });
-
-      test('URL opens side panel', () => {
-        // Assert.
-        assertDeepEquals(
-            [
-              true,
-              CustomizeChromeSection.kAppearance,
-              SidePanelOpenTrigger.kNewTabFooter,
-            ],
-            customizeButtonsHandler.getArgs(
-                'setCustomizeChromeSidePanelVisible')[0]);
-        assertEquals(
-            1,
-            metrics.count(
-                'NewTabPage.Footer.CustomizeChromeOpened',
-                FooterCustomizeChromeEntryPoint.URL));
-      });
-    });
-
-    ([
       [NewTabPageType.kOther, false],
-      [NewTabPageType.kFirstPartyWebUI, true],
       [NewTabPageType.kExtension, true],
     ] as Array<[NewTabPageType, boolean]>)
         .forEach(([pageType, expected]) => {
@@ -307,6 +220,9 @@ suite('NewTabFooterAppTest', () => {
       assertTrue(isVisible(button));
 
       // Act.
+      callbackRouter.attachedTabStateUpdated(
+          NewTabPageType.kOther, /*canCustomizeChrome=*/ false);
+      await callbackRouter.$.flushForTesting();
       callbackRouter.attachedTabStateUpdated(
           NewTabPageType.kExtension, /*canCustomizeChrome=*/ false);
       await callbackRouter.$.flushForTesting();
@@ -332,74 +248,6 @@ suite('NewTabFooterAppTest', () => {
       assertEquals(
           1,
           metrics.count('NewTabPage.Footer.Click', FooterElement.CONTEXT_MENU));
-    });
-  });
-
-  suite('Background attribution', () => {
-    setup(async () => {
-      await setupFooter(NewTabPageType.kFirstPartyWebUI);
-    });
-
-    test('Get background attribution', async () => {
-      // Arrange with empty attribution URL.
-      let backgroundAttribution: BackgroundAttribution = {
-        name: 'background image name',
-        url: '',
-      };
-
-      // Act.
-      callbackRouter.setBackgroundAttribution(backgroundAttribution);
-      await callbackRouter.$.flushForTesting();
-
-      // Assert that the button is disabled.
-      let backgroundAttributionText =
-          $$(element, '#backgroundAttributionContainer p');
-      assertTrue(!!backgroundAttributionText);
-      assertEquals(
-          backgroundAttributionText.innerText, 'background image name');
-      let backgroundAttributionLink =
-          $$(element, '#backgroundAttributionContainer [role="link"]');
-      assertFalse(!!backgroundAttributionLink);
-
-      // Arrange with a non-empty URL.
-      backgroundAttribution = {
-        name: 'background image name',
-        url: 'https://info.com',
-      };
-
-      // Act.
-      callbackRouter.setBackgroundAttribution(backgroundAttribution);
-      await callbackRouter.$.flushForTesting();
-
-      // Assert that the button is enabled.
-      backgroundAttributionText =
-          $$(element, '#backgroundAttributionContainer p');
-      assertFalse(!!backgroundAttributionText);
-      backgroundAttributionLink =
-          $$(element, '#backgroundAttributionContainer [role="link"]');
-      assertTrue(!!backgroundAttributionLink);
-      assertEquals(
-          backgroundAttributionLink.innerText, 'background image name');
-    });
-
-    test('Click background attribution link', async () => {
-      // Arrange.
-      const attributionUrl = 'https://info.com';
-      const backgroundAttribution: BackgroundAttribution = {
-        name: 'background image name',
-        url: attributionUrl,
-      };
-      callbackRouter.setBackgroundAttribution(backgroundAttribution);
-      await callbackRouter.$.flushForTesting();
-
-      // Act.
-      const link = $$(element, '#backgroundAttributionContainer [role="link"]');
-      assertTrue(!!link);
-      link.click();
-
-      // Assert.
-      assertEquals(1, handler.getCallCount('openUrlInCurrentTab'));
-      assertEquals(attributionUrl, handler.getArgs('openUrlInCurrentTab')[0]);
     });
   });
 });

@@ -1244,14 +1244,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   NewTabFooterUI::RegisterProfilePrefs(registry);
   MostVisitedPrefObserver::RegisterProfilePrefs(registry);
-  registry->RegisterBooleanPref(prefs::kNtpToolChipsVisible, true);
-  registry->RegisterIntegerPref(prefs::kNtpCustomizeChromeButtonOpenCount, 0);
-  registry->RegisterIntegerPref(prefs::kNtpWallpaperSearchButtonShownCount, 0);
-  registry->RegisterIntegerPref(
-      prefs::kNtpCustomizeChromeSidePanelAutoOpeningsCount, 0);
-  registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeExplicitlyClosed,
-                                false);
-  registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeIPHAutoOpened, false);
 #else
   // Registered here because it is still accessed on Android (which doesn't use
   // WebUI NTP).

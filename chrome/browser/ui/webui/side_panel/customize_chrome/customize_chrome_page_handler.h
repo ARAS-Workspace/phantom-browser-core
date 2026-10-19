@@ -6,7 +6,6 @@
 #define CHROME_BROWSER_UI_WEBUI_SIDE_PANEL_CUSTOMIZE_CHROME_CUSTOMIZE_CHROME_PAGE_HANDLER_H_
 
 #include <optional>
-#include <vector>
 
 #include "base/containers/flat_map.h"
 #include "base/memory/raw_ptr.h"
@@ -21,9 +20,6 @@
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "chrome/common/search/ntp_logging_events.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/ntp_tiles/tile_type.h"
-#include "components/prefs/pref_change_registrar.h"
-#include "components/search_engines/template_url_service_observer.h"
 #include "components/themes/ntp_background_service.h"
 #include "components/themes/ntp_background_service_observer.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
@@ -43,7 +39,6 @@ class NewTabFooterController;
 }
 
 class Profile;
-class TemplateURLService;
 
 /**
  * Places where the chrome web store can be opened from in Customize Chrome.
@@ -67,7 +62,6 @@ class CustomizeChromePageHandler
       public ui::NativeThemeObserver,
       public ThemeServiceObserver,
       public NtpCustomBackgroundServiceObserver,
-      public TemplateURLServiceObserver,
       public ui::SelectFileDialog::Listener,
       public new_tab_footer::NewTabFooterControllerObserver {
  public:
@@ -98,10 +92,6 @@ class CustomizeChromePageHandler
   // Passes AttachedTabStateUpdated calls to the CustomizeChromePage.
   void AttachedTabStateUpdated(const GURL& url);
 
-  // Helper method to determine if the search engine is overriding the first
-  // party NTP.
-  bool IsNtpManagedByThirdPartySearchEngine() const;
-
   // side_panel::mojom::CustomizeChromePageHandler:
   void SetDefaultColor() override;
   void SetFollowDeviceTheme(bool follow) override;
@@ -124,20 +114,7 @@ class CustomizeChromePageHandler
   void RemoveBackgroundImage() override;
   void UpdateTheme() override;
   void UpdateThemeEditable(bool is_theme_editable) override;
-  void OpenChromeWebStore() override;
-  void OpenThirdPartyThemePage(const std::string& theme_id) override;
-  void OpenChromeWebStoreCategoryPage(
-      side_panel::mojom::ChromeWebStoreCategory category) override;
-  void OpenChromeWebStoreCollectionPage(
-      side_panel::mojom::ChromeWebStoreCollection collection) override;
-  void OpenChromeWebStoreHomePage() override;
   void OpenNtpManagedByPage() override;
-  void SetMostVisitedSettings(const std::vector<ntp_tiles::TileType>& types,
-                              bool visible,
-                              bool personal_shortcuts_visible) override;
-  void UpdateMostVisitedSettings() override;
-  void SetToolChipsVisible(bool visible) override;
-  void UpdateToolChipsSettings() override;
   void SetFooterVisible(bool visible) override;
   void UpdateFooterSettings() override;
   void UpdateScrollToSection() override;
@@ -146,15 +123,6 @@ class CustomizeChromePageHandler
 
  private:
   void LogEvent(NTPLoggingEventType event);
-  void UpdatePrefAndLogEvent(const char* pref_name,
-                             bool new_value,
-                             NTPLoggingEventType event);
-
-  std::set<ntp_tiles::TileType> GetTileTypes() const;
-  bool IsShortcutsVisible() const;
-  bool IsPersonalShortcutsVisible() const;
-  bool IsEnterpriseShortcutsVisible() const;
-  bool IsEnterpriseShortcutsEmpty() const;
 
   // Returns the type of New Tab Page the SidePanel is attached to.
   side_panel::mojom::NewTabPageType GetNewTabPageType(const GURL& url);
@@ -173,10 +141,6 @@ class CustomizeChromePageHandler
   void OnCollectionImagesAvailable() override;
   void OnNextCollectionImageAvailable() override;
   void OnNtpBackgroundServiceShuttingDown() override;
-
-  // TemplateURLServiceObserver:
-  void OnTemplateURLServiceChanged() override;
-  void OnTemplateURLServiceShuttingDown() override;
 
   // SelectFileDialog::Listener:
   void FileSelected(const ui::SelectedFileInfo& file, int index) override;
@@ -199,7 +163,6 @@ class CustomizeChromePageHandler
   std::string images_request_collection_id_;
   GetBackgroundImagesCallback background_images_callback_;
   base::TimeTicks background_images_request_start_time_;
-  raw_ptr<TemplateURLService> template_url_service_;
   raw_ptr<ThemeService> theme_service_;
 
   // Caches a request to scroll to a section in case the front-end queries the
@@ -211,10 +174,6 @@ class CustomizeChromePageHandler
   // value needs to be requeried by the page.
   GURL last_source_url_{chrome::ChromeUINewTabPageURLAsGURL()};
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  PrefChangeRegistrar browser_pref_change_registrar_;
-#endif
-  PrefChangeRegistrar pref_change_registrar_;
   base::ScopedObservation<ui::NativeTheme, ui::NativeThemeObserver>
       native_theme_observation_{this};
   base::ScopedObservation<ThemeService, ThemeServiceObserver>

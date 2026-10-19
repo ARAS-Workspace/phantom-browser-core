@@ -4,16 +4,15 @@
 
 import 'chrome://customize-chrome-side-panel.top-chrome/themes.js';
 
-import {CustomizeChromeAction, NtpImageType} from 'chrome://customize-chrome-side-panel.top-chrome/common.js';
+import {CustomizeChromeAction} from 'chrome://customize-chrome-side-panel.top-chrome/common.js';
 import type {BackgroundCollection, CollectionImage, CustomizeChromePageRemote} from 'chrome://customize-chrome-side-panel.top-chrome/customize_chrome.mojom-webui.js';
 import {CustomizeChromePageCallbackRouter, CustomizeChromePageHandlerRemote} from 'chrome://customize-chrome-side-panel.top-chrome/customize_chrome.mojom-webui.js';
 import {CustomizeChromeApiProxy} from 'chrome://customize-chrome-side-panel.top-chrome/customize_chrome_api_proxy.js';
 import type {ThemesElement} from 'chrome://customize-chrome-side-panel.top-chrome/themes.js';
-import {CHROME_THEME_BACK_ELEMENT_ID, CHROME_THEME_ELEMENT_ID} from 'chrome://customize-chrome-side-panel.top-chrome/themes.js';
 import {WindowProxy} from 'chrome://customize-chrome-side-panel.top-chrome/window_proxy.js';
 import type {CrAutoImgElement} from 'chrome://resources/cr_elements/cr_auto_img/cr_auto_img.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
-import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {MetricsTracker} from 'chrome://webui-test/metrics_test_support.js';
 import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
@@ -313,17 +312,6 @@ suite('ThemesTest', () => {
         assertFalse(themesElement.$.refreshDailyToggle.checked);
       });
 
-  test('help bubble can correctly find anchor elements', async () => {
-    await setCollection('test_collection', 2);
-    assertDeepEquals(
-        themesElement.getSortedAnchorStatusesForTesting(),
-        [
-          [CHROME_THEME_BACK_ELEMENT_ID, true],
-          [CHROME_THEME_ELEMENT_ID, true],
-        ],
-    );
-  });
-
   test('setting theme sets metric', async () => {
     await setCollection('test', 2);
 
@@ -378,38 +366,6 @@ suite('ThemesTest', () => {
         await microtasksFinished();
 
         assertTrue(isVisible(theme));
-      });
-    });
-
-    suite('ImageErrorDetectionMetric', () => {
-      suiteSetup(() => {
-        loadTimeData.overrideValues({
-          imageErrorDetectionEnabled: true,
-        });
-      });
-
-      test('error detection metrics fire correctly', async () => {
-        const numImages = 1;
-        await setCollection('test1', numImages);
-        const img = $$(themesElement, '.theme img');
-        assertTrue(!!img);
-
-        const metricCount = metrics.count(
-            'NewTabPage.BackgroundService.Images.Headers.ErrorDetected');
-        if (metricCount !== numImages) {
-          await eventToPromise('error', img);
-          await microtasksFinished();
-        }
-
-        assertEquals(
-            numImages,
-            metrics.count(
-                'NewTabPage.BackgroundService.Images.Headers.ErrorDetected'));
-        assertEquals(
-            numImages,
-            metrics.count(
-                'NewTabPage.BackgroundService.Images.Headers.ErrorDetected',
-                NtpImageType.BACKGROUND_IMAGE));
       });
     });
   });

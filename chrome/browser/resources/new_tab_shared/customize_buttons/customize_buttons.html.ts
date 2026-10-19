@@ -10,19 +10,6 @@ export function getHtml(this: CustomizeButtonsElement) {
   // clang-format off
   return html`<!--_html_template_start_-->
 <div id="customizeButtons">
-  ${this.showWallpaperSearchButton ? html`
-    <cr-button id="wallpaperSearchButton"
-        class="customize-button" @click="${this.onWallpaperSearchClick_}"
-        title="$i18n{customizeThisPageWallpaperSearch}"
-        aria-pressed="${this.showWallpaperSearch}">
-      <cr-icon id="wallpaperSearchIcon" class="customize-icon"
-          slot="prefix-icon" icon="ntp:sparkle-custom"></cr-icon>
-      <div id="wallpaperSearchText" class="customize-text"
-          ?hidden="${this.showWallpaperSearch}">
-        $i18n{wallpaperSearchButton}
-      </div>
-    </cr-button>
-  ` : ''}
   <cr-button id="customizeButton" class="customize-button"
       @click="${this.onCustomizeClick_}" title="$i18n{customizeThisPage}"
       aria-pressed="${this.showCustomize}">

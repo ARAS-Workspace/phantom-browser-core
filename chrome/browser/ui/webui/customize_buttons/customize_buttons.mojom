@@ -7,7 +7,6 @@ module customize_buttons.mojom;
 import "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom";
 
 enum SidePanelOpenTrigger {
-  kNewTabPage,
   kNewTabFooter,
 };
 
@@ -22,14 +21,6 @@ interface CustomizeButtonsHandlerFactory {
 
 // Browser-side handler for requests from WebUI document.
 interface CustomizeButtonsHandler {
-  // Increment the number of times the user has opened the side panel
-  // with the customize chrome button.
-  IncrementCustomizeChromeButtonOpenCount();
-
-  // Increment the number of times the user has seen the wallpaper search
-  // button.
-  IncrementWallpaperSearchButtonShownCount();
-
   // Shows or hides the customize chrome in unified side panel.
   SetCustomizeChromeSidePanelVisible(bool visible,
       side_panel.mojom.CustomizeChromeSection section,

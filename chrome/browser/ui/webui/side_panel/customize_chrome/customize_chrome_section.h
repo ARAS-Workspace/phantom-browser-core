@@ -8,9 +8,6 @@
 enum class CustomizeChromeSection {
   kUnspecified,
   kAppearance,
-  kShortcuts,
-  kModules,
-  kWallpaperSearch,
   kToolbar,
   kFooter,
 };

@@ -11,11 +11,6 @@
 
 namespace ntp_features {
 
-// If enabled, shows an extension card within the Customize Chrome Side
-// Panel for access to the Chrome Web Store extensions.
-BASE_FEATURE(kCustomizeChromeSidePanelExtensionsCard,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // If enabled, shows wallpaper search within the Customize Chrome Side Panel.
 // This is a kill switch. Keep indefinitely.
 BASE_FEATURE(kCustomizeChromeWallpaperSearch, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -47,9 +42,6 @@ BASE_FEATURE(kNtpAlphaBackgroundCollections, base::FEATURE_DISABLED_BY_DEFAULT);
 // errors."
 BASE_FEATURE(kNtpBackgroundImageErrorDetection,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, customization of Chrome will be promoted on the NTP.
-BASE_FEATURE(kNtpCustomizeChromeAutoOpen, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // When enabled, ChromeContentBrowserClient::OverrideNavigationParams no
 // longer treats NTP-sourced renderer-initiated link clicks as browser-
@@ -84,20 +76,6 @@ BASE_FEATURE(kNtpSimplificationBookmarkBar, base::FEATURE_DISABLED_BY_DEFAULT);
 // If enabled, the bookmark bar time interval and number of times it's shown on
 // the NTP before auto-hiding is decreased for testing.
 BASE_FEATURE(kBookmarkBarUpdatesForTesting, base::FEATURE_DISABLED_BY_DEFAULT);
-
-const base::FeatureParam<bool> kNtpNextDisablementParam(
-    &ntp_features::kNtpNextFeatures,
-    "NtpNextDisablementParam",
-    false);
-
-const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount(
-    &ntp_features::kNtpCustomizeChromeAutoOpen,
-    "max_customize_chrome_auto_shown_count",
-    5);
-const base::FeatureParam<int> kNtpCustomizeChromeAutoShownSessionMaxCount(
-    &ntp_features::kNtpCustomizeChromeAutoOpen,
-    "max_customize_chrome_auto_shown_session_count",
-    1);
 
 const base::FeatureParam<bool> kNtpRealboxCr23ExpandedStateBgMatchesOmnibox(
     &ntp_features::kRealboxCr23Theming,

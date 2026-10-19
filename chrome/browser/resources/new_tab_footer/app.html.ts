@@ -25,20 +25,6 @@ separated from each other by a divider.
           ${this.extensionName_}
         </button>
       </div>` : ''}
-    ${this.showBackgroundAttribution_ ? html`
-      ${this.backgroundAttributionLink_ ?  html`
-        <div id="backgroundAttributionContainer" class="notice-item"
-            title="${this.backgroundAttributionText_}">
-          <button @click="${this.onBackgroundAttributionClick_}" role="link"
-              aria-label="${this.backgroundAttributionText_}"
-              aria-description="$i18n{backgroundAttributionDesc}">
-            ${this.backgroundAttributionText_}
-          </button>
-        </div>` : html`
-        <div id="backgroundAttributionContainer" class="notice-item">
-          <p>${this.backgroundAttributionText_}</p>
-        </div>`}`
-      : ''}
   </div>
   ${!this.showCustomizeButtons_ ? html`<div id="spacer"></div>` : ''}
   ${this.showCustomizeButtons_ ? html`

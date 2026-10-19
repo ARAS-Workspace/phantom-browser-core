@@ -26,9 +26,6 @@ class MockNewTabFooterDocument
               AttachedTabStateUpdated,
               (new_tab_footer::mojom::NewTabPageType ntp_type,
                bool can_customize_chrome));
-  MOCK_METHOD(void,
-              SetBackgroundAttribution,
-              (new_tab_footer::mojom::BackgroundAttributionPtr));
 
   mojo::Receiver<new_tab_footer::mojom::NewTabFooterDocument> receiver_{this};
 };

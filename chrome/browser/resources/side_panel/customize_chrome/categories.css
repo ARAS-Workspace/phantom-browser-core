@@ -58,15 +58,6 @@ cr-grid {
       --color-side-panel-customize-chrome-custom-option-background);
 }
 
-#chromeWebStoreTile .image-container {
-  border: solid 1px
-      var(--color-side-panel-customize-chrome-web-store-border);
-}
-
-#chromeWebStoreTile .cr-icon {
-  --cr-icon-color: currentColor;
-}
-
 .image-container img,
 .image-container div,
 .image-container svg {
@@ -122,17 +113,6 @@ cr-grid {
   padding-top: 8px;
 }
 
-
-.icon-external {
-  --cr-icon-size: 13px;
-  display: inline-block;
-  height: 13px;
-  margin-bottom: -2px;
-  margin-inline-end: 4px;
-  margin-inline-start: 0;
-  width: 13px;
-}
-
 #uploadIcon {
   --cr-icon-image: url(icons/upload_old.svg);
   --cr-icon-size: 21px;
@@ -182,14 +162,6 @@ svg {
 
 #background {
   fill: var(--google-blue-500);
-}
-
-#chromeWebStore {
-  height: 32px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 32px;
 }
 
 .tile:nth-of-type(-n+4) customize-chrome-check-mark-wrapper {

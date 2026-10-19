@@ -16,7 +16,6 @@ const char kSixthTabOpened[] = "sixth_tab_opened";
 const char kReadingListItemAdded[] = "reading_list_item_added";
 const char kReadingListMenuOpened[] = "reading_list_menu_opened";
 const char kBookmarkStarMenuOpened[] = "bookmark_star_menu_opened";
-const char kCustomizeChromeOpened[] = "customize_chrome_opened";
 
 const char kMediaBackgrounded[] = "media_backgrounded";
 const char kGlobalMediaControlsOpened[] = "global_media_controls_opened";

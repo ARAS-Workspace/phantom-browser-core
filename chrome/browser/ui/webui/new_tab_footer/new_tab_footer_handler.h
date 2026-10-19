@@ -7,11 +7,9 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
-#include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
 #include "components/prefs/pref_change_registrar.h"
-#include "components/themes/ntp_custom_background_service_observer.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_registry_observer.h"
@@ -20,14 +18,9 @@
 #include "mojo/public/cpp/bindings/remote.h"
 
 class Profile;
-class NewTabPageFeaturePromoHelper;
-namespace ui {
-class ThemeProvider;
-}  // namespace ui
 
 class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
-                            public extensions::ExtensionRegistryObserver,
-                            public NtpCustomBackgroundServiceObserver {
+                            public extensions::ExtensionRegistryObserver {
  public:
   NewTabFooterHandler(
       mojo::PendingReceiver<new_tab_footer::mojom::NewTabFooterHandler>
@@ -35,7 +28,6 @@ class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
       mojo::PendingRemote<new_tab_footer::mojom::NewTabFooterDocument>
           pending_document,
       base::WeakPtr<TopChromeWebUIController::Embedder> embedder,
-      NtpCustomBackgroundService* ntp_custom_background_service,
       content::WebContents* web_contents);
 
   NewTabFooterHandler(const NewTabFooterHandler&) = delete;
@@ -46,16 +38,11 @@ class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
   // new_tab_footer::mojom::NewTabFooterHandler:
   void UpdateNtpExtensionName() override;
   void UpdateAttachedTabState() override;
-  void UpdateBackgroundAttribution() override;
   void OpenExtensionOptionsPageWithFallback() override;
-  void OpenUrlInCurrentTab(const GURL& url) override;
   void ShowContextMenu(const gfx::Point& point) override;
-  void NotifyCustomizationButtonVisible() override;
 
   // Passes `AttachedTabStateUpdated` calls to the `document_`.
   void AttachedTabStateUpdated(const GURL& url);
-
-  void SetThemeProviderForTesting(ui::ThemeProvider* theme_provider);
 
  private:
   void OpenUrlInCurrentTabInternal(const GURL& url);
@@ -67,26 +54,16 @@ class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
   void OnExtensionReady(content::BrowserContext* browser_context,
                         const extensions::Extension* extension) override;
 
-  // NtpCustomBackgroundServiceObserver:
-  void OnCustomBackgroundImageUpdated() override;
-
-  GURL curr_background_url_;
   std::string curr_ntp_extension_id_;
   base::WeakPtr<TopChromeWebUIController::Embedder> embedder_;
   const raw_ptr<Profile> profile_;
   const raw_ptr<content::WebContents> web_contents_;
-  raw_ptr<NtpCustomBackgroundService> ntp_custom_background_service_;
-  raw_ptr<const ui::ThemeProvider> theme_provider_;
-  std::unique_ptr<NewTabPageFeaturePromoHelper> feature_promo_helper_;
   PrefChangeRegistrar profile_pref_change_registrar_;
   GURL last_source_url_;
 
   base::ScopedObservation<extensions::ExtensionRegistry,
                           extensions::ExtensionRegistryObserver>
       extension_registry_observation_{this};
-  base::ScopedObservation<NtpCustomBackgroundService,
-                          NtpCustomBackgroundServiceObserver>
-      ntp_custom_background_service_observation_{this};
 
   // These are located at the end of the list of member variables to ensure the
   // WebUI page is disconnected before other members are destroyed.

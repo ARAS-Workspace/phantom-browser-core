@@ -216,7 +216,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 
   RegisterWebUIControllerInterfaceBinder<
       help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
-      CustomizeChromeUI, HistoryUI, ProfilePickerUI>(map);
+      HistoryUI, ProfilePickerUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::BookmarksPageHandlerFactory, BookmarksSidePanelUI>(
@@ -285,8 +285,7 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
   if (base::FeatureList::IsEnabled(ntp_features::kNtpFooter)) {
     registry.ForWebUI<NewTabFooterUI>()
         .Add<customize_buttons::mojom::CustomizeButtonsHandlerFactory>()
-        .Add<new_tab_footer::mojom::NewTabFooterHandlerFactory>()
-        .Add<help_bubble::mojom::HelpBubbleHandlerFactory>();
+        .Add<new_tab_footer::mojom::NewTabFooterHandlerFactory>();
   }
 
   registry.ForWebUI<NewTabPageThirdPartyUI>()

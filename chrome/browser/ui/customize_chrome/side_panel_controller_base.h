@@ -51,8 +51,6 @@ class SidePanelControllerBase : public SidePanelController,
   // SidePanelEntryObserver:
   void OnEntryShown(SidePanelEntry* entry) override;
   void OnEntryHidden(SidePanelEntry* entry) override;
-  void OnEntryWillHide(SidePanelEntry* entry,
-                       SidePanelEntryHideReason reason) override;
 
   // content::WebContentsObserver:
   void DidFinishNavigation(

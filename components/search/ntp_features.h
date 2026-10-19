@@ -17,7 +17,6 @@ namespace ntp_features {
 // The features should be documented alongside the definition of their values in
 // the .cc file.
 
-BASE_DECLARE_FEATURE(kCustomizeChromeSidePanelExtensionsCard);
 BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearch);
 BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearchButton);
 BASE_DECLARE_FEATURE(kCustomizeChromeWallpaperSearchInspirationCard);
@@ -25,7 +24,6 @@ BASE_DECLARE_FEATURE(kEnergyEffect);
 BASE_DECLARE_FEATURE(kRealboxCr23Theming);
 BASE_DECLARE_FEATURE(kNtpAlphaBackgroundCollections);
 BASE_DECLARE_FEATURE(kNtpBackgroundImageErrorDetection);
-BASE_DECLARE_FEATURE(kNtpCustomizeChromeAutoOpen);
 BASE_DECLARE_FEATURE(kNtpDisableBrowserInitiatedLinks);
 BASE_DECLARE_FEATURE(kNtpShortcuts);
 BASE_DECLARE_FEATURE(kNtpMostVisitedHighDpiFavicons);
@@ -36,21 +34,11 @@ BASE_DECLARE_FEATURE(kNtpShortcutsRedesign);
 BASE_DECLARE_FEATURE(kNtpSimplificationBookmarkBar);
 BASE_DECLARE_FEATURE(kBookmarkBarUpdatesForTesting);
 
-// Parameter for the maximum number of times to automatically show
-// Customize Chrome.
-extern const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount;
-// Parameter for the maximum number of times to automatically show
-// Customize Chrome in a session.
-extern const base::FeatureParam<int>
-    kNtpCustomizeChromeAutoShownSessionMaxCount;
 // Parameter determining the background color of the expanded state realbox.
 extern const base::FeatureParam<bool>
     kNtpRealboxCr23ExpandedStateBgMatchesOmnibox;
 // Parameter determining the whether the steady state realbox has a shadow.
 extern const base::FeatureParam<bool> kNtpRealboxCr23SteadyStateShadow;
-
-// Parameter determining if the disablement is enabled for NTP Next.
-extern const base::FeatureParam<bool> kNtpNextDisablementParam;
 
 // Parameter determining the minimum amount of time that must pass before
 // shortcuts staleness counters will be incremented.

@@ -5,17 +5,11 @@
 #ifndef CHROME_BROWSER_USER_EDUCATION_TUTORIAL_IDENTIFIERS_H_
 #define CHROME_BROWSER_USER_EDUCATION_TUTORIAL_IDENTIFIERS_H_
 
-inline constexpr char kSidePanelCustomizeChromeTutorialId[] =
-    "Side Panel Customize Chrome Tutorial";
-inline constexpr char kSidePanelCustomizeChromeTutorialMetricPrefix[] =
-    "CustomizeChromeSidePanel";
-
 inline constexpr char kTabGroupTutorialId[] = "Tab Group Tutorial";
 inline constexpr char kTabGroupTutorialMetricPrefix[] = "TabGroup";
 
 inline constexpr char kSavedTabGroupTutorialId[] = "Saved Tab Group Tutorial";
 inline constexpr char kSavedTabGroupTutorialMetricPrefix[] = "SavedTabGroup";
-
 
 inline constexpr char kLensOverlayTutorialId[] = "Lens Overlay Tutorial";
 inline constexpr char kLensOverlayTutorialMetricPrefix[] = "LensOverlay";

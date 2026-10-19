@@ -19,12 +19,9 @@ source_set("new_tab_footer") {
     "//chrome/browser/ui/webui/top_chrome",
     "//components/policy/core/browser",
     "//components/prefs",
-    "//components/themes",
-    "//components/user_education/webui",
     "//extensions/browser",
     "//ui/menus",
     "//ui/webui",
-    "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
   ]
 }
 
@@ -59,7 +56,6 @@ source_set("impl") {
     "//components/search",
     "//content/public/browser",
     "//ui/base",
-    "//ui/webui/tracked_element",
     "//url",
   ]
 }
@@ -89,27 +85,18 @@ source_set("browser_tests") {
     ":test_support",
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/top_chrome:test_support",
-    "//mojo/public/cpp/test_support:test_utils",
   ]
 }
 
 source_set("unit_tests") {
   testonly = true
   sources = [ "new_tab_footer_handler_unittest.cc" ]
-  deps = [
-    ":test_support",
-    "//chrome/browser/enterprise/browser_management:management_identity",
-    "//chrome/browser/ui/webui:webui_util",
-    "//components/themes",
-  ]
+  deps = [ ":test_support" ]
 }
 
 mojom("mojo_bindings") {
   sources = [ "new_tab_footer.mojom" ]
   webui_module_path = "/"
 
-  public_deps = [
-    "//ui/gfx/geometry/mojom",
-    "//url/mojom:url_mojom_gurl",
-  ]
+  public_deps = [ "//ui/gfx/geometry/mojom" ]
 }

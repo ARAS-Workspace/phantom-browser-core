@@ -29,10 +29,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, ButtonLabel) {
   RunTest("side_panel/customize_chrome/button_label_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Shortcuts) {
-  RunTest("side_panel/customize_chrome/shortcuts_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, App) {
   RunTest("side_panel/customize_chrome/app_test.js", "mocha.run()");
 }
@@ -54,10 +50,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Combobox) {
           "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Tools) {
-  RunTest("side_panel/customize_chrome/tools_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Footer) {
   RunTest("side_panel/customize_chrome/footer_test.js", "mocha.run()");
 }
@@ -68,10 +60,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, HoverButton) {
 
 IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Themes) {
   RunTest("side_panel/customize_chrome/themes_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, ThemeSnapshot) {
-  RunTest("side_panel/customize_chrome/theme_snapshot_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(SidePanelCustomizeChromeTest, Toolbar) {

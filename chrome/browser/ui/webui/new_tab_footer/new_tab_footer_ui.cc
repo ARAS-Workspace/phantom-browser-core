@@ -7,9 +7,6 @@
 #include <memory>
 #include <utility>
 
-#include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons_handler.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
@@ -29,7 +26,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
-#include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/webui_util.h"
 
 NewTabFooterUIConfig::NewTabFooterUIConfig()
@@ -47,8 +43,7 @@ NewTabFooterUI::NewTabFooterUI(content::WebUI* web_ui)
           web_ui->GetWebContents(),
           "NewTabPage.Footer.WebUI.LoadDocumentTime",
           "NewTabPage.Footer.WebUI.LoadCompletedTime")),
-      customize_buttons_factory_receiver_(this),
-      profile_(Profile::FromWebUI(web_ui)) {
+      customize_buttons_factory_receiver_(this) {
   // Set up the chrome://newtab-footer source.
   content::WebUIDataSource* source = content::WebUIDataSource::CreateAndAdd(
       web_ui->GetWebContents()->GetBrowserContext(),
@@ -62,19 +57,9 @@ NewTabFooterUI::NewTabFooterUI(content::WebUI* web_ui)
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"customizeButton", IDS_NTP_CUSTOMIZE_BUTTON_LABEL},
       {"customizeThisPage", IDS_NTP_CUSTOM_BG_CUSTOMIZE_NTP_LABEL},
-      {"customizeThisPageWallpaperSearch",
-       IDS_NTP_CUSTOM_BG_CUSTOMIZE_NTP_WALLPAPER_SEARCH_LABEL},
       {"manageExtension", IDS_MANAGE_EXTENSION},
-      {"wallpaperSearchButton", IDS_NTP_WALLPAPER_SEARCH_PAGE_HEADER},
-      // TODO(crbug.com/394902303): alphabetically order the following strings.
-      {"backgroundAttributionDesc",
-       IDS_NEW_TAB_FOOTER_BACKGROUND_ATTRIBUTION_ARIA_DESC},
   };
   source->AddLocalizedStrings(kLocalizedStrings);
-
-  ui::TrackedElementHandlerDocumentSingleton::Register(
-      this, std::vector<ui::ElementIdentifier>{
-                CustomizeButtonsHandler::kCustomizeChromeButtonElementId});
 }
 
 NewTabFooterUI::~NewTabFooterUI() = default;
@@ -104,15 +89,6 @@ void NewTabFooterUI::BindInterface(
   customize_buttons_factory_receiver_.Bind(std::move(pending_receiver));
 }
 
-void NewTabFooterUI::BindInterface(
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
-        pending_receiver) {
-  if (help_bubble_handler_factory_receiver_.is_bound()) {
-    help_bubble_handler_factory_receiver_.reset();
-  }
-  help_bubble_handler_factory_receiver_.Bind(std::move(pending_receiver));
-}
-
 void NewTabFooterUI::CreateNewTabFooterHandler(
     mojo::PendingRemote<new_tab_footer::mojom::NewTabFooterDocument>
         pending_document,
@@ -120,20 +96,10 @@ void NewTabFooterUI::CreateNewTabFooterHandler(
         pending_handler) {
   handler_ = std::make_unique<NewTabFooterHandler>(
       std::move(pending_handler), std::move(pending_document), this->embedder(),
-      NtpCustomBackgroundServiceFactory::GetForProfile(profile_),
       web_ui()->GetWebContents());
   if (!source_tab_url_.is_empty()) {
     handler_->AttachedTabStateUpdated(source_tab_url_);
   }
-}
-
-void NewTabFooterUI::CreateHelpBubbleHandler(
-    mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler) {
-  help_bubble_handler_ = std::make_unique<user_education::HelpBubbleHandler>(
-      std::move(handler), std::move(client),
-      ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
-          web_ui()->GetRenderFrameHost()));
 }
 
 void NewTabFooterUI::AttachedTabStateUpdated(const GURL& url) {
@@ -151,8 +117,7 @@ void NewTabFooterUI::CreateCustomizeButtonsHandler(
         pending_page_handler) {
   customize_buttons_handler_ = std::make_unique<CustomizeButtonsHandler>(
       std::move(pending_page_handler), std::move(pending_page), web_ui(),
-      /*tab_interface=*/nullptr,
-      std::make_unique<NewTabPageFeaturePromoHelper>());
+      /*tab_interface=*/nullptr);
 }
 
 WEB_UI_CONTROLLER_TYPE_IMPL(NewTabFooterUI)

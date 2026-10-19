@@ -33,51 +33,6 @@ export function getHtml(this: AppElement) {
       </sp-heading>
       <cr-icon icon="cr:chevron-right" slot="suffix-icon"></cr-icon>
     </cr-button>
-    ${this.ntpNextFeaturesEnabled_ && this.ntpNextDisablementEnabled_
-      && this.aimPolicyEnabled_ && this.isSourceTabFirstPartyNtp_() ? html`
-      <hr class="sp-cards-separator">
-      <div id="tools" class="section sp-card">
-        <sp-heading hide-back-button>
-          <h2 slot="heading">$i18n{toolsHeader}</h2>
-        </sp-heading>
-        <customize-chrome-tools></customize-chrome-tools>
-      </div>
-    ` : ''}
-     ${this.isSourceTabFirstPartyNtp_() ? html`<hr class="sp-cards-separator">
-    <div id="shortcuts" class="section sp-card">
-      <sp-heading hide-back-button>
-        <h2 slot="heading">$i18n{shortcutsHeader}</h2>
-      </sp-heading>
-      <customize-chrome-shortcuts></customize-chrome-shortcuts>
-    </div>`: ''}
-    ${this.extensionsCardEnabled_ ? html`
-      <hr class="sp-cards-separator">
-      <div id="extensions" class="section sp-card">
-        <sp-heading hide-back-button>
-          <h2 slot="heading">$i18n{extensionsHeader}</h2>
-        </sp-heading>
-        <div class="description" @click="${this.onChromeWebStoreLinkClick_}">
-          $i18nRaw{customizeWithChromeWebstoreLabel}
-        </div>
-        <div id="buttonContainer">
-          <cr-chip id="couponsButton" chip-role="link"
-            @click="${this.onCouponsButtonClick_}">
-            <div class="cr-icon"></div>
-            $i18n{webstoreShoppingCategoryLabel}
-          </cr-chip>
-          <cr-chip id="writingButton" chip-role="link"
-            @click="${this.onWritingButtonClick_}">
-            <div class="cr-icon"></div>
-            $i18n{webstoreWritingHelpCollectionLabel}
-          </cr-chip>
-          <cr-chip id="productivityButton" chip-role="link"
-            @click="${this.onProductivityButtonClick_}">
-            <div class="cr-icon"></div>
-            $i18n{webstoreProductivityCategoryLabel}
-          </cr-chip>
-        </div>
-      </div>
-    ` : ''}
     ${this.showFooter_ ? html`
       <hr class="sp-cards-separator">
       <div id="footer" class="section sp-card">

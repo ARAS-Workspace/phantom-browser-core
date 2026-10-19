@@ -8,10 +8,7 @@ assert(enable_webui_ntp)
 
 # The public API target.
 source_set("new_tab_page") {
-  public = [
-    "feature_promo_helper/new_tab_page_feature_promo_helper.h",
-    "new_tab_page_util.h",
-  ]
+  public = [ "new_tab_page_util.h" ]
   public_deps = [
     "//chrome/browser/new_tab_page/prefs",
     "//chrome/browser/profiles:profile",
@@ -34,10 +31,7 @@ source_set("new_tab_page") {
 
 # The implementation target.
 source_set("impl") {
-  sources = [
-    "feature_promo_helper/new_tab_page_feature_promo_helper.cc",
-    "new_tab_page_util.cc",
-  ]
+  sources = [ "new_tab_page_util.cc" ]
   public_deps = [
     ":new_tab_page",
     "//chrome/browser:browser_public_dependencies",
@@ -47,17 +41,8 @@ source_set("impl") {
     "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
     "//chrome/browser/new_tab_page/chrome_colors:selected_colors_info",
     "//chrome/browser/profiles",
-    "//chrome/browser/search",
-    "//chrome/browser/search/background",
     "//chrome/browser/search_engines",
-    "//chrome/browser/ui/actions:actions_headers",
-    "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/side_panel",
-    "//chrome/browser/ui/side_panel:side_panel_views_dependent",
-    "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/cr_components/theme_color_picker",
-    "//components/feature_engagement/public",
-    "//components/feature_engagement/public:feature_constants",
     "//components/keyed_service/core",
     "//components/ntp_tiles:pref_names",
     "//components/prefs",
@@ -71,11 +56,6 @@ source_set("impl") {
     "chrome_colors/chrome_colors_factory.cc",
     "chrome_colors/chrome_colors_service.cc",
   ]
-  deps += [
-    "//chrome/browser/ui/signin",
-    "//chrome/browser/ui/user_education",
-    "//chrome/browser/user_education",
-  ]
 }
 
 # TODO(b/502297163): Enable tests.
@@ -84,7 +64,6 @@ source_set("browser_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [
     "chrome_colors/chrome_colors_service_browsertest.cc",
-    "feature_promo_helper/new_tab_page_feature_promo_helper_browsertest.cc",
     "new_tab_page_util_browsertest.cc",
   ]
   deps = [
@@ -96,12 +75,8 @@ source_set("browser_tests") {
     "//chrome/browser/optimization_guide",
     "//chrome/browser/signin:signin_browser_test_base",
     "//chrome/browser/sync",
-    "//chrome/browser/ui/views/user_education",
     "//chrome/browser/ui/webui/cr_components/theme_color_picker",
-    "//chrome/browser/user_education",
     "//chrome/test:test_support",
-    "//chrome/test/user_education:impl",
-    "//components/feature_engagement/test:test_support",
     "//components/ntp_tiles:pref_names",
     "//components/variations/service",
     "//content/test:test_support",

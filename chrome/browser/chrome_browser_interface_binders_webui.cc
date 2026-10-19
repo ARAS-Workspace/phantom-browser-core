@@ -38,7 +38,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
-#include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 
@@ -95,7 +94,6 @@ void BindTrackedElementHandlerRestricted(
   DCHECK(controller);
 
   const bool is_allowed = controller->GetAs<UserEducationInternalsUI>() ||
-                          controller->GetAs<CustomizeChromeUI>() ||
                           controller->GetAs<HistoryUI>() ||
                           controller->GetAs<ProfilePickerUI>() || false;
 

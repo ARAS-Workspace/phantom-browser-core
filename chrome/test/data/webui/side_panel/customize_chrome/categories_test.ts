@@ -5,7 +5,6 @@
 import 'chrome://customize-chrome-side-panel.top-chrome/categories.js';
 
 import type {CategoriesElement} from 'chrome://customize-chrome-side-panel.top-chrome/categories.js';
-import {CHANGE_CHROME_THEME_CLASSIC_ELEMENT_ID, CHROME_THEME_COLLECTION_ELEMENT_ID} from 'chrome://customize-chrome-side-panel.top-chrome/categories.js';
 import {CustomizeChromeAction, NtpImageType} from 'chrome://customize-chrome-side-panel.top-chrome/common.js';
 import type {BackgroundCollection, CustomizeChromePageRemote} from 'chrome://customize-chrome-side-panel.top-chrome/customize_chrome.mojom-webui.js';
 import {CustomizeChromePageCallbackRouter, CustomizeChromePageHandlerRemote} from 'chrome://customize-chrome-side-panel.top-chrome/customize_chrome.mojom-webui.js';
@@ -14,7 +13,7 @@ import {WindowProxy} from 'chrome://customize-chrome-side-panel.top-chrome/windo
 import type {CrA11yAnnouncerMessagesSentEvent} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import type {CrAutoImgElement} from 'chrome://resources/cr_elements/cr_auto_img/cr_auto_img.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
-import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {MetricsTracker} from 'chrome://webui-test/metrics_test_support.js';
 import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
@@ -286,13 +285,6 @@ suite('CategoriesTest', () => {
             1, metrics.count('NTPRicherPicker.Backgrounds.UploadClicked'));
       });
 
-  test('clicking Chrome Web Store tile opens Chrome Web Store', async () => {
-    await setInitialSettings({numCollections: 0});
-
-    categoriesElement.$.chromeWebStoreTile.click();
-    assertEquals(1, handler.getCallCount('openChromeWebStore'));
-  });
-
   test('checks selected category', async () => {
     await setInitialSettings({numCollections: 2});
 
@@ -359,17 +351,6 @@ suite('CategoriesTest', () => {
     checkedCategories =
         categoriesElement.shadowRoot.querySelectorAll('[checked]');
     assertEquals(0, checkedCategories.length);
-  });
-
-  test('help bubble can correctly find anchor elements', async () => {
-    await setInitialSettings({numCollections: 5});
-    assertDeepEquals(
-        categoriesElement.getSortedAnchorStatusesForTesting(),
-        [
-          [CHANGE_CHROME_THEME_CLASSIC_ELEMENT_ID, true],
-          [CHROME_THEME_COLLECTION_ELEMENT_ID, true],
-        ],
-    );
   });
 
   test('classic chrome tile shows correct image', async () => {

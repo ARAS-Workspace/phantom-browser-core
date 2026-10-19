@@ -6,49 +6,23 @@
 
 #include <memory>
 
-#include "base/memory/ref_counted_memory.h"
 #include "base/strings/string_util.h"
 #include "base/test/gmock_move_support.h"
 #include "base/test/mock_callback.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
 #include "chrome/browser/extensions/extension_url_overrides.h"
-#include "chrome/browser/search/background/ntp_custom_background_service.h"
-#include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
-#include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/webui/new_tab_footer/mock_new_tab_footer_document.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
-#include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
-#include "chrome/grit/theme_resources.h"
-#include "components/themes/ntp_custom_background_service_observer.h"
-#include "content/public/browser/web_contents_delegate.h"
 #include "content/public/test/test_web_ui.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/test/test_extension_dir.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "ui/base/theme_provider.h"
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "base/test/scoped_feature_list.h"
-#include "chrome/browser/enterprise/browser_management/management_identity.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/webui/util/webui_util_desktop.h"
-#include "chrome/test/base/testing_browser_process.h"
-#include "chrome/test/base/testing_profile_manager.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
-#include "content/public/test/browser_task_environment.h"
-#include "ui/color/color_provider.h"
-#include "ui/gfx/image/image_skia_rep_default.h"
-#include "ui/gfx/image/image_unittest_util.h"
-#include "ui/gfx/paint_vector_icon.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 using testing::_;
 using ::testing::SaveArg;
@@ -56,38 +30,6 @@ using ::testing::SaveArg;
 namespace {
 const char kExtensionNtpName[] = "Extension-overridden NTP";
 }
-
-class MockThemeProvider : public ui::ThemeProvider {
- public:
-  MOCK_CONST_METHOD1(GetImageSkiaNamed, gfx::ImageSkia*(int));
-  MOCK_CONST_METHOD1(GetColor, SkColor(int));
-  MOCK_CONST_METHOD1(GetTint, color_utils::HSL(int));
-  MOCK_CONST_METHOD1(GetDisplayProperty, int(int));
-  MOCK_CONST_METHOD0(ShouldUseNativeFrame, bool());
-  MOCK_CONST_METHOD1(HasCustomImage, bool(int));
-  MOCK_CONST_METHOD2(
-      GetRawData,
-      scoped_refptr<base::RefCountedMemory>(int, ui::ResourceScaleFactor));
-};
-
-class MockNtpCustomBackgroundService : public NtpCustomBackgroundService {
- public:
-  explicit MockNtpCustomBackgroundService(Profile* profile)
-      : NtpCustomBackgroundService(profile) {}
-  MOCK_METHOD(std::optional<CustomBackground>, GetCustomBackground, ());
-  MOCK_METHOD(void, AddObserver, (NtpCustomBackgroundServiceObserver*));
-};
-
-class MockWebContentsDelegate : public content::WebContentsDelegate {
- public:
-  MOCK_METHOD(content::WebContents*,
-              OpenURLFromTab,
-              (content::WebContents * source,
-               const content::OpenURLParams& params,
-               base::OnceCallback<void(content::NavigationHandle&)>
-                   navigation_handle_callback),
-              (override));
-};
 
 class NewTabFooterHandlerExtensionTest
     : public extensions::ExtensionServiceTestBase {
@@ -102,7 +44,6 @@ class NewTabFooterHandlerExtensionTest
         mojo::PendingReceiver<new_tab_footer::mojom::NewTabFooterHandler>(),
         document_.BindAndGetRemote(),
         base::WeakPtr<TopChromeWebUIController::Embedder>(),
-        NtpCustomBackgroundServiceFactory::GetForProfile(profile()),
         web_contents_.get());
     testing::Mock::VerifyAndClearExpectations(&document_);
   }
@@ -293,191 +234,3 @@ TEST_F(NewTabFooterHandlerExtensionTest, SetNtpExtensionName_ReenablePolicy) {
   document_.FlushForTesting();
   testing::Mock::VerifyAndClearExpectations(&document_);
 }
-
-TEST_F(NewTabFooterHandlerExtensionTest, OpenUrlInCurrentTab) {
-  testing::NiceMock<MockBrowserWindowInterface> mock_browser_interface;
-  webui::SetBrowserWindowInterface(web_contents_.get(),
-                                   &mock_browser_interface);
-
-  MockWebContentsDelegate mock_delegate;
-  web_contents_->SetDelegate(&mock_delegate);
-
-  const GURL kTestUrl("https://www.example.com");
-  EXPECT_CALL(
-      mock_delegate,
-      OpenURLFromTab(web_contents_.get(),
-                     testing::Field(&content::OpenURLParams::url, kTestUrl),
-                     testing::_))
-      .WillOnce(testing::Return(nullptr));
-
-  handler().OpenUrlInCurrentTab(kTestUrl);
-}
-
-TEST_F(NewTabFooterHandlerExtensionTest, OpenUrlInCurrentTab_InvalidUrl) {
-  testing::NiceMock<MockBrowserWindowInterface> mock_browser_interface;
-  webui::SetBrowserWindowInterface(web_contents_.get(),
-                                   &mock_browser_interface);
-
-  MockWebContentsDelegate mock_delegate;
-  web_contents_->SetDelegate(&mock_delegate);
-
-  const GURL kInvalidUrl("https://");
-  EXPECT_CALL(mock_delegate, OpenURLFromTab(testing::_, testing::_, testing::_))
-      .Times(0);
-
-  handler().OpenUrlInCurrentTab(kInvalidUrl);
-}
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-class NewTabFooterHandlerEnterpriseTest : public testing::Test {
- public:
-  void SetUp() override {
-    profile_manager_ = std::make_unique<TestingProfileManager>(
-        TestingBrowserProcess::GetGlobal());
-    ASSERT_TRUE(profile_manager_->SetUp());
-    profile_ = profile_manager_->CreateTestingProfile("Test Profile");
-    InitializeHandler();
-    testing::Mock::VerifyAndClearExpectations(&document_);
-  }
-
-  void InitializeHandler() {
-    web_contents_ = content::WebContents::Create(
-        content::WebContents::CreateParams(profile_));
-    mock_ntp_custom_background_service_ =
-        std::make_unique<testing::NiceMock<MockNtpCustomBackgroundService>>(
-            profile_);
-    EXPECT_CALL(*mock_ntp_custom_background_service_.get(), AddObserver)
-        .Times(1)
-        .WillOnce(
-            testing::SaveArg<0>(&ntp_custom_background_service_observer_));
-    handler_ = std::make_unique<NewTabFooterHandler>(
-        mojo::PendingReceiver<new_tab_footer::mojom::NewTabFooterHandler>(),
-        document_.BindAndGetRemote(),
-        base::WeakPtr<TopChromeWebUIController::Embedder>(),
-        mock_ntp_custom_background_service_.get(), web_contents_.get());
-    ASSERT_EQ(handler_.get(), ntp_custom_background_service_observer_);
-    handler_->SetThemeProviderForTesting(&mock_theme_provider_);
-
-    document_.FlushForTesting();
-    testing::Mock::VerifyAndClearExpectations(&document_);
-  }
-
-  void TearDown() override {
-    ntp_custom_background_service_observer_ = nullptr;
-    // Ensure that the handler is destroyed before the profile.
-    handler_->SetThemeProviderForTesting(nullptr);
-    handler_.reset();
-    web_contents_.reset();
-    mock_ntp_custom_background_service_.reset();
-    profile_ = nullptr;
-    profile_manager_->DeleteAllTestingProfiles();
-    profile_manager_.reset();
-  }
-
-  NewTabFooterHandler& handler() { return *handler_; }
-  Profile* profile() { return profile_; }
-
- protected:
-  content::BrowserTaskEnvironment task_environment_;
-  std::unique_ptr<testing::NiceMock<MockNtpCustomBackgroundService>>
-      mock_ntp_custom_background_service_;
-  std::unique_ptr<content::WebContents> web_contents_;
-  std::unique_ptr<TestingProfileManager> profile_manager_;
-  raw_ptr<TestingProfile> profile_;
-  testing::NiceMock<MockNewTabFooterDocument> document_;
-  testing::NiceMock<MockThemeProvider> mock_theme_provider_;
-  raw_ptr<NtpCustomBackgroundServiceObserver>
-      ntp_custom_background_service_observer_;
-  std::unique_ptr<NewTabFooterHandler> handler_;
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(NewTabFooterHandlerEnterpriseTest, SetCustomBackground_None) {
-  new_tab_footer::mojom::BackgroundAttributionPtr attribution;
-  EXPECT_CALL(document_, SetBackgroundAttribution)
-      .Times(1)
-      .WillOnce(
-          [&attribution](new_tab_footer::mojom::BackgroundAttributionPtr arg) {
-            attribution = std::move(arg);
-          });
-  ON_CALL(*mock_ntp_custom_background_service_.get(), GetCustomBackground())
-      .WillByDefault(testing::Return(std::make_optional<CustomBackground>()));
-  ON_CALL(mock_theme_provider_, HasCustomImage(IDR_THEME_NTP_BACKGROUND))
-      .WillByDefault(testing::Return(false));
-
-  ntp_custom_background_service_observer_->OnCustomBackgroundImageUpdated();
-  document_.FlushForTesting();
-
-  EXPECT_FALSE(attribution);
-}
-
-TEST_F(NewTabFooterHandlerEnterpriseTest,
-       SetCustomBackground_ThemeWithCustomImagePresent) {
-  EXPECT_CALL(document_, SetBackgroundAttribution)
-      .Times(1)
-      .WillOnce(
-          [](new_tab_footer::mojom::BackgroundAttributionPtr attribution) {
-            EXPECT_FALSE(attribution);
-          });
-  CustomBackground custom_background;
-  custom_background.custom_background_attribution_line_1 = "foo line";
-  custom_background.custom_background_attribution_action_url =
-      GURL("https://foo.com/action");
-  ON_CALL(*mock_ntp_custom_background_service_.get(), GetCustomBackground())
-      .WillByDefault(testing::Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_provider_, HasCustomImage(IDR_THEME_NTP_BACKGROUND))
-      .WillByDefault(testing::Return(true));
-
-  ntp_custom_background_service_observer_->OnCustomBackgroundImageUpdated();
-  document_.FlushForTesting();
-}
-
-TEST_F(NewTabFooterHandlerEnterpriseTest,
-       SetCustomBackground_TwoLinesAttribution) {
-  EXPECT_CALL(document_, SetBackgroundAttribution)
-      .Times(1)
-      .WillOnce(
-          [](new_tab_footer::mojom::BackgroundAttributionPtr attribution) {
-            ASSERT_TRUE(attribution);
-            EXPECT_EQ("foo line, bar line", attribution->name);
-            EXPECT_EQ(attribution->url->spec(), "https://foo.com/action");
-          });
-
-  CustomBackground custom_background;
-  custom_background.custom_background_attribution_line_1 = "foo line";
-  custom_background.custom_background_attribution_line_2 = "bar line";
-  custom_background.custom_background_attribution_action_url =
-      GURL("https://foo.com/action");
-  ON_CALL(*mock_ntp_custom_background_service_.get(), GetCustomBackground())
-      .WillByDefault(testing::Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_provider_, HasCustomImage(IDR_THEME_NTP_BACKGROUND))
-      .WillByDefault(testing::Return(false));
-
-  ntp_custom_background_service_observer_->OnCustomBackgroundImageUpdated();
-  document_.FlushForTesting();
-}
-
-TEST_F(NewTabFooterHandlerEnterpriseTest,
-       SetCustomBackground_OneLineAtribution) {
-  EXPECT_CALL(document_, SetBackgroundAttribution)
-      .Times(1)
-      .WillOnce(
-          [](new_tab_footer::mojom::BackgroundAttributionPtr attribution) {
-            ASSERT_TRUE(attribution);
-            EXPECT_EQ("foo line", attribution->name);
-            EXPECT_EQ(attribution->url->spec(), "https://foo.com/action");
-          });
-
-  CustomBackground custom_background;
-  custom_background.custom_background_attribution_line_1 = "foo line";
-  custom_background.custom_background_attribution_action_url =
-      GURL("https://foo.com/action");
-  ON_CALL(*mock_ntp_custom_background_service_, GetCustomBackground())
-      .WillByDefault(testing::Return(std::make_optional(custom_background)));
-  ON_CALL(mock_theme_provider_, HasCustomImage(IDR_THEME_NTP_BACKGROUND))
-      .WillByDefault(testing::Return(false));
-
-  ntp_custom_background_service_observer_->OnCustomBackgroundImageUpdated();
-  document_.FlushForTesting();
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

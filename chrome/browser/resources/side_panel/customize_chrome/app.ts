@@ -3,9 +3,7 @@
 // found in the LICENSE file.
 
 import 'chrome://customize-chrome-side-panel.top-chrome/shared/sp_heading.js';
-import 'chrome://resources/cr_components/help_bubble/new_badge.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
-import 'chrome://resources/cr_elements/cr_chip/cr_chip.js';
 import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import 'chrome://resources/cr_elements/cr_page_selector/cr_page_selector.js';
 import 'chrome://resources/cr_elements/icons.html.js';
@@ -13,13 +11,10 @@ import './appearance.js';
 import './categories.js';
 import './customize_toolbar/toolbar.js';
 import './footer.js';
-import './tools.js';
-import './shortcuts.js';
 import './themes.js';
 import './wallpaper_search/wallpaper_search.js';
 
 import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
-import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 import {assert, assertNotReached, assertNotReachedCase} from 'chrome://resources/js/assert.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
@@ -30,20 +25,15 @@ import {getHtml} from './app.html.js';
 import type {AppearanceElement} from './appearance.js';
 import type {CategoriesElement} from './categories.js';
 import type {BackgroundCollection} from './customize_chrome.mojom-webui.js';
-import {ChromeWebStoreCategory, ChromeWebStoreCollection, CustomizeChromeSection, NewTabPageType} from './customize_chrome.mojom-webui.js';
+import {CustomizeChromeSection, NewTabPageType} from './customize_chrome.mojom-webui.js';
 import {CustomizeChromeApiProxy} from './customize_chrome_api_proxy.js';
 import type {ThemesElement} from './themes.js';
 
 const SECTION_TO_SELECTOR = {
   [CustomizeChromeSection.kUnspecified]: '',
   [CustomizeChromeSection.kAppearance]: '#appearance',
-  [CustomizeChromeSection.kShortcuts]: '#shortcuts',
-  [CustomizeChromeSection.kModules]: '#modules',
   [CustomizeChromeSection.kFooter]: '#footer',
 };
-
-const CHANGE_CHROME_THEME_BUTTON_ELEMENT_ID =
-    'CustomizeChromeUI::kChangeChromeThemeButtonElementId';
 
 export enum CustomizeChromePage {
   OVERVIEW = 'overview',
@@ -52,8 +42,6 @@ export enum CustomizeChromePage {
   TOOLBAR = 'toolbar',
   WALLPAPER_SEARCH = 'wallpaper-search',
 }
-
-const AppElementBase = HelpBubbleMixinLit(CrLitElement);
 
 export interface AppElement {
   $: {
@@ -64,7 +52,7 @@ export interface AppElement {
   };
 }
 
-export class AppElement extends AppElementBase {
+export class AppElement extends CrLitElement {
   static get is() {
     return 'customize-chrome-app';
   }
@@ -82,10 +70,6 @@ export class AppElement extends AppElementBase {
       page_: {type: String},
       selectedCollection_: {type: Object},
       extensionPolicyEnabled_: {type: Boolean},
-      extensionsCardEnabled_: {type: Boolean},
-      ntpNextFeaturesEnabled_: {type: Boolean},
-      ntpNextDisablementEnabled_: {type: Boolean},
-      aimPolicyEnabled_: {type: Boolean},
       footerEnabled_: {type: Boolean},
       wallpaperSearchEnabled_: {type: Boolean},
       newTabPageType_: {type: Number},
@@ -96,22 +80,13 @@ export class AppElement extends AppElementBase {
 
   protected accessor page_: CustomizeChromePage = CustomizeChromePage.OVERVIEW;
   protected accessor selectedCollection_: BackgroundCollection|null = null;
-  protected accessor extensionsCardEnabled_: boolean =
-      loadTimeData.getBoolean('extensionsCardEnabled');
-  protected accessor ntpNextFeaturesEnabled_: boolean =
-      loadTimeData.getBoolean('ntpNextFeaturesEnabled');
-  protected accessor ntpNextDisablementEnabled_: boolean =
-      loadTimeData.getBoolean('ntpNextDisablementEnabled');
   protected accessor extensionPolicyEnabled_: boolean = false;
-  protected accessor aimPolicyEnabled_: boolean =
-      loadTimeData.getBoolean('aimPolicyEnabled');
   protected accessor footerEnabled_: boolean =
       loadTimeData.getBoolean('footerEnabled');
   protected accessor wallpaperSearchEnabled_: boolean =
       loadTimeData.getBoolean('wallpaperSearchEnabled');
-  protected accessor newTabPageType_: NewTabPageType =
-      NewTabPageType.kFirstPartyWebUI;
-  protected accessor showEditTheme_: boolean = true;
+  protected accessor newTabPageType_: NewTabPageType = NewTabPageType.kNone;
+  protected accessor showEditTheme_: boolean = false;
   protected accessor showFooter_: boolean = false;
 
   private listenerIds_: number[] = [];
@@ -139,23 +114,6 @@ export class AppElement extends AppElementBase {
     // laid out.
     window.addEventListener('load', () => {
       this.apiProxy_.handler.updateScrollToSection();
-      // Install observer to log extension cards impression.
-      const extensionsCardSectionObserver =
-          new IntersectionObserver(entries => {
-            assert(entries.length >= 1);
-            if (entries[0]!.intersectionRatio >= 0.8) {
-              extensionsCardSectionObserver.disconnect();
-              this.dispatchEvent(
-                  new Event('detect-extensions-card-section-impression'));
-            }
-          }, {
-            threshold: 1.0,
-          });
-      // Start observing if extension cards are scroll into view.
-      if (this.shadowRoot.querySelector('#extensions')) {
-        extensionsCardSectionObserver.observe(
-            this.shadowRoot.querySelector('#extensions')!);
-      }
     }, {once: true});
   }
 
@@ -182,17 +140,9 @@ export class AppElement extends AppElementBase {
 
   override firstUpdated() {
     ColorChangeUpdater.forDocument().start();
-    this.registerHelpBubble(
-        CHANGE_CHROME_THEME_BUTTON_ELEMENT_ID,
-        ['#appearanceElement', '#editThemeButton']);
   }
 
   private onScrollToSection_(section: CustomizeChromeSection) {
-    if (section === CustomizeChromeSection.kWallpaperSearch) {
-      this.onWallpaperSearchSelect_();
-      return;
-    }
-
     if (section === CustomizeChromeSection.kToolbar) {
       this.openToolbarCustomizationPage();
       chrome.metricsPrivate.recordUserAction(
@@ -219,10 +169,9 @@ export class AppElement extends AppElementBase {
 
     this.newTabPageType_ = newTabPageType;
 
-    // Since some pages aren't supported in non first party mode,
-    // change the section back to the overview.
-    if (!this.isSourceTabFirstPartyNtp_() &&
-        !this.pageSupportedOnNonFirstPartyNtps()) {
+    // Only the toolbar page does not depend on the attached tab, so change any
+    // other page back to the overview.
+    if (this.page_ !== CustomizeChromePage.TOOLBAR) {
       this.page_ = CustomizeChromePage.OVERVIEW;
     }
   }
@@ -239,10 +188,6 @@ export class AppElement extends AppElementBase {
   protected computeShowFooter_(): boolean {
     return this.footerEnabled_ && this.extensionPolicyEnabled_ &&
         this.newTabPageType_ === NewTabPageType.kExtension;
-  }
-
-  protected isSourceTabFirstPartyNtp_(): boolean {
-    return this.newTabPageType_ === NewTabPageType.kFirstPartyWebUI;
   }
 
   protected async onBackClick_() {
@@ -298,32 +243,6 @@ export class AppElement extends AppElementBase {
     page.focusOnBackButton();
   }
 
-  protected onCouponsButtonClick_() {
-    this.apiProxy_.handler.openChromeWebStoreCategoryPage(
-        ChromeWebStoreCategory.kShopping);
-  }
-
-  protected onWritingButtonClick_() {
-    this.apiProxy_.handler.openChromeWebStoreCollectionPage(
-        ChromeWebStoreCollection.kWritingEssentials);
-  }
-
-  protected onProductivityButtonClick_() {
-    this.apiProxy_.handler.openChromeWebStoreCategoryPage(
-        ChromeWebStoreCategory.kWorkflowPlanning);
-  }
-
-  protected onChromeWebStoreLinkClick_(e: Event) {
-    if ((e.target as HTMLElement).id !== 'chromeWebstoreLink') {
-      // Ignore any clicks that are not directly on the <a> element itself. Note
-      // that the <a> element is part of a localized string, which is why the
-      // listener is added on the parent DOM node.
-      return;
-    }
-
-    this.apiProxy_.handler.openChromeWebStoreHomePage();
-  }
-
   protected onToolbarCustomizationButtonClick_() {
     this.openToolbarCustomizationPage();
     chrome.metricsPrivate.recordUserAction(
@@ -336,10 +255,6 @@ export class AppElement extends AppElementBase {
     assert(page);
     await this.updateComplete;
     page.focusOnBackButton();
-  }
-
-  private pageSupportedOnNonFirstPartyNtps() {
-    return this.page_ === CustomizeChromePage.TOOLBAR;
   }
 }
 

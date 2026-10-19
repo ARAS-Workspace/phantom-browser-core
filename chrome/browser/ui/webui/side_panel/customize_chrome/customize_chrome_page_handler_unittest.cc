@@ -14,15 +14,12 @@
 #include "base/files/file.h"
 #include "base/files/file_path.h"
 #include "base/memory/raw_ptr.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_move_support.h"
-#include "base/test/metrics/histogram_tester.h"
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/mock_callback.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/global_features.h"
-#include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -30,19 +27,14 @@
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/browser/ui/search/ntp_user_data_types.h"
 #include "chrome/browser/ui/select_file_policy/chrome_select_file_policy.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
-#include "chrome/common/pref_names.h"
-#include "chrome/common/url_constants.h"
-#include "chrome/grit/generated_resources.h"
+#include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/application_locale_storage/application_locale_storage.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/ntp_tiles/pref_names.h"
-#include "components/ntp_tiles/tile_type.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/search/ntp_features.h"
 #include "components/search_engines/template_url_service.h"
@@ -59,19 +51,12 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/color/color_provider.h"
 #include "ui/native_theme/mock_os_settings_provider.h"
 #include "ui/native_theme/native_theme.h"
 #include "ui/shell_dialogs/select_file_dialog_factory.h"
 #include "ui/shell_dialogs/selected_file_info.h"
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/ui/ui_features.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
-#endif
 
 namespace content {
 class BrowserContext;
@@ -160,12 +145,6 @@ class MockPage : public side_panel::mojom::CustomizeChromePage {
 
   void FlushForTesting() { receiver_.FlushForTesting(); }
 
-  MOCK_METHOD(void,
-              SetMostVisitedSettings,
-              (const std::vector<ntp_tiles::TileType>&,
-               bool,
-               bool,
-               const std::vector<ntp_tiles::TileType>&));
   MOCK_METHOD(void, SetTheme, (side_panel::mojom::ThemePtr));
   MOCK_METHOD(void, SetThemeEditable, (bool));
   MOCK_METHOD(void, ScrollToSection, (CustomizeChromeSection));
@@ -175,7 +154,6 @@ class MockPage : public side_panel::mojom::CustomizeChromePage {
   MOCK_METHOD(void,
               NtpManagedByNameUpdated,
               (const std::string&, const std::string&));
-  MOCK_METHOD(void, SetToolsSettings, (bool visible));
   MOCK_METHOD(
       void,
       SetFooterSettings,
@@ -309,60 +287,6 @@ class CustomizeChromePageHandlerTest : public testing::Test {
     test_url_loader_factory_.ClearResponses();
   }
 
-  void SetMostVisitedPrefs(bool custom_links_visible,
-                           bool enterprise_shortcuts_visible,
-                           bool shortcuts_visible,
-                           bool personal_shortcuts_visible) {
-    profile().GetPrefs()->SetBoolean(ntp_prefs::kNtpCustomLinksVisible,
-                                     custom_links_visible);
-    profile().GetPrefs()->SetBoolean(ntp_prefs::kNtpEnterpriseShortcutsVisible,
-                                     enterprise_shortcuts_visible);
-    profile().GetPrefs()->SetBoolean(ntp_prefs::kNtpShortcutsVisible,
-                                     shortcuts_visible);
-    profile().GetPrefs()->SetBoolean(ntp_prefs::kNtpPersonalShortcutsVisible,
-                                     personal_shortcuts_visible);
-  }
-
-  void CheckMostVisitedPrefs(bool custom_links_visible,
-                             bool enterprise_shortcuts_visible,
-                             bool shortcuts_visible,
-                             bool personal_shortcuts_visible) {
-    EXPECT_EQ(custom_links_visible, profile().GetPrefs()->GetBoolean(
-                                        ntp_prefs::kNtpCustomLinksVisible));
-    EXPECT_EQ(enterprise_shortcuts_visible,
-              profile().GetPrefs()->GetBoolean(
-                  ntp_prefs::kNtpEnterpriseShortcutsVisible));
-    EXPECT_EQ(shortcuts_visible, profile().GetPrefs()->GetBoolean(
-                                     ntp_prefs::kNtpShortcutsVisible));
-    EXPECT_EQ(personal_shortcuts_visible,
-              profile().GetPrefs()->GetBoolean(
-                  ntp_prefs::kNtpPersonalShortcutsVisible));
-  }
-
-  void CheckHistograms(const std::string& name, const auto& counts) {
-    int total = 0;
-    for (const auto& [action, count] : counts) {
-      histogram_tester().ExpectBucketCount(name, action, count);
-      total += count;
-    }
-    histogram_tester().ExpectTotalCount(name, total);
-  }
-
-  void SetEnterpriseShortcutsPolicy(bool has_policy) {
-    if (has_policy) {
-      base::ListValue enterprise_shortcuts;
-      enterprise_shortcuts.Append(base::DictValue()
-                                      .Set("title", "test")
-                                      .Set("url", "https://test.com"));
-      profile().GetPrefs()->SetList(
-          ntp_tiles::prefs::kEnterpriseShortcutsPolicyList,
-          std::move(enterprise_shortcuts));
-    } else {
-      profile().GetPrefs()->SetList(
-          ntp_tiles::prefs::kEnterpriseShortcutsPolicyList, base::ListValue());
-    }
-  }
-
   TestingProfile& profile() { return *profile_; }
   content::WebContents& web_contents() { return *web_contents_; }
   CustomizeChromePageHandler& handler() { return *handler_; }
@@ -376,7 +300,6 @@ class CustomizeChromePageHandlerTest : public testing::Test {
     return *ntp_background_service_observer_;
   }
   MockThemeService& mock_theme_service() { return *mock_theme_service_; }
-  base::HistogramTester& histogram_tester() { return histogram_tester_; }
   base::UserActionTester& user_action_tester() { return user_action_tester_; }
 
  protected:
@@ -393,7 +316,6 @@ class CustomizeChromePageHandlerTest : public testing::Test {
   testing::NiceMock<MockPage> mock_page_;
   raw_ptr<MockThemeService> mock_theme_service_;
   base::test::ScopedFeatureList scoped_feature_list_;
-  base::HistogramTester histogram_tester_;
   base::UserActionTester user_action_tester_;
   base::MockRepeatingCallback<void(const GURL& gurl)> mock_open_url_callback_;
   std::unique_ptr<CustomizeChromePageHandler> handler_;
@@ -401,317 +323,6 @@ class CustomizeChromePageHandlerTest : public testing::Test {
       ntp_custom_background_service_observer_;
   raw_ptr<NtpBackgroundServiceObserver> ntp_background_service_observer_;
 };
-
-struct SetMostVisitedSettingsTestCase {
-  std::string test_name;
-  // Initial state
-  bool initial_custom_links_visible;
-  bool initial_enterprise_shortcuts_visible;
-  bool initial_shortcuts_visible;
-  bool initial_personal_shortcuts_visible;
-  bool has_enterprise_policy;
-  // Action
-  std::vector<ntp_tiles::TileType> types_to_set;
-  bool visible_to_set;
-  bool personal_shortcuts_visible_to_set;
-  // Expected final state
-  bool expected_custom_links_visible;
-  bool expected_enterprise_shortcuts_visible;
-  bool expected_shortcuts_visible;
-  bool expected_personal_shortcuts_visible;
-  std::map<CustomizeShortcutAction, int> expected_histogram_counts;
-};
-
-class CustomizeChromePageHandlerSetMostVisitedTest
-    : public CustomizeChromePageHandlerTest,
-      public ::testing::WithParamInterface<SetMostVisitedSettingsTestCase> {};
-
-TEST_P(CustomizeChromePageHandlerSetMostVisitedTest, SetMostVisitedSettings) {
-  const auto& test_case = GetParam();
-
-  std::vector<ntp_tiles::TileType> types;
-  bool visible;
-  bool personal_shortcuts_visible;
-  std::vector<ntp_tiles::TileType> disabled_shortcuts;
-  EXPECT_CALL(mock_page_, SetMostVisitedSettings)
-      .WillRepeatedly(DoAll(SaveArg<0>(&types), SaveArg<1>(&visible),
-                            SaveArg<2>(&personal_shortcuts_visible),
-                            SaveArg<3>(&disabled_shortcuts)));
-
-  // Set initial enterprise shortcuts policy and prefs state.
-  SetEnterpriseShortcutsPolicy(test_case.has_enterprise_policy);
-  SetMostVisitedPrefs(test_case.initial_custom_links_visible,
-                      test_case.initial_enterprise_shortcuts_visible,
-                      test_case.initial_shortcuts_visible,
-                      test_case.initial_personal_shortcuts_visible);
-
-  // Validate initial prefs state.
-  histogram_tester().ExpectTotalCount("NewTabPage.CustomizeShortcutAction", 0);
-  CheckMostVisitedPrefs(test_case.initial_custom_links_visible,
-                        test_case.initial_enterprise_shortcuts_visible,
-                        test_case.initial_shortcuts_visible,
-                        test_case.initial_personal_shortcuts_visible);
-  // Ensure auto removal is enabled (pref is false) initially.
-  profile().GetPrefs()->SetBoolean(ntp_prefs::kNtpShortcutsAutoRemovalDisabled,
-                                   false);
-
-  // Call SetMostVisitedSettings handler.
-  handler().SetMostVisitedSettings(test_case.types_to_set,
-                                   test_case.visible_to_set,
-                                   test_case.personal_shortcuts_visible_to_set);
-  mock_page_.FlushForTesting();
-
-  // Validate updated prefs state.
-  CheckMostVisitedPrefs(test_case.expected_custom_links_visible,
-                        test_case.expected_enterprise_shortcuts_visible,
-                        test_case.expected_shortcuts_visible,
-                        test_case.expected_personal_shortcuts_visible);
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(
-      ntp_prefs::kNtpShortcutsAutoRemovalDisabled));
-
-  // Validate histograms.
-  CheckHistograms("NewTabPage.CustomizeShortcutAction",
-                  test_case.expected_histogram_counts);
-}
-
-const SetMostVisitedSettingsTestCase kSetMostVisitedSettingsTestCases[] = {
-    {.test_name = "SetSingleType",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = true,
-     .initial_shortcuts_visible = true,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = true,
-     .types_to_set = {ntp_tiles::TileType::kTopSites},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = true,
-     .expected_custom_links_visible = false,
-     .expected_enterprise_shortcuts_visible = false,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = true,
-     .expected_histogram_counts =
-         {{CustomizeShortcutAction::CUSTOMIZE_SHORTCUT_ACTION_TOGGLE_TYPE, 1},
-          {CustomizeShortcutAction::
-               CUSTOMIZE_ENTERPRISE_SHORTCUT_ACTION_TOGGLE_VISIBILITY,
-           1}}},
-    {.test_name = "SetSingleType_EnterprisePolicyEmpty",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = true,
-     .initial_shortcuts_visible = true,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = false,
-     .types_to_set = {ntp_tiles::TileType::kTopSites},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = true,
-     .expected_custom_links_visible = false,
-     .expected_enterprise_shortcuts_visible = true,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = true,
-     .expected_histogram_counts =
-         {{CustomizeShortcutAction::CUSTOMIZE_SHORTCUT_ACTION_TOGGLE_TYPE, 1}}},
-    {.test_name = "SetMultipleTypes",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = false,
-     .initial_shortcuts_visible = true,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = true,
-     .types_to_set = {ntp_tiles::TileType::kTopSites,
-                      ntp_tiles::TileType::kEnterpriseShortcuts},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = true,
-     .expected_custom_links_visible = false,
-     .expected_enterprise_shortcuts_visible = true,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = true,
-     .expected_histogram_counts =
-         {{CustomizeShortcutAction::CUSTOMIZE_SHORTCUT_ACTION_TOGGLE_TYPE, 1},
-          {CustomizeShortcutAction::
-               CUSTOMIZE_ENTERPRISE_SHORTCUT_ACTION_TOGGLE_VISIBILITY,
-           1}}},
-    {.test_name = "SetMultipleTypes_EnterprisePolicyEmpty",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = false,
-     .initial_shortcuts_visible = true,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = false,
-     .types_to_set = {ntp_tiles::TileType::kTopSites,
-                      ntp_tiles::TileType::kEnterpriseShortcuts},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = true,
-     .expected_custom_links_visible = false,
-     .expected_enterprise_shortcuts_visible = false,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = true,
-     .expected_histogram_counts =
-         {{CustomizeShortcutAction::CUSTOMIZE_SHORTCUT_ACTION_TOGGLE_TYPE, 1}}},
-    {.test_name = "SetShortcutsVisible",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = false,
-     .initial_shortcuts_visible = false,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = true,
-     .types_to_set = {ntp_tiles::TileType::kCustomLinks},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = true,
-     .expected_custom_links_visible = true,
-     .expected_enterprise_shortcuts_visible = false,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = true,
-     .expected_histogram_counts =
-         {{CustomizeShortcutAction::CUSTOMIZE_SHORTCUT_ACTION_TOGGLE_VISIBILITY,
-           1}}},
-    {.test_name = "SetPersonalShortcutsVisible",
-     .initial_custom_links_visible = true,
-     .initial_enterprise_shortcuts_visible = false,
-     .initial_shortcuts_visible = true,
-     .initial_personal_shortcuts_visible = true,
-     .has_enterprise_policy = true,
-     .types_to_set = {ntp_tiles::TileType::kCustomLinks},
-     .visible_to_set = true,
-     .personal_shortcuts_visible_to_set = false,
-     .expected_custom_links_visible = true,
-     .expected_enterprise_shortcuts_visible = false,
-     .expected_shortcuts_visible = true,
-     .expected_personal_shortcuts_visible = false,
-     .expected_histogram_counts = {
-         {CustomizeShortcutAction::
-              CUSTOMIZE_PERSONAL_SHORTCUT_ACTION_TOGGLE_VISIBILITY,
-          1}}}};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    CustomizeChromePageHandlerSetMostVisitedTest,
-    ::testing::ValuesIn(kSetMostVisitedSettingsTestCases),
-    [](const testing::TestParamInfo<SetMostVisitedSettingsTestCase>& info) {
-      return info.param.test_name;
-    });
-
-struct UpdateMostVisitedSettingsTestCase {
-  std::string test_name;
-  // Initial state
-  bool has_enterprise_policy;
-  bool custom_links_visible;
-  bool enterprise_shortcuts_visible;
-  bool personal_shortcuts_visible;
-  // Expected state sent to UI
-  std::vector<ntp_tiles::TileType> expected_types;
-  std::vector<ntp_tiles::TileType> expected_disabled_shortcuts;
-};
-
-class CustomizeChromePageHandlerUpdateMostVisitedTest
-    : public CustomizeChromePageHandlerTest,
-      public ::testing::WithParamInterface<UpdateMostVisitedSettingsTestCase> {
-};
-
-TEST_P(CustomizeChromePageHandlerUpdateMostVisitedTest,
-       UpdateMostVisitedSettings) {
-  const auto& test_case = GetParam();
-
-  std::vector<ntp_tiles::TileType> types;
-  bool visible;
-  bool personal_shortcuts_visible;
-  std::vector<ntp_tiles::TileType> disabled_shortcuts;
-  EXPECT_CALL(mock_page_, SetMostVisitedSettings)
-      .WillRepeatedly(DoAll(SaveArg<0>(&types), SaveArg<1>(&visible),
-                            SaveArg<2>(&personal_shortcuts_visible),
-                            SaveArg<3>(&disabled_shortcuts)));
-
-  // Set initial enterprise shortcuts policy and prefs state.
-  SetEnterpriseShortcutsPolicy(test_case.has_enterprise_policy);
-  SetMostVisitedPrefs(
-      test_case.custom_links_visible, test_case.enterprise_shortcuts_visible,
-      /*shortcuts_visible=*/true, test_case.personal_shortcuts_visible);
-  mock_page_.FlushForTesting();
-
-  // Validate returned types and disbaled_shortcuts from handler.
-  EXPECT_THAT(types,
-              testing::UnorderedElementsAreArray(test_case.expected_types));
-  EXPECT_THAT(disabled_shortcuts, testing::UnorderedElementsAreArray(
-                                      test_case.expected_disabled_shortcuts));
-}
-
-const UpdateMostVisitedSettingsTestCase kUpdateMostVisitedSettingsTestCases[] =
-    {{.test_name = "EnterprisePolicyEmpty",
-      .has_enterprise_policy = false,
-      .custom_links_visible = true,
-      .enterprise_shortcuts_visible = true,
-      .personal_shortcuts_visible = true,
-      .expected_types = {ntp_tiles::TileType::kEnterpriseShortcuts,
-                         ntp_tiles::TileType::kCustomLinks},
-      .expected_disabled_shortcuts =
-          {ntp_tiles::TileType::kEnterpriseShortcuts}},
-     {.test_name = "PersonalShortcutsVisible",
-      .has_enterprise_policy = true,
-      .custom_links_visible = true,
-      .enterprise_shortcuts_visible = true,
-      .personal_shortcuts_visible = true,
-      .expected_types = {ntp_tiles::TileType::kEnterpriseShortcuts,
-                         ntp_tiles::TileType::kCustomLinks},
-      .expected_disabled_shortcuts = {}},
-     {.test_name = "PersonalShortcutsNotVisible",
-      .has_enterprise_policy = true,
-      .custom_links_visible = true,
-      .enterprise_shortcuts_visible = true,
-      .personal_shortcuts_visible = false,
-      .expected_types = {ntp_tiles::TileType::kEnterpriseShortcuts},
-      .expected_disabled_shortcuts = {}}};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    CustomizeChromePageHandlerUpdateMostVisitedTest,
-    ::testing::ValuesIn(kUpdateMostVisitedSettingsTestCases),
-    [](const testing::TestParamInfo<UpdateMostVisitedSettingsTestCase>& info) {
-      return info.param.test_name;
-    });
-
-TEST_F(CustomizeChromePageHandlerTest,
-       UpdateMostVisitedSettingsOnPolicyChange) {
-  std::vector<ntp_tiles::TileType> types;
-  bool visible;
-  bool personal_shortcuts_visible;
-  std::vector<ntp_tiles::TileType> disabled_shortcuts;
-  EXPECT_CALL(mock_page_, SetMostVisitedSettings)
-      .WillRepeatedly(DoAll(SaveArg<0>(&types), SaveArg<1>(&visible),
-                            SaveArg<2>(&personal_shortcuts_visible),
-                            SaveArg<3>(&disabled_shortcuts)));
-
-  SetEnterpriseShortcutsPolicy(true);
-  SetMostVisitedPrefs(
-      /*custom_links_visible=*/true, /*enterprise_shortcuts_visible=*/true,
-      /*shortcuts_visible=*/true, /*personal_shortcuts_visible=*/false);
-  mock_page_.FlushForTesting();
-
-  // The enterprise shortcuts option should be visible.
-  EXPECT_EQ(0u, disabled_shortcuts.size());
-
-  // Set shortcut type to enterprise (no personal shortcuts should be set since
-  // they are not visible).
-  handler().SetMostVisitedSettings(
-      /*types=*/{ntp_tiles::TileType::kEnterpriseShortcuts}, /*visible=*/true,
-      /*personal_shortcuts_visible=*/false);
-  mock_page_.FlushForTesting();
-
-  // Verify state.
-  EXPECT_THAT(types, testing::UnorderedElementsAre(
-                         ntp_tiles::TileType::kEnterpriseShortcuts));
-  EXPECT_FALSE(personal_shortcuts_visible);
-  EXPECT_EQ(0u, disabled_shortcuts.size());
-
-  // Set enterprise shortcuts policy to empty list.
-  SetEnterpriseShortcutsPolicy(false);
-  mock_page_.FlushForTesting();
-
-  // Verify state is updated. The type should fallback to the existing custom
-  // links visibility pref and enterprise shortcuts should be disabled. Personal
-  // shortcuts should become visible.
-  EXPECT_THAT(types, testing::UnorderedElementsAre(
-                         ntp_tiles::TileType::kEnterpriseShortcuts,
-                         ntp_tiles::TileType::kCustomLinks));
-  EXPECT_TRUE(visible);
-  EXPECT_TRUE(personal_shortcuts_visible);
-  EXPECT_THAT(
-      disabled_shortcuts,
-      testing::UnorderedElementsAre(ntp_tiles::TileType::kEnterpriseShortcuts));
-}
 
 enum class ThemeUpdateSource {
   kMojo,
@@ -1017,91 +628,11 @@ TEST_F(CustomizeChromePageHandlerTest, SetBackgroundImage) {
       GURL("https://image.jpg"), GURL("https://thumbnail.jpg"), "collectionId");
 }
 
-TEST_F(CustomizeChromePageHandlerTest, OpenChromeWebStore) {
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 0);
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
-  handler().OpenChromeWebStore();
-  ASSERT_EQ(GURL("https://chromewebstore.google.com/category/themes"), url);
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 1);
-
-  ASSERT_EQ(
-      histogram_tester().GetBucketCount("NewTabPage.ChromeWebStoreOpen",
-                                        NtpChromeWebStoreOpen::kAppearance),
-      1);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, OpenThirdPartyThemePage) {
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 0);
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
-  handler().OpenThirdPartyThemePage("foo");
-  ASSERT_EQ(GURL("https://chromewebstore.google.com/detail/foo"), url);
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 1);
-  ASSERT_EQ(
-      histogram_tester().GetBucketCount("NewTabPage.ChromeWebStoreOpen",
-                                        NtpChromeWebStoreOpen::kCollections),
-      1);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, OpenChromeWebStoreCategoryPage) {
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 0);
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
-  handler().OpenChromeWebStoreCategoryPage(
-      side_panel::mojom::ChromeWebStoreCategory::kWorkflowPlanning);
-
-  ASSERT_EQ(
-      GURL("https://chromewebstore.google.com/category/extensions/"
-           "productivity/workflow?utm_source=chromeSidebarExtensionCards"),
-      url);
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 1);
-
-  ASSERT_EQ(histogram_tester().GetBucketCount(
-                "NewTabPage.ChromeWebStoreOpen",
-                NtpChromeWebStoreOpen::kWorkflowPlanningCategoryPage),
-            1);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, OpenChromeWebStoreCollectionPage) {
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 0);
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
-  handler().OpenChromeWebStoreCollectionPage(
-      side_panel::mojom::ChromeWebStoreCollection::kWritingEssentials);
-  ASSERT_EQ(GURL("https://chromewebstore.google.com/collection/"
-                 "writing_essentials?utm_source=chromeSidebarExtensionCards"),
-            url);
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 1);
-
-  ASSERT_EQ(histogram_tester().GetBucketCount(
-                "NewTabPage.ChromeWebStoreOpen",
-                NtpChromeWebStoreOpen::kWritingEssentialsCollectionPage),
-            1);
-}
-
+// Without an extension overriding the new tab page nothing manages it, so no
+// page is opened.
 TEST_F(CustomizeChromePageHandlerTest, OpenNtpManagedByPage) {
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
+  EXPECT_CALL(mock_open_url_callback_, Run).Times(0);
   handler().OpenNtpManagedByPage();
-
-  EXPECT_EQ(GURL(chrome::kBrowserSettingsSearchEngineURL), url);
-}
-
-TEST_F(CustomizeChromePageHandlerTest, OpenChromeWebStoreHomePage) {
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 0);
-  GURL url;
-  EXPECT_CALL(mock_open_url_callback_, Run).Times(1).WillOnce(SaveArg<0>(&url));
-  handler().OpenChromeWebStoreHomePage();
-  ASSERT_EQ(
-      GURL("https://"
-           "chromewebstore.google.com/?utm_source=chromeSidebarExtensionCards"),
-      url);
-  histogram_tester().ExpectTotalCount("NewTabPage.ChromeWebStoreOpen", 1);
-
-  ASSERT_EQ(histogram_tester().GetBucketCount("NewTabPage.ChromeWebStoreOpen",
-                                              NtpChromeWebStoreOpen::kHomePage),
-            1);
 }
 
 TEST_F(CustomizeChromePageHandlerTest, SetDailyRefreshCollectionId) {
@@ -1186,30 +717,6 @@ TEST_F(CustomizeChromePageHandlerTest, UpdateScrollToSection) {
   EXPECT_EQ(CustomizeChromeSection::kAppearance, section);
 }
 
-// Tests that SetToolChipsVisible sets the pref to the given value.
-TEST_F(CustomizeChromePageHandlerTest, SetToolChipsVisible) {
-  profile().GetPrefs()->SetBoolean(prefs::kNtpToolChipsVisible, false);
-  handler().SetToolChipsVisible(true);
-  mock_page_.FlushForTesting();
-
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(prefs::kNtpToolChipsVisible));
-}
-
-// Tests that UpdateToolChipsSettings calls the page with SetToolsSettings
-TEST_F(CustomizeChromePageHandlerTest, UpdateToolChipsSettings) {
-  bool visible;
-
-  EXPECT_CALL(mock_page_, SetToolsSettings)
-      .Times(1)
-      .WillOnce([&visible](bool visible_arg) { visible = visible_arg; });
-
-  profile().GetPrefs()->SetBoolean(prefs::kNtpToolChipsVisible, true);
-  mock_page_.FlushForTesting();
-
-  EXPECT_TRUE(visible);
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(prefs::kNtpToolChipsVisible));
-}
-
 class CustomizeChromePageHandlerWallpaperSearchTest
     : public CustomizeChromePageHandlerTest,
       public ::testing::WithParamInterface<bool> {
@@ -1265,10 +772,7 @@ class CustomizeChromePageHandlerWithTemplateURLServiceTest
     AddSearchProviders();
   }
 
-  static constexpr char16_t kFirstPartyShortName[] = u"first party";
   static constexpr char16_t kThirdPartyShortName[] = u"third party";
-  static constexpr char kFirstPartyDomain[] = "{google:baseURL}";
-  static constexpr char kFirstPartySuggestDomain[] = "{google:baseSuggestURL}";
   static constexpr char kThirdPartyDomain[] = "www.third_party.com";
 
   void AddSearchProviders() {
@@ -1289,29 +793,6 @@ class CustomizeChromePageHandlerWithTemplateURLServiceTest
       third_party_url_ =
           factory_util_.model()->Add(std::make_unique<TemplateURL>(data));
     }
-
-    {  // first party
-      TemplateURLData data;
-      data.SetURL(std::string(kFirstPartyDomain) + "search?q={searchTerms}");
-      data.suggestions_url =
-          std::string(kFirstPartySuggestDomain) + "search?q={searchTerms}";
-      data.image_url = std::string(kFirstPartyDomain) + "searchbyimage/upload";
-      data.image_translate_url =
-          std::string(kFirstPartyDomain) + "searchbyimage/upload?translate";
-      data.new_tab_url = std::string(kFirstPartyDomain) + "_/chrome/newtab";
-      data.contextual_search_url =
-          std::string(kFirstPartyDomain) + "_/contextualsearch";
-      data.alternate_urls.push_back(std::string(kFirstPartyDomain) +
-                                    "s#q={searchTerms}");
-      data.SetShortName(kFirstPartyShortName);
-      first_party_url_ =
-          factory_util_.model()->Add(std::make_unique<TemplateURL>(data));
-    }
-  }
-
-  void SetFirstPartyDefault() {
-    factory_util_.model()->SetUserSelectedDefaultSearchProvider(
-        first_party_url_);
   }
 
   void SetThirdPartyDefault() {
@@ -1321,34 +802,33 @@ class CustomizeChromePageHandlerWithTemplateURLServiceTest
 
  private:
   TemplateURLServiceFactoryTestUtil factory_util_;
-  raw_ptr<TemplateURL> first_party_url_ = nullptr;
   raw_ptr<TemplateURL> third_party_url_ = nullptr;
 };
 
+// The new tab page is local for every search engine, so a non-Google default
+// search engine neither manages it nor classifies a regular tab.
 TEST_F(CustomizeChromePageHandlerWithTemplateURLServiceTest,
-       NtpManagedByNameUpdated) {
+       NtpNotManagedBySearchEngine) {
+  SetThirdPartyDefault();
   mock_page_.FlushForTesting();
   testing::Mock::VerifyAndClearExpectations(&mock_page_);
 
-  std::string name;
-  std::string description;
+  std::string name = "unset";
+  std::string description = "unset";
   EXPECT_CALL(mock_page_, NtpManagedByNameUpdated)
       .Times(1)
       .WillOnce(DoAll(SaveArg<0>(&name), SaveArg<1>(&description)));
-  SetFirstPartyDefault();
+  handler().UpdateNtpManagedByName();
   mock_page_.FlushForTesting();
   EXPECT_EQ(std::string(), name);
   EXPECT_EQ(std::string(), description);
 
-  mock_page_.FlushForTesting();
-  testing::Mock::VerifyAndClearExpectations(&mock_page_);
-
-  EXPECT_CALL(mock_page_, NtpManagedByNameUpdated)
+  side_panel::mojom::NewTabPageType source_tab =
+      side_panel::mojom::NewTabPageType::kExtension;
+  EXPECT_CALL(mock_page_, AttachedTabStateUpdated)
       .Times(1)
-      .WillOnce(DoAll(SaveArg<0>(&name), SaveArg<1>(&description)));
-  SetThirdPartyDefault();
+      .WillOnce(SaveArg<0>(&source_tab));
+  handler().AttachedTabStateUpdated(GURL("https://example.com"));
   mock_page_.FlushForTesting();
-  EXPECT_EQ(std::string(base::UTF16ToUTF8(kThirdPartyShortName)), name);
-  EXPECT_EQ(l10n_util::GetStringUTF8(IDS_NTP_MANAGED_BY_SEARCH_ENGINE),
-            description);
+  EXPECT_EQ(side_panel::mojom::NewTabPageType::kNone, source_tab);
 }

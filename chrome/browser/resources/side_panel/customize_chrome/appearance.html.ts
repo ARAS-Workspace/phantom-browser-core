@@ -9,19 +9,6 @@ import type {AppearanceElement} from './appearance.js';
 export function getHtml(this: AppearanceElement) {
   // clang-format off
   return html`<!--_html_template_start_-->
-<customize-chrome-theme-snapshot id="themeSnapshot"
-    role="button" tabindex="0"
-    @keydown="${this.onThemeSnapshotKeydown_}"
-    @edit-theme-click="${this.onEditThemeClick_}"
-    ?hidden="${!this.showThemeSnapshot_}">
-</customize-chrome-theme-snapshot>
-<customize-chrome-hover-button id="thirdPartyThemeLinkButton"
-    class="link-out-button theme-button"
-    ?hidden="${!this.thirdPartyThemeId_}"
-    @click="${this.onThirdPartyThemeLinkButtonClick_}"
-    label="${this.thirdPartyThemeName_}"
-    label-description="$i18n{currentTheme}">
-</customize-chrome-hover-button>
 <customize-chrome-hover-button id="uploadedImageButton" class="theme-button"
     ?hidden="${!this.showUploadedImageButton_}"
     @click="${this.onUploadedImageButtonClick_}"

@@ -7,7 +7,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
-#include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "components/tabs/public/tab_interface.h"
@@ -15,13 +14,10 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
-#include "ui/base/interaction/element_identifier.h"
 
 namespace customize_chrome {
 class SidePanelController;
 }  // namespace customize_chrome
-
-class Profile;
 
 class CustomizeButtonsHandler
     : public customize_buttons::mojom::CustomizeButtonsHandler {
@@ -36,18 +32,12 @@ class CustomizeButtonsHandler
       // BrowserView. If embedded in a tab, the caller should pass the
       // corresponding `TabInterface`. Otherwise, the handler will fall back to
       // the active tab's `TabInterface` if available.
-      tabs::TabInterface* tab_interface,
-      std::unique_ptr<NewTabPageFeaturePromoHelper>
-          customize_chrome_feature_promo_helper);
+      tabs::TabInterface* tab_interface);
   CustomizeButtonsHandler(const CustomizeButtonsHandler&) = delete;
   CustomizeButtonsHandler& operator=(const CustomizeButtonsHandler&) = delete;
   ~CustomizeButtonsHandler() override;
 
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kCustomizeChromeButtonElementId);
-
   // customize_buttons::mojom::CustomizeButtonsHandler:
-  void IncrementCustomizeChromeButtonOpenCount() override;
-  void IncrementWallpaperSearchButtonShownCount() override;
   // TODO(crbug.com/419368727) Remove |visible| as part of deprecating the
   // Wallpaper Search button.
   void SetCustomizeChromeSidePanelVisible(
@@ -68,10 +58,8 @@ class CustomizeButtonsHandler
 
   // Holds subscriptions for TabInterface callbacks.
   std::vector<base::CallbackListSubscription> tab_subscriptions_;
-  raw_ptr<Profile> profile_;
   const raw_ptr<content::WebUI> web_ui_;
   raw_ptr<tabs::TabInterface> tab_interface_;
-  std::unique_ptr<NewTabPageFeaturePromoHelper> feature_promo_helper_;
 
   // These are located at the end of the list of member variables to ensure the
   // WebUI page is disconnected before other members are destroyed.

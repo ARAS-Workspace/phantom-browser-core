@@ -10,7 +10,6 @@ import './check_mark_wrapper.js';
 import '/strings.m.js';
 
 import type {SpHeadingElement} from 'chrome://customize-chrome-side-panel.top-chrome/shared/sp_heading.js';
-import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 import type {CrToggleElement} from 'chrome://resources/cr_elements/cr_toggle/cr_toggle.js';
 import {assert} from 'chrome://resources/js/assert.js';
 import {FocusOutlineManager} from 'chrome://resources/js/focus_outline_manager.js';
@@ -25,13 +24,6 @@ import {getCss} from './themes.css.js';
 import {getHtml} from './themes.html.js';
 import {WindowProxy} from './window_proxy.js';
 
-export const CHROME_THEME_ELEMENT_ID =
-    'CustomizeChromeUI::kChromeThemeElementId';
-export const CHROME_THEME_BACK_ELEMENT_ID =
-    'CustomizeChromeUI::kChromeThemeBackElementId';
-
-const ThemesElementBase = HelpBubbleMixinLit(CrLitElement);
-
 export interface ThemesElement {
   $: {
     refreshDailyToggle: CrToggleElement,
@@ -39,7 +31,7 @@ export interface ThemesElement {
   };
 }
 
-export class ThemesElement extends ThemesElementBase {
+export class ThemesElement extends CrLitElement {
   static get is() {
     return 'customize-chrome-themes';
   }
@@ -109,31 +101,8 @@ export class ThemesElement extends ThemesElementBase {
     }
   }
 
-  override firstUpdated() {
-    this.registerHelpBubble(
-        CHROME_THEME_BACK_ELEMENT_ID, this.$.heading.getBackButton());
-  }
-
-  override updated(changedProperties: PropertyValues<this>) {
-    super.updated(changedProperties);
-
-    const changedPrivateProperties =
-        changedProperties as Map<PropertyKey, unknown>;
-
-    if (changedPrivateProperties.has('themes_') && this.themes_.length > 0) {
-      this.onThemesRendered_();
-    }
-  }
-
   focusOnBackButton() {
     this.$.heading.getBackButton().focus();
-  }
-
-  private onThemesRendered_() {
-    const firstTile = this.shadowRoot.querySelector('.tile.theme');
-    if (firstTile) {
-      this.registerHelpBubble(CHROME_THEME_ELEMENT_ID, firstTile);
-    }
   }
 
   protected shouldShowTheme_(itemLoaded: boolean) {

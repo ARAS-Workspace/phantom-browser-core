@@ -22,9 +22,7 @@ import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.
 import {$$, assertNotStyle, assertStyle, createBackgroundImage, createTheme, createThirdPartyThemeInfo, installMock} from './test_support.js';
 
 const newTabPageTypes = [
-  NewTabPageType.kFirstPartyWebUI,
   NewTabPageType.kThirdPartyWebUI,
-  NewTabPageType.kThirdPartyRemote,
   NewTabPageType.kExtension,
   NewTabPageType.kIncognito,
   NewTabPageType.kGuestMode,
@@ -63,6 +61,8 @@ suite('AppearanceTest', () => {
     theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
     assertTrue(!appearanceElement.$.setClassicChromeButton.hidden);
@@ -72,6 +72,8 @@ suite('AppearanceTest', () => {
     const theme = createTheme();
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
     assertTrue(appearanceElement.$.setClassicChromeButton.hidden);
@@ -82,6 +84,8 @@ suite('AppearanceTest', () => {
     theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
     appearanceElement.$.setClassicChromeButton.click();
@@ -110,6 +114,8 @@ suite('AppearanceTest', () => {
     theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
     // Set classic chrome. This should announce.
@@ -150,6 +156,8 @@ suite('AppearanceTest', () => {
     let theme = createTheme();
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
     // Set non-classic chrome theme.
@@ -184,6 +192,9 @@ suite('AppearanceTest', () => {
         theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
 
         callbackRouterRemote.setTheme(theme);
+        callbackRouterRemote.attachedTabStateUpdated(
+            NewTabPageType.kThirdPartyWebUI);
+        callbackRouterRemote.setThemeEditable(true);
         await callbackRouterRemote.$.flushForTesting();
 
         // Act.
@@ -210,6 +221,8 @@ suite('AppearanceTest', () => {
         theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
 
         callbackRouterRemote.setTheme(theme);
+        callbackRouterRemote.attachedTabStateUpdated(
+            NewTabPageType.kThirdPartyWebUI);
         await callbackRouterRemote.$.flushForTesting();
         const focusedElement = appearanceElement.shadowRoot.activeElement;
         assertNotEquals(
@@ -226,42 +239,13 @@ suite('AppearanceTest', () => {
             appearanceElement.shadowRoot.activeElement, focusedElement);
       });
 
-  test('1P view shows when 3P theme info not set', async () => {
+  test('color picker shows when 3P theme info not set', async () => {
     const theme = createTheme();
 
     callbackRouterRemote.setTheme(theme);
     await callbackRouterRemote.$.flushForTesting();
-    assertNotStyle(appearanceElement.$.themeSnapshot, 'display', 'none');
     assertNotStyle(appearanceElement.$.chromeColors, 'display', 'none');
-    assertStyle(
-        appearanceElement.$.thirdPartyThemeLinkButton, 'display', 'none');
   });
-
-  test(
-      'theme snapshot is tabbable and triggers edit theme on keydown',
-      async () => {
-        const theme = createTheme();
-        callbackRouterRemote.setTheme(theme);
-        await callbackRouterRemote.$.flushForTesting();
-
-        const snapshot = appearanceElement.$.themeSnapshot;
-        assertEquals('button', snapshot.getAttribute('role'));
-        assertEquals('0', snapshot.getAttribute('tabindex'));
-
-        // Test Enter key
-        const enterPromise =
-            eventToPromise('edit-theme-click', appearanceElement);
-        snapshot.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
-        const enterEvent = await enterPromise;
-        assertTrue(!!enterEvent);
-
-        // Test Space key
-        const spacePromise =
-            eventToPromise('edit-theme-click', appearanceElement);
-        snapshot.dispatchEvent(new KeyboardEvent('keydown', {key: ' '}));
-        const spaceEvent = await spacePromise;
-        assertTrue(!!spaceEvent);
-      });
 
   test('respects policy for edit theme', async () => {
     const theme = createTheme();
@@ -303,9 +287,6 @@ suite('AppearanceTest', () => {
     const theme = createTheme();
     theme.backgroundImage = createBackgroundImage('chrome://theme/foo');
     callbackRouterRemote.setTheme(theme);
-    // Set any non-1P WebUI NTP type.
-    callbackRouterRemote.attachedTabStateUpdated(
-        NewTabPageType.kThirdPartyWebUI);
     await microtasksFinished();
 
     // Act.
@@ -424,6 +405,8 @@ suite('AppearanceTest', () => {
                 }
 
                 callbackRouterRemote.setTheme(theme);
+                callbackRouterRemote.attachedTabStateUpdated(
+                    NewTabPageType.kThirdPartyWebUI);
                 await callbackRouterRemote.$.flushForTesting();
 
                 assertNotEquals(
@@ -442,15 +425,12 @@ suite('AppearanceTest', () => {
   });
 
   suite('third party theme', () => {
-    test('3P view shows when 3P theme info is set', async () => {
+    test('3P theme hides the color picker', async () => {
       const theme = createTheme();
       theme.thirdPartyThemeInfo = createThirdPartyThemeInfo('foo', 'bar');
 
       callbackRouterRemote.setTheme(theme);
       await callbackRouterRemote.$.flushForTesting();
-      assertNotStyle(
-          appearanceElement.$.thirdPartyThemeLinkButton, 'display', 'none');
-      assertStyle(appearanceElement.$.themeSnapshot, 'display', 'none');
       assertStyle(appearanceElement.$.chromeColors, 'display', 'none');
       if (loadTimeData.getBoolean('footerEnabled')) {
         assertStyle(
@@ -460,37 +440,22 @@ suite('AppearanceTest', () => {
             appearanceElement.$.setClassicChromeButton, 'display', 'none');
       }
     });
-
-    test('clicking 3P theme link opens theme page', async () => {
-      // Arrange.
-      const theme = createTheme();
-      theme.thirdPartyThemeInfo = createThirdPartyThemeInfo('foo', 'Foo Name');
-
-      // Act.
-      callbackRouterRemote.setTheme(theme);
-      await callbackRouterRemote.$.flushForTesting();
-
-      // Assert.
-      appearanceElement.$.thirdPartyThemeLinkButton.click();
-      assertEquals(1, handler.getCallCount('openThirdPartyThemePage'));
-    });
   });
 
-  test('uploaded image shows button and no snapshot', async () => {
+  test('uploaded image shows button', async () => {
     const theme = createTheme();
     theme.backgroundImage = createBackgroundImage('local');
     theme.backgroundImage.isUploadedImage = true;
 
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
-    assertStyle(
-        appearanceElement.$.thirdPartyThemeLinkButton, 'display', 'none');
     assertNotStyle(appearanceElement.$.uploadedImageButton, 'display', 'none');
     assertStyle(appearanceElement.$.searchedImageButton, 'display', 'none');
     assertNotStyle(
         appearanceElement.$.setClassicChromeButton, 'display', 'none');
-    assertStyle(appearanceElement.$.themeSnapshot, 'display', 'none');
     assertNotStyle(appearanceElement.$.chromeColors, 'display', 'none');
   });
 
@@ -516,15 +481,14 @@ suite('AppearanceTest', () => {
       high: BigInt(20),
     };
     callbackRouterRemote.setTheme(theme);
+    callbackRouterRemote.attachedTabStateUpdated(
+        NewTabPageType.kThirdPartyWebUI);
     await callbackRouterRemote.$.flushForTesting();
 
-    assertStyle(
-        appearanceElement.$.thirdPartyThemeLinkButton, 'display', 'none');
     assertStyle(appearanceElement.$.uploadedImageButton, 'display', 'none');
     assertNotStyle(appearanceElement.$.searchedImageButton, 'display', 'none');
     assertNotStyle(
         appearanceElement.$.setClassicChromeButton, 'display', 'none');
-    assertStyle(appearanceElement.$.themeSnapshot, 'display', 'none');
     assertNotStyle(appearanceElement.$.chromeColors, 'display', 'none');
   });
 
@@ -590,6 +554,14 @@ suite('AppearanceTest', () => {
         categoriesHeader: 'wallpaper search button enabled',
         changeTheme: 'wallpaper search button disabled',
       });
+    });
+
+    setup(async () => {
+      // The edit buttons are only shown if the attached tab allows editing the
+      // theme.
+      callbackRouterRemote.setThemeEditable(true);
+      await callbackRouterRemote.$.flushForTesting();
+      await microtasksFinished();
     });
 
     test('wallpaper search button shows if it is enabled', () => {
@@ -707,43 +679,9 @@ suite('AppearanceTest', () => {
 
         // Assert.
         assertEquals(
-            t === NewTabPageType.kFirstPartyWebUI ||
-                t === NewTabPageType.kThirdPartyWebUI,
+            t === NewTabPageType.kThirdPartyWebUI,
             !appearanceElement.$.setClassicChromeButton.hidden);
       });
-    });
-  });
-
-  test('source tab type should update the content', async () => {
-    const idsControlledByIsSourceTabFirstPartyNtp = [
-      '#editButtonsContainer',
-      '#themeSnapshot',
-    ];
-
-    const idsNotControlledByIsSourceTabFirstPartyNtp = [
-      '#thirdPartyThemeLinkButton',
-      '#uploadedImageButton',
-      '#searchedImageButton',
-      '#chromeColors',
-      '#followThemeToggle',
-      '#followThemeToggleControl',
-      '#editThemeButton',
-      '#editThemeIcon',
-    ];
-
-    const checkIdsVisibility = (sourceTabType: NewTabPageType) => {
-      idsControlledByIsSourceTabFirstPartyNtp.forEach(
-          id => assertEquals(
-              sourceTabType === NewTabPageType.kFirstPartyWebUI,
-              !!appearanceElement.shadowRoot.querySelector(id)));
-      idsNotControlledByIsSourceTabFirstPartyNtp.forEach(
-          id => assertTrue(!!appearanceElement.shadowRoot.querySelector(id)));
-    };
-
-    await newTabPageTypes.forEach(async t => {
-      callbackRouterRemote.attachedTabStateUpdated(t);
-      await microtasksFinished();
-      checkIdsVisibility(t);
     });
   });
 });

@@ -34,16 +34,12 @@
 #include "chrome/grit/side_panel_shared_resources_map.h"
 #include "components/search/ntp_features.h"
 #include "components/strings/grit/components_strings.h"
-#include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/url_data_source.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
-#include "extensions/strings/grit/extensions_strings.h"
 #include "ui/base/webui/web_ui_util.h"
-#include "ui/strings/grit/ui_strings.h"
 #include "ui/webui/color_change_listener/color_change_handler.h"
-#include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/webui_util.h"
 
 namespace {
@@ -55,16 +51,6 @@ int64_t RandInt64() {
 }
 
 }  // namespace
-
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeChromeUI,
-                                      kChangeChromeThemeButtonElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeChromeUI,
-                                      kChangeChromeThemeClassicElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeChromeUI,
-                                      kChromeThemeBackElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeChromeUI,
-                                      kChromeThemeCollectionElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(CustomizeChromeUI, kChromeThemeElementId);
 
 CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
     // Enable chrome.send to notify `ThemeHandler` to observe theme changes.
@@ -96,13 +82,9 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       {"appearanceHeader", IDS_NTP_CUSTOMIZE_APPEARANCE_LABEL},
       {"categoriesHeader", IDS_NTP_CUSTOMIZE_THEMES_HEADER},
       {"footerHeader", IDS_NTP_CUSTOMIZE_FOOTER_HEADER},
-      {"toolsHeader", IDS_NTP_CUSTOMIZE_TOOLS_HEADER},
-      {"shortcutsHeader", IDS_NTP_CUSTOMIZE_MENU_SHORTCUTS_LABEL},
       {"toolbarHeader", IDS_NTP_CUSTOMIZE_MENU_TOOLBAR_LABEL},
-      {"extensionsHeader", IDS_NTP_CUSTOMIZE_MENU_EXTENSIONS_LABEL},
       // Appearance strings.
       {"changeTheme", IDS_NTP_CUSTOMIZE_CHROME_CHANGE_THEME_LABEL},
-      {"chromeWebStore", IDS_EXTENSION_WEB_STORE_TITLE},
       {"classicChrome", IDS_NTP_CUSTOMIZE_NO_BACKGROUND_LABEL},
       {"colorsContainerLabel", IDS_NTP_THEMES_CONTAINER_LABEL},
       {"colorPickerLabel", IDS_NTP_CUSTOMIZE_COLOR_PICKER_LABEL},
@@ -117,7 +99,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       {"managedColorsTitle", IDS_NTP_THEME_MANAGED_DIALOG_TITLE},
       {"managedColorsBody", IDS_NTP_THEME_MANAGED_DIALOG_BODY},
       {"uploadImage", IDS_NTP_CUSTOM_BG_UPLOAD_AN_IMAGE},
-      {"uploadedImage", IDS_NTP_CUSTOMIZE_UPLOADED_IMAGE_LABEL},
       {"yourUploadedImage", IDS_NTP_CUSTOMIZE_YOUR_UPLOADED_IMAGE_LABEL},
       {"yourSearchedImage", IDS_NTP_CUSTOMIZE_YOUR_SEARCHED_IMAGE_LABEL},
       {"resetToClassicChrome",
@@ -128,25 +109,8 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
        IDS_NTP_CUSTOMIZE_CHROME_RESET_TO_UPLOADED_IMAGE_COMPLETE},
       {"followThemeToggle", IDS_NTP_CUSTOMIZE_CHROME_FOLLOW_THEME_LABEL},
       {"refreshDaily", IDS_NTP_CUSTOM_BG_DAILY_REFRESH},
-      {"managedByExtension", IDS_NTP_MANAGED_BY_EXTENSION},
-      {"managedBySearchEngine", IDS_NTP_MANAGED_BY_SEARCH_ENGINE},
       {"newTabPageManagedByA11yLabel",
        IDS_NTP_CUSTOMIZE_CHROME_MANAGED_NEW_TAB_PAGE_ACCESSIBILITY},
-      // Tools strings.
-      {"showChipsToggleTitle", IDS_NTP_CUSTOMIZE_SHOW_SUGGESTIONS_CHIPS_LABEL},
-      // Shortcut strings.
-      {"topSites", IDS_NTP_CUSTOMIZE_MOST_VISITED_LABEL},
-      {"myShortcuts", IDS_NTP_CUSTOMIZE_MY_SHORTCUTS_LABEL},
-      {"enterpriseShortcuts", IDS_NTP_CUSTOMIZE_ENTERPRISE_SHORTCUTS_LABEL},
-      {"shortcutsCurated", IDS_NTP_CUSTOMIZE_MY_SHORTCUTS_DESC},
-      {"shortcutsSuggested", IDS_NTP_CUSTOMIZE_MOST_VISITED_DESC},
-      {"enterpriseShortcutsCurated",
-       IDS_NTP_CUSTOMIZE_ENTERPRISE_SHORTCUTS_DESC},
-      {"showShortcutsToggle", IDS_NTP_CUSTOMIZE_SHOW_SHORTCUTS_LABEL},
-      {"showPersonalShortcutsToggle",
-       IDS_NTP_CUSTOMIZE_SHOW_PERSONAL_SHORTCUTS_LABEL},
-      {"showPersonalShortcutsToggleDescription",
-       IDS_NTP_CUSTOMIZE_SHOW_PERSONAL_SHORTCUTS_DESC},
       // Footer strings.
       {"showFooterToggleTitle", IDS_NTP_CUSTOMIZE_SHOW_FOOTER_LABEL},
       // Required by <managed-dialog>.
@@ -233,15 +197,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
        IDS_NTP_WALLPAPER_SEARCH_DESCRIPTORS_CHANGED_A11Y_MESSAGE},
       {"signedOutDescription", IDS_NTP_WALLPAPER_SEARCH_SIGNED_OUT_DESCRIPTION},
       {"signedOutTitle", IDS_NTP_WALLPAPER_SEARCH_SIGNED_OUT_TITLE},
-      // Side Panel Extension Card.
-      {"customizeWithChromeWebstoreLabel",
-       IDS_NTP_CUSTOMIZE_CHROME_WEBSTORE_LABEL},
-      {"webstoreShoppingCategoryLabel",
-       IDS_NTP_WEBSTORE_SHOPPING_CATEOGRY_LABEL},
-      {"webstoreWritingHelpCollectionLabel",
-       IDS_NTP_WEBSTORE_WRITTING_HELP_COLLECTION_LABEL},
-      {"webstoreProductivityCategoryLabel",
-       IDS_NTP_WEBSTORE_PRODUCTIVITY_CATEOGRY_LABEL},
       // Customize Toolbar strings.
       {"enterpriseEnabledLabel",
        IDS_NTP_CUSTOMIZE_TOOLBAR_ENTERPRISE_ENABLED_LABEL},
@@ -253,22 +208,12 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
        IDS_NTP_CUSTOMIZE_TOOLBAR_RESET_TO_DEFAULT_ANNOUNCEMENT},
       {"reorderTipLabel", IDS_NTP_CUSTOMIZE_TOOLBAR_REORDER_TIP_LABEL},
       {"managedA11yLabel", IDS_MANAGED},
-      {"newBadgeLabel", IDS_NEW_BADGE},
   };
   source->AddLocalizedStrings(kLocalizedStrings);
 
   source->AddBoolean("showDeviceThemeToggle",
                      false);
 
-  source->AddBoolean(
-      "extensionsCardEnabled",
-      base::FeatureList::IsEnabled(
-          ntp_features::kCustomizeChromeSidePanelExtensionsCard));
-
-  source->AddBoolean("ntpNextFeaturesEnabled", false);
-  source->AddBoolean("aimPolicyEnabled", false);
-  source->AddBoolean("ntpNextDisablementEnabled",
-                     ntp_features::kNtpNextDisablementParam.Get());
   source->AddBoolean("wallpaperSearchEnabled", wallpaper_search_enabled);
   source->AddBoolean(
       "wallpaperSearchInspirationCardEnabled",
@@ -296,14 +241,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
                               std::make_unique<SanitizedImageSource>(profile_));
   content::URLDataSource::Add(profile_,
                               std::make_unique<ThemeSource>(profile_));
-
-  ui::TrackedElementHandlerDocumentSingleton::Register(
-      this, std::vector<ui::ElementIdentifier>{
-                CustomizeChromeUI::kChangeChromeThemeButtonElementId,
-                CustomizeChromeUI::kChangeChromeThemeClassicElementId,
-                CustomizeChromeUI::kChromeThemeCollectionElementId,
-                CustomizeChromeUI::kChromeThemeElementId,
-                CustomizeChromeUI::kChromeThemeBackElementId});
 }
 
 CustomizeChromeUI::~CustomizeChromeUI() = default;
@@ -355,15 +292,6 @@ void CustomizeChromeUI::BindInterface(
     customize_toolbar_handler_factory_receiver_.reset();
   }
   customize_toolbar_handler_factory_receiver_.Bind(std::move(receiver));
-}
-
-void CustomizeChromeUI::BindInterface(
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
-        pending_receiver) {
-  if (help_bubble_handler_factory_receiver_.is_bound()) {
-    help_bubble_handler_factory_receiver_.reset();
-  }
-  help_bubble_handler_factory_receiver_.Bind(std::move(pending_receiver));
 }
 
 void CustomizeChromeUI::BindInterface(
@@ -419,15 +347,6 @@ void CustomizeChromeUI::CreatePageHandler(
         is_theme_editable_.value());
     is_theme_editable_.reset();
   }
-}
-
-void CustomizeChromeUI::CreateHelpBubbleHandler(
-    mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler) {
-  help_bubble_handler_ = std::make_unique<user_education::HelpBubbleHandler>(
-      std::move(handler), std::move(client),
-      ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
-          web_ui()->GetRenderFrameHost()));
 }
 
 void CustomizeChromeUI::CreateCustomizeColorSchemeModeHandler(
