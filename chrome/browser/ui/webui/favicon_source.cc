@@ -12,13 +12,11 @@
 #include "base/strings/string_number_conversions.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/favicon/favicon_utils.h"
-#include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/history/top_sites_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/favicon/core/history_ui_favicon_request_handler.h"
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/google/core/common/google_util.h"
 #include "components/history/core/browser/top_sites.h"
@@ -48,34 +46,6 @@ const char kGoogleLogoMismatchHistogramName[] =
 // Generous cap to guard against out-of-memory issues.
 constexpr int kMaxDesiredSizeInPixel = 2048;
 
-// web_contents->GetLastCommittedURL in general will not necessarily yield the
-// original URL that started the request, but we're only interested in verifying
-// if it was issued by a history page, for whom this is the case. If it is not
-// possible to obtain the URL, we return the empty GURL.
-GURL GetUnsafeRequestOrigin(const content::WebContents::Getter& wc_getter) {
-  content::WebContents* web_contents = wc_getter.Run();
-  return web_contents ? web_contents->GetLastCommittedURL() : GURL();
-}
-
-bool IsOriginAllowedServerFallback(const GURL& url) {
-  // Allow chrome-untrusted://data-sharing to use Google server fallback.
-  if (url.GetScheme() == content::kChromeUIUntrustedScheme &&
-      url.GetHost() == chrome::kChromeUIUntrustedDataSharingHost) {
-    return true;
-  }
-  GURL history_url(chrome::kChromeUIHistoryURL);
-  if (url == history_url) {
-    return true;
-  }
-  if (url == history_url.Resolve(chrome::kChromeUIHistorySyncedTabs)) {
-    return true;
-  }
-  if (url == chrome::ChromeUINewTabURLAsGURL()) {
-    return true;
-  }
-  return false;
-}
-
 }  // namespace
 
 FaviconSource::FaviconSource(Profile* profile,
@@ -89,8 +59,6 @@ FaviconSource::~FaviconSource() = default;
 
 std::string FaviconSource::GetSource() {
   switch (url_format_) {
-    case chrome::FaviconUrlFormat::kFaviconLegacy:
-      return chrome::kChromeUIFaviconHost;
     case chrome::FaviconUrlFormat::kFavicon2:
       return serve_untrusted_ ? chrome::kChromeUIUntrustedFavicon2URL
                               : chrome::kChromeUIFavicon2Host;
@@ -174,37 +142,16 @@ void FaviconSource::StartDataRequest(
       }
     }
 
-    if (!(parsed.allow_favicon_server_fallback &&
-          IsOriginAllowedServerFallback(GetUnsafeRequestOrigin(wc_getter)))) {
-      base::UmaHistogramBoolean(kDefaultResponseHistogramName, false);
-      // Request from local storage only.
-      const bool fallback_to_host = true;
-      favicon_service->GetRawFaviconForPageURL(
-          page_url, {favicon_base::IconType::kFavicon}, desired_size_in_pixel,
-          fallback_to_host,
-          base::BindOnce(&FaviconSource::OnFaviconDataAvailable,
-                         base::Unretained(this), std::move(callback), parsed,
-                         wc_getter),
-          &cancelable_task_tracker_);
-      return;
-    }
-
-    // Request from both local storage and favicon server using
-    // HistoryUiFaviconRequestHandler.
-    favicon::HistoryUiFaviconRequestHandler*
-        history_ui_favicon_request_handler =
-            HistoryUiFaviconRequestHandlerFactory::GetForBrowserContext(
-                profile_);
-    if (!history_ui_favicon_request_handler) {
-      SendDefaultResponse(std::move(callback), parsed, wc_getter);
-      return;
-    }
     base::UmaHistogramBoolean(kDefaultResponseHistogramName, false);
-    history_ui_favicon_request_handler->GetRawFaviconForPageURL(
-        page_url, desired_size_in_pixel, parsed.fallback_to_host,
+    // Request from local storage only.
+    const bool fallback_to_host = true;
+    favicon_service->GetRawFaviconForPageURL(
+        page_url, {favicon_base::IconType::kFavicon}, desired_size_in_pixel,
+        fallback_to_host,
         base::BindOnce(&FaviconSource::OnFaviconDataAvailable,
-                       weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                       parsed, wc_getter));
+                       base::Unretained(this), std::move(callback), parsed,
+                       wc_getter),
+        &cancelable_task_tracker_);
   }
 }
 

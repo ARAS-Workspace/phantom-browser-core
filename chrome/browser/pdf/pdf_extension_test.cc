@@ -1079,19 +1079,22 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionTest, LinkPermissions) {
       LoadPdfGetExtensionHost(embedded_test_server()->GetURL("/pdf/test.pdf"));
   ASSERT_TRUE(extension_host);
 
-  // chrome://favicon links should be allowed for PDFs, while chrome://settings
-  // links should not.
-  GURL valid_link_url(std::string(chrome::kChromeUIFaviconURL) +
-                      "https://www.google.ca/");
+  // chrome://extension-icon links should be allowed for PDFs, while
+  // chrome://favicon and chrome://settings links should not.
+  GURL valid_link_url(chrome::kChromeUIExtensionIconURL);
+  GURL favicon_link_url(std::string(chrome::kChromeUIFaviconURL) +
+                        "https://www.google.ca/");
   GURL invalid_link_url(chrome::kChromeUISettingsURL);
 
   GURL unfiltered_valid_link_url(valid_link_url);
   content::RenderProcessHost* rph = extension_host->GetProcess();
   rph->FilterURL(true, &valid_link_url);
+  rph->FilterURL(true, &favicon_link_url);
   rph->FilterURL(true, &invalid_link_url);
 
   // Invalid link URLs should be changed to "about:blank#blocked" when filtered.
   EXPECT_EQ(unfiltered_valid_link_url, valid_link_url);
+  EXPECT_EQ(GURL(content::kBlockedURL), favicon_link_url);
   EXPECT_EQ(GURL(content::kBlockedURL), invalid_link_url);
 }
 

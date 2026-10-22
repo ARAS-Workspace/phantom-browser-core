@@ -2,31 +2,29 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/webui/theme_favicon_source_service_factory.h"
+#include "chrome/browser/ui/webui/theme_source_service_factory.h"
 
 #include <memory>
 
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#include "chrome/browser/ui/webui/theme_favicon_source_service.h"
+#include "chrome/browser/ui/webui/theme_source_service.h"
 
 // static
-ThemeFaviconSourceService* ThemeFaviconSourceServiceFactory::GetForProfile(
-    Profile* profile) {
-  return static_cast<ThemeFaviconSourceService*>(
+ThemeSourceService* ThemeSourceServiceFactory::GetForProfile(Profile* profile) {
+  return static_cast<ThemeSourceService*>(
       GetInstance()->GetServiceForBrowserContext(profile, true));
 }
 
 // static
-ThemeFaviconSourceServiceFactory*
-ThemeFaviconSourceServiceFactory::GetInstance() {
-  static base::NoDestructor<ThemeFaviconSourceServiceFactory> instance;
+ThemeSourceServiceFactory* ThemeSourceServiceFactory::GetInstance() {
+  static base::NoDestructor<ThemeSourceServiceFactory> instance;
   return instance.get();
 }
 
-ThemeFaviconSourceServiceFactory::ThemeFaviconSourceServiceFactory()
+ThemeSourceServiceFactory::ThemeSourceServiceFactory()
     : ProfileKeyedServiceFactory(
-          "ThemeFaviconSourceService",
+          "ThemeSourceService",
           ProfileSelections::Builder()
               // Regular & Incognito profiles.
               .WithRegular(ProfileSelection::kOwnInstance)
@@ -36,11 +34,11 @@ ThemeFaviconSourceServiceFactory::ThemeFaviconSourceServiceFactory()
   DependsOn(ThemeServiceFactory::GetInstance());
 }
 
-ThemeFaviconSourceServiceFactory::~ThemeFaviconSourceServiceFactory() = default;
+ThemeSourceServiceFactory::~ThemeSourceServiceFactory() = default;
 
 std::unique_ptr<KeyedService>
-ThemeFaviconSourceServiceFactory::BuildServiceInstanceForBrowserContext(
+ThemeSourceServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  return std::make_unique<ThemeFaviconSourceService>(
+  return std::make_unique<ThemeSourceService>(
       Profile::FromBrowserContext(context));
 }

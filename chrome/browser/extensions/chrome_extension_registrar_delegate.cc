@@ -25,9 +25,7 @@
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/webui/favicon_source.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/favicon_base/favicon_url_parser.h"
 #include "extensions/browser/delayed_install_manager.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_assets_manager.h"
@@ -151,16 +149,9 @@ void ChromeExtensionRegistrarDelegate::PostActivateExtension(
 
   const PermissionsData* permissions_data = extension->permissions_data();
 
-  // If the extension has permission to load chrome://favicon/ resources we need
-  // to make sure that the FaviconSource is registered with the
+  // If the extension has permission to load chrome://theme/ resources we need
+  // to make sure that the ThemeSource is registered with the
   // ChromeURLDataManager.
-  if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIFaviconURL))) {
-    content::URLDataSource::Add(
-        profile_, std::make_unique<FaviconSource>(
-                      profile_, chrome::FaviconUrlFormat::kFaviconLegacy));
-  }
-
-  // Same for chrome://theme/ resources.
   if (permissions_data->HasHostPermission(GURL(chrome::kChromeUIThemeURL))) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     content::URLDataSource::Add(profile_,

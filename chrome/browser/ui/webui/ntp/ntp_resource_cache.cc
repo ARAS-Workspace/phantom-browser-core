@@ -54,14 +54,6 @@ using content::BrowserThread;
 
 namespace {
 
-// The URL for the the Learn More page shown on incognito new tab.
-const char kLearnMoreIncognitoUrl[] =
-    "https://support.google.com/chrome/?p=incognito";
-
-// The URL for the Learn More page shown on guest session new tab.
-const char kLearnMoreGuestSessionUrl[] =
-    "https://support.google.com/chrome/?p=ui_guest";
-
 std::string ReplaceTemplateExpressions(
     const scoped_refptr<base::RefCountedMemory>& bytes,
     const ui::TemplateReplacements& replacements) {
@@ -155,12 +147,6 @@ base::RefCountedMemory* NTPResourceCache::GetNewTabHTML(
       }
       return new_tab_incognito_html_.get();
 
-    case ISOLATED:
-      if (!new_tab_isolated_html_) {
-        CreateNewTabIsolatedHTML(wc_getter);
-      }
-      return new_tab_isolated_html_.get();
-
     case NON_PRIMARY_OTR:
       if (!new_tab_non_primary_otr_html_) {
         new_tab_non_primary_otr_html_ =
@@ -178,18 +164,6 @@ base::RefCountedMemory* NTPResourceCache::GetNewTabCSS(
     const content::WebContents::Getter& wc_getter) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-  // Guest mode doesn't have theme-related CSS.
-  if (win_type == GUEST) {
-    return nullptr;
-  }
-
-  if (win_type == ISOLATED) {
-    if (!new_tab_isolated_css_) {
-      CreateNewTabIsolatedCSS(wc_getter);
-    }
-    return new_tab_isolated_css_.get();
-  }
-
   // Returns the cached CSS if it exists.
   // The cache will be invalidated when the theme of |wc_getter| changes.
   if (win_type == INCOGNITO) {
@@ -199,10 +173,8 @@ base::RefCountedMemory* NTPResourceCache::GetNewTabCSS(
     return new_tab_incognito_css_.get();
   }
 
-  if (!new_tab_css_) {
-    CreateNewTabCSS(wc_getter);
-  }
-  return new_tab_css_.get();
+  // Only the incognito NTP has theme-related CSS.
+  return nullptr;
 }
 
 void NTPResourceCache::OnThemeChanged() {
@@ -222,9 +194,6 @@ void NTPResourceCache::OnNativeThemeUpdated(ui::NativeTheme* updated_theme) {
 void NTPResourceCache::Invalidate() {
   new_tab_incognito_html_ = nullptr;
   new_tab_incognito_css_ = nullptr;
-  new_tab_isolated_html_ = nullptr;
-  new_tab_isolated_css_ = nullptr;
-  new_tab_css_ = nullptr;
   new_tab_guest_html_ = nullptr;
 }
 
@@ -245,12 +214,6 @@ void NTPResourceCache::CreateNewTabIncognitoHTML(
       l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_VISIBLE);
   replacements["incognitoTabFeatures"] =
       l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_NOT_SAVED);
-  replacements["learnMore"] =
-      l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_LEARN_MORE_LINK);
-
-  replacements["learnMoreLink"] = kLearnMoreIncognitoUrl;
-  replacements["learnMoreA11yLabel"] = l10n_util::GetStringUTF8(
-      IDS_INCOGNITO_TAB_LEARN_MORE_ACCESSIBILITY_LABEL);
   replacements["title"] = l10n_util::GetStringUTF8(IDS_NEW_INCOGNITO_TAB_TITLE);
 
   replacements["cookieControlsTitle"] = l10n_util::GetStringUTF8(
@@ -280,53 +243,17 @@ void NTPResourceCache::CreateNewTabIncognitoHTML(
       ReplaceTemplateExpressions(*incognito_tab_html, replacements));
 }
 
-void NTPResourceCache::CreateNewTabIsolatedHTML(
-    const content::WebContents::Getter& wc_getter) {
-  ui::TemplateReplacements replacements;
-  base::DictValue localized_strings;
-
-  const std::string& app_locale = g_browser_process->GetApplicationLocale();
-  webui::SetLoadTimeDataDefaults(app_locale, &replacements);
-
-  static const base::NoDestructor<scoped_refptr<base::RefCountedMemory>>
-      isolated_tab_html(
-          ui::ResourceBundle::GetSharedInstance().LoadDataResourceBytes(
-              IDR_ISOLATED_TAB_HTML));
-  CHECK(*isolated_tab_html);
-  ui::TemplateReplacementsFromDictionaryValue(localized_strings, &replacements);
-  new_tab_isolated_html_ = base::MakeRefCounted<base::RefCountedString>(
-      ReplaceTemplateExpressions(*isolated_tab_html, replacements));
-}
-
-void NTPResourceCache::CreateNewTabIsolatedCSS(
-    const content::WebContents::Getter& wc_getter) {
-  static const base::NoDestructor<scoped_refptr<base::RefCountedMemory>>
-      isolated_tab_css(
-          ui::ResourceBundle::GetSharedInstance().LoadDataResourceBytes(
-              IDR_INCOGNITO_TAB_THEME_CSS));
-  new_tab_isolated_css_ = *isolated_tab_css;
-}
-
 void NTPResourceCache::CreateNewTabGuestHTML() {
   base::DictValue localized_strings;
   localized_strings.Set("title", l10n_util::GetStringUTF16(IDS_NEW_TAB_TITLE));
-  const char* guest_tab_link = kLearnMoreGuestSessionUrl;
   int guest_tab_idr = IDR_GUEST_TAB_HTML;
   int guest_tab_description_ids = IDS_NEW_TAB_GUEST_SESSION_DESCRIPTION;
   int guest_tab_heading_ids = IDS_NEW_TAB_GUEST_SESSION_HEADING;
-  int guest_tab_link_ids = IDS_LEARN_MORE;
 
   localized_strings.Set("guestTabDescription",
                         l10n_util::GetStringUTF16(guest_tab_description_ids));
   localized_strings.Set("guestTabHeading",
                         l10n_util::GetStringUTF16(guest_tab_heading_ids));
-  localized_strings.Set("learnMore",
-                        l10n_util::GetStringUTF16(guest_tab_link_ids));
-  localized_strings.Set("learnMoreLink", guest_tab_link);
-  localized_strings.Set(
-      "learnMoreA11yLabel",
-      l10n_util::GetStringUTF16(
-          IDS_NEW_TAB_GUEST_SESSION_LEARN_MORE_ACCESSIBILITY_TEXT));
 
   const std::string& app_locale = g_browser_process->GetApplicationLocale();
   webui::SetLoadTimeDataDefaults(app_locale, &localized_strings);
@@ -373,74 +300,5 @@ void NTPResourceCache::CreateNewTabIncognitoCSS(
               IDR_INCOGNITO_TAB_THEME_CSS));
   CHECK(*new_tab_theme_css);
   new_tab_incognito_css_ = base::MakeRefCounted<base::RefCountedString>(
-      ReplaceTemplateExpressions(*new_tab_theme_css, substitutions));
-}
-
-void NTPResourceCache::CreateNewTabCSS(
-    const content::WebContents::Getter& wc_getter) {
-  auto* web_contents = wc_getter.Run();
-  const ui::NativeTheme* native_theme =
-      webui::GetNativeThemeDeprecated(web_contents);
-  DCHECK(native_theme);
-
-  const ui::ThemeProvider& tp =
-      ThemeService::GetThemeProviderForProfile(profile_);
-  const ui::ColorProvider& cp = web_contents->GetColorProvider();
-
-  // Get our theme colors.
-  SkColor color_background =
-      GetThemeColor(native_theme, cp, kColorNewTabPageBackground);
-  SkColor color_text = GetThemeColor(native_theme, cp, kColorNewTabPageText);
-  SkColor color_text_light =
-      GetThemeColor(native_theme, cp, kColorNewTabPageTextLight);
-
-  SkColor color_section_border =
-      GetThemeColor(native_theme, cp, kColorNewTabPageSectionBorder);
-
-  // Generate the replacements.
-  ui::TemplateReplacements substitutions;
-
-  // Cache-buster for background.
-  substitutions["themeId"] =
-      profile_->GetPrefs()->GetString(prefs::kCurrentThemeID);
-
-  // Colors.
-  substitutions["colorBackground"] =
-      color_utils::SkColorToRgbaString(color_background);
-  substitutions["colorLink"] = color_utils::SkColorToRgbString(
-      GetThemeColor(native_theme, cp, kColorNewTabPageLink));
-  substitutions["backgroundPosition"] = GetNewTabBackgroundPositionCSS(tp);
-  substitutions["backgroundTiling"] = GetNewTabBackgroundTilingCSS(tp);
-  substitutions["colorTextRgba"] = color_utils::SkColorToRgbaString(color_text);
-  substitutions["colorTextLight"] =
-      color_utils::SkColorToRgbaString(color_text_light);
-  substitutions["colorSectionBorder"] =
-      color_utils::SkColorToRgbString(color_section_border);
-  substitutions["colorText"] = color_utils::SkColorToRgbString(color_text);
-
-  // For themes that right-align the background, we flip the attribution to the
-  // left to avoid conflicts.
-  int alignment =
-      tp.GetDisplayProperty(ThemeProperties::NTP_BACKGROUND_ALIGNMENT);
-  if (alignment & ThemeProperties::ALIGN_RIGHT) {
-    substitutions["leftAlignAttribution"] = "0";
-    substitutions["rightAlignAttribution"] = "auto";
-    substitutions["textAlignAttribution"] = "right";
-  } else {
-    substitutions["leftAlignAttribution"] = "auto";
-    substitutions["rightAlignAttribution"] = "0";
-    substitutions["textAlignAttribution"] = "left";
-  }
-
-  substitutions["displayAttribution"] =
-      tp.HasCustomImage(IDR_THEME_NTP_ATTRIBUTION) ? "inline" : "none";
-
-  // Get our template.
-  static const base::NoDestructor<scoped_refptr<base::RefCountedMemory>>
-      new_tab_theme_css(
-          ui::ResourceBundle::GetSharedInstance().LoadDataResourceBytes(
-              IDR_NEW_TAB_4_THEME_CSS));
-  CHECK(*new_tab_theme_css);
-  new_tab_css_ = base::MakeRefCounted<base::RefCountedString>(
       ReplaceTemplateExpressions(*new_tab_theme_css, substitutions));
 }

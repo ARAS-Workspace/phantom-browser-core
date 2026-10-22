@@ -111,19 +111,17 @@ TEST_F(WebUISourcesTest, ThemeSourceImages) {
 }
 
 TEST_F(WebUISourcesTest, ThemeSourceCSS) {
-  // Generating the test data for the NTP CSS would just involve copying the
-  // method, or being super brittle and hard-coding the result (requiring
-  // an update to the unittest every time the CSS template changes), so we
-  // just check for a successful request and data that is non-null.
+  // Only the incognito NTP has theme CSS, so the regular profile gets no data
+  // for either NTP theme CSS path.
   size_t empty_size = 0;
 
   StartDataRequest("css/new_tab_theme.css");
   base::RunLoop().RunUntilIdle();
-  EXPECT_NE(result_data_size_, empty_size);
+  EXPECT_EQ(result_data_size_, empty_size);
 
-  StartDataRequest("css/new_tab_theme.css?pie");
+  StartDataRequest("css/incognito_tab_theme.css");
   base::RunLoop().RunUntilIdle();
-  EXPECT_NE(result_data_size_, empty_size);
+  EXPECT_EQ(result_data_size_, empty_size);
 
 #if !DCHECK_IS_ON()
   // Check that we send NULL back when we can't find what we're looking for.

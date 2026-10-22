@@ -583,17 +583,10 @@ class OutputAdditionalInfoProperty extends OutputDictionaryProperty {
 
 
 class OutputUrlProperty extends FlexWrappingOutputProperty {
-  constructor(
-      destinationUrl: string, isSearchType: boolean,
-      strippedDestinationUrl: string) {
+  constructor(destinationUrl: string, strippedDestinationUrl: string) {
     super(destinationUrl);
-    const iconAndUrlContainer = createEl('div', this.container, ['pair-item']);
-    if (!isSearchType) {
-      createEl('img', iconAndUrlContainer).src =
-          `chrome://favicon/${destinationUrl}`;
-    }
-    createEl('a', iconAndUrlContainer, [], destinationUrl).href =
-        destinationUrl;
+    const urlContainer = createEl('div', this.container, ['pair-item']);
+    createEl('a', urlContainer, [], destinationUrl).href = destinationUrl;
     createEl('a', this.container, ['pair-item'], strippedDestinationUrl).href =
         strippedDestinationUrl;
   }
@@ -729,8 +722,7 @@ const COLUMNS: Column[] = [
       'URL & Stripped URL\nThe URL for the result. / The stripped URL for ' +
           'the result.',
       match => new OutputUrlProperty(
-          match.destinationUrl, match.isSearchType,
-          match.strippedDestinationUrl)),
+          match.destinationUrl, match.strippedDestinationUrl)),
   new Column(
       ['AQS Type & Subtypes'], '', 'aqs-type-subtypes', false,
       'The type and subtypes reported in the Assisted Query Stats (AQS) url ' +

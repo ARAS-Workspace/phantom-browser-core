@@ -349,6 +349,8 @@ class CookieSettingsTestP : public CookieSettingsTestBase,
 };
 
 TEST_F(CookieSettingsTest, CustomExceptionsNoWildcardLessSpecificDomain) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = GURL("https://cool.things.com");
 
   EXPECT_TRUE(
@@ -370,6 +372,8 @@ TEST_F(CookieSettingsTest, CustomExceptionsNoWildcardLessSpecificDomain) {
 }
 
 TEST_F(CookieSettingsTest, CustomExceptionsNoWildcardMatchingDomain) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = GURL("https://cool.things.com");
 
   EXPECT_TRUE(
@@ -401,6 +405,8 @@ TEST_F(CookieSettingsTest, CustomExceptionsNoWildcardMatchingDomain) {
 }
 
 TEST_F(CookieSettingsTest, CustomExceptionsWildcardMatchingDomain) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = GURL("https://cool.things.com");
 
   EXPECT_TRUE(
@@ -439,6 +445,8 @@ TEST_F(CookieSettingsTest, CustomExceptionsWildcardMatchingDomain) {
 }
 
 TEST_F(CookieSettingsTest, CustomExceptionsWildcardLessSpecificDomain) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = GURL("https://cool.things.com");
 
   EXPECT_TRUE(
@@ -477,6 +485,8 @@ TEST_F(CookieSettingsTest, CustomExceptionsWildcardLessSpecificDomain) {
 }
 
 TEST_F(CookieSettingsTest, CustomExceptionsDotComWildcard) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = GURL("https://cool.things.com");
 
   EXPECT_TRUE(
@@ -514,11 +524,13 @@ TEST_F(CookieSettingsTest, CustomExceptionsDotComWildcard) {
 }
 
 TEST_F(CookieSettingsTest, TestAllowlistedScheme) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   cookie_settings_->SetDefaultCookieSetting(CONTENT_SETTING_BLOCK);
   EXPECT_FALSE(cookie_settings_->IsFullCookieAccessAllowed(
       kHttpSite, kChromeSiteForCookies, /*top_frame_origin=*/std::nullopt,
       net::CookieSettingOverrides(), /*cookie_partition_key=*/std::nullopt));
-  EXPECT_TRUE(cookie_settings_->IsFullCookieAccessAllowed(
+  EXPECT_FALSE(cookie_settings_->IsFullCookieAccessAllowed(
       kHttpsSite, kChromeSiteForCookies, /*top_frame_origin=*/std::nullopt,
       net::CookieSettingOverrides(), /*cookie_partition_key=*/std::nullopt));
   EXPECT_TRUE(cookie_settings_->IsFullCookieAccessAllowed(
@@ -553,8 +565,8 @@ TEST_F(CookieSettingsTest, ShouldIgnoreSameSiteRestrictions) {
   EXPECT_FALSE(cookie_settings_->ShouldIgnoreSameSiteRestrictions(
       kHttpSite, kHttpsSiteForCookies, url::Origin::Create(kChromeURL)));
 
-  // Case 4: All conditions met.
-  EXPECT_TRUE(cookie_settings_->ShouldIgnoreSameSiteRestrictions(
+  // Case 4: chrome:// top-level origin with a secure url and site for cookies.
+  EXPECT_FALSE(cookie_settings_->ShouldIgnoreSameSiteRestrictions(
       kHttpsSite, kHttpsSiteForCookies, url::Origin::Create(kChromeURL)));
 }
 
@@ -601,7 +613,7 @@ TEST_P(CookieSettingsTestP, CookiesBlockThirdParty) {
 }
 
 TEST_F(CookieSettingsTest, CookiesControlsDefault) {
-  EXPECT_TRUE(cookie_settings_->IsFullCookieAccessAllowed(
+  EXPECT_FALSE(cookie_settings_->IsFullCookieAccessAllowed(
       kBlockedSite, kFirstPartySiteForCookies,
       /*top_frame_origin=*/std::nullopt, net::CookieSettingOverrides(),
       /*cookie_partition_key=*/std::nullopt));
@@ -691,6 +703,8 @@ TEST_F(CookieSettingsTest, TestThirdPartyCookiePhaseout) {
 }
 
 TEST_F(CookieSettingsTest, CookiesAllowThirdParty) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   EXPECT_TRUE(cookie_settings_->IsFullCookieAccessAllowed(
       kBlockedSite, kFirstPartySiteForCookies,
       /*top_frame_origin=*/std::nullopt, net::CookieSettingOverrides(),
@@ -716,6 +730,8 @@ TEST_F(CookieSettingsTest, CookiesAllowThirdParty) {
 }
 
 TEST_F(CookieSettingsTest, CookiesExplicitBlockSingleThirdParty) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   cookie_settings_->SetCookieSetting(kBlockedSite, CONTENT_SETTING_BLOCK);
   EXPECT_FALSE(cookie_settings_->IsFullCookieAccessAllowed(
       kBlockedSite, kFirstPartySiteForCookies,
@@ -768,6 +784,8 @@ TEST_F(CookieSettingsTestUserBypass, UserBypassExceptions) {
 }
 
 TEST_F(CookieSettingsTestUserBypass, UserBypassThirdPartyCookiesExceptions) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = kFirstPartySiteForCookies.RepresentativeUrl();
   GURL same_site_url = kSameSiteSite;
   SettingInfo info;
@@ -855,6 +873,8 @@ TEST_F(CookieSettingsTestUserBypass, ResetThirdPartyCookiesExceptions) {
 
 TEST_F(CookieSettingsTestUserBypass,
        UserBypassThirdPartyCookiesIncognitoExceptions) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   // User bypass exceptions created in incognito should always be permanent.
   GURL first_party_url = kFirstPartySiteForCookies.RepresentativeUrl();
   SettingInfo info;
@@ -911,6 +931,8 @@ TEST_F(CookieSettingsTest, KeepBlocked) {
 }
 
 TEST_F(CookieSettingsTest, DeleteSessionOnly) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(net::features::kEnableSchemeBoundCookies);
   // Keep session_only http cookies if https is allowed.
   cookie_settings_->SetDefaultCookieSetting(CONTENT_SETTING_SESSION_ONLY);
   cookie_settings_->SetCookieSetting(kHttpsSite, CONTENT_SETTING_ALLOW);
@@ -1477,6 +1499,8 @@ TEST_F(CookieSettingsTest, ExtensionsThirdParty) {
 }
 
 TEST_F(CookieSettingsTest, ThirdPartyException) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   GURL first_party_url = kFirstPartySiteForCookies.RepresentativeUrl();
   net::CookieSettingOverrides cookie_setting_overrides;
 
@@ -1536,6 +1560,8 @@ TEST_F(CookieSettingsTest, ThirdPartyException) {
 }
 
 TEST_F(CookieSettingsTest, ManagedThirdPartyException) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   SettingInfo info;
   EXPECT_TRUE(
       cookie_settings_->IsThirdPartyAccessAllowed(kFirstPartySite, &info));
@@ -1564,6 +1590,8 @@ TEST_F(CookieSettingsTest, Blocks3pcsInIncognitoWithCookieControlsModeOff) {
 }
 
 TEST_F(CookieSettingsTest, ThirdPartySettingObserver) {
+  prefs_.SetInteger(prefs::kCookieControlsMode,
+                    static_cast<int>(CookieControlsMode::kIncognitoOnly));
   CookieSettingsObserver observer(cookie_settings_.get());
   EXPECT_FALSE(observer.last_value());
   prefs_.SetInteger(prefs::kCookieControlsMode,

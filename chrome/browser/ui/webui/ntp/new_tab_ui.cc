@@ -59,8 +59,6 @@ bool NewTabUIConfig::IsWebUIEnabled(content::BrowserContext* browser_context) {
       [[fallthrough]];
     case NTPResourceCache::GUEST:
       [[fallthrough]];
-    case NTPResourceCache::ISOLATED:
-      [[fallthrough]];
     case NTPResourceCache::NON_PRIMARY_OTR:
       return true;
   }
@@ -205,8 +203,7 @@ std::string NewTabUI::NewTabHTMLSource::GetContentSecurityPolicy(
     network::mojom::CSPDirectiveName directive) {
   if (directive == network::mojom::CSPDirectiveName::ScriptSrc) {
     // 'unsafe-inline' is added to script-src.
-    return "script-src chrome://resources 'self' 'unsafe-eval' "
-           "'unsafe-inline';";
+    return "script-src chrome://resources 'self' 'unsafe-inline';";
   } else if (directive == network::mojom::CSPDirectiveName::StyleSrc) {
     return "style-src 'self' chrome://resources 'unsafe-inline' "
            "chrome://theme;";

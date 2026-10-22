@@ -8,19 +8,16 @@
 #include <utility>
 
 #include "base/functional/callback_helpers.h"
-#include "base/memory/ptr_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/strings/escape.h"
 #include "base/strings/strcat.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/favicon/core/history_ui_favicon_request_handler.h"
 #include "components/favicon/core/test/mock_favicon_service.h"
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/search_engines/template_url_data.h"
@@ -30,9 +27,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/web_contents_tester.h"
-#include "extensions/browser/extension_registry.h"
-#include "extensions/common/extension_builder.h"
-#include "extensions/common/manifest.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/native_theme/mock_os_settings_provider.h"
@@ -44,7 +38,6 @@ using WebContentsGetter = content::WebContents::Getter;
 using testing::_;
 using testing::NiceMock;
 using testing::Return;
-using testing::ReturnArg;
 
 namespace {
 
@@ -52,23 +45,6 @@ const int kDummyTaskId = 1;
 const char kDummyPrefix[] = "chrome://any-host/";
 
 }  // namespace
-
-class MockHistoryUiFaviconRequestHandler
-    : public favicon::HistoryUiFaviconRequestHandler {
- public:
-  MockHistoryUiFaviconRequestHandler() = default;
-  ~MockHistoryUiFaviconRequestHandler() override = default;
-
-  MOCK_METHOD4(GetRawFaviconForPageURL,
-               void(const GURL& page_url,
-                    int desired_size_in_pixel,
-                    bool fallback_to_host,
-                    favicon_base::FaviconRawBitmapCallback callback));
-
-  MOCK_METHOD2(GetFaviconImageForPageURL,
-               void(const GURL& page_url,
-                    favicon_base::FaviconImageCallback callback));
-};
 
 class TestFaviconSource : public FaviconSource {
  public:
@@ -89,14 +65,6 @@ class FaviconSourceTestBase : public testing::Test {
 
   void Init() {
     // Setup testing factories for main dependencies.
-    mock_history_ui_favicon_request_handler_ =
-        static_cast<NiceMock<MockHistoryUiFaviconRequestHandler>*>(
-            HistoryUiFaviconRequestHandlerFactory::GetInstance()
-                ->SetTestingFactoryAndUse(
-                    &profile_, base::BindOnce([](content::BrowserContext*) {
-                      return base::WrapUnique<KeyedService>(
-                          new NiceMock<MockHistoryUiFaviconRequestHandler>());
-                    })));
     mock_favicon_service_ = static_cast<NiceMock<favicon::MockFaviconService>*>(
         FaviconServiceFactory::GetInstance()->SetTestingFactoryAndUse(
             &profile_, base::BindOnce([](content::BrowserContext*) {
@@ -117,11 +85,6 @@ class FaviconSourceTestBase : public testing::Test {
                           auto) {
           std::move(callback).Run(favicon_base::FaviconRawBitmapResult());
           return kDummyTaskId;
-        });
-    ON_CALL(mock_history_ui_favicon_request_handler(), GetRawFaviconForPageURL)
-        .WillByDefault([](auto, auto, auto,
-                          favicon_base::FaviconRawBitmapCallback callback) {
-          std::move(callback).Run(favicon_base::FaviconRawBitmapResult());
         });
 
     // Mock default icon loading.
@@ -144,11 +107,6 @@ class FaviconSourceTestBase : public testing::Test {
     return *mock_favicon_service_;
   }
 
-  NiceMock<MockHistoryUiFaviconRequestHandler>&
-  mock_history_ui_favicon_request_handler() {
-    return *mock_history_ui_favicon_request_handler_;
-  }
-
   NiceMock<TestFaviconSource>& source() { return source_; }
 
   TestingProfile& profile() { return profile_; }
@@ -161,72 +119,9 @@ class FaviconSourceTestBase : public testing::Test {
   std::unique_ptr<content::WebContents> test_web_contents_;
   WebContentsGetter test_web_contents_getter_;
   raw_ptr<NiceMock<favicon::MockFaviconService>> mock_favicon_service_;
-  raw_ptr<NiceMock<MockHistoryUiFaviconRequestHandler>>
-      mock_history_ui_favicon_request_handler_;
   NiceMock<TestFaviconSource> source_;
   scoped_refptr<base::RefCountedBytes> dummy_icon_bytes_;
 };
-
-class FaviconSourceTestWithLegacyFormat : public FaviconSourceTestBase {
- public:
-  FaviconSourceTestWithLegacyFormat()
-      : FaviconSourceTestBase(chrome::FaviconUrlFormat::kFaviconLegacy) {}
-};
-
-TEST_F(FaviconSourceTestWithLegacyFormat, DarkDefault) {
-  os_settings_provider().SetPreferredColorScheme(
-      ui::NativeTheme::PreferredColorScheme::kDark);
-  EXPECT_CALL(source(), LoadIconBytes(_, IDR_DEFAULT_FAVICON_DARK));
-  source().StartDataRequest(GURL(kDummyPrefix), test_web_contents_getter(),
-                            base::DoNothing());
-}
-
-TEST_F(FaviconSourceTestWithLegacyFormat, LightDefault) {
-  EXPECT_CALL(source(), LoadIconBytes(_, IDR_DEFAULT_FAVICON));
-  source().StartDataRequest(GURL(kDummyPrefix), test_web_contents_getter(),
-                            base::DoNothing());
-}
-
-TEST_F(FaviconSourceTestWithLegacyFormat,
-       ShouldNotQueryHistoryUiFaviconRequestHandler) {
-  content::WebContentsTester::For(test_web_contents())
-      ->SetLastCommittedURL(GURL(chrome::kChromeUIHistoryURL));
-
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
-
-  source().StartDataRequest(
-      GURL(base::StrCat({kDummyPrefix, "size/16@1x/https://www.google.com"})),
-      test_web_contents_getter(), base::DoNothing());
-}
-
-TEST_F(FaviconSourceTestWithLegacyFormat, ShouldNotQueryIfDesiredSizeTooLarge) {
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
-  EXPECT_CALL(mock_favicon_service(), GetRawFavicon).Times(0);
-  EXPECT_CALL(mock_favicon_service(), GetRawFaviconForPageURL).Times(0);
-
-  // 1000x scale factor runs into the max cap.
-  source().StartDataRequest(
-      GURL(
-          base::StrCat({kDummyPrefix, "size/16@1000x/https://www.google.com"})),
-      test_web_contents_getter(), base::DoNothing());
-}
-
-TEST_F(FaviconSourceTestWithLegacyFormat, ShouldNotQueryIfInvalidScaleFactor) {
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
-  EXPECT_CALL(mock_favicon_service(), GetRawFavicon).Times(0);
-  EXPECT_CALL(mock_favicon_service(), GetRawFaviconForPageURL).Times(0);
-
-  // A negative scale factor cannot be parsed.
-  source().StartDataRequest(
-      GURL(base::StrCat({kDummyPrefix, "size/16@-2x/https://www.google.com"})),
-      test_web_contents_getter(), base::DoNothing());
-}
 
 class FaviconSourceTestWithFavicon2Format
     : public FaviconSourceTestBase,
@@ -240,19 +135,6 @@ class FaviconSourceTestWithFavicon2Format
 INSTANTIATE_TEST_SUITE_P(,
                          FaviconSourceTestWithFavicon2Format,
                          /*serve_untrusted=*/testing::Bool());
-
-TEST_P(FaviconSourceTestWithFavicon2Format,
-       ShouldNotRecordFaviconResourceHistogram) {
-  base::HistogramTester tester;
-  source().StartDataRequest(
-      GURL(base::StrCat({kDummyPrefix, "size/16@1x/https://www.google.com"})),
-      test_web_contents_getter(), base::DoNothing());
-  std::unique_ptr<base::HistogramSamples> samples(
-      tester.GetHistogramSamplesSinceCreation(
-          "Extensions.FaviconResourceUsed"));
-  EXPECT_TRUE(samples);
-  EXPECT_EQ(0, samples->TotalCount());
-}
 
 TEST_P(FaviconSourceTestWithFavicon2Format, DarkDefault) {
   os_settings_provider().SetPreferredColorScheme(
@@ -312,48 +194,16 @@ TEST_P(FaviconSourceTestWithFavicon2Format, ForceEmptyDefaultFaviconIsOmitted) {
       test_web_contents_getter(), base::DoNothing());
 }
 
+// FaviconSource has no Google favicon server fallback: requests that allow it
+// are served from local storage, also from the History and data sharing WebUIs.
 TEST_P(FaviconSourceTestWithFavicon2Format,
-       ShouldNotQueryHistoryUiFaviconRequestHandlerIfNotAllowed) {
+       ShouldQueryFaviconServiceIfHasHistoryUiOriginAndAllowed) {
   content::WebContentsTester::For(test_web_contents())
       ->SetLastCommittedURL(GURL(chrome::kChromeUIHistoryURL));
 
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
-
-  source().StartDataRequest(
-      GURL(base::StrCat(
-          {kDummyPrefix,
-           "?size=16&scaleFactor=1x&pageUrl=https%3A%2F%2Fwww.google."
-           "com&allowGoogleServerFallback=0"})),
-      test_web_contents_getter(), base::DoNothing());
-}
-
-TEST_P(FaviconSourceTestWithFavicon2Format,
-       ShouldNotQueryHistoryUiFaviconRequestHandlerIfHasNotHistoryUiOrigin) {
-  content::WebContentsTester::For(test_web_contents())
-      ->SetLastCommittedURL(GURL("chrome://non-history-url"));
-
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
-
-  source().StartDataRequest(
-      GURL(base::StrCat(
-          {kDummyPrefix,
-           "?size=16&scaleFactor=1x&pageUrl=https%3A%2F%2Fwww.google."
-           "com&allowGoogleServerFallback=1"})),
-      test_web_contents_getter(), base::DoNothing());
-}
-
-TEST_P(
-    FaviconSourceTestWithFavicon2Format,
-    ShouldQueryHistoryUiFaviconRequestHandlerIfHasHistoryUiOriginAndAllowed) {
-  content::WebContentsTester::For(test_web_contents())
-      ->SetLastCommittedURL(GURL(chrome::kChromeUIHistoryURL));
-
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL(GURL("https://www.google.com"), _, _, _))
+  EXPECT_CALL(mock_favicon_service(),
+              GetRawFaviconForPageURL(GURL("https://www.google.com"), _, _,
+                                      /*fallback_to_host=*/true, _, _))
       .Times(1);
 
   source().StartDataRequest(
@@ -364,14 +214,14 @@ TEST_P(
       test_web_contents_getter(), base::DoNothing());
 }
 
-TEST_P(
-    FaviconSourceTestWithFavicon2Format,
-    ShouldQueryHistoryUiFaviconRequestHandlerIfHasDataSharingOriginAndAllowed) {
+TEST_P(FaviconSourceTestWithFavicon2Format,
+       ShouldQueryFaviconServiceIfHasDataSharingOriginAndAllowed) {
   content::WebContentsTester::For(test_web_contents())
       ->SetLastCommittedURL(GURL(chrome::kChromeUIUntrustedDataSharingURL));
 
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL(GURL("https://www.google.com"), _, _, _))
+  EXPECT_CALL(mock_favicon_service(),
+              GetRawFaviconForPageURL(GURL("https://www.google.com"), _, _,
+                                      /*fallback_to_host=*/true, _, _))
       .Times(1);
 
   source().StartDataRequest(
@@ -384,9 +234,6 @@ TEST_P(
 
 TEST_P(FaviconSourceTestWithFavicon2Format,
        ShouldNotQueryIfDesiredSizeTooLarge) {
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
   EXPECT_CALL(mock_favicon_service(), GetRawFavicon).Times(0);
   EXPECT_CALL(mock_favicon_service(), GetRawFaviconForPageURL).Times(0);
 
@@ -400,9 +247,6 @@ TEST_P(FaviconSourceTestWithFavicon2Format,
 
 TEST_P(FaviconSourceTestWithFavicon2Format,
        ShouldNotQueryIfInvalidScaleFactor) {
-  EXPECT_CALL(mock_history_ui_favicon_request_handler(),
-              GetRawFaviconForPageURL)
-      .Times(0);
   EXPECT_CALL(mock_favicon_service(), GetRawFavicon).Times(0);
   EXPECT_CALL(mock_favicon_service(), GetRawFaviconForPageURL).Times(0);
 

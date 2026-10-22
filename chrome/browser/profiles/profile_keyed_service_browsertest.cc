@@ -412,7 +412,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "StatefulSSLHostStateDelegate",
     "StorageAccessAPIService",
     "SubresourceFilterProfileContext",
-    "ThemeFaviconSourceService",
+    "ThemeSourceService",
     "WebRequestProxyingURLLoaderFactory",
     "captive_portal::CaptivePortalService",
 

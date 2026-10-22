@@ -208,11 +208,6 @@ tbody.head th {
   color: orange;
 }
 
-.cell-destination-url .pair-item:first-child img {
-  margin-inline-end: 5px;
-  vertical-align: middle;
-}
-
 .cell-destination-url .pair-item:nth-child(2) {
   color: red;
 }

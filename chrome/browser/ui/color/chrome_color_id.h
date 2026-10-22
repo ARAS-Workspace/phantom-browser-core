@@ -331,14 +331,10 @@
   E_CPONLY(kColorComposeboxToolChipBackground) \
   E_CPONLY(kColorComposeboxVoiceButtonHoverBackground) \
   E_CPONLY(kColorNewTabPageControlBackgroundHovered) \
-  E_CPONLY(kColorNewTabPageHeader) \
-  E_CPONLY(kColorNewTabPageLink) \
   E_CPONLY(kColorNewTabPageMostVisitedTileBackground) \
   E_CPONLY(kColorNewTabPageMostVisitedTileBackgroundUnthemed) \
   E_CPONLY(kColorNewTabPageRealboxNextIconHover) \
-  E_CPONLY(kColorNewTabPageSectionBorder) \
   E_CPONLY(kColorNewTabPageText) \
-  E_CPONLY(kColorNewTabPageTextLight) \
   /* New Tab Footer colors. */ \
   E_CPONLY(kColorNewTabFooterBackground) \
   E_CPONLY(kColorNewTabFooterText) \

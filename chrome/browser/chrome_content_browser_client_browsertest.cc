@@ -1030,18 +1030,18 @@ IN_PROC_BROWSER_TEST_F(ChromeContentBrowserClientBrowserTest,
                    .SchemeIs("chrome-search"));
 }
 
-// ThemeFaviconSourceService adds the theme and the legacy favicon data
-// sources of every profile, so they load before any WebUI that adds them
-// itself is opened.
-using ThemeFaviconSourceServiceBrowserTest = InProcessBrowserTest;
+// ThemeSourceService adds the theme data source of every profile, so it loads
+// before any WebUI that adds it itself is opened. The legacy favicon data
+// source (chrome://favicon/) is not registered.
+using ThemeSourceServiceBrowserTest = InProcessBrowserTest;
 
-IN_PROC_BROWSER_TEST_F(ThemeFaviconSourceServiceBrowserTest,
-                       ThemeAndLegacyFaviconSourcesLoad) {
+IN_PROC_BROWSER_TEST_F(ThemeSourceServiceBrowserTest,
+                       ThemeSourceLoadsWithoutLegacyFaviconSource) {
   content::WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
   EXPECT_TRUE(content::NavigateToURL(
       web_contents, GURL("chrome://theme/current-channel-logo")));
-  EXPECT_TRUE(content::NavigateToURL(
+  EXPECT_FALSE(content::NavigateToURL(
       web_contents, GURL("chrome://favicon/https://example.com/")));
 }
 

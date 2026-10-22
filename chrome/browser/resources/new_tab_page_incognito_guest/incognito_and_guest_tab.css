@@ -28,29 +28,6 @@ p {
   text-align: start;
 }
 
-a {
-  color: rgb(51, 103, 214);
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.learn-more-button {
-  color: rgb(66, 133, 244);
-  display: inline-block;
-  font-size: 92.8%;
-  font-weight: 500;
-  margin-top: 1.98em;
-  padding: 10.5px 12px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :-webkit-any(a, .learn-more-button) {
-    color: rgb(138, 180, 248);  /* --google-blue-300 */
-  }
-}
-
 .content {
   box-sizing: border-box;
   margin: 3.5em auto 0;

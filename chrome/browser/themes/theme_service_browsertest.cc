@@ -35,8 +35,8 @@
 
 namespace {
 
-// The ntp link color specified in the theme.
-constexpr SkColor kThemeNtpLinkColor = SkColorSetRGB(36, 70, 0);
+// The ntp text color specified in the theme.
+constexpr SkColor kThemeNtpTextColor = SkColorSetRGB(20, 40, 0);
 
 bool UsingCustomTheme(const ThemeService& theme_service) {
   return !theme_service.UsingSystemTheme() &&
@@ -68,8 +68,8 @@ IN_PROC_BROWSER_TEST_F(ThemeServiceBrowserTest, PRE_ThemeDataPackInvalid) {
 
   // Test initial state.
   EXPECT_FALSE(UsingCustomTheme(*theme_service));
-  EXPECT_NE(kThemeNtpLinkColor,
-            GetColorProviderFor(browser())->GetColor(kColorNewTabPageLink));
+  EXPECT_NE(kThemeNtpTextColor,
+            GetColorProviderFor(browser())->GetColor(kColorNewTabPageText));
   EXPECT_EQ(base::FilePath(),
             profile->GetPrefs()->GetFilePath(prefs::kCurrentThemePackFilename));
 
@@ -79,8 +79,8 @@ IN_PROC_BROWSER_TEST_F(ThemeServiceBrowserTest, PRE_ThemeDataPackInvalid) {
 
   // Check that the theme was installed.
   EXPECT_TRUE(UsingCustomTheme(*theme_service));
-  EXPECT_EQ(kThemeNtpLinkColor,
-            GetColorProviderFor(browser())->GetColor(kColorNewTabPageLink));
+  EXPECT_EQ(kThemeNtpTextColor,
+            GetColorProviderFor(browser())->GetColor(kColorNewTabPageText));
   EXPECT_NE(base::FilePath(),
             profile->GetPrefs()->GetFilePath(prefs::kCurrentThemePackFilename));
 
@@ -95,8 +95,8 @@ IN_PROC_BROWSER_TEST_F(ThemeServiceBrowserTest, ThemeDataPackInvalid) {
   ThemeService* theme_service =
       ThemeServiceFactory::GetForProfile(browser()->GetProfile());
   EXPECT_TRUE(UsingCustomTheme(*theme_service));
-  EXPECT_EQ(kThemeNtpLinkColor,
-            GetColorProviderFor(browser())->GetColor(kColorNewTabPageLink));
+  EXPECT_EQ(kThemeNtpTextColor,
+            GetColorProviderFor(browser())->GetColor(kColorNewTabPageText));
 }
 
 IN_PROC_BROWSER_TEST_F(ThemeServiceBrowserTest, IncognitoTest) {

@@ -720,7 +720,7 @@ class NetworkContextConfigurationBrowserTest
 };
 
 IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
-                       SecureCookiesAllowedForChromeScheme) {
+                       SecureCookiesBlockedForChromeScheme) {
   if (IsRestartStateWithInProcessNetworkService())
     return;
   // The system network context does not support cookie options,
@@ -729,8 +729,8 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
   if (system)
     return;
 
-  // Cookies are only allowed for chrome:// schemes requesting a secure origin,
-  // so create an HTTPS server.
+  // chrome:// pages have no cookie exception for secure origins, so a cookie
+  // of an HTTPS server is not sent.
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
   net::test_server::RegisterDefaultHandlers(&https_server);
   ASSERT_TRUE(https_server.Start());
@@ -762,7 +762,7 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
 
   EXPECT_EQ(200, simple_loader->ResponseInfo()->headers->response_code());
   ASSERT_TRUE(simple_loader_helper.response_body());
-  EXPECT_EQ("cookie", *simple_loader_helper.response_body());
+  EXPECT_EQ("None", *simple_loader_helper.response_body());
 }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)

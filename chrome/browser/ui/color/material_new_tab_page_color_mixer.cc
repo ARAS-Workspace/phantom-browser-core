@@ -52,7 +52,6 @@ void AddMaterialNewTabPageColorMixer(ui::ColorProvider* provider,
 
   mixer[kColorNewTabPageControlBackgroundHovered] = {
       ui::kColorSysStateHoverOnSubtle};
-  mixer[kColorNewTabPageLink] = {ui::kColorSysPrimary};
 
   mixer[kColorNewTabPageMostVisitedTileBackground] = {
       ui::kColorSysBaseContainer};

@@ -74,24 +74,6 @@ em {
   }
 }
 
-/** The "Learn more" link --------------------------------------------------- */
-
-/* By default, we only show the inline "Learn more" link. */
-.content > .learn-more-button {
-  display: none;
-}
-
-/* On narrow screens, we show the standalone "Learn more" link. */
-@media (max-width: 720px) {
-  #subtitle > .learn-more-button {
-    display: none;
-  }
-
-  .content > .learn-more-button {
-    display: inline;
-  }
-}
-
 /** Cookie Controls --------------------------------------------------------- */
 
 #cookie-controls {
@@ -131,7 +113,6 @@ em {
   font-weight: 500;
 }
 
-.learn-more-button,
 #cookie-controls-description a {
   color: rgb(138, 180, 248);
 }
@@ -199,8 +180,7 @@ h1 {
 @media (min-width: 720px) {
   .icon,
   h1,
-  #subtitle,
-  .learn-more-button {
+  #subtitle {
     margin-top: 1.5rem;
   }
 
@@ -248,7 +228,6 @@ h1 {
       margin-top: 16px;
     }
 
-    .learn-more-button,
     .bulletpoints,
     .icon,
     #cookie-controls {
@@ -272,7 +251,6 @@ h1 {
   }
 
   .bulletpoints,
-  .learn-more-button,
   #cookie-controls {
     margin-bottom: 1.5rem;
   }
@@ -291,7 +269,6 @@ h1 {
     }
 
     .bulletpoints,
-    .learn-more-button,
     #cookie-controls {
       margin-bottom: 1rem;
     }
@@ -304,13 +281,9 @@ h1 {
     }
   }
 
-  /* Undo the first and last elements margins. */
+  /* Undo the first element margin. */
   .icon {
     margin-top: 0;
-  }
-
-  .learn-more-button {
-    margin-bottom: 0;
   }
 }
 

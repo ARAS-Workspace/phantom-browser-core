@@ -201,14 +201,12 @@ void ChromeExtensionWebContentsObserver::SetUpRenderFrameHost(
   }
 
   // Extensions, legacy packaged apps, and component platform apps are allowed
-  // to use chrome://favicon/ and chrome://extension-icon/ URLs. Hosted apps are
-  // not allowed because they are served via web servers (and are generally
-  // never given access to Chrome APIs).
+  // to use chrome://extension-icon/ URLs. Hosted apps are not allowed because
+  // they are served via web servers (and are generally never given access to
+  // Chrome APIs).
   if (extension->is_extension() || extension->is_legacy_packaged_app() ||
       (extension->is_platform_app() &&
        Manifest::IsComponentLocation(extension->location()))) {
-    policy->GrantRequestOrigin(
-        process_id, url::Origin::Create(GURL(chrome::kChromeUIFaviconURL)));
     policy->GrantRequestOrigin(
         process_id,
         url::Origin::Create(GURL(chrome::kChromeUIExtensionIconURL)));

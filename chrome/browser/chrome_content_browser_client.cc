@@ -414,7 +414,7 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/waap/waap_utils.h"
 #include "chrome/browser/ui/webui/chrome_content_browser_client_webui_part.h"
-#include "chrome/browser/ui/webui/theme_favicon_source_service_factory.h"
+#include "chrome/browser/ui/webui/theme_source_service_factory.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
 #include "chrome/browser/web_applications/isolated_web_apps/chrome_content_browser_client_isolated_web_apps_part.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_error_page.h"
@@ -1570,27 +1570,11 @@ bool ChromeContentBrowserClient::
 bool ChromeContentBrowserClient::ShouldTreatAsFirstPartyWhenTopLevel(
     const url::Origin& top_frame_origin,
     bool is_embedded_origin_secure) {
-  // This is needed to bypass the normal SameSite rules for any chrome:// page
-  // embedding a secure origin, regardless of the registrable domains of any
-  // intervening frames.
-  if (is_embedded_origin_secure &&
-      top_frame_origin.scheme() == content::kChromeUIScheme) {
-    return true;
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   return top_frame_origin.scheme() == extensions::kExtensionScheme;
 #else
   return false;
 #endif
-}
-
-bool ChromeContentBrowserClient::
-    ShouldIgnoreSameSiteCookieRestrictionsWhenTopLevel(
-        const url::Origin& top_frame_origin,
-        bool is_embedded_origin_secure) {
-  return is_embedded_origin_secure &&
-         top_frame_origin.scheme() == content::kChromeUIScheme;
 }
 
 // TODO(crbug.com/40694933): This is based on SubframeTask::GetTitle()
@@ -2313,9 +2297,8 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
             blink::switches::kDisableReduceAcceptLanguage);
       }
 
-      // ThemeFaviconSourceService adds the theme and favicon data sources of
-      // the profile.
-      ThemeFaviconSourceServiceFactory::GetForProfile(profile);
+      // ThemeSourceService adds the theme data source of the profile.
+      ThemeSourceServiceFactory::GetForProfile(profile);
 
       // Enable SharedArrayBuffer on desktop if allowed by Enterprise Policy.
       // TODO(crbug.com/40155376) Remove when migration to COOP+COEP is
@@ -4620,11 +4603,10 @@ void AddChromeSchemeFactories(
       (extension->is_platform_app() &&
        Manifest::IsComponentLocation(extension->location()))) {
     // Extensions, legacy packaged apps, and component platform apps are allowed
-    // to use chrome://favicon/, chrome://extension-icon/ and chrome://app-icon
-    // URLs. Hosted apps are not allowed because they are served via web servers
-    // (and are generally never given access to Chrome APIs).
+    // to use chrome://extension-icon/ and chrome://app-icon URLs. Hosted apps
+    // are not allowed because they are served via web servers (and are
+    // generally never given access to Chrome APIs).
     allowed_webui_hosts.emplace_back(chrome::kChromeUIExtensionIconHost);
-    allowed_webui_hosts.emplace_back(chrome::kChromeUIFaviconHost);
     allowed_webui_hosts.emplace_back(chrome::kChromeUIAppIconHost);
   }
   if (!allowed_webui_hosts.empty()) {

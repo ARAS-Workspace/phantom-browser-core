@@ -56,24 +56,6 @@ ui::ColorTransform GetContrastingColorTransform(
                              std::move(luminosity_change));
 }
 
-ui::ColorTransform IncreaseLightness(ui::ColorTransform input_transform,
-                                     double percent) {
-  const auto generator = [](ui::ColorTransform input_transform, double percent,
-                            SkColor input_color, const ui::ColorMixer& mixer) {
-    const SkColor color = input_transform.Run(input_color, mixer);
-    color_utils::HSL result;
-    color_utils::SkColorToHSL(color, &result);
-    result.l += (1 - result.l) * percent;
-    const SkColor result_color =
-        color_utils::HSLToSkColor(result, SkColorGetA(color));
-    DVLOG(2) << "ColorTransform IncreaseLightness:" << " Percent: " << percent
-             << " Transform Color: " << ui::SkColorName(color)
-             << " Result Color: " << ui::SkColorName(result_color);
-    return result_color;
-  };
-  return base::BindRepeating(generator, std::move(input_transform), percent);
-}
-
 ui::ColorTransform SelectBasedOnNtpBackground(
     ui::ColorTransform output_transform_for_white_input,
     ui::ColorTransform output_transform_for_black_input,
@@ -169,7 +151,6 @@ void AddGeneratedThemeComprehensiveColors(ui::ColorMixer& mixer) {
                    /* 10% opacity */ 0.1 * SK_AlphaOPAQUE),
       ui::SetAlpha(gfx::kGoogleGrey900,
                    /* 10% opacity */ 0.1 * SK_AlphaOPAQUE));
-  mixer[kColorNewTabPageLink] = themed_foreground_color;
   mixer[kColorNewTabPageMostVisitedTileBackground] =
       SelectBasedOnWhiteNtpBackground(gfx::kGoogleGrey100,
                                       element_background_color);
@@ -330,8 +311,6 @@ void AddWebThemeNewTabPageColors(ui::ColorMixer& mixer, bool dark_mode) {
   mixer[kColorNewTabPageControlBackgroundHovered] =
       ui::SetAlpha(dark_mode ? gfx::kGoogleGrey200 : gfx::kGoogleGrey900,
                    /* 10% opacity */ 0.1 * SK_AlphaOPAQUE);
-  mixer[kColorNewTabPageLink] = {dark_mode ? gfx::kGoogleBlue300
-                                           : gfx::kGoogleBlue700};
 }
 
 }  // namespace
@@ -344,7 +323,6 @@ void AddNewTabPageColorMixer(ui::ColorProvider* provider,
 
   ui::ColorMixer& mixer = provider->AddMixer();
   mixer[kColorNewTabPageBackground] = {kColorToolbar};
-  mixer[kColorNewTabPageHeader] = {SkColorSetRGB(0x96, 0x96, 0x96)};
 
   if (key.custom_theme) {
     mixer[kColorNewTabPageMostVisitedTileBackground] =
@@ -362,10 +340,6 @@ void AddNewTabPageColorMixer(ui::ColorProvider* provider,
 
   mixer[kColorNewTabPageMostVisitedTileBackgroundUnthemed] = {
       gfx::kGoogleGrey100};
-  mixer[kColorNewTabPageSectionBorder] =
-      ui::SetAlpha(kColorNewTabPageHeader, 0x50);
-  mixer[kColorNewTabPageTextLight] =
-      IncreaseLightness(kColorNewTabPageText, 0.40);
 
   AddWebThemeNewTabPageColors(mixer, dark_mode);
 

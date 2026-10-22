@@ -88,15 +88,6 @@ IN_PROC_BROWSER_TEST_F(PermissionsApiTest, ExperimentalPermissionsFail) {
       << message_;
 }
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && defined(NDEBUG)
-#define MAYBE_FaviconPermission DISABLED_FaviconPermission
-#else
-#define MAYBE_FaviconPermission FaviconPermission
-#endif
-IN_PROC_BROWSER_TEST_F(PermissionsApiTest, MAYBE_FaviconPermission) {
-  ASSERT_TRUE(RunExtensionTest("permissions/favicon")) << message_;
-}
-
 // Test functions and APIs that are always allowed (even if you ask for no
 // permissions).
 IN_PROC_BROWSER_TEST_F(PermissionsApiTest, AlwaysAllowed) {

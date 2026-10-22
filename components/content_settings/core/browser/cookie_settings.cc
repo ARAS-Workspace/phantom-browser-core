@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "components/content_settings/core/browser/content_settings_info.h"
 #include "components/content_settings/core/browser/content_settings_registry.h"
-#include "components/content_settings/core/browser/content_settings_utils.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_constraints.h"
@@ -189,9 +188,7 @@ bool CookieSettings::ShouldIgnoreSameSiteRestrictions(
     const GURL& url,
     const net::SiteForCookies& site_for_cookies,
     const url::Origin& top_level_origin) const {
-  return !site_for_cookies.IsNull() &&
-         top_level_origin.scheme() == kChromeUIScheme &&
-         url.SchemeIsCryptographic();
+  return false;
 }
 
 void CookieSettings::ShutdownOnUIThread() {
@@ -203,18 +200,11 @@ void CookieSettings::ShutdownOnUIThread() {
 // allow the cookie regardless of cookie content settings and third-party
 // cookie blocking settings.
 // This just checks the scheme of the |url| and |site_for_cookies|:
-//  - Allow cookies if the |site_for_cookies| is a chrome:// scheme URL, and
-//    the |url| has a secure scheme.
 //  - Allow cookies if the |site_for_cookies| and the |url| match in scheme
 //    and both have the Chrome extensions scheme.add
 bool CookieSettings::ShouldAlwaysAllowCookies(
     const GURL& url,
     const GURL& first_party_url) const {
-  if (first_party_url.SchemeIs(kChromeUIScheme) &&
-      url.SchemeIsCryptographic()) {
-    return true;
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (url.SchemeIs(extension_scheme_) &&
       first_party_url.SchemeIs(extension_scheme_)) {

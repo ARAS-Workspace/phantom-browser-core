@@ -61,6 +61,40 @@ IN_PROC_BROWSER_TEST_F(NewTabUIBrowserTest, ShowIncognito) {
                                            chrome::ChromeUINewTabURLAsGURL()));
 }
 
+// The incognito NTP shows no links.
+IN_PROC_BROWSER_TEST_F(NewTabUIBrowserTest, IncognitoHasNoLinks) {
+  Browser* incognito = CreateIncognitoBrowser();
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(incognito,
+                                           chrome::ChromeUINewTabURLAsGURL()));
+  EXPECT_EQ(
+      0, content::EvalJs(incognito->tab_strip_model()->GetActiveWebContents(),
+                         "document.querySelectorAll('a').length"));
+}
+
+// The guest NTP shows no links.
+IN_PROC_BROWSER_TEST_F(NewTabUIBrowserTest, GuestHasNoLinks) {
+  Browser* guest = CreateGuestBrowser();
+  ASSERT_TRUE(
+      ui_test_utils::NavigateToURL(guest, chrome::ChromeUINewTabURLAsGURL()));
+  EXPECT_EQ(0, content::EvalJs(guest->tab_strip_model()->GetActiveWebContents(),
+                               "document.querySelectorAll('a').length"));
+}
+
+// The incognito NTP's CSP doesn't allow eval(). Not a NewTabUIBrowserTest: the
+// blocked eval() logs a CSP console error.
+using NewTabUICspBrowserTest = InProcessBrowserTest;
+
+IN_PROC_BROWSER_TEST_F(NewTabUICspBrowserTest, IncognitoBlocksEval) {
+  Browser* incognito = CreateIncognitoBrowser();
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(incognito,
+                                           chrome::ChromeUINewTabURLAsGURL()));
+  EXPECT_EQ(
+      "EvalError",
+      content::EvalJs(incognito->tab_strip_model()->GetActiveWebContents(),
+                      "(() => { try { eval('1'); return 'allowed'; }"
+                      " catch (e) { return e.name; } })()"));
+}
+
 class NewTabUIProcessPerTabTest : public NewTabUIBrowserTest {
  public:
   NewTabUIProcessPerTabTest() = default;

@@ -371,6 +371,18 @@ TEST_F(ChromeContentBrowserClientTest, AutomaticBeaconCredentials) {
       profile(), GURL("a.test"), url::Origin::Create(GURL("c.test"))));
 }
 
+// A chrome:// top-level origin gets no first party or SameSite cookie
+// exception for the secure origins it embeds.
+TEST_F(ChromeContentBrowserClientTest, ChromeSchemeHasNoTopLevelCookieBypass) {
+  ChromeContentBrowserClient client;
+  const url::Origin chrome_origin =
+      url::Origin::Create(GURL("chrome://settings"));
+  EXPECT_FALSE(client.ShouldTreatAsFirstPartyWhenTopLevel(
+      chrome_origin, /*is_embedded_origin_secure=*/true));
+  EXPECT_FALSE(client.ShouldIgnoreSameSiteCookieRestrictionsWhenTopLevel(
+      chrome_origin, /*is_embedded_origin_secure=*/true));
+}
+
 TEST_F(ChromeContentBrowserClientTestWithWebContents,
        GetAutoPipInfo_AutoPipReason) {
   ChromeContentBrowserClient client;

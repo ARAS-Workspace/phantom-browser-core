@@ -9,7 +9,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/memory/weak_ptr.h"
 #include "base/task/cancelable_task_tracker.h"
 #include "components/favicon/core/favicon_service.h"
 #include "content/public/browser/url_data_source.h"
@@ -31,15 +30,12 @@ class NativeTheme;
 
 // FaviconSource is the gateway between network-level chrome:
 // requests for favicons and the history backend that serves these.
-// Two possible formats are allowed: chrome://favicon, kept only for backwards
-// compatibility for extensions, and chrome://favicon2. Formats are described in
-// favicon_url_parser.h.
+// The chrome://favicon2 format is described in favicon_url_parser.h.
 class FaviconSource : public content::URLDataSource {
  public:
   // By default, favicons are served via a chrome trusted URL (chrome://). If
   // |serve_untrusted| is set to true, favicons will be served via
-  // chrome-untrusted://. Note that chrome-untrusted:// only supports the
-  // favicon2 URL format and does not support the legacy URL format.
+  // chrome-untrusted://.
   explicit FaviconSource(Profile* profile,
                          chrome::FaviconUrlFormat format,
                          bool serve_untrusted = false);
@@ -115,8 +111,6 @@ class FaviconSource : public content::URLDataSource {
   base::CancelableTaskTracker cancelable_task_tracker_;
 
   bool serve_untrusted_;
-
-  base::WeakPtrFactory<FaviconSource> weak_ptr_factory_{this};
 };
 
 #endif  // CHROME_BROWSER_UI_WEBUI_FAVICON_SOURCE_H_

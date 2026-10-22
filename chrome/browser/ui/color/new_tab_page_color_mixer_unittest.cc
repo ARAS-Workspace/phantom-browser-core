@@ -76,7 +76,6 @@ TEST(NewTabPageColorMixer, DefaultColorComprehensiveThemeColor) {
             kSampleToolbarColor);
   EXPECT_EQ(provider.GetColor(kColorNewTabPageButtonForeground),
             gfx::kGoogleBlue600);
-  EXPECT_EQ(provider.GetColor(kColorNewTabPageLink), gfx::kGoogleBlue600);
   EXPECT_EQ(provider.GetColor(kColorNewTabPageMostVisitedTileBackground),
             gfx::kGoogleGrey100);
 }

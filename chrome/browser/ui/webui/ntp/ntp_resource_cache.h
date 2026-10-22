@@ -39,8 +39,7 @@ std::string GetNewTabBackgroundTilingCSS(
 
 // This class keeps a cache of NTP resources (HTML and CSS) so we don't have to
 // regenerate them all the time.
-// Note: This is only used for incognito and guest mode NTPs (NewTabUI), as well
-// as for (non-incognito) app launcher pages (AppLauncherPageUI).
+// Note: This is only used for incognito and guest mode NTPs (NewTabUI).
 class NTPResourceCache : public ThemeServiceObserver,
                          public KeyedService,
                          public ui::NativeThemeObserver {
@@ -49,7 +48,6 @@ class NTPResourceCache : public ThemeServiceObserver,
     NORMAL,
     INCOGNITO,
     GUEST,
-    ISOLATED,
     // The OTR profile that is not used for Incognito or Guest windows.
     NON_PRIMARY_OTR,
   };
@@ -84,24 +82,16 @@ class NTPResourceCache : public ThemeServiceObserver,
   // Invalidates the NTPResourceCache.
   void Invalidate();
 
-  void CreateNewTabCSS(const content::WebContents::Getter& wc_getter);
-
   void CreateNewTabIncognitoHTML(const content::WebContents::Getter& wc_getter);
   void CreateNewTabIncognitoCSS(const content::WebContents::Getter& wc_getter);
-
-  void CreateNewTabIsolatedHTML(const content::WebContents::Getter& wc_getter);
-  void CreateNewTabIsolatedCSS(const content::WebContents::Getter& wc_getter);
 
   void CreateNewTabGuestHTML();
 
   raw_ptr<Profile> profile_;
 
-  scoped_refptr<base::RefCountedMemory> new_tab_css_;
   scoped_refptr<base::RefCountedMemory> new_tab_guest_html_;
   scoped_refptr<base::RefCountedMemory> new_tab_incognito_html_;
   scoped_refptr<base::RefCountedMemory> new_tab_incognito_css_;
-  scoped_refptr<base::RefCountedMemory> new_tab_isolated_html_;
-  scoped_refptr<base::RefCountedMemory> new_tab_isolated_css_;
   scoped_refptr<base::RefCountedMemory> new_tab_non_primary_otr_html_;
 
   base::ScopedObservation<ui::NativeTheme, ui::NativeThemeObserver>

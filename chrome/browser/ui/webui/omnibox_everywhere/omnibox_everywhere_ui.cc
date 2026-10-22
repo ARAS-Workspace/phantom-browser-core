@@ -129,8 +129,8 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
       "media-src blob: data: 'self';");
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ImgSrc,
-      "img-src 'self' chrome://resources chrome://theme chrome://favicon/ "
-      "chrome://favicon2/ chrome://image/ data: blob:;");
+      "img-src 'self' chrome://resources chrome://theme chrome://favicon2/ "
+      "chrome://image/ data: blob:;");
 
   std::string profile_avatar_url =
       "chrome://theme/IDR_PROFILE_AVATAR_PLACEHOLDER_LARGE";

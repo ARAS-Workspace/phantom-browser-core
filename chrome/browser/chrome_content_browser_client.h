@@ -199,9 +199,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldTreatAsFirstPartyWhenTopLevel(
       const url::Origin& top_frame_origin,
       bool is_embedded_origin_secure) override;
-  bool ShouldIgnoreSameSiteCookieRestrictionsWhenTopLevel(
-      const url::Origin& top_frame_origin,
-      bool is_embedded_origin_secure) override;
   std::string GetSiteDisplayNameForCdmProcess(
       content::BrowserContext* browser_context,
       const GURL& site_url) override;

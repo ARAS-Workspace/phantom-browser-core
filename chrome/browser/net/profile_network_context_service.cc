@@ -975,10 +975,6 @@ ProfileNetworkContextService::CreateCookieManagerParams(
   auto out = network::mojom::CookieManagerParams::New();
   out->block_third_party_cookies =
       cookie_settings.ShouldBlockThirdPartyCookies();
-  // This allows cookies to be sent on https requests from chrome:// pages,
-  // ignoring SameSite attribute rules.
-  out->secure_origin_cookies_allowed_schemes.push_back(
-      content::kChromeUIScheme);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // TODO(chlily): To be consistent with the content_settings version of
