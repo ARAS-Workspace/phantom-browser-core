@@ -4,5 +4,4 @@
 -All/MultiContentsViewTabDragEntrypointsUiParamTest.DragAndDrop/*
 -All/MultiContentsViewTabDragEntrypointsUiParamTest.DragAndDropDisabledForChromePage/*
 -All/MultiContentsViewTabDragEntrypointsUiParamTest.ShowAndHideDropTarget/*
--SidePanelBookmarksTest.ShoppingList
 -TabDragging/DetachToBrowserTabDragControllerTest.DragToSeparateWindowDuringDragEnd/*

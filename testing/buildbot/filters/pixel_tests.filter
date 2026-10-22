@@ -41,7 +41,6 @@ CookieControlsBubbleViewPixelTest.*
 CryptoModulePasswordDialogTest.*
 DashboardKombuchaInteractiveUITest.*
 DeepScanningFailureModalDialogTest.*
-DiscountBubbleViewBrowserTest.*
 DiceMigrationServicePixelBrowserTest.*
 *DiceWebSigninInterceptionBubblePixelTest.InvokeUi_*
 *DiceWebSigninInterceptionBubbleV1SyncPromoPixelTest.InvokeUi_*
@@ -119,7 +118,6 @@ PermissionPromptPreviewBrowserTest.InvokeUi_*
 PlusAddressCreationDialogWithNoticeTest.ShowNoticeAndCancel
 *PopupViewViewsBrowsertest*
 *PopupViewViewsPlusAddressSuggestionBrowsertest*
-PriceTrackingBubbleDialogViewBrowserTest.*
 ProfileMenuViewPixelTest.*
 ProfilePickerSigninToolbarUIPixelTest.*
 ProfilePickerUIPixelTest.*

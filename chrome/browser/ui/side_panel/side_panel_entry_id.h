@@ -33,8 +33,6 @@
   V(kAboutThisSite, kActionSidePanelShowAboutThisSite, "AboutThisSite")       \
   V(kCustomizeChrome, kActionSidePanelShowCustomizeChrome, "CustomizeChrome") \
   V(kSearchCompanion, kActionSidePanelShowSearchCompanion, "Companion")       \
-  V(kShoppingInsights, kActionSidePanelShowShoppingInsights,                  \
-    "ShoppingInsights")                                                       \
   V(kLensOverlayResults, kActionSidePanelShowLensOverlayResults,              \
     "LensOverlayResults")                                                     \
   V(kMerchantTrust, kActionSidePanelShowMerchantTrust, "MerchantTrust")       \

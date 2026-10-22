@@ -86,8 +86,6 @@
   E_CPONLY(kColorBookmarkBarSeparator) \
   E_CPONLY(kColorBookmarkBarSeparatorChromeRefresh) \
   E_CPONLY(kColorBookmarkButtonIcon) \
-  E_CPONLY(kColorBookmarkDialogTrackPriceIcon) \
-  E_CPONLY(kColorBookmarkDialogProductImageBorder) \
   E_CPONLY(kColorBookmarkDragImageBackground) \
   E_CPONLY(kColorBookmarkDragImageCountBackground) \
   E_CPONLY(kColorBookmarkDragImageCountForeground) \
@@ -455,31 +453,6 @@
   E_CPONLY(kColorPipWindowScrimBottomGradientEnd) \
   E_CPONLY(kColorPipWindowSkipAdButtonBackground) \
   E_CPONLY(kColorPipWindowSkipAdButtonBorder) \
-  /* Product Specifications colors */ \
-  E_CPONLY(kColorProductSpecificationsButtonBackground) \
-  E_CPONLY(kColorProductSpecificationsCitationBackground) \
-  E_CPONLY(kColorProductSpecificationsCitationPopupBackground) \
-  E_CPONLY(kColorProductSpecificationsCitationPopupText) \
-  E_CPONLY(kColorProductSpecificationsCitationPopupTitle) \
-  E_CPONLY(kColorProductSpecificationsComparisonTableListBackground) \
-  E_CPONLY(kColorProductSpecificationsDetailChipBackground) \
-  E_CPONLY(kColorProductSpecificationsDisclosureBackground) \
-  E_CPONLY(kColorProductSpecificationsDisclosureForeground) \
-  E_CPONLY(kColorProductSpecificationsDisclosureGradientEnd) \
-  E_CPONLY(kColorProductSpecificationsDisclosureGradientStart) \
-  E_CPONLY(kColorProductSpecificationsDisclosureSummaryBackground) \
-  E_CPONLY(kColorProductSpecificationsDivider) \
-  E_CPONLY(kColorProductSpecificationsGradientIcon) \
-  E_CPONLY(kColorProductSpecificationsHorizontalCarouselScrollbarThumb) \
-  E_CPONLY(kColorProductSpecificationsIcon) \
-  E_CPONLY(kColorProductSpecificationsIconButtonBackground) \
-  E_CPONLY(kColorProductSpecificationsIconButtonHoveredBackground) \
-  E_CPONLY(kColorProductSpecificationsLink) \
-  E_CPONLY(kColorProductSpecificationsPageBackground) \
-  E_CPONLY(kColorProductSpecificationsSummaryBackground) \
-  E_CPONLY(kColorProductSpecificationsSummaryBackgroundDragging) \
-  E_CPONLY(kColorProductSpecificationsTonalButtonBackground) \
-  E_CPONLY(kColorProductSpecificationsTonalButtonIcon) \
   /* Profile Menu colors. */ \
   E_CPONLY(kColorProfileMenuBackground) \
   E_CPONLY(kColorProfileMenuIdentityInfoBackground) \
@@ -581,9 +554,6 @@
   E_CPONLY(kColorSidePanelCardBackground) \
   E_CPONLY(kColorSidePanelCardPrimaryForeground) \
   E_CPONLY(kColorSidePanelCardSecondaryForeground) \
-  E_CPONLY(kColorSidePanelCommerceGraphAxis) \
-  E_CPONLY(kColorSidePanelCommerceGraphBubbleBackground) \
-  E_CPONLY(kColorSidePanelCommerceGraphLine) \
   E_CPONLY(kColorSidePanelContentAreaSeparator) \
   E_CPONLY(kColorSidePanelContentBackground) \
   E_CPONLY(kColorSidePanelDialogBackground) \

@@ -336,8 +336,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
       {ui::kColorSysStateDisabled}, {kColorToolbar})};
   mixer[kColorBookmarkBarSeparatorChromeRefresh] = {ui::kColorSysDivider};
   mixer[kColorBookmarkButtonIcon] = {kColorBookmarkBarForeground};
-  mixer[kColorBookmarkDialogProductImageBorder] = {ui::kColorSysNeutralOutline};
-  mixer[kColorBookmarkDialogTrackPriceIcon] = {ui::kColorSysOnSurfaceSubtle};
   mixer[kColorBookmarkDragImageBackground] = {ui::kColorSysPrimary};
   mixer[kColorBookmarkFolderIcon] = {kColorBookmarkBarForeground};
   mixer[kColorCapturedTabContentsBorder] = {ui::kColorSysPrimary};

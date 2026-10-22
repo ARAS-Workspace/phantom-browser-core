@@ -2098,12 +2098,6 @@ inline constexpr char kPerformanceInterventionBackgroundCpuRateLimitedCount[] =
 inline constexpr char kPerformanceInterventionDailySample[] =
     "performance_intervention.last_daily_sample";
 
-// A boolean indicating whether the price track first user experience bubble
-// should show. This is set to false if the user has clicked the "Price track"
-// button in the FUE bubble once.
-inline constexpr char kShouldShowPriceTrackFUEBubble[] =
-    "should_show_price_track_fue_bubble_fue";
-
 inline constexpr char kStrictMimetypeCheckForWorkerScriptsEnabled[] =
     "strict_mime_type_check_for_worker_scripts_enabled";
 

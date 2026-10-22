@@ -125,7 +125,6 @@ void AppMenuBrowserTest::ShowUi(const std::string& name) {
       // Submenus present in all versions.
       {"history", AppMenuModel::kRecentTabsMenuPlaceholder},
       {"bookmarks", AppMenuModel::kBookmarksMenuPlaceholder},
-      {"bookmarks_comparison_tables", AppMenuModel::kBookmarksMenuPlaceholder},
       {"more_tools", AppMenuModel::kMoreToolsMenuPlaceholder},
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       {"help", AppMenuModel::kHelpMenuPlaceholder},

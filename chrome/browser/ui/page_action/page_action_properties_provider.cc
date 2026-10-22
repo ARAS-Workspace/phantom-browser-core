@@ -108,25 +108,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionCommercePriceInsights,
-        {
-            .histogram_name = "PriceInsights",
-            .type = PageActionIconType::kPriceInsights,
-            .element_identifier = kPriceInsightsChipElementId,
-            .priority = page_actions::PageActionPriorityCategory::kUnknown,
-        },
-    },
-    {
-        kActionCommerceDiscounts,
-        {
-            .histogram_name = "Discounts",
-            .type = PageActionIconType::kDiscounts,
-            .element_identifier = kDiscountsChipElementId,
-            .priority =
-                page_actions::PageActionPriorityCategory::kDiscoveryNudge,
-        },
-    },
-    {
         kActionShowCollaborationRecentActivity,
         {
             .histogram_name = "ShowCollaborationRecentActivity",

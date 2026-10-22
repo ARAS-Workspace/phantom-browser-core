@@ -10,7 +10,6 @@ import "ui/gfx/geometry/mojom/geometry.mojom";
 // Used to indicate the source item from which the action is triggered.
 enum ActionSource {
   kBookmark,
-  kPriceTracking,
 };
 
 // Used to indicate the order bookmarks are sorted in the side panel.

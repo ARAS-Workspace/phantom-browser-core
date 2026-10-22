@@ -5,8 +5,7 @@
 import 'chrome://history/history.js';
 
 import type {HistoryAppElement, HistoryEntry, HistoryItemElement} from 'chrome://history/history.js';
-import {BrowserProxyImpl, HistoryPageViewHistogram, HistorySignInState, SyncState, VisitContextMenuAction} from 'chrome://history/history.js';
-import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
+import {BrowserProxyImpl, HistoryPageViewHistogram, VisitContextMenuAction} from 'chrome://history/history.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -76,20 +75,10 @@ suite('Metrics', function() {
     assertTrue(!!histogram);
     assertEquals(1, histogram[HistoryPageViewHistogram.HISTORY]);
 
-    navigateTo('/syncedTabs', app);
+    navigateTo('/grouped', app);
     await microtasksFinished();
-    assertEquals(1, histogram[HistoryPageViewHistogram.SIGNIN_PROMO]);
-    await testProxy.whenCalled('otherDevicesInitialized');
+    assertEquals(1, histogram[HistoryPageViewHistogram.JOURNEYS]);
 
-    testProxy.resetResolver('recordHistogram');
-    webUIListenerCallback('history-identity-state-changed', {
-      signIn: HistorySignInState.SIGNED_IN,
-      tabsSync: SyncState.TURNED_ON,
-      historySync: SyncState.TURNED_OFF,
-    });
-    await testProxy.whenCalled('recordHistogram');
-
-    assertEquals(1, histogram[HistoryPageViewHistogram.SYNCED_TABS]);
     navigateTo('/history', app);
     await microtasksFinished();
     assertEquals(2, histogram[HistoryPageViewHistogram.HISTORY]);

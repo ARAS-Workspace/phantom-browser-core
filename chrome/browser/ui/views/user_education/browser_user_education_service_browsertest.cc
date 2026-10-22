@@ -297,8 +297,6 @@ IN_PROC_BROWSER_TEST_F(BrowserUserEducationServiceBrowserTest,
       // revisited in the future.
       {&feature_engagement::kIPHMemorySaverModeFeature,
        IPHFailureReason::kWrongSessionRate, "crbug.com/40910929"},
-      {&feature_engagement::kIPHPriceTrackingInSidePanelFeature, std::nullopt,
-       "crbug.com/40910929"},
       {&feature_engagement::kIPHPowerBookmarksSidePanelFeature,
        IPHFailureReason::kWrongSessionRate,
        "crbug.com/40910930, crbug.com/40910929"},

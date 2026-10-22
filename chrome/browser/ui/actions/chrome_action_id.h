@@ -324,10 +324,6 @@
   E(kActionBookmarkBarShowAppsShortcut, IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT) \
   E(kActionBookmarkBarShowManagedBookmarks, \
     IDC_BOOKMARK_BAR_SHOW_MANAGED_BOOKMARKS) \
-  E(kActionBookmarkBarTrackPriceForShoppingBookmark, \
-    IDC_BOOKMARK_BAR_TRACK_PRICE_FOR_SHOPPING_BOOKMARK) \
-  E(kActionBookmarkBarUntrackPriceForShoppingBookmark, \
-    IDC_BOOKMARK_BAR_UNTRACK_PRICE_FOR_SHOPPING_BOOKMARK) \
   E(kActionBookmarkBarAddToBookmarksBar, \
     IDC_BOOKMARK_BAR_ADD_TO_BOOKMARKS_BAR) \
   E(kActionBookmarkBarRemoveFromBookmarksBar, \

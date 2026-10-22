@@ -157,15 +157,6 @@ BASE_FEATURE(kIPHPerformanceInterventionDialogFeature,
 BASE_FEATURE(kIPHPowerBookmarksSidePanelFeature,
              "IPH_PowerBookmarksSidePanel",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPriceInsightsPageActionIconLabelFeature,
-             "IPH_PriceInsightsPageActionIconLabelFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPriceTrackingEmailConsentFeature,
-             "IPH_PriceTrackingEmailConsentFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPriceTrackingPageActionIconLabelFeature,
-             "IPH_PriceTrackingPageActionIconLabelFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHReadingListDiscoveryFeature,
              "IPH_ReadingListDiscovery",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -186,9 +177,6 @@ BASE_FEATURE(kIPHReadingModePresentationModeFeature,
              base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHReadingModeSidePanelFeature,
              "IPH_ReadingModeSidePanel",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHShoppingCollectionFeature,
-             "IPH_ShoppingCollectionFeature",
              base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHSmartTabSharingDefaultOnFeature,
              "IPH_SmartTabSharingDefaultOnFeature",
@@ -259,9 +247,6 @@ BASE_FEATURE(kIPHProfileSwitchFeature,
 BASE_FEATURE(kIPHWebUiHelpBubbleTestFeature,
              "IPH_WebUiHelpBubbleTest",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPriceTrackingInSidePanelFeature,
-             "IPH_PriceTrackingInSidePanel",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHBackNavigationMenuFeature,
              "IPH_BackNavigationMenu",
              base::FEATURE_DISABLED_BY_DEFAULT);

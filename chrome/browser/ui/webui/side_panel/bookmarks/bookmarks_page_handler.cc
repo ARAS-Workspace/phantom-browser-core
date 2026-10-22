@@ -620,9 +620,6 @@ void BookmarksPageHandler::OpenBookmark(
       click_modifiers->shift_key);
   bookmarks::OpenAllIfAllowed(browser_window_interface_, {bookmark_node},
                               open_location);
-  if (source == side_panel::mojom::ActionSource::kPriceTracking) {
-    return;
-  }
   base::RecordAction(base::UserMetricsAction("SidePanel.Bookmarks.Navigation"));
   RecordBookmarkLaunch(parent_folder_depth > 0
                            ? BookmarkLaunchLocation::kSidePanelSubfolder

@@ -14,7 +14,6 @@ import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 export const Page = {
   HISTORY: 'history',
   HISTORY_CLUSTERS: 'grouped',
-  PRODUCT_SPECIFICATIONS_LISTS: 'comparisonTables',
 };
 
 // The ids of pages with corresponding tabs in the order of their tab indices.

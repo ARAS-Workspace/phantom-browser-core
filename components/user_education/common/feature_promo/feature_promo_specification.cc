@@ -111,7 +111,6 @@ bool IsAllowedLegacyPromo(const base::Feature& promo_feature) {
           "IPH_DesktopPwaInstall",
           "IPH_DesktopSharedHighlighting",
           "IPH_GMCCastStartStop",
-          "IPH_PriceTrackingInSidePanel",
           "IPH_ReadingListDiscovery",
           "IPH_ReadingListInSidePanel",
           "IPH_TabSearch",

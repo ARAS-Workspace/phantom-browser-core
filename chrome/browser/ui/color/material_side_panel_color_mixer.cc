@@ -84,12 +84,6 @@ void AddMaterialSidePanelColorMixer(ui::ColorProvider* provider,
   mixer[kColorSidePanelBookmarksActiveFolderBackground] = {
       ui::kColorSysPrimaryContainer};
 
-  /* Commerce */
-  mixer[kColorSidePanelCommerceGraphAxis] = {ui::kColorSysDivider};
-  mixer[kColorSidePanelCommerceGraphBubbleBackground] = {
-      ui::kColorSysTonalContainer};
-  mixer[kColorSidePanelCommerceGraphLine] = {ui::kColorLinkForegroundDefault};
-
   // Note anything below here will only apply if themes aren't being used.
   if (!ShouldApplyChromeMaterialOverrides(key)) {
     return;

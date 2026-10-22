@@ -198,7 +198,6 @@ TEST(BrowserUserEducationServiceTest, PreventNewHardCodedConfigurations) {
       &feature_engagement::kIPHReadingModeSidePanelFeature,
       &feature_engagement::kIPHSidePanelGenericPinnableFeature,
       &feature_engagement::kIPHProfileSwitchFeature,
-      &feature_engagement::kIPHPriceTrackingInSidePanelFeature,
       &feature_engagement::kIPHBackNavigationMenuFeature,
       &feature_engagement::kIPHAutofillCreditCardBenefitFeature,
       &feature_engagement::kIPHAutofillExternalAccountProfileSuggestionFeature,
