@@ -13,7 +13,4 @@ declare_args() {
 declare_args() {
   # Enable the modern generation of Ink libraries and PDF annotation features.
   enable_pdf_ink2 = enable_pdf
-
-  # Enable the ability to save PDF to Google Drive.
-  enable_pdf_save_to_drive = enable_pdf
 }

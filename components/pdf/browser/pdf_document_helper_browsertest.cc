@@ -64,13 +64,6 @@ class FakePdfListener : public pdf::mojom::PdfListener {
               IsPasswordProtected,
               (IsPasswordProtectedCallback callback),
               (override));
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-  MOCK_METHOD(void,
-              GetSaveDataBufferHandlerForDrive,
-              (pdf::mojom::SaveRequestType,
-               GetSaveDataBufferHandlerForDriveCallback callback),
-              (override));
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
 };
 
 class TestPDFDocumentHelperClient : public PDFDocumentHelperClient {

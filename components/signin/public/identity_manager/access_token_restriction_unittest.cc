@@ -10,8 +10,6 @@
 #include "google_apis/gaia/gaia_constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#include "pdf/buildflags.h"  // nogncheck
-
 namespace {
 struct AccessTokenRestrictionTestParam {
   std::string scope;
@@ -35,9 +33,6 @@ const AccessTokenRestrictionTestParam kTestParams[] = {
  {GaiaConstants::kDeviceManagementServiceOAuth,
   OAuth2ScopeRestriction::kSignedIn
  },
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
- {GaiaConstants::kDriveOAuth2Scope, OAuth2ScopeRestriction::kNoRestriction},
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
 };
 // clang-format on
 

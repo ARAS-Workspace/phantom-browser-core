@@ -23,10 +23,6 @@ mojom("mojom") {
     enabled_features += [ "enable_pdf_ink2" ]
   }
 
-  if (enable_pdf_save_to_drive) {
-    enabled_features += [ "enable_pdf_save_to_drive" ]
-  }
-
   if (enable_screen_ai_service) {
     enabled_features += [ "enable_screen_ai_service" ]
   }

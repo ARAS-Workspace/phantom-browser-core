@@ -1921,10 +1921,6 @@ test("browser_tests") {
       sources += [ "../browser/pdf/pdf_extension_printing_test.cc" ]
       deps += [ "//chrome/browser/printing" ]
     }
-
-    if (enable_pdf_save_to_drive) {
-      deps += [ "//chrome/browser/save_to_drive:browser_tests" ]
-    }
   }
 
   if (is_linux) {
@@ -3815,16 +3811,6 @@ test("unit_tests") {
       "//services/network/public/mojom:url_loader_base",
       "//url",
     ]
-    if (enable_pdf_save_to_drive) {
-      deps += [
-        "//chrome/browser/save_to_drive",
-        "//chrome/browser/save_to_drive:unit_tests",
-        "//chrome/browser/ui/save_to_drive",
-        "//chrome/browser/ui/views/save_to_drive:unit_tests",
-      ]
-      allow_circular_includes_from +=
-          [ "//chrome/browser/ui/views/save_to_drive:unit_tests" ]
-    }
   }
 
   if (enable_printing) {
@@ -4992,10 +4978,6 @@ test("interactive_ui_tests") {
 
     if (enable_pdf) {
       deps += [ "//chrome/browser/pdf:interactive_ui_tests" ]
-      if (enable_pdf_save_to_drive) {
-        deps +=
-            [ "//chrome/browser/ui/views/save_to_drive:interactive_ui_tests" ]
-      }
     }
 
     sources += [ "../browser/ui/views/download/bubble/download_bubble_interactive_uitest.cc" ]

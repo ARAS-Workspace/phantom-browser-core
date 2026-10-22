@@ -253,7 +253,6 @@ Refer to README.md for content description and update process.
  <item id="aim_eligibility_fetch" added_in_milestone="141" content_hash_code="0013f5c1" os_list="linux,windows,android,chromeos" file_path="components/omnibox/browser/aim_eligibility_service.cc" />
  <item id="enterprise_logo_fetcher_for_browser" added_in_milestone="141" content_hash_code="03eb36e5" os_list="linux,windows,chromeos,android" file_path="chrome/browser/enterprise/util/managed_browser_utils.cc" />
  <item id="devtools_gdp_service" added_in_milestone="141" content_hash_code="0240d8d3" os_list="linux,windows,android,chromeos" file_path="chrome/browser/devtools/gdp_service_handler.cc" />
- <item id="save_to_drive" added_in_milestone="141" content_hash_code="0012bc0c" os_list="linux,windows,chromeos" file_path="chrome/browser/save_to_drive/drive_uploader.cc" />
  <item id="webrtc_rtc_transport" added_in_milestone="142" content_hash_code="0456b8fc" os_list="linux,windows,android,chromeos" file_path="third_party/blink/renderer/modules/peerconnection/rtc_transport/rtc_transport_dependencies.cc" />
  <item id="email_verification" added_in_milestone="143" content_hash_code="028efd71" os_list="linux,windows,android,chromeos" file_path="content/browser/webid/delegation/email_verifier_network_request_manager.cc" />
  <item id="amount_extraction_model_execution" added_in_milestone="144" content_hash_code="05d4d2fd" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />

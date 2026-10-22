@@ -11,14 +11,11 @@ import 'chrome://resources/cr_elements/cr_progress/cr_progress.js';
 import './icons.html.js';
 import './viewer_download_controls.js';
 import './viewer_page_selector.js';
-// <if expr="enable_pdf_save_to_drive">
-import './viewer_save_to_drive_controls.js';
-// </if>
 import './shared_vars.css.js';
 
 import type {CrActionMenuElement} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
 import {AnchorAlignment} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
-// <if expr="enable_pdf_ink2 or enable_pdf_save_to_drive">
+// <if expr="enable_pdf_ink2">
 import {assert} from 'chrome://resources/js/assert.js';
 // </if>
 // <if expr="enable_pdf_ink2">
@@ -34,9 +31,6 @@ import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import {AnnotationMode} from '../constants.js';
 // </if>
 import {FittingType, FormFieldFocusType} from '../constants.js';
-// <if expr="enable_pdf_save_to_drive">
-import {SaveToDriveState} from '../constants.js';
-// </if>
 // <if expr="enable_pdf_ink2">
 import {PluginController, PluginControllerEventType} from '../controller.js';
 import {Ink2Manager} from '../ink2_manager.js';
@@ -126,12 +120,6 @@ export class ViewerToolbarElement extends CrLitElement {
       shouldEnableUndo_: {type: Boolean},
       pdfTextAnnotationsEnabled_: {type: Boolean},
       // </if> enable_pdf_ink2
-
-      // <if expr="enable_pdf_save_to_drive">
-      pdfSaveToDriveEnabled: {type: Boolean},
-      saveToDriveProgress: {type: Number},
-      saveToDriveState: {type: String},
-      // </if> enable_pdf_save_to_drive
     };
   }
 
@@ -155,11 +143,6 @@ export class ViewerToolbarElement extends CrLitElement {
   protected accessor loading_: boolean = true;
   protected accessor printingEnabled_: boolean = false;
   private accessor viewportZoomPercent_: number = 0;
-  // <if expr="enable_pdf_save_to_drive">
-  accessor pdfSaveToDriveEnabled: boolean = false;
-  accessor saveToDriveProgress: number = 0;
-  accessor saveToDriveState: SaveToDriveState = SaveToDriveState.UNINITIALIZED;
-  // </if> enable_pdf_save_to_drive
 
   // <if expr="enable_pdf_ink2">
   // Ink2 reactive properties
@@ -531,14 +514,6 @@ export class ViewerToolbarElement extends CrLitElement {
   protected presentationModeAvailable_(): boolean {
     return !this.embeddedViewer;
   }
-
-  // <if expr="enable_pdf_save_to_drive">
-  getSaveToDriveBubbleAnchor(): HTMLElement {
-    const anchor = this.shadowRoot.querySelector<HTMLElement>('#save-to-drive');
-    assert(anchor);
-    return anchor;
-  }
-  // </if> enable_pdf_save_to_drive
 }
 
 declare global {

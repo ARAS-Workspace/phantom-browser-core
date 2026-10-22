@@ -147,13 +147,6 @@ class HangingPdfListener : public pdf::mojom::PdfListener {
   void IsPasswordProtected(IsPasswordProtectedCallback callback) override {
     std::move(callback).Run(false);
   }
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-  void GetSaveDataBufferHandlerForDrive(
-      pdf::mojom::SaveRequestType request_type,
-      GetSaveDataBufferHandlerForDriveCallback callback) override {
-    std::move(callback).Run(nullptr);
-  }
-#endif
 
  private:
   std::vector<GetPageTextCallback> pending_get_page_text_callbacks_;

@@ -145,10 +145,7 @@ source_set("pdf_extension_test_base") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [
-    "mime_handler_stream_manager_pdf_unittest.cc",
-    "pdf_extension_util_unittest.cc",
-  ]
+  sources = [ "mime_handler_stream_manager_pdf_unittest.cc" ]
 
   deps = [
     ":pdf",
@@ -161,7 +158,6 @@ source_set("unit_tests") {
     "//extensions/browser/mime_handler",
     "//extensions/browser/mime_handler:stream_container",
     "//extensions/browser/mime_handler:test_helpers",
-    "//pdf:buildflags",
     "//pdf:features",
     "//testing/gmock",
     "//testing/gtest",

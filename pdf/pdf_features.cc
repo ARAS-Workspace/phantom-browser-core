@@ -67,11 +67,6 @@ const base::FeatureParam<bool> kPdfInk2TextAnnotations{
     &kPdfInk2, "text-annotations", false};
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
 
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-// Saves the PDF file to Google Drive.
-BASE_FEATURE(kPdfSaveToDrive, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-
 void SetIsOopifPdfPolicyEnabled(bool is_oopif_pdf_policy_enabled) {
   g_is_oopif_pdf_policy_enabled = is_oopif_pdf_policy_enabled;
 }

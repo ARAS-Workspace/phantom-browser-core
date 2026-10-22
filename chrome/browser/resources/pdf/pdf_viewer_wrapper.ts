@@ -20,9 +20,6 @@ export {AnnotationMode} from './constants.js';
 // </if>
 export {FittingType, FormFieldFocusType} from './constants.js';
 export type {Attachment, Point, Rect} from './constants.js';
-// <if expr="enable_pdf_save_to_drive">
-export {SaveToDriveBubbleRequestType, SaveToDriveState} from './constants.js';
-// </if>
 export {PluginController} from './controller.js';
 export type {SaveMessage} from './controller.js';
 // <if expr="enable_pdf_ink2">
@@ -54,10 +51,6 @@ export {ViewerPasswordDialogElement} from './elements/viewer_password_dialog.js'
 export {ViewerPdfSidenavElement} from './elements/viewer_pdf_sidenav.js';
 export {ViewerPropertiesDialogElement} from './elements/viewer_properties_dialog.js';
 export {ViewerSaveControlsMixin} from './elements/viewer_save_controls_mixin.js';
-// <if expr="enable_pdf_save_to_drive">
-export {ViewerSaveToDriveBubbleElement} from './elements/viewer_save_to_drive_bubble.js';
-export {ViewerSaveToDriveControlsElement} from './elements/viewer_save_to_drive_controls.js';
-// </if>
 // <if expr="enable_pdf_ink2">
 export {ViewerSidePanelElement} from './elements/viewer_side_panel.js';
 export {ViewerTextBottomToolbarElement} from './elements/viewer_text_bottom_toolbar.js';
@@ -80,18 +73,13 @@ export type {NavigatorDelegate, PdfNavigator} from './navigator.js';
 export {OpenPdfParamsParser, ViewMode} from './open_pdf_params_parser.js';
 export {getFilenameFromURL, PdfViewerElement} from './pdf_viewer.js';
 export {PdfViewerBaseElement} from './pdf_viewer_base.js';
-// <if expr="enable_pdf_save_to_drive">
 export {PdfViewerPrivateProxyImpl} from './pdf_viewer_private_proxy.js';
 export type {PdfViewerPrivateProxy} from './pdf_viewer_private_proxy.js';
-// </if>
 // <if expr="enable_pdf_ink2">
 export {convertRotatedCoordinates, pageToScreenCoordinates, screenToPageCoordinates} from './ink_text_annotation_utils.js';
 export {hexToColor} from './pdf_viewer_utils.js';
 // </if>
 export {shouldIgnoreKeyEvents} from './pdf_viewer_utils.js';
-// <if expr="enable_pdf_save_to_drive">
-export {SaveToDriveBubbleAction, SaveToDriveBubbleState, SaveToDriveSaveType} from './save_to_drive_metrics.js';
-// </if>
 export {SwipeDetector, SwipeDirection} from './swipe_detector.js';
 export {PAGE_SHADOW, Viewport} from './viewport.js';
 export type {DocumentDimensions, LayoutOptions} from './viewport.js';

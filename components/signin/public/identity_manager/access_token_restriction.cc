@@ -9,8 +9,6 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "google_apis/gaia/gaia_constants.h"
 
-#include "pdf/buildflags.h"  // nogncheck
-
 namespace signin {
 
 namespace {
@@ -35,11 +33,6 @@ bool IsUnrestrictedOAuth2Scopes(const std::string& scope) {
       // Required to fetch the ManagedAccounsSigninRestriction policy during
       // sign in.
       GaiaConstants::kSecureConnectOAuth2Scope,
-
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-      GaiaConstants::kDriveOAuth2Scope,
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-
   });
 
   return kScopes.contains(scope);

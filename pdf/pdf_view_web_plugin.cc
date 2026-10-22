@@ -1813,35 +1813,6 @@ void PdfViewWebPlugin::GetPageText(int32_t page_index,
   std::move(callback).Run(engine_->GetPageText(page_index));
 }
 
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-void PdfViewWebPlugin::GetSaveDataBufferHandlerForDrive(
-    pdf::mojom::SaveRequestType request_type,
-    GetSaveDataBufferHandlerForDriveCallback callback) {
-  std::unique_ptr<SaveDataBufferHandlerForDrive> buffer_handler;
-  if (request_type == pdf::mojom::SaveRequestType::kOriginal) {
-    buffer_handler = std::make_unique<OriginalDataHandlerForDrive>(this);
-  } else {
-    buffer_handler = std::make_unique<ModifiedDataBufferHandlerForDrive>(this);
-#if BUILDFLAG(ENABLE_PDF_INK2)
-    if (request_type == pdf::mojom::SaveRequestType::kAnnotation &&
-        ink_module_) {
-      ink_module_->RecordMetricsOnSave();
-    }
-#endif  // BUILDFLAG(ENABLE_PDF_INK2)
-  }
-  const uint32_t file_size = buffer_handler->GetFileSize();
-  if (!file_size) {
-    std::move(callback).Run(nullptr);
-    return;
-  }
-  mojo::PendingRemote<pdf::mojom::SaveDataBufferHandler> remote;
-  save_data_buffer_handler_receivers_.Add(
-      std::move(buffer_handler), remote.InitWithNewPipeAndPassReceiver());
-  std::move(callback).Run(pdf::mojom::SaveDataBufferHandlerGetResult::New(
-      std::move(remote), file_size));
-}
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-
 bool PdfViewWebPlugin::IsValid() const {
   return client_->HasFrame();
 }

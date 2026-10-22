@@ -2697,12 +2697,6 @@ static_library("ui") {
       # - c/b/ui/side_panel/read_anything/read_anything_untrusted_page_handler.cc
       "//pdf:features",
     ]
-
-    if (enable_pdf_save_to_drive) {
-      deps += [ "//chrome/browser/ui/views/save_to_drive" ]
-      allow_circular_includes_from +=
-          [ "//chrome/browser/ui/views/save_to_drive:save_to_drive" ]
-    }
   }
 
   if (enable_printing) {

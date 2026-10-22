@@ -85,19 +85,6 @@ import {AnnotationMode} from '../constants.js';
 </if>
   </div>
   <div id="end">
-<if expr="enable_pdf_save_to_drive">
-    ${this.pdfSaveToDriveEnabled ? html`
-    <viewer-save-to-drive-controls id="save-to-drive"
-        .hasEdits="${this.hasEdits}"
-        .hasEnteredAnnotationMode="${this.hasEnteredAnnotationMode}"
-<if expr="enable_pdf_ink2">
-        .hasInk2Edits="${this.hasInk2Edits}"
-</if>
-        .isFormFieldFocused="${this.isFormFieldFocused_()}"
-        .progress="${this.saveToDriveProgress}"
-        .state="${this.saveToDriveState}">
-    </viewer-save-to-drive-controls>` : ''}
-</if>
     <viewer-download-controls id="downloads"
         .hasEdits="${this.hasEdits}"
         .hasEnteredAnnotationMode="${this.hasEnteredAnnotationMode}"

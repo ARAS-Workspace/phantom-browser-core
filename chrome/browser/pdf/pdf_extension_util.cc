@@ -42,13 +42,10 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(ENABLE_PDF_INK2)
+#include "chrome/browser/profiles/profile.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
-
-#if BUILDFLAG(ENABLE_PDF_INK2) || BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-#include "chrome/browser/profiles/profile.h"
-#endif  // BUILDFLAG(ENABLE_PDF_INK2) || BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
 
 namespace pdf_extension_util {
 
@@ -209,32 +206,6 @@ base::DictValue GetPdfViewerStrings() {
       {"ink2TextStyles", IDS_PDF_INK2_TEXT_STYLES},
       {"ink2Tool", IDS_PDF_INK2_ANNOTATION_TOOL},
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
-
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-      {"saveToDriveDialogCancelUploadButtonLabel",
-       IDS_SAVE_TO_DRIVE_DIALOG_CANCEL_UPLOAD_BUTTON_LABEL},
-      {"saveToDriveDialogConnectionErrorMessage",
-       IDS_SAVE_TO_DRIVE_DIALOG_CONNECTION_ERROR_MESSAGE},
-      {"saveToDriveDialogErrorTitle", IDS_SAVE_TO_DRIVE_DIALOG_ERROR_TITLE},
-      {"saveToDriveDialogManageStorageButtonLabel",
-       IDS_SAVE_TO_DRIVE_DIALOG_MANAGE_STORAGE_BUTTON_LABEL},
-      {"saveToDriveDialogOpenInDriveButtonLabel",
-       IDS_SAVE_TO_DRIVE_DIALOG_OPEN_IN_DRIVE_BUTTON_LABEL},
-      {"saveToDriveDialogRetryButtonLabel",
-       IDS_SAVE_TO_DRIVE_DIALOG_RETRY_BUTTON_LABEL},
-      {"saveToDriveDialogSessionTimeoutErrorMessage",
-       IDS_SAVE_TO_DRIVE_DIALOG_SESSION_TIMEOUT_ERROR_MESSAGE},
-      {"saveToDriveDialogStorageFullErrorMessage",
-       IDS_SAVE_TO_DRIVE_DIALOG_STORAGE_FULL_ERROR_MESSAGE},
-      {"saveToDriveDialogSuccessMessage",
-       IDS_SAVE_TO_DRIVE_DIALOG_SUCCESS_MESSAGE},
-      {"saveToDriveDialogSuccessTitle", IDS_SAVE_TO_DRIVE_DIALOG_SUCCESS_TITLE},
-      {"saveToDriveDialogUnknownErrorMessage",
-       IDS_SAVE_TO_DRIVE_DIALOG_UNKNOWN_ERROR_MESSAGE},
-      {"saveToDriveDialogUploadingTitle",
-       IDS_SAVE_TO_DRIVE_DIALOG_UPLOADING_TITLE},
-      {"tooltipSaveToDrive", IDS_PDF_TOOLTIP_SAVE_TO_DRIVE},
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
   };
   base::DictValue dict;
   for (const auto& resource : kPdfResources) {
@@ -268,14 +239,6 @@ bool IsPdfInk2AnnotationsEnabled(content::BrowserContext* context) {
          IsPdfAnnotationsEnabledByPolicy(context);
 }
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
-
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-bool IsPdfSaveToDriveEnabled(content::BrowserContext* context) {
-
-  return base::FeatureList::IsEnabled(chrome_pdf::features::kPdfSaveToDrive) &&
-         !Profile::FromBrowserContext(context)->IsOffTheRecord();
-}
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
 
 }  // namespace
 
@@ -332,11 +295,6 @@ base::DictValue GetAdditionalData(content::WebContents* web_contents) {
   dict.Set("pdfTextAnnotationsEnabled",
            use_ink2 && chrome_pdf::features::kPdfInk2TextAnnotations.Get());
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
-
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-  const bool save_to_drive_enabled = IsPdfSaveToDriveEnabled(context);
-  dict.Set("pdfSaveToDrive", save_to_drive_enabled);
-#endif
 
   return dict;
 }

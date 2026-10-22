@@ -37,10 +37,6 @@ BASE_DECLARE_FEATURE(kPdfInk2);
 extern const base::FeatureParam<bool> kPdfInk2TextAnnotations;
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
 
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-BASE_DECLARE_FEATURE(kPdfSaveToDrive);
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-
 // Sets whether the OOPIF PDF policy enables the OOPIF PDF viewer. Otherwise,
 // GuestView PDF viewer will be used. The policy is enabled by default.
 void SetIsOopifPdfPolicyEnabled(bool is_oopif_pdf_policy_enabled);

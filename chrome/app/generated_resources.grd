@@ -18733,32 +18733,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       </message>
     </if>
 
-    <!-- Save to Drive -->
-    <message name="IDS_ACCOUNT_CHOOSER_SINGLE_ACCOUNT_TITLE" desc="Text to prompt a user to save a file to their account.">
-      Save to your account
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_MULTI_ACCOUNT_TITLE" desc="Text to prompt a user to choose an account to save a file to.">
-      Choose your account
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_SUBTITLE" desc="Text description for saving files to Drive via Chrome PDF viewer.">
-      Find your <ph name="FILENAME">$1<ex>document.pdf</ex></ph> in the <ph name="FEATURE_NAME">$2<ex>Saved from Chrome</ex></ph> folder
-    </message>
-    <message name="IDS_SAVE_TO_DRIVE_FOLDER_NAME" desc="Name of the folder in Drive where files saved from Chrome are stored." meaning="Name of the folder in Drive where files saved from Chrome are stored. Please use the short version of the branded term for Google Chrome i.e. Chrome">
-      Saved from Chrome
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_DRIVE" desc="Google Drive product name.">
-      Drive
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_ADD_ACCOUNT" desc="Text for the button to add an account.">
-      Use a different account
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_RADIO_GROUP_ACCESSIBILITY_LABEL" is_accessibility_with_no_ui="true" desc="Text for account chooser radio group's accessibility label.">
-      Account selection
-    </message>
-    <message name="IDS_ACCOUNT_CHOOSER_HEADER_ACCESSIBILITY_LABEL" is_accessibility_with_no_ui="true" desc="Text for the account chooser header's accessibility label.  'Drive' is a product name, please translate accordingly.">
-      Choose Drive account
-    </message>
-
     <!-- Tips Notifications-->
     <message name="IDS_TIPS_NOTIFICATIONS_HELPFUL_BUTTON_TEXT" desc="Text for the helpful button found on tips notifications.">
       Open Chrome

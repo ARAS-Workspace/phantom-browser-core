@@ -44,7 +44,6 @@
 #include "chrome/browser/sessions/restore_on_startup_policy_handler.h"
 #include "chrome/browser/ssl/secure_origin_policy_handler.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
-#include "chrome/common/buildflags.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
@@ -551,11 +550,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kPdfViewerOutOfProcessIframeEnabled,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(ENABLE_PDF)
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-  { key::kRestrictPdfSaveToGoogleDriveAccountsToPattern,
-    prefs::kRestrictPdfSaveToGoogleDriveAccountsToPattern,
-    base::Value::Type::STRING },
-#endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
   { key::kPolicyRefreshRate,
     policy_prefs::kUserPolicyRefreshRate,
     base::Value::Type::INTEGER },

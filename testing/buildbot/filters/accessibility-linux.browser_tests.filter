@@ -18,10 +18,6 @@
 # Flaky on multiple bots for all OSes: crbug.com/40947143
 -All/NetworkRequestMetricsBrowserTest.CancelDuringBody/2
 
-# Flaky on Linux: crbug.com/483413085
--All/PDFExtensionJSSaveToDriveTest.SaveToDrive/0
--All/PDFExtensionJSSaveToDriveTest.SaveToDriveBubble/0
-
 # Flaky on Linux: crbug.com/483542948
 -AutocompleteTest.SubmitSimpleValue_Disabled_DoesNotSave
 

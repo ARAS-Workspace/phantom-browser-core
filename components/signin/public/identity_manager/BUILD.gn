@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//pdf/features.gni")
-
 source_set("identity_manager") {
   sources = [
     "access_token_fetcher.cc",
@@ -67,8 +65,6 @@ source_set("identity_manager") {
     "//services/network/public/cpp",
   ]
 
-  deps += [ "//pdf:buildflags" ]
-
   allow_circular_includes_from = [
     # This target is a pair with internal/identity_manager. They always go
     # together and include headers from each other.
@@ -129,8 +125,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  deps += [ "//pdf:buildflags" ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
