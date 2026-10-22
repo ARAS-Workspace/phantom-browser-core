@@ -45,7 +45,6 @@ gclient_gn_args = [
   'checkout_clang_coverage_tools',
   'checkout_copybara',
   'checkout_fuchsia',
-  'checkout_glic_e2e_tests',
   'checkout_mutter',
   'checkout_openxr',
   'checkout_src_internal',
@@ -106,12 +105,6 @@ vars = {
   # restricted to Googlers only.
   'checkout_chromium_autofill_test_dependencies': False,
 
-  # By default, do not check out Chromium password manager captured sites test
-  # dependencies. These dependencies include very large numbers of very
-  # large web capture files. Captured sites test dependencies are also
-  # restricted to Googlers only.
-  'checkout_chromium_password_manager_test_dependencies': False,
-
   # Checkout fuzz archive. Should not need in builders.
   'checkout_clusterfuzz_data': False,
 
@@ -139,10 +132,6 @@ vars = {
   # Checkout legacy src_internal. This variable is ignored if
   # checkout_src_internal is set as false.
   'checkout_legacy_src_internal': True,
-
-
-  # Checkout test code and archives for glic E2E tests.
-  'checkout_glic_e2e_tests': False,
 
   # For super-internal deps. Set by the official builders.
   'checkout_google_internal': False,
@@ -1576,11 +1565,6 @@ deps = {
   'src/chrome/test/data/autofill/captured_sites/artifacts': {
     'url': Var('chrome_git') + '/chrome/test/captured_sites/autofill.git' + '@' + '27a2afc9520a5a1ee6298ee116ae6ed51364cf1c',
     'condition': 'checkout_chromium_autofill_test_dependencies',
-  },
-
-  'src/chrome/test/data/password/captured_sites/artifacts': {
-    'url': Var('chrome_git') + '/chrome/test/captured_sites/password.git' + '@' + 'a252d7722f577b62c6244648b4031baffa876f17',
-    'condition': 'checkout_chromium_password_manager_test_dependencies',
   },
 
   'src/chrome/test/data/perf/canvas_bench':
@@ -3467,28 +3451,10 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/chrome/browser/actor/resources/internal': {
-      'url': Var('chrome_git') + '/chrome/browser/actor/resources/internal.git' + '@' +
-        'a93269b6f5eaf301ee21a44c7d286cf9d029237c',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/chrome/browser/cpu_performance_internal': {
       'url': Var('chrome_git') + '/chrome/browser/cpu_performance_internal.git' + '@' +
         'dfe1ccf3c2a93128082bb1d955517b4a6489ba62',
       'condition': 'checkout_src_internal',
-  },
-
-  'src/chrome/browser/glic/resources/internal': {
-      'url': Var('chrome_git') + '/chrome/browser/glic/resources/internal.git' + '@' +
-         '95f6df7236aeabbcc0409bf3f7e4c284ca3f2e72',
-      'condition': 'checkout_src_internal',
-  },
-
-  'src/chrome/browser/glic/e2e_test/internal': {
-      'url': Var('chrome_git') + '/chrome/browser/glic/test/internal.git' + '@' +
-        '9a2bfdf14b4def0d12e28bca05f6d491c4287b20',
-      'condition': 'checkout_glic_e2e_tests',
   },
 
   'src/chrome/browser/indigo/resources/internal': {
@@ -3631,23 +3597,6 @@ deps = {
       'condition': 'checkout_win and checkout_src_internal',
   },
 
-  'src/chrome/services/speech/internal': {
-      'url': Var('chrome_git') + '/chromeos/speech.git' + '@' + 'de8180ddc1a70f8c7ebb56bf9a1a9c1a9ba89b7d',
-      'condition': 'checkout_chromeos and checkout_src_internal',
-   },
-
-  'src/chrome/updater/internal': {
-    'url': Var('chrome_git') + '/chrome/updater/internal.git' + '@' +
-        '5f1216c3c95eb081c1a24a9e7bf65d0096f1e645',
-    'condition': 'checkout_src_internal',
-  },
-
-  'src/components/activity_reporter/internal': {
-    'url': Var('chrome_git') + '/activity_reporter_internal.git' + '@' +
-        '0540703a9db51619739c3de547961dd2227d2f26',
-    'condition': 'checkout_src_internal',
-  },
-
   'src/components/autofill/core/browser/geo/chrome_alternative_state_name_maps': {
       'url': Var('chrome_git') + '/chrome/components/autofill_alternative_state_name_maps.git' + '@' +
         'a2c20aaa74def75d6485ba287340ffb05bbabc09',
@@ -3660,26 +3609,9 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/components/crash/core/app/internal': {
-    'url': Var('chrome_git') + '/chrome/components/crash.git' + '@' + '977755983e64eb91813875407050afcc7c1b6683',
-    'condition': 'checkout_src_internal',
-  },
-
   'src/components/internal': {
       'url': Var('chrome_git') + '/chrome/components.git' + '@' +
         '4e8c4db51652c4650b58b0bbfee03741df8f37d2',
-      'condition': 'checkout_src_internal',
-  },
-
-  'src/components/metrics/internal': {
-      'url': Var('chrome_git') + '/chrome/components/metrics/internal.git' + '@' +
-        '6c5b0a009ec24624e40e58045cc107d1c47672c6',
-      'condition': 'checkout_src_internal',
-  },
-
-  'src/components/optimization_guide/internal': {
-      'url': Var('chrome_git') + '/chrome/components/optimization_guide.git' + '@' +
-        '7c38b77a11e87c58f1cac9f609129766228b0259',
       'condition': 'checkout_src_internal',
   },
 
@@ -4763,7 +4695,6 @@ recursedeps = [
   # clank has its own DEPS file, does not need to be in trybot_analyze_config
   # since the roller does not run tests.
   'src/clank',
-  'src/components/optimization_guide/internal',
   'src/ios_internal',
 
   # WebPageReplay ships with a go toolchain in its DEPS that's necessary for

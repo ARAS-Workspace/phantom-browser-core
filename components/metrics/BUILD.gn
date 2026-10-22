@@ -617,11 +617,7 @@ test("metrics_unittests") {
 }
 
 grit("server_urls_grd") {
-  if (is_internal_chrome_branded) {
-    source = "internal/server_urls.grd"
-  } else {
-    source = "server_urls.grd"
-  }
+  source = "server_urls.grd"
   outputs = [
     "grit/metrics_server_urls.h",
     "metrics_server_urls.pak",

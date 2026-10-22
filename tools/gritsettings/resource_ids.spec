@@ -91,11 +91,6 @@
     "includes": [2200],
     "structures": [2220],
   },
-  "chrome/browser/actor/resources/internal/browser_resources.grd": {
-    "structures": [2230],
-    "messages": [2235],
-    "includes": [2240],
-  },
   "chrome/browser/dev_ui_browser_resources.grd": {
     "includes": [2250],
   },
@@ -134,14 +129,6 @@
   },
   "chrome/browser/resources/preinstalled_web_apps/resources.grd": {
     "includes": [2500],
-  },
-  # chrome/browser/glic/resources/internal/browser_resources.grd and
-  # chrome/browser/glic/resources/browser_resources.grd must share the same id
-  # because they define the same resources, but only one of them is built
-  # depending on whether src_internal is available.
-  "chrome/browser/glic/resources/internal/browser_resources.grd": {
-    "messages": [2540],
-    "includes": [2600],
   },
   "chrome/browser/indigo/resources/internal/browser_resources.grd": {
     "includes": [2640],
@@ -1012,12 +999,6 @@
   },
   "components/headless/command_handler/headless_command.grd": {
     "includes": [7120],
-  },
-  # metrics/internal/server_urls.grd and metrics/server_urls.grd must share the
-  # same id because they define the same strings, but only one of them is built
-  # depending on whether src_internal is available.
-  "components/metrics/internal/server_urls.grd": {
-    "messages": [7130],
   },
   "components/metrics/server_urls.grd": {
     "messages": [7130],

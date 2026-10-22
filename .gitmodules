@@ -24,10 +24,6 @@
 	path = chrome/test/data/autofill/captured_sites/artifacts
 	url = https://chrome-internal.googlesource.com/chrome/test/captured_sites/autofill
 	gclient-condition = checkout_chromium_autofill_test_dependencies
-[submodule "chrome/test/data/password/captured_sites/artifacts"]
-	path = chrome/test/data/password/captured_sites/artifacts
-	url = https://chrome-internal.googlesource.com/chrome/test/captured_sites/password
-	gclient-condition = checkout_chromium_password_manager_test_dependencies
 [submodule "chrome/test/data/perf/canvas_bench"]
 	path = chrome/test/data/perf/canvas_bench
 	url = https://chromium.googlesource.com/chromium/canvas_bench
@@ -619,22 +615,10 @@
 	path = chrome/app/theme/google_chrome
 	url = https://chrome-internal.googlesource.com/chrome/theme/google_chrome
 	gclient-condition = checkout_src_internal
-[submodule "chrome/browser/actor/resources/internal"]
-	path = chrome/browser/actor/resources/internal
-	url = https://chrome-internal.googlesource.com/chrome/browser/actor/resources/internal
-	gclient-condition = checkout_src_internal
 [submodule "chrome/browser/cpu_performance_internal"]
 	path = chrome/browser/cpu_performance_internal
 	url = https://chrome-internal.googlesource.com/chrome/browser/cpu_performance_internal
 	gclient-condition = checkout_src_internal
-[submodule "chrome/browser/glic/resources/internal"]
-	path = chrome/browser/glic/resources/internal
-	url = https://chrome-internal.googlesource.com/chrome/browser/glic/resources/internal
-	gclient-condition = checkout_src_internal
-[submodule "chrome/browser/glic/e2e_test/internal"]
-	path = chrome/browser/glic/e2e_test/internal
-	url = https://chrome-internal.googlesource.com/chrome/browser/glic/test/internal
-	gclient-condition = checkout_glic_e2e_tests
 [submodule "chrome/browser/indigo/resources/internal"]
 	path = chrome/browser/indigo/resources/internal
 	url = https://chrome-internal.googlesource.com/chrome/browser/indigo/resources/internal
@@ -719,18 +703,6 @@
 	path = chrome/tools/memory
 	url = https://chrome-internal.googlesource.com/chrome/tools/memory
 	gclient-condition = checkout_win and checkout_src_internal
-[submodule "chrome/services/speech/internal"]
-	path = chrome/services/speech/internal
-	url = https://chrome-internal.googlesource.com/chromeos/speech
-	gclient-condition = checkout_chromeos and checkout_src_internal
-[submodule "chrome/updater/internal"]
-	path = chrome/updater/internal
-	url = https://chrome-internal.googlesource.com/chrome/updater/internal
-	gclient-condition = checkout_src_internal
-[submodule "components/activity_reporter/internal"]
-	path = components/activity_reporter/internal
-	url = https://chrome-internal.googlesource.com/activity_reporter_internal
-	gclient-condition = checkout_src_internal
 [submodule "components/autofill/core/browser/geo/chrome_alternative_state_name_maps"]
 	path = components/autofill/core/browser/geo/chrome_alternative_state_name_maps
 	url = https://chrome-internal.googlesource.com/chrome/components/autofill_alternative_state_name_maps
@@ -739,21 +711,9 @@
 	path = components/autofill/core/browser/form_parsing/internal_resources
 	url = https://chrome-internal.googlesource.com/chrome/components/autofill_regex_patterns
 	gclient-condition = checkout_src_internal
-[submodule "components/crash/core/app/internal"]
-	path = components/crash/core/app/internal
-	url = https://chrome-internal.googlesource.com/chrome/components/crash
-	gclient-condition = checkout_src_internal
 [submodule "components/internal"]
 	path = components/internal
 	url = https://chrome-internal.googlesource.com/chrome/components
-	gclient-condition = checkout_src_internal
-[submodule "components/metrics/internal"]
-	path = components/metrics/internal
-	url = https://chrome-internal.googlesource.com/chrome/components/metrics/internal
-	gclient-condition = checkout_src_internal
-[submodule "components/optimization_guide/internal"]
-	path = components/optimization_guide/internal
-	url = https://chrome-internal.googlesource.com/chrome/components/optimization_guide
 	gclient-condition = checkout_src_internal
 [submodule "components/personal_context/core/resources/internal"]
 	path = components/personal_context/core/resources/internal

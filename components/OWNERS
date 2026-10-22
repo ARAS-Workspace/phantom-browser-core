@@ -81,9 +81,6 @@ per-file error_page_strings.grdp=edwardjung@chromium.org
 # Autorollers & git submodules
 per-file autofill/core/browser/form_parsing/internal_resources=*
 per-file autofill/core/browser/geo/chrome_alternative_state_name_maps=*
-per-file crash/core/app/internal=*
-per-file metrics/internal=*
-per-file optimization_guide/internal=*
 per-file plus_addresses/resources/internal=*
 per-file resources/default_100_percent/google_chrome=*
 per-file resources/default_200_percent/google_chrome=*
