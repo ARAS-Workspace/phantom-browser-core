@@ -762,9 +762,6 @@
                   '|media/capture/video/chromeos/camera_app'\
                   '|media/capture/video/chromeos/mojom/camera_app',
     },
-    'chrome_elf': {
-      'filepath': 'chrome/chrome_elf',
-    },
     'chrome_grc': {
       'filepath': 'chrome/browser/resource_coordinator/'\
                   '|services/resource_coordinator/',
@@ -1689,7 +1686,6 @@
         'content/public/browser/platform_notification|'\
         'content/public/common/platform_notification|'\
         'content/renderer/notification_|'\
-        'chrome/notification_helper/|'\
         'third_party/blink/web_tests/external/wpt/notifications|'\
         'third_party/blink/web_tests/http/tests/notifications|'\
         'third_party/blink/renderer/modules/notifications|'\
@@ -2686,8 +2682,6 @@
                                  'martijn+crwatch@martijnc.be',
                                  'rsleevi+watch@chromium.org'],
     'chrome_camera_app': ['chromeos-camera-app-eng@google.com'],
-    'chrome_elf': ['caitkp+watch@chromium.org',
-                   'pmonette+watch@chromium.org'],
     'chrome_grc': ['chrome-grc-reviews@chromium.org'],
     'chrome_intelligence': ['chrome-intelligence-reviews@chromium.org',
                             'chrome-intelligence-team-chromium-cl-reviews@google.com'],

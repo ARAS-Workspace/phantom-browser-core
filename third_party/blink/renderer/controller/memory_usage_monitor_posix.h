@@ -39,7 +39,6 @@ class CONTROLLER_EXPORT MemoryUsageMonitorPosix
   FRIEND_TEST_ALL_PREFIXES(MemoryUsageMonitorPosixTest,
                            CalculateProcessFootprint);
 
-  friend class CrashMemoryMetricsReporterImpl;
   void GetProcessMemoryUsage(MemoryUsage&) override;
   static bool CalculateProcessMemoryFootprint(int statm_fd,
                                               int status_fd,

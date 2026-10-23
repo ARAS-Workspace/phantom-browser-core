@@ -5,16 +5,12 @@
 #include "content/browser/webui/web_ui_main_frame_observer.h"
 
 #include <string>
-#include <utility>
 
 #include "base/command_line.h"
-#include "base/feature_list.h"
-#include "base/functional/callback_helpers.h"
 #include "base/logging.h"
 #include "base/strings/strcat.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/version_info/version_info.h"
-#include "build/build_config.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/webui/web_ui_impl.h"
 #include "content/public/browser/navigation_handle.h"
@@ -22,29 +18,27 @@
 #include "content/public/browser/web_ui_controller.h"
 #include "content/public/browser/webui_config.h"
 #include "content/public/browser/webui_config_map.h"
-#include "content/public/common/content_features.h"
 #include "content/public/common/url_constants.h"
 #include "url/gurl.h"
-
-#include "components/crash/content/browser/error_reporting/error_reporting_util.h"
-#include "components/crash/content/browser/error_reporting/javascript_error_report.h"
-#include "components/crash/content/browser/error_reporting/js_error_report_processor.h"
 
 namespace content {
 
 namespace {
 
-bool IsWebUIJavaScriptErrorReportingSupported() {
-#if BUILDFLAG(IS_LINUX)
-  return true;
-#else
-  return base::FeatureList::IsEnabled(features::kWebUIJSErrorReportingExtended);
-#endif
-}
-
 // The command line flag to disable the crash on WebUI JS error in development
 // builds.
 const char kDisableCrashOnWebUIJsError[] = "disable-crash-on-webui-js-error";
+
+// Returns `url` without its username, password, query and fragment, for the
+// crash message.
+std::string RedactUrl(const GURL& url) {
+  GURL::Replacements replacements;
+  replacements.ClearUsername();
+  replacements.ClearPassword();
+  replacements.ClearQuery();
+  replacements.ClearRef();
+  return url.ReplaceComponents(replacements).spec();
+}
 
 }  // namespace
 
@@ -66,99 +60,69 @@ void WebUIMainFrameObserver::OnDidAddMessageToConsole(
     DVLOG(3) << "stack is " << *untrusted_stack_trace;
   }
 
-  if (!error_reporting_enabled_) {
-    DVLOG(3) << "Message not reported, error reporting disabled for this page "
-                "or experiment is off";
+  if (!should_crash_on_error_) {
+    DVLOG(3) << "Message ignored, no crash on error for this page";
     return;
   }
 
   if (log_level != blink::mojom::ConsoleMessageLevel::kError) {
-    DVLOG(3) << "Message not reported, not an error";
+    DVLOG(3) << "Message ignored, not an error";
     return;
   }
 
   // Some WebUI pages have another WebUI page in an <iframe>. Both
   // WebUIMainFrameObservers will get a callback when either page gets an error.
-  // To avoid duplicates, only report on errors from this page's frame.
+  // To avoid duplicates, only handle errors from this page's frame.
   if (source_frame != web_ui_->GetRenderFrameHost()) {
-    DVLOG(3) << "Message not reported, different frame";
+    DVLOG(3) << "Message ignored, different frame";
     return;
   }
 
-  // Redact query parameters & fragment. Also the username and password.
-  // TODO(crbug.com/40146362) Improve redaction.
   GURL url(source_id);
   if (!url.is_valid()) {
-    DVLOG(3) << "Message not reported, invalid URL";
+    DVLOG(3) << "Message ignored, invalid URL";
     return;
   }
 
-  // If this is not a chrome:// page, do not report the error. In particular,
-  // some WebUIs use chrome-untrusted:// to host pages with some
-  // not-controlled-by-Chrome content. The code must not send reports for such
-  // content because Chrome cannot control what information is being included in
-  // the reports.
+  // If this is not a chrome:// page, ignore the error. In particular, some
+  // WebUIs use chrome-untrusted:// to host pages with some
+  // not-controlled-by-Chrome content, whose errors must not crash the browser.
   if (!url.SchemeIs(kChromeUIScheme)) {
-    DVLOG(3) << "Message not reported, not a chrome:// URL";
+    DVLOG(3) << "Message ignored, not a chrome:// URL";
     return;
   }
 
   // Ignore console messages from frames that are pending deletion to avoid
-  // reporting errors during frame teardown.
+  // crashing on errors during frame teardown.
   if (source_frame->GetLifecycleState() ==
       RenderFrameHost::LifecycleState::kPendingDeletion) {
-    DVLOG(3) << "Message not reported, frame is being deleted";
+    DVLOG(3) << "Message ignored, frame is being deleted";
     return;
   }
 
-  JavaScriptErrorReport report;
-  report.message = base::UTF16ToUTF8(message);
-  report.line_number = line_no;
-  report.url = RedactUrlForErrorReports(url);
-  report.source_system = JavaScriptErrorReport::SourceSystem::kWebUIObserver;
+  std::string stack_trace = "(empty)";
   if (untrusted_stack_trace) {
-    report.stack_trace = base::UTF16ToUTF8(*untrusted_stack_trace);
+    stack_trace = base::UTF16ToUTF8(*untrusted_stack_trace);
   }
 
+  std::string redacted_page_url = "(empty)";
   GURL page_url = source_frame->GetLastCommittedURL();
   if (page_url.is_valid()) {
-    report.page_url = RedactUrlForErrorReports(page_url);
+    redacted_page_url = RedactUrl(page_url);
   }
 
-  if (should_crash_on_error_) {
-    // LOG(FATAL) will crash the browser.
-    LOG(FATAL) << "JavaScript error in development build. To disable this "
-                  "crash, use --"
-               << kDisableCrashOnWebUIJsError << ".\n"
-               << "URL: " << report.url << "\n"
-               << "Page URL: " << report.page_url.value_or("(empty)") << "\n"
-               << "Message: " << report.message << "\n"
-               << "Stack trace: " << report.stack_trace.value_or("(empty)");
-  }
-
-  scoped_refptr<JsErrorReportProcessor> processor =
-      JsErrorReportProcessor::Get();
-
-  if (!processor) {
-    // This usually means we are not on an official Google build, FYI.
-    DVLOG(3) << "Message not reported, no processor";
-    return;
-  }
-
-  DVLOG(3) << "Error being sent to Google";
-  processor->SendErrorReport(std::move(report), base::DoNothing(),
-                             web_contents()->GetBrowserContext());
+  // LOG(FATAL) will crash the browser.
+  LOG(FATAL) << "JavaScript error in development build. To disable this "
+                "crash, use --"
+             << kDisableCrashOnWebUIJsError << ".\n"
+             << "URL: " << RedactUrl(url) << "\n"
+             << "Page URL: " << redacted_page_url << "\n"
+             << "Message: " << base::UTF16ToUTF8(message) << "\n"
+             << "Stack trace: " << stack_trace;
 }
 
-void WebUIMainFrameObserver::MaybeEnableWebUIJavaScriptErrorReporting(
+void WebUIMainFrameObserver::MaybeEnableCrashOnJavaScriptError(
     NavigationHandle* navigation_handle) {
-  if (!IsWebUIJavaScriptErrorReportingSupported()) {
-    return;
-  }
-
-  error_reporting_enabled_ =
-      web_ui_->GetController()->IsJavascriptErrorReportingEnabled();
-
   // WebUIConfigMap::GetConfig() uses the origin of the URL to look up the
   // config, so this works even if the page URL has a path, e.g.
   // chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html.
@@ -174,17 +138,17 @@ void WebUIMainFrameObserver::MaybeEnableWebUIJavaScriptErrorReporting(
     should_crash_on_error_ = false;
   }
 
-  // If we are collecting error reports, make sure the main frame sends us
-  // stacks along with those messages. Warning: Don't call
+  // If we crash on JavaScript errors, make sure the main frame sends us stacks
+  // along with those messages. Warning: Don't call
   // RenderFrameHostImpl::SetWantErrorMessageStackTrace() before the remote
   // frame is created, or it will lock up the communications channel. (See
   // https://crbug.com/1154866).
-  if (error_reporting_enabled_) {
+  if (should_crash_on_error_) {
     DVLOG(3) << "Enabled";
     static_cast<content::RenderFrameHostImpl*>(web_ui_->GetRenderFrameHost())
         ->SetWantErrorMessageStackTrace();
   } else {
-    DVLOG(3) << "Error reporting disabled for this page";
+    DVLOG(3) << "Crash on JavaScript error disabled for this page";
   }
 }
 
@@ -199,7 +163,7 @@ void WebUIMainFrameObserver::ReadyToCommitNavigation(
   web_ui_->SetUpMojoInterfaceBroker();
 
   GetContentClient()->browser()->LogWebUIUsage(web_ui_);
-  MaybeEnableWebUIJavaScriptErrorReporting(navigation_handle);
+  MaybeEnableCrashOnJavaScriptError(navigation_handle);
 }
 
 void WebUIMainFrameObserver::PrimaryPageChanged(Page& page) {

@@ -14,20 +14,15 @@
 #include "base/path_service.h"
 #include "base/strings/string_split.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_paths_internal.h"
 #include "chrome/common/chrome_result_codes.h"
 #include "chrome/common/env_vars.h"
-#include "chrome/installer/util/google_update_settings.h"
-#include "components/crash/core/common/crash_keys.h"
 #include "components/version_info/version_info_values.h"
-#include "content/public/common/content_switches.h"
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-#include "components/upload_list/crash_upload_list.h"
 #include "components/version_info/version_info.h"
 #endif
 
@@ -74,18 +69,7 @@ ChromeCrashReporterClient::ChromeCrashReporterClient() = default;
 
 ChromeCrashReporterClient::~ChromeCrashReporterClient() = default;
 
-#if !BUILDFLAG(IS_MAC)
-void ChromeCrashReporterClient::SetCrashReporterClientIdFromGUID(
-    const std::string& client_guid) {
-  crash_keys::SetMetricsClientIdFromGUID(client_guid);
-}
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-base::FilePath ChromeCrashReporterClient::GetReporterLogFilename() {
-  return base::FilePath(CrashUploadList::kReporterLogFilename);
-}
-
 bool ChromeCrashReporterClient::GetShouldDumpLargerDumps() {
   return chrome::GetChannel() != version_info::Channel::STABLE;
 }
@@ -116,52 +100,7 @@ void ChromeCrashReporterClient::GetProductInfo(ProductInfo* product_info) {
       chrome::GetChannelName(chrome::WithExtendedStable(true));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-bool ChromeCrashReporterClient::GetCrashMetricsLocation(
-    base::FilePath* metrics_dir) {
-  if (!GetCollectStatsConsent()) {
-    return false;
-  }
-  return base::PathService::Get(chrome::DIR_CRASH_METRICS, metrics_dir);
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
 bool ChromeCrashReporterClient::IsRunningUnattended() {
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   return env->HasVar(env_vars::kHeadless);
-}
-
-bool ChromeCrashReporterClient::GetCollectStatsConsent() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  bool is_official_chrome_build = true;
-#else
-  bool is_official_chrome_build = false;
-#endif
-
-  if (!is_official_chrome_build) {
-    VLOG(1) << "GetCollectStatsConsent(): is_official_chrome_build is false "
-            << "so returning false";
-    return false;
-  }
-  bool settings_consent = GoogleUpdateSettings::GetCollectStatsConsent();
-  VLOG(1) << "GetCollectStatsConsent(): settings_consent: " << settings_consent
-          << " so returning that";
-  return settings_consent;
-}
-
-#if BUILDFLAG(IS_LINUX)
-bool ChromeCrashReporterClient::ShouldMonitorCrashHandlerExpensively() {
-  // TODO(jperaza): Turn this on less frequently for stable channels when
-  // Crashpad is always enabled on Linux. Consider combining with the
-  // macOS implementation.
-  return true;
-}
-#endif  // BUILDFLAG(IS_LINUX)
-
-bool ChromeCrashReporterClient::EnableBreakpadForProcess(
-    const std::string& process_type) {
-  return process_type == switches::kRendererProcess ||
-         process_type == switches::kZygoteProcess ||
-         process_type == switches::kGpuProcess ||
-         process_type == switches::kUtilityProcess;
 }

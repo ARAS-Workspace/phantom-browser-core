@@ -56,7 +56,6 @@ inline constexpr std::array kSpanifyManualPathsToIgnoreChrome = {
     // Exclude tools that do not ship in the Chrome binary. Can't depend on
     // //base.
     "base/android/linker/",
-    "chrome/chrome_elf/",
     "chrome/installer/mini_installer/",
     "testing/platform_test.h",
     "/tools/",  // catches subdirs e.g. /net/tools, but not devtools/ etc.

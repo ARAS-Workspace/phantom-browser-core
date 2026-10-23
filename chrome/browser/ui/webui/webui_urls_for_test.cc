@@ -131,7 +131,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
       "chrome://signout-confirmation",
 #endif
-      "chrome://webuijserror",
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
       "chrome://print",
 #endif

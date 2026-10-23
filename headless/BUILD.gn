@@ -461,10 +461,7 @@ source_set("headless_browser") {
     "lib/headless_crash_reporter_client.cc",
     "lib/headless_crash_reporter_client.h",
   ]
-  deps += [
-    "//components/crash/content/browser",
-    "//components/crash/core/app",
-  ]
+  deps += [ "//components/crash/core/app" ]
 
   if (is_linux) {
     data_deps += [ "//components/crash/core/app:chrome_crashpad_handler" ]

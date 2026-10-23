@@ -152,11 +152,6 @@ bool PathProvider(int key, base::FilePath* result) {
       // Do not create the download directory here, we have done it twice now
       // and annoyed a lot of users.
       break;
-    case chrome::DIR_CRASH_METRICS:
-      if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
-        return false;
-      }
-      break;
     case chrome::DIR_CRASH_DUMPS:
       // The crash reports are always stored relative to the default user data
       // directory.  This avoids the problem of having to re-initialize the

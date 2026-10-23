@@ -11,8 +11,6 @@
 #include "base/files/file_path.h"
 #include "base/path_service.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/build_config.h"
-#include "content/public/common/content_switches.h"
 #include "content/shell/common/shell_switches.h"
 
 namespace content {
@@ -33,12 +31,6 @@ base::FilePath GetCrashDumpLocationInternal() {
 ShellCrashReporterClient::ShellCrashReporterClient() {}
 ShellCrashReporterClient::~ShellCrashReporterClient() {}
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-base::FilePath ShellCrashReporterClient::GetReporterLogFilename() {
-  return base::FilePath(FILE_PATH_LITERAL("uploads.log"));
-}
-#endif
-
 bool ShellCrashReporterClient::GetCrashDumpLocation(base::FilePath* crash_dir) {
   base::FilePath crash_directory = GetCrashDumpLocationInternal();
   if (crash_directory.empty()) {
@@ -51,13 +43,6 @@ bool ShellCrashReporterClient::GetCrashDumpLocation(base::FilePath* crash_dir) {
 void ShellCrashReporterClient::GetProductInfo(ProductInfo* product_info) {
   product_info->product_name = "content_shell";
   product_info->version = CONTENT_SHELL_VERSION;
-}
-
-bool ShellCrashReporterClient::EnableBreakpadForProcess(
-    const std::string& process_type) {
-  return process_type == switches::kRendererProcess ||
-         process_type == switches::kZygoteProcess ||
-         process_type == switches::kGpuProcess;
 }
 
 }  // namespace content

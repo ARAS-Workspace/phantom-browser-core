@@ -550,7 +550,6 @@ source_set("extensions") {
     "//components/content_settings/core/browser",
     "//components/content_settings/core/browser:cookie_settings",
     "//components/cookie_config",
-    "//components/crash/content/browser/error_reporting",
     "//components/crx_file",
     "//components/data_sharing/public",
     "//components/data_sharing/public:features",
@@ -1568,9 +1567,6 @@ source_set("unit_tests") {
       ]
     }
   }
-
-  sources += [ "chrome_extension_web_contents_observer_unittest.cc" ]
-  deps += [ "//components/crash/content/browser/error_reporting" ]
 
   if (toolkit_views) {
     deps += [ "//chrome/browser/ui/views/web_apps:launch_dialogs" ]

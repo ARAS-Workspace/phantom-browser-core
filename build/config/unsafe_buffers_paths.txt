@@ -15,7 +15,6 @@ $../../
 -base/third_party/
 -codelabs/  # Examples, keep simple.
 -chrome/browser/platform_experience/win/
--chrome/chrome_elf/third_party_dlls/
 -chrome/elevation_service/internal/
 -chrome/installer/mac/third_party/
 -chromeos/assistant/internal

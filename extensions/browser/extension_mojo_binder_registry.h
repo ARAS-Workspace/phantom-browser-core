@@ -49,13 +49,6 @@ class ExtensionMojoBinderProvider {
           binder_map,
       content::BrowserContext* browser_context,
       const Extension* extension) {}
-
-  // Returns true if `extension` is allowed to report JS errors.
-  virtual bool IsJsErrorReportingEnabled() const;
-
-  // Returns true if `extension` should crash on JS errors in development
-  // builds.
-  virtual bool ShouldCrashOnJsErrorInDevelopmentBuild() const;
 };
 
 // A registry for extension-scoped Mojo interface binder providers. It decouples
@@ -95,13 +88,6 @@ class ExtensionMojoBinderRegistry : public KeyedService {
 
   // Returns true if `extension` is allowed to use MojoJS bindings.
   bool IsMojoJsEnabled(const Extension* extension) const;
-
-  // Returns true if `extension` is allowed to report JS errors.
-  bool IsJsErrorReportingEnabled(const Extension* extension) const;
-
-  // Returns true if `extension` should crash on JS errors in development
-  // builds.
-  bool ShouldCrashOnJsErrorInDevelopmentBuild(const Extension* extension) const;
 
   void ClearProvidersForTesting();
 

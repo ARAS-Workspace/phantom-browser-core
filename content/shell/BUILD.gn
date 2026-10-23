@@ -305,10 +305,7 @@ static_library("content_shell_lib") {
     "//v8",
   ]
 
-  deps += [
-    "//components/crash/content/browser",
-    "//components/crash/core/app",
-  ]
+  deps += [ "//components/crash/core/app" ]
 
   if (enable_plugins) {
     sources += [
@@ -838,10 +835,7 @@ group("content_shell_crash_test") {
     ]
   }
   if (is_posix) {
-    data += [
-      "//components/crash/content/tools/generate_breakpad_symbols.py",
-      "//components/crash/content/tools/dmp2minidump.py",
-    ]
+    data += [ "//components/crash/content/tools/generate_breakpad_symbols.py" ]
   }
   if (is_posix) {
     data_deps += [

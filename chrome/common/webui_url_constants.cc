@@ -143,7 +143,6 @@ base::span<const base::cstring_view> ChromeDebugURLs() {
        blink::kChromeUIMemoryExhaustURL,
        blink::kChromeUIMemoryPressureCriticalURL,
        blink::kChromeUIMemoryPressureModerateURL,
-       kChromeUIWebUIJsErrorURL,
        kChromeUIQuitURL,
        kChromeUIRestartURL});
 

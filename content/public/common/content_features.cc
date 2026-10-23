@@ -1140,12 +1140,6 @@ BASE_FEATURE(kWebUIBundledCodeCache, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<bool> kWebUIBundledCodeCacheGenerateResourceMap{
     &kWebUIBundledCodeCache, "WebUIBundledCodeCacheGenerateResourceMap", true};
 
-// Reports WebUI Javascript errors to the crash server on all desktop platforms.
-// Previously, this was only supported on ChromeOS and Linux.
-// Intentionally enabled by default and will be used as a kill switch in case
-// of regressions.
-BASE_FEATURE(kWebUIJSErrorReportingExtended, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // If enabled, WebUI will optimize resources loading by piping a dictionary of
 // URL paths to materialized WebUI resource content to the renderer via
 // LocalResourceLoaderConfig.

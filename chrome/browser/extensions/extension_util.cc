@@ -304,19 +304,6 @@ bool IsMojoJsEnabledForExtension(const Extension* extension,
       ->IsMojoJsEnabled(extension);
 }
 
-bool IsJsErrorReportingEnabledForExtension(const Extension* extension,
-                                           content::BrowserContext* context) {
-  return ExtensionMojoBinderRegistryFactory::GetForBrowserContext(context)
-      ->IsJsErrorReportingEnabled(extension);
-}
-
-bool ShouldCrashOnExtensionJsErrorInDevelopmentBuild(
-    const Extension* extension,
-    content::BrowserContext* context) {
-  return ExtensionMojoBinderRegistryFactory::GetForBrowserContext(context)
-      ->ShouldCrashOnJsErrorInDevelopmentBuild(extension);
-}
-
 #if BUILDFLAG(IS_MAC)
 DseNtpOverrideType GetDseNtpOverrideType(const Extension& extension) {
   enum Flags {

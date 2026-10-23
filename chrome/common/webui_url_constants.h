@@ -331,8 +331,6 @@ inline constexpr char kChromeUITabsFromOtherDevicesSidePanelURL[] =
     "chrome://tabs-from-other-devices.top-chrome/";
 inline constexpr char kChromeUIWebuiBrowserHost[] = "webui-browser";
 inline constexpr char kChromeUIWebuiBrowserURL[] = "chrome://webui-browser/";
-inline constexpr char kChromeUIWebUIJsErrorHost[] = "webuijserror";
-inline constexpr char kChromeUIWebUIJsErrorURL[] = "chrome://webuijserror/";
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 inline constexpr char kChromeUIDiscardsHost[] = "discards";

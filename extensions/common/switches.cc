@@ -19,8 +19,6 @@ const char kEmbeddedExtensionOptions[] = "embedded-extension-options";
 const char kEnableBLEAdvertising[] = "enable-ble-advertising-in-apps";
 const char kEnableExperimentalExtensionApis[] =
     "enable-experimental-extension-apis";
-const char kDisableCrashOnComponentExtensionJsError[] =
-    "disable-crash-on-component-extension-js-error";
 const char kDisableExtensionsFileAccessCheck[] =
     "disable-extensions-file-access-check";
 const char kDisableExtensionsHttpThrottling[] =

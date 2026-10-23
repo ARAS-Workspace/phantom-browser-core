@@ -436,7 +436,6 @@ test("components_unittests") {
   ]
 
   deps += [
-    "//components/crash/content/browser:unit_tests",
     "//components/crash/core/app:unit_tests",
     "//components/history_embeddings/content:unit_tests",
     "//components/page_content_annotations/content:unit_tests",

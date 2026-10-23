@@ -10,7 +10,6 @@ DevToolsProtocolTest.*
 ExtensionProtocolTest.*
 PrintToPdfProtocolTest.*
 AutofillFormDevtoolsProtocolTest.*
-WebUIJSErrorReportingTest.*
 
 # FileSystem access
 ChromeFileSystemAccessPermissionContextPrerenderingBrowserTest.*

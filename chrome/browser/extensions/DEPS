@@ -1,6 +1,5 @@
 include_rules = [
   "+components/app_constants/constants.h",
-  "+components/crash/content/browser/error_reporting",
   "+components/guest_view/common",
   "+components/security_state/content",
   "+components/split_tabs",

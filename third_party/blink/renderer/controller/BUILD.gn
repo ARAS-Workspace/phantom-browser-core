@@ -79,8 +79,6 @@ component("controller") {
   }
   if (is_android) {
     sources += [
-      "crash_memory_metrics_reporter_impl.cc",
-      "crash_memory_metrics_reporter_impl.h",
       "memory_usage_monitor_posix.cc",
       "memory_usage_monitor_posix.h",
       "oom_intervention_impl.cc",

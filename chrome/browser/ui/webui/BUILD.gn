@@ -102,7 +102,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/organizer_panel",
     "//chrome/browser/ui/webui/profile_internals",
     "//chrome/browser/ui/webui/tab_search",
-    "//chrome/browser/ui/webui/webui_js_error",
     "//chrome/browser/ui/webui/webui_toolbar",
     "//chrome/browser/ui/webui_browser",
   ]

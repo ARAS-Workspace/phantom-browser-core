@@ -6,12 +6,10 @@
 
 #include <memory>
 
-#include "base/command_line.h"
 #include "base/functional/bind.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/test/test_future.h"
 #include "base/types/pass_key.h"
-#include "components/version_info/version_info.h"
 #include "content/public/browser/service_worker_version_base_info.h"
 #include "extensions/browser/extension_mojo_binder_registry_factory.h"
 #include "extensions/browser/extensions_test.h"
@@ -19,7 +17,6 @@
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/mojom/keep_alive.mojom.h"
-#include "extensions/common/switches.h"
 #include "mojo/public/cpp/bindings/binder_map.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -40,25 +37,13 @@ class TestBinderProvider : public ExtensionMojoBinderProvider {
       base::RepeatingCallback<void(content::BrowserContext*,
                                    const content::ServiceWorkerVersionBaseInfo&,
                                    mojo::PendingReceiver<TestInterface>)>
-          sw_binder,
-      bool js_error_reporting_enabled = false,
-      bool should_crash_on_js_error = false)
+          sw_binder)
       : extension_id_(std::move(extension_id)),
         frame_binder_(std::move(frame_binder)),
-        sw_binder_(std::move(sw_binder)),
-        js_error_reporting_enabled_(js_error_reporting_enabled),
-        should_crash_on_js_error_(should_crash_on_js_error) {}
+        sw_binder_(std::move(sw_binder)) {}
   ~TestBinderProvider() override = default;
 
   ExtensionId GetExtensionId() const override { return extension_id_; }
-
-  bool IsJsErrorReportingEnabled() const override {
-    return js_error_reporting_enabled_;
-  }
-
-  bool ShouldCrashOnJsErrorInDevelopmentBuild() const override {
-    return should_crash_on_js_error_;
-  }
 
   void PopulateFrameBinders(
       mojo::BinderMapWithContext<content::RenderFrameHost*>& binder_map,
@@ -89,8 +74,6 @@ class TestBinderProvider : public ExtensionMojoBinderProvider {
                                const content::ServiceWorkerVersionBaseInfo&,
                                mojo::PendingReceiver<TestInterface>)>
       sw_binder_;
-  bool js_error_reporting_enabled_ = false;
-  bool should_crash_on_js_error_ = false;
 };
 
 }  // namespace
@@ -233,40 +216,6 @@ TEST_F(ExtensionMojoBinderRegistryTest, IsMojoJsEnabled) {
 
   EXPECT_TRUE(registry()->IsMojoJsEnabled(component_extension.get()));
   EXPECT_FALSE(registry()->IsMojoJsEnabled(unpacked_extension.get()));
-}
-
-TEST_F(ExtensionMojoBinderRegistryTest, IsJsErrorReportingEnabled) {
-  EXPECT_FALSE(registry()->IsJsErrorReportingEnabled(nullptr));
-  EXPECT_FALSE(registry()->ShouldCrashOnJsErrorInDevelopmentBuild(nullptr));
-
-  scoped_refptr<const Extension> component_extension =
-      ExtensionBuilder("Component Extension")
-          .SetLocation(mojom::ManifestLocation::kComponent)
-          .Build();
-
-  EXPECT_FALSE(
-      registry()->IsJsErrorReportingEnabled(component_extension.get()));
-  EXPECT_FALSE(registry()->ShouldCrashOnJsErrorInDevelopmentBuild(
-      component_extension.get()));
-
-  RegisterTestProvider(std::make_unique<TestBinderProvider>(
-      component_extension->id(), base::NullCallback(), base::NullCallback(),
-      /*js_error_reporting_enabled=*/true,
-      /*should_crash_on_js_error=*/true));
-
-  EXPECT_TRUE(registry()->IsJsErrorReportingEnabled(component_extension.get()));
-  if (version_info::IsOfficialBuild()) {
-    EXPECT_FALSE(registry()->ShouldCrashOnJsErrorInDevelopmentBuild(
-        component_extension.get()));
-  } else {
-    EXPECT_TRUE(registry()->ShouldCrashOnJsErrorInDevelopmentBuild(
-        component_extension.get()));
-
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kDisableCrashOnComponentExtensionJsError);
-    EXPECT_FALSE(registry()->ShouldCrashOnJsErrorInDevelopmentBuild(
-        component_extension.get()));
-  }
 }
 
 }  // namespace extensions

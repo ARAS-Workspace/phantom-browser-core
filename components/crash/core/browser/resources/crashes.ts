@@ -67,7 +67,6 @@ interface UpdateCrashListParams {
   crashes: CrashData[];
   version: string;
   os: string;
-  isGoogleAccount: boolean;
 }
 
 /**
@@ -80,7 +79,6 @@ function updateCrashList({
   crashes,
   version,
   os,
-  isGoogleAccount,
 }: UpdateCrashListParams) {
   getRequiredElement('crashesCount').textContent = loadTimeData.getStringF(
       'crashCountFormat', crashes.length.toLocaleString());
@@ -155,15 +153,7 @@ function updateCrashList({
     if (uploaded) {
       const uploadIdValue = uploadId.querySelector('.value');
       assert(uploadIdValue);
-      if (isGoogleAccount) {
-        const crashLink = document.createElement('a');
-        crashLink.href = `https://goto.google.com/crash/${crash.id}`;
-        crashLink.target = '_blank';
-        crashLink.textContent = crash.id;
-        uploadIdValue.appendChild(crashLink);
-      } else {
-        uploadIdValue.textContent = crash.id;
-      }
+      uploadIdValue.textContent = crash.id;
 
       const uploadTimeCell = uploadTime.querySelector('.value');
       assert(uploadTimeCell);

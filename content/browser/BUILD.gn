@@ -2715,8 +2715,6 @@ source_set("browser") {
     "//ui/base",
   ]
 
-  deps += [ "//components/crash/content/browser/error_reporting" ]
-
   if (enable_devtools_frontend) {
     sources += [
       # Devtools frontend not included in mobile Android and iOS

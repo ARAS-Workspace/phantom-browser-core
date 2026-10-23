@@ -1150,14 +1150,6 @@ _CONFIG = [
         ],
     },
     {
-        'paths': [
-            'third_party/blink/renderer/controller/crash_memory_metrics_reporter_impl.cc'
-        ],
-        'allowed': [
-            'base::subtle::RelaxedAtomicWriteMemcpy',
-        ],
-    },
-    {
         'paths':
         ['third_party/blink/renderer/controller/oom_intervention_impl.cc'],
         'allowed': [

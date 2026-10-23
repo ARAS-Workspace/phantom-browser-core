@@ -18,7 +18,6 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/stringprintf.h"
 #include "base/system/sys_info.h"
-#include "build/branding_buildflags.h"
 #include "build/chromeos_buildflags.h"
 #include "components/crash/core/app/crash_reporter_client.h"
 #include "components/crash/core/app/crash_switches.h"
@@ -104,18 +103,7 @@ bool PlatformCrashpadInitialization(
     annotations["prod"] = product_info.product_name;
     annotations["ver"] = product_info.version;
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    // Empty means stable.
-    const bool allow_empty_channel = true;
-    if (product_info.channel == "extended") {
-      // Extended stable reports as stable (empty string) with an extra bool.
-      product_info.channel.clear();
-      annotations["extended_stable_channel"] = "true";
-    }
-#else
-    const bool allow_empty_channel = false;
-#endif
-    if (allow_empty_channel || !product_info.channel.empty()) {
+    if (!product_info.channel.empty()) {
       annotations["channel"] = product_info.channel;
     }
 
@@ -126,13 +114,8 @@ bool PlatformCrashpadInitialization(
     annotations["lsb-release"] = base::GetLinuxDistro();
 
     std::vector<std::string> arguments;
-    if (crash_reporter_client->ShouldMonitorCrashHandlerExpensively()) {
-      arguments.push_back("--monitor-self");
-    }
-
-    // Set up --monitor-self-annotation even in the absence of --monitor-self
-    // so that minidumps produced by Crashpad's generate_dump tool will
-    // contain these annotations.
+    // Set up --monitor-self-annotation so that minidumps produced by
+    // Crashpad's generate_dump tool will contain these annotations.
     arguments.push_back("--monitor-self-annotation=ptype=crashpad-handler");
 
     CHECK(client.StartHandler(handler_path, *database_path, metrics_path, url,

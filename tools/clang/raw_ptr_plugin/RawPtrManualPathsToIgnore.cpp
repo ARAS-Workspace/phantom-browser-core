@@ -42,7 +42,6 @@ constexpr const char* const kRawPtrManualPathsToIgnore[] = {
     // //base.
     "base/android/linker/",
     "/tools/",  // catches subdirs e.g. /net/tools, but not devtools/ etc.
-    "chrome/chrome_elf/",
     "chrome/installer/mini_installer/",
     "testing/platform_test.h",
 
@@ -56,9 +55,6 @@ constexpr const char* const kRawPtrManualPathsToIgnore[] = {
 
     // Exclude internal definitions of undocumented Windows structures.
     "sandbox/win/src/nt_internals.h",
-
-    // Cannot dep on //base as files are also used by chrome_elf.
-    "sandbox/policy/win/hook_util/",
 
     // Exclude directories that don't depend on //base, because nothing there
     // uses

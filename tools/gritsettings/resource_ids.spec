@@ -633,10 +633,6 @@
     "META": {"sizes": {"includes": [90]}},
     "includes": [5140],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/webui_js_error/resources.grd": {
-   "META": {"sizes": {"includes": [10],}},
-   "includes": [5160],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/chromeos/floating_workspace/resources.grd": {
     "META": {"sizes": {"includes": [10],}},
     "includes": [5210],

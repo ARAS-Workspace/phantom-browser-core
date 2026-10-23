@@ -33,16 +33,6 @@ class DevToolsFrontendHostImpl : public DevToolsFrontendHost,
 
   void BadMessageReceived() override;
 
-#if BUILDFLAG(IS_LINUX)
-  void OnDidAddMessageToConsole(
-      RenderFrameHost* source_frame,
-      blink::mojom::ConsoleMessageLevel log_level,
-      const std::u16string& message,
-      int32_t line_no,
-      const std::u16string& source_id,
-      const std::optional<std::u16string>& untrusted_stack_trace) override;
-#endif  // BUILDFLAG(IS_LINUX)
-
  private:
   // blink::mojom::DevToolsFrontendHost implementation.
   void DispatchEmbedderMessage(base::DictValue message) override;

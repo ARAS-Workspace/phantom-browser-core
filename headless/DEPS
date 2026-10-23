@@ -1,6 +1,5 @@
 include_rules = [
   "+components/cookie_config",
-  "+components/crash/content/browser",
   "+components/crash/core",
   "+components/headless",
   "+components/services/print_compositor/public",

@@ -19,7 +19,6 @@
 #include "base/files/file_path.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/sys_string_conversions.h"
-#include "build/branding_buildflags.h"
 #include "components/crash/core/app/crash_reporter_client.h"
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
 #include "third_party/crashpad/crashpad/client/crashpad_client.h"
@@ -38,41 +37,21 @@ std::map<std::string, std::string> GetProcessSimpleAnnotations() {
     std::map<std::string, std::string> process_annotations;
     @autoreleasepool {
       NSBundle* outer_bundle = base::apple::OuterBundle();
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      process_annotations["prod"] = "Chrome_Mac";
-#else
       NSString* product = base::apple::ObjCCast<NSString>(
           [outer_bundle objectForInfoDictionaryKey:base::apple::CFToNSPtrCast(
                                                        kCFBundleNameKey)]);
       process_annotations["prod"] =
           base::SysNSStringToUTF8(product).append("_Mac");
-#endif
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      // Empty means stable.
-      const bool allow_empty_channel = true;
-#else
-      const bool allow_empty_channel = false;
-#endif
       NSString* channel = base::apple::ObjCCast<NSString>(
           [outer_bundle objectForInfoDictionaryKey:@"KSChannelID"]);
-      if (!channel || [channel isEqual:@"arm64"] ||
-          [channel isEqual:@"universal"]) {
-        if (allow_empty_channel)
-          process_annotations["channel"] = "";
-      } else {
+      if (channel && ![channel isEqual:@"arm64"] &&
+          ![channel isEqual:@"universal"]) {
         if ([channel hasPrefix:@"arm64-"])
           channel = [channel substringFromIndex:[@"arm64-" length]];
         else if ([channel hasPrefix:@"universal-"])
           channel = [channel substringFromIndex:[@"universal-" length]];
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        if ([channel isEqual:@"extended"]) {
-          // Extended stable reports as stable with an extra bool.
-          channel = @"";
-          process_annotations["extended_stable_channel"] = "true";
-        }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        if (allow_empty_channel || [channel length]) {
+        if ([channel length]) {
           process_annotations["channel"] = base::SysNSStringToUTF8(channel);
         }
       }
@@ -159,13 +138,8 @@ bool PlatformCrashpadInitialization(
 
       std::vector<std::string> arguments;
 
-      if (crash_reporter_client->ShouldMonitorCrashHandlerExpensively()) {
-        arguments.push_back("--monitor-self");
-      }
-
-      // Set up --monitor-self-annotation even in the absence of --monitor-self
-      // so that minidumps produced by Crashpad's generate_dump tool will
-      // contain these annotations.
+      // Set up --monitor-self-annotation so that minidumps produced by
+      // Crashpad's generate_dump tool will contain these annotations.
       arguments.push_back("--monitor-self-annotation=ptype=crashpad-handler");
 
       if (!browser_process) {

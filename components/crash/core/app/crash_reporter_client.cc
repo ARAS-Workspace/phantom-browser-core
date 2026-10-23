@@ -4,21 +4,15 @@
 
 #include "components/crash/core/app/crash_reporter_client.h"
 
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
 #include "base/check.h"
-#include "base/files/file_path.h"
 
 namespace crash_reporter {
 
 namespace {
 
 CrashReporterClient* g_client = nullptr;
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && defined(OFFICIAL_BUILD)
-const char kDefaultUploadURL[] = "https://clients2.google.com/cr/report";
-#endif
 
 }  // namespace
 
@@ -37,24 +31,8 @@ CrashReporterClient* GetCrashReporterClient() {
 CrashReporterClient::CrashReporterClient() = default;
 CrashReporterClient::~CrashReporterClient() = default;
 
-#if !BUILDFLAG(IS_APPLE)
-void CrashReporterClient::SetCrashReporterClientIdFromGUID(
-    const std::string& client_guid) {}
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 bool CrashReporterClient::GetShouldDumpLargerDumps() {
-  return false;
-}
-#endif
-
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-base::FilePath CrashReporterClient::GetReporterLogFilename() {
-  return base::FilePath();
-}
-
-bool CrashReporterClient::HandleCrashDump(const char* crashdump_filename,
-                                          uint64_t crash_pid) {
   return false;
 }
 #endif
@@ -86,32 +64,8 @@ bool CrashReporterClient::ReportingIsEnforcedByPolicy(bool* breakpad_enabled) {
   return false;
 }
 
-#if BUILDFLAG(IS_LINUX)
-void CrashReporterClient::GetSanitizationInformation(
-    const char* const** allowed_annotations,
-    void** target_module,
-    bool* sanitize_stacks) {
-  *allowed_annotations = nullptr;
-  *target_module = nullptr;
-  *sanitize_stacks = false;
-}
-#endif
-
 std::string CrashReporterClient::GetUploadUrl() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && defined(OFFICIAL_BUILD)
-  return kDefaultUploadURL;
-#else
   return std::string();
-#endif
-}
-
-bool CrashReporterClient::ShouldMonitorCrashHandlerExpensively() {
-  return false;
-}
-
-bool CrashReporterClient::EnableBreakpadForProcess(
-    const std::string& process_type) {
-  return false;
 }
 
 }  // namespace crash_reporter

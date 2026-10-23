@@ -21,37 +21,18 @@ class ChromeCrashReporterClient : public crash_reporter::CrashReporterClient {
       delete;
 
   // crash_reporter::CrashReporterClient implementation.
-#if !BUILDFLAG(IS_MAC)
-  void SetCrashReporterClientIdFromGUID(
-      const std::string& client_guid) override;
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-  base::FilePath GetReporterLogFilename() override;
-
   bool GetShouldDumpLargerDumps() override;
 #endif
 
   bool GetCrashDumpLocation(base::FilePath* crash_dir) override;
   void GetProductInfo(ProductInfo* product_info) override;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  bool GetCrashMetricsLocation(base::FilePath* metrics_dir) override;
-#endif
-
   bool IsRunningUnattended() override;
-
-  bool GetCollectStatsConsent() override;
 
 #if BUILDFLAG(IS_MAC)
   bool ReportingIsEnforcedByPolicy(bool* breakpad_enabled) override;
 #endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  bool ShouldMonitorCrashHandlerExpensively() override;
-#endif
-
-  bool EnableBreakpadForProcess(const std::string& process_type) override;
 
  private:
   friend class base::NoDestructor<ChromeCrashReporterClient>;

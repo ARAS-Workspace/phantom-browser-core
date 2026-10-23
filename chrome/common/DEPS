@@ -1,5 +1,4 @@
 include_rules = [
-  "+chrome/chrome_elf/chrome_elf_main.h",
   "+chrome/grit",
   "+chrome/install_static",
   "+chrome/services/file_util/public",

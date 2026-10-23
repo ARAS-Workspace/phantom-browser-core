@@ -183,12 +183,6 @@ BASE_FEATURE(kKillOnUnexpectedOriginHeader, base::FEATURE_ENABLED_BY_DEFAULT);
 // embedding: https://github.com/mikewest/embedding-requires-opt-in.
 BASE_FEATURE(kEmbeddingRequiresOptIn, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Enables error reporting for JS errors inside DevTools frontend host
-#if BUILDFLAG(IS_LINUX)
-BASE_FEATURE(kEnableDevToolsJsErrorReporting,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_LINUX)
-
 // When enabled, enforces that same-document navigations must not change
 // the committed origin, insecure request policy, or insecure navigations set.
 // Any mismatch will result in a renderer kill via bad_message handling.

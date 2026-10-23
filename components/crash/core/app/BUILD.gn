@@ -15,10 +15,7 @@ source_set("lib") {
     "crash_reporter_client.h",
   ]
 
-  deps = [
-    "//base",
-    "//build:branding_buildflags",
-  ]
+  deps = [ "//base" ]
 }
 
 source_set("crashpad_handler_main") {
@@ -47,7 +44,6 @@ source_set("crashpad_handler_main") {
 
 static_library("app") {
   sources = [
-    "crash_export_thunks.h",
     "crash_switches.cc",
     "crash_switches.h",
     "crashpad.cc",

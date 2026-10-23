@@ -34,8 +34,4 @@ WebUIController::TrustPolicy WebUIController::GetTrustPolicy() {
   return TrustPolicy::kTrusted;
 }
 
-bool WebUIController::IsJavascriptErrorReportingEnabled() {
-  return true;
-}
-
 }  // namespace content

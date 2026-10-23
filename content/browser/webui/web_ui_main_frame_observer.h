@@ -35,14 +35,11 @@ class CONTENT_EXPORT WebUIMainFrameObserver : public WebContentsObserver {
   WebUIMainFrameObserver& operator=(const WebUIMainFrameObserver& rhs) = delete;
 
  protected:
-  friend class WebUIMainFrameObserverTest;
-
   // Override from WebContentsObserver
   void PrimaryPageChanged(Page& page) override;
 
-  // On official Google builds, capture and report JavaScript error messages on
-  // WebUI surfaces back to Google. This allows us to fix JavaScript errors and
-  // exceptions.
+  // In development builds, crash the browser on the JavaScript errors of the
+  // WebUI surfaces whose config asks for it.
   void OnDidAddMessageToConsole(
       RenderFrameHost* source_frame,
       blink::mojom::ConsoleMessageLevel log_level,
@@ -54,11 +51,7 @@ class CONTENT_EXPORT WebUIMainFrameObserver : public WebContentsObserver {
   void ReadyToCommitNavigation(NavigationHandle* navigation_handle) override;
 
  private:
-  void MaybeEnableWebUIJavaScriptErrorReporting(
-      NavigationHandle* navigation_handle);
-
-  // Do we report JavaScript errors ?
-  bool error_reporting_enabled_ = false;
+  void MaybeEnableCrashOnJavaScriptError(NavigationHandle* navigation_handle);
 
   // Do we crash the browser on JavaScript errors?
   bool should_crash_on_error_ = false;

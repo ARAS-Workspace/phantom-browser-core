@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {eventToPromise} from 'chrome://webui-test/test_util.js';
+import {assertEquals, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 
 suite('WebviewContentScriptTest', function() {
   const REQUEST_TO_COMM_CHANNEL_1 = 'connect';
@@ -28,16 +27,6 @@ suite('WebviewContentScriptTest', function() {
             assertEquals('red', results[0]);
             resolve();
           });
-    });
-  }
-
-  function executeScript<T>(
-      webview: chrome.webviewTag.WebView,
-      details: chrome.webviewTag.InjectDetails): Promise<T[]> {
-    return new Promise<T[]>(resolve => {
-      webview.executeScript(details, (results: T[]) => {
-        resolve(results);
-      });
     });
   }
 
@@ -632,33 +621,5 @@ suite('WebviewContentScriptTest', function() {
 
     assertEquals(
         kExpectedResult, result, `Unexpected test results:\n${result}`);
-  });
-
-  test('ExecuteScriptBadUrlFromOtherWebUi', async () => {
-    const webview = createWebview();
-    let seenError = false;
-    webview.addEventListener('consolemessage', () => {
-      // If the script runs, it'll log a message that we'll see here.
-      seenError = true;
-    });
-
-    // It does not make sense to pass an absolute URL to these script injection
-    // APIs, especially one that is cross-origin to the embedder. We verify that
-    // this does not execute.
-    const badUrl = 'chrome://webuijserror/webui_js_error.js';
-    webview.addContentScripts([{
-      name: 'evil',
-      matches: ['http://*/*', 'https://*/*'],
-      js: {files: [badUrl]},
-      run_at: 'document_start' as chrome.extensionTypes.RunAt,
-    }]);
-
-    const loadStopPromise = eventToPromise('loadstop', webview);
-    webview.src = getWebviewUrl();
-    await loadStopPromise;
-
-    await executeScript(webview, {file: badUrl});
-
-    assertFalse(seenError, 'Script should not have run');
   });
 });

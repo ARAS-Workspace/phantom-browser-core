@@ -98,15 +98,6 @@ target(crash_key_target_type, "crash_key_lib") {
   } else if (use_crashpad_annotation) {
     sources += [ "crash_key_crashpad.cc" ]
     public_deps += [ "//third_party/crashpad/crashpad/client" ]
-  } else {
-    include_dirs = [ "//third_party/breakpad/breakpad/src" ]
-
-    sources += [
-      "crash_key_breakpad.cc",
-      "crash_key_internal.h",
-    ]
-
-    deps += [ "//third_party/breakpad:client" ]
   }
 }
 

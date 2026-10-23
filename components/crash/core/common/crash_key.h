@@ -73,8 +73,6 @@ using CrashKeyString = crashpad::StringAnnotation<MaxLength>;
 
 #else  // Crashpad-compatible crash key interface:
 
-class CrashKeyBreakpadTest;
-
 namespace internal {
 
 constexpr size_t kCrashKeyStorageKeySize = 40;
@@ -99,8 +97,6 @@ class CRASH_KEY_EXPORT CrashKeyStringImpl {
   bool is_set() const;
 
  private:
-  friend class crash_reporter::CrashKeyBreakpadTest;
-
   // The name of the crash key.
   const char* const name_;
 

@@ -7,30 +7,18 @@
 #include <utility>
 
 #include "base/check.h"
-#include "base/command_line.h"
 #include "base/containers/map_util.h"
-#include "components/version_info/version_info.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/service_worker_version_base_info.h"
 #include "content/public/browser/site_instance.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/manifest.h"
-#include "extensions/common/switches.h"
 #include "mojo/public/cpp/bindings/binder_map.h"
 
 namespace extensions {
 
 class ExtensionMojoBinderRegistryTest;
-
-bool ExtensionMojoBinderProvider::IsJsErrorReportingEnabled() const {
-  return false;
-}
-
-bool ExtensionMojoBinderProvider::ShouldCrashOnJsErrorInDevelopmentBuild()
-    const {
-  return false;
-}
 
 ExtensionMojoBinderRegistry::ExtensionMojoBinderRegistry() = default;
 
@@ -95,27 +83,6 @@ bool ExtensionMojoBinderRegistry::IsMojoJsEnabled(
     const Extension* extension) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return GetProviderIfAllowed(extension) != nullptr;
-}
-
-bool ExtensionMojoBinderRegistry::IsJsErrorReportingEnabled(
-    const Extension* extension) const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  ExtensionMojoBinderProvider* provider = GetProviderIfAllowed(extension);
-  return provider && provider->IsJsErrorReportingEnabled();
-}
-
-bool ExtensionMojoBinderRegistry::ShouldCrashOnJsErrorInDevelopmentBuild(
-    const Extension* extension) const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (version_info::IsOfficialBuild()) {
-    return false;
-  }
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kDisableCrashOnComponentExtensionJsError)) {
-    return false;
-  }
-  ExtensionMojoBinderProvider* provider = GetProviderIfAllowed(extension);
-  return provider && provider->ShouldCrashOnJsErrorInDevelopmentBuild();
 }
 
 void ExtensionMojoBinderRegistry::ClearProvidersForTesting() {

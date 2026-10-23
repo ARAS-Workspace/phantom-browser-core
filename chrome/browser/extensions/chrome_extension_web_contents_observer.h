@@ -5,16 +5,10 @@
 #ifndef CHROME_BROWSER_EXTENSIONS_CHROME_EXTENSION_WEB_CONTENTS_OBSERVER_H_
 #define CHROME_BROWSER_EXTENSIONS_CHROME_EXTENSION_WEB_CONTENTS_OBSERVER_H_
 
-#include <stdint.h>
-
-#include <optional>
-#include <string>
-
 #include "content/public/browser/web_contents_user_data.h"
 #include "extensions/browser/extension_web_contents_observer.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/stack_frame.h"
-#include "third_party/blink/public/mojom/devtools/console_message.mojom-forward.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -44,7 +38,6 @@ class ChromeExtensionWebContentsObserver
 
  private:
   friend class content::WebContentsUserData<ChromeExtensionWebContentsObserver>;
-  friend class ChromeExtensionWebContentsObserverUnitTest;
 
   explicit ChromeExtensionWebContentsObserver(
       content::WebContents* web_contents);
@@ -59,13 +52,6 @@ class ChromeExtensionWebContentsObserver
 
   // content::WebContentsObserver overrides.
   void RenderFrameCreated(content::RenderFrameHost* render_frame_host) override;
-  void OnDidAddMessageToConsole(
-      content::RenderFrameHost* source_frame,
-      blink::mojom::ConsoleMessageLevel log_level,
-      const std::u16string& message,
-      int32_t line_no,
-      const std::u16string& source_id,
-      const std::optional<std::u16string>& untrusted_stack_trace) override;
 
   // Reloads an extension if it is on the terminated list.
   void ReloadIfTerminated(content::RenderFrameHost* render_frame_host);

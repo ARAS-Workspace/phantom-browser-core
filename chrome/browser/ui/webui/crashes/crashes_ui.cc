@@ -21,20 +21,16 @@
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/metrics/metrics_reporting_state.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "components/crash/core/browser/crashes_ui_util.h"
 #include "components/grit/components_scaled_resources.h"
 #include "components/grit/crashes_resources.h"
 #include "components/grit/crashes_resources_map.h"
-#include "components/signin/public/base/consent_level.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
 #include "content/public/browser/web_ui_message_handler.h"
-#include "google_apis/gaia/gaia_auth_util.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/resource/resource_scale_factor.h"
 #include "ui/webui/webui_util.h"
@@ -154,15 +150,6 @@ void CrashesDOMHandler::UpdateUI() {
 
   bool system_crash_reporter = false;
 
-  bool is_internal = false;
-  auto* identity_manager =
-      IdentityManagerFactory::GetForProfile(Profile::FromWebUI(web_ui()));
-  if (identity_manager) {
-    is_internal = gaia::IsGoogleInternalAccountEmail(
-        identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
-            .email);
-  }
-
   bool manual_uploads_supported = false;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   manual_uploads_supported = true;
@@ -188,7 +175,6 @@ void CrashesDOMHandler::UpdateUI() {
   result.Set("version", version_info::GetVersionNumber());
   result.Set("os", base::SysInfo::OperatingSystemName() + " " +
                        base::SysInfo::OperatingSystemVersion());
-  result.Set("isGoogleAccount", is_internal);
   FireWebUIListener(crash_reporter::kCrashesUIUpdateCrashList, result);
 }
 
