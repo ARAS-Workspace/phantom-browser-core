@@ -5,14 +5,9 @@
 #include "components/update_client/command_line_config_policy.h"
 
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "url/gurl.h"
 
 namespace update_client {
-
-bool CommandLineConfigPolicy::BackgroundDownloadsEnabled() const {
-  return false;
-}
 
 bool CommandLineConfigPolicy::DeltaUpdatesEnabled() const {
   return true;
@@ -20,10 +15,6 @@ bool CommandLineConfigPolicy::DeltaUpdatesEnabled() const {
 
 bool CommandLineConfigPolicy::FastUpdate() const {
   return false;
-}
-
-bool CommandLineConfigPolicy::PingsEnabled() const {
-  return true;
 }
 
 bool CommandLineConfigPolicy::TestRequest() const {

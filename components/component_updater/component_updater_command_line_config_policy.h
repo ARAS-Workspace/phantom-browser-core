@@ -30,19 +30,15 @@ class ComponentUpdaterCommandLineConfigPolicy final
       const ComponentUpdaterCommandLineConfigPolicy&) = delete;
 
   // update_client::CommandLineConfigPolicy overrides.
-  bool BackgroundDownloadsEnabled() const override;
   bool DeltaUpdatesEnabled() const override;
   bool FastUpdate() const override;
-  bool PingsEnabled() const override;
   bool TestRequest() const override;
   GURL UrlSourceOverride() const override;
   base::TimeDelta InitialDelay() const override;
 
  private:
-  bool background_downloads_enabled_ = false;
   bool deltas_enabled_ = true;
   bool fast_update_ = false;
-  bool pings_enabled_ = true;
   bool test_request_ = false;
 
   // If non-zero, time interval until the first component update check.

@@ -53,10 +53,8 @@ TEST_F(ComponentUpdaterConfiguratorImplTest, FastUpdateWithCustomPolicy) {
     DefaultCommandLineConfigPolicy() = default;
 
     // update_client::CommandLineConfigPolicy overrides.
-    bool BackgroundDownloadsEnabled() const override { return false; }
     bool DeltaUpdatesEnabled() const override { return false; }
     bool FastUpdate() const override { return false; }
-    bool PingsEnabled() const override { return false; }
     bool TestRequest() const override { return false; }
     GURL UrlSourceOverride() const override { return GURL(); }
   };
@@ -95,10 +93,8 @@ TEST_F(ComponentUpdaterConfiguratorImplTest, InitialDelay) {
     CommandLineConfigPolicy() = default;
 
     // update_client::CommandLineConfigPolicy overrides.
-    bool BackgroundDownloadsEnabled() const override { return false; }
     bool DeltaUpdatesEnabled() const override { return false; }
     bool FastUpdate() const override { return fast_update_; }
-    bool PingsEnabled() const override { return false; }
     bool TestRequest() const override { return false; }
     GURL UrlSourceOverride() const override { return GURL(); }
     base::TimeDelta InitialDelay() const override { return initial_delay_; }
@@ -153,10 +149,8 @@ TEST_F(ComponentUpdaterConfiguratorImplTest, TestRequest) {
     CommandLineConfigPolicy() = default;
 
     // update_client::CommandLineConfigPolicy overrides.
-    bool BackgroundDownloadsEnabled() const override { return false; }
     bool DeltaUpdatesEnabled() const override { return false; }
     bool FastUpdate() const override { return false; }
-    bool PingsEnabled() const override { return false; }
     bool TestRequest() const override { return test_request_; }
     GURL UrlSourceOverride() const override { return GURL(); }
     base::TimeDelta InitialDelay() const override { return base::Seconds(0); }

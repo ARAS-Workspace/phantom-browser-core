@@ -172,11 +172,6 @@ scoped_refptr<PatcherFactory> TestConfigurator::GetPatcherFactory() {
   return patch_factory_;
 }
 
-bool TestConfigurator::EnabledBackgroundDownloader() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return false;
-}
-
 bool TestConfigurator::EnabledCupSigning() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return enabled_cup_signing_;

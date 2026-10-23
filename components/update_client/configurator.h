@@ -104,10 +104,6 @@ class Configurator : public base::RefCountedThreadSafe<Configurator> {
 
   virtual scoped_refptr<PatcherFactory> GetPatcherFactory() = 0;
 
-  // True means that the background downloader can be used for downloading
-  // non on-demand components.
-  virtual bool EnabledBackgroundDownloader() const = 0;
-
   // True if signing of update checks is enabled.
   virtual bool EnabledCupSigning() const = 0;
 

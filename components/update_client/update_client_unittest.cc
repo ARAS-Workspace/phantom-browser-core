@@ -181,8 +181,7 @@ class MockCrxDownloaderFactory : public CrxDownloaderFactory {
 
   // Overrides for CrxDownloaderFactory.
   scoped_refptr<CrxDownloader> MakeCrxDownloader(
-      const std::string& /*prod_id*/,
-      bool /*background_download_enabled*/) const override {
+      const std::string& /*prod_id*/) const override {
     return crx_downloader_;
   }
 
@@ -3655,12 +3654,6 @@ TEST_P(SendPingTest, SendPingTestCases) {
 
   class MockCrxDownloader : public CrxDownloader {
    public:
-    static scoped_refptr<CrxDownloader> Create(
-        bool is_background_download,
-        scoped_refptr<NetworkFetcherFactory> network_fetcher_factory) {
-      return nullptr;
-    }
-
     MockCrxDownloader() = default;
 
    private:

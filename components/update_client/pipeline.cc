@@ -274,10 +274,9 @@ std::queue<Operation> MakeOperations(
       }
       ops.push(SkipIfCached(
           cache_check,
-          base::BindOnce(&DownloadOperation, config, id, is_foreground,
-                         operation.urls, operation.size, operation.sha256_out,
-                         event_adder, state_tracker,
-                         download_progress_callback)));
+          base::BindOnce(&DownloadOperation, config, id, operation.urls,
+                         operation.size, operation.sha256_out, event_adder,
+                         state_tracker, download_progress_callback)));
     } else if (operation.type == "puff") {
       // expects: `previous` (hash object) and `out` (hash object)
       if (operation.sha256_previous.empty() || operation.sha256_out.empty()) {

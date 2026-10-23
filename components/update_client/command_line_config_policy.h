@@ -14,18 +14,11 @@ namespace update_client {
 // main configurator.
 class CommandLineConfigPolicy {
  public:
-  // If true, background downloads are enabled.
-  virtual bool BackgroundDownloadsEnabled() const;
-
   // If true, differential updates are enabled.
   virtual bool DeltaUpdatesEnabled() const;
 
   // If true, speed up the initial update checking.
   virtual bool FastUpdate() const;
-
-  // If true, pings are enabled. Pings are the requests sent to the update
-  // server that report the success or failure of installs or update attempts.
-  virtual bool PingsEnabled() const;
 
   // If true, add "testrequest" attribute to update check requests.
   virtual bool TestRequest() const;

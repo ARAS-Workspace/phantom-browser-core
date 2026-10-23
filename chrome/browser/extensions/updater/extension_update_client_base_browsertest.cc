@@ -55,12 +55,6 @@ class TestChromeUpdateClientConfig
 
   bool EnabledCupSigning() const final { return false; }
 
-  bool EnabledBackgroundDownloader() const final {
-    // Some tests rely on URLFetcher network interceptors, which won't intercept
-    // BITS requests.
-    return false;
-  }
-
   std::unique_ptr<update_client::ProtocolHandlerFactory>
   GetProtocolHandlerFactory() const final {
     return std::make_unique<update_client::ProtocolHandlerFactoryJSON>();

@@ -101,7 +101,6 @@ class TestConfigurator : public Configurator {
   scoped_refptr<CrxDownloaderFactory> GetCrxDownloaderFactory() override;
   scoped_refptr<UnzipperFactory> GetUnzipperFactory() override;
   scoped_refptr<PatcherFactory> GetPatcherFactory() override;
-  bool EnabledBackgroundDownloader() const override;
   bool EnabledCupSigning() const override;
   PrefService* GetPrefService() const override;
   PersistedData* GetPersistedData() const override;

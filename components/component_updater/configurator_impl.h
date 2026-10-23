@@ -54,8 +54,7 @@ class ConfiguratorImpl {
   // that succeeds wins.
   std::vector<GURL> UpdateUrl() const;
 
-  // The URLs for pings. Returns an empty vector if and only if pings are
-  // disabled. Similarly, these URLs have a fall back behavior too.
+  // The URLs for pings. Always empty: pings are disabled.
   std::vector<GURL> PingUrl() const;
 
   // Version of the application. Used to compare the component manifests.
@@ -78,10 +77,6 @@ class ConfiguratorImpl {
   // True is the component updates are enabled.
   bool EnabledComponentUpdates() const;
 
-  // True means that the background downloader can be used for downloading
-  // non on-demand components.
-  bool EnabledBackgroundDownloader() const;
-
   // True if signing of update checks is enabled.
   bool EnabledCupSigning() const;
 
@@ -103,10 +98,8 @@ class ConfiguratorImpl {
  private:
   SEQUENCE_CHECKER(sequence_checker_);
   base::flat_map<std::string, std::string> extra_info_;
-  const bool background_downloads_enabled_;
   const bool deltas_enabled_;
   const bool fast_update_;
-  const bool pings_enabled_;
   const bool require_encryption_;
   const GURL url_source_override_;
   const base::TimeDelta initial_delay_;

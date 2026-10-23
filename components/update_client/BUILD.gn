@@ -187,34 +187,6 @@ static_library("update_client") {
     "//third_party/zlib/google:compression_utils",
     "//url",
   ]
-
-  if (is_mac) {
-    sources += [
-      "background_downloader_mac.h",
-      "background_downloader_mac.mm",
-    ]
-    frameworks = [ "Foundation.framework" ]
-    deps += [ ":background_downloader_delegate" ]
-  }
-}
-
-if (is_mac) {
-  # The background downloader delegate is implemented as a component to avoid
-  # duplicate symbol warnings at runtime in component builds:
-  # http://crbug.com/361129285.
-  component("background_downloader_delegate") {
-    sources = [
-      "background_downloader_mac_delegate.h",
-      "background_downloader_mac_delegate.mm",
-      "update_client_errors.h",
-    ]
-    frameworks = [ "Foundation.framework" ]
-    deps = [
-      "//base",
-      "//url",
-    ]
-    defines = [ "IS_BACKGROUND_DOWNLOADER_DELEGATE_IMPL" ]
-  }
 }
 
 source_set("test_support") {
@@ -313,10 +285,6 @@ source_set("unit_tests") {
 
   if (!disable_file_support) {
     sources += [ "crx_downloader_unittest.cc" ]
-
-    if (is_mac) {
-      sources += [ "background_downloader_mac_unittest.cc" ]
-    }
   }
 
   deps = [

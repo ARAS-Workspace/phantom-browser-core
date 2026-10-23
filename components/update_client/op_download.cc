@@ -17,7 +17,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/types/expected.h"
 #include "base/values.h"
-#include "build/build_config.h"
 #include "components/update_client/cancellation.h"
 #include "components/update_client/configurator.h"
 #include "components/update_client/crx_downloader.h"
@@ -30,20 +29,6 @@
 namespace update_client {
 
 namespace {
-
-#if BUILDFLAG(IS_MAC)
-// The minimum size of a download to attempt it at background priority.
-constexpr int64_t kBackgroundDownloadSizeThreshold = 10'000'000; /*10 MB*/
-#else
-constexpr int64_t kBackgroundDownloadSizeThreshold = 0;
-#endif
-
-bool CanDoBackgroundDownload(bool is_foreground,
-                             bool background_downloads_enabled,
-                             int64_t size) {
-  return !is_foreground && background_downloads_enabled &&
-         size >= kBackgroundDownloadSizeThreshold;
-}
 
 // Returns a string literal corresponding to the value of the downloader |d|.
 const char* DownloaderToString(CrxDownloader::DownloadMetrics::Downloader d) {
@@ -136,7 +121,6 @@ void DownloadComplete(
 base::OnceClosure DownloadOperation(
     scoped_refptr<Configurator> config,
     const std::string& id,
-    bool is_foreground,
     const std::vector<GURL>& urls,
     int64_t size,
     const std::string& hash,
@@ -150,10 +134,7 @@ base::OnceClosure DownloadOperation(
   auto cancellation = base::MakeRefCounted<Cancellation>();
   progress_callback.Run(-1, -1);
   scoped_refptr<CrxDownloader> crx_downloader =
-      config->GetCrxDownloaderFactory()->MakeCrxDownloader(
-          config->GetProdId(),
-          CanDoBackgroundDownload(is_foreground,
-                                  config->EnabledBackgroundDownloader(), size));
+      config->GetCrxDownloaderFactory()->MakeCrxDownloader(config->GetProdId());
   crx_downloader->set_progress_callback(base::BindRepeating(
       [](CrxDownloader::ProgressCallback progress_callback, int64_t file_size,
          int64_t downloaded_bytes, int64_t /*content_length*/) {

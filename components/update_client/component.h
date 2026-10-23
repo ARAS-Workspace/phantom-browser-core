@@ -297,11 +297,6 @@ class Component {
     void DoHandle() override;
   };
 
-  // Returns true is the update payload for this component can be downloaded
-  // by a downloader which can do bandwidth throttling on the client side.
-  // The decision may be predicated on the expected size of the download.
-  bool CanDoBackgroundDownload(int64_t size) const;
-
   // Changes the component state and notifies the caller of the |Handle|
   // function that the handling of this component state is complete.
   void ChangeState(std::unique_ptr<State> next_state);

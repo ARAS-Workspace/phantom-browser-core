@@ -20,9 +20,7 @@ TEST(ExtensionUpdateClientCommandLineConfigPolicyTest, CommandLine) {
   {
     const ExtensionUpdateClientCommandLineConfigPolicy config_policy(&cmdline);
 
-    EXPECT_FALSE(config_policy.BackgroundDownloadsEnabled());
     EXPECT_TRUE(config_policy.DeltaUpdatesEnabled());
-    EXPECT_TRUE(config_policy.PingsEnabled());
     EXPECT_FALSE(config_policy.FastUpdate());
     EXPECT_FALSE(config_policy.TestRequest());
     EXPECT_EQ(GURL(), config_policy.UrlSourceOverride());

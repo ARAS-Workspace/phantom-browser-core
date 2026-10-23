@@ -36,7 +36,6 @@ class Configurator;
 base::OnceClosure DownloadOperation(
     scoped_refptr<Configurator> config,
     const std::string& id,
-    bool is_foreground,
     const std::vector<GURL>& urls,
     int64_t size,
     const std::string& hash,

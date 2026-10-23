@@ -4,21 +4,17 @@
 
 #include "components/component_updater/configurator_impl.h"
 
-#include <algorithm>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "base/containers/flat_map.h"
 #include "base/enterprise_util.h"
-#include "base/feature_list.h"
 #include "base/functional/callback.h"
 #include "base/sequence_checker.h"
-#include "base/strings/string_split.h"
 #include "base/time/time.h"
 #include "base/version.h"
 #include "build/build_config.h"
-#include "components/component_updater/component_updater_switches.h"
 #include "components/component_updater/component_updater_url_constants.h"
 #include "components/update_client/command_line_config_policy.h"
 #include "components/update_client/protocol_handler.h"
@@ -32,10 +28,8 @@ namespace component_updater {
 ConfiguratorImpl::ConfiguratorImpl(
     const update_client::CommandLineConfigPolicy& config_policy,
     bool require_encryption)
-    : background_downloads_enabled_(config_policy.BackgroundDownloadsEnabled()),
-      deltas_enabled_(config_policy.DeltaUpdatesEnabled()),
+    : deltas_enabled_(config_policy.DeltaUpdatesEnabled()),
       fast_update_(config_policy.FastUpdate()),
-      pings_enabled_(config_policy.PingsEnabled()),
       require_encryption_(require_encryption),
       url_source_override_(config_policy.UrlSourceOverride()),
       initial_delay_(config_policy.InitialDelay()) {
@@ -87,7 +81,7 @@ std::vector<GURL> ConfiguratorImpl::UpdateUrl() const {
 
 std::vector<GURL> ConfiguratorImpl::PingUrl() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return pings_enabled_ ? UpdateUrl() : std::vector<GURL>();
+  return {};
 }
 
 const base::Version& ConfiguratorImpl::GetBrowserVersion() const {
@@ -119,11 +113,6 @@ bool ConfiguratorImpl::EnabledDeltas() const {
 bool ConfiguratorImpl::EnabledComponentUpdates() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return true;
-}
-
-bool ConfiguratorImpl::EnabledBackgroundDownloader() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return background_downloads_enabled_;
 }
 
 bool ConfiguratorImpl::EnabledCupSigning() const {

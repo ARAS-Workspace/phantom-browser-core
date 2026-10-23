@@ -27,8 +27,7 @@ class CrxDownloaderFactory
   CrxDownloaderFactory& operator=(const CrxDownloaderFactory&) = delete;
 
   virtual scoped_refptr<CrxDownloader> MakeCrxDownloader(
-      const std::string& prod_id,
-      bool background_download_enabled) const = 0;
+      const std::string& prod_id) const = 0;
 
  protected:
   friend class base::RefCountedThreadSafe<CrxDownloaderFactory>;
@@ -38,9 +37,7 @@ class CrxDownloaderFactory
 };
 
 scoped_refptr<CrxDownloaderFactory> MakeCrxDownloaderFactory(
-    scoped_refptr<NetworkFetcherFactory> network_fetcher_factory,
-    std::optional<base::FilePath> background_downloader_cache_path =
-        std::nullopt);
+    scoped_refptr<NetworkFetcherFactory> network_fetcher_factory);
 
 }  // namespace update_client
 

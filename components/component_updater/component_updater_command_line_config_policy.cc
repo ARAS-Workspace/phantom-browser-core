@@ -11,8 +11,6 @@
 #include "base/command_line.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
-#include "base/strings/sys_string_conversions.h"
-#include "build/build_config.h"
 #include "components/component_updater/component_updater_switches.h"
 
 namespace component_updater {
@@ -25,10 +23,6 @@ namespace {
 // Speed up the initial component checking.
 constexpr char kSwitchFastUpdate[] = "fast-update";
 
-// Disables pings. Pings are the requests sent to the update server that report
-// the success or the failure of component install or update attempts.
-constexpr char kSwitchDisablePings[] = "disable-pings";
-
 // Sets the URL for updates.
 constexpr char kSwitchUrlSource[] = "url-source";
 
@@ -38,12 +32,6 @@ constexpr char kSwitchDisableDeltaUpdates[] = "disable-delta-updates";
 // Configures the initial delay before the first component update check. The
 // value is in seconds.
 constexpr char kInitialDelay[] = "initial-delay";
-
-#if BUILDFLAG(IS_MAC)
-// Disables background downloads.
-constexpr char kSwitchDisableBackgroundDownloads[] =
-    "disable-background-downloads";
-#endif  // BUILDFLAG(IS_MAC)
 
 // If there is an element of |vec| of the form |test|=.*, returns the right-
 // hand side of that assignment. Otherwise, returns an empty string.
@@ -75,17 +63,9 @@ ComponentUpdaterCommandLineConfigPolicy::
       cmdline->GetSwitchValueASCII(switches::kComponentUpdater), ",",
       base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
 
-#if BUILDFLAG(IS_MAC)
-  background_downloads_enabled_ =
-      !std::ranges::contains(switch_values, kSwitchDisableBackgroundDownloads);
-#else
-  background_downloads_enabled_ = false;
-#endif
-
   deltas_enabled_ =
       !std::ranges::contains(switch_values, kSwitchDisableDeltaUpdates);
   fast_update_ = std::ranges::contains(switch_values, kSwitchFastUpdate);
-  pings_enabled_ = !std::ranges::contains(switch_values, kSwitchDisablePings);
   test_request_ = std::ranges::contains(switch_values, kSwitchTestRequestParam);
 
   const std::string switch_url_source =
@@ -102,21 +82,12 @@ ComponentUpdaterCommandLineConfigPolicy::
   }
 }
 
-bool ComponentUpdaterCommandLineConfigPolicy::BackgroundDownloadsEnabled()
-    const {
-  return background_downloads_enabled_;
-}
-
 bool ComponentUpdaterCommandLineConfigPolicy::DeltaUpdatesEnabled() const {
   return deltas_enabled_;
 }
 
 bool ComponentUpdaterCommandLineConfigPolicy::FastUpdate() const {
   return fast_update_;
-}
-
-bool ComponentUpdaterCommandLineConfigPolicy::PingsEnabled() const {
-  return pings_enabled_;
 }
 
 bool ComponentUpdaterCommandLineConfigPolicy::TestRequest() const {

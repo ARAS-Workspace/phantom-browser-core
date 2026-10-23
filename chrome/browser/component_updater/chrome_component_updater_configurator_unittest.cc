@@ -44,13 +44,11 @@ void ChromeComponentUpdaterConfiguratorTest::SetUp() {
 
 TEST_F(ChromeComponentUpdaterConfiguratorTest, TestDisablePings) {
   base::CommandLine cmdline(*base::CommandLine::ForCurrentProcess());
-  cmdline.AppendSwitchASCII(switches::kComponentUpdater, "disable-pings");
 
   const auto config(
       MakeChromeComponentUpdaterConfigurator(&cmdline, pref_service()));
 
-  const std::vector<GURL> pingUrls = config->PingUrl();
-  EXPECT_TRUE(pingUrls.empty());
+  EXPECT_TRUE(config->PingUrl().empty());
 }
 
 TEST_F(ChromeComponentUpdaterConfiguratorTest, TestFastUpdate) {
@@ -124,7 +122,7 @@ TEST_F(ChromeComponentUpdaterConfiguratorTest, TestUseEncryption) {
     ASSERT_EQ(2u, urls.size());
     ASSERT_STREQ(kUpdaterJSONDefaultUrl, urls[0].spec().c_str());
     ASSERT_STREQ(kUpdaterJSONFallbackUrl, urls[1].spec().c_str());
-    ASSERT_EQ(config->UpdateUrl(), config->PingUrl());
+    EXPECT_TRUE(config->PingUrl().empty());
   }
 
   // Use the configurator implementation to test the filtering of
@@ -135,7 +133,7 @@ TEST_F(ChromeComponentUpdaterConfiguratorTest, TestUseEncryption) {
     const auto urls = config.UpdateUrl();
     ASSERT_EQ(1u, urls.size());
     ASSERT_STREQ(kUpdaterJSONDefaultUrl, urls[0].spec().c_str());
-    ASSERT_EQ(config.UpdateUrl(), config.PingUrl());
+    EXPECT_TRUE(config.PingUrl().empty());
   }
 
   {
@@ -145,7 +143,7 @@ TEST_F(ChromeComponentUpdaterConfiguratorTest, TestUseEncryption) {
     ASSERT_EQ(2u, urls.size());
     ASSERT_STREQ(kUpdaterJSONDefaultUrl, urls[0].spec().c_str());
     ASSERT_STREQ(kUpdaterJSONFallbackUrl, urls[1].spec().c_str());
-    ASSERT_EQ(config.UpdateUrl(), config.PingUrl());
+    EXPECT_TRUE(config.PingUrl().empty());
   }
 }
 

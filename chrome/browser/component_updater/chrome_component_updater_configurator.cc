@@ -17,7 +17,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/path_service.h"
 #include "base/sequence_checker.h"
-#include "base/strings/sys_string_conversions.h"
 #include "base/time/time.h"
 #include "base/version.h"
 #include "build/branding_buildflags.h"
@@ -77,7 +76,6 @@ class ChromeConfigurator : public update_client::Configurator {
       override;
   scoped_refptr<update_client::UnzipperFactory> GetUnzipperFactory() override;
   scoped_refptr<update_client::PatcherFactory> GetPatcherFactory() override;
-  bool EnabledBackgroundDownloader() const override;
   bool EnabledCupSigning() const override;
   PrefService* GetPrefService() const override;
   update_client::PersistedData* GetPersistedData() const override;
@@ -96,8 +94,6 @@ class ChromeConfigurator : public update_client::Configurator {
   friend class base::RefCountedThreadSafe<ChromeConfigurator>;
 
   ~ChromeConfigurator() override = default;
-
-  std::optional<base::FilePath> GetBackgroundDownloaderCache() const;
 
   SEQUENCE_CHECKER(sequence_checker_);
   ConfiguratorImpl configurator_impl_;
@@ -217,8 +213,8 @@ scoped_refptr<update_client::CrxDownloaderFactory>
 ChromeConfigurator::GetCrxDownloaderFactory() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   if (!crx_downloader_factory_) {
-    crx_downloader_factory_ = update_client::MakeCrxDownloaderFactory(
-        GetNetworkFetcherFactory(), GetBackgroundDownloaderCache());
+    crx_downloader_factory_ =
+        update_client::MakeCrxDownloaderFactory(GetNetworkFetcherFactory());
   }
   return crx_downloader_factory_;
 }
@@ -243,11 +239,6 @@ ChromeConfigurator::GetPatcherFactory() {
         base::BindRepeating(&patch::LaunchFilePatcher));
   }
   return patch_factory_;
-}
-
-bool ChromeConfigurator::EnabledBackgroundDownloader() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return configurator_impl_.EnabledBackgroundDownloader();
 }
 
 bool ChromeConfigurator::EnabledCupSigning() const {
@@ -290,16 +281,6 @@ ChromeConfigurator::GetUpdaterStateProvider() const {
 scoped_refptr<update_client::CrxCache> ChromeConfigurator::GetCrxCache() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return crx_cache_;
-}
-
-std::optional<base::FilePath> ChromeConfigurator::GetBackgroundDownloaderCache()
-    const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  base::FilePath path;
-  bool result = base::PathService::Get(chrome::DIR_USER_DATA, &path);
-  return result
-             ? std::optional<base::FilePath>(path.AppendASCII("download_cache"))
-             : std::nullopt;
 }
 
 #if BUILDFLAG(CHROME_FOR_TESTING)

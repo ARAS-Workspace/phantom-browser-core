@@ -14,10 +14,6 @@ inline constexpr base::TaskTraits kTaskTraits = {
     base::MayBlock(), base::TaskPriority::USER_VISIBLE,
     base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN};
 
-inline constexpr base::TaskTraits kTaskTraitsBackgroundDownloader = {
-    base::MayBlock(), base::TaskPriority::BEST_EFFORT,
-    base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN};
-
 inline constexpr base::TaskTraits kTaskTraitsBackgroundDecompression = {
     base::MayBlock(), base::TaskPriority::BEST_EFFORT,
     base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN};
