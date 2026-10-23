@@ -114,10 +114,6 @@ AX_BASE_EXPORT bool IsImageDescriptionsAlternateRoutingEnabled();
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityExposeSummaryAsHeading);
 AX_BASE_EXPORT bool IsAccessibilityExposeSummaryAsHeadingEnabled();
 
-// Extension manifest v3 migration for network speech synthesis.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kExtensionManifestV3NetworkSpeechSynthesis);
-AX_BASE_EXPORT bool IsExtensionManifestV3NetworkSpeechSynthesisEnabled();
-
 // Expose document markers on inline text boxes in addition to
 // static nodes. (Note: This will make it possible for AXPosition in the browser
 // process to handle document markers, which will be platform agnositc)

@@ -80,10 +80,6 @@ const char kDisableBackgroundMediaSuspend[] =
 const char kDisableRTCSmoothnessAlgorithm[] =
     "disable-rtc-smoothness-algorithm";
 
-// Sets the default value for the kLiveCaptionEnabled preference to true.
-const char kEnableLiveCaptionPrefForTesting[] =
-    "enable-live-caption-pref-for-testing";
-
 // Causes the AudioManager to fail creating audio streams. Used when testing
 // various failure cases.
 const char kFailAudioStreamCreation[] = "fail-audio-stream-creation";
@@ -384,11 +380,6 @@ BASE_FEATURE(kFailUrlProvisionFetcherForTesting,
 // because the behavior is simpler and more predictable.
 BASE_FEATURE(kFallbackAfterDecodeError, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// FeatureManagement gate for Live Translate on ChromeOS devices. No impact
-// outside of CrOS.
-BASE_FEATURE(kFeatureManagementLiveTranslateCrOS,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Forces software video encoders to be used for low resolutions.
 // Enabled-by-default, except for Android where SW encoder for H26x and AV1 are
 // (sometimes) not available.
@@ -481,60 +472,12 @@ const base::FeatureParam<bool>
 // and the OS Content Decryption Module (CDM).
 BASE_FEATURE(kHardwareSecureDecryptionVp9, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// If enabled, Glic will start captioning as soon as a profile is loaded.
-BASE_FEATURE(kHeadlessCaptionEarlyStart, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls headless Live Caption experiment, which is likely unstable.
-BASE_FEATURE(kHeadlessLiveCaption, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enables the internal Media Session logic without enabling the Media Session
 // service.
 BASE_FEATURE(kInternalMediaSession, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Enables the Live Caption feature on supported devices.
-BASE_FEATURE(kLiveCaption, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable automatic downloading of speech recognition language packs.
-BASE_FEATURE(kLiveCaptionAutomaticLanguageDownload,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enable experimental Live Caption languages.
-BASE_FEATURE(kLiveCaptionExperimentalLanguages,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Log the amount of flickering between partial results. This measures how often
-// the system revises earlier outputs, to quantify the system's output
-// instability or flicker. Intuitively, it measures how many tokens must be
-// truncated from the previous text before appending any new text. The erasure
-// of the current timestep can be calculated from its longest common prefix with
-// the previous timestep.
-BASE_FEATURE(kLiveCaptionLogFlickerRate, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enable or disable Live Caption from the right click menu.
-BASE_FEATURE(kLiveCaptionRightClick, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enable speech recognition model LLM integration for Live Caption.
-BASE_FEATURE(kLiveCaptionSpeechRecognitionSmallExpertModel,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Use a greedy text stabilizer to reduce flickering when translating partial
-// speech recognition results.
-BASE_FEATURE(kLiveCaptionUseGreedyTextStabilizer,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Use a wait-k approach to reduce flickering when translating partial speech
-// recognition results.
-BASE_FEATURE(kLiveCaptionUseWaitK, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enable or disable Live Caption support for WebAudio.
 BASE_FEATURE(kLiveCaptionWebAudio, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Logs a DumpWithoutCrashing() call each time the Speech On-Device API (SODA)
-// fails to load. Used to diagnose issues when rolling out new versions of the
-// SODA library.
-BASE_FEATURE(kLogSodaLoadFailures,
-             "kLogSodaLoadFailures",
-             base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kMP4TimedMetadataTrack, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -650,10 +593,6 @@ BASE_FEATURE(kPlatformAudioEncoder,
 #endif
 );
 
-// Enables the preemptive downloading of the SODA binary and language
-// packs.
-BASE_FEATURE(kPreemptiveSodaDownload, base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kPreloadMediaEngagementData, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables Media Engagement Index recording. This data will be used to determine
@@ -699,10 +638,6 @@ BASE_FEATURE(kRevokeMediaSourceObjectURLOnAttach,
 
 // Enables Rust version of MPEG parser (MP3/ADTS). Remove after M152 stable.
 BASE_FEATURE(kRustMpegAudioDataParser, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable the Speaker Change Detection feature, which inserts a line break when
-// the Speech On-Device API (SODA) detects a speaker change.
-BASE_FEATURE(kSpeakerChangeDetection, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // CanPlayThrough issued according to standard.
 BASE_FEATURE(kSpecCompliantCanPlayThrough, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -1259,10 +1194,6 @@ bool IsIamfAudioDecodingSupported() {
 #else
   return false;
 #endif
-}
-
-bool IsLiveTranslateEnabled() {
-  return true;
 }
 
 bool IsRestrictOwnAudioSupported() {

@@ -21,7 +21,6 @@
 #include "base/time/time.h"
 #include "base/trace_event/trace_event.h"
 #include "base/values.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/component_extensions_allowlist/allowlist.h"
@@ -35,7 +34,6 @@
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/grit/browser_resources.h"
-#include "chrome/grit/component_extension_resources.h"
 #include "components/crx_file/id_util.h"
 #include "components/version_info/version_info.h"
 #include "content/public/browser/browser_thread.h"
@@ -54,15 +52,10 @@
 #include "extensions/common/manifest_constants.h"
 #include "pdf/buildflags.h"
 #include "printing/buildflags/buildflags.h"
-#include "ui/accessibility/accessibility_features.h"
 #include "ui/base/resource/resource_bundle.h"
 
 #if BUILDFLAG(ENABLE_PDF)
 #include "chrome/browser/pdf/pdf_extension_util.h"
-#endif
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/defaults.h"
 #endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -314,16 +307,6 @@ void ComponentLoader::AddHangoutServicesExtension() {
 }
 #endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
 
-void ComponentLoader::AddNetworkSpeechSynthesisExtension() {
-  if (::features::IsExtensionManifestV3NetworkSpeechSynthesisEnabled()) {
-    Add(IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3,
-        base::FilePath(FILE_PATH_LITERAL("network_speech_synthesis/mv3")));
-  } else {
-    Add(IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST,
-        base::FilePath(FILE_PATH_LITERAL("network_speech_synthesis")));
-  }
-}
-
 scoped_refptr<const Extension> ComponentLoader::CreateExtension(
     const ComponentExtensionInfo& info,
     std::u16string* error) {
@@ -403,15 +386,6 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
   if (should_disable_background_extensions) {
     return;
   }
-
-  if (!skip_session_components) {
-
-  }
-
-// http://crbug.com/41070702
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  AddNetworkSpeechSynthesisExtension();
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
 
 void ComponentLoader::

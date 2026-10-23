@@ -12,7 +12,6 @@
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/common/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/live_caption/pref_names.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 
@@ -55,11 +54,11 @@ enum {
   kHomePage = 100014,
   kHomePageIsNewTabPage = 100015,
   kNtpCustomBackgroundDict = 100016,
-  kLiveCaptionBubbleExpanded = 100017,
+  // kLiveCaptionBubbleExpanded = 100017,  // deprecated
   // kLiveCaptionBubblePinned = 100018,  // deprecated
-  kLiveCaptionEnabled = 100019,
-  kLiveCaptionLanguageCode = 100020,
-  kLiveCaptionMediaFoundationRendererErrorSilenced = 100021,
+  // kLiveCaptionEnabled = 100019,  // deprecated
+  // kLiveCaptionLanguageCode = 100020,  // deprecated
+  // kLiveCaptionMediaFoundationRendererErrorSilenced = 100021,  // deprecated
   kShowHomeButton = 100022,
   kPinnedExtensions = 100023,
   // kSupervisedUserApprovedExtensions = 100024,  // deprecated
@@ -195,8 +194,8 @@ enum {
   kExtensionCommands = 100153,
   kExtensionsUIDeveloperMode = 100154,
   kHttpsOnlyModeEnabled = 100155,
-  kLiveTranslateEnabled = 100156,
-  kLiveTranslateTargetLanguageCode = 100157,
+  // kLiveTranslateEnabled = 100156,  // deprecated
+  // kLiveTranslateTargetLanguageCode = 100157,  // deprecated
   kNetworkEasterEggHighScore = 100158,
   kNetworkPredictionOptions = 100159,
   kNetworkQualities = 100160,
@@ -257,7 +256,7 @@ enum {
   kSixPackKeyPageUpNotificationsRemaining = 100214,
   kSixPackKeyPageDownNotificationsRemaining = 100215,
   kSixPackKeyInsertNotificationsRemaining = 100216,
-  kLiveCaptionMaskOffensiveWords = 100217,
+  // kLiveCaptionMaskOffensiveWords = 100217,  // deprecated
   kTimeOfLastSessionActivation = 100218,
   kBrowserColorScheme = 100219,
   kBrowserColorVariant = 100220,
@@ -456,26 +455,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
      {syncable_prefs_ids::kNtpCustomBackgroundDict, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveCaptionBubbleExpanded,
-     {syncable_prefs_ids::kLiveCaptionBubbleExpanded, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveCaptionEnabled,
-     {syncable_prefs_ids::kLiveCaptionEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveCaptionLanguageCode,
-     {syncable_prefs_ids::kLiveCaptionLanguageCode, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveCaptionMediaFoundationRendererErrorSilenced,
-     {syncable_prefs_ids::kLiveCaptionMediaFoundationRendererErrorSilenced,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveCaptionMaskOffensiveWords,
-     {syncable_prefs_ids::kLiveCaptionMaskOffensiveWords, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
     {prefs::kShowHomeButton,
      {syncable_prefs_ids::kShowHomeButton, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
@@ -590,14 +569,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       sync_preferences::MergeBehavior::kNone}},
     {prefs::kHttpsOnlyModeEnabled,
      {syncable_prefs_ids::kHttpsOnlyModeEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveTranslateEnabled,
-     {syncable_prefs_ids::kLiveTranslateEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kLiveTranslateTargetLanguageCode,
-     {syncable_prefs_ids::kLiveTranslateTargetLanguageCode, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
     {prefs::kNetworkEasterEggHighScore,

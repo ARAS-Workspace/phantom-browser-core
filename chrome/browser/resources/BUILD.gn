@@ -59,7 +59,6 @@ group("resources") {
     "signin:resources",
     "tab_group_home:resources",
     "tab_search:resources",
-    "webnn_internals:resources",
     "webui_browser:resources",
     "webui_gallery:resources",
     "webui_toolbar:resources",
@@ -128,13 +127,7 @@ if (enable_extensions_core) {
   grit("component_extension_resources") {
     source = "component_extension_resources.grd"
 
-    inputs = [
-      "network_speech_synthesis/mv3/audio.html",
-      "network_speech_synthesis/mv3/audio.js",
-      "network_speech_synthesis/mv3/service_worker.js",
-      "network_speech_synthesis/mv3/tts_extension.js",
-      "network_speech_synthesis/tts_extension.js",
-    ]
+    inputs = []
 
     if (is_chrome_branded || enable_hangout_services_extension) {
       inputs += [
@@ -259,7 +252,6 @@ group("dev_ui_resources") {
     "multistep_filter_internals:resources",
     "on_device_internals:resources",
     "user_education_internals:resources",
-    "webnn_internals:resources",
   ]
 
   if (is_linux) {

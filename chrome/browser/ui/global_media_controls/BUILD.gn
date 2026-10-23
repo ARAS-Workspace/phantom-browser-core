@@ -48,7 +48,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/tabs:tab_strip",
-    "//components/live_caption:constants",
     "//services/metrics/public/cpp:ukm_builders",
   ]
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]

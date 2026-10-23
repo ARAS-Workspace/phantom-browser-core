@@ -402,16 +402,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kString;
   (*s_allowlist)[::prefs::kAccessibilityCaptionsBackgroundOpacity] =
       settings_api::PrefType::kNumber;
-  (*s_allowlist)[::prefs::kLiveCaptionEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kLiveCaptionLanguageCode] =
-      settings_api::PrefType::kString;
-  (*s_allowlist)[::prefs::kLiveCaptionMaskOffensiveWords] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kLiveTranslateEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kLiveTranslateTargetLanguageCode] =
-      settings_api::PrefType::kString;
   (*s_allowlist)[::prefs::kAccessibilityAXTreeFixingEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kAccessibilityMainNodeAnnotationsEnabled] =

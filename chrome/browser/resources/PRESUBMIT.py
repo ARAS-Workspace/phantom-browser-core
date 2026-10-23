@@ -151,7 +151,6 @@ def CheckNoNewJs(input_api, output_api):
     'chrome/browser/resources/hangout_services/',
     'chrome/browser/resources/inspect/',
     'chrome/browser/resources/net_internals/',
-    'chrome/browser/resources/network_speech_synthesis/',
     'chrome/browser/resources/new_tab_page_incognito_guest/',
   ]
 

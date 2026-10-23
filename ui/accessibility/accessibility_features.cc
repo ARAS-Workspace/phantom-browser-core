@@ -121,13 +121,6 @@ bool IsImageDescriptionsAlternateRoutingEnabled() {
       ::features::kImageDescriptionsAlternateRouting);
 }
 
-BASE_FEATURE(kExtensionManifestV3NetworkSpeechSynthesis,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsExtensionManifestV3NetworkSpeechSynthesisEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kExtensionManifestV3NetworkSpeechSynthesis);
-}
-
 BASE_FEATURE(kUseAXPositionForDocumentMarkers,
              base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsUseAXPositionForDocumentMarkersEnabled() {

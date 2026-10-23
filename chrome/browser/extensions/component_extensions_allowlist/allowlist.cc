@@ -9,13 +9,11 @@
 #include "base/containers/fixed_flat_set.h"
 #include "base/logging.h"
 #include "base/notreached.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/grit/browser_resources.h"
-#include "chrome/grit/component_extension_resources.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 #include "printing/buildflags/buildflags.h"
@@ -43,17 +41,14 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
 }
 
 bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
+#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
   switch (manifest_resource_id) {
     // Please keep the list in alphabetical order.
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
     case IDR_HANGOUT_SERVICES_MANIFEST_V2:
     case IDR_HANGOUT_SERVICES_MANIFEST_V3:
-#endif
-    case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST:
-    case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3:
-
       return true;
   }
+#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
 
   LOG(ERROR) << "Component extension with manifest resource id "
              << manifest_resource_id << " not in allowlist and is not being "

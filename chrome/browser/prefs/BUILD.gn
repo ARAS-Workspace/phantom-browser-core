@@ -127,7 +127,6 @@ source_set("impl") {
     "//components/history_clusters/core",
     "//components/image_fetcher/core/cache",
     "//components/language/core/browser",
-    "//components/live_caption:constants",
     "//components/lookalikes/core",
     "//components/media_device_salt",
     "//components/metrics/demographics",

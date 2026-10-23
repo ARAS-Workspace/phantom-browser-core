@@ -65,7 +65,6 @@
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/live_caption/pref_names.h"
 #include "components/metrics/metrics_pref_names.h"
 #include "components/network_time/network_time_pref_names.h"
 #include "components/ntp_tiles/enterprise/ntp_shortcuts_policy_handler.h"
@@ -864,12 +863,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kAutomatedPasswordChangeSettings,
     optimization_guide::prefs::kAutomatedPasswordChangeEnterprisePolicyAllowed,
     base::Value::Type::INTEGER },
-  { key::kLiveCaptionEnabled,
-    prefs::kLiveCaptionEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kLiveTranslateEnabled,
-    prefs::kLiveTranslateEnabled,
-    base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // First run import.
   { key::kImportBookmarks,

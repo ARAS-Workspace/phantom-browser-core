@@ -45,7 +45,6 @@ browser_exposed_mojom_targets = [
   "//chrome/browser/ui/webui/suggest_internals:mojo_bindings",
   "//chrome/browser/ui/webui/tab_search:mojo_bindings",
   "//chrome/browser/ui/webui/tab_strip_internals:mojo_bindings",
-  "//chrome/browser/ui/webui/webnn_internals:mojo_bindings",
   "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
   "//chrome/common:mojo_bindings",
   "//chrome/common:offline_page_auto_fetcher_mojom",

@@ -48,7 +48,6 @@ MEDIA_EXPORT extern const char kDisableAudioInput[];
 MEDIA_EXPORT extern const char kDisableAudioOutput[];
 MEDIA_EXPORT extern const char kDisableBackgroundMediaSuspend[];
 MEDIA_EXPORT extern const char kDisableRTCSmoothnessAlgorithm[];
-MEDIA_EXPORT extern const char kEnableLiveCaptionPrefForTesting[];
 MEDIA_EXPORT extern const char kFailAudioStreamCreation[];
 MEDIA_EXPORT extern const char kFakeBackgroundBlurTogglePeriod[];
 MEDIA_EXPORT extern const char kForceVideoOverlays[];
@@ -138,7 +137,6 @@ MEDIA_EXPORT extern const base::FeatureParam<std::string>
     kMediaFoundationClearKeyCdmPathForTesting;
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kFailUrlProvisionFetcherForTesting);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kFallbackAfterDecodeError);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kFeatureManagementLiveTranslateCrOS);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kForceSoftwareForRtcLowResolutions);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kGetDisplayMediaConfersActivation);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kGlobalMediaControlsAutoDismiss);
@@ -162,22 +160,8 @@ MEDIA_EXPORT extern const base::FeatureParam<int>
 MEDIA_EXPORT extern const base::FeatureParam<bool>
     kHardwareSecureDecryptionFallbackOnHardwareContextReset;
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kHardwareSecureDecryptionVp9);
-// If enabled, Glic will start captioning as soon as a profile is loaded.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kHeadlessCaptionEarlyStart);
-// Enable experimental headless captions.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kHeadlessLiveCaption);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kInternalMediaSession);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaption);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionAutomaticLanguageDownload);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionExperimentalLanguages);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionLogFlickerRate);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionRightClick);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(
-    kLiveCaptionSpeechRecognitionSmallExpertModel);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionUseGreedyTextStabilizer);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionUseWaitK);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kLiveCaptionWebAudio);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kLogSodaLoadFailures);
 // Flag to enable or disable parsing of MP4 timed metadata tracks.
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMP4TimedMetadataTrack);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMatchSourceAudioChannelLayout);
@@ -218,7 +202,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kPauseMutedBackgroundAudio);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPictureInPictureMuteControl);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformAudioEncoder);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlaybackSpeedButton);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kPreemptiveSodaDownload);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPreloadMediaEngagementData);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPreloadMetadataSuspend);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kRecordMediaEngagementScores);
@@ -228,7 +211,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kResolutionBasedDecoderPriority);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kResumeBackgroundVideo);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kRevokeMediaSourceObjectURLOnAttach);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kRustMpegAudioDataParser);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kSpeakerChangeDetection);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kSpecCompliantCanPlayThrough);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kSuspendMediaForFrozenFrames);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kUnifiedAutoplay);
@@ -406,8 +388,6 @@ MEDIA_EXPORT bool IsDedicatedMediaServiceThreadEnabled(
 MEDIA_EXPORT bool IsHardwareSecureDecryptionEnabled();
 
 MEDIA_EXPORT bool IsIamfAudioDecodingSupported();
-
-MEDIA_EXPORT bool IsLiveTranslateEnabled();
 
 MEDIA_EXPORT bool IsRestrictOwnAudioSupported();
 

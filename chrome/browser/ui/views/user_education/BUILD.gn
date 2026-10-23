@@ -239,7 +239,6 @@ source_set("interactive_ui_tests") {
     "//chrome/test:test_support_ui",
     "//chrome/test/data/webui:resources_grit",
     "//chrome/test/user_education",
-    "//components/live_caption:utils",
     "//components/user_education/common",
     "//components/user_education/test",
     "//content/test:test_support",

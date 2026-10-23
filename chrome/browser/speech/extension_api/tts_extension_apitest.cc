@@ -11,7 +11,6 @@
 #include "base/memory/weak_ptr.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "chrome/browser/extensions/component_loader.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
@@ -29,10 +28,8 @@
 #include "extensions/browser/extension_system.h"
 #include "extensions/common/mojom/view_type.mojom.h"
 #include "extensions/test/extension_test_message_listener.h"
-#include "net/base/network_change_notifier.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "ui/accessibility/accessibility_features.h"
 
 using ::testing::_;
 using ::testing::AnyNumber;
@@ -253,25 +250,6 @@ class MockTtsPlatformImpl : public content::TtsPlatform {
   base::WeakPtrFactory<MockTtsPlatformImpl> ptr_factory_{this};
 };
 
-class FakeNetworkOnlineStateForTest : public net::NetworkChangeNotifier {
- public:
-  explicit FakeNetworkOnlineStateForTest(bool online) : online_(online) {}
-
-  FakeNetworkOnlineStateForTest(const FakeNetworkOnlineStateForTest&) = delete;
-  FakeNetworkOnlineStateForTest& operator=(
-      const FakeNetworkOnlineStateForTest&) = delete;
-
-  ~FakeNetworkOnlineStateForTest() override = default;
-
-  ConnectionType GetCurrentConnectionType() const override {
-    return online_ ? net::NetworkChangeNotifier::CONNECTION_ETHERNET
-                   : net::NetworkChangeNotifier::CONNECTION_NONE;
-  }
-
- private:
-  bool online_;
-};
-
 class EventRouterAddListenerWaiter : public EventRouter::Observer {
  public:
   EventRouterAddListenerWaiter(Profile* profile, const std::string& event_name)
@@ -332,16 +310,6 @@ class TtsApiTest : public ExtensionApiTest,
     tts_controller->SetTtsEngineDelegate(TtsExtensionEngine::GetInstance());
   }
 
-  void AddNetworkSpeechSynthesisExtension() {
-    auto* component_loader = extensions::ComponentLoader::Get(profile());
-    component_loader->AddNetworkSpeechSynthesisExtension();
-
-    // Wait for any tts engine event listener to be added by the network tts
-    // engine so that tests can be ready to validate state.
-    EventRouterAddListenerWaiter waiter(profile(), tts_engine_events::kOnStop);
-    waiter.Wait();
-  }
-
  protected:
   bool HasVoiceWithName(const std::string& name) {
     std::vector<content::VoiceData> voices;
@@ -369,15 +337,8 @@ INSTANTIATE_TEST_SUITE_P(
 INSTANTIATE_TEST_SUITE_P(
     ServiceWorker,
     TtsApiTest,
-    ::testing::Values(
-        FeaturesTestParam{
-            .context_type = ContextType::kServiceWorker,
-            .enabled_features =
-                {features::kExtensionManifestV3NetworkSpeechSynthesis}},
-        FeaturesTestParam{
-            .context_type = ContextType::kServiceWorker,
-            .disabled_features = {
-                features::kExtensionManifestV3NetworkSpeechSynthesis}}));
+    ::testing::Values(FeaturesTestParam{
+        .context_type = ContextType::kServiceWorker}));
 
 IN_PROC_BROWSER_TEST_P(TtsApiTest, PlatformSpeakOptionalArgs) {
   EXPECT_CALL(mock_platform_impl_, IsSpeaking());
@@ -632,25 +593,6 @@ IN_PROC_BROWSER_TEST_P(TtsApiTest, LangMatching) {
   EXPECT_CALL(mock_platform_impl_, StopSpeaking()).WillRepeatedly(Return(true));
 
   ASSERT_TRUE(RunExtensionTest("tts_engine/lang_matching")) << message_;
-}
-
-IN_PROC_BROWSER_TEST_P(TtsApiTest, NetworkSpeechEngine) {
-  // Simulate online network state.
-  net::NetworkChangeNotifier::DisableForTest disable_for_test;
-  FakeNetworkOnlineStateForTest fake_online_state(true);
-
-  ASSERT_NO_FATAL_FAILURE(AddNetworkSpeechSynthesisExtension());
-  ASSERT_TRUE(RunExtensionTest("tts_engine/network_speech_engine")) << message_;
-}
-
-IN_PROC_BROWSER_TEST_P(TtsApiTest, NoNetworkSpeechEngineWhenOffline) {
-  // Simulate offline network state.
-  net::NetworkChangeNotifier::DisableForTest disable_for_test;
-  FakeNetworkOnlineStateForTest fake_online_state(false);
-
-  ASSERT_NO_FATAL_FAILURE(AddNetworkSpeechSynthesisExtension());
-  // Test should fail when offline.
-  ASSERT_FALSE(RunExtensionTest("tts_engine/network_speech_engine"));
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 

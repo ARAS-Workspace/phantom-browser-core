@@ -52,7 +52,6 @@
       "chrome/browser/resources/chromeos/mobile_setup_portal.html",
       "chrome/browser/resources/dev_ui/dev_ui_loader_error.html",
       "chrome/browser/resources/hangout_services/.*(css|html|js)",
-      "chrome/browser/resources/network_speech_synthesis/.*(css|html|js)",
       "chrome/browser/resources/new_tab_page_incognito_guest/.*(css|html|js)",
       "chrome/browser/resources/page_not_available_for_guest/app.html",
       "chrome/browser/resources/page_not_aventerprise/incognito_navigation_blocked_page/incognito_blocked.html",

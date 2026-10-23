@@ -5,48 +5,7 @@
 #ifndef COMPONENTS_LIVE_CAPTION_PREF_NAMES_H_
 #define COMPONENTS_LIVE_CAPTION_PREF_NAMES_H_
 
-#include <string>
-
-#include "build/build_config.h"
-
-
-class PrefService;
-
 namespace prefs {
-
-// Live Caption is not available on Android, so exclude these unneeded
-// kLiveCaption*  prefs.
-#if !defined(ANDROID)
-// Whether the Live Caption bubble is expanded.
-inline constexpr char kLiveCaptionBubbleExpanded[] =
-    "accessibility.captions.live_caption_bubble_expanded";
-
-// Whether the Live Caption feature is enabled.
-inline constexpr char kLiveCaptionEnabled[] =
-    "accessibility.captions.live_caption_enabled";
-
-// The language to use with the Live Caption feature.
-inline constexpr char kLiveCaptionLanguageCode[] =
-    "accessibility.captions.live_caption_language";
-
-// Whether offensive words are masked.
-inline constexpr char kLiveCaptionMaskOffensiveWords[] =
-    "accessibility.captions.live_caption_mask_offensive_words";
-
-// The list of origins that should not display an error message when using the
-// Media Foundation renderer.
-inline constexpr char kLiveCaptionMediaFoundationRendererErrorSilenced[] =
-    "accessibility.captions.live_caption_media_foundation_renderer_error_"
-    "silenced";
-
-// Whether the Headless Caption exploration is enabled.  Unlike
-// `kLiveCaptionEnabled`, this does not imply that the UI is visible.  Both
-// prefs may be enabled at once.
-inline constexpr char kHeadlessCaptionEnabled[] =
-    "accessibility.captions.headless_caption_enabled";
-
-
-#endif  // !defined(ANDROID)
 
 // These kAccessibilityCaptions* caption style prefs are used on Android
 // (though their primary use is for Live Caption, which is why they are housed
@@ -79,16 +38,6 @@ inline constexpr char kAccessibilityCaptionsTextShadow[] =
 // Integer indicating the opacity of the captions text background from 0 - 100.
 inline constexpr char kAccessibilityCaptionsBackgroundOpacity[] =
     "accessibility.captions.background_opacity";
-
-// Live Translate prefs.
-
-// Whether the Live Translate feature is enabled.
-inline constexpr char kLiveTranslateEnabled[] =
-    "accessibility.captions.live_translate_enabled";
-
-// The target language to translate the captions to.
-inline constexpr char kLiveTranslateTargetLanguageCode[] =
-    "accessibility.captions.live_translate_target_language";
 
 }  // namespace prefs
 

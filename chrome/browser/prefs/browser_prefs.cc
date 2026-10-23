@@ -242,7 +242,6 @@
 #include "chrome/browser/user_education/browser_user_education_storage_service.h"
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
 #include "components/headless/policy/headless_mode_prefs.h"  // nogncheck crbug.com/40147906
-#include "components/live_caption/pref_names.h"
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 #include "chrome/browser/devtools/devtools_window.h"
@@ -1248,24 +1247,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   bookmarks_webui::RegisterProfilePrefs(registry);
   browser_sync::ForeignSessionHandler::RegisterProfilePrefs(registry);
   BrowserUserEducationStorageService::RegisterProfilePrefs(registry);
-  registry->RegisterBooleanPref(
-      prefs::kLiveCaptionBubbleExpanded, false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
-      prefs::kLiveCaptionEnabled, false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
-      prefs::kLiveCaptionMaskOffensiveWords, false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(prefs::kHeadlessCaptionEnabled, false,
-                                /*flags=*/0);
-  registry->RegisterStringPref(prefs::kLiveCaptionLanguageCode, "en-US",
-                               user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterListPref(
-      prefs::kLiveCaptionMediaFoundationRendererErrorSilenced,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(prefs::kLiveTranslateEnabled, false);
-  registry->RegisterStringPref(prefs::kLiveTranslateTargetLanguageCode, "en");
   ChromeAuthenticatorRequestDelegate::RegisterProfilePrefs(registry);
   first_run::RegisterProfilePrefs(registry);
   PinnedTabCodec::RegisterProfilePrefs(registry);

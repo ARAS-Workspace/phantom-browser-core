@@ -1278,7 +1278,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/history_clusters",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
     "//chrome/browser/ui/webui/util",
-    "//chrome/browser/ui/webui/webnn_internals",
   ]
 
   if (use_aura) {

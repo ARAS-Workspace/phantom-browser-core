@@ -293,7 +293,6 @@ inline constexpr char kChromeUIWebUITestHost[] = "webui-test";
 inline constexpr char kChromeUIWebUIToolbarURL[] =
     "chrome://webui-toolbar.top-chrome";
 inline constexpr char kChromeUIWebUIToolbarHost[] = "webui-toolbar.top-chrome";
-inline constexpr char kChromeUIWebNNInternalsHost[] = "webnn-internals";
 
 inline constexpr char kChromeUIAutofillMlInternalsHost[] =
     "autofill-ml-internals";

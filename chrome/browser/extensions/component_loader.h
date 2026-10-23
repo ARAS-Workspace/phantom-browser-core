@@ -123,7 +123,6 @@ class ComponentLoader : public KeyedService {
 
  private:
   friend class ComponentLoaderFactory;
-  friend class TtsApiTest;
   FRIEND_TEST_ALL_PREFIXES(ComponentLoaderTest, ParseManifest);
 
   // Information about a registered component extension.
@@ -173,8 +172,6 @@ class ComponentLoader : public KeyedService {
 #if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
   void AddHangoutServicesExtension();
 #endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-
-  void AddNetworkSpeechSynthesisExtension();
 
   scoped_refptr<const Extension> CreateExtension(
       const ComponentExtensionInfo& info,
