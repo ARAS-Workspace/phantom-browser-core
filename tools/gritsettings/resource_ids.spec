@@ -1061,10 +1061,6 @@
     "META": {"sizes": {"includes": [5]}},
     "includes": [7370],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/components/metrics/debug/resources.grd": {
-    "META": {"sizes": {"includes": [25]}},
-    "includes": [7380],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/components/net_log/resources/resources.grd": {
     "META": {"sizes": {"includes": [5]}},
     "includes": [7385],

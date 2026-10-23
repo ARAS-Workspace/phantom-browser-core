@@ -70,7 +70,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://local-state",
       "chrome://media-engagement",
       "chrome://media-internals",
-      "chrome://metrics-internals",
       "chrome://net-export",
       "chrome://net-internals",
       "chrome://network-errors",

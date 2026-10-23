@@ -680,7 +680,6 @@ static_library("ui") {
     "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//components/language_detection/core",
-    "//components/metrics/debug:resources",
     "//components/metrics/private_metrics",
     "//components/omnibox/browser:vector_icons",
     "//components/optimization_guide/content/browser",

@@ -161,7 +161,6 @@ inline constexpr char kChromeUILocalStateHost[] = "local-state";
 inline constexpr char kChromeUILocalStateURL[] = "chrome://local-state";
 inline constexpr char kChromeUIMediaEngagementHost[] = "media-engagement";
 inline constexpr char kChromeUIMemoryInternalsHost[] = "memory-internals";
-inline constexpr char kChromeUIMetricsInternalsHost[] = "metrics-internals";
 inline constexpr char kChromeUINetExportHost[] = "net-export";
 inline constexpr char kChromeUINetInternalsHost[] = "net-internals";
 inline constexpr char kChromeUINetInternalsURL[] = "chrome://net-internals/";

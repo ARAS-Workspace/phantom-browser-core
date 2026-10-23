@@ -4,5 +4,4 @@
 
 declare_args() {
   structured_metrics_enabled = is_mac || is_linux
-  structured_metrics_debug_enabled = is_mac || is_linux
 }

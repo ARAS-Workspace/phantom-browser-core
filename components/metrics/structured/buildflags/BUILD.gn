@@ -8,8 +8,5 @@ import("//components/metrics/structured/buildflags/buildflags.gni")
 buildflag_header("buildflags") {
   header = "buildflags.h"
 
-  flags = [
-    "STRUCTURED_METRICS_ENABLED=$structured_metrics_enabled",
-    "STRUCTURED_METRICS_DEBUG_ENABLED=$structured_metrics_debug_enabled",
-  ]
+  flags = [ "STRUCTURED_METRICS_ENABLED=$structured_metrics_enabled" ]
 }

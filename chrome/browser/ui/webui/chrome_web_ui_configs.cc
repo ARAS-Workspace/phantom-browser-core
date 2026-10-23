@@ -26,7 +26,6 @@
 #include "chrome/browser/ui/webui/media/media_engagement_ui.h"
 #include "chrome/browser/ui/webui/media/webrtc_logs_ui.h"
 #include "chrome/browser/ui/webui/memory_internals_ui.h"
-#include "chrome/browser/ui/webui/metrics_internals/metrics_internals_ui.h"
 #include "chrome/browser/ui/webui/net_export_ui.h"
 #include "chrome/browser/ui/webui/net_internals/net_internals_ui.h"
 #include "chrome/browser/ui/webui/ntp_tiles_internals_ui.h"
@@ -152,7 +151,6 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<LocalStateUIConfig>());
   map.AddWebUIConfig(std::make_unique<MediaEngagementUIConfig>());
   map.AddWebUIConfig(std::make_unique<MemoryInternalsUIConfig>());
-  map.AddWebUIConfig(std::make_unique<MetricsInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<NetExportUIConfig>());
   map.AddWebUIConfig(std::make_unique<NetInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<NTPTilesInternalsUIConfig>());

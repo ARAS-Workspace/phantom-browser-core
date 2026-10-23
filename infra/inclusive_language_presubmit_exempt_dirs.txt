@@ -115,7 +115,6 @@ components/domain_reliability
 components/gcm_driver
 components/input
 components/metrics
-components/metrics/debug
 components/omnibox/browser
 components/onc/docs
 components/page_info
