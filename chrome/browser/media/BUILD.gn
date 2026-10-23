@@ -145,7 +145,6 @@ source_set("browser_tests") {
   deps += [
     ":impl",
     "//chrome/browser:chrome_content_browser_client",
-    "//chrome/browser/component_updater",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/content_settings:content_settings_util",
     "//chrome/browser/prefs:util",

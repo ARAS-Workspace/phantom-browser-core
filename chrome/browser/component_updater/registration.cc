@@ -9,7 +9,6 @@
 #include "base/functional/bind.h"
 #include "base/path_service.h"
 #include "base/task/thread_pool.h"
-#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/component_updater/crl_set_component_installer.h"
 #include "chrome/browser/component_updater/pki_metadata_component_installer.h"
@@ -17,15 +16,6 @@
 #include "chrome/common/chrome_paths.h"
 #include "components/component_updater/component_updater_service.h"
 #include "components/component_updater/installer_policies/history_search_strings_component_installer.h"
-#include "third_party/widevine/cdm/buildflags.h"
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/component_updater/recovery_improved_component_installer.h"
-#endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
-#include "chrome/browser/component_updater/widevine_cdm_component_installer.h"
-#endif  // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
 
 namespace component_updater {
 
@@ -53,14 +43,6 @@ void DeleteOldComponents(const base::FilePath& user_data_dir) {
 
 void RegisterComponentsForUpdate() {
   auto* const cus = g_browser_process->component_updater();
-
-#if BUILDFLAG(IS_MAC)
-  RegisterRecoveryImprovedComponent(cus, g_browser_process->local_state());
-#endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
-  RegisterWidevineCdmComponent(cus);
-#endif  // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
 
   // CRLSetFetcher attempts to load a CRL set from either the local disk or
   // network.

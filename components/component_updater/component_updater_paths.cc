@@ -44,9 +44,6 @@ bool PathProvider(int key, base::FilePath* result) {
     case DIR_COMPONENT_CLD2:
       cur = cur.Append(FILE_PATH_LITERAL("CLD"));
       break;
-    case DIR_RECOVERY_BASE:
-      cur = cur.Append(FILE_PATH_LITERAL("recovery"));
-      break;
     case DIR_SWIFT_SHADER:
       cur = cur.Append(FILE_PATH_LITERAL("SwiftShader"));
       break;

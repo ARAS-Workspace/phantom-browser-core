@@ -100,7 +100,6 @@ static_library("flags_android_impl") {
     "//components/policy/core/common",
     "//components/privacy_sandbox:features",
     "//components/regional_capabilities",
-    "//components/safety_check:features",
     "//components/saved_tab_groups/public:features",
     "//components/search",
     "//components/search_engines:search_engines_switches",

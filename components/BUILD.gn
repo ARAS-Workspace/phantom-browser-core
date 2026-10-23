@@ -425,7 +425,6 @@ test("components_unittests") {
     "//components/one_time_tokens/core/browser:unit_tests",
     "//components/page_info:unit_tests",
     "//components/privacy_sandbox/privacy_sandbox_attestations:unit_tests",
-    "//components/safety_check:unit_tests",
     "//components/security_interstitials/content:unit_tests",
     "//components/services/quarantine:unit_tests",
     "//components/site_engagement/content:unit_tests",

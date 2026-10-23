@@ -12,12 +12,4 @@ namespace prefs {
 constexpr char kComponentUpdatesEnabled[] =
     "component_updates.component_updates_enabled";
 
-// String that represents the recovery component last downloaded version. This
-// takes the usual 'a.b.c.d' notation.
-constexpr char kRecoveryComponentVersion[] = "recovery_component.version";
-
-// Full path where last recovery component CRX was unpacked to.
-constexpr char kRecoveryComponentUnpackPath[] =
-    "recovery_component.unpack_path";
-
 }  // namespace prefs

@@ -14,10 +14,7 @@
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/component_updater/mei_preload_component_installer.h"
 #include "chrome/browser/media/media_engagement_contents_observer.h"
-#include "chrome/browser/media/media_engagement_preloaded_list.h"
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/prefs/session_startup_pref.h"
 #include "chrome/browser/preloading/prefetch/no_state_prefetch/no_state_prefetch_manager_factory.h"
@@ -35,12 +32,14 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/component_updater/component_updater_service.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_handle.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/no_state_prefetch/common/no_state_prefetch_final_status.h"
+#include "components/prefs/pref_service.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
@@ -318,23 +317,6 @@ class MediaEngagementBrowserTest : public InProcessBrowserTest {
   const base::TimeDelta kMaxWaitingTime =
       MediaEngagementContentsObserver::kSignificantMediaPlaybackTime +
       base::Seconds(2);
-};
-
-// Class used to test the MEI preload component.
-class MediaEngagementPreloadBrowserTest : public InProcessBrowserTest {
- public:
-  MediaEngagementPreloadBrowserTest() = default;
-  ~MediaEngagementPreloadBrowserTest() override = default;
-
-  void SetUp() override {
-    scoped_feature_list_.InitWithFeatures({media::kPreloadMediaEngagementData},
-                                          {});
-
-    InProcessBrowserTest::SetUp();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, RecordEngagement) {
@@ -699,17 +681,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 1);
 }
 
-IN_PROC_BROWSER_TEST_F(MediaEngagementPreloadBrowserTest,
-                       EnsureSingletonListIsLoaded) {
-  base::RunLoop run_loop;
-  component_updater::RegisterMediaEngagementPreloadComponent(
-      g_browser_process->component_updater(), run_loop.QuitClosure());
-  run_loop.Run();
-
-  // The list should be loaded now.
-  EXPECT_TRUE(MediaEngagementPreloadedList::GetInstance()->loaded());
-}
-
 #if BUILDFLAG(IS_MAC)
 // https://crbug.com/40187393
 #define MAYBE_SessionNewTabNavigateSameURLWithOpener_Typed \
@@ -741,6 +712,14 @@ class MediaEngagementPreThirdPartyCookieDeprecationBrowserTest
     : public MediaEngagementBrowserTest {
  public:
   MediaEngagementPreThirdPartyCookieDeprecationBrowserTest() {
+  }
+
+  void SetUpOnMainThread() override {
+    MediaEngagementBrowserTest::SetUpOnMainThread();
+    // Allow third-party cookies.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kOff));
   }
 };
 

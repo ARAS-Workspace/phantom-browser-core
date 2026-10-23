@@ -4,7 +4,6 @@
 
 #include "components/safety_check/safety_check.h"
 
-
 namespace {
 
 const base::TimeDelta kUnusedSitePermissionsRevocationCleanUpThreshold =
@@ -16,10 +15,6 @@ namespace safety_check {
 
 base::TimeDelta GetUnusedSitePermissionsRevocationCleanUpThreshold() {
   return kUnusedSitePermissionsRevocationCleanUpThreshold;
-}
-
-SafeBrowsingStatus CheckSafeBrowsing(PrefService* pref_service) {
-  return SafeBrowsingStatus::kDisabled;
 }
 
 }  // namespace safety_check

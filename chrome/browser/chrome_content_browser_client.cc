@@ -372,7 +372,6 @@
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom-forward.h"
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
-#include "third_party/blink/public/public_buildflags.h"
 #include "ui/base/clipboard/clipboard_format_type.h"
 #include "ui/base/clipboard/clipboard_metadata.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -514,10 +513,6 @@
 
 #if BUILDFLAG(ENABLE_VR)
 #include "chrome/browser/vr/chrome_xr_integration_client.h"
-#endif
-
-#if BUILDFLAG(USE_MINIKIN_HYPHENATION)
-#include "chrome/browser/component_updater/hyphenation_component_installer.h"
 #endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
@@ -5968,31 +5963,6 @@ bool ChromeContentBrowserClient::SetupEmbedderSandboxParameters(
 }
 
 #endif  // BUILDFLAG(IS_MAC)
-
-void ChromeContentBrowserClient::GetHyphenationDictionary(
-    base::OnceCallback<void(const base::FilePath&)> callback) {
-#if BUILDFLAG(USE_MINIKIN_HYPHENATION)
-  // Chrome for Testing bundles hyphenation dictionaries however, if the
-  // component updater is disabled (which is commonly the case with test
-  // automation frameworks), the hyphenation dictionaries directory is never
-  // initialized. To work around this, provide the well known hyphenation
-  // directory here bypassing the disabled component installer.
-#if BUILDFLAG(CHROME_FOR_TESTING)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kDisableComponentUpdate)) {
-    base::FilePath dir;
-    if (base::PathService::Get(base::DIR_EXE, &dir)) {
-      dir = dir.AppendASCII("hyphen-data");
-      std::move(callback).Run(dir);
-      return;
-    }
-  }
-#endif  // BUILDFLAG(CHROME_FOR_TESTING)
-
-  component_updater::HyphenationComponentInstallerPolicy::
-      GetHyphenationDictionary(std::move(callback));
-#endif
-}
 
 bool ChromeContentBrowserClient::HasErrorPage(int http_status_code) {
   // Use an internal error page, if we have one for the status code.

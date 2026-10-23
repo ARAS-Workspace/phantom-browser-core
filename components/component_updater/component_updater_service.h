@@ -233,7 +233,6 @@ class OnDemandUpdater {
   friend class SwReporterOnDemandFetcher;
   friend class ::extensions::AutotestPrivateLoadSmartDimComponentFunction;
   friend class IwaKeyDistributionComponentInstallerPolicy;
-  friend class PlatformRuntimeComponentInstallerPolicy;
   friend void UpdateAIEmbeddingsComponentOnDemand(Priority priority,
                                                   Callback callback);
 

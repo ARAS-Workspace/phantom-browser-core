@@ -7,7 +7,6 @@ static_library("private_verification_tokens") {
     ":*",
     "//chrome/browser:*",
     "//chrome/browser/browsing_data:*",
-    "//chrome/browser/component_updater:*",
     "//chrome/browser/profiles:profiles_extra_parts_impl",
   ]
 

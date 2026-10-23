@@ -845,8 +845,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       sandbox::SandboxSerializer* serializer) override;
 #endif  // BUILDFLAG(IS_MAC)
 
-  void GetHyphenationDictionary(
-      base::OnceCallback<void(const base::FilePath&)>) override;
   bool HasErrorPage(int http_status_code) override;
 
   StartupData* startup_data() { return &startup_data_; }

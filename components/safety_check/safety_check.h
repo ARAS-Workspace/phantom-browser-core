@@ -5,8 +5,7 @@
 #ifndef COMPONENTS_SAFETY_CHECK_SAFETY_CHECK_H_
 #define COMPONENTS_SAFETY_CHECK_SAFETY_CHECK_H_
 
-#include "base/observer_list_types.h"
-#include "components/prefs/pref_service.h"
+#include "base/time/time.h"
 
 // Utilities for performing browser safety checks common to desktop, Android,
 // and iOS. Platform-specific checks, such as updates and extensions, are
@@ -82,10 +81,6 @@ enum class UpdateStatus {
   // New enum values must go above here.
   kMaxValue = kUpdateToRollbackVersionDisallowed,
 };
-
-// Gets the status of Safe Browsing from the PrefService and invokes
-// OnSafeBrowsingCheckResult on each Observer with results.
-SafeBrowsingStatus CheckSafeBrowsing(PrefService* pref_service);
 
 }  // namespace safety_check
 

@@ -21,7 +21,6 @@ enum {
   // The following paths live in the user directory only, and point to the base
   // installation directory for the component.
   DIR_COMPONENT_CLD2,  // The Compact Language Detector.
-  DIR_RECOVERY_BASE,   // The Recovery.
   DIR_SWIFT_SHADER,    // The SwiftShader.
   PATH_END
 };

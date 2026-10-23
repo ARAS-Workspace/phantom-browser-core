@@ -696,47 +696,6 @@ class InstallerConfig:
                 )
             )
 
-        # Privacy Sandbox Attestation
-        psa_dir = "PrivacySandboxAttestationsPreloaded"
-        psa_manifest = self.output_dir / psa_dir / "manifest.json"
-        if psa_manifest.exists():
-            artifacts.append(
-                Artifact(
-                    f"{psa_dir}/manifest.json",
-                    f"{psa_dir}/manifest.json",
-                    ArtifactType.RESOURCE,
-                    StandardPermissions.REGULAR,
-                )
-            )
-            artifacts.append(
-                Artifact(
-                    f"{psa_dir}/privacy-sandbox-attestations.dat",
-                    f"{psa_dir}/privacy-sandbox-attestations.dat",
-                    ArtifactType.RESOURCE,
-                    StandardPermissions.REGULAR,
-                )
-            )
-
-        # MEI Preload
-        mei_manifest = self.output_dir / "MEIPreload/manifest.json"
-        if mei_manifest.exists():
-            artifacts.append(
-                Artifact(
-                    "MEIPreload/manifest.json",
-                    "MEIPreload/manifest.json",
-                    ArtifactType.RESOURCE,
-                    StandardPermissions.REGULAR,
-                )
-            )
-            artifacts.append(
-                Artifact(
-                    "MEIPreload/preloaded_data.pb",
-                    "MEIPreload/preloaded_data.pb",
-                    ArtifactType.RESOURCE,
-                    StandardPermissions.REGULAR,
-                )
-            )
-
         return artifacts
 
     def get_icon_artifacts(self) -> list[Artifact]:

@@ -11,9 +11,6 @@ namespace prefs {
 
 extern const char kComponentUpdatesEnabled[];
 
-extern const char kRecoveryComponentVersion[];
-extern const char kRecoveryComponentUnpackPath[];
-
 }  // namespace prefs
 
 #endif  // COMPONENTS_COMPONENT_UPDATER_PREF_NAMES_H_

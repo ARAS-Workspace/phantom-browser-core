@@ -10,19 +10,4 @@ namespace switches {
 // for the browser process.
 constexpr char kComponentUpdater[] = "component-updater";
 
-// Optional testing override of the Trust Tokens key commitment component's
-// path.
-constexpr char kComponentUpdaterTrustTokensComponentPath[] =
-    "component-updater-trust-tokens-component-path";
-
-// Switch to control which serving campaigns file versions to select in test
-// cohort. Example: `--campaigns-test-tag=dev1` will select test cohort which
-// tag matches dev1.
-constexpr char kCampaignsTestTag[] = "campaigns-test-tag";
-
-// Switch to control which serving demo mode app versions to select in test
-// cohort. Example: `--demo-app-test-tag=dev1` will select test cohort which tag
-// matches dev1.
-constexpr char kDemoModeTestTag[] = "demo-app-test-tag";
-
 }  // namespace switches
