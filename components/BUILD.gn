@@ -450,10 +450,7 @@ test("components_unittests") {
     data_deps += [ "//content/shell:pak" ]
   }
 
-  deps += [
-    "//components/keep_alive_registry:unit_tests",
-    "//components/manta:unit_tests",
-  ]
+  deps += [ "//components/keep_alive_registry:unit_tests" ]
 
   deps += [
     "//components/headless/console_message_logger:unit_tests",

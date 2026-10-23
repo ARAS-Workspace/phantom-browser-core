@@ -2,15 +2,6 @@
 # followed by tests which are also flaky on other bots. Tests which are not
 # appropriate for this bot should be placed at the end of this file.
 
-# Flaky on most bots: crbug.com/460575305
--ActorToolAgnosticBrowserTest.EnsureFocusSimulatedWhenActing
-
-# Flaky on Linux: crbug.com/483506395
--ActorTypeToolBrowserTest.TypeTool_FocusMovesFocus
-
-# Flaky on Linux: crbug.com/483651798
--ActorWindowManagementToolBrowserTest.CloseWindow
-
 # Flaky on multiple bots for all OSes: crbug.com/462585538
 -AdsPageLoadMetricsObserverBrowserTest.AdFrameRecordMediaStatusNotPlayed
 -AdsPageLoadMetricsObserverPrerenderingBrowserTest.NoMetricsInPrerendering
@@ -75,12 +66,6 @@
 # Flaky on most bots: crbug.com/483085067
 -FlagsUiBrowserTest.App
 
-# Flaky on most bots: crbug.com/483506399
--GlicInstanceCoordinatorBrowserTest.DeactivationWhenSwitchingToUnboundTab
-
-# Flaky on Linux: crbug.com/487897248
--GlicInstanceCoordinatorBrowserTest.TabContentsDaisyChaining
-
 # Flaky on Linux: crbug.com/350991033, which was closed as a duplicate of restricted-access crbug.com/377951068
 -LensOverlayControllerContextualFeaturesDisabledTest.PreselectionToastOmniboxFocusState
 
@@ -143,13 +128,6 @@
 -SettingsTest.PaymentsSectionCardDialogs__PaymentsSectionCardDialogs_verifyOnlyValidCardNumbersAllowed_InvalidCasesWithNoError
 -SettingsTest.PaymentsSectionIban
 -SettingsTest.PaymentsSectionIban__PaymentsSectionIban_verifyIBANErrorMessage
-
-# Flaky on most bots: crbug.com/483542950
--SkillsBrowserTest.UserSkillsPage
--SkillsBrowserTest.UserSkillsPage__UserSkillsPage_CopySkillInstructionsToClipboard
-
-# Flaky on most bots: crbug.com/487944774
--SkillsInteractiveUiTest.UpdateSkillPreviews
 
 # Flaky on Linux: crbug.com/483092912
 -TabRestoreTest.RestoreGroupWithUnloadHandlerRejected

@@ -7,8 +7,6 @@
 # non-pixel tests here.
 
 AccountSettingsPagePixelBrowserTest.*
-ActorUiDomNodeGeometryBrowserTest.*
-ActorUiHandoffButtonControllerPixelTest.*
 *AutofillAiLocalSaveNotificationViewBrowsertest.*
 AddNewAddressProfileTest.*
 AppInfoDialogBrowserTest.*
@@ -140,7 +138,6 @@ SettingsOverriddenExplicitChoiceDialogInteractiveUiTest.*
 SharedTabGroupInteractiveUiTest.SharedTabGroupIn*
 SingleBookmarkUploadDialogPixelTest.InvokeUi
 SearchAIModeSignInPromoViewPixelTest.*
-*SkillsPageScreenshotInteractiveUITest.*
 SplitTabButtonInteractiveTest.ButtonUpdatesOnSplit
 SyncConfirmationUIDialogPixelTest.*
 SyncConfirmationUIWindowPixelTest.*

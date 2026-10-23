@@ -4,19 +4,14 @@
 
 #include "chrome/browser/extensions/component_extensions_allowlist/allowlist.h"
 
-#include <stddef.h>
-
 #include "base/containers/fixed_flat_set.h"
 #include "base/logging.h"
 #include "base/notreached.h"
-#include "build/build_config.h"
-#include "build/chromeos_buildflags.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/grit/browser_resources.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
-#include "printing/buildflags/buildflags.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -24,7 +19,6 @@ namespace extensions {
 
 bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
   constexpr auto kAllowed = base::MakeFixedFlatSet<std::string_view>({
-      extension_misc::kGlicExtensionId,
       extension_misc::kInAppPaymentsSupportAppId,
       extension_misc::kPdfExtensionId,
       extension_misc::kDictationConnectorExtensionId,

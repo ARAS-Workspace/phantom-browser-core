@@ -77,10 +77,6 @@ std::u16string GetApplicationTitle(WebContents* web_contents) {
   return url_identity.name;
 }
 
-bool IsGlicWebUI(const WebContents* web_contents) {
-  return false;
-}
-
 // If bypassing the media selection dialog is allowed for this request, this
 // returns the `DesktopMediaId` to use. Returns a null ID otherwise.
 DesktopMediaID GetMediaForSelectionDialogBypass(
@@ -94,27 +90,13 @@ DesktopMediaID GetMediaForSelectionDialogBypass(
   }
 
   const GURL& origin_url = web_contents->GetLastCommittedURL();
-  // Special behavior for chrome://glic: skip tab capture dialog.
-  if (request.video_type ==
-          blink::mojom::MediaStreamType::DISPLAY_VIDEO_CAPTURE_THIS_TAB &&
-      IsGlicWebUI(web_contents)) {
-    DesktopMediaID media_id(
-        DesktopMediaID::TYPE_WEB_CONTENTS, DesktopMediaID::kNullId,
-        WebContentsMediaCaptureId(
-            web_contents->GetPrimaryMainFrame()
-                ->GetProcess()
-                ->GetDeprecatedID(),
-            web_contents->GetPrimaryMainFrame()->GetRoutingID()));
-    media_id.audio_share =
-        request.audio_type != blink::mojom::MediaStreamType::NO_SERVICE;
-    return media_id;
-  } else if (request.video_type == blink::mojom::MediaStreamType::NO_SERVICE &&
-             request.audio_type != blink::mojom::MediaStreamType::NO_SERVICE &&
-             !request.exclude_system_audio &&
-             content_settings.GetContentSetting(
-                 origin_url, origin_url,
-                 ContentSettingsType::DISPLAY_MEDIA_SYSTEM_AUDIO) ==
-                 ContentSetting::CONTENT_SETTING_ALLOW) {
+  if (request.video_type == blink::mojom::MediaStreamType::NO_SERVICE &&
+      request.audio_type != blink::mojom::MediaStreamType::NO_SERVICE &&
+      !request.exclude_system_audio &&
+      content_settings.GetContentSetting(
+          origin_url, origin_url,
+          ContentSettingsType::DISPLAY_MEDIA_SYSTEM_AUDIO) ==
+          ContentSetting::CONTENT_SETTING_ALLOW) {
     return DesktopMediaID(DesktopMediaID::TYPE_SCREEN, DesktopMediaID::kNullId,
                           /*audio_share=*/true);
   }

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import {assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertFalse} from 'chrome://webui-test/chai_assert.js';
 
 suite('WebviewBasicTest', function() {
   function createWebview(): chrome.webviewTag.WebView {
@@ -77,23 +77,9 @@ suite('WebviewBasicTest', function() {
     return result;
   }
 
-  // Verifies that a webview within a webui can forward media requests
-  // successfully. This forwarding is enabled for chrome://glic.
-  test('MediaRequestAllowOnGlic', async () => {
-    assertTrue(await testMediaRequest(true));
-  });
-  test('MediaRequestDenyOnGlic', async () => {
-    assertFalse(await testMediaRequest(false));
-  });
   // chrome://chrome-signin does not forward media requests in the same way, so
   // they are not allowed unless the embedded site is allowed.
   test('MediaRequestAllowOnSignIn', async () => {
     assertFalse(await testMediaRequest(true));
-  });
-  test('MediaRequestPEPCAllowOnGlic', async () => {
-    assertTrue(await testMediaRequest(true));
-  });
-  test('MediaRequestPEPCDenyOnGlic', async () => {
-    assertFalse(await testMediaRequest(false));
   });
 });

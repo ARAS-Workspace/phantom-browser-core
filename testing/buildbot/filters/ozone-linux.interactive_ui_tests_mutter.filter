@@ -20,7 +20,6 @@
 -NotificationsTestWithFakeMediaStream.ShouldQueueDuringScreenPresent
 -PasswordBubbleInteractiveUiTest.AutoSigninNoFocus
 -PopupBlockerBrowserTest.ModalPopUnder
--SettingsGlicPageFocusTest.GlicPageFocus
 -StartupBrowserCreatorTest.LastUsedProfileActivated
 -WidgetInputMethodInteractiveTest.Activation
 -WidgetInputMethodInteractiveTest.OneWindow

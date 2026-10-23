@@ -210,9 +210,6 @@
         "chrome://add-supervision/*",
         "chrome://contextual-tasks/*",
         "chrome://extensions/*",
-        "chrome://glic/*",
-        "chrome://glic-fre/*",
-        "chrome://glic-experimental-opt-in/*",
         "chrome://graduation/*",
         "chrome://home/*",
         "chrome://chrome-signin/*",
@@ -221,8 +218,7 @@
         "chrome://os-settings/*",
         "chrome://parent-access/*",
         "chrome://password-change/*",
-        "chrome://lock-reauth/*",
-        "chrome://skills/*"
+        "chrome://lock-reauth/*"
       ]
     }, {
       "internal": true,
@@ -334,8 +330,6 @@
       "chrome://extensions/*",
       "chrome://extensions-zero-state/*",
       "chrome://file-manager/*",
-      "chrome://glic/*",
-      "chrome://glic-fre/*",
       "chrome://help-app/*",
       "chrome://history/*",
       "chrome://new-tab-page/*",
@@ -850,9 +844,6 @@
       "chrome://add-supervision/*",
       "chrome://chrome-signin/*",
       "chrome://contextual-tasks/*",
-      "chrome://glic/*",
-      "chrome://glic-fre/*",
-      "chrome://glic-experimental-opt-in/*",
       "chrome://graduation/*",
       "chrome://home/*",
       "chrome://mobilesetup/*",
@@ -860,8 +851,7 @@
       "chrome://os-settings/*",
       "chrome://parent-access/*",
       "chrome://password-change/*",
-      "chrome://lock-reauth/*",
-      "chrome://skills/*"
+      "chrome://lock-reauth/*"
     ]
   }, {
     "internal": true,
@@ -897,9 +887,6 @@
       "chrome://add-supervision/*",
       "chrome://chrome-signin/*",
       "chrome://contextual-tasks/*",
-      "chrome://glic/*",
-      "chrome://glic-fre/*",
-      "chrome://glic-experimental-opt-in/*",
       "chrome://graduation/*",
       "chrome://home/*",
       "chrome://mobilesetup/*",
@@ -907,8 +894,7 @@
       "chrome://os-settings/*",
       "chrome://parent-access/*",
       "chrome://password-change/*",
-      "chrome://lock-reauth/*",
-      "chrome://skills/*"
+      "chrome://lock-reauth/*"
     ]
   }, {
     "internal": true,
@@ -942,14 +928,12 @@
       "chrome://add-supervision/*",
       "chrome://chrome-signin/*",
       "chrome://contextual-tasks/*",
-      "chrome://glic/*",
       "chrome://graduation/*",
       "chrome://home/*",
       "chrome://mobilesetup/*",
       "chrome://oobe/*",
       "chrome://os-settings/*",
-      "chrome://parent-access/*",
-      "chrome://skills/*"
+      "chrome://parent-access/*"
     ]
   }, {
     "channel": "stable",

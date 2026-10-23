@@ -17,7 +17,6 @@ all,services/network/cors/cors_url_loader_factory.cc
 all,chromeos/geolocation/simple_geolocation_request.cc
 all,chrome/services/cups_proxy/socket_manager.cc
 missing,chrome/browser/ui/webui/ash/emoji/seal.cc
-missing,components/manta/sparky/sparky_provider.cc
 
 # Android-specific annotations.
 # TODO(crbug.com/40641204): Complete these.

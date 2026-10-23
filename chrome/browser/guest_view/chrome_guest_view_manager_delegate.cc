@@ -34,8 +34,6 @@ void ChromeGuestViewManagerDelegate::OnGuestAdded(
   // manager.
   task_manager::WebContentsTags::CreateForGuestContents(guest_web_contents);
 
-  // Check if guest belongs to glic and apply specific customizations if so.
-
   performance_manager::GuestViewAssociatedToWebContents(guest_web_contents);
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)

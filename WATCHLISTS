@@ -45,19 +45,6 @@
     'accessibility_service': {
       'filepath': 'services/accessibility/',
     },
-    'actor': {
-      'filepath': 'chrome/browser/actor/|' \
-                  'chrome/browser/glic/actor/|' \
-                  'chrome/browser/glic/glic.mojom|' \
-                  'chrome/browser/glic/host/glic_actor|' \
-                  'chrome/browser/resources/glic/glic_api/|' \
-                  'chrome/browser/resources/glic/glic_api_impl/|' \
-                  'chrome/renderer/actor/|' \
-                  'third_party/blink/renderer/modules/actor/'
-    },
-    'actor_ui': {
-      'filepath': 'chrome/browser/actor/ui/'
-    },
     'ad_tracker': {
       'filepath': 'third_party/blink/renderer/platform/loader/fetch/ad_tagging_utils.*|' \
                   'third_party/blink/renderer/core/ad_tracker/|' \
@@ -76,8 +63,6 @@
     },
     'ai_page_content' : {
       'filepath': 'chrome/browser/ai/ai_data_keyed_service|' \
-                  'chrome/browser/glic/host/context/|' \
-                  'chrome/browser/glic/host/glic_annotation|' \
                   'chrome/browser/page_content_annotations/|' \
                   'components/optimization_guide/content/'
     },
@@ -1253,15 +1238,6 @@
     'gfx_image': {
       'filepath': 'ui/gfx/image/',
     },
-    'glic': {
-      'filepath': 'chrome/browser/glic|'\
-                  'chrome/test/data/webui/glic|'\
-                  'chrome/browser/resources/glic',
-
-    },
-    'glic_api': {
-      'filepath': 'chrome/browser/resources/glic/glic_api/',
-    },
     'global_media_controls': {
       'filepath': 'chrome/browser/ui/global_media_controls|'\
                   'chrome/browser/ui/views/global_media_controls|'\
@@ -2320,12 +2296,6 @@
                     '|content/browser/webid'\
                     '|chrome/browser/.*webid',
     },
-    'webmcp': {
-        'filepath': 'chrome/browser/actor/tools/.*script_tool' \
-                    '|chrome/browser/glic/host/.*script_tool' \
-                    '|chrome/renderer/actor/.*script_tool' \
-                    '|chrome/test/data/actor/.*script_tool',
-    },
     'webnn': {
         'filepath': 'third_party/blink/renderer/modules/ml/webnn/'\
                     '|services/webnn/',
@@ -2407,8 +2377,6 @@
         'lucasradaelli+watch@google.com'],
     'accessibility_service': ['hirokisato+watch@chromium.org',
                               'katie+watch@chromium.org'],
-    'actor': ['mfoltz+watch-actor@chromium.org'],
-    'actor_ui': ['aashnas+watch@google.com'],
     'ad_tracker': ['jkarlin@chromium.org', 'yaoxia@chromium.org'],
     'add_to_homescreen': ['pkotwicz+watch@chromium.org',
                           'webapks-watchlist@chromium.org'],
@@ -2863,9 +2831,6 @@
     'geolocation': ['mattreynolds+watch@chromium.org'],
     'gfx_geometry': ['cc-bugs@chromium.org'],
     'gfx_image': ['rsesek+watch@chromium.org'],
-    'glic': ['dewittj+watch@chromium.org'],
-    'glic_api': ['zewenli@google.com', 'anuragsimgeker@google.com',
-                 'thorstenk@google.com'],
     'global_media_controls': ['steimel+watch-gmc@chromium.org'],
     'gn': ['agrieve+watch@chromium.org',
            'dpranke@chromium.org'],
@@ -3250,7 +3215,6 @@
     'webid': ['yigu+watch@chromium.org',
               'cbiesinger@chromium.org',
               'npm+watch@chromium.org'],
-    'webmcp': ['mfoltz+watch-webmcp@chromium.org'],
     'webnn': ['qjw@chromium.org', 'ningxin.hu@intel.com'],
     'webotp': ['yigu+watch@chromium.org'],
     'webrtc_browser_tests': ['phoglund+watch@chromium.org'],

@@ -84,11 +84,9 @@ source_set("impl") {
   deps += [
     "//base",
     "//chrome/browser:browser_process",
-    "//chrome/browser/manta",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/tab_contents",
     "//components/language/core/browser",
-    "//components/manta",
     "//components/pref_registry",
     "//components/sync_preferences",
     "//components/update_client",

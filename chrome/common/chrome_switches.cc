@@ -784,47 +784,6 @@ const char kGuest[] = "guest";
 
 #endif
 
-// Overrides the glic guest URL.
-const char kGlicGuestURL[] = "glic-guest-url";
-const char kSkillsV2Origin[] = "skills-v2-origin";
-// Overrides the Gemini Enterprise settings JSON dictionary for local development.
-const char kGlicGeminiEnterpriseSettingsOverride[] =
-    "glic-gemini-enterprise-settings-override";
-const char kGlicAlwaysOpenFre[] = "glic-always-open-fre";
-const char kGlicAlwaysSkipFre[] = "glic-always-skip-fre";
-const char kGlicExperimentalFreURL[] = "glic-experimental-fre-url";
-const char kGlicShortcutsLearnMoreURL[] = "glic-shortcuts-learn-more-url";
-// Use --glic-open-on-startup=attached or --glic-open-on-startup=detached.
-const char kGlicOpenOnStartup[] = "glic-open-on-startup";
-// List of allowed origins in the glic webview, as a space-separated list.
-const char kGlicAllowedOrigins[] = "glic-webui-allowed-origins";
-// Automation is intended to be passed in addition to glic-dev. It further
-// disables functionality to make basic testing easier.
-const char kGlicAutomation[] = "glic-automation";
-// Dev mode for glic only exposed via command line flag.
-const char kGlicDev[] = "glic-dev";
-// If this flag is set, then the page navigating will not trigger a reload.
-const char kGlicSkipReloadAfterNavigation[] =
-    "glic-skip-reload-after-navigation";
-// Whether additional logging is enabled in the glic api host.
-const char kGlicHostLogging[] = "glic-host-logging";
-// Whether to show web actuation toggle in the Chrome AI settings page.
-const char kGlicAlwaysShowWebActuationToggle[] =
-    "glic-always-show-web-actuation-toggle";
-
-// List of URL patterns in the glic webview to redirect to an admin blocked
-// panel, as a space-separated list.
-const char kGlicAdminRedirectPatterns[] = "glic-admin-redirect-patterns";
-
-
-// Configure preset guest URLs for manual testing. These are saved to local
-// state prefs and can be selected to override the default glic guest URL
-// through corresponding entries in chrome://flags.
-const char kGlicGuestUrlPresetAutopush[] = "glic-guest-url-preset-autopush";
-const char kGlicGuestUrlPresetStaging[] = "glic-guest-url-preset-staging";
-const char kGlicGuestUrlPresetPreprod[] = "glic-guest-url-preset-preprod";
-const char kGlicGuestUrlPresetProd[] = "glic-guest-url-preset-prod";
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Domains and associated SAML attributes for which third-party profile
 // management should be enabled. Input should be in JSON format.

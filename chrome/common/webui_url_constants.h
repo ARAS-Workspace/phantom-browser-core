@@ -37,9 +37,6 @@ inline constexpr char kChromeUIAboutURL[] = "chrome://about/";
 inline constexpr char kChromeUIAccessibilityHost[] = "accessibility";
 inline constexpr char kChromeUIAccountSettingsURL[] =
     "chrome://settings/account";
-inline constexpr char kChromeUIActorInternalsHost[] = "actor-internals";
-inline constexpr char kChromeUIActorOverlayHost[] = "actor-overlay";
-inline constexpr char kChromeUIActorOverlayURL[] = "chrome://actor-overlay";
 inline constexpr char kChromeUIAppIconHost[] = "app-icon";
 inline constexpr char kChromeUIAppIconURL[] = "chrome://app-icon/";
 inline constexpr char kChromeUIAppLauncherPageHost[] = "apps";
@@ -130,14 +127,6 @@ inline constexpr char kChromeUIFlagsHost[] = "flags";
 inline constexpr char kChromeUIFlagsURL[] = "chrome://flags/";
 inline constexpr char16_t kChromeUIFlagsURL16[] = u"chrome://flags/";
 inline constexpr char kChromeUIGCMInternalsHost[] = "gcm-internals";
-inline constexpr char kChromeUIGlicHost[] = "glic";
-inline constexpr char kChromeUIGlicURL[] = "chrome://glic/";
-inline constexpr char kChromeUIGlicUntrustedHost[] = "glic";
-inline constexpr char kChromeUIGlicUntrustedURL[] = "chrome-untrusted://glic/";
-inline constexpr char kChromeUIGlicExperimentalOptInHost[] =
-    "glic-experimental-opt-in";
-inline constexpr char kChromeUIGlicExperimentalOptInURL[] =
-    "chrome://glic-experimental-opt-in";
 inline constexpr char kChromeUIHangUIHost[] = "uithreadhang";
 inline constexpr char kChromeUIHelpHost[] = "help";
 inline constexpr char kChromeUIHelpURL[] = "chrome://help/";
@@ -241,11 +230,6 @@ inline constexpr char kChromeUISignoutConfirmationURL[] =
     "chrome://signout-confirmation";
 #endif
 inline constexpr char kChromeUISiteEngagementHost[] = "site-engagement";
-inline constexpr char kChromeUISkillsHost[] = "skills";
-inline constexpr char kChromeUISkillsURL[] = "chrome://skills/";
-inline constexpr char kChromeUISkillsDialogPath[] = "dialog";
-inline constexpr char kChromeUISkillsYourSkillsPath[] = "yourSkills";
-inline constexpr char kChromeUISkillsBrowsePath[] = "browse";
 inline constexpr char kChromeUISplitViewNewTabPageURL[] =
     "chrome://tab-search.top-chrome/split_new_tab_page.html";
 inline constexpr char kChromeUISubresourceFilterInternalsHost[] =
@@ -408,8 +392,6 @@ inline constexpr char kDownloadsSubPage[] = "downloads";
 inline constexpr char kExperimentalAISettingsSubPage[] = "ai";
 inline constexpr char kFileSystemSettingsSubpage[] =
     "content/filesystem/siteDetails";
-inline constexpr char kGlicSettingsSubpage[] = "ai/gemini";
-inline constexpr char kGlicLoginSettingsSubpage[] = "ai/gemini/login";
 inline constexpr char kGoogleServicesSubpage[] = "googleServices";
 inline constexpr char kHandlerSettingsSubPage[] = "handlers";
 inline constexpr char kHistorySearchSubpage[] = "ai/historySearch";

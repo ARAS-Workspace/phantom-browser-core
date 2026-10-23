@@ -92,7 +92,6 @@
 #include "chrome/browser/language/url_language_histogram_factory.h"
 #include "chrome/browser/login_detection/login_detection_keyed_service_factory.h"
 #include "chrome/browser/lookalikes/lookalike_url_service_factory.h"
-#include "chrome/browser/manta/manta_service_factory.h"
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/media/media_engagement_service_factory.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
@@ -579,7 +578,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   LoginUIServiceFactory::GetInstance();
   LookalikeUrlServiceFactory::GetInstance();
   ManagedConfigurationAPIFactory::GetInstance();
-  manta::MantaServiceFactory::GetInstance();
   MediaDeviceSaltServiceFactory::GetInstance();
   if (MediaEngagementService::IsEnabled()) {
     MediaEngagementServiceFactory::GetInstance();

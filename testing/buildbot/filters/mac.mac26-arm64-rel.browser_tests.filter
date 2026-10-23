@@ -1,6 +1,5 @@
 # Test filter for browser_tests on mac26-arm64-rel (MacOS 26 ARM64)
 
--ActorOverlayTest.OverlayWebViewIsTransparentAfterNavigation
 -All/WebUIToolbarWebViewButtonVisibilityTest.TogglesVisibility/HomeButton
 -All/WebUIToolbarWebViewButtonVisibilityTest.TogglesVisibility/SplitTabsButton
 -AppControllerGoogleChromeSchemeBrowserTest.OpenSchemeUrlInvalid

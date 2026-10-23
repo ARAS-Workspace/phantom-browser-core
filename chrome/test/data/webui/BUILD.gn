@@ -183,13 +183,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/webui/default_browser:default_browser_modal",
     "//chrome/browser/ui/webui/signin:signin_utils",
   ]
-
-  if (!enable_extensions_core && enable_guest_view) {
-    sources += [ "guest_view_shared/slim_webview_browsertest.cc" ]
-    deps += [ "//chrome/browser/permissions" ]
-
-    data += [ "//chrome/test/data/" ]
-  }
 }
 
 source_set("interactive_ui_tests") {
@@ -507,11 +500,6 @@ generate_grd("build_grd") {
     deps += [ "signin/signout_confirmation:build_grdp" ]
     grdp_files +=
         [ "$target_gen_dir/signin/signout_confirmation/resources.grdp" ]
-  }
-
-  if (!enable_extensions_core && enable_guest_view) {
-    deps += [ "guest_view_shared:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/guest_view_shared/resources.grdp" ]
   }
 
   manifest_files =

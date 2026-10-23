@@ -25,7 +25,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
   static constexpr auto kChromeURLHosts = std::to_array<base::cstring_view>({
       kChromeUIAboutHost,
       kChromeUIAccessibilityHost,
-      kChromeUIActorInternalsHost,
       kChromeUIChromeFindsInternalsHost,
       kChromeUIChromeURLsHost,
       kChromeUIComponentsHost,
@@ -53,7 +52,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIWebUIToolbarHost,
       kChromeUISignInInternalsHost,
       kChromeUISiteEngagementHost,
-      kChromeUISkillsHost,
       kChromeUISubresourceFilterInternalsHost,
       kChromeUINTPTilesInternalsHost,
       kChromeUISyncInternalsHost,

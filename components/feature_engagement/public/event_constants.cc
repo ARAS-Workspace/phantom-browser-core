@@ -44,8 +44,6 @@ const char kFocusHelpBubbleAcceleratorPromoRead[] =
 const char kExtensionsRequestAccessButtonClicked[] =
     "extensions_request_access_button_clicked";
 
-const char kGlicOnboardingCompleted[] = "glic_onboarding_completed";
-
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 const char kTabSearchComboButtonUsed[] = "tab_search_combo_button_used";

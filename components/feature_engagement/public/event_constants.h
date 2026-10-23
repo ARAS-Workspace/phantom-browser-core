@@ -64,9 +64,6 @@ extern const char kFocusHelpBubbleAcceleratorPromoRead[];
 // Th user clicked the extensions request access button in the toolbar.
 extern const char kExtensionsRequestAccessButtonClicked[];
 
-// The user has accepted the Glic onboarding.
-extern const char kGlicOnboardingCompleted[];
-
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 extern const char kTabSearchComboButtonUsed[];

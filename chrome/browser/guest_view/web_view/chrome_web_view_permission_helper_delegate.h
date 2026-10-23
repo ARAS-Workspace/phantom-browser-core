@@ -91,12 +91,6 @@ class ChromeWebViewPermissionHelperDelegate
       const GURL& requesting_frame_url,
       base::OnceCallback<void(bool)> callback) override;
 
-  bool ForwardEmbeddedMediaPermissionChecksAsEmbedder(
-      const url::Origin& embedder_origin) override;
-
-  std::optional<content::PermissionResult> OverridePermissionResult(
-      ContentSettingsType type) override;
-
  private:
 #if BUILDFLAG(ENABLE_PLUGINS)
   // chrome::mojom::PluginAuthHost methods.

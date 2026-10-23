@@ -3605,7 +3605,6 @@ test("unit_tests") {
     "//components/feature_engagement/test:test_support",
     "//components/fullscreen_control",
     "//components/global_media_controls:test_support",
-    "//components/manta",
     "//components/media_effects/test:test_support",
     "//components/media_message_center:test_support",
     "//components/omnibox/common:features",

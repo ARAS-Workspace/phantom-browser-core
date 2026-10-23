@@ -13,7 +13,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/common/buildflags.h"
-#include "chrome/common/webui_url_constants.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/guest_view/browser/guest_view_base.h"
@@ -25,7 +24,6 @@
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/common/buildflags.h"
-#include "content/public/common/url_constants.h"
 #include "extensions/browser/guest_view/web_view/web_view_constants.h"
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 #include "extensions/browser/guest_view/web_view/web_view_permission_types.h"
@@ -603,43 +601,6 @@ void ChromeWebViewPermissionHelperDelegate::RequestEmbedderFramePermission(
                   CreatePermissionDescriptorForPermissionType(permission_type),
               user_gesture),
           std::move(callback));
-}
-
-bool ChromeWebViewPermissionHelperDelegate::
-    ForwardEmbeddedMediaPermissionChecksAsEmbedder(
-        const url::Origin& embedder_origin) {
-  // Note that it probably makes sense for most WebUIs to forward approved media
-  // permissions as the embedder, but historically, the default has been to
-  // forward as the embedded origin.
-  // TODO(crbug.com/382773576): Change to true for all chrome:// origins, with
-  // the exception of chrome://chrome-signin and chrome://oobe, which needs the
-  // old behavior.
-  return embedder_origin.scheme() == content::kChromeUIScheme &&
-         embedder_origin.host() == chrome::kChromeUIGlicHost;
-}
-
-std::optional<content::PermissionResult>
-ChromeWebViewPermissionHelperDelegate::OverridePermissionResult(
-    ContentSettingsType type) {
-  const url::Origin& origin =
-      web_view_guest()->owner_rfh()->GetLastCommittedOrigin();
-  // chrome://glic requires additional permissions, and webview's
-  // permissionrequest API does not handle clipboard access or screen wake
-  // lock.
-  if (origin.scheme() == content::kChromeUIScheme &&
-      origin.host() == chrome::kChromeUIGlicHost) {
-    switch (type) {
-      case ContentSettingsType::CLIPBOARD_READ_WRITE:
-      case ContentSettingsType::CLIPBOARD_SANITIZED_WRITE:
-      case ContentSettingsType::WAKE_LOCK_SCREEN:
-        return content::PermissionResult(
-            content::PermissionStatus::GRANTED,
-            content::PermissionStatusSource::UNSPECIFIED);
-      default:
-        break;
-    }
-  }
-  return std::nullopt;
 }
 
 }  // namespace extensions

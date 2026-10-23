@@ -232,26 +232,6 @@ extern const char kDebugPrint[];
 extern const char kGuest[];
 #endif
 
-extern const char kGlicGuestURL[];
-extern const char kSkillsV2Origin[];
-extern const char kGlicGeminiEnterpriseSettingsOverride[];
-extern const char kGlicAlwaysOpenFre[];
-extern const char kGlicAlwaysSkipFre[];
-extern const char kGlicExperimentalFreURL[];
-extern const char kGlicShortcutsLearnMoreURL[];
-extern const char kGlicOpenOnStartup[];
-extern const char kGlicAllowedOrigins[];
-extern const char kGlicAutomation[];
-extern const char kGlicDev[];
-extern const char kGlicSkipReloadAfterNavigation[];
-extern const char kGlicHostLogging[];
-extern const char kGlicAdminRedirectPatterns[];
-extern const char kGlicAlwaysShowWebActuationToggle[];
-extern const char kGlicGuestUrlPresetAutopush[];
-extern const char kGlicGuestUrlPresetStaging[];
-extern const char kGlicGuestUrlPresetPreprod[];
-extern const char kGlicGuestUrlPresetProd[];
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 extern const char kProfileManagementAttributes[];
 #endif
