@@ -7,7 +7,6 @@
 
 #include "base/component_export.h"
 #include "base/feature_list.h"
-#include "base/metrics/field_trial_params.h"
 
 namespace one_time_tokens::features {
 
@@ -15,10 +14,6 @@ namespace one_time_tokens::features {
 
 COMPONENT_EXPORT(ONE_TIME_TOKENS)
 BASE_DECLARE_FEATURE(kGmailOtpRetrievalService);
-
-COMPONENT_EXPORT(ONE_TIME_TOKENS)
-extern const base::FeatureParam<base::TimeDelta>
-    kGmailOtpSubscriptionPeriodParam;
 
 }  // namespace one_time_tokens::features
 
