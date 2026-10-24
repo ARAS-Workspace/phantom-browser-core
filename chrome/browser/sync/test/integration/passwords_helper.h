@@ -12,7 +12,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/sync/test/integration/fake_server_match_status_checker.h"
-#include "chrome/browser/sync/test/integration/multi_client_status_change_checker.h"
 #include "chrome/browser/sync/test/integration/single_client_status_change_checker.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "components/password_manager/core/browser/password_form.h"
@@ -39,11 +38,6 @@ std::vector<std::unique_ptr<password_manager::PasswordForm>> GetLogins(
 std::vector<std::unique_ptr<password_manager::PasswordForm>> GetAllLogins(
     password_manager::PasswordStoreInterface* store);
 
-// Removes all password forms from the password store |store|. This is an async
-// method that return immediately and does *not* block until the operation is
-// finished on the background thread.
-void RemoveLogins(password_manager::PasswordStoreInterface* store);
-
 // Gets the profile password store of the profile with index |index|.
 password_manager::PasswordStoreInterface* GetProfilePasswordStoreInterface(
     int index);
@@ -57,21 +51,6 @@ password_manager::PasswordStoreInterface* GetAccountPasswordStoreInterface(
 password_manager::PasswordStoreInterface* GetPasswordStoreInterface(
     int index,
     password_manager::PasswordForm::Store store);
-
-// Returns true iff the profile with index |index_a| contains the same
-// password forms as the profile with index |index_b|.
-bool ProfilesContainSamePasswordForms(
-    int index_a,
-    int index_b,
-    password_manager::PasswordForm::Store store);
-
-// Returns true iff all profiles contain the same password forms.
-bool AllProfilesContainSamePasswordForms(
-    password_manager::PasswordForm::Store store);
-
-// Returns the number of forms in the password store of the profile with index
-// |index|.
-int GetPasswordCount(int index, password_manager::PasswordForm::Store store);
 
 // Creates a test password form with a well known fake signon realm based on
 // |index|.
@@ -94,14 +73,6 @@ void InjectEncryptedServerPassword(
     const std::string& encryption_passphrase,
     const syncer::KeyDerivationParams& key_derivation_params,
     fake_server::FakeServer* fake_server);
-// As above, but using standard Keystore encryption.
-void InjectKeystoreEncryptedServerPassword(
-    const password_manager::PasswordForm& form,
-    fake_server::FakeServer* fake_server);
-// As above, but using standard Keystore encryption and PasswordSpecificsData.
-void InjectKeystoreEncryptedServerPassword(
-    const sync_pb::PasswordSpecificsData& password_data,
-    fake_server::FakeServer* fake_server);
 
 }  // namespace passwords_helper
 
@@ -115,33 +86,8 @@ class PasswordSyncActiveChecker : public SingleClientStatusChangeChecker {
   bool IsExitConditionSatisfied(std::ostream* os) override;
 };
 
-// Checker to wait until the PASSWORDS datatype becomes inactive.
-class PasswordSyncInactiveChecker : public SingleClientStatusChangeChecker {
- public:
-  explicit PasswordSyncInactiveChecker(syncer::SyncServiceImpl* service);
-  ~PasswordSyncInactiveChecker() override;
-
-  // StatusChangeChecker implementation.
-  bool IsExitConditionSatisfied(std::ostream* os) override;
-};
-
 // TODO(crbug.com/40651154): avoid re-entrance protection in checkers below or
 // factor it out to not duplicate in every checker.
-// Checker to block until all profiles contain the same password forms.
-class SamePasswordFormsChecker : public MultiClientStatusChangeChecker {
- public:
-  explicit SamePasswordFormsChecker(
-      password_manager::PasswordForm::Store store);
-  ~SamePasswordFormsChecker() override;
-  // StatusChangeChecker implementation.
-  bool IsExitConditionSatisfied(std::ostream* os) override;
-
- private:
-  const password_manager::PasswordForm::Store store_;
-  bool in_progress_ = false;
-  bool needs_recheck_ = false;
-};
-
 // Checker to block until specified profile contains the given password forms.
 class PasswordFormsChecker : public SingleClientStatusChangeChecker {
  public:

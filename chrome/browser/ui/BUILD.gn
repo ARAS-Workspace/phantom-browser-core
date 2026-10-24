@@ -3004,7 +3004,6 @@ static_library("test_support") {
   ]
   deps += [
     "//chrome/browser/ui/content_settings:test_support",
-    "//chrome/browser/ui/passwords:test_support_ui",
     "//chrome/browser/ui/views/toolbar",
     "//chrome/test:test_support_ui",
     "//components/embedder_support",

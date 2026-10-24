@@ -5,12 +5,9 @@
 #include "base/path_service.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/test_future.h"
-#include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/extensions/sync/account_extension_tracker.h"
-#include "chrome/browser/password_manager/password_manager_test_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/browser/signin/dice_tab_helper.h"
@@ -20,23 +17,18 @@
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/extensions/extension_post_install_dialog.h"
-#include "chrome/browser/ui/passwords/manage_passwords_test.h"
-#include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_signin_button_view.h"
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_view.h"
 #include "chrome/browser/ui/signin/promos/signin_promo_tab_helper.h"
-#include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/autofill/address_sign_in_promo_view.h"
 #include "chrome/browser/ui/views/autofill/save_address_profile_view.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bubble_view.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_sign_in_promo_bubble_view.h"
 #include "chrome/browser/ui/views/extensions/extension_post_install_dialog_view_utils.h"
-#include "chrome/browser/ui/views/passwords/password_bubble_view_base.h"
-#include "chrome/browser/ui/views/passwords/password_save_update_view.h"
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "chrome/common/chrome_paths.h"
-#include "chrome/grit/branded_strings.h"
 #include "chrome/test/base/interactive_test_utils.h"
+#include "chrome/test/interaction/interactive_browser_test.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
 #include "components/autofill/core/browser/data_manager/personal_data_manager.h"
@@ -44,19 +36,14 @@
 #include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_node.h"
-#include "components/password_manager/core/browser/password_form.h"
-#include "components/password_manager/core/browser/password_form_manager.h"
-#include "components/password_manager/core/browser/password_manager_test_utils.h"
-#include "components/password_manager/core/browser/password_store/test_password_store.h"
+#include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/signin_metrics.h"
-#include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/accounts_mutator.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
-#include "components/signin/public/identity_manager/identity_utils.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/user_selectable_type.h"
@@ -91,35 +78,9 @@ std::unique_ptr<KeyedService> BuildTestSyncService(
   return std::make_unique<testing::NiceMock<syncer::TestSyncService>>();
 }
 
-// TODO(crbug.com/528193769): Re-enable this test on Mac.
-#if !BUILDFLAG(IS_MAC)
-// UI variations of the password save/update bubble to test.
-enum PasswordBubbleTestFeature : uint32_t {
-  // Standard 2-button dialog (Save/Update and Cancel).
-  kNone = 0,
-  // 3-button dialog variant featuring an explicit "Never" button.
-  kThreeButtonSaveDialog = 1,
-  // Split-button variant replacing Cancel with a dropdown menu offering
-  // "Never".
-  kDropdownMenuExperiment = 2,
-};
-
-std::string GetPasswordSignInPromoSaveUiInteractiveUITestName(
-    const testing::TestParamInfo<PasswordBubbleTestFeature>& info) {
-  switch (info.param) {
-    case kNone:
-      return "Default";
-    case kThreeButtonSaveDialog:
-      return "ThreeButtonSaveDialog";
-    case kDropdownMenuExperiment:
-      return "DropdownMenuExperiment";
-  }
-}
-#endif  // !BUILDFLAG(IS_MAC)
-
 }  // namespace
 
-class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
+class BubbleSignInPromoInteractiveUITest : public InteractiveBrowserTest {
  public:
   BubbleSignInPromoInteractiveUITest() {
     scoped_feature_list_.InitWithFeatures(
@@ -130,7 +91,7 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
   }
 
   void SetUpInProcessBrowserTestFixture() override {
-    ManagePasswordsTest::SetUpInProcessBrowserTestFixture();
+    InteractiveBrowserTest::SetUpInProcessBrowserTestFixture();
     url_loader_factory_helper_.SetUp();
     create_services_subscription_ =
         BrowserContextDependencyManager::GetInstance()
@@ -141,21 +102,22 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
   }
 
   void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    // Create local password store and mock sync service.
-    local_password_store_ = CreateAndUseTestPasswordStore(context);
     SyncServiceFactory::GetInstance()->SetTestingFactoryAndUse(
         context, base::BindRepeating(&BuildTestSyncService));
   }
 
   void SetUpOnMainThread() override {
-    ManagePasswordsTest::SetUpOnMainThread();
+    InteractiveBrowserTest::SetUpOnMainThread();
+    ASSERT_TRUE(embedded_test_server()->Start());
+    GURL test_url = embedded_test_server()->GetURL("/empty.html");
+    ASSERT_TRUE(AddTabAtIndex(0, test_url, ui::PAGE_TRANSITION_TYPED));
 
     // Test Sync Service is signed in by default.
     test_sync_service().SetSignedOut();
   }
 
   void TearDownOnMainThread() override {
-    ManagePasswordsTest::TearDownOnMainThread();
+    InteractiveBrowserTest::TearDownOnMainThread();
   }
 
   // Sets the values returned by `TestSyncService::GetLocalDataDescriptions()`.
@@ -168,12 +130,6 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
   // `TestSyncService::GetLocalDataDescriptions()`.
   bool HasLocalDataItemId(syncer::DataType data_type,
                           syncer::LocalDataItemModel::DataId data_id);
-
-  // Shows the Password Bubble and trigger the password save by simulating an
-  // "Accept" in the password bubble, and wait for it to appear in the profile
-  // store. Saves the password in the sync service local data, and returns the
-  // corresponding `syncer::LocalDataItemModel::DataId`.
-  syncer::LocalDataItemModel::DataId SaveLocalPassword();
 
   // Address save callback for `TriggerSaveLocalAddressBubble`.
   void SaveLocalAddress(
@@ -251,7 +207,6 @@ class BubbleSignInPromoInteractiveUITest : public ManagePasswordsTest {
 
   ChromeSigninClientWithURLLoaderHelper url_loader_factory_helper_;
   base::CallbackListSubscription create_services_subscription_;
-  scoped_refptr<password_manager::TestPasswordStore> local_password_store_;
 };
 
 void BubbleSignInPromoInteractiveUITest::SetLocalDataDescription(
@@ -291,31 +246,6 @@ bool BubbleSignInPromoInteractiveUITest::HasLocalDataItemId(
   }
 
   return false;
-}
-
-syncer::LocalDataItemModel::DataId
-BubbleSignInPromoInteractiveUITest::SaveLocalPassword() {
-  // Set up password and the local password store.
-  std::unique_ptr<password_manager::PasswordFormManager> password_form_manager =
-      CreateFormManager(local_password_store_.get(), nullptr);
-  password_manager::PasswordForm password_form =
-      password_form_manager->GetPendingCredentials();
-  GetController()->OnPasswordSubmitted(std::move(password_form_manager));
-
-  password_manager::PasswordStoreWaiter store_waiter(
-      local_password_store_.get());
-  PasswordBubbleViewBase* bubble =
-      PasswordBubbleViewBase::manage_password_bubble();
-  bubble->AcceptDialog();
-  store_waiter.WaitOrReturn();
-
-  // Check that it was properly saved to profile store.
-  EXPECT_EQ(1u, GetAllLoginsSync(local_password_store_.get()).size());
-
-  syncer::LocalDataItemModel::DataId data_id =
-      PasswordFormUniqueKey(password_form);
-  SetLocalDataDescription(syncer::DataType::PASSWORDS, data_id);
-  return data_id;
 }
 
 void BubbleSignInPromoInteractiveUITest::SaveLocalAddress(
@@ -438,305 +368,6 @@ void BubbleSignInPromoInteractiveUITest::ExtendAccountInfo(AccountInfo& info) {
              .Build();
   signin::UpdateAccountInfoForAccount(identity_manager(), info);
 }
-
-/////////////////////////////////////////////////////////////////
-///// Password Sign in Promo
-
-/**
- * Tests for the password sign in promo.
- *
- * The tests are parameterized by the password save UI feature because the
- * width of the sign-in promo changes depending on which feature flag is
- * enabled (e.g., kThreeButtonPasswordSaveDialog or
- * kPasswordSaveUpdateDropdownMenuExperiment). Parameterizing the test suite
- * ensures that pixel tests (Screenshot) verify promo rendering across all
- * possible bubble width variations.
- */
-// TODO(crbug.com/528193769): Re-enable this test on Mac.
-#if !BUILDFLAG(IS_MAC)
-class BubbleSignInPromoPasswordSaveUiInteractiveUITest
-    : public BubbleSignInPromoInteractiveUITest,
-      public ::testing::WithParamInterface<PasswordBubbleTestFeature> {
- public:
-  BubbleSignInPromoPasswordSaveUiInteractiveUITest() {
-    switch (GetParam()) {
-      case kNone:
-        scoped_feature_list_.InitWithFeatures(
-            /*enabled_features=*/{},
-            /*disabled_features=*/{
-                features::kThreeButtonPasswordSaveDialog,
-                features::kPasswordSaveUpdateDropdownMenuExperiment});
-        break;
-      case kThreeButtonSaveDialog:
-        scoped_feature_list_.InitWithFeatures(
-            /*enabled_features=*/{features::kThreeButtonPasswordSaveDialog},
-            /*disabled_features=*/{
-                features::kPasswordSaveUpdateDropdownMenuExperiment});
-        break;
-      case kDropdownMenuExperiment:
-        scoped_feature_list_.InitWithFeatures(
-            /*enabled_features=*/
-            {features::kPasswordSaveUpdateDropdownMenuExperiment},
-            /*disabled_features=*/{features::kThreeButtonPasswordSaveDialog});
-        break;
-    }
-  }
-
-  ~BubbleSignInPromoPasswordSaveUiInteractiveUITest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_P(BubbleSignInPromoPasswordSaveUiInteractiveUITest,
-                       PasswordSignInPromoNoAccountPresent) {
-  base::HistogramTester histogram_tester;
-
-  // Save a local password.
-  syncer::LocalDataItemModel::DataId password_data_id = SaveLocalPassword();
-
-  // Wait for the bubble to be replaced with the sign in promo and click the
-  // sign in button.
-  RunTestSequence(
-      WaitForEvent(BubbleSignInPromoSignInButtonView::kPromoSignInButton,
-                   kBubbleSignInPromoSignInButtonHasCallback),
-      EnsurePresent(PasswordSaveUpdateView::kPasswordBubbleElementId),
-      EnsureNotPresent(PasswordSaveUpdateView::kExtraButtonElementId),
-      SetOnIncompatibleAction(
-          OnIncompatibleAction::kIgnoreAndContinue,
-          "Screenshot can only run in pixel_tests on Windows."),
-      Screenshot(PasswordSaveUpdateView::kPasswordBubbleElementId,
-                 std::string(), "5455375"),
-      NameChildViewByType<views::MdTextButton>(
-          BubbleSignInPromoSignInButtonView::kPromoSignInButton, kButton),
-      PressButton(kButton).SetMustRemainVisible(false),
-      EnsureNotPresent(PasswordSaveUpdateView::kPasswordBubbleElementId));
-
-  // Check that clicking the sign in button navigated to a sign in page.
-  EXPECT_TRUE(IsSignInURL());
-
-  // Check that there is a helper attached to the sign in tab, because the
-  // password still needs to be moved.
-  EXPECT_TRUE(SigninPromoTabHelper::GetForWebContents(
-                  *browser()->tab_strip_model()->GetActiveWebContents())
-                  ->IsInitializedForTesting());
-
-  // Passwords are initially off.
-  ASSERT_FALSE(test_sync_service().GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  // Local password can be retrieved from SyncService local data.
-  ASSERT_TRUE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Simulate a sign in event with the correct access point, which should call
-  // `SelectTypeAndMigrateLocalDataItemsWhenActive()`.
-  SignIn(signin_metrics::AccessPoint::kPasswordBubble);
-
-  // Check that the sign in was successful.
-  EXPECT_TRUE(IsSignedIn());
-
-  // Passwords are now enabled.
-  EXPECT_TRUE(test_sync_service().GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  // And the data is not present in the local storage anymore.
-  EXPECT_FALSE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Signin metrics - Offered/Started/Completed are recorded, but no values for
-  // WebSignin (WithDefault).
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered.NewAccountNoExistingAccount",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Offered.WithDefault", 0);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Started", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Completed", signin_metrics::AccessPoint::kPasswordBubble,
-      1);
-  histogram_tester.ExpectTotalCount("Signin.WebSignin.SourceToChromeSignin", 0);
-
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignInPromo.Accepted",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "Signin.SigninPending.Offered",
-      signin_metrics::AccessPoint::kPasswordBubble, 0);
-}
-
-IN_PROC_BROWSER_TEST_P(BubbleSignInPromoPasswordSaveUiInteractiveUITest,
-                       PasswordSignInPromoWithWebSignedInAccount) {
-  base::HistogramTester histogram_tester;
-
-  // Sign in with an account, but only on the web. The primary account is not
-  // set.
-  AccountInfo info = signin::MakeAccountAvailable(
-      identity_manager(),
-      signin::AccountAvailabilityOptionsBuilder(test_url_loader_factory())
-          .WithCookie()
-          .WithAccessPoint(signin_metrics::AccessPoint::kWebSignin)
-          .Build("test@email.com"));
-  ExtendAccountInfo(info);
-
-  // Save a local password.
-  syncer::LocalDataItemModel::DataId password_data_id = SaveLocalPassword();
-
-  // Passwords are initially off.
-  ASSERT_FALSE(test_sync_service().GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  // Local password can be retrieved from SyncService local data.
-  ASSERT_TRUE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Wait for the bubble to be replaced with the sign in promo and click the
-  // sign in button. This should directly sign the user in and trigger the data
-  // migration.
-  RunTestSequence(
-      WaitForEvent(BubbleSignInPromoSignInButtonView::kPromoSignInButton,
-                   kBubbleSignInPromoSignInButtonHasCallback),
-      EnsurePresent(PasswordSaveUpdateView::kPasswordBubbleElementId),
-      EnsureNotPresent(PasswordSaveUpdateView::kExtraButtonElementId),
-      SetOnIncompatibleAction(
-          OnIncompatibleAction::kIgnoreAndContinue,
-          "Screenshot can only run in pixel_tests on Windows."),
-      Screenshot(PasswordSaveUpdateView::kPasswordBubbleElementId,
-                 std::string(), "5455375"),
-      NameChildViewByType<views::MdTextButton>(
-          BubbleSignInPromoSignInButtonView::kPromoSignInButton, kButton),
-      PressButton(kButton).SetMustRemainVisible(false),
-      EnsureNotPresent(PasswordSaveUpdateView::kPasswordBubbleElementId));
-
-  // Check that there is no helper attached to the sign in tab, because the
-  // password was already moved.
-  EXPECT_FALSE(SigninPromoTabHelper::GetForWebContents(
-                   *browser()->tab_strip_model()->GetActiveWebContents())
-                   ->IsInitializedForTesting());
-
-  // Check that the sign in was successful.
-  EXPECT_TRUE(IsSignedIn());
-  EnsureSyncServiceSigninStateConsistency();
-
-  // Passwords are now enabled.
-  EXPECT_TRUE(test_sync_service().GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  // And the data is not present in the local storage anymore.
-  EXPECT_FALSE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Signin metrics - WebSignin (WithDefault) metrics are also recorded.
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Started", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Completed", signin_metrics::AccessPoint::kPasswordBubble,
-      1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered.WithDefault",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectTotalCount(
-      "Signin.SignIn.Offered.NewAccountNoExistingAccount", 0);
-  histogram_tester.ExpectBucketCount(
-      "Signin.WebSignin.SourceToChromeSignin",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignInPromo.Accepted",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "Signin.SigninPending.Offered",
-      signin_metrics::AccessPoint::kPasswordBubble, 0);
-}
-
-IN_PROC_BROWSER_TEST_P(BubbleSignInPromoPasswordSaveUiInteractiveUITest,
-                       PasswordSignInPromoWithAccountSignInPending) {
-  // Sign in with an account, and put its refresh token into an error
-  // state. This simulates the "sign in pending" state.
-  AccountInfo account_info = SignIn(signin_metrics::AccessPoint::kUserManager);
-  signin::SetInvalidRefreshTokenForPrimaryAccount(identity_manager());
-
-  // Start recording metrics after signing in.
-  base::HistogramTester histogram_tester;
-
-  // Save a local password.
-  syncer::LocalDataItemModel::DataId password_data_id = SaveLocalPassword();
-
-  // Passwords are already enabled.
-  ASSERT_TRUE(test_sync_service().GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  // Local password can be retrieved from SyncService local data.
-  ASSERT_TRUE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Wait for the bubble to be replaced with the sign in promo and click
-  // the sign in button.
-  RunTestSequence(
-      WaitForEvent(BubbleSignInPromoSignInButtonView::kPromoSignInButton,
-                   kBubbleSignInPromoSignInButtonHasCallback),
-      EnsurePresent(PasswordSaveUpdateView::kPasswordBubbleElementId),
-      EnsureNotPresent(PasswordSaveUpdateView::kExtraButtonElementId),
-      SetOnIncompatibleAction(
-          OnIncompatibleAction::kIgnoreAndContinue,
-          "Screenshot can only run in pixel_tests on Windows."),
-      Screenshot(PasswordSaveUpdateView::kPasswordBubbleElementId,
-                 std::string(), "5455375"),
-      NameChildViewByType<views::MdTextButton>(
-          BubbleSignInPromoSignInButtonView::kPromoSignInButton, kButton),
-      PressButton(kButton).SetMustRemainVisible(false),
-      EnsureNotPresent(PasswordSaveUpdateView::kPasswordBubbleElementId));
-
-  // Check that clicking the sign in button navigated to a sign in page.
-  EXPECT_TRUE(IsSignInURL());
-
-  // Check that there is a helper attached to the sign in tab, because the
-  // password still needs to be moved.
-  EXPECT_TRUE(SigninPromoTabHelper::GetForWebContents(
-                  *browser()->tab_strip_model()->GetActiveWebContents())
-                  ->IsInitializedForTesting());
-  EXPECT_FALSE(IsSignedIn());
-
-  // Set a new refresh token for the primary account, which verifies the
-  // user's identity and signs them back in. This triggers the local data
-  // migration.
-  identity_manager()->GetAccountsMutator()->AddOrUpdateAccount(
-      account_info.gaia, account_info.email, "dummy_refresh_token",
-      /*is_under_advanced_protection=*/false,
-      signin_metrics::AccessPoint::kPasswordBubble,
-      signin_metrics::SourceForRefreshTokenOperation::
-          kDiceResponseHandler_Signin);
-
-  // Check that the sign in was successful.
-  EXPECT_TRUE(IsSignedIn());
-  // And the data is not present in the local storage anymore.
-  EXPECT_FALSE(
-      HasLocalDataItemId(syncer::DataType::PASSWORDS, password_data_id));
-
-  // Signin metrics - nothing should be recorded for reauth.
-  EXPECT_THAT(histogram_tester.GetTotalCountsForPrefix("Signin.SignIn."),
-              testing::ContainerEq(base::HistogramTester::CountsMap()));
-  histogram_tester.ExpectTotalCount("Signin.WebSignin.SourceToChromeSignin", 0);
-
-  // It was recorded that the reauth sign in promo was shown and accepted.
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignInPromo.Accepted",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Signin.SigninPending.Offered",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         BubbleSignInPromoPasswordSaveUiInteractiveUITest,
-                         testing::Values(kNone,
-                                         kThreeButtonSaveDialog,
-                                         kDropdownMenuExperiment),
-                         GetPasswordSignInPromoSaveUiInteractiveUITestName);
-#endif  // !BUILDFLAG(IS_MAC)
 
 /////////////////////////////////////////////////////////////////
 ///// Address Sign in Promo
@@ -1722,84 +1353,6 @@ IN_PROC_BROWSER_TEST_F(
 
 /////////////////////////////////////////////////////////////////
 ///// Other tests
-
-#if BUILDFLAG(IS_MAC)
-// TODO(crbug.com/532726834): Re-enable this test on Mac.
-#define MAYBE_PasswordSignInPromoAccountDisallowedByPattern \
-  DISABLED_PasswordSignInPromoAccountDisallowedByPattern
-#else
-#define MAYBE_PasswordSignInPromoAccountDisallowedByPattern \
-  PasswordSignInPromoAccountDisallowedByPattern
-#endif
-IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
-                       MAYBE_PasswordSignInPromoAccountDisallowedByPattern) {
-  // Set the signin pattern
-  g_browser_process->local_state()->SetString(
-      prefs::kGoogleServicesUsernamePattern, "*@signinallowed.com");
-
-  // Sign in with an account, but only on the web. The primary account is not
-  // set, and is not allowed to be set with this account.
-  AccountInfo info = signin::MakeAccountAvailable(
-      identity_manager(),
-      signin::AccountAvailabilityOptionsBuilder(test_url_loader_factory())
-          .WithCookie()
-          .WithAccessPoint(signin_metrics::AccessPoint::kWebSignin)
-          .Build("test@email.com"));
-  ExtendAccountInfo(info);
-
-  PrefService* local_state = g_browser_process->local_state();
-  ASSERT_FALSE(signin::IsUsernameAllowedByPatternFromPrefs(local_state,
-                                                           "test@email.com"));
-
-  base::HistogramTester histogram_tester;
-
-  // Save a local password.
-  SaveLocalPassword();
-
-  // Wait for the bubble to be replaced with the sign in promo and click the
-  // sign in button.
-  RunTestSequence(
-      WaitForShow(BubbleSignInPromoSignInButtonView::kPromoSignInButton),
-      WaitForEvent(BubbleSignInPromoSignInButtonView::kPromoSignInButton,
-                   kBubbleSignInPromoSignInButtonHasCallback),
-      EnsurePresent(PasswordSaveUpdateView::kPasswordBubbleElementId),
-      EnsureNotPresent(PasswordSaveUpdateView::kExtraButtonElementId),
-      NameChildViewByType<views::MdTextButton>(
-          BubbleSignInPromoSignInButtonView::kPromoSignInButton, kButton),
-      // The button has the generic non-personalized "Sign in to Chrome" text.
-      CheckViewProperty(
-          kButton, &views::MdTextButton::GetText,
-          l10n_util::GetStringUTF16(IDS_PROFILE_MENU_SIGNIN_PROMO_BUTTON)),
-      PressButton(kButton).SetMustRemainVisible(false),
-      EnsureNotPresent(PasswordSaveUpdateView::kPasswordBubbleElementId));
-
-  // Check that clicking the sign in button navigated to a sign in page.
-  EXPECT_TRUE(IsSignInURL());
-
-  // And did not sign the user in.
-  EXPECT_FALSE(IsSignedIn());
-
-  // Signin metrics - Offered/Started/Completed are recorded, but no values for
-  // WebSignin (WithDefault).
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Offered.NewAccountNoExistingAccount",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Offered.WithDefault", 0);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Started", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignIn.Completed", signin_metrics::AccessPoint::kPasswordBubble,
-      0);
-  histogram_tester.ExpectBucketCount(
-      "Signin.SignInPromo.Accepted",
-      signin_metrics::AccessPoint::kPasswordBubble, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "Signin.SigninPending.Offered",
-      signin_metrics::AccessPoint::kPasswordBubble, 0);
-}
 
 // The bookmark sign in promo is split into a separate bubble with
 // `UnoPhase2FollowUp` enabled. These are regression tests for the old footnote

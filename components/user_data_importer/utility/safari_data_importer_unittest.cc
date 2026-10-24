@@ -28,7 +28,6 @@
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history/core/test/history_service_test_util.h"
-#include "components/password_manager/core/browser/features/password_manager_features_util.h"
 #include "components/password_manager/core/browser/import/csv_password_sequence.h"
 #include "components/password_manager/core/browser/import/import_results.h"
 #include "components/password_manager/core/browser/import/password_importer.h"
@@ -55,7 +54,6 @@
 using bookmarks::test::IsFolder;
 using bookmarks::test::IsUrlBookmark;
 
-using password_manager::ImportEntry;
 using password_manager::ImportResults;
 
 using testing::_;
@@ -65,7 +63,6 @@ using testing::ElementsAre;
 using testing::Field;
 using testing::IsEmpty;
 using testing::Property;
-using testing::SizeIs;
 
 namespace user_data_importer {
 
@@ -194,11 +191,6 @@ class SafariDataImporterTest : public testing::Test {
     Synchronize();
   }
 
-  void PreparePasswords(std::string csv_data) {
-    importer_->PreparePasswords(std::move(csv_data));
-    Synchronize();
-  }
-
   // Executes the import, using selected_ids to resolve password conflicts.
   void CompleteImport(const std::vector<int>& selected_ids) {
     importer_->CompleteImport(selected_ids);
@@ -262,68 +254,6 @@ class SafariDataImporterTest : public testing::Test {
     return bookmark_model_->other_node();
   }
 
-  // Helper function for the "sync enabled" test.
-  void PasswordsImportToAccountStore() {
-    sync_service_.SetSignedIn(signin::ConsentLevel::kSignin);
-    ASSERT_TRUE(password_manager::features_util::IsAccountStorageActive(
-        &sync_service_));
-
-    constexpr char kTestCSVInput[] =
-        "Url,Username,Password,Note\n"
-        "https://account.example.com,user1,pass1,note1\n";
-
-    EXPECT_CALL(
-        client_,
-        OnPasswordsReady(Property(
-            &base::expected<ImportResults, ImportPreparationError>::value,
-            AllOf(Field(&ImportResults::number_imported, 0u),
-                  Field(&ImportResults::number_to_import, 1u)))));
-    PreparePasswords(kTestCSVInput);
-
-    EXPECT_CALL(client_, OnPasswordsImported(AllOf(
-                             Field(&ImportResults::number_imported, 1u),
-                             Field(&ImportResults::number_to_import, 0u))));
-    EXPECT_CALL(client_, OnBookmarksImported(0));
-    EXPECT_CALL(client_, OnHistoryImported(0));
-    EXPECT_CALL(client_, OnPaymentCardsImported(0));
-
-    CompleteImport({});
-
-    EXPECT_THAT(GetAllLoginsSync(account_store()), SizeIs(1));
-    EXPECT_THAT(GetAllLoginsSync(profile_store()), IsEmpty());
-  }
-
-  // Helper function for the "sync disabled" test.
-  void PasswordsImportToProfileStore() {
-    sync_service_.SetSignedOut();
-    ASSERT_FALSE(password_manager::features_util::IsAccountStorageActive(
-        &sync_service_));
-
-    constexpr char kTestCSVInput[] =
-        "Url,Username,Password,Note\n"
-        "https://profile.example.com,user2,pass2,note2\n";
-
-    EXPECT_CALL(
-        client_,
-        OnPasswordsReady(Property(
-            &base::expected<ImportResults, ImportPreparationError>::value,
-            AllOf(Field(&ImportResults::number_imported, 0u),
-                  Field(&ImportResults::number_to_import, 1u)))));
-    PreparePasswords(kTestCSVInput);
-
-    EXPECT_CALL(client_, OnPasswordsImported(AllOf(
-                             Field(&ImportResults::number_imported, 1u),
-                             Field(&ImportResults::number_to_import, 0u))));
-    EXPECT_CALL(client_, OnBookmarksImported(0));
-    EXPECT_CALL(client_, OnHistoryImported(0));
-    EXPECT_CALL(client_, OnPaymentCardsImported(0));
-
-    CompleteImport({});
-
-    EXPECT_THAT(GetAllLoginsSync(profile_store()), SizeIs(1));
-    EXPECT_THAT(GetAllLoginsSync(account_store()), IsEmpty());
-  }
-
   // Helper to set up common expectations for the "Ready" phase of an
   // end-to-end file import.
   void SetUpEndToEndPrepareExpectations() {
@@ -351,13 +281,6 @@ class SafariDataImporterTest : public testing::Test {
     EXPECT_CALL(client_, OnBookmarksImported(5u));
     EXPECT_CALL(client_, OnPaymentCardsImported(3u));
     EXPECT_CALL(client_, OnHistoryImported(7u));  // Actual.
-  }
-
-  password_manager::TestPasswordStore* profile_store() {
-    return profile_store_.get();
-  }
-  password_manager::TestPasswordStore* account_store() {
-    return account_store_.get();
   }
 
   autofill::TestAutofillClient* autofill_client() { return &autofill_client_; }
@@ -590,99 +513,10 @@ TEST_F(SafariDataImporterTest, Bookmarks_MiscJunk) {
   // <A>Google Reader</A> was skipped for lack of URL.
 }
 
-TEST_F(SafariDataImporterTest, NoPassword) {
-  EXPECT_CALL(client_,
-              OnPasswordsReady(Property(
-                  &base::expected<ImportResults, ImportPreparationError>::value,
-                  Field(&ImportResults::number_to_import, 0u))));
-
-  PreparePasswords("");
-}
-
 TEST_F(SafariDataImporterTest, NoPaymentCard) {
   EXPECT_CALL(client_, OnPaymentCardsReady(IsOkAndHolds(0u)));
 
   PreparePaymentCards(std::vector<PaymentCardEntry>());
-}
-
-TEST_F(SafariDataImporterTest, PasswordImport) {
-  constexpr char kTestCSVInput[] =
-      "Url,Username,Password,Note\n"
-      "http://example1.com,username1,password1,note1\n"
-      "http://example1.com,username2,password2,note2\n"
-      "http://example2.com,username1,password3,note3\n";
-
-  EXPECT_CALL(client_,
-              OnPasswordsReady(Property(
-                  &base::expected<ImportResults, ImportPreparationError>::value,
-                  AllOf(Field(&ImportResults::number_imported, 0u),
-                        Field(&ImportResults::number_to_import, 3u)))));
-  PreparePasswords(kTestCSVInput);
-
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 3u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-
-  EXPECT_CALL(client_, OnBookmarksImported(_));
-  EXPECT_CALL(client_, OnHistoryImported(_));
-  EXPECT_CALL(client_, OnPaymentCardsImported(_));
-
-  CompleteImport({});
-}
-
-TEST_F(SafariDataImporterTest, PasswordImportConflicts) {
-  constexpr char kTestCSVInput[] =
-      "Url,Username,Password,Note\n"
-      "http://example1.com,username1,password1,note1\n"
-      "http://example1.com,username2,password2,note2\n"
-      "http://example2.com,username1,password3,note3\n";
-
-  constexpr char kTestCSVConflicts[] =
-      "Url,Username,Password,Note\n"
-      "http://example1.com,username2,password4,note2\n"
-      "http://example2.com,username1,password5,note3\n";
-
-  // Import 3 passwords.
-  EXPECT_CALL(client_,
-              OnPasswordsReady(Property(
-                  &base::expected<ImportResults, ImportPreparationError>::value,
-                  AllOf(Field(&ImportResults::number_imported, 0u),
-                        Field(&ImportResults::number_to_import, 3u)))));
-  PreparePasswords(kTestCSVInput);
-
-  // Confirm password import.
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 3u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-
-  EXPECT_CALL(client_, OnBookmarksImported(_));
-  EXPECT_CALL(client_, OnHistoryImported(_));
-  EXPECT_CALL(client_, OnPaymentCardsImported(_));
-
-  CompleteImport({});
-
-  // Attempt to import 2 conflicting passwords, which should return conflicts.
-  EXPECT_CALL(
-      client_,
-      OnPasswordsReady(Property(
-          &base::expected<ImportResults, ImportPreparationError>::value,
-          AllOf(Field(&ImportResults::number_imported, 0u),
-                Field(&ImportResults::number_to_import, 0u),
-                Field(&ImportResults::displayed_entries,
-                      Property(&std::vector<ImportEntry>::size, 2u))))));
-
-  PreparePasswords(kTestCSVConflicts);
-
-  // Resolve the 2 conflicts.
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 2u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-
-  EXPECT_CALL(client_, OnBookmarksImported(_));
-  EXPECT_CALL(client_, OnHistoryImported(_));
-  EXPECT_CALL(client_, OnPaymentCardsImported(_));
-
-  CompleteImport({0, 1});
 }
 
 TEST_F(SafariDataImporterTest, TotalFailure) {
@@ -941,95 +775,6 @@ TEST_F(SafariDataImporterTest, ImportWithNoBookmarks) {
   CompleteImport({});
 
   EXPECT_THAT(GetOtherBookmarkNode()->children(), IsEmpty());
-}
-
-// Tests that passwords are imported to the account store when sync is on.
-TEST_F(SafariDataImporterTest,
-       PasswordsImportedToAccountStoreWhenSyncIsEnabled) {
-  PasswordsImportToAccountStore();
-}
-
-// Tests that passwords are imported to the profile store when sync is off.
-TEST_F(SafariDataImporterTest,
-       PasswordsImportedToProfileStoreWhenSyncIsDisabled) {
-  PasswordsImportToProfileStore();
-}
-
-// Tests both password import scenarios (account and profile) sequentially.
-TEST_F(SafariDataImporterTest, ImportToBothStoresSequentially) {
-  PasswordsImportToAccountStore();
-
-  // Clear the account store before the next import since
-  // `PasswordsImportToProfileStore` expects account store to be empty.
-  account_store()->RemoveLoginsCreatedBetween(FROM_HERE, base::Time(),
-                                              base::Time::Max());
-
-  PasswordsImportToProfileStore();
-}
-
-// Tests that password import is blocked when disabled by enterprise policy.
-TEST_F(SafariDataImporterTest, ImportPasswordsBlockedByPolicy) {
-  pref_service_.SetManagedPref(
-      password_manager::prefs::kCredentialsEnableService,
-      std::make_unique<base::Value>(false));
-
-  constexpr char kTestCSVInput[] =
-      "Url,Username,Password,Note\n"
-      "https://account.example.com,user1,pass1,note1\n";
-
-  EXPECT_CALL(client_, OnPasswordsReady(
-                           IsError(ImportPreparationError::kBlockedByPolicy)));
-  PreparePasswords(kTestCSVInput);
-
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 0u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-  EXPECT_CALL(client_, OnBookmarksImported(0));
-  EXPECT_CALL(client_, OnHistoryImported(0));
-  EXPECT_CALL(client_, OnPaymentCardsImported(0));
-
-  CompleteImport({});
-
-  EXPECT_THAT(GetAllLoginsSync(profile_store()), IsEmpty());
-  EXPECT_THAT(GetAllLoginsSync(account_store()), IsEmpty());
-}
-
-// Tests that password import is directed to the local store when password sync
-// is disabled by the SyncTypesListDisabled policy.
-TEST_F(SafariDataImporterTest,
-       PasswordsImportLocallyWithSyncTypesListDisabled) {
-  sync_service_.SetSignedIn(signin::ConsentLevel::kSignin);
-  ASSERT_TRUE(
-      password_manager::features_util::IsAccountStorageActive(&sync_service_));
-
-  syncer::UserSelectableTypeSet types =
-      sync_service_.GetUserSettings()->GetRegisteredSelectableTypes();
-  types.Remove(syncer::UserSelectableType::kPasswords);
-  sync_service_.GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
-                                                    types);
-
-  constexpr char kTestCSVInput[] =
-      "Url,Username,Password,Note\n"
-      "https://local.example.com,user1,pass1,note1\n";
-
-  EXPECT_CALL(client_,
-              OnPasswordsReady(Property(
-                  &base::expected<ImportResults, ImportPreparationError>::value,
-                  AllOf(Field(&ImportResults::number_imported, 0u),
-                        Field(&ImportResults::number_to_import, 1u)))));
-  PreparePasswords(kTestCSVInput);
-
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 1u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-  EXPECT_CALL(client_, OnBookmarksImported(0));
-  EXPECT_CALL(client_, OnHistoryImported(0));
-  EXPECT_CALL(client_, OnPaymentCardsImported(0));
-
-  CompleteImport({});
-
-  EXPECT_THAT(GetAllLoginsSync(profile_store()), SizeIs(1));
-  EXPECT_THAT(GetAllLoginsSync(account_store()), IsEmpty());
 }
 
 // Tests that history import is blocked when disabled by enterprise policy.

@@ -75,26 +75,6 @@ std::vector<uint8_t> EncryptInvitationData(
 }
 }  // namespace
 
-sync_pb::PasswordSharingInvitationData DecryptInvitationData(
-    const std::string& encrypted_data,
-    const sync_pb::CrossUserSharingPublicKey& sender_public_key,
-    const syncer::CrossUserSharingPublicPrivateKeyPair& recipient_key_pair) {
-  std::unique_ptr<syncer::CryptographerImpl> recipient_cryptographer =
-      InitializeCryptographer(recipient_key_pair);
-
-  std::optional<std::vector<uint8_t>> decrypted_data =
-      recipient_cryptographer->AuthDecryptForCrossUserSharing(
-          base::as_byte_span(encrypted_data),
-          base::as_byte_span(sender_public_key.x25519_public_key()),
-          kDefaultKeyVersion);
-  CHECK(decrypted_data);
-
-  sync_pb::PasswordSharingInvitationData invitation_data;
-  CHECK(invitation_data.ParseFromArray(decrypted_data->data(),
-                                       decrypted_data->size()));
-  return invitation_data;
-}
-
 sync_pb::IncomingPasswordSharingInvitationSpecifics
 CreateEncryptedIncomingInvitationSpecifics(
     const sync_pb::PasswordSharingInvitationData& invitation_data,

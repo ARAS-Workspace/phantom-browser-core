@@ -7,13 +7,11 @@
 #include "build/build_config.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/encryption_helper.h"
-#include "chrome/browser/sync/test/integration/passwords_helper.h"
 #include "chrome/browser/sync/test/integration/sync_engine_stopped_checker.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/browser_sync/browser_sync_switches.h"
-#include "components/password_manager/core/browser/password_form.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/sync/base/passphrase_enums.h"
 #include "components/sync/model/crypto/key_derivation_params.h"
@@ -180,15 +178,6 @@ class SingleClientCustomPassphraseSyncTest
     server_entity->SetSpecifics(GetEncryptedBookmarkEntitySpecifics(
         server_entity->GetSpecifics().bookmark(), key_params));
     GetFakeServer()->InjectEntity(std::move(server_entity));
-  }
-
-  password_manager::PasswordForm::Store GetPasswordsStoreType() const {
-    switch (GetSetupSyncMode()) {
-      case SetupSyncMode::kSyncTransportOnly:
-        return password_manager::PasswordForm::Store::kAccountStore;
-      case SetupSyncMode::kSyncTheFeature:
-        return password_manager::PasswordForm::Store::kProfileStore;
-    }
   }
 
   const bookmarks::BookmarkNode* GetLocalBookmarkBarNode() {

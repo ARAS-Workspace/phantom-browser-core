@@ -7,10 +7,8 @@
 #include <sstream>
 #include <utility>
 
-#include "base/base64.h"
 #include "base/compiler_specific.h"
 #include "base/functional/bind.h"
-#include "base/location.h"
 #include "base/run_loop.h"
 #include "base/strings/escape.h"
 #include "base/strings/stringprintf.h"
@@ -138,12 +136,6 @@ std::vector<std::unique_ptr<PasswordForm>> GetAllLogins(
   return consumer.WaitForResult();
 }
 
-void RemoveLogins(PasswordStoreInterface* store) {
-  // Null Time values enforce unbounded deletion in both direction
-  store->RemoveLoginsCreatedBetween(FROM_HERE,
-                                    /*delete_begin=*/base::Time(),
-                                    /*delete_end=*/base::Time::Max());
-}
 PasswordStoreInterface* GetProfilePasswordStoreInterface(int index) {
   return ProfilePasswordStoreFactory::GetForProfile(
              test()->GetProfile(index), ServiceAccessType::IMPLICIT_ACCESS)
@@ -167,43 +159,6 @@ password_manager::PasswordStoreInterface* GetPasswordStoreInterface(
     case PasswordForm::Store::kAccountStore:
       return GetAccountPasswordStoreInterface(index);
   }
-}
-
-bool ProfilesContainSamePasswordForms(int index_a,
-                                      int index_b,
-                                      PasswordForm::Store store) {
-  std::vector<std::unique_ptr<PasswordForm>> forms_a =
-      GetLogins(GetPasswordStoreInterface(index_a, store));
-  std::vector<std::unique_ptr<PasswordForm>> forms_b =
-      GetLogins(GetPasswordStoreInterface(index_b, store));
-
-  std::ostringstream mismatch_details_stream;
-  bool is_matching = password_manager::ContainsEqualPasswordFormsUnordered(
-      forms_a, forms_b, &mismatch_details_stream);
-  if (!is_matching) {
-    VLOG(1) << "Password forms in Profile " << index_a
-            << " (listed as 'expected forms' below)"
-            << " do not match those in Profile " << index_b
-            << " (listed as 'actual forms' below)";
-    VLOG(1) << mismatch_details_stream.str();
-  }
-  return is_matching;
-}
-
-bool AllProfilesContainSamePasswordForms(PasswordForm::Store store) {
-  for (int i = 1; i < test()->num_clients(); ++i) {
-    if (!ProfilesContainSamePasswordForms(0, i, store)) {
-      DVLOG(1) << "Profile " << i
-               << " does not contain the same password"
-                  " forms as Profile 0.";
-      return false;
-    }
-  }
-  return true;
-}
-
-int GetPasswordCount(int index, PasswordForm::Store store) {
-  return GetLogins(GetPasswordStoreInterface(index, store)).size();
 }
 
 PasswordForm CreateTestPasswordForm(int index, PasswordForm::Store store) {
@@ -247,24 +202,6 @@ void InjectEncryptedServerPassword(
           /*creation_time=*/0, /*last_modified_time=*/0));
 }
 
-void InjectKeystoreEncryptedServerPassword(
-    const password_manager::PasswordForm& form,
-    fake_server::FakeServer* fake_server) {
-  sync_pb::PasswordSpecificsData password_data =
-      password_manager::SpecificsFromStoredCredential(
-          password_manager::FromPasswordForm(form), /*base_password_data=*/{})
-          .client_only_encrypted_data();
-  InjectKeystoreEncryptedServerPassword(password_data, fake_server);
-}
-
-void InjectKeystoreEncryptedServerPassword(
-    const sync_pb::PasswordSpecificsData& password_data,
-    fake_server::FakeServer* fake_server) {
-  InjectEncryptedServerPassword(
-      password_data, base::Base64Encode(fake_server->GetKeystoreKeys().back()),
-      syncer::KeyDerivationParams::CreateForPbkdf2(), fake_server);
-}
-
 }  // namespace passwords_helper
 
 PasswordSyncActiveChecker::PasswordSyncActiveChecker(
@@ -275,57 +212,6 @@ PasswordSyncActiveChecker::~PasswordSyncActiveChecker() = default;
 
 bool PasswordSyncActiveChecker::IsExitConditionSatisfied(std::ostream* os) {
   return service()->GetActiveDataTypes().Has(syncer::PASSWORDS);
-}
-
-PasswordSyncInactiveChecker::PasswordSyncInactiveChecker(
-    syncer::SyncServiceImpl* service)
-    : SingleClientStatusChangeChecker(service) {}
-
-PasswordSyncInactiveChecker::~PasswordSyncInactiveChecker() = default;
-
-bool PasswordSyncInactiveChecker::IsExitConditionSatisfied(std::ostream* os) {
-  return !service()->GetActiveDataTypes().Has(syncer::PASSWORDS);
-}
-
-SamePasswordFormsChecker::SamePasswordFormsChecker(PasswordForm::Store store)
-    : MultiClientStatusChangeChecker(
-          sync_datatype_helper::test()->GetSyncServices()),
-      store_(store) {}
-
-SamePasswordFormsChecker::~SamePasswordFormsChecker() = default;
-
-// This method needs protection against re-entrancy.
-//
-// This function indirectly calls GetLogins(), which starts a RunLoop on the UI
-// thread.  This can be a problem, since the next task to execute could very
-// well contain a SyncServiceObserver::OnStateChanged() event, which would
-// trigger another call to this here function, and start another layer of
-// nested RunLoops.  That makes the StatusChangeChecker's Quit() method
-// ineffective.
-//
-// The work-around is to not allow re-entrancy.  But we can't just drop
-// IsExitConditionSatisifed() calls if one is already in progress.  Instead, we
-// set a flag to ask the current execution of IsExitConditionSatisfied() to be
-// re-run.  This ensures that the return value is always based on the most
-// up-to-date state.
-bool SamePasswordFormsChecker::IsExitConditionSatisfied(std::ostream* os) {
-  *os << "Waiting for matching passwords";
-
-  if (in_progress_) {
-    LOG(WARNING) << "Setting flag and returning early to prevent nesting.";
-    needs_recheck_ = true;
-    return false;
-  }
-
-  // Keep retrying until we get a good reading.
-  bool result = false;
-  in_progress_ = true;
-  do {
-    needs_recheck_ = false;
-    result = passwords_helper::AllProfilesContainSamePasswordForms(store_);
-  } while (needs_recheck_);
-  in_progress_ = false;
-  return result;
 }
 
 PasswordFormsChecker::PasswordFormsChecker(
@@ -344,8 +230,20 @@ PasswordFormsChecker::PasswordFormsChecker(
 
 PasswordFormsChecker::~PasswordFormsChecker() = default;
 
-// This method uses the same re-entrancy prevention trick as
-// the SamePasswordFormsChecker.
+// This method needs protection against re-entrancy.
+//
+// This function indirectly calls GetLogins(), which starts a RunLoop on the UI
+// thread.  This can be a problem, since the next task to execute could very
+// well contain a SyncServiceObserver::OnStateChanged() event, which would
+// trigger another call to this here function, and start another layer of
+// nested RunLoops.  That makes the StatusChangeChecker's Quit() method
+// ineffective.
+//
+// The work-around is to not allow re-entrancy.  But we can't just drop
+// IsExitConditionSatisifed() calls if one is already in progress.  Instead, we
+// set a flag to ask the current execution of IsExitConditionSatisfied() to be
+// re-run.  This ensures that the return value is always based on the most
+// up-to-date state.
 bool PasswordFormsChecker::IsExitConditionSatisfied(std::ostream* os) {
   if (in_progress_) {
     LOG(WARNING) << "Setting flag and returning early to prevent nesting.";

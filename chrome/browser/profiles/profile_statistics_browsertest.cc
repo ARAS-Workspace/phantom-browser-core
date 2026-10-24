@@ -17,15 +17,11 @@
 #include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
 #include "build/build_config.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/profiles/profile_statistics_aggregator.h"
 #include "chrome/browser/profiles/profile_statistics_common.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/in_process_browser_test.h"
-#include "components/keyed_service/content/browser_context_dependency_manager.h"
-#include "components/password_manager/core/browser/password_manager_test_utils.h"
-#include "components/password_manager/core/browser/password_store/test_password_store.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
 
@@ -153,30 +149,7 @@ class ProfileStatisticsAggregatorState {
 
 }  // namespace
 
-class ProfileStatisticsBrowserTest : public InProcessBrowserTest {
- public:
-  void SetUpInProcessBrowserTestFixture() override {
-    InProcessBrowserTest::SetUpInProcessBrowserTestFixture();
-    create_services_subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(
-                base::BindRepeating([](content::BrowserContext* context) {
-                  // Use TestPasswordStore to remove a possible race. Normally
-                  // the PasswordStore does its database manipulation on the DB
-                  // thread, which creates a possible race during navigation.
-                  // Specifically the PasswordManager will ignore any forms in a
-                  // page if the load from the PasswordStore has not completed.
-                  ProfilePasswordStoreFactory::GetInstance()->SetTestingFactory(
-                      context, base::BindRepeating(
-                                   &password_manager::BuildPasswordStore<
-                                       content::BrowserContext,
-                                       password_manager::TestPasswordStore>));
-                }));
-  }
-
- private:
-  base::CallbackListSubscription create_services_subscription_;
-};
+using ProfileStatisticsBrowserTest = InProcessBrowserTest;
 
 using ProfileStatisticsBrowserDeathTest = ProfileStatisticsBrowserTest;
 

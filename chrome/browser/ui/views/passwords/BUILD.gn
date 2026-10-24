@@ -138,23 +138,3 @@ source_set("impl") {
     deps += [ "//components/os_crypt/async/common" ]
   }
 }
-
-source_set("test_support") {
-  testonly = true
-  public = [ "password_bubble_view_test_base.h" ]
-  sources = [ "password_bubble_view_test_base.cc" ]
-  public_deps = [
-    "//chrome/browser/signin:test_support",
-    "//chrome/browser/ui/passwords:test_support_ui",
-    "//chrome/test:test_support",
-    "//components/password_manager/core/browser:test_support",
-    "//components/signin/public/identity_manager:test_support",
-    "//content/test:test_support",
-    "//testing/gmock",
-    "//ui/views",
-  ]
-  deps = [
-    "//chrome/browser/ui/passwords",
-    "//testing/gtest",
-  ]
-}

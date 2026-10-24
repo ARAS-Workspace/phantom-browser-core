@@ -120,7 +120,6 @@ include_rules = [
   "+chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h",
   "+chrome/browser/sync/sync_service_factory.h",
   "+chrome/browser/sync/sync_ui_util.h",
-  "+chrome/browser/sync/test/integration/passwords_helper.h",
   "+chrome/browser/sync/test/integration/sync_service_impl_harness.h",
   "+chrome/browser/sync/test/integration/sync_test.h",
   "+chrome/browser/trusted_vault/trusted_vault_service_factory.h",

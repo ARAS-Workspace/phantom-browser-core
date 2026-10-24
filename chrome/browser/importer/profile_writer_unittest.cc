@@ -9,14 +9,12 @@
 #include <string>
 
 #include "base/functional/bind.h"
-#include "base/run_loop.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/test_future.h"
 #include "base/time/time.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/password_manager/password_manager_test_util.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/bookmarks/browser/bookmark_model.h"
@@ -26,10 +24,6 @@
 #include "components/bookmarks/test/bookmark_test_helpers.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
-#include "components/password_manager/core/browser/password_manager_test_utils.h"
-#include "components/password_manager/core/browser/password_store/test_password_store.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/prefs/pref_service.h"
 #include "components/query_parser/query_parser.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/user_data_importer/common/imported_bookmark_entry.h"
@@ -40,19 +34,6 @@ namespace {
 using bookmarks::BookmarkModel;
 using bookmarks::TitledUrlMatch;
 using bookmarks::UrlAndTitle;
-using password_manager::PasswordForm;
-using password_manager::TestPasswordStore;
-
-PasswordForm MakePasswordForm() {
-  PasswordForm form;
-  form.url = GURL("https://example.com/");
-  form.signon_realm = form.url.DeprecatedGetOriginAsURL().spec();
-  form.username_value = u"user@gmail.com";
-  form.password_value = u"s3cre3t";
-  form.in_store = PasswordForm::Store::kProfileStore;
-  return form;
-}
-
 }  // namespace
 
 class TestProfileWriter : public ProfileWriter {
@@ -296,31 +277,4 @@ TEST_F(ProfileWriterTest, AddKeywords) {
   EXPECT_EQ(turls[1]->keyword(), u"key2");
   EXPECT_EQ(turls[1]->url(), "http://key2.com");
   EXPECT_EQ(turls[1]->short_name(), u"n2");
-}
-
-TEST_F(ProfileWriterTest, AddPassword) {
-  scoped_refptr<TestPasswordStore> store =
-      CreateAndUseTestPasswordStore(profile());
-  PasswordForm form = MakePasswordForm();
-
-  auto profile_writer = base::MakeRefCounted<TestProfileWriter>(profile());
-  profile_writer->AddPasswordForm(form);
-
-  base::RunLoop().RunUntilIdle();
-  EXPECT_THAT(GetAllLoginsSync(store.get()).at(form.signon_realm),
-              testing::ElementsAre(form));
-}
-
-TEST_F(ProfileWriterTest, AddPasswordDisabled) {
-  scoped_refptr<TestPasswordStore> store =
-      CreateAndUseTestPasswordStore(profile());
-  profile()->GetPrefs()->SetBoolean(
-      password_manager::prefs::kCredentialsEnableService, false);
-  PasswordForm form = MakePasswordForm();
-
-  auto profile_writer = base::MakeRefCounted<TestProfileWriter>(profile());
-  profile_writer->AddPasswordForm(form);
-
-  base::RunLoop().RunUntilIdle();
-  EXPECT_THAT(GetAllLoginsSync(store.get()), testing::IsEmpty());
 }

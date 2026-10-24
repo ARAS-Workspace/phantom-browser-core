@@ -12,8 +12,6 @@
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history/web_history_service_factory.h"
-#include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
@@ -24,11 +22,9 @@
 #include "components/browsing_data/core/browsing_data_utils.h"
 #include "components/browsing_data/core/counters/autofill_counter.h"
 #include "components/browsing_data/core/counters/history_counter.h"
-#include "components/browsing_data/core/counters/passwords_counter.h"
 #include "components/browsing_data/core/pref_names.h"
 #include "components/history/core/browser/web_history_service.h"
 #include "components/history/core/test/fake_web_history_service.h"
-#include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/service/sync_service_impl.h"
 #include "content/public/browser/browser_thread.h"
@@ -153,76 +149,6 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, AutofillCounter) {
   EXPECT_FALSE(CountingFinishedSinceLastAsked());
 
   // We start syncing autofill again. This restarts the counter.
-  sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false,
-      GetRegisteredSelectableTypes(kFirstProfileIndex));
-  sync_blocker.reset();
-  WaitForCounting();
-  EXPECT_TRUE(IsSyncEnabled());
-
-  // Stopping the Sync service triggers a restart.
-  GetClient(0)->SignOutPrimaryAccount();
-  WaitForCounting();
-  EXPECT_FALSE(IsSyncEnabled());
-}
-
-// Test that the counting restarts when password sync state changes.
-// TODO(crbug.com/40443942): Move this to the sync/test/integration directory?
-IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, PasswordCounter) {
-  // Set up the Sync client.
-  ASSERT_TRUE(SetupClients());
-  syncer::SyncService* sync_service = GetSyncService(kFirstProfileIndex);
-  Profile* profile = GetProfile(kFirstProfileIndex);
-  // Set up the counter.
-  browsing_data::PasswordsCounter counter(
-      ProfilePasswordStoreFactory::GetForProfile(
-          profile, ServiceAccessType::EXPLICIT_ACCESS),
-      AccountPasswordStoreFactory::GetForProfile(
-          profile, ServiceAccessType::EXPLICIT_ACCESS),
-      profile->GetPrefs(), sync_service);
-
-  counter.Init(profile->GetPrefs(),
-               base::BindRepeating(&SyncAwareCounterTest::OnCounterResult,
-                                   base::Unretained(this)));
-
-  // We sync all datatypes by default, so starting Sync means that we start
-  // syncing passwords, and this should restart the counter.
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(sync_service->GetTransportState() ==
-              syncer::SyncService::TransportState::ACTIVE);
-  ASSERT_TRUE(sync_service->GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  WaitForCounting();
-  EXPECT_TRUE(IsSyncEnabled());
-
-  // We stop syncing passwords in particular. This restarts the counter.
-  syncer::UserSelectableTypeSet everything_except_passwords =
-      GetRegisteredSelectableTypes(kFirstProfileIndex);
-  everything_except_passwords.Remove(syncer::UserSelectableType::kPasswords);
-  auto sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, everything_except_passwords);
-  ASSERT_FALSE(sync_service->GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  sync_blocker.reset();
-  WaitForCounting();
-  ASSERT_FALSE(sync_service->GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kPasswords));
-  EXPECT_FALSE(IsSyncEnabled());
-
-  // If password sync is not affected, the counter is not restarted.
-  syncer::UserSelectableTypeSet only_history = {
-      syncer::UserSelectableType::kHistory};
-  sync_service->GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
-                                                    only_history);
-  sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
-                                                    only_history);
-  sync_blocker.reset();
-  EXPECT_FALSE(CountingFinishedSinceLastAsked());
-
-  // We start syncing passwords again. This restarts the counter.
   sync_blocker = sync_service->GetSetupInProgressHandle();
   sync_service->GetUserSettings()->SetSelectedTypes(
       /*sync_everything=*/false,

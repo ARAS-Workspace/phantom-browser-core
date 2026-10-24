@@ -111,7 +111,6 @@ source_set("unit_tests") {
     "//base",
     "//chrome/browser/ui/views/controls",
     "//chrome/browser/ui/views/location_bar",
-    "//chrome/browser/ui/views/passwords:test_support",
     "//components/password_manager/core/browser",
     "//testing/gmock",
     "//testing/gtest",

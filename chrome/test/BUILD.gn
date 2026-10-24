@@ -72,7 +72,6 @@ static_library("test_support") {
     "//chrome/browser/lifetime",
     "//chrome/browser/omnibox",
     "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager:test_support",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/performance_manager:test_support",
     "//chrome/browser/profiles:misc",
@@ -953,8 +952,6 @@ test("browser_tests") {
     "//chrome/browser/page_load_metrics:browser_tests",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager:impl",
-    "//chrome/browser/password_manager:test_support",
-    "//chrome/browser/password_manager:test_support_ui",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:browser_tests",
     "//chrome/browser/permissions",
@@ -1235,8 +1232,6 @@ test("browser_tests") {
     "//components/autofill/content/browser:autofill_shared_storage_proto",
     "//components/autofill/content/browser:risk_proto",
     "//components/autofill/content/browser:test_support",
-    "//components/autofill/content/common/mojom",
-    "//components/autofill/content/renderer:test_support",
     "//components/autofill/core/browser",
     "//components/back_forward_cache",
     "//components/background_fetch",
@@ -1522,8 +1517,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/guest_view" ]
   }
 
-  deps += [ "//chrome/browser/ui/passwords:impl" ]
-
   allow_circular_includes_from = []
 
   if (is_mac) {
@@ -1690,12 +1683,6 @@ test("browser_tests") {
     "../browser/ui/waap/initial_webui_browsertest.cc",
     "../common/chrome_paths_browsertest.cc",
     "../common/time_format_browsertest.cc",
-    "../renderer/autofill/fake_mojo_password_manager_driver.cc",
-    "../renderer/autofill/fake_mojo_password_manager_driver.h",
-    "../renderer/autofill/fake_password_generation_driver.cc",
-    "../renderer/autofill/fake_password_generation_driver.h",
-    "../renderer/autofill/password_generation_test_utils.cc",
-    "../renderer/autofill/password_generation_test_utils.h",
     "../renderer/chrome_content_settings_agent_delegate_browsertest.cc",
     "../renderer/chrome_render_frame_observer_browsertest.cc",
     "base/devtools_listener_browsertest.cc",
@@ -2173,8 +2160,6 @@ test("browser_tests") {
       "//chrome/browser/ui/find_bar:browser_tests",
       "//chrome/browser/ui/global_error:browser_tests",
       "//chrome/browser/ui/page_action:icon_type",
-      "//chrome/browser/ui/passwords:test_support",
-      "//chrome/browser/ui/passwords:test_support_ui",
       "//chrome/browser/ui/tabs:test_support",
       "//chrome/browser/ui/toasts:browser_tests",
       "//chrome/browser/ui/views/accessibility:dump_accessibility_events_views_browsertest_base",
@@ -2736,7 +2721,6 @@ test("unit_tests") {
     "//chrome/browser/page_load_metrics:unit_tests",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager:impl",
-    "//chrome/browser/password_manager:test_support",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:unit_tests",
@@ -3360,7 +3344,6 @@ test("unit_tests") {
     "//chrome/browser/ui/context_highlight:unit_tests",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/extensions:unit_tests",
-    "//chrome/browser/ui/passwords:test_support_ui",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/performance_controls:unit_tests",
     "//chrome/browser/ui/record_replay:unit_tests",
@@ -3396,7 +3379,6 @@ test("unit_tests") {
     "//chrome/browser/ui/views/dictation:unit_tests",
     "//chrome/browser/ui/views/page_action:test_support",
     "//chrome/browser/ui/views/page_action:unit_tests",
-    "//chrome/browser/ui/views/passwords:test_support",
     "//chrome/browser/ui/views/tabs/common:unit_tests",
     "//chrome/browser/ui/views/tabs/vertical:unit_tests",
     "//chrome/browser/ui/views/toolbar:unit_tests",
@@ -3451,8 +3433,6 @@ test("unit_tests") {
     "//components/webapps/isolated_web_apps/test_support",
     "//components/webauthn/content/browser",
   ]
-
-  deps += [ "//chrome/browser/ui/passwords:impl" ]
 
   if (is_mac) {
     deps += [ "//chrome/updater:browser_sources" ]
@@ -4876,7 +4856,6 @@ test("interactive_ui_tests") {
       "//chrome/browser/ui/find_bar",
       "//chrome/browser/ui/frame",
       "//chrome/browser/ui/omnibox",
-      "//chrome/browser/ui/passwords:test_support",
       "//chrome/browser/ui/performance_controls/test_support",
       "//chrome/browser/ui/tabs",
       "//chrome/browser/ui/tabs:tab_group",
@@ -5113,7 +5092,6 @@ test("sync_performance_tests") {
     "../browser/sync/test/integration/performance/autofill_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/bookmarks_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/extensions_sync_perf_test.cc",
-    "../browser/sync/test/integration/performance/passwords_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/sessions_sync_perf_test.cc",
     "base/browser_perf_tests_main.cc",
   ]
@@ -5130,7 +5108,6 @@ test("sync_performance_tests") {
     "//chrome/browser/ui/select_file_policy",
     "//chrome/test/base:chrome_test_launcher",
     "//components/bookmarks/browser",
-    "//components/password_manager/core/browser",
     "//components/sync",
     "//testing/gmock",
     "//testing/gtest",
@@ -5197,7 +5174,6 @@ test("captured_sites_interactive_tests") {
 
   data = [
     "//chrome/test/data/autofill/captured_sites/",
-    "//chrome/test/data/password/captured_sites/",
     "//chrome/test/data/web_page_replay_go_helper_scripts/automation_helper.js",
     "//components/test/data/autofill/web_page_replay_support_files/",
     "//third_party/catapult/telemetry/telemetry/bin/",

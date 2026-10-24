@@ -1759,7 +1759,6 @@
       'filepath': 'chrome/.*/password_'\
                   '|chrome/browser/ui/passwords'\
                   '|chrome/browser/ui/views/passwords'\
-                  '|chrome/test/data/password'\
                   '|components/autofill.*password'
                   '|components/password_'\
                   '|^ios/chrome/browser/passwords'\

@@ -57,8 +57,6 @@ class PasswordCredentialFetcher
   static void SetInstanceForTesting(PasswordCredentialFetcher* instance);
 
  private:
-  friend class FakePasswordCredentialFetcher;
-
   explicit PasswordCredentialFetcher(content::RenderFrameHost* rfh);
 
   // FormFetcher::Consumer:

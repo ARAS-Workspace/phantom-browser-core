@@ -59,7 +59,6 @@
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/security_principal.h"
-#include "content/public/browser/site_isolation_policy.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/common/content_features.h"
@@ -2562,73 +2561,6 @@ class SiteIsolationForPasswordSitesBrowserTest
  private:
   base::test::ScopedFeatureList feature_list_;
 };
-
-// Verifies that a site gets process-isolated after a password is typed on a
-// page from that site.
-IN_PROC_BROWSER_TEST_F(SiteIsolationForPasswordSitesBrowserTest,
-                       SiteIsIsolatedAfterEnteringPassword) {
-  // This test requires dynamic isolated origins to be enabled.
-  if (!content::SiteIsolationPolicy::AreDynamicIsolatedOriginsEnabled())
-    return;
-
-  GURL url(embedded_https_test_server().GetURL("sub.foo.com",
-                                               "/password/password_form.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // foo.com should not be isolated to start with. Verify that a cross-site
-  // iframe does not become an OOPIF.
-  EXPECT_FALSE(contents->GetPrimaryMainFrame()
-                   ->GetSiteInstance()
-                   ->RequiresDedicatedProcess());
-  std::string kAppendIframe = R"(
-      var i = document.createElement('iframe');
-      i.id = 'child';
-      document.body.appendChild(i);)";
-  EXPECT_TRUE(ExecJs(contents, kAppendIframe));
-  GURL bar_url(embedded_https_test_server().GetURL("bar.com", "/title1.html"));
-  EXPECT_TRUE(NavigateIframeToURL(contents, "child", bar_url));
-  content::RenderFrameHost* child =
-      ChildFrameAt(contents->GetPrimaryMainFrame(), 0);
-  EXPECT_FALSE(child->IsCrossProcessSubframe());
-
-  // Fill a form and submit through a <input type="submit"> button.
-  content::TestNavigationObserver observer(contents);
-  std::string kFillAndSubmit =
-      "document.getElementById('username_field').value = 'temp';"
-      "document.getElementById('password_field').value = 'random';"
-      "document.getElementById('input_submit_button').click()";
-  EXPECT_TRUE(content::ExecJs(contents, kFillAndSubmit));
-  observer.Wait();
-
-  // Since there were no script references from other windows, we should've
-  // swapped BrowsingInstances and put the result of the form submission into a
-  // dedicated process, locked to foo.com.  Check that a cross-site iframe now
-  // becomes an OOPIF.
-  EXPECT_TRUE(contents->GetPrimaryMainFrame()
-                  ->GetSiteInstance()
-                  ->RequiresDedicatedProcess());
-  EXPECT_TRUE(ExecJs(contents, kAppendIframe));
-  EXPECT_TRUE(NavigateIframeToURL(contents, "child", bar_url));
-  child = ChildFrameAt(contents->GetPrimaryMainFrame(), 0);
-  EXPECT_TRUE(child->IsCrossProcessSubframe());
-
-  // Open a fresh tab (also forcing a new BrowsingInstance), navigate to
-  // foo.com, and verify that a cross-site iframe becomes an OOPIF.
-  AddBlankTabAndShow(browser());
-  EXPECT_EQ(2, browser()->tab_strip_model()->count());
-  content::WebContents* new_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  EXPECT_NE(new_contents, contents);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  EXPECT_TRUE(ExecJs(new_contents, kAppendIframe));
-  EXPECT_TRUE(NavigateIframeToURL(new_contents, "child", bar_url));
-  content::RenderFrameHost* new_child =
-      ChildFrameAt(new_contents->GetPrimaryMainFrame(), 0);
-  EXPECT_TRUE(new_child->IsCrossProcessSubframe());
-}
 
 // Verifies that persistent isolated sites survive restarts.  Part 1.
 IN_PROC_BROWSER_TEST_F(SiteIsolationForPasswordSitesBrowserTest,

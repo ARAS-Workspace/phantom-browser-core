@@ -26,7 +26,6 @@
 #include "chrome/browser/apps/platform_apps/shortcut_manager.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
@@ -52,10 +51,6 @@
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
-#include "components/password_manager/core/browser/password_form.h"
-#include "components/password_manager/core/browser/password_store/password_form_converters.h"
-#include "components/password_manager/core/browser/password_store/password_store_consumer.h"
-#include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
@@ -183,44 +178,6 @@ class ProfileRemovalObserver : public ProfileAttributesStorage::Observer {
 
  private:
   std::string last_used_profile_name_;
-};
-
-// The class serves to retrieve passwords from PasswordStore asynchronously. It
-// used by ProfileManagerBrowserTest.DeletePasswords on some platforms.
-class PasswordStoreConsumerVerifier
-    : public password_manager::PasswordStoreConsumer {
- public:
-  void OnGetPasswordStoreResultsOrErrorFrom(
-      password_manager::PasswordStoreInterface* store,
-      password_manager::LoginsResultOrError results_or_error) override {
-    if (std::holds_alternative<password_manager::PasswordStoreBackendError>(
-            results_or_error)) {
-      ADD_FAILURE() << "Error from password store";
-      password_entries_ = std::vector<password_manager::PasswordForm>();
-    } else {
-      password_entries_ = password_manager::ToPasswordForms(
-          std::get<password_manager::LoginsResult>(
-              std::move(results_or_error)));
-    }
-    run_loop_.Quit();
-  }
-
-  void Wait() {
-    run_loop_.Run();
-  }
-
-  const std::vector<password_manager::PasswordForm>& GetPasswords() const {
-    return password_entries_;
-  }
-
-  base::WeakPtr<password_manager::PasswordStoreConsumer> GetWeakPtr() {
-    return weak_ptr_factory_.GetWeakPtr();
-  }
-
- private:
-  base::RunLoop run_loop_;
-  std::vector<password_manager::PasswordForm> password_entries_;
-  base::WeakPtrFactory<PasswordStoreConsumerVerifier> weak_ptr_factory_{this};
 };
 
 base::FilePath GetFirstNonSigninProfile(ProfileAttributesStorage* storage) {
@@ -668,46 +625,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, EphemeralProfile) {
     // have been recreated by pending file tasks after being deleted.
     // See crbug.com/40756611.
   }
-}
-
-// The test makes sense on those platforms where the keychain exists.
-IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, DeletePasswords) {
-  Profile* profile = browser()->GetProfile();
-  ASSERT_TRUE(profile);
-
-  password_manager::PasswordForm form;
-  form.scheme = password_manager::PasswordForm::Scheme::kHtml;
-  form.url = GURL("http://accounts.google.com/LoginAuth");
-  form.signon_realm = "http://accounts.google.com/";
-  form.username_value = u"my_username";
-  form.password_value = u"my_password";
-  form.blocked_by_user = false;
-
-  scoped_refptr<password_manager::PasswordStoreInterface> password_store =
-      ProfilePasswordStoreFactory::GetForProfile(
-          profile, ServiceAccessType::EXPLICIT_ACCESS)
-          .get();
-  ASSERT_TRUE(password_store.get());
-
-  password_store->AddLogin(password_manager::FromPasswordForm(form));
-  PasswordStoreConsumerVerifier verify_add;
-  password_store->GetAutofillableLogins(verify_add.GetWeakPtr());
-  verify_add.Wait();
-  EXPECT_EQ(1u, verify_add.GetPasswords().size());
-
-  MultipleProfileDeletionObserver profile_deletion_observer(1U);
-  g_browser_process->profile_manager()
-      ->GetDeleteProfileHelper()
-      .MaybeScheduleProfileForDeletion(
-          profile->GetPath(), base::DoNothing(),
-          ProfileMetrics::DELETE_PROFILE_USER_MANAGER);
-  // run_loop.Run();
-  profile_deletion_observer.Wait();
-
-  PasswordStoreConsumerVerifier verify_delete;
-  password_store->GetAutofillableLogins(verify_delete.GetWeakPtr());
-  verify_delete.Wait();
-  EXPECT_EQ(0u, verify_delete.GetPasswords().size());
 }
 
 // Tests Profile::HasOffTheRecordProfile, Profile::IsValidProfile and the
