@@ -11,7 +11,6 @@
 #include "chrome/browser/ui/login/login_handler.h"
 #include "chrome/browser/ui/views/login_view.h"
 #include "components/constrained_window/constrained_window_views.h"
-#include "components/password_manager/core/browser/password_manager.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/web_modal/web_contents_modal_dialog_manager.h"
 #include "content/public/browser/browser_thread.h"

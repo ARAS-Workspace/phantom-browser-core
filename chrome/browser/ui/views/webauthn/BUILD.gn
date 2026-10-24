@@ -71,7 +71,6 @@ source_set("webauthn") {
     "//chrome/browser/ui/autofill/payments",
     "//chrome/browser/ui/color:color_headers",
     "//chrome/browser/ui/passwords",
-    "//chrome/browser/ui/passwords/bubble_controllers",
     "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/accessibility",
     "//chrome/browser/ui/views/extensions:security_dialog_tracker",

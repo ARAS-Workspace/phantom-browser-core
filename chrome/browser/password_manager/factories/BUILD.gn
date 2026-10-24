@@ -26,8 +26,6 @@ source_set("factories") {
     "profile_password_store_factory.h",
   ]
   sources += [
-    "bulk_leak_check_service_factory.cc",
-    "bulk_leak_check_service_factory.h",
     "password_counter_factory.cc",
     "password_counter_factory.h",
   ]
@@ -37,7 +35,6 @@ source_set("factories") {
     "//base",
     "//chrome/browser:browser_process",
     "//chrome/browser/affiliations",
-    "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles",
     "//chrome/browser/signin",
     "//chrome/browser/sync:factories",
@@ -52,7 +49,6 @@ source_set("factories") {
     "//components/password_manager/core/browser/affiliation:affiliation_fetching",
     "//components/password_manager/core/browser/affiliation:affiliation_match_helper",
     "//components/password_manager/core/browser/features:password_features",
-    "//components/password_manager/core/browser/leak_detection",
     "//components/password_manager/core/browser/sharing",
     "//components/password_manager/core/common",
     "//components/pref_registry",

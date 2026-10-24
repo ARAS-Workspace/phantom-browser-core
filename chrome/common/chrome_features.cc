@@ -218,18 +218,6 @@ constexpr base::FeatureParam<int> kLinuxLowMemoryMonitorCriticalLevel{
     &kLinuxLowMemoryMonitor, "critical_level", 255};
 #endif  // BUILDFLAG(IS_LINUX)
 
-// When enabled, keyed services are instantiated lazily rather than eagerly at
-// startup.
-BASE_FEATURE(kLazyKeyedServiceInstantiation, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, autofill and password manager keyed services are instantiated
-// lazily.
-BASE_FEATURE_PARAM(bool,
-                   kLazyKeyedServiceInstantiationAutofillAndPassword,
-                   &features::kLazyKeyedServiceInstantiation,
-                   "autofill_and_password",
-                   true);
-
 // Enables the use of system notification centers instead of using the Message
 // Center for displaying the toasts. The feature is hardcoded to enabled for
 // Chrome OS.

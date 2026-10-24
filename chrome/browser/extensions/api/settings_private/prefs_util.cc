@@ -253,8 +253,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[password_manager::prefs::kAutomaticPasskeyUpgrades] =
       settings_api::PrefType::kBoolean;
-  (*s_allowlist)[password_manager::prefs::kAutomatedPasswordChangeEnabled] =
-      settings_api::PrefType::kBoolean;
   (*s_allowlist)[password_manager::prefs::kPasswordSharingEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[password_manager::prefs::kPasswordLeakDetectionEnabled] =
@@ -478,9 +476,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kNumber;
   (*s_allowlist)[optimization_guide::prefs::GetSettingEnabledPrefName(
       optimization_guide::UserVisibleFeatureKey::kHistorySearch)] =
-      settings_api::PrefType::kNumber;
-  (*s_allowlist)[optimization_guide::prefs::GetSettingEnabledPrefName(
-      optimization_guide::UserVisibleFeatureKey::kPasswordChangeSubmission)] =
       settings_api::PrefType::kNumber;
   (*s_allowlist)[optimization_guide::prefs::GetSettingEnabledPrefName(
       optimization_guide::UserVisibleFeatureKey::kContextualCueing)] =

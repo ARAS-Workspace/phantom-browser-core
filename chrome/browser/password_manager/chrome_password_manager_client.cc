@@ -36,8 +36,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history/history_tab_helper.h"
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
-#include "chrome/browser/password_manager/android/first_cct_page_load_marker.h"
-#include "chrome/browser/password_manager/chrome_password_change_service.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
@@ -45,7 +43,6 @@
 #include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_reuse_manager_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
-#include "chrome/browser/password_manager/password_change_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -419,14 +416,7 @@ void ChromePasswordManagerClient::NotifyStorePasswordCalled() {
 }
 
 bool ChromePasswordManagerClient::IsPasswordChangeOngoing() {
-  ChromePasswordChangeService* password_change_service =
-      PasswordChangeServiceFactory::GetForProfile(GetProfile());
-  if (!password_change_service) {
-    return false;
-  }
-
-  return password_change_service->GetPasswordChangeDelegate(web_contents()) !=
-         nullptr;
+  return false;
 }
 
 void ChromePasswordManagerClient::NotifyOnSuccessfulLogin(
@@ -570,7 +560,7 @@ ChromePasswordManagerClient::GetPasswordReuseManager() const {
 
 password_manager::PasswordChangeServiceInterface*
 ChromePasswordManagerClient::GetPasswordChangeService() const {
-  return PasswordChangeServiceFactory::GetForProfile(GetProfile());
+  return nullptr;
 }
 
 bool ChromePasswordManagerClient::WasLastNavigationHTTPError() const {

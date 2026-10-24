@@ -27,9 +27,7 @@
 #include "components/password_manager/core/browser/password_manager_client.h"
 #include "components/password_manager/core/browser/password_manager_constants.h"
 #include "components/password_manager/core/browser/password_manager_util.h"
-#include "components/password_manager/core/browser/password_sync_util.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_user_settings.h"
@@ -240,28 +238,4 @@ const gfx::VectorIcon& GooglePasswordManagerVectorIcon() {
 #else
   return features::IsRoundedIconsEnabled() ? kVpnKeyFilledIcon : kKeyOldIcon;
 #endif
-}
-
-std::optional<AccountInfo> GetAccountInfoForPasswordMessages(
-    syncer::SyncService* sync_service,
-    signin::IdentityManager* identity_manager) {
-  if (!password_manager::sync_util::HasChosenToSyncPasswords(sync_service)) {
-    return std::nullopt;
-  }
-  CoreAccountId account_id =
-      identity_manager->GetPrimaryAccountId(signin::ConsentLevel::kSignin);
-  return identity_manager->FindExtendedAccountInfoByAccountId(account_id);
-}
-
-std::string GetDisplayableAccountName(
-    syncer::SyncService* sync_service,
-    signin::IdentityManager* identity_manager) {
-  std::optional<AccountInfo> account_info =
-      GetAccountInfoForPasswordMessages(sync_service, identity_manager);
-  if (!account_info.has_value()) {
-    return "";
-  }
-  return account_info->CanHaveEmailAddressDisplayed()
-             ? std::string(account_info->GetEmail())
-             : std::string(account_info->GetFullName().value_or(""));
 }

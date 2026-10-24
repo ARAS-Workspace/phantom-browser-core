@@ -135,12 +135,6 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<int> kLinuxLowMemoryMonitorCriticalLevel;
 #endif  // BUILDFLAG(IS_LINUX)
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kLazyKeyedServiceInstantiation);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE_PARAM(bool,
-                           kLazyKeyedServiceInstantiationAutofillAndPassword);
-
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kNativeNotifications);
 
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kSystemNotifications);

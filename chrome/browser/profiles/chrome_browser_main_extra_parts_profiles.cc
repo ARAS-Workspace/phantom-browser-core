@@ -123,8 +123,6 @@
 #include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_reuse_manager_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
-#include "chrome/browser/password_manager/password_change_service_factory.h"
-#include "chrome/browser/password_manager/password_field_classification_model_handler_factory.h"
 #include "chrome/browser/performance_manager/persistence/site_data/site_data_cache_facade_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/permissions/one_time_permissions_tracker_factory.h"
@@ -254,7 +252,6 @@
 #include "chrome/browser/metrics/critical_user_journeys/critical_user_journey_service_factory.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_profile_session_durations_service_factory.h"
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
-#include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager_factory.h"
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
@@ -479,7 +476,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   browser_sync::UserEventServiceFactory::GetInstance();
   BrowserManagerServiceFactory::GetInstance();
   BrowsingDataHistoryObserverService::Factory::GetInstance();
-  BulkLeakCheckServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   CaptivePortalServiceFactory::GetInstance();
 #endif
@@ -623,8 +619,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   passage_embeddings::PassageEmbedderModelObserverFactory::GetInstance();
   password_manager::PasswordManagerLogRouterFactory::GetInstance();
   password_manager::PasswordRequirementsServiceFactory::GetInstance();
-  PasswordFieldClassificationModelHandlerFactory::GetInstance();
-  PasswordChangeServiceFactory::GetInstance();
   PasswordCounterFactory::GetInstance();
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   PasswordManagerBlocklistPolicyFactory::GetInstance();

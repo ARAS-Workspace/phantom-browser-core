@@ -244,7 +244,6 @@
 #include "components/no_state_prefetch/common/no_state_prefetch_final_status.h"
 #include "components/no_state_prefetch/common/no_state_prefetch_url_loader_throttle.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
-#include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/pdf/common/pdf_util.h"
 #include "components/performance_manager/public/graph/frame_node.h"
@@ -429,8 +428,6 @@
 #include "chrome/browser/webauthn/chrome_web_authentication_delegate.h"
 #include "chrome/grit/chrome_unscaled_resources.h"  // nogncheck crbug.com/40147906
 #include "components/keep_alive_registry/keep_alive_registry.h"
-#include "components/password_manager/content/common/web_ui_constants.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/webapps/isolated_web_apps/url_loading/url_loader_factory.h"
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 

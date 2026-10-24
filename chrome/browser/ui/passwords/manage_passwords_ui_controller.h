@@ -60,7 +60,6 @@ class CredentialLeakPrompt;
 class CredentialLeakDialogController;
 class CredentialManagerDialogController;
 class PasswordBaseDialogController;
-class ManagePasswordsPageActionController;
 class ManagePasswordsAutoSigninToastDelegate;
 
 // Per-tab class to control the Omnibox password icon and bubble.
@@ -170,8 +169,6 @@ class ManagePasswordsUIController
       const override;
   size_t GetTotalNumberCompromisedPasswords() const override;
   bool BubbleIsManualFallbackForSaving() const override;
-  const std::u16string& PasswordChangeUsername() const override;
-  const std::u16string& PasswordChangeNewPassword() const override;
   void OnBubbleShown() override;
   void OnBubbleHidden() override;
   void OnNoInteraction() override;
@@ -199,7 +196,6 @@ class ManagePasswordsUIController
   void AuthenticateUserWithMessage(const std::u16string& message,
                                    AvailabilityCallback callback) override;
   void RelaunchChrome() override;
-  void NavigateToPasswordChangeSettings() override;
   void OnMouseEntered() override;
   void OnMouseExited() override;
   // Returns true if the only blocking error is a trusted vault error.
@@ -243,9 +239,6 @@ class ManagePasswordsUIController
   void NavigateToPasswordCheckup(
       password_manager::PasswordCheckReferrer referrer) override;
   void OnLeakDialogHidden() override;
-  void OnPasswordChangeFinishedSuccessfully() override;
-  void ShowChangePasswordBubble(const std::u16string& username,
-                                const std::u16string& new_password) override;
 
   void ShowAutoSignInToast();
 
@@ -290,10 +283,6 @@ class ManagePasswordsUIController
   // content::WebContentsObserver:
   void PrimaryPageChanged(content::Page& page) override;
   void OnVisibilityChanged(content::Visibility visibility) override;
-
-  PasswordChangeDelegate* GetPasswordChangeDelegate() const override;
-
-  PasswordsLeakDialogDelegate* GetPasswordsLeakDialogDelegate() override;
 
  private:
   friend class content::WebContentsUserData<ManagePasswordsUIController>;
@@ -365,9 +354,6 @@ class ManagePasswordsUIController
   // Returns true if the password that is about to be changed was previously
   // phished.
   bool IsPendingPasswordPhished() const;
-
-  // Returns true if password changing is currently running.
-  bool IsPasswordChangeOngoing() const;
 
   // Invoked after a user accepted the update bubble. If the credentials were
   // not manually modified and if `password` is the backup password of an

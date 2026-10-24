@@ -52,7 +52,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
-#include "chrome/browser/password_manager/password_field_classification_model_handler_factory.h"
 #include "chrome/browser/personal_context/first_run/personal_context_first_run_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_eligibility_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
@@ -75,7 +74,6 @@
 #include "chrome/browser/ui/autofill/popup_controller_common.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
@@ -398,12 +396,6 @@ ChromeAutofillClient::GetAutofillFieldClassificationModelHandler() {
         web_contents()->GetBrowserContext());
   }
   return nullptr;
-}
-
-FieldClassificationModelHandler*
-ChromeAutofillClient::GetPasswordManagerFieldClassificationModelHandler() {
-  return PasswordFieldClassificationModelHandlerFactory::GetForBrowserContext(
-      web_contents()->GetBrowserContext());
 }
 
 PersonalDataManager& ChromeAutofillClient::GetPersonalDataManager() {

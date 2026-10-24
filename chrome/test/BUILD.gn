@@ -955,7 +955,6 @@ test("browser_tests") {
     "//chrome/browser/password_manager:impl",
     "//chrome/browser/password_manager:test_support",
     "//chrome/browser/password_manager:test_support_ui",
-    "//chrome/browser/password_manager/password_change",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:browser_tests",
     "//chrome/browser/permissions",
@@ -1523,13 +1522,7 @@ test("browser_tests") {
     deps += [ "//chrome/browser/guest_view" ]
   }
 
-  # TODO(crbug.com/437811373): Remove this dependency when
-  # c/b/ui/passwords/password_change_ui_controller.h gets built from
-  # `//c/b/ui/passwords:passwords`.
-  deps += [
-    "//chrome/browser/ui/passwords:impl",
-    "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
-  ]
+  deps += [ "//chrome/browser/ui/passwords:impl" ]
 
   allow_circular_includes_from = []
 
@@ -3347,7 +3340,6 @@ test("unit_tests") {
     "//chrome/browser/media:access_handler",
     "//chrome/browser/metrics/critical_user_journeys:unit_tests",
     "//chrome/browser/page_info:unit_tests",
-    "//chrome/browser/password_manager/password_change",
     "//chrome/browser/predictors:unit_tests",
     "//chrome/browser/predictors/lcp_critical_path_predictor:unit_tests",
     "//chrome/browser/privacy_sandbox:test_support",
@@ -3369,7 +3361,6 @@ test("unit_tests") {
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/extensions:unit_tests",
     "//chrome/browser/ui/passwords:test_support_ui",
-    "//chrome/browser/ui/passwords/bubble_controllers/password_change",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/performance_controls:unit_tests",
     "//chrome/browser/ui/record_replay:unit_tests",
@@ -3406,7 +3397,6 @@ test("unit_tests") {
     "//chrome/browser/ui/views/page_action:test_support",
     "//chrome/browser/ui/views/page_action:unit_tests",
     "//chrome/browser/ui/views/passwords:test_support",
-    "//chrome/browser/ui/views/passwords/password_change:successful_password_change_view",
     "//chrome/browser/ui/views/tabs/common:unit_tests",
     "//chrome/browser/ui/views/tabs/vertical:unit_tests",
     "//chrome/browser/ui/views/toolbar:unit_tests",
@@ -3462,13 +3452,7 @@ test("unit_tests") {
     "//components/webauthn/content/browser",
   ]
 
-  # TODO(crbug.com/437811373): Remove this dependency when
-  # c/b/ui/passwords/password_change_ui_controller.h gets built from
-  # `//c/b/ui/passwords:passwords`.
-  deps += [
-    "//chrome/browser/ui/passwords:impl",
-    "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
-  ]
+  deps += [ "//chrome/browser/ui/passwords:impl" ]
 
   if (is_mac) {
     deps += [ "//chrome/updater:browser_sources" ]

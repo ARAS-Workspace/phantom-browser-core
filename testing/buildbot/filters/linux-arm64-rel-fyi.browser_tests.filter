@@ -9,6 +9,5 @@
 -CrElementsTest.CrLazyList
 -ExtensionWebRequestApiTest.DISABLE_SecurityInfo_Secure
 -ExtensionWebRequestApiTest.DISABLE_SecurityInfo_WebSocket_Secure
--PasswordChangeUIControllerBrowserTest.PageIsInteractableWhileToastIsShowing
 -SecurityInfoBrokenWebRequestApiTest.DISABLE_SecurityInfo_Broken
 -SocketApiTest.SocketTCPExtension

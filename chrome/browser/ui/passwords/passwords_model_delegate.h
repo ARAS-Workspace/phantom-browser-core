@@ -10,7 +10,6 @@
 
 #include "base/functional/callback.h"
 #include "base/memory/weak_ptr.h"
-#include "chrome/browser/ui/passwords/passwords_leak_dialog_delegate.h"
 #include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/password_manager/core/browser/ui/password_check_referrer.h"
 #include "components/password_manager/core/common/credential_manager_types.h"
@@ -29,7 +28,6 @@ enum class CredentialSourceType;
 enum class MoveToAccountStoreTrigger;
 }  // namespace metrics_util
 }  // namespace password_manager
-class PasswordChangeDelegate;
 
 // An interface for ManagePasswordsBubbleModel implemented by
 // ManagePasswordsUIController. Allows to retrieve the current state of the tab
@@ -87,13 +85,6 @@ class PasswordsModelDelegate {
 
   // Returns true iff the current bubble is the manual fallback for saving.
   virtual bool BubbleIsManualFallbackForSaving() const = 0;
-
-  // Returns username of a password that was updated during a recent password
-  // change flow.
-  virtual const std::u16string& PasswordChangeUsername() const = 0;
-
-  // Returns password that was generated during a recent password change flow.
-  virtual const std::u16string& PasswordChangeNewPassword() const = 0;
 
   // Called from the model when the bubble is displayed.
   virtual void OnBubbleShown() = 0;
@@ -188,14 +179,6 @@ class PasswordsModelDelegate {
 
   // Called from the Relaunch Chrome bubble to gracefully restart the Chrome.
   virtual void RelaunchChrome() = 0;
-
-  // Returns the delegate for the password change flow.
-  virtual PasswordChangeDelegate* GetPasswordChangeDelegate() const = 0;
-
-  virtual PasswordsLeakDialogDelegate* GetPasswordsLeakDialogDelegate() = 0;
-
-  // Opens the password change settings page as a separate tab.
-  virtual void NavigateToPasswordChangeSettings() = 0;
 
   // Called when the mouse enters the bubble view.
   virtual void OnMouseEntered() = 0;

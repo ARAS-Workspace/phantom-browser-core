@@ -448,10 +448,6 @@ source_set("extensions") {
     # enterprise headers include extension_management.h.
     "//chrome/browser/enterprise",
 
-    # password_manager:impl includes
-    # extensions/api/settings_private/generated_pref.h
-    "//chrome/browser/password_manager:impl",
-
     # ssl includes extensions/api/settings_private/generated_pref.h via
     # generated_https_first_mode_pref.h.
     "//chrome/browser/ssl",
@@ -501,9 +497,6 @@ source_set("extensions") {
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/net",
     "//chrome/browser/notifications",
-    "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager:impl",
-    "//chrome/browser/password_manager/factories",
     "//chrome/browser/prefetch",
     "//chrome/browser/prefs",
     "//chrome/browser/prefs:util",
@@ -803,7 +796,6 @@ source_set("extensions") {
       "//chrome/browser:font_pref",
       "//chrome/browser:primitives",
       "//chrome/browser/accessibility/tree_fixing:prefs",
-      "//chrome/browser/affiliations",
       "//chrome/browser/apps:user_type_filter",
       "//chrome/browser/importer",
       "//chrome/browser/language",
@@ -834,7 +826,6 @@ source_set("extensions") {
       "//chrome/browser/ui/window_sizer",
       "//chrome/browser/ui/zoom",
       "//chrome/browser/webauthn",
-      "//components/password_manager/core/browser/form_parsing",
       "//components/services/app_service",
 
       # Only for allow_circular_includes_from
@@ -863,7 +854,6 @@ source_set("extensions") {
       "//chrome/common/extensions/api:extensions_features",
       "//chrome/services/file_util/public/mojom",
       "//chrome/services/removable_storage_writer/public/mojom",
-      "//components/affiliations/core/browser:affiliations",
       "//components/app_constants",
       "//components/autofill/content/browser",
       "//components/autofill/core/common:credit_card_number_validation",
@@ -888,13 +878,6 @@ source_set("extensions") {
       "//components/net_log",
       "//components/onc",
       "//components/page_load_metrics/browser",
-      "//components/password_manager/content/browser",
-      "//components/password_manager/core/browser",
-      "//components/password_manager/core/browser/export",
-      "//components/password_manager/core/browser/features:password_features",
-      "//components/password_manager/core/browser/import:importer",
-      "//components/password_manager/core/browser/leak_detection",
-      "//components/password_manager/core/browser/sharing",
       "//components/performance_manager",
       "//components/permissions",
       "//components/policy:generated",
@@ -1537,21 +1520,13 @@ source_set("unit_tests") {
     ]
 
     deps += [
-      "//chrome/browser/affiliations",
       "//chrome/browser/custom_handlers",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/password_manager:test_support",
       "//chrome/browser/ui/global_error:test_support",
       "//chrome/browser/web_applications:web_app_test",
       "//chrome/browser/web_applications:web_applications_test_support",
       "//chrome/browser/webapps:desktop",
       "//chrome/browser/webauthn:test_support",
-      "//components/affiliations/core/browser:test_support",
       "//components/device_reauth:test_support",
-      "//components/password_manager/content/browser",
-      "//components/password_manager/core/browser/leak_detection:test_support",
-      "//components/password_manager/core/browser/sharing",
-      "//components/password_manager/core/browser/sharing:test_support",
       "//components/webauthn/core/browser:test_support",
       "//ui/base/clipboard:clipboard_test_support",
     ]
@@ -2028,7 +2003,6 @@ source_set("browser_tests") {
 
     deps += [
       "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser/affiliations",
       "//chrome/browser/apps/app_service",
       "//chrome/browser/autofill",
       "//chrome/browser/background",
@@ -2042,8 +2016,6 @@ source_set("browser_tests") {
       "//chrome/browser/extensions/api/messaging:browser_tests",
       "//chrome/browser/extensions/api/messaging:test_support",
       "//chrome/browser/extensions/api/mime_handlers:browser_tests",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/password_manager:test_support",
       "//chrome/browser/pdf:pdf_extension_test_utils",
       "//chrome/browser/prefetch",
       "//chrome/browser/tab_list",
@@ -2067,7 +2039,6 @@ source_set("browser_tests") {
       "//chrome/common/extensions/api",
       "//chrome/renderer/controlled_frame",
       "//chrome/services/media_gallery_util/public/cpp:browser_tests",
-      "//components/affiliations/core/browser:test_support",
       "//components/autofill/core/common:features",
       "//components/client_hints/browser",
       "//components/consent_auditor",

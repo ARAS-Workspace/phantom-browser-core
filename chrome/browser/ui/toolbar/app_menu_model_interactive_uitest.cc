@@ -38,7 +38,6 @@
 #include "chrome/test/interaction/webcontents_interaction_test_util.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/crx_file/id_util.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/performance_manager/public/features.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/vector_icons/vector_icons.h"
@@ -348,44 +347,4 @@ IN_PROC_BROWSER_TEST_P(AppMenuModelExtensionsInteractiveTest,
                                 MENU_ACTION_FIND_EXTENSIONS, collapse ? 1 : 0);
   histograms_.ExpectBucketCount("WrenchMenu.MenuAction",
                                 MENU_ACTION_MANAGE_EXTENSIONS, 0);
-}
-
-class PasswordManagerMenuItemInteractiveTest
-    : public AppMenuModelInteractiveTest,
-      public testing::WithParamInterface<bool> {
- public:
-  PasswordManagerMenuItemInteractiveTest() = default;
-  PasswordManagerMenuItemInteractiveTest(
-      const PasswordManagerMenuItemInteractiveTest&) = delete;
-  void operator=(const PasswordManagerMenuItemInteractiveTest&) = delete;
-
-  ~PasswordManagerMenuItemInteractiveTest() override = default;
-};
-
-IN_PROC_BROWSER_TEST_F(PasswordManagerMenuItemInteractiveTest,
-                       PasswordManagerMenuItem) {
-  base::HistogramTester histograms;
-
-  RunTestSequence(InstrumentTab(kPrimaryTabPageElementId),
-                  PressButton(kToolbarAppMenuButtonElementId),
-                  SelectMenuItem(AppMenuModel::kPasswordAndAutofillMenuItem),
-                  SelectMenuItem(AppMenuModel::kPasswordManagerMenuItem),
-                  WaitForWebContentsNavigation(
-                      kPrimaryTabPageElementId,
-                      GURL("chrome://password-manager/passwords")));
-
-  histograms.ExpectTotalCount("WrenchMenu.TimeToAction.ShowPasswordManager", 1);
-  histograms.ExpectBucketCount("WrenchMenu.MenuAction",
-                               MENU_ACTION_SHOW_PASSWORD_MANAGER, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(PasswordManagerMenuItemInteractiveTest,
-                       NoMenuItemOnPasswordManagerPage) {
-  RunTestSequence(
-      AddInstrumentedTab(kPrimaryTabPageElementId,
-                         GURL("chrome://password-manager/passwords")),
-      WaitForWebContentsReady(kPrimaryTabPageElementId,
-                              GURL("chrome://password-manager/passwords")),
-      PressButton(kToolbarAppMenuButtonElementId),
-      EnsureNotPresent(AppMenuModel::kPasswordManagerMenuItem));
 }

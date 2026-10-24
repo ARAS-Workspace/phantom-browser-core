@@ -61,7 +61,6 @@
 #include "chrome/browser/navigation_predictor/navigation_predictor_features.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/policy/chrome_policy_blocklist_service_factory.h"
 #include "chrome/browser/predictors/loading_predictor.h"
@@ -136,7 +135,6 @@
 #include "components/autofill/content/browser/content_autofill_driver.h"
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/autofill/core/common/password_generation_util.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/content_extraction/content/browser/inner_text.h"
 #include "components/custom_handlers/protocol_handler.h"
@@ -147,9 +145,6 @@
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
-#include "components/password_manager/content/browser/content_password_manager_driver.h"
-#include "components/password_manager/core/browser/password_manager_metrics_util.h"
-#include "components/password_manager/core/browser/password_manager_util.h"
 #include "components/pdf/common/pdf_util.h"
 #include "components/policy/core/browser/url_list/policy_blocklist_service.h"
 #include "components/policy/core/common/policy_pref_names.h"
@@ -2502,7 +2497,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_VIDEO_FRAME:
     case kOpenLinkWithMenuId:
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
-    case IDC_CONTENT_CONTEXT_GENERATEPASSWORD:
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       return true;
 
@@ -2950,13 +2944,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
 
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
       ExecProtocolHandlerSettings(event_flags);
-      break;
-
-    case IDC_CONTENT_CONTEXT_GENERATEPASSWORD:
-      password_manager_util::UserTriggeredManualGenerationFromContextMenu(
-          ChromePasswordManagerClient::FromWebContents(source_web_contents_),
-          autofill::ContentAutofillClient::FromWebContents(
-              source_web_contents_));
       break;
 
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:

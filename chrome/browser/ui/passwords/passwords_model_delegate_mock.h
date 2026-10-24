@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "base/memory/weak_ptr.h"
-#include "chrome/browser/ui/passwords/passwords_leak_dialog_delegate.h"
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
 #include "components/password_manager/core/browser/password_form.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -58,14 +57,6 @@ class PasswordsModelDelegateMock : public PasswordsModelDelegate {
               (const override));
   MOCK_METHOD(size_t, GetTotalNumberCompromisedPasswords, (), (const override));
   MOCK_METHOD(bool, BubbleIsManualFallbackForSaving, (), (const override));
-  MOCK_METHOD(const std::u16string&,
-              PasswordChangeUsername,
-              (),
-              (const override));
-  MOCK_METHOD(const std::u16string&,
-              PasswordChangeNewPassword,
-              (),
-              (const override));
   MOCK_METHOD(void, OnBubbleShown, (), (override));
   MOCK_METHOD(void, OnBubbleHidden, (), (override));
   MOCK_METHOD(void, OnNoInteraction, (), (override));
@@ -117,15 +108,6 @@ class PasswordsModelDelegateMock : public PasswordsModelDelegate {
               (const std::u16string&, const password_manager::PasswordForm&),
               (override));
   MOCK_METHOD(void, RelaunchChrome, (), (override));
-  MOCK_METHOD(PasswordChangeDelegate*,
-              GetPasswordChangeDelegate,
-              (),
-              (const override));
-  MOCK_METHOD(PasswordsLeakDialogDelegate*,
-              GetPasswordsLeakDialogDelegate,
-              (),
-              (override));
-  MOCK_METHOD(void, NavigateToPasswordChangeSettings, (), (override));
   MOCK_METHOD(void, OnMouseEntered, (), (override));
   MOCK_METHOD(void, OnMouseExited, (), (override));
   MOCK_METHOD(void,

@@ -14,6 +14,7 @@
 #include "base/i18n/time_formatting.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_number_conversions.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/values.h"
 #include "chrome/browser/autofill/autofill_ai_model_cache_factory.h"
@@ -38,11 +39,6 @@
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/grit/autofill_and_password_manager_internals_resources.h"
 #include "components/grit/autofill_and_password_manager_internals_resources_map.h"
-#include "components/password_manager/content/browser/content_password_manager_driver_factory.h"
-#include "components/password_manager/core/browser/password_change_service_interface.h"
-#include "components/password_manager/core/browser/password_manager_client.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
 #include "components/webui/version/version_handler_helper.h"
 #include "components/webui/version/version_ui_constants.h"
@@ -168,10 +164,6 @@ void InternalsUIHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "setDomNodeId", base::BindRepeating(&InternalsUIHandler::SetDomNodeId,
                                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "setPasswordChangeOverrideUrl",
-      base::BindRepeating(&InternalsUIHandler::OnSetPasswordChangeOverrideUrl,
-                          base::Unretained(this)));
 }
 
 void InternalsUIHandler::OnJavascriptAllowed() {
@@ -571,27 +563,6 @@ void InternalsUIHandler::EndSubscription() {
       get_log_router_function_.Run(Profile::FromWebUI(web_ui()));
   if (log_router) {
     log_router->UnregisterReceiver(this);
-  }
-}
-
-void InternalsUIHandler::OnSetPasswordChangeOverrideUrl(
-    const base::ListValue& args) {
-  if (args.size() != 1 || !args[0].is_string()) {
-    return;
-  }
-  password_manager::ContentPasswordManagerDriverFactory* factory =
-      password_manager::ContentPasswordManagerDriverFactory::FromWebContents(
-          web_ui()->GetWebContents());
-  if (factory) {
-    password_manager::PasswordManagerClient* client =
-        factory->password_client();
-    if (client) {
-      password_manager::PasswordChangeServiceInterface* service =
-          client->GetPasswordChangeService();
-      if (service) {
-        service->AddChangePasswordUrlOverride(GURL(args[0].GetString()));
-      }
-    }
   }
 }
 

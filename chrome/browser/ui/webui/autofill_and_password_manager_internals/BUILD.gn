@@ -8,8 +8,6 @@ source_set("autofill_and_password_manager_internals") {
     "autofill_internals_ui.h",
     "internals_ui_handler.cc",
     "internals_ui_handler.h",
-    "password_manager_internals_ui.cc",
-    "password_manager_internals_ui.h",
   ]
 
   public_deps = [
@@ -29,10 +27,6 @@ source_set("autofill_and_password_manager_internals") {
     "//components/autofill/core/common:features",
     "//components/device_reauth",
     "//components/embedder_support:user_agent",
-    "//components/password_manager/content/browser",
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/common",
-    "//components/prefs",
     "//components/version_info",
     "//components/webui/version",
     "//services/network/public/mojom:mojom_content_security_policy",

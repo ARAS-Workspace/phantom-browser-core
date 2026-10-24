@@ -126,7 +126,6 @@ source_set("impl") {
       "//chrome/browser/ui/color:color_headers",
       "//chrome/browser/ui/find_bar",
       "//chrome/browser/ui/omnibox",
-      "//chrome/browser/ui/passwords",
       "//chrome/browser/ui/record_replay",
       "//chrome/browser/ui/search",
       "//chrome/browser/ui/tabs:tabs_public",

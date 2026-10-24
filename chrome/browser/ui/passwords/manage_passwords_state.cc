@@ -313,22 +313,12 @@ void ManagePasswordsState::OpenPasswordDetailsBubble(
   SetState(password_manager::ui::State::MANAGE_STATE);
 }
 
-void ManagePasswordsState::OpenPasswordChangedBubble(
-    const std::u16string& username,
-    const std::u16string& new_password) {
-  password_change_username_ = username;
-  password_change_new_password_ = new_password;
-  SetState(password_manager::ui::State::PASSWORD_CHANGE_STATE);
-}
-
 void ManagePasswordsState::ClearData() {
   form_manager_.reset();
   clear_selected_password();
   local_credentials_forms_.clear();
   credentials_callback_.Reset();
   single_credential_mode_credential_.reset();
-  password_change_username_.clear();
-  password_change_new_password_.clear();
 }
 
 bool ManagePasswordsState::AddForm(const PasswordForm& form) {

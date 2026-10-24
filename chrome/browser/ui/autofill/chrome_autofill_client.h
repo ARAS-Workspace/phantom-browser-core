@@ -130,8 +130,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
       const final;
   FieldClassificationModelHandler* GetAutofillFieldClassificationModelHandler()
       final;
-  FieldClassificationModelHandler*
-  GetPasswordManagerFieldClassificationModelHandler() final;
   PersonalDataManager& GetPersonalDataManager() final;
   ValuablesDataManager* GetValuablesDataManager() final;
   EntityDataManager* GetEntityDataManager() final;

@@ -44,12 +44,6 @@
         <structure type="lottie" name="IDR_AUTOFILL_TURN_ON_PAYMENTS_AUTOFILL_CONVENIENTLY_LOTTIE" file="resources/autofill/autofill_turn_on_payments_autofill_conveniently.json" compress="brotli"/>
         <structure type="lottie" name="IDR_AUTOFILL_WALLET_REMINDER_NOTICE_LOTTIE" file="resources/autofill/autofill_wallet_reminder_notice.json" compress="brotli"/>
 
-
-        <!-- Automated Password Change resources -->
-        <structure type="lottie" name="IDR_PASSWORD_CHANGE_SUCCESS_LOTTIE" file="resources/automated_password_change/password_change_success.json" compress="brotli"/>
-        <structure type="lottie" name="IDR_PASSWORD_CHANGE_NEUTRAL_LOTTIE" file="resources/automated_password_change/password_change_neutral.json" compress="brotli"/>
-        <structure type="lottie" name="IDR_PASSWORD_CHANGE_WARNING_LOTTIE" file="resources/automated_password_change/password_change_warning.json" compress="brotli"/>
-
         <!-- Toolbar Lottie resources -->
         <structure type="lottie" name="IDR_PAGE_INFO_LOTTIE" file="resources/toolbar/page_info.json" compress="brotli" />
         <structure type="lottie" name="IDR_RELOAD_LOTTIE" file="resources/toolbar/reload.json" compress="brotli" />

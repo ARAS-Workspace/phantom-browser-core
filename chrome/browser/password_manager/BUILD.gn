@@ -9,13 +9,9 @@ import("//components/signin/features.gni")
 source_set("password_manager") {
   sources = []
   public = [
-    "chrome_password_change_service.h",
     "chrome_password_manager_client.h",
     "chrome_webauthn_credentials_delegate.h",
     "chrome_webauthn_credentials_delegate_factory.h",
-    "password_change_delegate.h",
-    "password_change_service_factory.h",
-    "password_field_classification_model_handler_factory.h",
   ]
 
   public_deps = [
@@ -47,10 +43,7 @@ source_set("password_manager") {
     "//url",
   ]
 
-  deps = [
-    "//components/affiliations/core/browser:affiliations",
-    "//components/optimization_guide/core",
-  ]
+  deps = [ "//components/affiliations/core/browser:affiliations" ]
 
   if (is_mac) {
     frameworks = [
@@ -62,13 +55,6 @@ source_set("password_manager") {
     sources += [ "password_manager_util_mac.mm" ]
   }
 
-  public += [
-    # TODO(crbug.com/485620841): Make delegate not dependent on client and
-    # move this back to /password_change.
-    "password_change/password_change_actuator.h",
-  ]
-  public_deps += [ "//chrome/browser/password_manager/password_change" ]
-
   if (enable_dice_support) {
     public += [ "multi_profile_credentials_filter.h" ]
   }
@@ -76,12 +62,9 @@ source_set("password_manager") {
 
 source_set("impl") {
   sources = [
-    "chrome_password_change_service.cc",
     "chrome_password_manager_client.cc",
     "chrome_webauthn_credentials_delegate.cc",
     "chrome_webauthn_credentials_delegate_factory.cc",
-    "password_change_service_factory.cc",
-    "password_field_classification_model_handler_factory.cc",
   ]
 
   public_deps = [
@@ -91,19 +74,15 @@ source_set("impl") {
 
   deps = [
     "//chrome/browser/affiliations",
-    "//chrome/browser/autofill",
     "//chrome/browser/critical_actions",
     "//chrome/browser/device_reauth",
     "//chrome/browser/favicon",
     "//chrome/browser/history",
     "//chrome/browser/metrics",
-    "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/signin",
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",
-    "//chrome/browser/tab_contents",
-    "//chrome/browser/ui/autofill",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/passwords",
     "//chrome/browser/webauthn",
@@ -138,17 +117,9 @@ source_set("impl") {
     "//extensions/buildflags",
   ]
 
-  sources += [
-    "password_change/script_password_change_actuator.cc",
-    "password_change/script_password_change_actuator.h",
-    "password_change_delegate_impl.cc",
-    "password_change_delegate_impl.h",
-  ]
   deps += [
-    "//chrome/browser/password_manager/password_change",
     "//chrome/browser/ui/passwords",
     "//chrome/browser/ui/passwords:impl",
-    "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/user_education",
   ]
 
@@ -187,8 +158,6 @@ source_set("test_support") {
 
   # These helpers are used by tests on all platforms, including Android.
   sources = [
-    "password_change_delegate_mock.cc",
-    "password_change_delegate_mock.h",
     "password_manager_test_util.cc",
     "password_manager_test_util.h",
     "passwords_navigation_observer.cc",

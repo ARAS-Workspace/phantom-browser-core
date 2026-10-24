@@ -46,7 +46,6 @@
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"

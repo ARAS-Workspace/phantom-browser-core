@@ -62,9 +62,8 @@ class AutofillCacheResetter : public content::BrowsingDataRemover::Observer {
   Callback callback_;
 };
 
-// UI handler for chrome://password-manager-internals and
-// chrome://autofill-internals that takes care of subscribing to the autofill
-// logging instance.
+// UI handler for chrome://autofill-internals that takes care of subscribing to
+// the autofill logging instance.
 class InternalsUIHandler
     : public content::WebUIMessageHandler,
       public LogReceiver,
@@ -122,7 +121,6 @@ class InternalsUIHandler
   void OnLoaded(const base::ListValue& args);
   void OnResetCache(const base::ListValue& args);
   void OnDumpAddresses(const base::ListValue& args);
-  void OnSetPasswordChangeOverrideUrl(const base::ListValue& args);
   void CheckAtMemoryPermissions(const base::ListValue& args);
   void CheckAutofillAiPermissions(const base::ListValue& args);
   void SetDomNodeId(const base::ListValue& args);

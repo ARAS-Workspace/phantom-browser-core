@@ -120,7 +120,6 @@
 #include "components/page_content_annotations/content/page_content_annotations_web_contents_observer.h"
 #include "components/page_content_annotations/core/page_content_extraction_types.h"
 #include "components/page_info/core/features.h"
-#include "components/password_manager/core/browser/password_manager.h"
 #include "components/performance_manager/embedder/performance_manager_registry.h"
 #include "components/performance_manager/public/features.h"
 #include "components/permissions/features.h"
