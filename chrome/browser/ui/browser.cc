@@ -128,7 +128,6 @@
 #include "components/javascript_dialogs/tab_modal_dialog_manager.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
-#include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 #include "components/page_load_metrics/common/page_load_metrics.mojom.h"
 #include "components/paint_preview/buildflags/buildflags.h"

@@ -1069,10 +1069,6 @@
     "META": {"sizes": {"includes": [5]}},
     "includes": [7395],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/components/optimization_guide/optimization_guide_internals/resources/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [7400],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/components/policy/resources/webui/resources.grd": {
     "META": {"sizes": {"includes": [50]}},
     "includes": [7420],

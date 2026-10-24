@@ -88,24 +88,6 @@ class ModelQualityLogEntryTest : public testing::Test {
   TestModelQualityLogsUploaderService uploader_;
 };
 
-TEST_F(ModelQualityLogEntryTest, UploadOnDestruction) {
-  {
-    auto log = std::make_unique<ModelQualityLogEntry>(uploader());
-    AddComposeLoggingData(log->log_ai_data_request());
-  }  // ModelQualityLogEntry destroyed, this should trigger an upload.
-
-  EXPECT_EQ(1, NumPendingUploads());
-}
-
-TEST_F(ModelQualityLogEntryTest, Upload_WithNonEmptyLog_SchedulesAnUpload) {
-  auto log = std::make_unique<ModelQualityLogEntry>(uploader());
-  AddComposeLoggingData(log->log_ai_data_request());
-
-  ModelQualityLogEntry::Upload(std::move(log));
-
-  EXPECT_EQ(1, NumPendingUploads());
-}
-
 TEST_F(ModelQualityLogEntryTest, Upload_WithEmptyLog_DoesNotScheduleAnUpload) {
   ModelQualityLogEntry::Upload(
       std::make_unique<ModelQualityLogEntry>(uploader()));

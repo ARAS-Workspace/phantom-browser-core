@@ -41,9 +41,6 @@ class OptimizationGuideWebContentsObserver
 
   ~OptimizationGuideWebContentsObserver() override;
 
-  // Notifies |this| to flush |last_navigation_data| so metrics are recorded.
-  void FlushLastNavigationData();
-
  private:
   friend class content::WebContentsUserData<
       OptimizationGuideWebContentsObserver>;

@@ -20,7 +20,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
 #include "ui/base/l10n/l10n_util.h"

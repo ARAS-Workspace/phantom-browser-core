@@ -8,7 +8,6 @@
 #include "base/observer_list.h"
 #include "components/optimization_guide/core/delivery/optimization_guide_model_provider.h"
 #include "components/optimization_guide/core/optimization_guide_logger.h"
-#include "components/optimization_guide/optimization_guide_internals/webui/optimization_guide_internals.mojom.h"
 
 namespace optimization_guide {
 
@@ -46,9 +45,6 @@ class ModelProviderRegistry final : public OptimizationGuideModelProvider {
   // Returns the current model for the target, or nullptr if one is not
   // available yet.
   const ModelInfo* GetModel(proto::OptimizationTarget target) const;
-  // Gets information about all the available models.
-  std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
-  GetDownloadedModelsInfoForWebUI() const;
   // Updates the model for `optimization_target` and notifies observers.
   void UpdateModel(proto::OptimizationTarget optimization_target,
                    ModelInfo model_info);

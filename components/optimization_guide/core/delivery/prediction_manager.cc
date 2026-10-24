@@ -44,7 +44,6 @@
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/optimization_guide/core/optimization_guide_switches.h"
 #include "components/optimization_guide/core/optimization_guide_util.h"
-#include "components/optimization_guide/optimization_guide_internals/webui/optimization_guide_internals.mojom.h"
 #include "components/optimization_guide/proto/models.pb.h"
 #include "components/prefs/pref_service.h"
 #include "components/services/unzip/public/cpp/unzip.h"
@@ -198,12 +197,6 @@ void PredictionManager::OnModelReady(const base::FilePath& base_model_dir,
                           /*record_availability_metrics=*/false,
                           ModelInfo::CreateFromProto(model));
   }
-}
-
-std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
-PredictionManager::GetDownloadedModelsInfoForWebUI() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return registry_.GetDownloadedModelsInfoForWebUI();
 }
 
 base::flat_map<std::string, bool>

@@ -43,14 +43,11 @@ TEST_F(OptimizationGuideFeaturesTest, ModelQualityLoggingDefault) {
 
   EXPECT_TRUE(features::IsModelQualityLoggingEnabled());
 
-  // Compose and wallpaper search should be enabled by
-  // default whereas product specifications should be disabled by default.
+  // Compose should be enabled by default whereas product specifications should
+  // be disabled by default.
   MqlsFeatureRegistry& registry = MqlsFeatureRegistry::GetInstance();
   EXPECT_TRUE(features::IsModelQualityLoggingEnabledForFeature(
       registry.GetFeature(proto::LogAiDataRequest::FeatureCase::kCompose)));
-  EXPECT_TRUE(
-      features::IsModelQualityLoggingEnabledForFeature(registry.GetFeature(
-          proto::LogAiDataRequest::FeatureCase::kWallpaperSearch)));
   EXPECT_FALSE(
       features::IsModelQualityLoggingEnabledForFeature(registry.GetFeature(
           proto::LogAiDataRequest::FeatureCase::kProductSpecifications)));
@@ -79,10 +76,6 @@ TEST_F(OptimizationGuideFeaturesTest, ComposeModelQualityLoggingDisabled) {
 
   EXPECT_TRUE(features::IsModelQualityLoggingEnabled());
   EXPECT_FALSE(features::IsModelQualityLoggingEnabledForFeature(metadata));
-  // WallpaperSearch should still be enabled.
-  EXPECT_TRUE(
-      features::IsModelQualityLoggingEnabledForFeature(registry.GetFeature(
-          proto::LogAiDataRequest::FeatureCase::kWallpaperSearch)));
 }
 
 TEST_F(OptimizationGuideFeaturesTest, ModelQualityLoggingDisabled) {
@@ -95,9 +88,6 @@ TEST_F(OptimizationGuideFeaturesTest, ModelQualityLoggingDisabled) {
   MqlsFeatureRegistry& registry = MqlsFeatureRegistry::GetInstance();
   EXPECT_FALSE(features::IsModelQualityLoggingEnabledForFeature(
       registry.GetFeature(proto::LogAiDataRequest::FeatureCase::kCompose)));
-  EXPECT_FALSE(
-      features::IsModelQualityLoggingEnabledForFeature(registry.GetFeature(
-          proto::LogAiDataRequest::FeatureCase::kWallpaperSearch)));
 }
 
 TEST_F(OptimizationGuideFeaturesTest,

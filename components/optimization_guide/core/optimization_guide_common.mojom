@@ -5,8 +5,6 @@
 module optimization_guide_common.mojom;
 
 // Source (or category) of the log message.
-// Must be kept in sync with |getLogSource| method in
-// optimization_guide_internals/resources/optimization_guide_internals.ts.
 enum LogSource {
   SERVICE_AND_SETTINGS,
   HINTS,

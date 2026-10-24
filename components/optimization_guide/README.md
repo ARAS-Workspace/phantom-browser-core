@@ -19,8 +19,6 @@ to enable it to be easily used on all platforms.
 
 * public/: Mojom interfaces exposed to sandboxed processes
 
-* optimization_guide_internals/: WebUI for chrome://optimization-guide-internals
-
 ## Related Directories
 
 In addition to regular consumers of these services, this code has special relationships with code in the following directories:

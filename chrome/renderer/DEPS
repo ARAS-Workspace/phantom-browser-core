@@ -37,7 +37,6 @@ include_rules = [
   "+components/page_content_annotations/content/renderer",
   "+components/page_content_annotations/core",
   "+components/optimization_guide/content/renderer",
-  "+components/optimization_guide/core",
   "+components/page_load_metrics/common",
   "+components/page_load_metrics/renderer",
   "+components/paint_preview/buildflags",

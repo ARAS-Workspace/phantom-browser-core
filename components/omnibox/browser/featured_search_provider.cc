@@ -32,7 +32,6 @@
 #include "components/omnibox/browser/suggestion_group_util.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"

@@ -27,8 +27,8 @@
 #include "components/optimization_guide/core/delivery/model_provider_registry.h"
 #include "components/optimization_guide/core/delivery/prediction_model_store.h"
 #include "components/optimization_guide/core/optimization_guide_enums.h"
-#include "components/optimization_guide/optimization_guide_internals/webui/optimization_guide_internals.mojom.h"
 #include "components/optimization_guide/proto/models.pb.h"
+#include "mojo/public/cpp/bindings/pending_remote.h"
 #include "url/origin.h"
 
 namespace network {
@@ -85,8 +85,6 @@ class PredictionManager : public OptimizationGuideModelProvider {
   // PredictionModelDownloadObserver:
   void OnModelReady(const base::FilePath& base_model_dir,
                     const proto::PredictionModel& model);
-  std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
-  GetDownloadedModelsInfoForWebUI() const;
 
   base::flat_map<std::string, bool> GetOnDeviceSupplementaryModelsInfoForWebUI()
       const;

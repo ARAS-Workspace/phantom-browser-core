@@ -13,7 +13,7 @@
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/strings/grit/components_strings.h"
-#include "omnibox_event.pb.h"
+#include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/omnibox_proto/groups.pb.h"
 #include "ui/base/l10n/l10n_util.h"
 

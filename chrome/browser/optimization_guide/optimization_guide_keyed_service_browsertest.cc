@@ -58,7 +58,6 @@
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
-#include "components/ukm/test_ukm_recorder.h"
 #include "components/variations/hashing.h"
 #include "components/variations/service/variations_service.h"
 #include "content/public/browser/navigation_handle.h"
@@ -67,8 +66,6 @@
 #include "content/public/test/browser_test_utils.h"
 #include "net/test/embedded_test_server/http_request.h"
 #include "net/test/embedded_test_server/http_response.h"
-#include "services/metrics/public/cpp/ukm_builders.h"
-#include "services/metrics/public/cpp/ukm_source.h"
 #include "services/network/public/cpp/network_connection_tracker.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_network_connection_tracker.h"
@@ -572,7 +569,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   PushHintsComponentAndWaitForCompletion();
   RegisterWithKeyedService();
 
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
   base::HistogramTester histogram_tester;
 
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url_with_hints()));
@@ -587,61 +583,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   // We had a hint and it was loaded.
   EXPECT_EQ(OptimizationGuideDecision::kTrue,
             last_can_apply_optimization_decision());
-
-  // Navigate away so metrics get recorded.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url_with_hints()));
-
-  // Expect that UKM is recorded.
-  auto entries = ukm_recorder.GetEntriesByName(
-      ukm::builders::OptimizationGuide::kEntryName);
-  EXPECT_EQ(1u, entries.size());
-  auto* entry = entries[0].get();
-  EXPECT_TRUE(ukm_recorder.EntryHasMetric(
-      entry,
-      ukm::builders::OptimizationGuide::kRegisteredOptimizationTypesName));
-
-  const int64_t* entry_metric = ukm_recorder.GetEntryMetric(
-      entry,
-      ukm::builders::OptimizationGuide::kRegisteredOptimizationTypesName);
-  EXPECT_TRUE(*entry_metric & (1 << proto::NOSCRIPT));
-}
-
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       RecordsMetricsWhenTabHidden) {
-  PushHintsComponentAndWaitForCompletion();
-  RegisterWithKeyedService();
-
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histogram_tester;
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url_with_hints()));
-
-  EXPECT_GT(RetryForHistogramUntilCountReached(
-                &histogram_tester, "OptimizationGuide.LoadedHint.Result", 1),
-            0);
-  // There is a hint that matches this URL, so there should be an attempt to
-  // load a hint that succeeds.
-  histogram_tester.ExpectUniqueSample("OptimizationGuide.LoadedHint.Result",
-                                      true, 1);
-  // We had a hint and it was loaded.
-  EXPECT_EQ(OptimizationGuideDecision::kTrue,
-            last_can_apply_optimization_decision());
-
-  // Make sure metrics get recorded when tab is hidden.
-  browser()->tab_strip_model()->GetActiveWebContents()->WasHidden();
-
-  // Expect that the optimization guide UKM is recorded.
-  auto entries = ukm_recorder.GetEntriesByName(
-      ukm::builders::OptimizationGuide::kEntryName);
-  EXPECT_EQ(1u, entries.size());
-  auto* entry = entries[0].get();
-  EXPECT_TRUE(ukm_recorder.EntryHasMetric(
-      entry,
-      ukm::builders::OptimizationGuide::kRegisteredOptimizationTypesName));
-  const int64_t* entry_metric = ukm_recorder.GetEntryMetric(
-      entry,
-      ukm::builders::OptimizationGuide::kRegisteredOptimizationTypesName);
-  EXPECT_TRUE(*entry_metric & (1 << proto::NOSCRIPT));
 }
 
 IN_PROC_BROWSER_TEST_F(

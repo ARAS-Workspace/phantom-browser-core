@@ -441,7 +441,6 @@ static_library("url_constants") {
   ]
   deps = [
     "//components/history_clusters/history_clusters_internals/webui:constants",
-    "//components/optimization_guide/optimization_guide_internals/webui:url_constants",
     "//components/password_manager/content/common",
     "//device/vr/buildflags",
   ]

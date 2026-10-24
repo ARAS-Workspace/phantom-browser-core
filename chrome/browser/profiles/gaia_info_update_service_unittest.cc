@@ -33,7 +33,6 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
-#include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/state.h"
 #include "components/signin/public/base/consent_level.h"

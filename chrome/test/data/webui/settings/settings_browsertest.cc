@@ -17,7 +17,6 @@
 #include "components/browsing_data/core/features.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/history/core/browser/features.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/permissions/features.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"

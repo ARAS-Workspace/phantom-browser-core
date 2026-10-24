@@ -44,7 +44,6 @@ source_set("configs") {
     ":ntp_tiles_internals_ui",
     ":signin_internals_ui",
     ":webui",
-    "//chrome/browser/optimization_guide",
     "//chrome/browser/ui",
     "//chrome/browser/ui/webui/about",
     "//chrome/browser/ui/webui/accessibility",
@@ -437,7 +436,6 @@ source_set("chrome_web_ui_controller_factory") {
   ]
   deps = [
     "//chrome/browser:flags",
-    "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/webui/about",

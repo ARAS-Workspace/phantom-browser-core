@@ -145,24 +145,6 @@ ModelProviderRegistry::GetRegistrationMetadata(
   return it->second.metadata;
 }
 
-std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
-ModelProviderRegistry::GetDownloadedModelsInfoForWebUI() const {
-  std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
-      downloaded_models_info;
-  downloaded_models_info.reserve(optimization_target_model_info_map_.size());
-  for (const auto& it : optimization_target_model_info_map_) {
-    const std::string& optimization_target_name =
-        optimization_guide::proto::OptimizationTarget_Name(it.first);
-    const optimization_guide::ModelInfo& model_info = it.second;
-    auto downloaded_model_info_ptr =
-        optimization_guide_internals::mojom::DownloadedModelInfo::New(
-            optimization_target_name, model_info.version,
-            model_info.model_file_path.AsUTF8Unsafe());
-    downloaded_models_info.push_back(std::move(downloaded_model_info_ptr));
-  }
-  return downloaded_models_info;
-}
-
 void ModelProviderRegistry::UpdateModel(
     proto::OptimizationTarget optimization_target,
     ModelInfo model_info) {

@@ -179,15 +179,6 @@ void OptimizationGuideWebContentsObserver::NotifyNavigationFinish(
   page_data.SetNavigationData(std::move(navigation_data));
 }
 
-void OptimizationGuideWebContentsObserver::FlushLastNavigationData() {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  if (!web_contents()) {
-    return;
-  }
-  PageData& page_data = GetPageData(web_contents()->GetPrimaryPage());
-  page_data.SetNavigationData(nullptr);
-}
-
 OptimizationGuideWebContentsObserver::PageData&
 OptimizationGuideWebContentsObserver::GetPageData(content::Page& page) {
   return *PageData::GetOrCreateForPage(page);

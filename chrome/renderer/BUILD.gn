@@ -6,7 +6,6 @@ import("//build/config/buildflags_paint_preview.gni")
 import("//chrome/common/features.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
-import("//components/optimization_guide/features.gni")
 import("//components/signin/features.gni")
 import("//content/public/common/features.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -137,7 +136,6 @@ static_library("renderer") {
     "//components/no_state_prefetch/renderer",
     "//components/omnibox/common",
     "//components/optimization_guide/content/renderer",
-    "//components/optimization_guide/core:features",
     "//components/page_content_annotations/content/mojom",
     "//components/page_content_annotations/content/renderer",
     "//components/page_content_annotations/core:features",

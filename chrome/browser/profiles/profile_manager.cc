@@ -122,7 +122,6 @@
 #include "chrome/browser/profiles/nuke_profile_directory_utils.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
-#include "components/optimization_guide/core/model_execution/model_execution_features.h"
 
 #include "chrome/browser/profiles/profile_statistics.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
