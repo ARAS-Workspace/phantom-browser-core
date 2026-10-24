@@ -932,10 +932,6 @@ inline constexpr char kStaticStorageQuotaEnabled[] =
 // *************** LOCAL STATE ***************
 // These are attached to the machine/installation
 
-// A time pref storing the last time an audio input stream was created.
-inline constexpr char kAudioInputStreamLastTimeCreated[] =
-    "media.audio_input_stream_last_time_created";
-
 // Directory of the last profile used.
 inline constexpr char kProfileLastUsed[] = "profile.last_used";
 

@@ -13,8 +13,6 @@
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/history/core/browser/top_sites.h"
 #include "components/history_embeddings/core/history_embeddings_search.h"
-#include "components/omnibox/browser/fake_autocomplete_scoring_model_service.h"
-#include "components/omnibox/browser/fake_on_device_tail_model_service.h"
 #include "components/omnibox/browser/fake_tab_matcher.h"
 #include "components/omnibox/browser/in_memory_url_index.h"
 #include "components/omnibox/browser/mock_autocomplete_provider_client.h"
@@ -76,10 +74,6 @@ class FakeAutocompleteProviderClient : public MockAutocompleteProviderClient {
   scoped_refptr<history::TopSites> GetTopSites() override;
   std::string ProfileUserName() const override;
 
-  OnDeviceTailModelService* GetOnDeviceTailModelService() const override;
-  FakeAutocompleteScoringModelService* GetAutocompleteScoringModelService()
-      const override;
-
   void ResetGeolocationPermissionToAsk(const GURL& url) const override;
 
   GURL last_reset_geolocation_url() const {
@@ -140,9 +134,6 @@ class FakeAutocompleteProviderClient : public MockAutocompleteProviderClient {
   scoped_refptr<history::TopSites> top_sites_;
   std::unique_ptr<tab_groups::FakeTabGroupSyncService>
       fake_tab_group_sync_service_;
-
-  std::unique_ptr<FakeOnDeviceTailModelService> on_device_tail_model_service_;
-  std::unique_ptr<FakeAutocompleteScoringModelService> scoring_model_service_;
 
   mutable GURL last_reset_geolocation_url_;
   mutable int reset_geolocation_call_count_ = 0;

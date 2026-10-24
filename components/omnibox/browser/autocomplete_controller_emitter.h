@@ -11,7 +11,6 @@
 #include "components/omnibox/browser/autocomplete_controller.h"
 
 class AutocompleteInput;
-class AutocompleteResult;
 
 // This KeyedService is meant to observe multiple AutocompleteController
 // instances and forward the notifications to its own observers.
@@ -35,8 +34,6 @@ class AutocompleteControllerEmitter : public KeyedService,
                const AutocompleteInput& input) override;
   void OnResultChanged(AutocompleteController* controller,
                        bool default_match_changed) override;
-  void OnMlScored(AutocompleteController* controller,
-                  const AutocompleteResult& result) override;
 
  private:
   base::ObserverList<AutocompleteController::Observer> observers_;

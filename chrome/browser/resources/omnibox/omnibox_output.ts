@@ -559,9 +559,6 @@ class OutputScoringSignalsProperty extends OutputDictionaryProperty {
   constructor(value: Signals) {
     super(Object.fromEntries(
         Object.entries(value).filter(([, value]) => value !== null)));
-    const link = createEl('a', null, ['icon', 'edit-icon']);
-    link.href = `chrome://omnibox/ml?signals=${Object.values(value).join()}`;
-    this.container.insertBefore(link, this.container.firstChild);
   }
 }
 

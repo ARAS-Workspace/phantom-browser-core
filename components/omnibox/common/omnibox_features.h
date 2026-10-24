@@ -45,12 +45,6 @@ BASE_DECLARE_FEATURE(kZeroSuggestPrefetchDebouncing);
 BASE_DECLARE_FEATURE(kZeroSuggestPrefetchingOnSRP);
 BASE_DECLARE_FEATURE(kZeroSuggestPrefetchingOnWeb);
 
-// On Device Suggest.
-BASE_DECLARE_FEATURE(kOnDeviceHeadProviderIncognito);
-BASE_DECLARE_FEATURE(kOnDeviceHeadProviderNonIncognito);
-BASE_DECLARE_FEATURE(kOnDeviceTailModel);
-BASE_DECLARE_FEATURE(kOnDeviceTailEnableEnglishModel);
-
 // Document provider and domain suggestions
 BASE_DECLARE_FEATURE(kDocumentProvider);
 BASE_DECLARE_FEATURE(kDocumentProviderPrimaryAccountRequirement);
@@ -93,12 +87,6 @@ inline constexpr base::FeatureParam<int> kOmniboxSpareRendererDelayMs{
 
 // Omnibox ML scoring.
 BASE_DECLARE_FEATURE(kLogUrlScoringSignals);
-BASE_DECLARE_FEATURE(kEnableHistoryScoringSignalsAnnotatorForSearches);
-BASE_DECLARE_FEATURE(kMlUrlPiecewiseMappedSearchBlending);
-BASE_DECLARE_FEATURE(kMlUrlScoreCaching);
-BASE_DECLARE_FEATURE(kMlUrlScoring);
-BASE_DECLARE_FEATURE(kMlUrlSearchBlending);
-BASE_DECLARE_FEATURE(kUrlScoringModel);
 
 // Allows for touch down events to send a signal to |SearchPrefetchService| to
 // start prefetching the suggestion. The feature only applies to search

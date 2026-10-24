@@ -34,7 +34,6 @@ class OmniboxEverywhereController;
 }
 
 class ApplicationLocaleStorage;
-class AudioProcessMlModelForwarder;
 class BrowserProcess;
 
 namespace installer_downloader {
@@ -137,10 +136,6 @@ class GlobalFeatures {
     return optimization_guide_global_feature_.get();
   }
 
-  AudioProcessMlModelForwarder* audio_process_ml_model_forwarder() {
-    return audio_process_ml_model_forwarder_.get();
-  }
-
   GlobalBrowserCollection* global_browser_collection() {
     return global_browser_collection_.get();
   }
@@ -192,10 +187,6 @@ class GlobalFeatures {
 
   std::unique_ptr<optimization_guide::OptimizationGuideGlobalFeature>
       optimization_guide_global_feature_;
-
-  // Must be outlived by `optimization_guide_global_feature_`.
-  std::unique_ptr<AudioProcessMlModelForwarder>
-      audio_process_ml_model_forwarder_;
 
   std::unique_ptr<local_network_access::IPAddressSpaceOverridesPrefsObserver>
       ip_address_space_overrides_prefs_observer_;

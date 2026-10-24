@@ -6,24 +6,15 @@
 
 #include <utility>
 
-#include "base/feature_list.h"
-#include "base/functional/bind.h"
-#include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/webui/omnibox/logging/logs_page_handler.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_page_handler.h"
-#include "chrome/browser/ui/webui/version/version_handler.h"
 #include "chrome/browser/ui/webui/version/version_ui.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/omnibox_resources.h"
 #include "chrome/grit/omnibox_resources_map.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_controller.h"
 #include "content/public/browser/web_ui_data_source.h"
-#include "services/network/public/mojom/content_security_policy.mojom.h"
-#include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
 
 #include "chrome/browser/ui/webui/theme_source.h"
@@ -52,12 +43,7 @@ OmniboxUI::OmniboxUI(content::WebUI* web_ui)
   // Expose version information to client because it is useful in output.
   VersionUI::AddVersionDetailStrings(source);
 
-  source->AddResourcePath("ml", IDR_OMNIBOX_ML_ML_HTML);
   source->AddResourcePath("logging", IDR_OMNIBOX_LOGGING_LOGS_HTML);
-
-  source->AddBoolean("isMlUrlScoringEnabled",
-                     OmniboxFieldTrial::IsMlUrlScoringEnabled());
-
 }
 
 WEB_UI_CONTROLLER_TYPE_IMPL(OmniboxUI)

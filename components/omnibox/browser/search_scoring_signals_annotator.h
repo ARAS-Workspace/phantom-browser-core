@@ -5,24 +5,19 @@
 #ifndef COMPONENTS_OMNIBOX_BROWSER_SEARCH_SCORING_SIGNALS_ANNOTATOR_H_
 #define COMPONENTS_OMNIBOX_BROWSER_SEARCH_SCORING_SIGNALS_ANNOTATOR_H_
 
-#include "components/omnibox/browser/autocomplete_scoring_signals_annotator.h"
+#include <string>
+
+struct AutocompleteMatch;
 
 // Annotates autocomplete Search suggestion candidates with scoring signals
 // derived from suggestions obtained from the remote Suggest service, including:
 // `search_suggest_relevance`, `is_search_suggest_entity`.
-class SearchScoringSignalsAnnotator
-    : public AutocompleteScoringSignalsAnnotator {
+class SearchScoringSignalsAnnotator {
  public:
-  SearchScoringSignalsAnnotator() = default;
+  SearchScoringSignalsAnnotator() = delete;
   SearchScoringSignalsAnnotator(const SearchScoringSignalsAnnotator&) = delete;
   SearchScoringSignalsAnnotator& operator=(
       const SearchScoringSignalsAnnotator&) = delete;
-  ~SearchScoringSignalsAnnotator() override = default;
-
-  // Annotates the suggestions in the autocomplete result with Search scoring
-  // signals.
-  void AnnotateResult(const AutocompleteInput& input,
-                      AutocompleteResult* result) override;
 
   // Updates various scoring signals whose values are determined by the
   // autocomplete match type (and potentially the user's input text).

@@ -33,8 +33,6 @@ namespace sync_sessions {
 class SessionSyncService;
 }  // namespace sync_sessions
 
-class AutocompleteScoringModelService;
-class OnDeviceTailModelService;
 class OmniboxTriggeredFeatureService;
 
 struct AutocompleteMatch;
@@ -117,15 +115,6 @@ class MockAutocompleteProviderClient
 
   signin::IdentityManager* GetIdentityManager() const override {
     return identity_manager_;
-  }
-
-  AutocompleteScoringModelService* GetAutocompleteScoringModelService()
-      const override {
-    return nullptr;
-  }
-
-  OnDeviceTailModelService* GetOnDeviceTailModelService() const override {
-    return nullptr;
   }
 
   ProviderStateService* GetProviderStateService() const override {

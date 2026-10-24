@@ -41,7 +41,6 @@
 #include "components/omnibox/browser/autocomplete_provider_listener.h"
 #include "components/omnibox/browser/document_suggestions_service.h"
 #include "components/omnibox/browser/in_memory_url_index_types.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
 #include "components/omnibox/browser/search_suggestion_parser.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
@@ -868,12 +867,6 @@ void DocumentProvider::SetCachedMatchesScoresTo0() {
 }
 
 void DocumentProvider::DemoteMatchesBeyondMax() {
-  // Allow all matches to retain their scores if unlimited matches param is
-  // enabled.
-  if (OmniboxFieldTrial::IsMlUrlScoringUnlimitedNumCandidatesEnabled()) {
-    return;
-  }
-
   for (size_t i = provider_max_matches_; i < matches_.size(); ++i)
     matches_[i].relevance = 0;
 }

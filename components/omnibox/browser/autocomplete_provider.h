@@ -353,11 +353,8 @@ class AutocompleteProvider
 
   virtual ~AutocompleteProvider();
 
-  // Limits the size of `matches_` to `max_matches`. When ML scoring is enabled,
-  // the provider should pass all suggestions to the controller. In that case,
-  // this does not resize the list of matches, but instead marks all matches
-  // beyond `max_matches` as zero relevance and `culled_by_provider`.
-  void ResizeMatches(size_t max_matches, bool ml_scoring_enabled);
+  // Limits the size of `matches_` to `max_matches`.
+  void ResizeMatches(size_t max_matches);
 
   // If `input` is in keyword mode for a starter pack keyword, returns `input`
   // with the keyword stripped and the starter pack's `TemplateURL`. E.g. for

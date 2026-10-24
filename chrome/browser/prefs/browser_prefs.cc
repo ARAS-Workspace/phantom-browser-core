@@ -140,7 +140,6 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/policy/core/common/policy_statistics_collector.h"
 #include "components/pref_registry/pref_registry_syncable.h"
-#include "components/prefs/pref_registry.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
@@ -985,8 +984,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   // clearly be grouped together, please group them together into a helper
   // function called above. Please keep this list alphabetized.
 
-  registry->RegisterTimePref(prefs::kAudioInputStreamLastTimeCreated,
-                             base::Time(), PrefRegistry::LOSSY_PREF);
   registry->RegisterBooleanPref(
       policy::policy_prefs::kIntensiveWakeUpThrottlingEnabled, false);
 

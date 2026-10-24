@@ -28,26 +28,6 @@ source_set("access_handler_impl") {
   ]
 }
 
-source_set("audio_process_ml_model_forwarder") {
-  sources = [
-    "audio_process_ml_model_forwarder.cc",
-    "audio_process_ml_model_forwarder.h",
-  ]
-  public_deps = [
-    "//base",
-    "//components/optimization_guide/core:prediction",
-    "//components/optimization_guide/proto:optimization_guide_proto",
-    "//mojo/public/cpp/bindings",
-    "//services/audio/public/mojom",
-  ]
-  deps = [
-    "//chrome/browser/media/webrtc",
-    "//chrome/common:constants",
-    "//components/prefs",
-    "//content/public/browser",
-  ]
-}
-
 source_set("unittests") {
   testonly = true
 
@@ -56,7 +36,6 @@ source_set("unittests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
   sources = [
-    "audio_process_ml_model_forwarder_unittest.cc",
     "autoplay_policy_status_observer_unittest.cc",
     "media_engagement_contents_observer_unittest.cc",
     "media_engagement_preloaded_list_unittest.cc",
@@ -67,13 +46,11 @@ source_set("unittests") {
     "unified_autoplay_config_unittest.cc",
   ]
   deps = [
-    ":audio_process_ml_model_forwarder",
     ":impl",
     "//base",
     "//base/test:test_support",
     "//chrome/browser/content_settings",
     "//chrome/browser/content_settings:content_settings_factory",
-    "//chrome/browser/media/webrtc",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui:recently_audible_helper",
     "//chrome/common:constants",
@@ -82,9 +59,6 @@ source_set("unittests") {
     "//components/content_settings/core/common",
     "//components/history/core/browser",
     "//components/history/core/test",
-    "//components/optimization_guide/core",
-    "//components/optimization_guide/core:test_support",
-    "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/prefs:test_support",
     "//components/site_engagement/content",
     "//components/ukm:test_support",
@@ -92,8 +66,6 @@ source_set("unittests") {
     "//content/test:test_support",
     "//media",
     "//mojo/core/embedder",
-    "//mojo/public/cpp/bindings",
-    "//services/audio/public/mojom",
     "//services/metrics/public/cpp:ukm_builders",
     "//testing/gmock",
     "//testing/gtest",
@@ -108,23 +80,17 @@ source_set("browser_tests") {
   # destructor types, which -Wexit-time-destructors rejects.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-  sources = [ "audio_process_ml_model_forwarder_browsertest.cc" ]
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   deps = [
-    ":audio_process_ml_model_forwarder",
     "//base/test:test_support",
-    "//chrome/browser:global_features",
-    "//chrome/browser/optimization_guide",
     "//chrome/test:test_support",
-    "//components/optimization_guide/core:test_support",
-    "//components/optimization_guide/proto:optimization_guide_proto",
     "//content/public/browser",
     "//content/test:browsertest_support",
     "//media",
     "//testing/gtest",
   ]
 
-  sources += [
+  sources = [
     "audio_ducker_browsertest.cc",
     "autoplay_metrics_browsertest.cc",
     "defer_background_media_browsertest.cc",

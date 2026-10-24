@@ -16,17 +16,13 @@ struct ACMatchClassification {
 // Keep consistent:
 // - omnibox_event.proto `ScoringSignals`
 // - omnibox_scoring_signals.proto `OmniboxScoringSignals`
-// - autocomplete_scoring_model_handler.cc
-//   `AutocompleteScoringModelHandler::ExtractInputFromScoringSignals()`
 // - autocomplete_match.cc `AutocompleteMatch::MergeScoringSignals()`
-// - autocomplete_controller.cc `RecordScoringSignalCoverageForProvider()`
 // - omnibox_metrics_provider.cc `GetScoringSignalsForLogging()`
 // - omnibox.mojom `struct Signals`
 // - omnibox_page_handler.cc
 //   `TypeConverter<AutocompleteMatch::ScoringSignals, mojom::SignalsPtr>`
 // - omnibox_page_handler.cc `TypeConverter<mojom::SignalsPtr,
 //   AutocompleteMatch::ScoringSignals>`
-// - omnibox_util.ts `signalNames`
 // - omnibox/histograms.xml
 //   `Omnibox.URLScoringModelExecuted.ScoringSignalCoverage`
 struct Signals {
@@ -122,9 +118,6 @@ enum AutocompleteControllerType {
   // The autocomplete controller used by chrome://omnibox to support customized
   // inputs without messing with the location bar omnibox.
   kDebug = 1,
-  // The autocomplete controller used by chrome://omnibox/ml that forces off ML
-  // scoring.
-  kMlDisabledDebug = 2,
 };
 
 // ts (`BrowserProxy`) -> cpp (`OmniboxPageHandler`) path.
@@ -143,10 +136,6 @@ interface OmniboxPageHandler {
                     // it's guaranteed to a valid URL if non-empty.
                     string current_url,
                     int32 page_classification);
-  // Gets the ML model version.
-  GetMlModelVersion() => (int32 version);
-  // Runs `AutocompleteScoringModelService`.
-  StartMl(Signals signals) => (float score);
 };
 
 // cpp (`OmniboxPageHandler`) -> ts (`BrowserProxy`) path.
@@ -161,14 +150,6 @@ interface OmniboxPage {
   HandleNewAutocompleteResponse(
     AutocompleteControllerType autocomplete_controller_type,
     OmniboxResponse response);
-
-  // Notifies the page of an ML scoring batch completing. This is an
-  // intermediate step of autocompletion. This occurs before the omnibox
-  // response is created (i.e. before `HandleNewAutocompleteResponse()` is
-  // called) and won't usually have the same matches.
-  HandleNewMlResponse(AutocompleteControllerType autocomplete_controller_type,
-                      string input_text,
-                      array<AutocompleteMatch> matches);
 
   // Asynchronously notifies the page of the image data URLs for previous
   // omnibox responses.

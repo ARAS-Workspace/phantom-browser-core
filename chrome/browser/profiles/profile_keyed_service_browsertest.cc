@@ -24,7 +24,6 @@
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/keyed_service/core/dependency_graph.h"
 #include "components/keyed_service/core/keyed_service_base_factory.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/universal_optout/features.h"
 #include "content/public/common/content_features.h"
@@ -186,8 +185,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
           extensions_features::kForceWebRequestProxyForTest,
           network::features::kReduceAcceptLanguage,
           features::kMainNodeAnnotations,
-          omnibox::kOnDeviceTailModel,
-          omnibox::kOnDeviceHeadProviderNonIncognito,
           switches::kSyncEnableBookmarksInTransportMode,
         },
         {});
@@ -364,7 +361,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "HostContentSettingsMap",
 
     "NotificationDisplayService",
-    "OnDeviceTailModelService",
     "OneTimePermissionsTrackerKeyedService",
     "OptimizationGuideGlobalStateHolderKeyedService",
     "OptimizationGuideKeyedService",
@@ -469,7 +465,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AudioAPI",
     "AutocompleteActionPredictor",
     "AutocompleteHistoryManager",
-    "AutocompleteScoringModelService",
     "AutofillClientProvider",
     "AutofillImageFetcher",
     "AutofillPrivateEventRouter",
@@ -573,7 +568,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "NtpCustomBackgroundService",
     "OmniboxAPI",
     "OmniboxSuggestionsWatcher",
-    "OnDeviceTailModelService",
     "OneTimePermissionsTrackerKeyedService",
     "OperationManager",
     "OptimizationGuideGlobalStateHolderKeyedService",

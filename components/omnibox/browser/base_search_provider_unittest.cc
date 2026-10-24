@@ -588,56 +588,6 @@ TEST_F(BaseSearchProviderTest, PrerenderDefaultMatch) {
   EXPECT_TRUE(BaseSearchProvider::ShouldPrerender(match));
 }
 
-class BaseSearchProviderOnDeviceSuggestionTest
-    : public BaseSearchProviderTestFixture,
-      public testing::TestWithParam<bool> {
- public:
-  ~BaseSearchProviderOnDeviceSuggestionTest() override = default;
-
-  void SetUp() override { BaseSearchProviderTestFixture::SetUp(); }
-};
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         BaseSearchProviderOnDeviceSuggestionTest,
-                         testing::Bool());
-
-TEST_P(BaseSearchProviderOnDeviceSuggestionTest,
-       CreateOnDeviceSearchSuggestion) {
-  bool is_tail_suggestion = GetParam();
-  TemplateURLData data;
-  data.SetURL("http://foo.com/url?bar={searchTerms}");
-  auto template_url = std::make_unique<TemplateURL>(data);
-
-  std::vector<std::u16string> input_texts = {
-      u"googl", u"google", u"google ma", u"google map ", u"googl map login"};
-  std::vector<std::u16string> suggestions = {
-      u"google", u"google map", u"google map login", u"google map login",
-      u"google map login"};
-  std::vector<std::u16string> expected_tail_match_contents = {
-      u"google", u"google map", u"map login", u"map login",
-      u"google map login"};
-
-  for (size_t i = 0; i < input_texts.size(); ++i) {
-    AutocompleteInput autocomplete_input(input_texts[i],
-                                         metrics::OmniboxEventProto::OTHER,
-                                         TestSchemeClassifier());
-    AutocompleteMatch match =
-        BaseSearchProvider::CreateOnDeviceSearchSuggestion(
-            provider_.get(), autocomplete_input, suggestions[i], 99,
-            template_url.get(),
-            client_->GetTemplateURLService()->search_terms_data(),
-            TemplateURLRef::NO_SUGGESTION_CHOSEN, is_tail_suggestion);
-    ASSERT_EQ(match.contents, is_tail_suggestion
-                                  ? expected_tail_match_contents[i]
-                                  : suggestions[i]);
-    ASSERT_EQ(match.type, is_tail_suggestion
-                              ? AutocompleteMatchType::SEARCH_SUGGEST_TAIL
-                              : AutocompleteMatchType::SEARCH_SUGGEST);
-    ASSERT_EQ(match.suggest_type,
-              is_tail_suggestion ? omnibox::TYPE_TAIL : omnibox::TYPE_QUERY);
-  }
-}
-
 TEST_F(BaseSearchProviderTest, CreateActionInSuggest_BuildActionURL) {
   using TemplateAction = omnibox::SuggestTemplateInfo::TemplateAction;
   // Correlation between ActionType and UMA-recorded bucket.

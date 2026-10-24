@@ -219,17 +219,13 @@ bool StructTraits<mojom::SignalsDataView, AutocompleteMatch::ScoringSignals>::
   // Keep consistent:
   // - omnibox_event.proto `ScoringSignals`
   // - omnibox_scoring_signals.proto `OmniboxScoringSignals`
-  // - autocomplete_scoring_model_handler.cc
-  //   `AutocompleteScoringModelHandler::ExtractInputFromScoringSignals()`
   // - autocomplete_match.cc `AutocompleteMatch::MergeScoringSignals()`
-  // - autocomplete_controller.cc `RecordScoringSignalCoverageForProvider()`
   // - omnibox_metrics_provider.cc `GetScoringSignalsForLogging()`
   // - omnibox.mojom `struct Signals`
   // - omnibox_page_handler.cc
   //   `TypeConverter<AutocompleteMatch::ScoringSignals, mojom::SignalsPtr>`
   // - omnibox_page_handler.cc `TypeConverter<mojom::SignalsPtr,
   //   AutocompleteMatch::ScoringSignals>`
-  // - omnibox_util.ts `signalNames`
   // - omnibox/histograms.xml
   //   `Omnibox.URLScoringModelExecuted.ScoringSignalCoverage`
   // TODO(crbug.com/428153670): Use the IfChange linter to help make sure these

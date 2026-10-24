@@ -301,7 +301,6 @@ AutocompleteMatch::AutocompleteMatch(const AutocompleteMatch& match)
       duplicate_matches(match.duplicate_matches),
       suggest_tiles(match.suggest_tiles),
       scoring_signals(match.scoring_signals),
-      culled_by_provider(match.culled_by_provider),
       shortcut_boosted(match.shortcut_boosted),
       iph_type(match.iph_type),
       iph_link_text(match.iph_link_text),
@@ -372,7 +371,6 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   duplicate_matches = std::move(match.duplicate_matches);
   suggest_tiles = std::move(match.suggest_tiles);
   scoring_signals = std::move(match.scoring_signals);
-  culled_by_provider = std::move(match.culled_by_provider);
   shortcut_boosted = std::move(match.shortcut_boosted);
   iph_type = std::move(match.iph_type);
   iph_link_text = std::move(match.iph_link_text);
@@ -447,7 +445,6 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   duplicate_matches = match.duplicate_matches;
   suggest_tiles = match.suggest_tiles;
   scoring_signals = match.scoring_signals;
-  culled_by_provider = match.culled_by_provider;
   shortcut_boosted = match.shortcut_boosted;
   iph_type = match.iph_type;
   iph_link_text = match.iph_link_text;
@@ -1740,60 +1737,6 @@ bool AutocompleteMatch::IsMlSignalLoggingEligible() const {
          AutocompleteMatch::IsVerbatimType();
 }
 
-bool AutocompleteMatch::IsMlScoringEligible() const {
-  if (!IsMlSignalLoggingEligible() || !scoring_signals.has_value()) {
-    return false;
-  }
-
-  // Do not apply ML scoring to calculator or answer suggestions as the ML model
-  // currently doesn't provide accurate scores for suggestions that have a low
-  // click-through rate.
-  if (type == AutocompleteMatchType::CALCULATOR ||
-      answer_type != omnibox::ANSWER_TYPE_UNSPECIFIED) {
-    return false;
-  }
-
-  // Do not apply ML scoring to stale suggestions sourced from the
-  // DocumentProvider cache.
-  if (type == AutocompleteMatchType::DOCUMENT_SUGGESTION && relevance == 0) {
-    return false;
-  }
-
-  const auto& ml_config = OmniboxFieldTrial::GetMLConfig();
-
-  // Search suggestions are conditionally eligible for ML scoring.
-  if (AutocompleteMatch::IsSearchType(type)) {
-    return ml_config.enable_ml_scoring_for_searches;
-  }
-
-  // Verbatim URL suggestions are conditionally eligible for ML scoring.
-  // A "verbatim URL" suggestion is any suggestion that is UWYT itself or has
-  // been deduped with a UWYT suggestion.
-  if (AutocompleteMatch::IsVerbatimUrlSuggestion()) {
-    return ml_config.enable_ml_scoring_for_verbatim_urls;
-  }
-
-  // Certain suggestion types are manually excluded from ML scoring (since
-  // applying ML scoring to these suggestions currently results in suboptimal
-  // behavior).
-  if (type == AutocompleteMatchType::NAVSUGGEST ||
-      type == AutocompleteMatchType::NAVSUGGEST_PERSONALIZED ||
-      type == AutocompleteMatchType::TILE_NAVSUGGEST) {
-    return false;
-  }
-
-  // If any of the duplicates under this match are ineligible for ML scoring,
-  // then the top-level match (this) is also considered ineligible for ML
-  // scoring.
-  if (std::ranges::any_of(duplicate_matches, [](const auto& match) {
-        return !match.IsMlScoringEligible();
-      })) {
-    return false;
-  }
-
-  return true;
-}
-
 bool AutocompleteMatch::IsTrendSuggestion() const {
   return subtypes.contains(/*omnibox::SUBTYPE_TRENDS=*/143);
 }
@@ -2080,17 +2023,13 @@ void AutocompleteMatch::MergeScoringSignals(const AutocompleteMatch& other) {
   // Keep consistent:
   // - omnibox_event.proto `ScoringSignals`
   // - omnibox_scoring_signals.proto `OmniboxScoringSignals`
-  // - autocomplete_scoring_model_handler.cc
-  //   `AutocompleteScoringModelHandler::ExtractInputFromScoringSignals()`
   // - autocomplete_match.cc `AutocompleteMatch::MergeScoringSignals()`
-  // - autocomplete_controller.cc `RecordScoringSignalCoverageForProvider()`
   // - omnibox_metrics_provider.cc `GetScoringSignalsForLogging()`
   // - omnibox.mojom `struct Signals`
   // - omnibox_page_handler.cc
   //   `TypeConverter<AutocompleteMatch::ScoringSignals, mojom::SignalsPtr>`
   // - omnibox_page_handler.cc `TypeConverter<mojom::SignalsPtr,
   //   AutocompleteMatch::ScoringSignals>`
-  // - omnibox_util.ts `signalNames`
   // - omnibox/histograms.xml
   //   `Omnibox.URLScoringModelExecuted.ScoringSignalCoverage`
 

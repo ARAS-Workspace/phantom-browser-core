@@ -639,7 +639,6 @@ source_set("core") {
     "//chrome/browser/login_detection",
     "//chrome/browser/lookalikes",
     "//chrome/browser/media",
-    "//chrome/browser/media:audio_process_ml_model_forwarder",
     "//chrome/browser/media/prefs",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/memory",

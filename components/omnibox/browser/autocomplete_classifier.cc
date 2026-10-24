@@ -17,7 +17,6 @@
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/autocomplete_provider.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "extensions/buildflags/buildflags.h"
@@ -68,9 +67,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
       AutocompleteProvider::TYPE_ZERO_SUGGEST_LOCAL_HISTORY |
       (base::FeatureList::IsEnabled(omnibox::kDocumentProvider)
            ? AutocompleteProvider::TYPE_DOCUMENT
-           : 0) |
-      (OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForAnyMode()
-           ? AutocompleteProvider::TYPE_ON_DEVICE_HEAD
            : 0) |
       (base::FeatureList::IsEnabled(omnibox::kOmniboxCrossDeviceTabZeroSuggest)
            ? AutocompleteProvider::TYPE_CROSS_DEVICE_TAB

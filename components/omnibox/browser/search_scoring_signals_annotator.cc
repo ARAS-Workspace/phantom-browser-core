@@ -4,30 +4,7 @@
 
 #include "components/omnibox/browser/search_scoring_signals_annotator.h"
 
-#include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
-#include "components/omnibox/browser/autocomplete_result.h"
-
-void SearchScoringSignalsAnnotator::AnnotateResult(
-    const AutocompleteInput& input,
-    AutocompleteResult* result) {
-  for (auto& match : *result) {
-    // Skip ineligible matches
-    if (!match.IsMlSignalLoggingEligible()) {
-      continue;
-    }
-
-    // Initialize the scoring signals if needed.
-    if (!match.scoring_signals) {
-      match.scoring_signals = std::make_optional<ScoringSignals>();
-    }
-
-    if (!match.scoring_signals->has_search_suggest_relevance()) {
-      match.scoring_signals->set_search_suggest_relevance(0);
-    }
-    UpdateMatchTypeScoringSignals(match, input.text());
-  }
-}
 
 // static
 void SearchScoringSignalsAnnotator::UpdateMatchTypeScoringSignals(

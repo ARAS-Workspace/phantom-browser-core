@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/containers/span.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/metrics/histogram_functions.h"
@@ -20,7 +19,6 @@
 #include "base/trace_event/trace_event.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/language_detection_resolver.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "third_party/tflite_support/src/tensorflow_lite_support/cc/task/text/nlclassifier/nl_classifier.h"
 
 namespace language_detection {
@@ -103,11 +101,7 @@ LanguageDetectionModel::LoadModelFromFile(base::File model_file,
                         model_file.GetLength());
 }
 
-LanguageDetectionModel::LanguageDetectionModel()
-    : num_threads_(
-          optimization_guide::features::OverrideNumThreadsForOptTarget(
-              optimization_guide::proto::OPTIMIZATION_TARGET_LANGUAGE_DETECTION)
-              .value_or(-1)) {}
+LanguageDetectionModel::LanguageDetectionModel() = default;
 
 LanguageDetectionModel::~LanguageDetectionModel() = default;
 

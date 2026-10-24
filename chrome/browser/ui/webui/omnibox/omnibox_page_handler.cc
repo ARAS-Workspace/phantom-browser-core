@@ -4,21 +4,14 @@
 
 #include "chrome/browser/ui/webui/omnibox/omnibox_page_handler.h"
 
-#include <stddef.h>
-
-#include <algorithm>
 #include <string>
 #include <utility>
 
 #include "base/base64.h"
-#include "base/check.h"
 #include "base/containers/to_vector.h"
 #include "base/functional/bind.h"
-#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
-#include "base/values.h"
-#include "chrome/browser/autocomplete/autocomplete_scoring_model_service_factory.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_provider_client.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service.h"
@@ -27,13 +20,10 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/omnibox/autocomplete_controller_emitter_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
-#include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_internals.mojom-forward.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_mojom_traits.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/url_database.h"
-#include "components/omnibox/browser/actions/omnibox_pedal.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_controller_config.h"
@@ -41,15 +31,8 @@
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/autocomplete_provider.h"
 #include "components/omnibox/browser/autocomplete_result.h"
-#include "components/omnibox/browser/autocomplete_scoring_model_service.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
-#include "components/omnibox/common/omnibox_feature_configs.h"
-#include "components/search_engines/template_url.h"
-#include "content/public/browser/web_ui.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/metrics_proto/omnibox_focus_type.pb.h"
-#include "third_party/omnibox_proto/answer_data.pb.h"
-#include "third_party/omnibox_proto/answer_type.pb.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/image/image.h"
 
@@ -59,8 +42,7 @@ OmniboxPageHandler::OmniboxPageHandler(
     : profile_(profile), receiver_(this, std::move(receiver)) {
   observation_.Observe(
       AutocompleteControllerEmitterFactory::GetForBrowserContext(profile_));
-  controller_ = CreateController(false);
-  ml_disabled_controller_ = CreateController(true);
+  controller_ = CreateController();
 }
 
 OmniboxPageHandler::~OmniboxPageHandler() = default;
@@ -71,11 +53,6 @@ void OmniboxPageHandler::OnStart(AutocompleteController* controller,
   input_ = input;
   auto type = GetAutocompleteControllerType(controller);
   page_->HandleNewAutocompleteQuery(type, base::UTF16ToUTF8(input.text()));
-  // Kick off ml-disabled autocompletion to show a before/after comparison on
-  // chrome://omnibox/ml.
-  if (type == mojom::AutocompleteControllerType::kBrowser) {
-    ml_disabled_controller_->Start(input);
-  }
 }
 
 void OmniboxPageHandler::OnResultChanged(AutocompleteController* controller,
@@ -150,17 +127,6 @@ void OmniboxPageHandler::OnResultChanged(AutocompleteController* controller,
   }
 }
 
-void OmniboxPageHandler::OnMlScored(AutocompleteController* controller,
-                                    const AutocompleteResult& result) {
-  auto combined_results =
-      base::ToVector(result, [](const ::AutocompleteMatch& match) {
-        return ::AutocompleteMatchWrapper(nullptr, match);
-      });
-  page_->HandleNewMlResponse(GetAutocompleteControllerType(controller),
-                             base::UTF16ToUTF8(controller->input().text()),
-                             std::move(combined_results));
-}
-
 void OmniboxPageHandler::OnBitmapFetched(mojom::AutocompleteControllerType type,
                                          const GURL& image_url,
                                          const SkBitmap bitmap) {
@@ -207,7 +173,7 @@ void OmniboxPageHandler::StartOmniboxQuery(const std::string& input_string,
   // important logic and return stale results.  In short, we want the
   // actual results to not depend on the state of the previous request.
   if (reset_autocomplete_controller) {
-    controller_ = CreateController(false);
+    controller_ = CreateController();
   }
   AutocompleteInput input(
       base::UTF8ToUTF16(input_string), cursor_position,
@@ -227,47 +193,12 @@ void OmniboxPageHandler::StartOmniboxQuery(const std::string& input_string,
   controller_->Start(input);
 }
 
-void OmniboxPageHandler::GetMlModelVersion(GetMlModelVersionCallback callback) {
-  if (auto* service = GetMlService()) {
-    auto version = service->GetModelVersion();
-    if (version == -1) {
-      service->AddOnModelUpdatedCallback(
-          base::BindOnce(&OmniboxPageHandler::GetMlModelVersion,
-                         weak_factory_.GetWeakPtr(), std::move(callback)));
-    } else {
-      std::move(callback).Run(version);
-    }
-  } else {
-    std::move(callback).Run(-1);
-  }
-}
-
-void OmniboxPageHandler::StartMl(
-    const AutocompleteMatch::ScoringSignals& signals,
-    StartMlCallback callback) {
-  if (auto* service = GetMlService()) {
-    std::vector<AutocompleteScoringModelService::Result> result =
-        service->BatchScoreAutocompleteUrlMatchesSync({&signals});
-    std::move(callback).Run(result.size() ? result[0].value_or(-1) : -1);
-  } else {
-    std::move(callback).Run(-1);
-  }
-}
-
-std::unique_ptr<AutocompleteController> OmniboxPageHandler::CreateController(
-    bool ml_disabled) {
+std::unique_ptr<AutocompleteController> OmniboxPageHandler::CreateController() {
   auto providers = AutocompleteClassifier::DefaultOmniboxProviders();
-  // `HistoryEmbeddingsProvider` only supports 1 query at a time. Running it for
-  // the traditional-scoring controller used in the ML before/after comparisons
-  // would break history embeddings for the other, more important controllers.
-  if (ml_disabled) {
-    providers &= ~AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS;
-  }
 
   auto controller = std::make_unique<AutocompleteController>(
       std::make_unique<ChromeAutocompleteProviderClient>(profile_),
-      AutocompleteControllerConfig{.provider_types = providers,
-                                   .disable_ml = ml_disabled});
+      AutocompleteControllerConfig{.provider_types = providers});
   // We will observe our internal AutocompleteController directly, so there's
   // no reason to hook it up to the profile-keyed AutocompleteControllerEmitter.
   controller->AddObserver(this);
@@ -280,15 +211,5 @@ OmniboxPageHandler::GetAutocompleteControllerType(
   if (controller == controller_.get()) {
     return mojom::AutocompleteControllerType::kDebug;
   }
-  if (controller == ml_disabled_controller_.get()) {
-    return mojom::AutocompleteControllerType::kMlDisabledDebug;
-  }
   return mojom::AutocompleteControllerType::kBrowser;
-}
-
-AutocompleteScoringModelService* OmniboxPageHandler::GetMlService() {
-  return OmniboxFieldTrial::IsMlUrlScoringEnabled()
-             ? AutocompleteScoringModelServiceFactory::GetInstance()
-                   ->GetForProfile(profile_)
-             : nullptr;
 }

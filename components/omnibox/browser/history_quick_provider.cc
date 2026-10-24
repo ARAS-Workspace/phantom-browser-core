@@ -27,7 +27,6 @@
 #include "components/omnibox/browser/autocomplete_match_type.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/omnibox/browser/autocomplete_result.h"
-#include "components/omnibox/browser/autocomplete_scoring_signals_annotator.h"
 #include "components/omnibox/browser/history_url_provider.h"
 #include "components/omnibox/browser/in_memory_url_index.h"
 #include "components/omnibox/browser/keyword_provider.h"
@@ -135,13 +134,9 @@ void HistoryQuickProvider::DoAutocomplete() {
 
   if (!omnibox::IsAndroidHubOrTabSearch(
           autocomplete_input_.current_page_classification())) {
-    // If ML scoring is enabled, mark all "extra" matches as
-    // `culled_by_provider`. If ML scoring is disabled, this is effectively a
-    // no-op as the matches will already be resized in the above call to
-    // `HistoryItemsForTerms()`.
-    ResizeMatches(
-        max_matches,
-        OmniboxFieldTrial::IsMlUrlScoringUnlimitedNumCandidatesEnabled());
+    // This is effectively a no-op as the matches will already be resized in
+    // the above call to `HistoryItemsForTerms()`.
+    ResizeMatches(max_matches);
   }
 }
 

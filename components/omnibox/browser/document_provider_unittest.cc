@@ -28,7 +28,6 @@
 #include "components/omnibox/browser/autocomplete_provider.h"
 #include "components/omnibox/browser/autocomplete_provider_listener.h"
 #include "components/omnibox/browser/fake_autocomplete_provider_client.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
@@ -932,60 +931,6 @@ TEST_F(DocumentProviderTest, CachingForSyncMatches) {
                            Summary{u"Document 5 longer title", 599, true},
                            Summary{u"Document 0 longer title", 0, true},
                            Summary{u"Document 1 longer title", 0, true}));
-}
-
-TEST_F(DocumentProviderTest, MaxMatches) {
-  InitClient();
-
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeaturesAndParameters(
-      /*enabled_features=*/{{omnibox::kUrlScoringModel, {}},
-                            {omnibox::kMlUrlScoring,
-                             {{"MlUrlScoringUnlimitedNumCandidates", "true"}}}},
-      /*disabled_features=*/{});
-
-  OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
-
-  AutocompleteInput input(u"document", metrics::OmniboxEventProto::OTHER,
-                          TestSchemeClassifier());
-  input.set_omit_asynchronous_matches(true);
-
-  // Sync matches should have scores.
-  // Sync matches beyond |provider_max_matches_| should NOT have scores set to 0
-  // (since the "unlimited candidate matches" param is enabled).
-  provider_->input_ = input;
-  provider_->UpdateResults(MakeTestResponse({"0", "1", "2", "3", "4"}, 1000));
-  provider_->Start(input, false);
-  EXPECT_THAT(
-      ExtractMatchSummary(provider_->matches_),
-      testing::ElementsAre(Summary{u"Document 0 longer title", 1000, true},
-                           Summary{u"Document 1 longer title", 999, true},
-                           Summary{u"Document 2 longer title", 998, true},
-                           Summary{u"Document 3 longer title", 997, true}));
-
-  // Sync matches from the latest response should have scores.
-  // Sync matches from previous responses should not have scores.
-  provider_->UpdateResults(MakeTestResponse({"4", "5"}, 600));
-  provider_->Start(input, false);
-  EXPECT_THAT(
-      ExtractMatchSummary(provider_->matches_),
-      testing::ElementsAre(Summary{u"Document 4 longer title", 600, true},
-                           Summary{u"Document 5 longer title", 599, true},
-                           Summary{u"Document 0 longer title", 0, true},
-                           Summary{u"Document 1 longer title", 0, true}));
-
-  // Unlimited matches should ignore the provider max matches, even if the
-  // `kMlUrlScoringMaxMatchesByProvider` param is set.
-  scoped_ml_config.GetMLConfig().ml_url_scoring_max_matches_by_provider = "*:2";
-
-  provider_->UpdateResults(MakeTestResponse({"6", "7", "8", "9"}, 2000));
-  provider_->Start(input, false);
-  EXPECT_THAT(
-      ExtractMatchSummary(provider_->matches_),
-      testing::ElementsAre(Summary{u"Document 6 longer title", 2000, true},
-                           Summary{u"Document 7 longer title", 1999, true},
-                           Summary{u"Document 8 longer title", 1998, true},
-                           Summary{u"Document 9 longer title", 1997, true}));
 }
 
 TEST_F(DocumentProviderTest, StartCallsStop) {

@@ -11,13 +11,11 @@
 #include "base/feature_list.h"
 #include "base/memory/ptr_util.h"
 #include "base/no_destructor.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/infobars/browser_infobar_manager.h"
 #include "chrome/browser/infobars/infobar_features.h"
 #include "chrome/browser/local_network_access/ip_address_space_overrides_prefs_observer.h"
-#include "chrome/browser/media/audio_process_ml_model_forwarder.h"
 #include "chrome/browser/optimization_guide/model_execution/optimization_guide_global_state.h"
 #include "chrome/browser/permissions/system/platform_handle.h"
 #include "chrome/browser/profiles/profile_manager.h"
@@ -25,7 +23,6 @@
 #include "chrome/browser/ui/views/frame/glass_frame_service.h"
 #include "components/application_locale_storage/application_locale_storage.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_manager.h"
-#include "media/base/media_switches.h"
 #include "net/net_buildflags.h"
 #include "ui/base/ui_base_features.h"
 
@@ -40,7 +37,6 @@
 // buildflags, so we include it only on platforms where it is used.
 #include "chrome/browser/default_browser/default_browser_manager.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
-#include "components/user_education/common/user_education_features.h"  // nogncheck
 #endif
 
 #include "chrome/browser/lifetime/smart_restart_manager.h"
@@ -148,11 +144,6 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
 
   optimization_guide_global_feature_ =
       std::make_unique<optimization_guide::OptimizationGuideGlobalFeature>();
-
-  if (media::IsAudioProcessMlModelUsageEnabled()) {
-    audio_process_ml_model_forwarder_ =
-        AudioProcessMlModelForwarder::Create(g_browser_process->local_state());
-  }
 }
 
 void GlobalFeatures::Init() {
@@ -175,7 +166,6 @@ void GlobalFeatures::PostMainMessageLoopRun() {
   profile_launch_observer_.reset();
 
   omnibox_everywhere_controller_.reset();
-  audio_process_ml_model_forwarder_.reset();
   optimization_guide_global_feature_.reset();
 
   tab_drag_session_manager_.reset();

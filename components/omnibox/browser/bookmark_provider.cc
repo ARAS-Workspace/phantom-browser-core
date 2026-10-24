@@ -143,9 +143,7 @@ void BookmarkProvider::DoAutocomplete(const AutocompleteInput& input) {
   std::partial_sort(matches_.begin(), matches_.begin() + num_matches,
                     matches_.end(), AutocompleteMatch::MoreRelevant);
   if (!omnibox::IsAndroidHubOrTabSearch(input.current_page_classification())) {
-    ResizeMatches(
-        num_matches,
-        OmniboxFieldTrial::IsMlUrlScoringUnlimitedNumCandidatesEnabled());
+    ResizeMatches(num_matches);
   }
 }
 
@@ -249,7 +247,7 @@ std::pair<int, int> BookmarkProvider::CalculateBookmarkMatchRelevance(
   int relevance = static_cast<int>(normalized_sum * kBookmarkScoreRange) +
                   kBaseBookmarkScore;
 
-  // If scoring signal logging and ML scoring is disabled, skip counting
+  // If scoring signal logging is disabled, skip counting
   // bookmarks if relevance is above max score. Don't waste any time searching
   // for additional referenced URLs if we already have a perfect title match.
   // Returns a pair of the relevance score and -1 as a dummy bookmark count.

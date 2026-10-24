@@ -91,9 +91,6 @@ class BrowserProxy {
 
   private handleNewAutocompleteResponse(
       controllerType: AutocompleteControllerType, response: OmniboxResponse) {
-    if (controllerType === AutocompleteControllerType.kMlDisabledDebug) {
-      return;
-    }
     const isDebugController =
         controllerType === AutocompleteControllerType.kDebug;
 
@@ -123,9 +120,6 @@ class BrowserProxy {
 
   private handleNewAutocompleteQuery(
       controllerType: AutocompleteControllerType, inputText: string) {
-    if (controllerType === AutocompleteControllerType.kMlDisabledDebug) {
-      return;
-    }
     const isDebugController =
         controllerType === AutocompleteControllerType.kDebug;
     // If the request originated from the debug page and is not for display,

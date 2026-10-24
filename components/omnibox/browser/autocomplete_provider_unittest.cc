@@ -164,7 +164,7 @@ class TestProvider : public AutocompleteProvider {
   // AutocompleteProvider:
   void StartPrefetch(const AutocompleteInput& input) override;
   void Start(const AutocompleteInput& input, bool minimal_changes) override;
-  void ResizeMatches(size_t max_matches, bool ml_scoring_enabled);
+  void ResizeMatches(size_t max_matches);
 
   void set_supports_prefetch(const bool supports_prefetch) {
     supports_prefetch_ = supports_prefetch;
@@ -258,8 +258,8 @@ void TestProvider::Start(const AutocompleteInput& input, bool minimal_changes) {
   }
 }
 
-void TestProvider::ResizeMatches(size_t max_matches, bool ml_scoring_enabled) {
-  AutocompleteProvider::ResizeMatches(max_matches, ml_scoring_enabled);
+void TestProvider::ResizeMatches(size_t max_matches) {
+  AutocompleteProvider::ResizeMatches(max_matches);
 }
 
 void TestProvider::OnNonPrefetchRequestDone() {
@@ -1728,42 +1728,13 @@ TEST_F(AutocompleteProviderTest, ResizeMatches) {
   provider->set_matches(matches);
   EXPECT_EQ(provider->get_matches().size(), matches.size());
 
-  // When ML Scoring is enabled, calling resize matches should not actually
-  // resize the match list. Instead, it should mark any matches over the
-  // `max_matches` with a relevance score of zero and `culled_by_provider`.
+  // `matches_` should be resized and `relevance` should be untouched.
   const size_t kMaxMatches = 3;
-  provider->ResizeMatches(kMaxMatches, true);
-  EXPECT_EQ(provider->get_matches().size(), matches.size());
-
-  // Check to see if `relevance` and `culled_by_provider` are set correctly.
-  // The first `max_matches` matches should keep their relevance score and have
-  // `culled_by_provider` set to false.
-  ACMatches provider_matches = provider->get_matches();
-  std::ranges::for_each(provider_matches.begin(),
-                        std::next(provider_matches.begin(), kMaxMatches),
-                        [&](auto match) {
-                          EXPECT_NE(match.relevance, 0);
-                          EXPECT_FALSE(match.culled_by_provider);
-                        });
-  // Any match beyond that should have their relevance score zeroed and
-  // `culled_by_provider` set.
-  std::ranges::for_each(std::next(provider_matches.begin(), kMaxMatches),
-                        provider_matches.end(), [&](auto match) {
-                          EXPECT_EQ(match.relevance, 0);
-                          EXPECT_TRUE(match.culled_by_provider);
-                        });
-
-  // Now disable the flag. With ML Scoring disabled, `matches_` should actually
-  // be resized and `relevance` and `culled_by_provider` should be untouched.
-  provider->set_matches(matches);
-  EXPECT_EQ(provider->get_matches().size(), matches.size());
-
-  provider->ResizeMatches(kMaxMatches, false);
+  provider->ResizeMatches(kMaxMatches);
   EXPECT_EQ(provider->get_matches().size(), kMaxMatches);
-  std::ranges::for_each(provider->get_matches(), [&](auto match) {
+  for (const auto& match : provider->get_matches()) {
     EXPECT_NE(match.relevance, 0);
-    EXPECT_FALSE(match.culled_by_provider);
-  });
+  }
 }
 
 class AutocompleteProviderPrefetchTest : public AutocompleteProviderTest {

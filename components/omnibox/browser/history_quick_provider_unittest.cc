@@ -19,7 +19,6 @@
 #include "base/run_loop.h"
 #include "base/strings/to_string.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/test/test_bookmark_client.h"
@@ -33,7 +32,6 @@
 #include "components/omnibox/browser/history_test_util.h"
 #include "components/omnibox/browser/history_url_provider.h"
 #include "components/omnibox/browser/omnibox_triggered_feature_service.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/search_engines/template_url_starter_pack_data.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
@@ -1004,43 +1002,6 @@ TEST_F(HistoryQuickProviderTest, MaxMatches) {
 
   matches = provider().matches();
   EXPECT_EQ(matches.size(), provider().provider_max_matches_in_keyword_mode());
-
-  // The provider should not limit the number of suggestions when ML scoring
-  // w/increased candidates is enabled. Any matches beyond the limit should be
-  // marked as culled_by_provider and have a relevance of 0.
-  input.set_in_keyword_mode(false);
-
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeaturesAndParameters(
-      /*enabled_features=*/
-      {{omnibox::kUrlScoringModel, {}},
-       {omnibox::kMlUrlScoring,
-        {{"MlUrlScoringUnlimitedNumCandidates", "true"}}}},
-      /*disabled_features=*/{});
-  OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
-
-  provider().Start(input, false);
-  matches = provider().matches();
-  EXPECT_EQ(matches.size(), 8u);
-  // Matches below the `max_matches` limit.
-  for (size_t i = 0; i < provider().provider_max_matches(); i++) {
-    EXPECT_FALSE(matches[i].culled_by_provider);
-    EXPECT_GT(matches[i].relevance, 0);
-  }
-  // "Extra" matches above the `max_matches` limit. Should have 0 relevance and
-  // be marked as `culled_by_provider`.
-  for (size_t i = provider().provider_max_matches(); i < matches.size(); i++) {
-    EXPECT_TRUE(matches[i].culled_by_provider);
-    EXPECT_EQ(matches[i].relevance, 0);
-  }
-
-  // Unlimited matches should ignore the provider max matches, even if the
-  // `kMlUrlScoringMaxMatchesByProvider` param is set.
-  scoped_ml_config.GetMLConfig().ml_url_scoring_max_matches_by_provider = "*:6";
-
-  provider().Start(input, false);
-  matches = provider().matches();
-  EXPECT_EQ(matches.size(), 8u);
 }
 
 TEST_F(HistoryQuickProviderTest, GroupForAndroidHub) {

@@ -690,9 +690,6 @@ struct AutocompleteMatch {
   // Returns true if the match is eligible for ML scoring signal logging.
   bool IsMlSignalLoggingEligible() const;
 
-  // Returns true if the match is eligible to be re-scored by ML scoring.
-  bool IsMlScoringEligible() const;
-
   // Filter `OmniboxActions` based on the supplied qualifiers. The order of the
   // supplied qualifiers determines the preference.
   void FilterOmniboxActions(
@@ -1061,16 +1058,6 @@ struct AutocompleteMatch {
 
   // Signals for ML scoring.
   std::optional<ScoringSignals> scoring_signals;
-
-  // A flag to mark whether this would've been excluded from the "original" list
-  // of matches. Traditionally, providers limit the number of suggestions they
-  // provide to the top N most relevant matches. When ML scoring is enabled,
-  // however, providers pass ALL suggestion candidates to the controller. When
-  // this flag is true, this match is an "extra" suggestion that would've
-  // originally been culled by the provider.
-  // TODO(yoangela|manukh): Currently unused except in tests. Remove if not
-  //   needed. Might be needed when increasing the max provider limit?
-  bool culled_by_provider = false;
 
   // True for shortcut suggestions that were boosted. Used for grouping logic.
   // TODO(manukh): Remove this field and use `suggestion_group_id` once grouping

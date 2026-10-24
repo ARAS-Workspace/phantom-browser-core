@@ -24,11 +24,6 @@ FakeAutocompleteProviderClient::FakeAutocompleteProviderClient() {
           /*identity_manager=*/nullptr,
           /*url_loader_factory=*/nullptr);
 
-  on_device_tail_model_service_ =
-      std::make_unique<FakeOnDeviceTailModelService>();
-  scoring_model_service_ =
-      std::make_unique<FakeAutocompleteScoringModelService>();
-
   fake_tab_group_sync_service_ =
       std::make_unique<tab_groups::FakeTabGroupSyncService>();
 
@@ -117,16 +112,6 @@ scoped_refptr<history::TopSites> FakeAutocompleteProviderClient::GetTopSites() {
 
 std::string FakeAutocompleteProviderClient::ProfileUserName() const {
   return "goodEmail@gmail.com";
-}
-
-OnDeviceTailModelService*
-FakeAutocompleteProviderClient::GetOnDeviceTailModelService() const {
-  return on_device_tail_model_service_.get();
-}
-
-FakeAutocompleteScoringModelService*
-FakeAutocompleteProviderClient::GetAutocompleteScoringModelService() const {
-  return scoring_model_service_.get();
 }
 
 void FakeAutocompleteProviderClient::ResetGeolocationPermissionToAsk(

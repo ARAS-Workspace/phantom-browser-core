@@ -32,7 +32,6 @@
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/autocomplete_match_classification.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
-#include "components/omnibox/browser/autocomplete_scoring_signals_annotator.h"
 #include "components/omnibox/browser/history_cluster_provider.h"
 #include "components/omnibox/browser/history_url_provider.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
@@ -349,14 +348,7 @@ void ShortcutsProvider::DoAutocomplete(const AutocompleteInput& input,
                    ? elem1.contents < elem2.contents
                    : elem1.relevance > elem2.relevance;
       });
-  // TODO(manukh): Some inputs have 1000+ shortcuts. Even if
-  //   `IsMlUrlScoringUnlimitedNumCandidatesEnabled()` is enabled, we should use
-  //   some limit, greater than `provider_max_matches_`, but less than 1000.
-  //   Likewise for other providers.
-  bool ignore_provider_limit =
-      OmniboxFieldTrial::IsMlUrlScoringUnlimitedNumCandidatesEnabled();
-  if (!ignore_provider_limit &&
-      shortcut_matches.size() > provider_max_matches_) {
+  if (shortcut_matches.size() > provider_max_matches_) {
     shortcut_matches.erase(shortcut_matches.begin() + provider_max_matches_,
                            shortcut_matches.end());
   }
@@ -381,7 +373,7 @@ void ShortcutsProvider::DoAutocomplete(const AutocompleteInput& input,
         return match;
       });
 
-  ResizeMatches(provider_max_matches_, ignore_provider_limit);
+  ResizeMatches(provider_max_matches_);
   std::ranges::transform(
       history_cluster_shortcut_matches, std::back_inserter(matches_),
       [&](const auto& shortcut_match) {

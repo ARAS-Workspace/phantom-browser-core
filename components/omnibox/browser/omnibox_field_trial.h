@@ -261,21 +261,6 @@ bool HQPAlsoDoHUPLikeScoring();
 bool HUPSearchDatabase();
 
 // ---------------------------------------------------------
-// For UI experiments.
-
-// On Device Suggestions feature and its helper functions.
-// TODO(crbug.com/40218594): clean up head suggest flags once crbug.com/1307005
-// no longer happens.
-bool IsOnDeviceHeadSuggestEnabledForIncognito();
-bool IsOnDeviceHeadSuggestEnabledForNonIncognito();
-bool IsOnDeviceHeadSuggestEnabledForAnyMode();
-bool IsOnDeviceHeadSuggestEnabledForLocale(const std::string& locale);
-bool IsOnDeviceTailSuggestEnabled(const std::string& locale);
-bool ShouldEncodeLeadingSpaceForOnDeviceTailSuggest();
-// Functions can be used in both non-incognito and incognito.
-std::string OnDeviceHeadModelLocaleConstraint(bool is_incognito);
-
-// ---------------------------------------------------------
 // Clipboard URL suggestions:
 
 // The parameter "ClipboardURLMaximumAge" doesn't live in this file; instead
@@ -340,9 +325,6 @@ extern const char kUIMaxAutocompleteMatchesParam[];
 // URLs; otherwise show 8 suggestions.
 extern const char kDynamicMaxAutocompleteUrlCutoffParam[];
 extern const char kDynamicMaxAutocompleteIncreasedLimitParam[];
-
-// Parameter names used by on device head model.
-extern const char kOnDeviceHeadModelLocaleConstraint[];
 
 // The amount of time to wait before sending a new suggest request after the
 // previous one unless overridden by a field trial parameter.
@@ -428,128 +410,9 @@ struct MLConfig {
   // Equivalent to omnibox::kLogUrlScoringSignals.
   bool log_url_scoring_signals{false};
 
-  // If true, enables history scoring signal annotator for populating history
-  // scoring signals associated with Search suggestions. These signals will be
-  // empty for Search suggestions otherwise.
-  bool enable_history_scoring_signals_annotator_for_searches{false};
-
-  // If true, enables scoring signal annotators for populating additional
-  // Omnibox URL scoring signals for logging or ML scoring.
-  bool enable_scoring_signals_annotators{false};
-
   // If true, document suggestions from the shortcut provider will include
   // shortcut signals.
   bool shortcut_document_signals{false};
-
-  // If true, runs the ML scoring model to assign new relevance scores to the
-  // URL suggestions and reranks them.
-  // Equivalent to omnibox::kMlUrlScoring.
-  bool ml_url_scoring{false};
-
-  // If true, runs the ML scoring model but does not assign new relevance scores
-  // to the URL suggestions and does not rerank them.
-  // Equivalent to OmniboxFieldTrial::kMlUrlScoringCounterfactual.
-  bool ml_url_scoring_counterfactual{false};
-
-  // If true, increases the number of candidates the URL autocomplete providers
-  // pass to the controller beyond `provider_max_matches`.
-  // `ml_url_scoring_max_matches_by_provider` does nothing if this is true.
-  // Equivalent to OmniboxFieldTrial::kMlUrlScoringUnlimitedNumCandidates.
-  bool ml_url_scoring_unlimited_num_candidates{false};
-
-  // If true, creates Omnibox autocomplete URL scoring model.
-  // Equivalent to omnibox::kUrlScoringModel.
-  bool url_scoring_model{false};
-
-  // Sets the maximum matches provided by each provider.  See
-  // `OmniboxFieldTrial::GetProviderMaxMatches()` for more info. When ML Scoring
-  // is enabled, this param takes precedence over
-  // `OmniboxFieldTrial::kUIMaxAutocompleteMatchesByProviderParam`. This param
-  // has no effect if `ml_url_scoring_unlimited_num_candidates` is true.
-  std::string ml_url_scoring_max_matches_by_provider;
-
-  // There are 3 implementations for mapping ML scores [0, 1] to usable
-  // relevances scores.
-  // 1) The original implementation in `RunBatchUrlScoringModel()`. This
-  //    redistributes the traditional relevance scores and shortcut boosting so
-  //    that the highest ML scoring URLs are assigned the highest traditional
-  //    scores, but the overall set of scores remains unchanged. This results in
-  //    mostly stable search v URL balance, but can change the default match
-  //    from a URL to a search; or vice versa; and therefore also change the
-  //    number of URLs above searches by +/- 1; because it doesn't consider
-  //    `allowed_to_be_default`. We've experimented with this for multiple
-  //    milestone, so this has the advantage in potentially launching first.
-  // 2) The `mapped_search_blending` implementation in
-  //    `RunBatchUrlScoringModelMappedSearchBlending()`. It maps ML scores
-  //    linearly to a relevance score. Unlike the above 2, instead of trying to
-  //    maintain search v URL balance for each individual input, it tries to
-  //    balance them across all inputs, but allows shifts for individual inputs.
-  //    Not keeping the search v URL balance fixed for each individual input is
-  //    the long term goal, though we may end up with a more complicated or ML
-  //    approach.
-  // 3) The `piecewise_mapped_search_blending` implementation in
-  //    `RunBatchUrlScoringModelPiecewiseMappedSearchBlending()`. It maps ML
-  //    scores to relevance scores using a piecewise function (which must be
-  //    continuous with respect to ML scores) composed of individual line
-  //    segments whose break points are specified by
-  //    `piecewise_mapped_search_blending_break_points`. The Search vs Url
-  //    behavior of this implementation is similar to that noted above in (2).
-
-  // Enables approach (2) above.
-  // Map ML scores [0, 1] to [`min`, `max`]. Groups URLs above searches if their
-  // mapped relevance is greater than
-  // `mapped_search_blending_grouping_threshold`.
-  bool mapped_search_blending{false};
-  int mapped_search_blending_min{600};
-  int mapped_search_blending_max{2800};
-  int mapped_search_blending_grouping_threshold{1400};
-
-  // Enables approach (3) above.
-  // Map ML scores [0, 1] to relevance scores by using a piecewise score mapping
-  // function. Groups URLs above searches if their mapped relevance is greater
-  // than `piecewise_mapped_search_blending_grouping_threshold`.
-  bool piecewise_mapped_search_blending{false};
-  int piecewise_mapped_search_blending_grouping_threshold{1400};
-  // Specifies a list of N break points (x, y) which collectively define the N-1
-  // line segments that comprise the piecewise score mapping function. The list
-  // of break points must be sorted in ascending order with respect to their
-  // x-coordinates. This list of break points will be applied to score any
-  // suggestion which doesn't satisfy the criteria for applying one of the more
-  // specific break points params listed below.
-  // As an example, if we use "0,550;0.018,1300;0.14,1398;1,1422" as the value
-  // for this param, then the resulting list of break points would be [(0, 550),
-  // (0.018, 1300), (0.14, 1398), (1, 1422)].
-  std::string piecewise_mapped_search_blending_break_points;
-  // Similar to `piecewise_mapped_search_blending_break_points`, this param
-  // specifies a list of break points that will only be used when scoring
-  // verbatim URL suggestions.
-  // A "verbatim URL" suggestion is any suggestion that is UWYT itself or has
-  // been deduped with a UWYT suggestion.
-  std::string piecewise_mapped_search_blending_break_points_verbatim_url;
-  // Similar to `piecewise_mapped_search_blending_break_points`, this param
-  // specifies a list of break points that will only be used when scoring
-  // Search suggestions.
-  std::string piecewise_mapped_search_blending_break_points_search;
-  // Specifies a bias term that will be added to the relevance score which was
-  // computed by the piecewise score mapping function. By varying this term,
-  // it's possible to make the piecewise mapping function more or less
-  // aggressive at a global scale.
-  // The same bias param value will be used regardless of which one of the above
-  // "break points" variants is currently in use.
-  int piecewise_mapped_search_blending_relevance_bias{0};
-
-  // If true, ML scoring service will utilize in-memory ML score cache.
-  // Equivalent to omnibox::kMlUrlScoreCaching.
-  bool ml_url_score_caching{false};
-  // Maximum number of cached entries to store in the ML score cache.
-  int max_ml_score_cache_size{30};
-
-  // If true, Search suggestions will be eligible for re-ranking via ML scoring.
-  bool enable_ml_scoring_for_searches{false};
-
-  // If true, verbatim URL suggestions will be eligible for re-ranking via ML
-  // scoring.
-  bool enable_ml_scoring_for_verbatim_urls{false};
 };
 
 // A testing utility class for overriding the current configuration returned
@@ -579,50 +442,6 @@ bool IsReportingUrlScoringSignalsEnabled();
 // If enabled, populates scoring signals of URL matches.
 bool IsPopulatingUrlScoringSignalsEnabled();
 
-// Whether the scoring signal annotators are enabled for logging Omnibox scoring
-// signals to OmniboxEventProto.
-bool AreScoringSignalsAnnotatorsEnabled();
-
-// If enabled, runs the ML scoring model to assign new relevance scores to the
-// URL suggestions and reranks them.
-bool IsMlUrlScoringEnabled();
-
-// If true, runs the ML scoring model but does not assign new relevance scores
-// to URL suggestions.
-bool IsMlUrlScoringCounterfactual();
-
-// If true, increases the number of candidates the url autocomplete providers
-// pass to the controller.
-bool IsMlUrlScoringUnlimitedNumCandidatesEnabled();
-
-// Whether the URL scoring model is enabled.
-bool IsUrlScoringModelEnabled();
-
-// Whether ML URL score caching is enabled.
-bool IsMlUrlScoreCachingEnabled();
-
-enum class PiecewiseMappingVariant {
-  // Regular piecewise score mapping for most suggestion types.
-  kRegular,
-  // Piecewise score mapping specific to verbatim URL suggestions.
-  kVerbatimUrl,
-  // Piecewise score mapping specific to Search suggestions.
-  kSearch,
-
-  kPiecewiseMappingVariantSize,
-};
-
-// Converts the `piecewise_break_points` feature param into a vector of (x, y)
-// coordinates specifying the "break points" of the piecewise ML score mapping
-// function.
-// The `mapping_variant` parameter allows callers to fetch an alternative list
-// of break points which might be more relevant for suggestions of a certain
-// type.
-std::vector<std::pair<double, int>> GetPiecewiseMappingBreakPoints(
-    PiecewiseMappingVariant mapping_variant =
-        PiecewiseMappingVariant::kRegular);
-
-// <- Ipad suggestions limit
 // ---------------------------------------------------------
 // <- ML Relevance Scoring
 // ---------------------------------------------------------

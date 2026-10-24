@@ -30,7 +30,6 @@
 #include "components/omnibox/browser/autocomplete_provider_debouncer.h"
 #include "components/omnibox/browser/autocomplete_provider_listener.h"
 #include "components/omnibox/browser/autocomplete_result.h"
-#include "components/omnibox/browser/autocomplete_scoring_signals_annotator.h"
 #include "third_party/omnibox_proto/types.pb.h"
 
 class BookmarkProvider;
@@ -43,7 +42,6 @@ class HistoryQuickProvider;
 class HistoryURLProvider;
 class KeywordProvider;
 class OmniboxTriggeredFeatureService;
-class OnDeviceHeadProvider;
 class OpenTabProvider;
 class SearchProvider;
 class TabGroupProvider;
@@ -135,11 +133,6 @@ class AutocompleteController : public AutocompleteProviderListener,
     virtual void OnResultChanged(AutocompleteController* controller,
                                  bool default_match_changed) {}
 
-    // Invoked when a ML scoring batch completes, i.e. `OnUrlScoringModelDone()`
-    // completes.
-    virtual void OnMlScored(AutocompleteController* controller,
-                            const AutocompleteResult& result) {}
-
     // Invoked when autocomplete stop timer is triggered.
     virtual void OnAutocompleteStopTimerTriggered(
         const AutocompleteInput& input) {}
@@ -156,13 +149,6 @@ class AutocompleteController : public AutocompleteProviderListener,
   static void ExtendMatchSubtypes(
       const AutocompleteMatch& match,
       base::flat_set<omnibox::SuggestSubtype>* subtypes);
-
-  // Given an `ml_score` in the range [0, 1], computes the corresponding
-  // relevance score using the piecewise function described by the given
-  // `break_points`.
-  static int ApplyPiecewiseScoringTransform(
-      double ml_score,
-      std::vector<std::pair<double, int>> break_points);
 
   // `provider_client` is passed to all providers.`config` customizes
   // autocomplete behavior for its embedders.
@@ -401,10 +387,6 @@ class AutocompleteController : public AutocompleteProviderListener,
   // `internal_result_`.
   void AggregateNewMatches();
 
-  // `UpdateResult()` helper. Gets ML scores for eligible matches in
-  // `internal_result_` and then sorts `internal_result_` accordingly.
-  void MlRerank(OldResult& old_result);
-
   // `UpdateResult()` helper. Calls multiple other helpers (see implementation).
   void PostProcessMatches();
 
@@ -471,12 +453,6 @@ class AutocompleteController : public AutocompleteProviderListener,
       const base::trace_event::MemoryDumpArgs& args,
       base::trace_event::ProcessMemoryDump* process_memory_dump) override;
 
-  // Runs the batch scoring for all the eligible matches in `results_.matches_`.
-  void RunBatchUrlScoringModel(OldResult& old_result);
-  void RunBatchUrlScoringModelMappedSearchBlending(OldResult& old_result);
-  void RunBatchUrlScoringModelPiecewiseMappedSearchBlending(
-      OldResult& old_result);
-
   // Constructs a destination URL from supplied search terms args.
   // TODO(crbug.com/40257536): look for a way to dissolve this function into
   // direct application where it's needed.
@@ -517,7 +493,6 @@ class AutocompleteController : public AutocompleteProviderListener,
   raw_ptr<UnscopedExtensionProvider> unscoped_extension_provider_ = nullptr;
   raw_ptr<SearchProvider> search_provider_ = nullptr;
   raw_ptr<ZeroSuggestProvider> zero_suggest_provider_ = nullptr;
-  raw_ptr<OnDeviceHeadProvider> on_device_head_provider_ = nullptr;
   raw_ptr<ClipboardProvider> clipboard_provider_ = nullptr;
   raw_ptr<VoiceSuggestProvider> voice_suggest_provider_ = nullptr;
   raw_ptr<HistoryFuzzyProvider> history_fuzzy_provider_ = nullptr;
@@ -525,12 +500,6 @@ class AutocompleteController : public AutocompleteProviderListener,
   raw_ptr<TabGroupProvider> tab_group_provider_ = nullptr;
   raw_ptr<FeaturedSearchProvider> featured_search_provider_ = nullptr;
   raw_ptr<ContextualSearchProvider> contextual_search_provider_ = nullptr;
-
-  // A vector of scoring signals annotators for URL suggestions.
-  // Unlike the other existing annotators (e.g., pedals and keywords), these
-  // signal annotations should be done before the sort and cull pass.
-  std::vector<std::unique_ptr<AutocompleteScoringSignalsAnnotator>>
-      url_scoring_signals_annotators_;
 
   // Input passed to Start.
   AutocompleteInput input_;

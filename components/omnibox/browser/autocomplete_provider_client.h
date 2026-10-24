@@ -18,7 +18,6 @@
 
 class AutocompleteClassifier;
 class AutocompleteSchemeClassifier;
-class AutocompleteScoringModelService;
 class DocumentSuggestionsService;
 class GURL;
 class GeolocationHeaderService;
@@ -27,7 +26,6 @@ class KeywordExtensionsDelegate;
 class KeywordProvider;
 class OmniboxPedalProvider;
 class OmniboxTriggeredFeatureService;
-class OnDeviceTailModelService;
 class PrefService;
 class RemoteSuggestionsService;
 class ShortcutsBackend;
@@ -115,9 +113,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   GetUnscopedExtensionProviderDelegate(UnscopedExtensionProvider* provider) = 0;
   virtual OmniboxTriggeredFeatureService* GetOmniboxTriggeredFeatureService()
       const = 0;
-  virtual AutocompleteScoringModelService* GetAutocompleteScoringModelService()
-      const = 0;
-  virtual OnDeviceTailModelService* GetOnDeviceTailModelService() const = 0;
   virtual ProviderStateService* GetProviderStateService() const = 0;
   virtual tab_groups::TabGroupSyncService* GetTabGroupSyncService() const = 0;
   virtual sync_sessions::SessionSyncService* GetSessionSyncService() const = 0;

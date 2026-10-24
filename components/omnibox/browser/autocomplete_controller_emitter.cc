@@ -7,7 +7,6 @@
 #include "build/build_config.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_input.h"
-#include "components/omnibox/browser/autocomplete_result.h"
 
 AutocompleteControllerEmitter::AutocompleteControllerEmitter() = default;
 AutocompleteControllerEmitter::~AutocompleteControllerEmitter() = default;
@@ -35,11 +34,4 @@ void AutocompleteControllerEmitter::OnResultChanged(
   for (auto& observer : observers_) {
     observer.OnResultChanged(controller, default_match_changed);
   }
-}
-
-void AutocompleteControllerEmitter::OnMlScored(
-    AutocompleteController* controller,
-    const AutocompleteResult& result) {
-  for (auto& observer : observers_)
-    observer.OnMlScored(controller, result);
 }

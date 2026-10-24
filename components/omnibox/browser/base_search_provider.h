@@ -90,17 +90,6 @@ class BaseSearchProvider : public AutocompleteProvider {
       const TemplateURL* template_url,
       const SearchTermsData& search_terms_data);
 
-  // A helper function to return an AutocompleteMatch for on device provider.
-  static AutocompleteMatch CreateOnDeviceSearchSuggestion(
-      AutocompleteProvider* autocomplete_provider,
-      const AutocompleteInput& input,
-      const std::u16string& suggestion,
-      int relevance,
-      const TemplateURL* template_url,
-      const SearchTermsData& search_terms_data,
-      int accepted_suggestion,
-      bool is_tail_suggestion);
-
   static scoped_refptr<OmniboxAction> CreateActionInSuggest(
       omnibox::SuggestTemplateInfo::TemplateAction template_action,
       const TemplateURLRef& search_url,

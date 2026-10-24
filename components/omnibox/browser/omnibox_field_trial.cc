@@ -16,7 +16,6 @@
 #include "base/no_destructor.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
-#include "base/strings/string_util.h"
 #include "base/system/sys_info.h"
 #include "base/time/time.h"
 #include "base/trace_event/memory_usage_estimator.h"
@@ -104,14 +103,6 @@ OmniboxFieldTrial::MLConfig& GetMLConfigInternal() {
   return *s_config;
 }
 
-bool IsKoreanLocale(const std::string& locale) {
-  return locale == "ko" || locale == "ko-KR";
-}
-
-bool IsEnglishLocale(const std::string& locale) {
-  return base::StartsWith(locale, "en", base::CompareCase::SENSITIVE);
-}
-
 }  // namespace
 
 HUPScoringParams::ScoreBuckets::ScoreBuckets()
@@ -171,15 +162,9 @@ size_t OmniboxFieldTrial::GetProviderMaxMatches(
     AutocompleteProvider::Type provider) {
   size_t default_max_matches_per_provider = 3;
 
-  std::string param_value;
-  if (OmniboxFieldTrial::IsMlUrlScoringEnabled()) {
-    param_value =
-        OmniboxFieldTrial::GetMLConfig().ml_url_scoring_max_matches_by_provider;
-  } else {
-    param_value = base::GetFieldTrialParamValueByFeature(
-        omnibox::kUIExperimentMaxAutocompleteMatches,
-        OmniboxFieldTrial::kUIMaxAutocompleteMatchesByProviderParam);
-  }
+  std::string param_value = base::GetFieldTrialParamValueByFeature(
+      omnibox::kUIExperimentMaxAutocompleteMatches,
+      OmniboxFieldTrial::kUIMaxAutocompleteMatchesByProviderParam);
 
   // If the experiment param specifies a max results for |provider|, return the
   // specified limit.
@@ -423,63 +408,6 @@ bool OmniboxFieldTrial::HUPSearchDatabase() {
   return value.empty() || (value == "true");
 }
 
-bool OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForIncognito() {
-  return base::FeatureList::IsEnabled(omnibox::kOnDeviceHeadProviderIncognito);
-}
-
-bool OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForNonIncognito() {
-  return base::FeatureList::IsEnabled(
-      omnibox::kOnDeviceHeadProviderNonIncognito);
-}
-
-bool OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForAnyMode() {
-  return IsOnDeviceHeadSuggestEnabledForIncognito() ||
-         IsOnDeviceHeadSuggestEnabledForNonIncognito();
-}
-
-bool OmniboxFieldTrial::IsOnDeviceTailSuggestEnabled(
-    const std::string& locale) {
-  // Tail model will only be enabled when head provider is also enabled.
-  if (!IsOnDeviceHeadSuggestEnabledForAnyMode()) {
-    return false;
-  }
-
-  // On Desktop the model is only launched for English locales.
-  if (IsEnglishLocale(locale)) {
-    return base::FeatureList::IsEnabled(
-        omnibox::kOnDeviceTailEnableEnglishModel);
-  }
-
-  return base::FeatureList::IsEnabled(omnibox::kOnDeviceTailModel);
-}
-
-bool OmniboxFieldTrial::ShouldEncodeLeadingSpaceForOnDeviceTailSuggest() {
-  return base::GetFieldTrialParamByFeatureAsBool(omnibox::kOnDeviceTailModel,
-                                                 "ShouldEncodeLeadingSpace",
-                                                 /*default_value=*/false);
-}
-
-bool OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForLocale(
-    const std::string& locale) {
-  if (IsKoreanLocale(locale)) {
-    return false;
-  }
-  return IsOnDeviceHeadSuggestEnabledForAnyMode();
-}
-
-std::string OmniboxFieldTrial::OnDeviceHeadModelLocaleConstraint(
-    bool is_incognito) {
-  const base::Feature* feature =
-      is_incognito ? &omnibox::kOnDeviceHeadProviderIncognito
-                   : &omnibox::kOnDeviceHeadProviderNonIncognito;
-  std::string constraint = base::GetFieldTrialParamValueByFeature(
-      *feature, kOnDeviceHeadModelLocaleConstraint);
-  if (constraint.empty()) {
-    constraint = "500000";
-  }
-  return constraint;
-}
-
 const char OmniboxFieldTrial::kBundledExperimentFieldTrialName[] =
     "OmniboxBundledExperimentV1";
 const char OmniboxFieldTrial::kDisableProvidersRule[] = "DisableProviders";
@@ -541,9 +469,6 @@ const char OmniboxFieldTrial::kDynamicMaxAutocompleteIncreasedLimitParam[] =
     "OmniboxDynamicMaxAutocompleteIncreasedLimit";
 const char OmniboxFieldTrial::kSuppressPsuggestBackfillWithMIAParam[] =
     "SuppressPsuggestBackfillWithMIA";
-
-const char OmniboxFieldTrial::kOnDeviceHeadModelLocaleConstraint[] =
-    "ForceModelLocaleConstraint";
 
 int OmniboxFieldTrial::kDefaultMinimumTimeBetweenSuggestQueriesMs = 100;
 
@@ -642,138 +567,12 @@ const base::FeatureParam<size_t>
 // ---------------------------------------------------------
 // ML Relevance Scoring ->
 
-// If true, enables scoring signal annotators for logging Omnibox scoring
-// signals to OmniboxEventProto.
-const base::FeatureParam<bool> kEnableScoringSignalsAnnotatorsForLogging(
-    &omnibox::kLogUrlScoringSignals,
-    "enable_scoring_signals_annotators",
-    false);
-
-// If true, enables scoring signal annotators for ML scoring.
-const base::FeatureParam<bool> kEnableScoringSignalsAnnotatorsForMlScoring(
-    &omnibox::kMlUrlScoring,
-    "enable_scoring_signals_annotators_for_ml_scoring",
-    true);
-
-// If true, runs the ML scoring model but does not assign new relevance scores
-// to the URL suggestions and does not rerank them.
-const base::FeatureParam<bool> kMlUrlScoringCounterfactual(
-    &omnibox::kMlUrlScoring,
-    "MlUrlScoringCounterfactual",
-    false);
-
-// If true, increases the number of candidates the URL autocomplete providers
-// pass to the controller beyond `provider_max_matches`.
-const base::FeatureParam<bool> kMlUrlScoringUnlimitedNumCandidates(
-    &omnibox::kMlUrlScoring,
-    "MlUrlScoringUnlimitedNumCandidates",
-    false);
-
-const base::FeatureParam<std::string> kMlUrlScoringMaxMatchesByProvider(
-    &omnibox::kMlUrlScoring,
-    "MlUrlScoringMaxMatchesByProvider",
-    "");
-
 MLConfig::MLConfig() {
   log_url_scoring_signals =
       base::FeatureList::IsEnabled(omnibox::kLogUrlScoringSignals);
-  enable_history_scoring_signals_annotator_for_searches =
-      base::FeatureList::IsEnabled(
-          omnibox::kEnableHistoryScoringSignalsAnnotatorForSearches);
-  enable_scoring_signals_annotators =
-      kEnableScoringSignalsAnnotatorsForLogging.Get() ||
-      kEnableScoringSignalsAnnotatorsForMlScoring.Get();
   shortcut_document_signals =
       base::FeatureParam<bool>(&omnibox::kLogUrlScoringSignals,
                                "MlUrlScoringShortcutDocumentSignals", false)
-          .Get() ||
-      base::FeatureParam<bool>(&omnibox::kMlUrlScoring,
-                               "MlUrlScoringShortcutDocumentSignals", true)
-          .Get();
-
-  ml_url_scoring = base::FeatureList::IsEnabled(omnibox::kMlUrlScoring);
-  ml_url_scoring_counterfactual = kMlUrlScoringCounterfactual.Get();
-  ml_url_scoring_unlimited_num_candidates =
-      kMlUrlScoringUnlimitedNumCandidates.Get();
-  ml_url_scoring_max_matches_by_provider =
-      kMlUrlScoringMaxMatchesByProvider.Get();
-
-  // `kMlUrlSearchBlending` parameters.
-  mapped_search_blending =
-      base::FeatureParam<bool>(&omnibox::kMlUrlSearchBlending,
-                               "MlUrlSearchBlending_MappedSearchBlending",
-                               mapped_search_blending)
-          .Get();
-  mapped_search_blending_min =
-      base::FeatureParam<int>(&omnibox::kMlUrlSearchBlending,
-                              "MlUrlSearchBlending_MappedSearchBlendingMin",
-                              mapped_search_blending_min)
-          .Get();
-  mapped_search_blending_max =
-      base::FeatureParam<int>(&omnibox::kMlUrlSearchBlending,
-                              "MlUrlSearchBlending_MappedSearchBlendingMax",
-                              mapped_search_blending_max)
-          .Get();
-  mapped_search_blending_grouping_threshold =
-      base::FeatureParam<int>(
-          &omnibox::kMlUrlSearchBlending,
-          "MlUrlSearchBlending_MappedSearchBlendingGroupingThreshold",
-          mapped_search_blending_grouping_threshold)
-          .Get();
-
-  // `kMlUrlPiecewiseMappedSearchBlending` parameters.
-  piecewise_mapped_search_blending =
-      base::FeatureParam<bool>(&omnibox::kMlUrlPiecewiseMappedSearchBlending,
-                               "MlUrlPiecewiseMappedSearchBlending",
-                               piecewise_mapped_search_blending)
-          .Get();
-  piecewise_mapped_search_blending_grouping_threshold =
-      base::FeatureParam<int>(
-          &omnibox::kMlUrlPiecewiseMappedSearchBlending,
-          "MlUrlPiecewiseMappedSearchBlending_GroupingThreshold",
-          piecewise_mapped_search_blending_grouping_threshold)
-          .Get();
-  piecewise_mapped_search_blending_break_points =
-      base::FeatureParam<std::string>(
-          &omnibox::kMlUrlPiecewiseMappedSearchBlending,
-          "MlUrlPiecewiseMappedSearchBlending_BreakPoints", "")
-          .Get();
-  piecewise_mapped_search_blending_break_points_verbatim_url =
-      base::FeatureParam<std::string>(
-          &omnibox::kMlUrlPiecewiseMappedSearchBlending,
-          "MlUrlPiecewiseMappedSearchBlending_BreakPoints_VerbatimUrl",
-          piecewise_mapped_search_blending_break_points.c_str())
-          .Get();
-  piecewise_mapped_search_blending_break_points_search =
-      base::FeatureParam<std::string>(
-          &omnibox::kMlUrlPiecewiseMappedSearchBlending,
-          "MlUrlPiecewiseMappedSearchBlending_BreakPoints_Search", "0,0;1,1400")
-          .Get();
-  piecewise_mapped_search_blending_relevance_bias =
-      base::FeatureParam<int>(
-          &omnibox::kMlUrlPiecewiseMappedSearchBlending,
-          "MlUrlPiecewiseMappedSearchBlending_RelevanceBias",
-          piecewise_mapped_search_blending_relevance_bias)
-          .Get();
-
-  url_scoring_model = base::FeatureList::IsEnabled(omnibox::kUrlScoringModel);
-
-  ml_url_score_caching =
-      base::FeatureList::IsEnabled(omnibox::kMlUrlScoreCaching);
-  max_ml_score_cache_size =
-      base::FeatureParam<int>(&omnibox::kMlUrlScoreCaching,
-                              "MlUrlScoreCaching_MaxMlScoreCacheSize",
-                              max_ml_score_cache_size)
-          .Get();
-
-  enable_ml_scoring_for_searches =
-      base::FeatureParam<bool>(&omnibox::kMlUrlScoring,
-                               "MlUrlScoring_EnableMlScoringForSearches", false)
-          .Get();
-  enable_ml_scoring_for_verbatim_urls =
-      base::FeatureParam<bool>(&omnibox::kMlUrlScoring,
-                               "MlUrlScoring_EnableMlScoringForVerbatimUrls",
-                               false)
           .Get();
 }
 
@@ -805,65 +604,7 @@ bool IsReportingUrlScoringSignalsEnabled() {
 }
 
 bool IsPopulatingUrlScoringSignalsEnabled() {
-  return IsReportingUrlScoringSignalsEnabled() || IsMlUrlScoringEnabled();
-}
-
-bool AreScoringSignalsAnnotatorsEnabled() {
-  return GetMLConfig().enable_scoring_signals_annotators;
-}
-bool IsMlUrlScoringEnabled() {
-  return IsUrlScoringModelEnabled() && GetMLConfig().ml_url_scoring;
-}
-bool IsMlUrlScoringCounterfactual() {
-  return IsMlUrlScoringEnabled() && GetMLConfig().ml_url_scoring_counterfactual;
-}
-bool IsMlUrlScoringUnlimitedNumCandidatesEnabled() {
-  return IsMlUrlScoringEnabled() &&
-         GetMLConfig().ml_url_scoring_unlimited_num_candidates;
-}
-bool IsUrlScoringModelEnabled() {
-  return GetMLConfig().url_scoring_model;
-}
-bool IsMlUrlScoreCachingEnabled() {
-  return GetMLConfig().ml_url_score_caching;
-}
-
-std::vector<std::pair<double, int>> GetPiecewiseMappingBreakPoints(
-    PiecewiseMappingVariant mapping_variant) {
-  std::vector<std::pair<double, int>> break_points;
-
-  std::string param_value;
-  switch (mapping_variant) {
-    case PiecewiseMappingVariant::kRegular:
-      param_value = OmniboxFieldTrial::GetMLConfig()
-                        .piecewise_mapped_search_blending_break_points;
-      break;
-    case PiecewiseMappingVariant::kVerbatimUrl:
-      param_value =
-          OmniboxFieldTrial::GetMLConfig()
-              .piecewise_mapped_search_blending_break_points_verbatim_url;
-      break;
-    case PiecewiseMappingVariant::kSearch:
-      param_value = OmniboxFieldTrial::GetMLConfig()
-                        .piecewise_mapped_search_blending_break_points_search;
-      break;
-    default:
-      NOTREACHED();
-  }
-
-  base::StringPairs pairs;
-  if (base::SplitStringIntoKeyValuePairs(param_value, ',', ';', &pairs)) {
-    for (const auto& p : pairs) {
-      double ml_score;
-      base::StringToDouble(p.first, &ml_score);
-      int relevance;
-      base::StringToInt(p.second, &relevance);
-
-      break_points.push_back(std::make_pair(ml_score, relevance));
-    }
-  }
-
-  return break_points;
+  return IsReportingUrlScoringSignalsEnabled();
 }
 
 // <- ML Relevance Scoring

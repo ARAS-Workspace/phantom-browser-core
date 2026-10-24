@@ -25,10 +25,6 @@ struct AutocompleteControllerConfig {
   // by the CrOS launcher.
   bool unscoped_open_tab_suggestions = false;
 
-  // Disables ML scoring regardless of its feature state. Used by
-  // chrome://omnibox/ml.
-  bool disable_ml = false;
-
   // Show IPH matches from the `FeaturedSearchProvider`. True for all embedders
   // except the WebUI omnibox popup, which hasn't implemented them yet.
   bool show_iph_matches = true;

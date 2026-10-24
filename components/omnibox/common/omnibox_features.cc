@@ -90,21 +90,6 @@ BASE_FEATURE(kZeroSuggestPrefetchingOnSRP, ENABLED);
 // Web (i.e. non-NTP and non-SRP URLs).
 BASE_FEATURE(kZeroSuggestPrefetchingOnWeb, DISABLED);
 
-// Features to provide head and tail non personalized search suggestion from
-// compact on device models. More specifically, feature name with suffix
-// Incognito / NonIncognito  will only controls behaviors under incognito /
-// non-incognito mode respectively.
-BASE_FEATURE(kOnDeviceHeadProviderIncognito,
-             "OmniboxOnDeviceHeadProviderIncognito",
-             ENABLED);
-BASE_FEATURE(kOnDeviceHeadProviderNonIncognito,
-             "OmniboxOnDeviceHeadProviderNonIncognito",
-             ENABLED);
-BASE_FEATURE(kOnDeviceTailModel, "OmniboxOnDeviceTailModel", DISABLED);
-BASE_FEATURE(kOnDeviceTailEnableEnglishModel,
-             "OmniboxOnDeviceTailEnableEnglishModel",
-             ENABLED);
-
 // Feature used to fetch document suggestions.
 BASE_FEATURE(kDocumentProvider, "OmniboxDocumentProvider", ENABLED);
 
@@ -206,32 +191,6 @@ const char kDefaultTypedNavigationsToHttpsTimeoutParam[] = "timeout";
 // If enabled, logs Omnibox URL scoring signals to OmniboxEventProto for
 // training the ML scoring models.
 BASE_FEATURE(kLogUrlScoringSignals, DISABLED);
-
-// If true, enables history scoring signal annotator for populating history
-// scoring signals associated with Search suggestions. These signals will be
-// empty for Search suggestions otherwise.
-BASE_FEATURE(kEnableHistoryScoringSignalsAnnotatorForSearches, DISABLED);
-
-// If enabled, (floating-point) ML model scores are mapped to (integral)
-// relevance scores by means of a piecewise function. This allows for the
-// integration of URL model scores with search traditional scores.
-BASE_FEATURE(kMlUrlPiecewiseMappedSearchBlending, DISABLED);
-
-// If enabled, the ML scoring service will make use of an in-memory ML score
-// cache in order to speed up the overall scoring process.
-BASE_FEATURE(kMlUrlScoreCaching, ENABLED);
-
-// If enabled, runs the ML scoring model to assign new relevance scores to the
-// URL suggestions and reranks them.
-BASE_FEATURE(kMlUrlScoring, ENABLED);
-
-// If enabled, specifies how URL model scores integrate with search traditional
-// scores.
-BASE_FEATURE(kMlUrlSearchBlending, DISABLED);
-
-// If enabled, creates Omnibox autocomplete URL scoring model. Prerequisite for
-// `kMlUrlScoring` & `kMlUrlSearchBlending`.
-BASE_FEATURE(kUrlScoringModel, ENABLED);
 
 // If enabled, sends a signal when a user touches down on a search suggestion to
 // |SearchPrefetchService|. |SearchPrefetchService| will then prefetch

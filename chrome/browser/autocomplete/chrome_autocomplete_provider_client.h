@@ -18,8 +18,6 @@
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "chrome/browser/autocomplete/tab_matcher_desktop.h"
 
-class AutocompleteScoringModelService;
-class OnDeviceTailModelService;
 class Profile;
 class TabMatcher;
 
@@ -91,9 +89,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   OmniboxTriggeredFeatureService* GetOmniboxTriggeredFeatureService()
       const override;
   signin::IdentityManager* GetIdentityManager() const override;
-  AutocompleteScoringModelService* GetAutocompleteScoringModelService()
-      const override;
-  OnDeviceTailModelService* GetOnDeviceTailModelService() const override;
   ProviderStateService* GetProviderStateService() const override;
   tab_groups::TabGroupSyncService* GetTabGroupSyncService() const override;
   sync_sessions::SessionSyncService* GetSessionSyncService() const override;

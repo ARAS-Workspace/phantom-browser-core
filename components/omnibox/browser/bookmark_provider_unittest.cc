@@ -15,17 +15,14 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/uuid.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/titled_url_match.h"
 #include "components/bookmarks/test/test_bookmark_client.h"
 #include "components/omnibox/browser/mock_autocomplete_provider_client.h"
-#include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
 #include "components/omnibox/browser/titled_url_match_utils.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/query_parser/query_parser.h"
 #include "components/search_engines/search_engines_test_environment.h"
 #include "components/search_engines/template_url.h"
@@ -420,7 +417,7 @@ TEST_F(BookmarkProviderTest, InlineAutocompletion) {
       {"http://bl", "http://blah.com/", true, "ah.com"},
       {"fiddle.c", "http://fiddle.com/", true, "om"},
       {"www", "http://www.www.com/", true, ".com"},
-      {"chro", "chrome://version", true, "me://version"},
+      {"chro", "chrome://version", false, ""},
       {"chrome://ve", "chrome://version", true, "rsion"},
       {"chrome ver", "chrome://version", false, ""},
       {"versi", "chrome://version", false, ""},
@@ -480,7 +477,7 @@ TEST_F(BookmarkProviderTest, StripHttpAndAdjustOffsets) {
     { "dom",       "domain.com/http/",        "0:3,3:1"                    },
     { "dom http",  "http://domain.com/http/", "0:3,4:1,7:3,10:1,18:3,22:1" },
     { "rep",       "repeat.com/1/repeat/2/",  "0:3,3:1"                    },
-    { "versi",     "chrome://version",        "0:1,9:3,14:1"               },
+    { "versi",     "phantom://version",       "0:1,10:3,15:1"              },
       // clang-format on
   });
 
@@ -622,43 +619,6 @@ TEST_F(BookmarkProviderTest, MaxMatches) {
 
   matches = provider_->matches();
   EXPECT_EQ(matches.size(), provider_->provider_max_matches_in_keyword_mode());
-
-  // The provider should not limit the number of suggestions when ML scoring
-  // w/increased candidates is enabled. Any matches beyond the limit should be
-  // marked as culled_by_provider and have a relevance of 0.
-  input.set_in_keyword_mode(false);
-
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeaturesAndParameters(
-      /*enabled_features=*/
-      {{omnibox::kUrlScoringModel, {}},
-       {omnibox::kMlUrlScoring,
-        {{"MlUrlScoringUnlimitedNumCandidates", "true"}}}},
-      /*disabled_features=*/{});
-  OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
-
-  provider_->Start(input, false);
-  matches = provider_->matches();
-  EXPECT_EQ(matches.size(), 9u);
-  // Matches below the `max_matches` limit.
-  for (size_t i = 0; i < provider_->provider_max_matches(); i++) {
-    EXPECT_FALSE(matches[i].culled_by_provider);
-    EXPECT_GT(matches[i].relevance, 0);
-  }
-  // "Extra" matches above the `max_matches` limit. Should have 0 relevance and
-  // be marked as `culled_by_provider`.
-  for (size_t i = provider_->provider_max_matches(); i < matches.size(); i++) {
-    EXPECT_TRUE(matches[i].culled_by_provider);
-    EXPECT_EQ(matches[i].relevance, 0);
-  }
-
-  // Unlimited matches should ignore the provider max matches, even if the
-  // `kMlUrlScoringMaxMatchesByProvider` param is set.
-  scoped_ml_config.GetMLConfig().ml_url_scoring_max_matches_by_provider = "*:6";
-
-  provider_->Start(input, false);
-  matches = provider_->matches();
-  EXPECT_EQ(matches.size(), 9u);
 }
 
 TEST_F(BookmarkProviderTest, SetsGroupForHubSearch) {

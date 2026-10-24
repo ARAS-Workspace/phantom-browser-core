@@ -827,45 +827,6 @@ TEST_F(ShortcutsProviderTest, DoAutocompleteAggregateShortcuts) {
     EXPECT_EQ(matches[1].relevance, 1423);
     EXPECT_EQ(matches[2].relevance, 1422);
   }
-
-  {
-    SCOPED_TRACE("ML Signals");
-    // The provider should not limit the number of suggestions when ML scoring
-    // w/increased candidates is enabled. Any matches beyond the limit should be
-    // marked as culled_by_provider and have a relevance of 0.
-    scoped_feature_list_.Reset();
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/
-        {{omnibox::kUrlScoringModel, {}},
-         {omnibox::kMlUrlScoring,
-          {{"MlUrlScoringUnlimitedNumCandidates", "true"}}}},
-        /*disabled_features=*/{});
-
-    OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
-
-    AutocompleteInput input(u"zebra", metrics::OmniboxEventProto::OTHER,
-                            TestSchemeClassifier());
-    provider_->Start(input, false);
-    const auto& matches = provider_->matches();
-    EXPECT_EQ(matches.size(), 4u);
-    // Matches below the limit.
-    EXPECT_FALSE(matches[0].culled_by_provider);
-    EXPECT_GT(matches[0].relevance, 0);
-
-    // Matches that would've originally been culled above the limit should be
-    // marked as such and have a zero relevance score.
-    EXPECT_TRUE(matches[3].culled_by_provider);
-    EXPECT_EQ(matches[3].relevance, 0);
-
-    // Unlimited matches should ignore the provider max matches, even if the
-    // `kMlUrlScoringMaxMatchesByProvider` param is set.
-    scoped_ml_config.GetMLConfig().ml_url_scoring_max_matches_by_provider =
-        "*:2";
-
-    provider_->Start(input, false);
-    const auto& new_matches = provider_->matches();
-    EXPECT_EQ(new_matches.size(), 4u);
-  }
 }
 
 TEST_F(ShortcutsProviderTest, DoAutocompleteWithScoringSignals) {
