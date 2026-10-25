@@ -57,7 +57,6 @@ namespace installer {
 //   "import_bookmarks": false,
 //   "import_history": false,
 //   "import_home_page": false,
-//   "import_saved_passwords": false,
 //   "import_search_engine": false
 // }
 //

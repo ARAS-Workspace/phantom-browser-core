@@ -28,7 +28,6 @@
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
@@ -97,8 +96,6 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
     EXPECT_TRUE(prefs->GetBoolean(language::prefs::kOfferTranslateEnabled));
     EXPECT_EQ(static_cast<int>(prefetch::NetworkPredictionOptions::kDefault),
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
-    EXPECT_TRUE(
-        prefs->GetBoolean(password_manager::prefs::kCredentialsEnableService));
     EXPECT_TRUE(prefs->GetBoolean(prefs::kSearchSuggestEnabled));
     VerifyPrefValueAndControlledState(prefs::kPrivacySandboxM1TopicsEnabled,
                                       base::Value(false),
@@ -135,8 +132,6 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
     EXPECT_FALSE(prefs->GetBoolean(language::prefs::kOfferTranslateEnabled));
     EXPECT_EQ(static_cast<int>(prefetch::NetworkPredictionOptions::kDisabled),
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
-    EXPECT_FALSE(
-        prefs->GetBoolean(password_manager::prefs::kCredentialsEnableService));
     EXPECT_FALSE(prefs->GetBoolean(prefs::kSearchSuggestEnabled));
     VerifyPrefValueAndControlledState(prefs::kPrivacySandboxM1TopicsEnabled,
                                       base::Value(true),
@@ -214,7 +209,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, Standard) {
   prefs->SetInteger(
       prefetch::prefs::kNetworkPredictionOptions,
       static_cast<int>(prefetch::NetworkPredictionOptions::kDisabled));
-  prefs->SetBoolean(password_manager::prefs::kCredentialsEnableService, false);
   prefs->SetBoolean(prefs::kSearchSuggestEnabled, false);
   prefs->SetString(prefs::kWebRTCIPHandlingPolicy,
                    blink::kWebRTCIPHandlingDefaultPublicInterfaceOnly);

@@ -16,7 +16,6 @@
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/embedder_support/pref_names.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
 
@@ -49,9 +48,6 @@ const PrefMappingEntry kMappings[] = {
     {"hyperlinkAuditingEnabled", prefs::kEnableHyperlinkAuditing,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
     {"networkPredictionEnabled", prefetch::prefs::kNetworkPredictionOptions,
-     APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
-    {"passwordSavingEnabled",
-     password_manager::prefs::kCredentialsEnableService,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
 
     {"protectedContentEnabled", prefs::kProtectedContentDefault,

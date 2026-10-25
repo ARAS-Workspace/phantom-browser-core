@@ -39,11 +39,6 @@ function getInitialPrefs(): chrome.settingsPrivate.PrefObject[] {
       value: true,
     },
     {
-      key: 'import_dialog_saved_passwords',
-      type: chrome.settingsPrivate.PrefType.BOOLEAN,
-      value: true,
-    },
-    {
       key: 'import_dialog_search_engine',
       type: chrome.settingsPrivate.PrefType.BOOLEAN,
       value: true,

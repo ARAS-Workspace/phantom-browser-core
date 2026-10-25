@@ -38,7 +38,6 @@
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/pref_names.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -85,13 +84,6 @@ bool IsSettingReadOnly(const std::string& pref_name) {
   }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_MAC)
-  // Can be changed only from C++ after successful re-auth.
-  if (pref_name ==
-      password_manager::prefs::kBiometricAuthenticationBeforeFilling) {
-    return true;
-  }
-#endif
   return false;
 }
 
@@ -245,26 +237,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kDownloadBubblePartialViewEnabled] =
       settings_api::PrefType::kBoolean;
-
-  // Password Manager settings.
-  (*s_allowlist)[password_manager::prefs::kCredentialsEnableService] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[password_manager::prefs::kCredentialsEnableAutosignin] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[password_manager::prefs::kAutomaticPasskeyUpgrades] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[password_manager::prefs::kPasswordSharingEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[password_manager::prefs::kPasswordLeakDetectionEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)
-      [password_manager::prefs::kPasswordDismissCompromisedAlertEnabled] =
-          settings_api::PrefType::kBoolean;
-#if BUILDFLAG(IS_MAC)
-  (*s_allowlist)
-      [password_manager::prefs::kBiometricAuthenticationBeforeFilling] =
-          settings_api::PrefType::kBoolean;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   (*s_allowlist)[::prefs::kCreatePasskeysInICloudKeychain] =
@@ -425,8 +397,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[::prefs::kImportDialogBookmarks] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kImportDialogHistory] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kImportDialogSavedPasswords] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kImportDialogSearchEngine] =
       settings_api::PrefType::kBoolean;

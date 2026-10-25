@@ -341,7 +341,6 @@ void RegisterProfilePrefs(
   registry->RegisterBooleanPref(prefs::kImportBookmarks, false);
   registry->RegisterBooleanPref(prefs::kImportHistory, false);
   registry->RegisterBooleanPref(prefs::kImportHomepage, false);
-  registry->RegisterBooleanPref(prefs::kImportSavedPasswords, false);
   registry->RegisterBooleanPref(prefs::kImportSearchEngine, false);
 }
 

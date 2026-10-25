@@ -33,8 +33,6 @@ source_set("impl") {
   ]
 
   deps = [
-    "//chrome/browser:browser_process",
-    "//chrome/browser/password_manager",
     "//chrome/browser/ui/browser_window",
     "//components/device_reauth",
     "//content/public/browser",
@@ -49,8 +47,12 @@ source_set("impl") {
       "mac/authenticator_mac.mm",
       "mac/device_authenticator_mac.mm",
     ]
+    frameworks = [
+      "Security.framework",
+      "Foundation.framework",
+    ]
     deps += [
-      "//components/password_manager/core/browser/features:password_features",
+      "//chrome/app:branded_strings",
       "//device/fido",
     ]
   }
@@ -68,7 +70,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/device_reauth",
     "//components/device_reauth:test_support",
-    "//components/password_manager/core/common",
     "//components/prefs:test_support",
     "//content/test:test_support",
     "//testing/gmock",

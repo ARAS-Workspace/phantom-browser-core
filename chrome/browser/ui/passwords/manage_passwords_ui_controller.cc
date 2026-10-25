@@ -89,7 +89,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/time/time.h"
-#include "chrome/browser/password_manager/password_manager_util_mac.h"
 #endif
 
 using password_manager::MovePasswordToAccountStoreHelper;

@@ -92,11 +92,6 @@
             "description": "If set, allows site-specific control over Autofill features by blocking specific data categories on matching URL patterns.",
             "nodoc": true
           },
-          "passwordSavingEnabled": {
-            "$ref": "types.ChromeSetting",
-            "value": ["passwordSavingEnabled", {"type":"boolean"}],
-            "description": "If enabled, the password manager will ask if you want to save passwords. This preference's value is a boolean, defaulting to <code>true</code>."
-          },
           "searchSuggestEnabled": {
             "$ref": "types.ChromeSetting",
             "value": ["searchSuggestEnabled", {"type":"boolean"}],

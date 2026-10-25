@@ -13,10 +13,7 @@
 #include "base/time/time.h"
 #include "chrome/browser/device_reauth/chrome_device_authenticator_factory.h"
 #include "chrome/browser/device_reauth/mac/authenticator_mac.h"
-#include "chrome/test/base/testing_browser_process.h"
 #include "components/device_reauth/device_reauth_metrics_util.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/prefs/pref_service.h"
 #include "device/fido/mac/scoped_touch_id_test_environment.h"
 #include "device/fido/mac/touch_id_context.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -90,10 +87,6 @@ class DeviceAuthenticatorMacTest
 
   MockSystemAuthenticator& system_authenticator() {
     return *system_authenticator_;
-  }
-
-  PrefService* local_state() {
-    return TestingBrowserProcess::GetGlobal()->local_state();
   }
 
   base::test::TaskEnvironment& task_environment() { return task_environment_; }
@@ -211,9 +204,6 @@ TEST_P(DeviceAuthenticatorMacTest, BiometricAuthenticationAvailability) {
   EXPECT_CALL(system_authenticator(), CheckIfBiometricsAvailable);
   EXPECT_EQ(authenticator()->CanAuthenticateWithBiometrics(),
             is_biometric_available());
-  EXPECT_EQ(is_biometric_available(),
-            local_state()->GetBoolean(
-                password_manager::prefs::kHadBiometricsAvailable));
 }
 
 TEST_P(DeviceAuthenticatorMacTest,
@@ -226,9 +216,6 @@ TEST_P(DeviceAuthenticatorMacTest,
 
   EXPECT_EQ(authenticator()->CanAuthenticateWithBiometricOrScreenLock(),
             is_biometric_available() || is_screen_lock_available());
-  EXPECT_EQ(is_biometric_available(),
-            local_state()->GetBoolean(
-                password_manager::prefs::kHadBiometricsAvailable));
 }
 
 TEST_P(DeviceAuthenticatorMacTest, RecordSuccessAuthHistogram) {

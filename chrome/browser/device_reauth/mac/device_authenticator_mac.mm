@@ -9,14 +9,9 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/device_reauth/mac/authenticator_mac.h"
-#include "chrome/browser/password_manager/password_manager_util_mac.h"
 #include "chrome/grit/branded_strings.h"
 #include "components/device_reauth/device_authenticator.h"
-#include "components/password_manager/core/browser/features/password_features.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/prefs/pref_service.h"
 #include "device/fido/mac/touch_id_context.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -35,22 +30,13 @@ bool DeviceAuthenticatorMac::CanAuthenticateWithBiometrics() {
   bool is_available = authenticator_->CheckIfBiometricsAvailable();
   base::UmaHistogramBoolean("PasswordManager.CanUseBiometricsMac",
                             is_available);
-  if (is_available) {
-    // If biometrics is available, we should record that at one point in time
-    // biometrics was available on this device. This will never be set to false
-    // after setting to true here as we only record this when biometrics is
-    // available.
-    g_browser_process->local_state()->SetBoolean(
-        password_manager::prefs::kHadBiometricsAvailable, /*value=*/true);
-  }
   return is_available;
 }
 
 bool DeviceAuthenticatorMac::CanAuthenticateWithBiometricOrScreenLock() {
   // We check if we can authenticate strictly with biometrics first as this
   // function has important side effects such as logging metrics related to how
-  // often users have biometrics available, and setting a pref that denotes that
-  // at one point biometrics was available on this device.
+  // often users have biometrics available.
   if (CanAuthenticateWithBiometrics()) {
     return true;
   }

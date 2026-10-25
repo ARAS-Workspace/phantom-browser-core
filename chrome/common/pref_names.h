@@ -638,10 +638,6 @@ inline constexpr char kImportHistory[] = "import_history";
 // browser on first run.
 inline constexpr char kImportHomepage[] = "import_home_page";
 
-// Boolean that specifies whether to import the saved passwords from the default
-// browser on first run.
-inline constexpr char kImportSavedPasswords[] = "import_saved_passwords";
-
 // Boolean that specifies whether to import the search engine from the default
 // browser on first run.
 inline constexpr char kImportSearchEngine[] = "import_search_engine";
@@ -652,8 +648,6 @@ inline constexpr char kImportDialogAutofillFormData[] =
     "import_dialog_autofill_form_data";
 inline constexpr char kImportDialogBookmarks[] = "import_dialog_bookmarks";
 inline constexpr char kImportDialogHistory[] = "import_dialog_history";
-inline constexpr char kImportDialogSavedPasswords[] =
-    "import_dialog_saved_passwords";
 inline constexpr char kImportDialogSearchEngine[] =
     "import_dialog_search_engine";
 

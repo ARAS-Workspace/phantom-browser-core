@@ -5,8 +5,6 @@ include_rules = [
 
     # Allowlisted monolith includes
     "+chrome/browser/ash/auth/legacy_fingerprint_engine.h",
-    "+chrome/browser/browser_process.h",
-    "+chrome/browser/password_manager/password_manager_util_mac.h",
     "+chrome/browser/password_manager/password_manager_util_win.h",
     "+chrome/browser/prefs/browser_prefs.h",
     "+chrome/browser/profiles/profile.h",

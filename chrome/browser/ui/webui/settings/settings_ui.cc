@@ -147,7 +147,6 @@ void SettingsUI::RegisterProfilePrefs(
   registry->RegisterBooleanPref(prefs::kImportDialogAutofillFormData, true);
   registry->RegisterBooleanPref(prefs::kImportDialogBookmarks, true);
   registry->RegisterBooleanPref(prefs::kImportDialogHistory, true);
-  registry->RegisterBooleanPref(prefs::kImportDialogSavedPasswords, true);
   registry->RegisterBooleanPref(prefs::kImportDialogSearchEngine, true);
 }
 
