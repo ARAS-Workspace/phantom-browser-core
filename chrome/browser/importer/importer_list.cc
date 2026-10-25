@@ -89,12 +89,6 @@ void DetectFirefoxProfiles(
     firefox.services_supported = user_data_importer::HISTORY |
                                  user_data_importer::FAVORITES |
                                  user_data_importer::AUTOFILL_FORM_DATA;
-#if !BUILDFLAG(IS_MAC)
-    // Passwords are imported by loading the NSS DLLs into the Chromium process.
-    // Restrictive code signing prevents that from ever working again in modern
-    // macOSes, so don't promise an import service that can't be delivered.
-    firefox.services_supported |= user_data_importer::PASSWORDS;
-#endif
     firefox.locale = locale;
     profiles->push_back(firefox);
   }

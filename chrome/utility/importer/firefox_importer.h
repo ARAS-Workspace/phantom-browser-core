@@ -76,9 +76,6 @@ class FirefoxImporter : public Importer {
   void ImportBookmarks();
   void ImportRemainingItems();
 
-#if !BUILDFLAG(IS_MAC)
-  void ImportPasswords();
-#endif
   void ImportHistory();
   // Import the user's home page, unless it is set to default home page as
   // defined in browserconfig.properties.

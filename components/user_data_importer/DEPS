@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/affiliations/core/browser",
   "+components/autofill/core/browser/data_manager/payments",
   "+components/autofill/core/browser/data_model/payments",
   "+components/autofill/core/browser/foundations",
@@ -11,13 +10,8 @@ include_rules = [
   "+components/history/core/browser",
   "+components/history/core/common",
   "+components/history/core/test",
-  "+components/password_manager/core/browser",
-  "+components/password_manager/core/common",
-  "+components/password_manager/services/csv_password",
   "+components/prefs",
   "+components/strings/grit",
-  "+components/sync/test",
-  "+components/sync/service",
   "+mojo/public/cpp/bindings",
   "+ui/base/l10n",
 ]

@@ -7,7 +7,6 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/types/expected.h"
-#include "components/password_manager/core/browser/import/import_results.h"
 
 namespace user_data_importer {
 
@@ -38,15 +37,6 @@ class SafariDataImportClient {
   // names of these profiles are passed in `profiles`.
   virtual void OnHistoryReady(CountOrError estimated_count) = 0;
 
-  // Invoked when the number of passwords in the input file has been determined.
-  // The results object provides detailed information about passwords with a
-  // conflict (i.e., those where the user already has a
-  // different saved password for the same username/URL); the Client must use
-  // this information to resolve conflicts and continue the import flow.
-  virtual void OnPasswordsReady(
-      base::expected<password_manager::ImportResults, ImportPreparationError>
-          results) = 0;
-
   // Invoked when the number of payment cards in the input file has been
   // determined.
   virtual void OnPaymentCardsReady(CountOrError result) = 0;
@@ -60,12 +50,6 @@ class SafariDataImportClient {
   // Invoked when importing of history has completed. `count` is the number of
   // entries which were successfully imported.
   virtual void OnHistoryImported(size_t count) = 0;
-
-  // Invoked when importing of passwords has completed. The results object
-  // includes detailed information about any errors that were encountered (such
-  // as a password which did not have a valid URL), which can be used to surface
-  // a UI with additional details.
-  virtual void OnPasswordsImported(const password_manager::ImportResults&) = 0;
 
   // Invoked when importing of payment cards has completed. `count` is the
   // number which were successfully imported.

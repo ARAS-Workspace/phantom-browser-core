@@ -71,8 +71,6 @@ class ExternalProcessImporterClient
   void OnFaviconsImportStart(uint32_t total_favicons_count) override;
   void OnFaviconsImportGroup(
       const favicon_base::FaviconUsageDataList& favicons_group) override;
-  void OnPasswordFormImportReady(
-      const user_data_importer::ImportedPasswordForm& form) override;
   void OnKeywordsImportReady(
       const std::vector<user_data_importer::SearchEngineInfo>& search_engines,
       bool unique_on_host_and_path) override;

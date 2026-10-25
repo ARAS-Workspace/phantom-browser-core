@@ -287,7 +287,6 @@
 #include "chrome/browser/multistep_filter/core/multistep_filter_log_router_factory.h"
 #include "chrome/browser/multistep_filter/core/multistep_filter_service_factory.h"
 #include "chrome/browser/notebooks/notebooks_service_factory.h"
-#include "chrome/browser/password_manager/factories/startup_passwords_import_service_factory.h"  // nogncheck (Desktop only)
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "device/fido/public/features.h"
 #if BUILDFLAG(IS_LINUX)
@@ -706,7 +705,6 @@ void ChromeBrowserMainExtraPartsProfiles::
           site_token_provider::features::kSiteTokenProviderEnabled)) {
     site_token_provider::SiteTokenProviderServiceFactory::GetInstance();
   }
-  StartupPasswordsImportServiceFactory::GetInstance();
   StatefulSSLHostStateDelegateFactory::GetInstance();
   StorageAccessAPIServiceFactory::GetInstance();
   StorageNotificationServiceFactory::GetInstance();

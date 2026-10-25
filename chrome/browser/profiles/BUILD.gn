@@ -795,9 +795,6 @@ source_set("profiles_extra_parts_impl") {
     ]
   }
 
-  deps +=
-      [ "//chrome/browser/password_manager/factories:startup_import_factory" ]
-
   if (enable_offline_pages) {
     deps += [ "//chrome/browser/offline_pages" ]
   }

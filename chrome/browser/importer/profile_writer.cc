@@ -19,7 +19,6 @@
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/first_run/first_run.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/webdata_services/web_data_service_factory.h"
@@ -30,10 +29,6 @@
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/favicon/core/favicon_service.h"
 #include "components/history/core/browser/history_service.h"
-#include "components/password_manager/core/browser/password_form.h"
-#include "components/password_manager/core/browser/password_store/password_form_converters.h"
-#include "components/password_manager/core/browser/password_store/password_store_interface.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
@@ -86,18 +81,6 @@ bool ProfileWriter::BookmarkModelIsLoaded() const {
 
 bool ProfileWriter::TemplateURLServiceIsLoaded() const {
   return TemplateURLServiceFactory::GetForProfile(profile_)->loaded();
-}
-
-void ProfileWriter::AddPasswordForm(
-    const password_manager::PasswordForm& form) {
-  DCHECK(profile_);
-
-  if (profile_->GetPrefs()->GetBoolean(
-          password_manager::prefs::kCredentialsEnableService)) {
-    ProfilePasswordStoreFactory::GetForProfile(
-        profile_, ServiceAccessType::EXPLICIT_ACCESS)
-        ->AddLogin(password_manager::FromPasswordForm(form));
-  }
 }
 
 void ProfileWriter::AddHistoryPage(const history::URLRows& page,

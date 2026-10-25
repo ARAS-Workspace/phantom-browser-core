@@ -53,7 +53,6 @@ source_set("impl") {
     "//chrome/browser/favicon",
     "//chrome/browser/first_run",
     "//chrome/browser/history",
-    "//chrome/browser/password_manager/factories",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search_engines",
     "//chrome/browser/webdata_services",
@@ -61,8 +60,6 @@ source_set("impl") {
     "//components/bookmarks/browser",
     "//components/bookmarks/common",
     "//components/favicon/core",
-    "//components/password_manager/core/browser:password_form",
-    "//components/password_manager/core/browser/password_store:password_store_interface",
   ]
 
   sources += [ "firefox_profile_lock_posix.cc" ]

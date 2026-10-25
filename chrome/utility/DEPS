@@ -43,8 +43,6 @@ include_rules = [
   "+components/heap_profiling/in_process/heap_profiler_controller.h",
   "+components/media_gallery_util",
   "+components/paint_preview/buildflags",
-  "+components/password_manager/core/common",
-  "+components/password_manager/services/csv_password",
   "+components/sampling_profiler",
   "+components/services/paint_preview_compositor",
   "+components/services/patch",

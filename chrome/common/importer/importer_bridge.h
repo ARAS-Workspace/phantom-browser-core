@@ -45,9 +45,6 @@ class ImporterBridge : public base::RefCountedThreadSafe<ImporterBridge> {
       const std::vector<user_data_importer::SearchEngineInfo>& search_engines,
       bool unique_on_host_and_path) = 0;
 
-  virtual void SetPasswordForm(
-      const user_data_importer::ImportedPasswordForm& form) = 0;
-
   virtual void SetAutofillFormData(
       const std::vector<ImporterAutofillFormDataEntry>& entries) = 0;
 

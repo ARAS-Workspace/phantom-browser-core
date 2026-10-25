@@ -482,7 +482,6 @@ void AutoImport(
       {prefs::kImportBookmarks, user_data_importer::FAVORITES},
       {prefs::kImportHistory, user_data_importer::HISTORY},
       {prefs::kImportHomepage, user_data_importer::HOME_PAGE},
-      {prefs::kImportSavedPasswords, user_data_importer::PASSWORDS},
       {prefs::kImportSearchEngine, user_data_importer::SEARCH_ENGINES},
   };
 

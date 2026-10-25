@@ -16,7 +16,6 @@
 #include "chrome/common/importer/importer_autofill_form_data_entry.h"
 #include "components/autofill/core/browser/webdata/autocomplete/autocomplete_entry.h"
 #include "components/favicon_base/favicon_usage_data.h"
-#include "components/password_manager/core/browser/password_form.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_parser.h"
 #include "components/search_engines/template_url_prepopulate_data.h"
@@ -54,33 +53,6 @@ history::VisitSource ConvertImporterVisitSourceToHistoryVisitSource(
       return history::SOURCE_SAFARI_IMPORTED;
   }
   NOTREACHED();
-}
-
-password_manager::PasswordForm::Scheme ConvertToPasswordFormScheme(
-    user_data_importer::ImportedPasswordForm::Scheme scheme) {
-  switch (scheme) {
-    case user_data_importer::ImportedPasswordForm::Scheme::kHtml:
-      return password_manager::PasswordForm::Scheme::kHtml;
-    case user_data_importer::ImportedPasswordForm::Scheme::kBasic:
-      return password_manager::PasswordForm::Scheme::kBasic;
-  }
-
-  NOTREACHED();
-}
-
-password_manager::PasswordForm ConvertImportedPasswordForm(
-    const user_data_importer::ImportedPasswordForm& form) {
-  password_manager::PasswordForm result;
-  result.scheme = ConvertToPasswordFormScheme(form.scheme);
-  result.signon_realm = form.signon_realm;
-  result.url = form.url;
-  result.action = form.action;
-  result.username_element = form.username_element;
-  result.username_value = form.username_value;
-  result.password_element = form.password_element;
-  result.password_value = form.password_value;
-  result.blocked_by_user = form.blocked_by_user;
-  return result;
 }
 
 // Attempts to create a TemplateURL from the provided data. |title| is optional.
@@ -143,11 +115,6 @@ void InProcessImporterBridge::SetKeywords(
       owned_template_urls.push_back(std::move(owned_template_url));
   }
   writer_->AddKeywords(std::move(owned_template_urls), unique_on_host_and_path);
-}
-
-void InProcessImporterBridge::SetPasswordForm(
-    const user_data_importer::ImportedPasswordForm& form) {
-  writer_->AddPasswordForm(ConvertImportedPasswordForm(form));
 }
 
 void InProcessImporterBridge::SetAutofillFormData(

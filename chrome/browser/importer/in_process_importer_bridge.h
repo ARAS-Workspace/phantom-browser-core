@@ -46,9 +46,6 @@ class InProcessImporterBridge : public ImporterBridge {
       const std::vector<user_data_importer::SearchEngineInfo>& search_engines,
       bool unique_on_host_and_path) override;
 
-  void SetPasswordForm(
-      const user_data_importer::ImportedPasswordForm& form) override;
-
   void SetAutofillFormData(
       const std::vector<ImporterAutofillFormDataEntry>& entries) override;
 

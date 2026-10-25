@@ -7,7 +7,6 @@
 
 #include "base/files/scoped_temp_dir.h"
 #include "base/threading/sequence_bound.h"
-#include "components/password_manager/core/browser/import/password_importer.h"
 #include "components/prefs/pref_service.h"
 #include "components/user_data_importer/utility/bookmark_parser.h"
 #include "components/user_data_importer/utility/importer_metrics_recorder.h"
@@ -31,10 +30,6 @@ namespace history {
 class HistoryService;
 }  // namespace history
 
-namespace syncer {
-class SyncService;
-}
-
 namespace user_data_importer {
 
 struct ImportedBookmarkEntry;
@@ -51,34 +46,27 @@ class RustHistoryCallback;
 // can't live in the components layer (because of platform dependencies).
 class SafariDataImporter {
  public:
-  using PasswordImportCallback =
-      password_manager::PasswordImporter::ImportResultsCallback;
-  using PasswordImportResults = password_manager::ImportResults;
-
   // All arguments passed as pointers are expected to outlive this importer.
   SafariDataImporter(SafariDataImportClient* client,
-                     password_manager::SavedPasswordsPresenter* presenter,
                      autofill::PaymentsDataManager* payments_data_manager,
                      history::HistoryService* history_service,
                      bookmarks::BookmarkModel* bookmark_model,
-                     syncer::SyncService* sync_service,
                      PrefService* pref_service,
                      std::unique_ptr<BookmarkParser> bookmark_parser,
                      std::string app_locale);
   ~SafariDataImporter();
 
   // Opens the ZIP file provided in `path` and prepares to import the data
-  // (passwords, payment cards, bookmarks, and history) contained inside. Each
-  // data type is optional and may or may not be present.
+  // (payment cards, bookmarks, and history) contained inside. Each data type
+  // is optional and may or may not be present.
   void PrepareImport(const base::FilePath& path);
 
   // Logs the file size of the uncompressed ZIP file.
   void LogFileSize(int64_t file_size_bytes);
 
   // Called after calling `PrepareImport` in order to complete the import
-  // process. In case of password conflicts, `selected_password_ids` provides
-  // the list of conflicting passwords to import.
-  void CompleteImport(const std::vector<int>& selected_password_ids);
+  // process.
+  void CompleteImport();
 
   // Called after calling "Import" in order to cancel the import process.
   void CancelImport();
@@ -176,11 +164,6 @@ class SafariDataImporter {
   // next step in the parsing pipeline.
   void OnZipArchiveReady(bool success);
 
-  // Parses the provided `csv_data` and determines if any conflicts with
-  // existing passwords will occur. Stops before actually committing any data.
-  // Informs `client_` that passwords are ready when done.
-  void PreparePasswords(std::string csv_data);
-
   // Converts payment_cards to autofill::CreditCard objects. Informs `client_`
   // that cards are ready when done.
   void PreparePaymentCards(
@@ -189,11 +172,6 @@ class SafariDataImporter {
   // Attempts to parse the provided HTML data. Informs `client_` that bookmarks
   // are ready when done.
   void PrepareBookmarks(BlockingWorker::BookmarkUnzipResult result);
-
-  // Receives the result of the first pass of the password importer, which
-  // parses passwords and identifies any conflicts, then pauses. Informs the
-  // client that passwords are ready.
-  void OnPasswordsParsed(const password_manager::ImportResults& results);
 
   // Receives the result of parsing bookmarks, stores them for later use,
   // and informs the client that bookmarks are ready.
@@ -217,11 +195,6 @@ class SafariDataImporter {
   // `client_`.
   void OnHistoryImportCompleted();
 
-  // Invoked once parsing of passwords is completed. Forwards the results to
-  // `client_`.
-  void OnPasswordImportCompleted(
-      const password_manager::ImportResults& results);
-
   // Imports Credit Cards to the Payments Data Manager.
   void ContinueImportPaymentCards();
 
@@ -239,9 +212,6 @@ class SafariDataImporter {
   // An instance of BlockingWorker which is bound to `blocking_queue_`.
   base::SequenceBound<BlockingWorker> blocking_worker_;
 
-  // The password importer used to import passwords and resolve conflicts.
-  std::unique_ptr<password_manager::PasswordImporter> password_importer_;
-
   // Interaction with UI layer
 
   // The client to inform when various processing events occur.
@@ -257,9 +227,6 @@ class SafariDataImporter {
 
   // Service used to import bookmarks.
   const raw_ref<bookmarks::BookmarkModel> bookmark_model_;
-
-  // Stores pointer to `SyncService` instance.
-  raw_ptr<syncer::SyncService> sync_service_;
 
   // The PrefService that this instance uses to read and write preferences.
   // Must outlive this instance.

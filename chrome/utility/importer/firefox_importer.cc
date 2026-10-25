@@ -32,10 +32,6 @@
 #include "sql/statement.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_MAC)
-#include "chrome/utility/importer/nss_decryptor.h"
-#endif  // !BUILDFLAG(IS_MAC)
-
 namespace {
 
 inline constexpr sql::Database::Tag kDatabaseTag{"FirefoxImporter"};
@@ -154,13 +150,6 @@ void FirefoxImporter::StartImport(
 }
 
 void FirefoxImporter::ImportRemainingItems() {
-#if !BUILDFLAG(IS_MAC)
-  if ((items_ & user_data_importer::PASSWORDS) && !cancelled()) {
-    bridge_->NotifyItemStarted(user_data_importer::PASSWORDS);
-    ImportPasswords();
-    bridge_->NotifyItemEnded(user_data_importer::PASSWORDS);
-  }
-#endif  // !BUILDFLAG(IS_MAC)
   if ((items_ & user_data_importer::AUTOFILL_FORM_DATA) && !cancelled()) {
     bridge_->NotifyItemStarted(user_data_importer::AUTOFILL_FORM_DATA);
     ImportAutofillFormData();
@@ -445,34 +434,6 @@ void FirefoxImporter::OnDefaultBookmarksParsed(
   bridge_->NotifyItemEnded(user_data_importer::FAVORITES);
   ImportRemainingItems();
 }
-
-#if !BUILDFLAG(IS_MAC)
-void FirefoxImporter::ImportPasswords() {
-  // Initializes NSS3.
-  NSSDecryptor decryptor;
-  if (!decryptor.Init(source_path_, source_path_) &&
-      !decryptor.Init(app_path_, source_path_)) {
-    return;
-  }
-
-  // Since Firefox 32, passwords are in logins.json.
-  base::FilePath json_file = source_path_.AppendASCII("logins.json");
-  if (!base::PathExists(json_file))
-    return;
-
-  std::vector<user_data_importer::ImportedPasswordForm> forms;
-  decryptor.ReadAndParseLogins(json_file, &forms);
-
-  if (!cancelled()) {
-    for (const auto& form : forms) {
-      if (!form.username_value.empty() || !form.password_value.empty() ||
-          form.blocked_by_user) {
-        bridge_->SetPasswordForm(form);
-      }
-    }
-  }
-}
-#endif  // !BUILDFLAG(IS_MAC)
 
 void FirefoxImporter::ImportHomepage() {
   GURL home_page = GetHomepage(source_path_);

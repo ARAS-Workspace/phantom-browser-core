@@ -29,8 +29,6 @@ class MockImporterBridge : public ImporterBridge {
   MOCK_METHOD2(SetKeywords,
                void(const std::vector<user_data_importer::SearchEngineInfo>&,
                     bool));
-  MOCK_METHOD1(SetPasswordForm,
-               void(const user_data_importer::ImportedPasswordForm&));
   MOCK_METHOD1(SetAutofillFormData,
                void(const std::vector<ImporterAutofillFormDataEntry>&));
   MOCK_METHOD0(NotifyStarted, void());

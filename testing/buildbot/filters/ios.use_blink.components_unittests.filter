@@ -396,7 +396,6 @@
 -SafariDataImporterTest.ImportFileEndToEndWithDefaultThreshold
 -SafariDataImporterTest.ImportHistory
 -SafariDataImporterTest.ImportHistoryBlockedByPolicy
--SafariDataImporterTest.ImportPasswords
 -SafariDataImporterTest.ImportPaymentCardsBlockedByPolicy
 -SafariDataImporterTest.ImportsEmptyFolder
 -SafariDataImporterTest.ImportSingleBookmark

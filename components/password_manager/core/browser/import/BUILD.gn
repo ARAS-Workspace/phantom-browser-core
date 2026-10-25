@@ -4,30 +4,6 @@
 
 import("//testing/libfuzzer/fuzzer_test.gni")
 
-source_set("importer") {
-  sources = [
-    "import_results.cc",
-    "import_results.h",
-    "password_importer.cc",
-    "password_importer.h",
-  ]
-  public_deps = [
-    ":csv",
-    "//base",
-    "//components/password_manager/core/browser:password_form",
-    "//components/password_manager/core/browser/password_store:password_store_interface",
-  ]
-
-  deps = [
-    "//components/password_manager/core/browser/ui",
-    "//components/password_manager/core/common:constants",
-    "//components/password_manager/core/common:features",
-    "//components/password_manager/services/csv_password:service",
-    "//components/sync/base",
-  ]
-  configs += [ "//build/config/compiler:wexit_time_destructors" ]
-}
-
 source_set("csv") {
   sources = [
     "csv_field_parser.cc",

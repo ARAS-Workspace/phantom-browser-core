@@ -26,9 +26,6 @@
 #include "components/history/core/browser/history_backend.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/common/pref_names.h"
-#include "components/password_manager/core/browser/features/password_manager_features_util.h"
-#include "components/password_manager/core/browser/ui/saved_passwords_presenter.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/user_data_importer/utility/bookmark_util.h"
 #include "components/user_data_importer/utility/history_callback_from_rust.h"
@@ -194,29 +191,6 @@ std::optional<history::URLRow> ConvertToURLRow(
   return url_row;
 }
 
-// Returns an error enum appropriate for logging if the password importer
-// status indicates an error, or std::nullopt if it is OK to proceed.
-std::optional<user_data_importer::PasswordsImportError>
-TranslatePasswordStatusToError(password_manager::ImportResults::Status status) {
-  switch (status) {
-    case password_manager::ImportResults::CONFLICTS:
-    case password_manager::ImportResults::SUCCESS:
-      return std::nullopt;
-    case password_manager::ImportResults::IO_ERROR:
-    case password_manager::ImportResults::BAD_FORMAT:
-      return user_data_importer::PasswordsImportError::kFailedToRead;
-    case password_manager::ImportResults::MAX_FILE_SIZE:
-    case password_manager::ImportResults::NUM_PASSWORDS_EXCEEDED:
-      return user_data_importer::PasswordsImportError::kTooBig;
-    case password_manager::ImportResults::NONE:
-    case password_manager::ImportResults::UNKNOWN_ERROR:
-    case password_manager::ImportResults::DISMISSED:
-    case password_manager::ImportResults::IMPORT_ALREADY_ACTIVE:
-    default:
-      return user_data_importer::PasswordsImportError::kOther;
-  }
-}
-
 // Returns true if an import is blocked by a "disabling" policy.
 bool IsImportBlockedByDisablingPolicy(const PrefService* pref_service,
                                       const char* pref_name) {
@@ -273,25 +247,19 @@ class RustHistoryCallback final
 
 SafariDataImporter::SafariDataImporter(
     SafariDataImportClient* client,
-    password_manager::SavedPasswordsPresenter* presenter,
     autofill::PaymentsDataManager* payments_data_manager,
     history::HistoryService* history_service,
     bookmarks::BookmarkModel* bookmark_model,
-    syncer::SyncService* sync_service,
     PrefService* pref_service,
     std::unique_ptr<BookmarkParser> bookmark_parser,
     std::string app_locale)
     : blocking_queue_(base::ThreadPool::CreateSequencedTaskRunner(
           {base::MayBlock(), base::TaskPriority::USER_VISIBLE})),
       blocking_worker_(blocking_queue_, std::move(bookmark_parser)),
-      password_importer_(std::make_unique<password_manager::PasswordImporter>(
-          CHECK_DEREF(presenter),
-          /*user_confirmation_required=*/true)),
       client_(CHECK_DEREF(client)),
       payments_data_manager_(CHECK_DEREF(payments_data_manager)),
       history_service_(CHECK_DEREF(history_service)),
       bookmark_model_(CHECK_DEREF(bookmark_model)),
-      sync_service_(sync_service),
       pref_service_(pref_service),
       metrics_recorder_(ImporterMetricsRecorder::Source::kSafari),
       app_locale_(std::move(app_locale)) {}
@@ -318,9 +286,8 @@ void SafariDataImporter::PrepareImport(const base::FilePath& path) {
                            weak_factory_.GetWeakPtr()));
 }
 
-void SafariDataImporter::CompleteImport(
-    const std::vector<int>& selected_password_ids) {
-  constexpr int kNumTasks = 4;
+void SafariDataImporter::CompleteImport() {
+  constexpr int kNumTasks = 3;
 
   // No need to BindPostTask here, because `barrier_closure` is always chained
   // to another callback which is, itself, posted back to the default runner.
@@ -360,27 +327,6 @@ void SafariDataImporter::CompleteImport(
     barrier_closure.Run();
   }
 
-  if (password_importer_ &&
-      password_importer_->IsState(
-          password_manager::PasswordImporter::kUserInteractionRequired)) {
-    CHECK(!IsImportBlockedByEnablingPolicy(
-        pref_service_, password_manager::prefs::kCredentialsEnableService));
-
-    metrics_recorder_.password_metrics().OnImportStarted();
-
-    password_importer_->ContinueImport(
-        selected_password_ids,
-        base::BindOnce(&SafariDataImporter::OnPasswordImportCompleted,
-                       weak_factory_.GetWeakPtr())
-            .Then(barrier_closure));
-  } else {
-    client_->OnPasswordsImported(password_manager::ImportResults());
-    // In the case where no passwords need to be imported, just run
-    // `barrier_closure` directly. This is safe because CompleteImport runs on
-    // the main sequence.
-    barrier_closure.Run();
-  }
-
   metrics_recorder_.bookmark_metrics().OnImportStarted();
   GetRunner()->PostTask(
       FROM_HERE, base::BindOnce(&SafariDataImporter::ContinueImportBookmarks,
@@ -396,8 +342,6 @@ void SafariDataImporter::CompleteImport(
 
 // Called after calling "Import" in order to cancel the import process.
 void SafariDataImporter::CancelImport() {
-  // TODO(crbug.com/407587751): Notify password_importer_.
-
   blocking_worker_.AsyncCall(&BlockingWorker::CloseZipFileArchive);
 }
 
@@ -535,13 +479,6 @@ void SafariDataImporter::OnZipArchiveReady(bool success) {
     return;
   }
 
-  // Passwords import may require conflict resolution, so it is done first.
-  metrics_recorder_.password_metrics().OnPreparationStarted();
-  blocking_worker_.AsyncCall(&BlockingWorker::Unzip)
-      .WithArgs(FileType::Passwords)
-      .Then(base::BindOnce(&SafariDataImporter::PreparePasswords,
-                           weak_factory_.GetWeakPtr()));
-
   metrics_recorder_.payment_card_metrics().OnPreparationStarted();
   blocking_worker_.AsyncCall(&BlockingWorker::ParsePaymentCards)
       .Then(base::BindOnce(&SafariDataImporter::PreparePaymentCards,
@@ -557,38 +494,6 @@ void SafariDataImporter::OnZipArchiveReady(bool success) {
       .WithArgs(FileType::SafariHistory)
       .Then(base::BindOnce(&SafariDataImporter::PrepareHistory,
                            weak_factory_.GetWeakPtr()));
-}
-
-void SafariDataImporter::PreparePasswords(std::string csv_data) {
-  if (csv_data.empty()) {
-    metrics_recorder_.password_metrics().LogOutcome(
-        DataTypeMetrics::ImportOutcome::kNotPresent);
-
-    // Empty results object, indicating no work could be done.
-    client_->OnPasswordsReady(base::ok(password_manager::ImportResults{}));
-    return;
-  }
-
-  if (IsImportBlockedByEnablingPolicy(
-          pref_service_, password_manager::prefs::kCredentialsEnableService)) {
-    // TODO(crbug.com/407587751): Signal to UI that passwords import is blocked
-    // by policy.
-    client_->OnPasswordsReady(
-        base::unexpected(ImportPreparationError::kBlockedByPolicy));
-    return;
-  }
-
-  metrics_recorder_.password_metrics().LogFileSizeBytes(csv_data.length());
-
-  password_manager::PasswordForm::Store to_store = {
-      password_manager::features_util::IsAccountStorageActive(sync_service_)
-          ? password_manager::PasswordForm::Store::kAccountStore
-          : password_manager::PasswordForm::Store::kProfileStore};
-
-  password_importer_->Import(
-      std::move(csv_data), to_store,
-      base::BindOnce(&SafariDataImporter::OnPasswordsParsed,
-                     weak_factory_.GetWeakPtr()));
 }
 
 void SafariDataImporter::PreparePaymentCards(
@@ -650,21 +555,6 @@ void SafariDataImporter::PrepareBookmarks(
 
   blocking_worker_.AsyncCall(&BlockingWorker::ParseBookmarks)
       .WithArgs(result.path, std::move(import_bookmarks_callback));
-}
-
-void SafariDataImporter::OnPasswordsParsed(
-    const password_manager::ImportResults& results) {
-  auto error = TranslatePasswordStatusToError(results.status);
-  if (error) {
-    metrics_recorder_.LogPasswordsError(*error);
-    client_->OnPasswordsReady(base::ok(password_manager::ImportResults{}));
-    return;
-  }
-
-  size_t count = results.displayed_entries.size() + results.number_to_import;
-  metrics_recorder_.password_metrics().OnPreparationFinished(count);
-
-  client_->OnPasswordsReady(base::ok(results));
 }
 
 void SafariDataImporter::OnBookmarksParsed(
@@ -756,19 +646,6 @@ void SafariDataImporter::OnHistoryImportCompleted() {
   metrics_recorder_.history_metrics().LogOutcome(
       DataTypeMetrics::ImportOutcome::kSuccess);
   client_->OnHistoryImported(history_urls_imported_);
-}
-
-void SafariDataImporter::OnPasswordImportCompleted(
-    const password_manager::ImportResults& results) {
-  metrics_recorder_.password_metrics().OnImportFinished(
-      results.number_imported);
-  // At this phase of import, any status other than SUCCESS is a failure, as we
-  // expect the flow to have concluded.
-  metrics_recorder_.password_metrics().LogOutcome(
-      results.status == password_manager::ImportResults::SUCCESS
-          ? DataTypeMetrics::ImportOutcome::kSuccess
-          : DataTypeMetrics::ImportOutcome::kFailure);
-  client_->OnPasswordsImported(results);
 }
 
 void SafariDataImporter::ContinueImportPaymentCards() {

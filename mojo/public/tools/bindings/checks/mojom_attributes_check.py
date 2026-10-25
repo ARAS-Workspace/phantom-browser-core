@@ -99,7 +99,6 @@ _NATIVE_ALLOWLIST = {
   'chrome.mojom.FaviconUsageDataList',
   'chrome.mojom.ImportedBookmarkEntry',
   'chrome.mojom.ImporterAutofillFormDataEntry',
-  'chrome.mojom.ImporterIE7PasswordInfo',
   'chrome.mojom.ImporterURLRow',
   'chrome.mojom.ImportItem',
   'chrome.mojom.SafeArchiveAnalyzerResults',

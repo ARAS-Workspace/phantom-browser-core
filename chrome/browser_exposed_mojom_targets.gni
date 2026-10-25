@@ -93,7 +93,6 @@ browser_exposed_mojom_targets = [
   "//components/page_image_service/mojom:mojo_bindings",
   "//components/page_load_metrics/common:page_load_metrics_mojom",
   "//components/paint_preview/common/mojom:mojom",
-  "//components/password_manager/services/csv_password/public/mojom:mojom",
   "//components/performance_manager/public/mojom:mojom",
   "//components/printing/common:mojo_interfaces",
   "//components/tabs/public/mojom:mojom",

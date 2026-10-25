@@ -79,10 +79,6 @@ class MockImporterBridge : public ImporterBridge {
                user_data_importer::VisitSource),
               (override));
   MOCK_METHOD(void,
-              SetPasswordForm,
-              (const user_data_importer::ImportedPasswordForm&),
-              (override));
-  MOCK_METHOD(void,
               SetAutofillFormData,
               (const std::vector<ImporterAutofillFormDataEntry>&),
               (override));

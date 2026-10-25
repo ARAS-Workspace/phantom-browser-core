@@ -10,9 +10,6 @@
 #include "build/build_config.h"
 #include "chrome/services/file_util/buildflags.h"
 #include "components/paint_preview/buildflags/buildflags.h"
-#include "components/password_manager/core/common/password_manager_features.h"
-#include "components/password_manager/services/csv_password/csv_password_parser_impl.h"
-#include "components/password_manager/services/csv_password/public/mojom/csv_password_parser.mojom.h"
 #include "components/services/patch/file_patcher_impl.h"
 #include "components/services/patch/public/mojom/file_patcher.mojom.h"
 #include "components/services/unzip/public/mojom/unzipper.mojom.h"
@@ -84,13 +81,6 @@ auto RunFilePatcher(mojo::PendingReceiver<patch::mojom::FilePatcher> receiver) {
 
 auto RunUnzipper(mojo::PendingReceiver<unzip::mojom::Unzipper> receiver) {
   return std::make_unique<unzip::UnzipperImpl>(std::move(receiver));
-}
-
-auto RunCSVPasswordParser(
-    mojo::PendingReceiver<password_manager::mojom::CSVPasswordParser>
-        receiver) {
-  return std::make_unique<password_manager::CSVPasswordParserImpl>(
-      std::move(receiver));
 }
 
 auto ContentBookmarkParser(
@@ -215,7 +205,6 @@ void RegisterElevatedMainThreadServices(mojo::ServiceFactory& services) {
 void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunFilePatcher);
   services.Add(RunUnzipper);
-  services.Add(RunCSVPasswordParser);
   services.Add(ContentBookmarkParser);
   services.Add(RunPassageEmbeddingsService);
 

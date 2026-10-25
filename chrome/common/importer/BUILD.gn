@@ -30,10 +30,6 @@ mojom("interfaces") {
           cpp = "::ImporterAutofillFormDataEntry"
         },
         {
-          mojom = "chrome.mojom.ImporterIE7PasswordInfo"
-          cpp = "::user_data_importer::ImporterIE7PasswordInfo"
-        },
-        {
           mojom = "chrome.mojom.ImporterURLRow"
           cpp = "::user_data_importer::ImporterURLRow"
         },
@@ -48,10 +44,6 @@ mojom("interfaces") {
         {
           mojom = "chrome.mojom.ImportItem"
           cpp = "::user_data_importer::ImportItem"
-        },
-        {
-          mojom = "chrome.mojom.ImportedPasswordForm"
-          cpp = "::user_data_importer::ImportedPasswordForm"
         },
       ]
       traits_headers = [

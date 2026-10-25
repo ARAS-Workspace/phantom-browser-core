@@ -108,11 +108,6 @@ void ExternalProcessImporterBridge::SetKeywords(
   observer_->OnKeywordsImportReady(search_engines, unique_on_host_and_path);
 }
 
-void ExternalProcessImporterBridge::SetPasswordForm(
-    const user_data_importer::ImportedPasswordForm& form) {
-  observer_->OnPasswordFormImportReady(form);
-}
-
 void ExternalProcessImporterBridge::SetAutofillFormData(
     const std::vector<ImporterAutofillFormDataEntry>& entries) {
   observer_->OnAutofillFormDataImportStart(entries.size());

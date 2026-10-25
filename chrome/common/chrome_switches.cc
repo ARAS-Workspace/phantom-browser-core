@@ -359,9 +359,6 @@ const char kHomePage[] = "homepage";
 const char kSimulateLockScreenSmartRestart[] =
     "simulate-lock-screen-smart-restart";
 
-// Triggers the import of passwords on startup.
-const char kImportPasswords[] = "import-passwords";
-
 // Causes the initial browser opened to be in incognito mode. Further browsers
 // may or may not be in incognito mode; see `IncognitoModePrefs`.
 const char kIncognito[] = "incognito";

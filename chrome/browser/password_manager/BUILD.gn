@@ -117,28 +117,3 @@ source_set("impl") {
     sources += [ "multi_profile_credentials_filter.cc" ]
   }
 }
-
-static_library("startup_import") {
-  sources = [
-    "startup_passwords_import_service.cc",
-    "startup_passwords_import_service.h",
-    "startup_passwords_importer.cc",
-    "startup_passwords_importer.h",
-  ]
-
-  deps = [
-    ":password_manager",
-    "//base",
-    "//chrome/browser/affiliations",
-    "//chrome/browser/profiles:profile",
-    "//chrome/common:channel_info",
-    "//chrome/common:non_code_constants",
-    "//components/affiliations/core/browser:affiliations",
-    "//components/keyed_service/core",
-    "//components/password_manager/core/browser/import:csv",
-    "//components/password_manager/core/browser/import:importer",
-    "//components/password_manager/core/browser/password_store:password_store_interface",
-    "//components/password_manager/core/browser/ui",
-    "//content/public/browser",
-  ]
-}

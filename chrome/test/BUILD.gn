@@ -2959,8 +2959,6 @@ test("unit_tests") {
     "//components/password_manager/core/browser:test_support",
     "//components/password_manager/core/browser/export",
     "//components/password_manager/core/browser/features:password_features",
-    "//components/password_manager/core/browser/import:csv",
-    "//components/password_manager/core/browser/import:importer",
     "//components/pdf/common:constants",
     "//components/pdf/common:util",
     "//components/performance_manager",
