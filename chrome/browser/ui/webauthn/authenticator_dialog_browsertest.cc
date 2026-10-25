@@ -353,7 +353,7 @@ class AuthenticatorDialogTest : public DialogBrowserTest {
 
     UpdateModelBeforeStartFlow(model_.get(), transport_availability,
                                /*is_off_the_record=*/false);
-    controller_->StartFlow(std::move(transport_availability), {});
+    controller_->StartFlow(std::move(transport_availability));
     if (name.ends_with("_disabled")) {
       model_->ui_disabled_ = true;
       model_->OnSheetModelChanged();

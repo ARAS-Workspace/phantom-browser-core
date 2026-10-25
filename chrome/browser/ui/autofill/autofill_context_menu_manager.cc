@@ -24,7 +24,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/webauthn/context_menu_helper.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
@@ -121,7 +120,6 @@ bool IsAutofillCustomCommandId(
       IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD,
       IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS,
       IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD,
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE,
   });
   return kAutofillCommands.contains(command_id.value());
 }
@@ -170,11 +168,6 @@ bool AutofillContextMenuManager::IsCommandIdEnabled(int command_id) {
 void AutofillContextMenuManager::ExecuteCommand(int command_id) {
   content::RenderFrameHost* rfh = delegate_->GetRenderFrameHost();
   if (!rfh) {
-    return;
-  }
-  if (command_id ==
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE) {
-    webauthn::OnPasskeyFromAnotherDeviceContextMenuItemSelected(rfh);
     return;
   }
   ContentAutofillDriver* autofill_driver =
@@ -327,10 +320,6 @@ void AutofillContextMenuManager::AddPasswordsManualFallbackItems(
       password_manager_driver.IsPasswordFieldForPasswordManager(
           FieldRendererId(params_.field_renderer_id.value()),
           params_.form_control_type);
-  const bool add_passkey_from_another_device_option =
-      webauthn::IsPasskeyFromAnotherDeviceContextMenuEnabled(
-          delegate_->GetRenderFrameHost(), params_.form_renderer_id.value(),
-          params_.field_renderer_id.value());
   const bool add_import_passwords_option = !add_select_password_option;
 
   if (add_select_password_option) {
@@ -352,11 +341,6 @@ void AutofillContextMenuManager::AddPasswordsManualFallbackItems(
     menu_model_->AddItemWithStringId(
         IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD,
         IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD);
-  }
-  if (add_passkey_from_another_device_option) {
-    menu_model_->AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE,
-        IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE);
   }
   if (add_import_passwords_option) {
     menu_model_->AddItemWithStringId(

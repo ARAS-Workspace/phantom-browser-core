@@ -82,10 +82,7 @@ namespace password_manager {
 class CredManController;
 class FieldInfoManager;
 class KeyboardReplacingSurfaceVisibilityController;
-class WebAuthnCredentialsDelegate;
 }  // namespace password_manager
-
-namespace webauthn {}  // namespace webauthn
 
 // ChromePasswordManagerClient implements the PasswordManagerClient interface.
 class ChromePasswordManagerClient
@@ -242,9 +239,6 @@ class ChromePasswordManagerClient
   bool IsIsolationForPasswordSitesEnabled() const override;
   bool IsNewTabPage() const override;
   bool IsChromeSigninPage() const override;
-  password_manager::WebAuthnCredentialsDelegate*
-  GetWebAuthnCredentialsDelegateForDriver(
-      password_manager::PasswordManagerDriver* driver) override;
   version_info::Channel GetChannel() const override;
   void RefreshPasswordManagerSettingsIfNeeded() const override;
   void OpenPasswordDetailsBubble(

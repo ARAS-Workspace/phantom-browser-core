@@ -8,11 +8,7 @@ import("//components/signin/features.gni")
 
 source_set("password_manager") {
   sources = []
-  public = [
-    "chrome_password_manager_client.h",
-    "chrome_webauthn_credentials_delegate.h",
-    "chrome_webauthn_credentials_delegate_factory.h",
-  ]
+  public = [ "chrome_password_manager_client.h" ]
 
   public_deps = [
     "//chrome/browser/password_manager/factories",
@@ -61,11 +57,7 @@ source_set("password_manager") {
 }
 
 source_set("impl") {
-  sources = [
-    "chrome_password_manager_client.cc",
-    "chrome_webauthn_credentials_delegate.cc",
-    "chrome_webauthn_credentials_delegate_factory.cc",
-  ]
+  sources = [ "chrome_password_manager_client.cc" ]
 
   public_deps = [
     ":password_manager",
@@ -85,7 +77,6 @@ source_set("impl") {
     "//chrome/browser/sync:factories",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/passwords",
-    "//chrome/browser/webauthn",
     "//chrome/common:channel_info",
     "//components/autofill/content/browser",
     "//components/autofill/core/browser",

@@ -33,17 +33,14 @@ enum class WebAuthnDeduplicatedType {
 enum class SortableCredentialType {
   kGpmPasskey,
   kPlatformPasskey,
-  kPassword,
   kOther,
 };
 
 // Helper function to deduplicate credentials for each account.
-// Goes through all the accounts and finds the best password, GPM passkey
-// and the passkey for each account. Then selects the best credential for the
-// account based on the following rules:
+// Goes through all the accounts and finds the best GPM passkey and the
+// passkey for each account. Then selects the best credential for the account
+// based on the following rule:
 // Rule 1: GPM Passkey vs Platform Passkey -> GPM Passkey.
-// Rule 2: GPM Passkey vs Password -> Most recent.
-// Rule 3: Password vs Platform Passkey -> Platform Passkey.
 template <typename T, typename Traits>
 std::vector<T> DeduplicateCredentialsByAccount(
     const std::map<std::u16string, std::vector<const T*>>& grouped_by_account) {
@@ -57,9 +54,6 @@ std::vector<T> DeduplicateCredentialsByAccount(
 
     const T* best_platform_passkey = nullptr;
     base::Time best_platform_passkey_timestamp = base::Time::Min();
-
-    const T* best_password = nullptr;
-    base::Time best_password_timestamp = base::Time::Min();
 
     const T* best_unknown = nullptr;
 
@@ -90,16 +84,6 @@ std::vector<T> DeduplicateCredentialsByAccount(
           }
           break;
         }
-        case SortableCredentialType::kPassword: {
-          base::Time current_password_timestamp =
-              Traits::GetLastUsedTime(*credential);
-          if (best_password == nullptr ||
-              best_password_timestamp < current_password_timestamp) {
-            best_password = credential;
-            best_password_timestamp = current_password_timestamp;
-          }
-          break;
-        }
         case SortableCredentialType::kOther: {
           best_unknown = credential;
           break;
@@ -108,28 +92,12 @@ std::vector<T> DeduplicateCredentialsByAccount(
     }
 
     if (best_gpm_passkey) {
-      // GPM Passkey is present.
-      if (best_password) {
-        // GPM Passkey vs Password: Most recent.
-        if (best_password_timestamp > best_gpm_passkey_timestamp) {
-          selected_credential = best_password;
-        } else {
-          selected_credential = best_gpm_passkey;
-        }
-      } else {
-        // Only GPM passkey (and possibly platform passkey, but GPM
-        // passkey wins by Rule 1).
-        selected_credential = best_gpm_passkey;
-      }
+      // GPM Passkey is present. It wins over a platform passkey by Rule 1.
+      selected_credential = best_gpm_passkey;
     } else if (best_platform_passkey) {
-      // No GPM passkey. If platform passkey exists, it wins over password
-      // by Rule 3.
       selected_credential = best_platform_passkey;
-    } else if (best_password) {
-      // Only password left.
-      selected_credential = best_password;
     } else {
-      // No passkey or password.
+      // No passkey.
       selected_credential = best_unknown;
     }
 
@@ -142,9 +110,6 @@ std::vector<T> DeduplicateCredentialsByAccount(
             break;
           case SortableCredentialType::kPlatformPasskey:
             type_to_log = WebAuthnDeduplicatedType::kPlatformPasskey;
-            break;
-          case SortableCredentialType::kPassword:
-            type_to_log = WebAuthnDeduplicatedType::kPassword;
             break;
           case SortableCredentialType::kOther:
             type_to_log = WebAuthnDeduplicatedType::kOther;

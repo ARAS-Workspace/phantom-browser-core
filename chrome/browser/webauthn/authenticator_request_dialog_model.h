@@ -21,7 +21,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
 #include "chrome/browser/webauthn/local_authentication_token.h"
-#include "chrome/browser/webauthn/shared_types.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "content/public/browser/global_routing_id.h"
 #include "device/fido/discoverable_credential_metadata.h"
@@ -114,10 +113,7 @@ using UIPresentation =
   AUTHENTICATOR_REQUEST_EVENT_1(OnHavePIN, std::u16string)                    \
   /* Called just before the model is destructed. */                           \
   AUTHENTICATOR_REQUEST_EVENT_1(OnModelDestroyed,                             \
-                                AuthenticatorRequestDialogModel*)             \
-  /* Called when a password mechanism is selected */                          \
-  AUTHENTICATOR_REQUEST_EVENT_1(OnPasswordCredentialSelected,                 \
-                                PasswordCredentialPair)
+                                AuthenticatorRequestDialogModel*)
 
 // AuthenticatorRequestDialogModel holds the UI state for a WebAuthn request.
 // This class is refcounted so that its ownership can be shared between the
@@ -185,8 +181,6 @@ struct AuthenticatorRequestDialogModel
     // mechanism.
     kSelectPriorityMechanism,
     kChromeProfileCreatePasskey,
-    // OS authentication after selecting a password.
-    kPasswordOsAuth,
     // The request is being dispatched to a platform authenticator.
     kPlatformAuthenticator,
     kMaxValue = kPlatformAuthenticator,
@@ -231,30 +225,13 @@ struct AuthenticatorRequestDialogModel
       const std::optional<base::Time> last_used_time;
     };
     using Credential = base::StrongAlias<class CredentialTag, CredentialInfo>;
-
-    struct PasswordInfo {
-      explicit PasswordInfo(
-          std::optional<base::Time> last_used_time_in,
-          std::optional<std::u16string> origin_in = std::nullopt);
-
-      PasswordInfo(const PasswordInfo&);
-      ~PasswordInfo();
-      bool operator==(const PasswordInfo& other) const;
-
-      const std::optional<base::Time> last_used_time;
-      const std::optional<std::u16string> origin;
-    };
-    using Password = base::StrongAlias<class PasswordTag, PasswordInfo>;
     using Transport =
         base::StrongAlias<class TransportTag, AuthenticatorTransport>;
     using WindowsAPI = base::StrongAlias<class WindowsAPITag, std::monostate>;
     using ICloudKeychain =
         base::StrongAlias<class iCloudKeychainTag, std::monostate>;
-    using Type = std::variant<Credential,
-                              Password,
-                              Transport,
-                              WindowsAPI,
-                              ICloudKeychain>;
+    using Type =
+        std::variant<Credential, Transport, WindowsAPI, ICloudKeychain>;
 
     Mechanism(Type type,
               std::u16string name,

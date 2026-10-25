@@ -41,17 +41,14 @@
 namespace {
 
 using CredentialMech = AuthenticatorRequestDialogModel::Mechanism::Credential;
-using PasswordMech = AuthenticatorRequestDialogModel::Mechanism::Password;
 using ICloudKeychainMech =
     AuthenticatorRequestDialogModel::Mechanism::ICloudKeychain;
 using Step = AuthenticatorRequestDialogModel::Step;
 
-bool IsLocalPasskeyOrEnclaveAuthenticatorOrPassword(
-    const AuthenticatorRequestDialogModel::Mechanism& mech) {
-  return (std::holds_alternative<CredentialMech>(mech.type) &&
-          std::get<CredentialMech>(mech.type).value().source !=
-              device::AuthenticatorType::kPhone) ||
-         std::holds_alternative<PasswordMech>(mech.type);
+bool IsLocalPasskey(const AuthenticatorRequestDialogModel::Mechanism& mech) {
+  return std::holds_alternative<CredentialMech>(mech.type) &&
+         std::get<CredentialMech>(mech.type).value().source !=
+             device::AuthenticatorType::kPhone;
 }
 
 // Possibly returns a resident key warning if the model indicates that it's
@@ -1042,14 +1039,13 @@ AuthenticatorMultiSourcePickerSheetModel::
 
   webauthn::user_actions::RecordMultipleOptionsShown(
       dialog_model->mechanisms, dialog_model->request_type);
-  if (std::ranges::any_of(dialog_model->mechanisms,
-                          &IsLocalPasskeyOrEnclaveAuthenticatorOrPassword)) {
+  if (std::ranges::any_of(dialog_model->mechanisms, &IsLocalPasskey)) {
     primary_passkeys_label_ =
         l10n_util::GetStringUTF16(IDS_WEBAUTHN_THIS_DEVICE_LABEL);
     for (size_t i = 0; i < dialog_model->mechanisms.size(); ++i) {
       const AuthenticatorRequestDialogModel::Mechanism& mech =
           dialog_model->mechanisms[i];
-      if (IsLocalPasskeyOrEnclaveAuthenticatorOrPassword(mech) ||
+      if (IsLocalPasskey(mech) ||
           // iCloud Keychain appears in the primary list if present. This
           // happens when Chrome does not have permission to enumerate
           // credentials from iCloud Keychain. Thus this generic option is the
@@ -1058,9 +1054,6 @@ AuthenticatorMultiSourcePickerSheetModel::
         primary_passkey_indices_.push_back(i);
       } else {
         secondary_passkey_indices_.push_back(i);
-      }
-      if (std::holds_alternative<PasswordMech>(mech.type)) {
-        has_passwords_ = true;
       }
     }
     return;
@@ -1075,10 +1068,6 @@ AuthenticatorMultiSourcePickerSheetModel::
     ~AuthenticatorMultiSourcePickerSheetModel() = default;
 
 std::u16string AuthenticatorMultiSourcePickerSheetModel::GetStepTitle() const {
-  if (has_passwords_) {
-    return u"Use a saved credential for " +
-           GetRelyingPartyIdStringTitle(dialog_model()) + u" (UT)";
-  }
   return l10n_util::GetStringFUTF16(
       IDS_WEBAUTHN_CHOOSE_PASSKEY_FOR_RP_TITLE,
       GetRelyingPartyIdStringTitle(dialog_model()));

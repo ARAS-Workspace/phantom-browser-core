@@ -111,7 +111,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#include "chrome/browser/ui/webauthn/context_menu_helper.h"
 #include "chrome/browser/ui/webui/history/foreign_session_handler.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
@@ -2497,7 +2496,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_VIDEO_FRAME:
     case kOpenLinkWithMenuId:
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
-    case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       return true;
 
     case IDC_CONTENT_CONTEXT_EXIT_FULLSCREEN:
@@ -2944,11 +2942,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
 
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
       ExecProtocolHandlerSettings(event_flags);
-      break;
-
-    case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
-      webauthn::OnPasskeyFromAnotherDeviceContextMenuItemSelected(
-          GetRenderFrameHost());
       break;
 
     case IDC_CONTENT_CONTEXT_PICTUREINPICTURE:

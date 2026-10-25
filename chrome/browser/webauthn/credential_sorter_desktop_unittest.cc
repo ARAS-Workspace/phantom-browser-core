@@ -15,7 +15,6 @@
 
 using Mechanism = AuthenticatorRequestDialogModel::Mechanism;
 using CredentialInfo = Mechanism::CredentialInfo;
-using PasswordInfo = Mechanism::PasswordInfo;
 
 namespace webauthn::sorting {
 
@@ -41,17 +40,6 @@ Mechanism CreatePlatformPasskey(const std::u16string& user_name,
       {device::AuthenticatorType::kICloudKeychain, kUserId, last_used_time});
   return Mechanism(
       std::move(cred_info), user_name,
-      features::IsRoundedIconsEnabled() ? kMobileIcon : kSmartphoneOldIcon,
-      base::DoNothing());
-}
-
-// Helper to create a Password mechanism.
-Mechanism CreatePassword(const std::u16string& user_name,
-                         base::Time last_used_time) {
-  Mechanism::Type password_data =
-      Mechanism::Password(Mechanism::PasswordInfo(last_used_time));
-  return Mechanism(
-      std::move(password_data), user_name,
       features::IsRoundedIconsEnabled() ? kMobileIcon : kSmartphoneOldIcon,
       base::DoNothing());
 }
@@ -113,17 +101,6 @@ TEST_P(CredentialSorterDesktopTest, SinglePlatformMechanism) {
   ExpectNoDeduplication();
 }
 
-// Test that a list with one password remains unchanged.
-TEST_P(CredentialSorterDesktopTest, SinglePasswordMechanism) {
-  std::vector<Mechanism> mechanisms;
-  mechanisms.push_back(CreatePassword(u"user1", base::Time::Now()));
-  std::vector<Mechanism> result =
-      SortMechanisms(std::move(mechanisms), GetParam());
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_EQ(result[0].name, u"user1");
-  ExpectNoDeduplication();
-}
-
 // Test deduplication: GPM Passkey preferred over Platform Passkey if newer.
 TEST_P(CredentialSorterDesktopTest,
        DeduplicateGpmPasskeyVsPlatformPasskey_GpmNewer) {
@@ -140,61 +117,6 @@ TEST_P(CredentialSorterDesktopTest,
   EXPECT_EQ(std::get<Mechanism::Credential>(result[0].type).value().source,
             device::AuthenticatorType::kEnclave);
   ExpectDeduplicationRecorded(WebAuthnDeduplicatedType::kGpmPasskey);
-}
-
-// Test deduplication: GPM Passkey preferred over Password if GPM Passkey is
-// newer.
-TEST_P(CredentialSorterDesktopTest,
-       DeduplicateGpmPasskeyVsGpmPassword_PasskeyNewer) {
-  std::vector<Mechanism> mechanisms;
-  base::Time time_now = base::Time::Now();
-  base::Time time_older = time_now - base::Minutes(1);
-
-  mechanisms.push_back(CreatePassword(u"user1", time_older));
-  mechanisms.push_back(CreateGpmPasskey(u"user1", time_now));  // Newer
-
-  std::vector<Mechanism> result =
-      SortMechanisms(std::move(mechanisms), GetParam());
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_TRUE(std::holds_alternative<Mechanism::Credential>(result[0].type));
-  EXPECT_EQ(std::get<Mechanism::Credential>(result[0].type).value().source,
-            device::AuthenticatorType::kEnclave);
-  ExpectDeduplicationRecorded(WebAuthnDeduplicatedType::kGpmPasskey);
-}
-
-// Test deduplication: GPM Password preferred over GPM Passkey if Password
-// is newer.
-TEST_P(CredentialSorterDesktopTest,
-       DeduplicateGpmPasskeyVsGpmPassword_PasswordNewer) {
-  std::vector<Mechanism> mechanisms;
-  base::Time time_now = base::Time::Now();
-  base::Time time_older = time_now - base::Minutes(1);
-
-  mechanisms.push_back(CreateGpmPasskey(u"user1", time_older));
-  mechanisms.push_back(CreatePassword(u"user1", time_now));
-
-  std::vector<Mechanism> result =
-      SortMechanisms(std::move(mechanisms), GetParam());
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_TRUE(std::holds_alternative<Mechanism::Password>(result[0].type));
-  ExpectDeduplicationRecorded(WebAuthnDeduplicatedType::kPassword);
-}
-
-// Test deduplication: Platform Passkey preferred over Password.
-TEST_P(CredentialSorterDesktopTest, DeduplicatePlatformPasskeyVsGpmPassword) {
-  std::vector<Mechanism> mechanisms;
-  base::Time time_now = base::Time::Now();
-
-  mechanisms.push_back(CreatePassword(u"user1", time_now));
-  mechanisms.push_back(CreatePlatformPasskey(u"user1", std::nullopt));
-
-  std::vector<Mechanism> result =
-      SortMechanisms(std::move(mechanisms), GetParam());
-  ASSERT_EQ(result.size(), 1u);
-  EXPECT_TRUE(std::holds_alternative<Mechanism::Credential>(result[0].type));
-  EXPECT_NE(std::get<Mechanism::Credential>(result[0].type).value().source,
-            device::AuthenticatorType::kEnclave);
-  ExpectDeduplicationRecorded(WebAuthnDeduplicatedType::kPlatformPasskey);
 }
 
 // Test sorting: Most recent first.
@@ -233,36 +155,6 @@ TEST_P(CredentialSorterDesktopTest, SortByNameIfTimestampsEqual) {
   EXPECT_EQ(result[1].name, u"user_b");
   EXPECT_EQ(result[2].name, u"user_c");
   ExpectNoDeduplication();
-}
-
-// Test multiple deduplications in one call.
-TEST_P(CredentialSorterDesktopTest, MultipleDeduplications) {
-  std::vector<Mechanism> mechanisms;
-  base::Time time_now = base::Time::Now();
-  base::Time time_older = time_now - base::Minutes(1);
-
-  // User 1: platform passkey wins over password.
-  mechanisms.push_back(CreatePassword(u"user1", time_now));
-  mechanisms.push_back(CreatePlatformPasskey(u"user1", time_older));
-
-  // User 2: newer GPM passkey wins over password.
-  mechanisms.push_back(CreatePassword(u"user2", time_older));
-  mechanisms.push_back(CreateGpmPasskey(u"user2", time_now));
-
-  std::vector<Mechanism> result =
-      SortMechanisms(std::move(mechanisms), GetParam());
-  ASSERT_EQ(result.size(), 2u);
-
-  histogram_tester_.ExpectUniqueSample(
-      "WebAuthentication.MechanismSorter.DeduplicationHappened", true, 1);
-  histogram_tester_.ExpectTotalCount(
-      "WebAuthentication.MechanismSorter.SelectedMechanismType", 2);
-  histogram_tester_.ExpectBucketCount(
-      "WebAuthentication.MechanismSorter.SelectedMechanismType",
-      WebAuthnDeduplicatedType::kPlatformPasskey, 1);
-  histogram_tester_.ExpectBucketCount(
-      "WebAuthentication.MechanismSorter.SelectedMechanismType",
-      WebAuthnDeduplicatedType::kGpmPasskey, 1);
 }
 
 INSTANTIATE_TEST_SUITE_P(All,

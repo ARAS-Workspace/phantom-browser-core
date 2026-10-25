@@ -36,8 +36,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history/history_tab_helper.h"
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
 #include "chrome/browser/password_manager/factories/field_info_manager_factory.h"
 #include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
@@ -825,16 +823,6 @@ bool ChromePasswordManagerClient::IsChromeSigninPage() const {
 #else
   return false;
 #endif
-}
-
-password_manager::WebAuthnCredentialsDelegate*
-ChromePasswordManagerClient::GetWebAuthnCredentialsDelegateForDriver(
-    PasswordManagerDriver* driver) {
-  auto* frame_host =
-      static_cast<password_manager::ContentPasswordManagerDriver*>(driver)
-          ->render_frame_host();
-  return ChromeWebAuthnCredentialsDelegateFactory::GetFactory(web_contents())
-      ->GetDelegateForFrame(frame_host);
 }
 
 version_info::Channel ChromePasswordManagerClient::GetChannel() const {

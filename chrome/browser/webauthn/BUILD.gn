@@ -7,17 +7,12 @@ import("//build/config/ui.gni")
 source_set("webauthn") {
   public = [
     "credential_sorter.h",
-    "password_credential_fetcher.h",
-    "shared_types.h",
-    "touch_to_fill_credential_receiver.h",
     "webauthn_metrics_util.h",
     "webauthn_pref_names.h",
     "webauthn_switches.h",
   ]
   sources = [ "webauthn_pref_names.cc" ]
   public_deps = [
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/browser:password_form",
     "//content/public/browser",
     "//device/fido",
   ]
@@ -32,8 +27,6 @@ source_set("webauthn") {
     "credential_sorter_desktop.h",
     "immediate_request_rate_limiter_factory.h",
     "local_authentication_token.h",
-    "password_credential_ui_controller.h",
-    "ui_readiness_barrier.h",
   ]
   public_deps += [
     "//base",
@@ -58,7 +51,6 @@ source_set("webauthn") {
 
 source_set("impl") {
   sources = [
-    "password_credential_fetcher.cc",
     "webauthn_metrics_util.cc",
     "webauthn_switches.cc",
   ]
@@ -70,11 +62,7 @@ source_set("impl") {
 
   deps = [
     "//base",
-    "//chrome/browser/password_manager",
     "//chrome/browser/profiles:profile",
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/browser:password_form",
-    "//components/password_manager/core/browser/password_store:password_store_interface",
     "//content/public/browser",
     "//url",
   ]
@@ -87,14 +75,11 @@ source_set("impl") {
     "chrome_authenticator_request_delegate.cc",
     "credential_sorter_desktop.cc",
     "immediate_request_rate_limiter_factory.cc",
-    "password_credential_ui_controller.cc",
-    "ui_readiness_barrier.cc",
   ]
   deps += [
     ":chrome_web_authentication_delegate",
     "//chrome/app:generated_resources",
     "//chrome/app/vector_icons",
-    "//chrome/browser/affiliations",
     "//chrome/browser/net",
     "//chrome/browser/profiles",
     "//chrome/browser/signin",
@@ -102,13 +87,10 @@ source_set("impl") {
     "//chrome/browser/ui:chrome_pages",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/navigator",
-    "//chrome/browser/ui/passwords",
     "//chrome/browser/ui/signin",
     "//chrome/browser/ui/webauthn",
     "//components/cbor",
     "//components/device_event_log",
-    "//components/password_manager/core/browser/affiliation:affiliation_fetching",
-    "//components/password_manager/core/common",
     "//components/pref_registry",
     "//components/prefs",
     "//components/signin/public/identity_manager",
@@ -241,11 +223,9 @@ source_set("unit_tests") {
     ":webauthn",
     "//base",
     "//base/test:test_support",
-    "//chrome/browser/password_manager",
     "//chrome/browser/profiles:profile",
     "//chrome/test:test_support",
     "//components/cbor",
-    "//components/password_manager/core/browser",
     "//components/sync:test_support",
     "//components/sync/protocol",
     "//components/webauthn/content/browser",
@@ -267,7 +247,6 @@ source_set("unit_tests") {
     "chrome_authenticator_request_delegate_unittest.cc",
     "chrome_web_authentication_delegate_unittest.cc",
     "credential_sorter_desktop_unittest.cc",
-    "ui_readiness_barrier_unittest.cc",
   ]
 
   deps += [

@@ -35,25 +35,13 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
-#include "chrome/browser/ui/webauthn/ambient/ambient_signin_controller.h"
 #include "chrome/browser/ui/webauthn/user_actions.h"
 #include "chrome/browser/webauthn/authenticator_reference.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
 #include "chrome/browser/webauthn/credential_sorter_desktop.h"
-#include "chrome/browser/webauthn/password_credential_fetcher.h"
-#include "chrome/browser/webauthn/webauthn_metrics_util.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/device_event_log/device_event_log.h"
-#include "components/password_manager/core/browser/credential_manager_utils.h"
-#include "components/password_manager/core/browser/passkey_credential.h"
-#include "components/password_manager/core/browser/password_manager_util.h"
-#include "components/strings/grit/components_strings.h"
-#include "components/url_formatter/elide_url.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/storage_partition.h"
@@ -92,7 +80,6 @@ using UIPresentation =
     content::AuthenticatorRequestClientDelegate::UIPresentation;
 using device::AuthenticatorType;
 using device::FidoRequestType;
-using PasswordCredentials = PasswordCredentialFetcher::PasswordCredentials;
 
 constexpr int GetMessageIdForTransportDescription(
     AuthenticatorTransport transport) {
@@ -148,26 +135,6 @@ constexpr const gfx::VectorIcon& GetTransportIcon(
 // currently only shown on MacOS, because that is the only desktop platform
 // authenticator without a "native" WebAuthn UI.
 constexpr bool kShowCreatePlatformPasskeyStep = BUILDFLAG(IS_MAC);
-
-password_manager::PasskeyCredential::Source ToPasswordManagerSource(
-    AuthenticatorType type) {
-  switch (type) {
-    case AuthenticatorType::kWinNative:
-      return password_manager::PasskeyCredential::Source::kWindowsHello;
-    case AuthenticatorType::kTouchID:
-      return password_manager::PasskeyCredential::Source::kTouchId;
-    case AuthenticatorType::kPhone:
-      return password_manager::PasskeyCredential::Source::kAndroidPhone;
-    case AuthenticatorType::kICloudKeychain:
-      return password_manager::PasskeyCredential::Source::kICloudKeychain;
-    case AuthenticatorType::kEnclave:
-      return password_manager::PasskeyCredential::Source::
-          kGooglePasswordManager;
-    case AuthenticatorType::kChromeOS:
-    case AuthenticatorType::kOther:
-      return password_manager::PasskeyCredential::Source::kOther;
-  }
-}
 
 bool WebAuthnApiSupportsHybrid() {
   return false;
@@ -323,8 +290,6 @@ const gfx::VectorIcon& GetMechanismIcon(
               switch (credential.value().source) {
                 case AuthenticatorType::kICloudKeychain:
                   return kIcloudKeychainColorCustomIcon;
-                case AuthenticatorType::kEnclave:
-                  return GooglePasswordManagerVectorIcon();
                 case AuthenticatorType::kWinNative:
                   return kWindowsHelloColorCustomIcon;
                 case AuthenticatorType::kTouchID:
@@ -335,9 +300,6 @@ const gfx::VectorIcon& GetMechanismIcon(
             }
             // Default icon for non-immediate mode or other credential sources.
             return GetCredentialIcon(credential.value().source);
-          },
-          [](const Mechanism::Password&) -> const gfx::VectorIcon& {
-            return GooglePasswordManagerVectorIcon();
           },
           [](const Mechanism::Transport& transport) -> const gfx::VectorIcon& {
             return GetTransportIcon(transport.value());
@@ -375,7 +337,6 @@ bool MechanismMatchesHint(const Mechanism::Type& mech,
             // Credentials are always given priority over hints.
             return false;
           },
-          [](const Mechanism::Password&) { return false; },
       },
       mech);
 }
@@ -492,19 +453,6 @@ void AuthenticatorRequestDialogController::CancelAuthenticatorRequest() {
 }
 
 void AuthenticatorRequestDialogController::OnRequestComplete() {
-  if (ui_presentation() == UIPresentation::kAutofill) {
-    auto* render_frame_host = MaybeGetRenderFrameHost();
-    auto* web_contents =
-        content::WebContents::FromRenderFrameHost(render_frame_host);
-    if (web_contents) {
-      ChromeWebAuthnCredentialsDelegate* delegate =
-          ChromeWebAuthnCredentialsDelegateFactory::GetFactory(web_contents)
-              ->GetDelegateForFrame(render_frame_host);
-      if (delegate) {
-        delegate->NotifyWebAuthnRequestAborted();
-      }
-    }
-  }
   SetCurrentStep(Step::kClosed);
 }
 
@@ -560,8 +508,7 @@ bool AuthenticatorRequestDialogController::is_request_complete() const {
 }
 
 void AuthenticatorRequestDialogController::StartFlow(
-    TransportAvailabilityInfo transport_availability,
-    PasswordCredentials passwords) {
+    TransportAvailabilityInfo transport_availability) {
   DCHECK(!started_);
   DCHECK_EQ(model_->step(), Step::kNotStarted);
   DCHECK_EQ(
@@ -570,7 +517,6 @@ void AuthenticatorRequestDialogController::StartFlow(
 
   started_ = true;
   transport_availability_ = std::move(transport_availability);
-  passwords_ = std::move(passwords);
   // All recognised credentials that are "Chrome implemented" are from the
   // same source, i.e. a platform never has two Chrome implemented platform
   // authenticators.
@@ -609,19 +555,6 @@ void AuthenticatorRequestDialogController::StartFlow(
     case UIPresentation::kDisabled:
       NOTREACHED();
   }
-}
-
-void AuthenticatorRequestDialogController::TransitionToModalWebAuthnRequest() {
-  FIDO_LOG(EVENT) << "TransitionToModalWebAuthnRequest from step: "
-                  << model_->step();
-
-  // Dispatch requests to any plugged in authenticators.
-  for (auto& authenticator : ephemeral_state_.saved_authenticators_) {
-    if (authenticator.transport != device::FidoTransportProtocol::kInternal) {
-      DispatchRequestAsync(&authenticator);
-    }
-  }
-  StartGuidedFlowForMostLikelyTransportOrShowMechanismSelection();
 }
 
 void AuthenticatorRequestDialogController::
@@ -663,8 +596,6 @@ void AuthenticatorRequestDialogController::
           !ProfileAuthenticatorWillDoUserVerification(
               transport_availability_.user_verification_requirement,
               transport_availability_.platform_has_biometrics)))) {
-      SetCurrentStep(Step::kSelectPriorityMechanism);
-    } else if (std::holds_alternative<Mechanism::Password>(mechanism.type)) {
       SetCurrentStep(Step::kSelectPriorityMechanism);
     } else {
       mechanism.callback.Run();
@@ -1272,10 +1203,6 @@ void AuthenticatorRequestDialogController::set_has_icloud_drive_enabled(
 
 #endif
 
-void AuthenticatorRequestDialogController::SetCredentialTypes(int types) {
-  credential_types_ = types;
-}
-
 content::AuthenticatorRequestClientDelegate::UIPresentation
 AuthenticatorRequestDialogController::ui_presentation() const {
   return model_->ui_presentation;
@@ -1372,46 +1299,6 @@ void AuthenticatorRequestDialogController::StartAutofillRequest() {
     return;
   }
 
-  std::vector<password_manager::PasskeyCredential> credentials;
-  for (const auto& credential : model_->creds) {
-    if (credential.source == AuthenticatorType::kEnclave) {
-      continue;
-    }
-    password_manager::PasskeyCredential& passkey = credentials.emplace_back(
-        ToPasswordManagerSource(credential.source),
-        password_manager::PasskeyCredential::RpId(credential.rp_id),
-        password_manager::PasskeyCredential::CredentialId(credential.cred_id),
-        password_manager::PasskeyCredential::UserId(credential.user.id),
-        password_manager::PasskeyCredential::Username(
-            credential.user.name.value_or("")),
-        password_manager::PasskeyCredential::DisplayName(
-            credential.user.display_name.value_or("")));
-    if (credential.provider_name) {
-      passkey.SetAuthenticatorLabel(l10n_util::GetStringFUTF16(
-          IDS_PASSWORD_MANAGER_PASSKEY_FROM_PROVIDER,
-          base::UTF8ToUTF16(*credential.provider_name)));
-    }
-  }
-  ReportConditionalUiPasskeyCount(credentials.size());
-
-  if (ui_presentation() == UIPresentation::kAmbient &&
-      (!credentials.empty() || !passwords_.empty())) {
-    auto* controller =
-        ambient_signin::AmbientSigninController::GetOrCreateForCurrentDocument(
-            render_frame_host);
-    controller->Show(model());
-  }
-
-  ChromeWebAuthnCredentialsDelegate* webauthn_credentials_delegate =
-      ChromeWebAuthnCredentialsDelegateFactory::GetFactory(web_contents)
-          ->GetDelegateForFrame(render_frame_host);
-  if (webauthn_credentials_delegate) {
-    // May be null on tests.
-    webauthn_credentials_delegate->OnCredentialsReceived(
-        std::move(credentials),
-        ChromeWebAuthnCredentialsDelegate::SecurityKeyOrHybridFlowAvailable(
-            true));
-  }
   SetCurrentStep(Step::kPasskeyAutofill);
 }
 
@@ -1490,9 +1377,6 @@ void AuthenticatorRequestDialogController::PopulateMechanisms() {
       mechanism.description =
           AuthenticatorRequestDialogModel::GetMechanismDescription(
               cred, ui_presentation());
-    }
-    if (!passwords_.empty()) {
-      PopulatePasswords();
     }
   }
 
@@ -1626,7 +1510,6 @@ AuthenticatorRequestDialogController::IndexOfGetAssertionPriorityMechanism() {
     std::optional<std::pair<size_t, const Mechanism::CredentialInfo*>>
         best_cred;
     bool multiple_distinct_creds = false;
-    bool has_password = false;
 
     for (size_t i = 0; i < model_->mechanisms.size(); ++i) {
       const auto& type = model_->mechanisms[i].type;
@@ -1644,12 +1527,10 @@ AuthenticatorRequestDialogController::IndexOfGetAssertionPriorityMechanism() {
         } else {
           multiple_distinct_creds = true;
         }
-      } else if (std::holds_alternative<Mechanism::Password>(type)) {
-        has_password = true;
       }
     }
     // If one of the passkeys is a valid default, go to that.
-    if (!has_password && !multiple_distinct_creds && best_cred.has_value() &&
+    if (!multiple_distinct_creds && best_cred.has_value() &&
         // Do not set Windows Hello credentials as priority mechanisms. Doing so
         // narrows the allow-list to that specific credential. But, since
         // Windows also handles other mechanisms, it's better to avoid narrowing
@@ -1756,32 +1637,4 @@ AuthenticatorRequestDialogController::MaybeGetRenderFrameHost() const {
 
 void AuthenticatorRequestDialogController::StartPasskeyUpgradeRequest() {
   CancelAuthenticatorRequest();
-}
-
-void AuthenticatorRequestDialogController::PopulatePasswords() {
-  for (const auto& password : passwords_) {
-    std::optional<std::u16string> origin;
-    if (password->match_type.has_value() &&
-        password_manager_util::GetMatchType(*password) !=
-            password_manager_util::GetLoginMatchType::kExact) {
-      origin = url_formatter::FormatUrlForSecurityDisplay(
-          password->url, url_formatter::SchemeDisplay::OMIT_HTTP_AND_HTTPS);
-    }
-
-    Mechanism::Type mechanism_type = Mechanism::Password(
-        AuthenticatorRequestDialogModel::Mechanism::PasswordInfo(
-            password->date_last_used, std::move(origin)));
-    Mechanism mechanism(
-        mechanism_type, password->username_value,
-        GetMechanismIcon(mechanism_type, ui_presentation()),
-        base::BindRepeating(
-            &AuthenticatorRequestDialogModel::OnPasswordCredentialSelected,
-            base::Unretained(model_.get()),
-            std::make_pair(password->username_value,
-                           password->password_value)));
-    mechanism.description = l10n_util::GetStringUTF16(
-        IDS_PASSWORD_MANAGER_PASSWORD_FROM_GOOGLE_PASSWORD_MANAGER);
-
-    model_->mechanisms.emplace_back(std::move(mechanism));
-  }
 }

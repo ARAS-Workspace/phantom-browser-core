@@ -20,10 +20,8 @@
 #include "chrome/browser/webauthn/authenticator_reference.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
-#include "chrome/browser/webauthn/password_credential_fetcher.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "content/public/browser/global_routing_id.h"
-#include "third_party/blink/public/mojom/credentialmanagement/credential_type_flags.mojom.h"
 #include "url/gurl.h"
 
 class Profile;
@@ -71,19 +69,12 @@ class AuthenticatorRequestDialogController
   // is only resolved after the UI is dismissed.
   bool is_request_complete() const;
 
-  // Starts the UX flow, by either showing the transport or password selection
-  // screen or the guided flow for the most likely transport.
+  // Starts the UX flow, by either showing the transport selection screen or
+  // the guided flow for the most likely transport.
   //
   // Valid action when at step: kNotStarted.
   void StartFlow(device::FidoRequestHandlerBase::TransportAvailabilityInfo
-                     transport_availability,
-                 PasswordCredentialFetcher::PasswordCredentials passwords);
-
-  // Starts a modal WebAuthn flow (i.e. what you normally get if you call
-  // WebAuthn with no mediation parameter) from a conditional request.
-  //
-  // Valid action when at step: kPasskeyAutofill.
-  void TransitionToModalWebAuthnRequest();
+                     transport_availability);
 
   // Starts the UX flow. Tries to figure out the most likely transport to be
   // used, and starts the guided flow for that transport; or shows the manual
@@ -266,8 +257,6 @@ class AuthenticatorRequestDialogController
   void set_has_icloud_drive_enabled(bool);
 #endif
 
-  void SetCredentialTypes(int types);
-
   content::AuthenticatorRequestClientDelegate::UIPresentation ui_presentation()
       const;
   void SetUIPresentation(
@@ -354,8 +343,6 @@ class AuthenticatorRequestDialogController
   // nullptr if the initiating frame or tab has been destroyed or detached.
   content::RenderFrameHost* MaybeGetRenderFrameHost() const;
 
-  void PopulatePasswords();
-
   scoped_refptr<AuthenticatorRequestDialogModel> model_;
 
   // Identifier for the RenderFrameHost of the frame that initiated the current
@@ -382,8 +369,6 @@ class AuthenticatorRequestDialogController
   // This field is only filled out once the UX flow is started.
   device::FidoRequestHandlerBase::TransportAvailabilityInfo
       transport_availability_;
-
-  PasswordCredentialFetcher::PasswordCredentials passwords_;
 
   content::AuthenticatorRequestClientDelegate::AccountPreselectedCallback
       account_preselected_callback_;
@@ -420,10 +405,6 @@ class AuthenticatorRequestDialogController
   // syncing is enabled.
   bool has_icloud_drive_enabled_ = false;
 #endif
-
-  // The credential types that are being asked for.
-  int credential_types_ =
-      static_cast<int>(blink::mojom::CredentialTypeFlags::kNone);
 
   const content::GlobalRenderFrameHostId frame_host_id_;
 

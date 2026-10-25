@@ -8,9 +8,6 @@
 
 namespace {
 
-// Maximum bucket for reporting number of passkeys present for a given
-// Conditional UI request.
-constexpr int kPasskeyCountMax = 10;
 constexpr std::string_view kCombinedSelectorActionHistogram =
     "WebAuthentication.GetCredentials.Immediate.CombinedSelectorActions";
 constexpr std::string_view kCombinedSelectorCredentialCountHistogram =
@@ -57,8 +54,3 @@ void RecordCombinedSelectorCancelButtonClicked() {
 }
 
 }  // namespace webauthn::metrics
-
-void ReportConditionalUiPasskeyCount(int passkey_count) {
-  base::UmaHistogramExactLinear("WebAuthentication.ConditionalUiPasskeyCount",
-                                passkey_count, kPasskeyCountMax);
-}

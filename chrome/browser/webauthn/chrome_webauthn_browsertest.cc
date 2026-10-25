@@ -12,13 +12,10 @@
 #include "base/files/scoped_temp_dir.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
-#include "base/notreached.h"
 #include "base/rand_util.h"
 #include "base/run_loop.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/task/sequenced_task_runner.h"
-#include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
 #include "base/test/values_test_util.h"
@@ -26,7 +23,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/test_extension_system.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/cert_verifier_browser_test.h"
 #include "chrome/browser/ui/page_action/action_ids.h"
@@ -34,7 +30,6 @@
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/page_action/page_action_container_view.h"
 #include "chrome/browser/ui/views/page_action/page_action_view.h"
-#include "chrome/browser/ui/webauthn/ambient/ambient_signin_controller.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_controller.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
@@ -51,12 +46,10 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "device/fido/discoverable_credential_metadata.h"
-#include "device/fido/fido_request_handler_base.h"
 #include "device/fido/public/features.h"
 #include "device/fido/public/fido_transport_protocol.h"
 #include "device/fido/public/fido_types.h"
 #include "device/fido/public/public_key_credential_user_entity.h"
-#include "device/fido/virtual_ctap2_device.h"
 #include "device/fido/virtual_fido_device.h"
 #include "device/fido/virtual_fido_device_factory.h"
 #include "extensions/browser/extension_registrar.h"
@@ -392,147 +385,11 @@ IN_PROC_BROWSER_TEST_F(WebAuthnHintsTest, HintsArePassedThrough) {
             AuthenticatorTransport::kHybrid);
 }
 
-class WebAuthnConditionalUITest : public WebAuthnBrowserTest {
-  class Observer : public ChromeAuthenticatorRequestDelegate::TestObserver {
-   public:
-    enum State {
-      kHasNotShowedUI,
-      kWaitingForUI,
-      kShowedUI,
-    };
-    virtual ~Observer() = default;
-    void WaitForUI() {
-      if (state_ != kHasNotShowedUI) {
-        return;
-      }
-      state_ = kWaitingForUI;
-      run_loop_.Run();
-    }
-
-    // ChromeAuthenticatorRequestDelegate::TestObserver:
-    void OnTransportAvailabilityEnumerated(
-        ChromeAuthenticatorRequestDelegate* delegate,
-        device::FidoRequestHandlerBase::TransportAvailabilityInfo* tai)
-        override {}
-
-    void UIShown(ChromeAuthenticatorRequestDelegate* delegate) override {
-      if (state_ == kWaitingForUI) {
-        // When the content layer controls authenticator dispatch, dispatching
-        // happens on tasks posted right before the UI is shown. We need to
-        // QuitWhenIdle to make sure that, if an authenticator is dispatched to,
-        // that task has a chance to finish before the test continues. That way
-        // we can catch any potentially unexpected authenticator dispatches.
-        run_loop_.QuitWhenIdle();
-      }
-      state_ = kShowedUI;
-    }
-
-    void AccountSelectorShown(
-        const std::vector<device::AuthenticatorGetAssertionResponse>& responses)
-        override {
-      for (const auto& response : responses) {
-        accounts_.emplace_back(base::HexEncode(response.credential->id));
-      }
-    }
-
-    std::vector<std::string> accounts_;
-
-   private:
-    State state_ = kHasNotShowedUI;
-    base::RunLoop run_loop_;
-  };
-
-  void SetUpOnMainThread() override {
-    WebAuthnBrowserTest::SetUpOnMainThread();
-    observer_ = std::make_unique<Observer>();
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(
-        browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-
-    auto virtual_device_factory =
-        std::make_unique<device::test::VirtualFidoDeviceFactory>();
-    virtual_device_factory_ = virtual_device_factory.get();
-    virtual_device_factory->mutable_state()->InjectResidentKey(
-        kCredentialID, "www.example.com", std::vector<uint8_t>{5, 6, 7, 8},
-        "flandre", "Flandre Scarlet");
-    virtual_device_factory->mutable_state()->fingerprints_enrolled = true;
-    device::VirtualCtap2Device::Config config;
-    config.resident_key_support = true;
-    config.internal_uv_support = true;
-    virtual_device_factory->SetCtap2Config(std::move(config));
-    auth_env_ =
-        std::make_unique<content::ScopedAuthenticatorEnvironmentForTesting>(
-            std::move(virtual_device_factory));
-
-    ChromeAuthenticatorRequestDelegate::SetGlobalObserverForTesting(
-        observer_.get());
-  }
-
-  void PostRunTestOnMainThread() override {
-    // To avoid dangling raw_ptr's these values need to be destroyed before
-    // this test class.
-    virtual_device_factory_ = nullptr;
-    auth_env_.reset();
-    ChromeAuthenticatorRequestDelegate::SetGlobalObserverForTesting(nullptr);
-    WebAuthnBrowserTest::PostRunTestOnMainThread();
-  }
-
- protected:
-  std::unique_ptr<Observer> observer_;
-  raw_ptr<device::test::VirtualFidoDeviceFactory> virtual_device_factory_;
-  std::unique_ptr<content::ScopedAuthenticatorEnvironmentForTesting> auth_env_;
-};
-
-static constexpr char kConditionalUIRequest[] = R"((() => {
-window.requestAbortController = new AbortController();
-navigator.credentials.get({
-  signal: window.requestAbortController.signal,
-  mediation: 'conditional',
-  publicKey: {
-    challenge: new Uint8Array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]),
-    timeout: 10000,
-    allowCredentials: [],
-  }}).then(c => window.domAutomationController.send('webauthn: OK'),
-           e => window.domAutomationController.send('error ' + e));
-})())";
-
-// Tests that the "Sign in with another device…" button dispatches requests to
-// plugged in authenticators.
-IN_PROC_BROWSER_TEST_F(WebAuthnConditionalUITest,
-                       ConditionalUIOtherDeviceButton) {
-  // Make a Conditional UI request. The authenticator should not be dispatched
-  // to before the user clicks the "Sign in with another device…" button.
-  virtual_device_factory_->mutable_state()->simulate_press_callback =
-      base::BindLambdaForTesting([](device::VirtualFidoDevice* device) -> bool {
-        NOTREACHED() << "Virtual device should not have been dispatched to";
-      });
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  content::DOMMessageQueue message_queue(web_contents);
-  content::ExecuteScriptAsync(web_contents, kConditionalUIRequest);
-  observer_->WaitForUI();
-
-  // Allow the virtual device to respond to requests, then simulate clicking the
-  // "Sign in with another device…" button and wait for a result.
-  virtual_device_factory_->mutable_state()->simulate_press_callback =
-      base::BindLambdaForTesting(
-          [&](device::VirtualFidoDevice* device) { return true; });
-  ChromeWebAuthnCredentialsDelegate delegate(
-      web_contents->GetPrimaryMainFrame());
-  delegate.LaunchSecurityKeyOrHybridFlow();
-
-  std::string result;
-  ASSERT_TRUE(message_queue.WaitForMessage(&result));
-  EXPECT_EQ(result, "\"webauthn: OK\"");
-  EXPECT_EQ(observer_->accounts_.size(), 1u);
-  EXPECT_EQ(observer_->accounts_.at(0), "0102030405060708090A0B0C0D0E0F10");
-}
-
 class WebAuthnImmediateGetTest : public WebAuthnBrowserTest {
  protected:
-  static constexpr std::string_view kRequestWithPasswordTemplate = R"(
+  static constexpr std::string_view kRequest = R"(
     navigator.credentials.get({
     uiMode: 'immediate',
-    password: $1,
     publicKey: {
       challenge: new Uint8Array([1,3,2,7,1,3,2,7]),
       timeout: 10000,
@@ -559,13 +416,8 @@ IN_PROC_BROWSER_TEST_F(WebAuthnImmediateGetTest, NoCreds_NotFoundError) {
   content::WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
 
-  for (const auto& request_password : {"false", "true"}) {
-    const auto& script = base::ReplaceStringPlaceholders(
-        kRequestWithPasswordTemplate, {request_password},
-        /*offsets=*/nullptr);
-    const auto& result = content::EvalJs(web_contents, script);
-    EXPECT_THAT(result.ExtractString(), testing::HasSubstr("NotAllowedError"));
-  }
+  const auto& result = content::EvalJs(web_contents, kRequest);
+  EXPECT_THAT(result.ExtractString(), testing::HasSubstr("NotAllowedError"));
 }
 
 IN_PROC_BROWSER_TEST_F(WebAuthnImmediateGetTest,
@@ -576,13 +428,8 @@ IN_PROC_BROWSER_TEST_F(WebAuthnImmediateGetTest,
   content::WebContents* web_contents =
       otr_browser->tab_strip_model()->GetActiveWebContents();
 
-  for (const auto& request_password : {"false", "true"}) {
-    const auto& script = base::ReplaceStringPlaceholders(
-        kRequestWithPasswordTemplate, {request_password},
-        /*offsets=*/nullptr);
-    const auto& result = content::EvalJs(web_contents, script);
-    EXPECT_THAT(result.ExtractString(), testing::HasSubstr("NotAllowedError"));
-  }
+  const auto& result = content::EvalJs(web_contents, kRequest);
+  EXPECT_THAT(result.ExtractString(), testing::HasSubstr("NotAllowedError"));
 }
 
 IN_PROC_BROWSER_TEST_F(WebAuthnImmediateGetTest, Allowlist_NotAllowedError) {

@@ -50,8 +50,6 @@ void RecordWindowsHelloShown(device::FidoRequestType request_type);
 void RecordWindowsHelloCancelled();
 void RecordWindowsHelloSuccess();
 
-void RecordContextMenuEntryClick();
-
 }  // namespace webauthn::user_actions
 
 #endif  // CHROME_BROWSER_UI_WEBAUTHN_USER_ACTIONS_H_

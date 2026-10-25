@@ -54,8 +54,7 @@ constexpr static int kGroupId = 1327;
 // The texts are returned in the order they should be displayed in the
 // CombinedSelectorRowView.
 // - The first text is the name of the mechanism (title).
-// - The second text (if present) is the display name or the
-//   origin if it's a password mechanism.
+// - The second text (if present) is the display name.
 // - The last text is the description (e.g.
 // "IDS_PASSWORD_MANAGER_PASSKEY_FROM_GOOGLE_PASSWORD_MANAGER").
 std::vector<std::u16string_view> GetTextsForMechanism(
@@ -67,13 +66,6 @@ std::vector<std::u16string_view> GetTextsForMechanism(
   } else {
     texts.push_back(mechanism.display_name);
     texts.push_back(mechanism.name);
-  }
-  if (const auto* password =
-          std::get_if<AuthenticatorRequestDialogModel::Mechanism::Password>(
-              &mechanism.type)) {
-    if (password->value().origin) {
-      texts.push_back(*password->value().origin);
-    }
   }
   texts.push_back(mechanism.description);
   return texts;

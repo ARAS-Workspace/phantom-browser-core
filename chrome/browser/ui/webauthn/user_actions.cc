@@ -37,7 +37,6 @@ constexpr std::string_view kGpmOnly = "GpmOnly";
 constexpr std::string_view kICloudOnly = "ICloudOnly";
 constexpr std::string_view kWinOnly = "WinOnly";
 constexpr std::string_view kProfileOnly = "ProfileOnly";
-constexpr std::string_view kPasswordOnly = "PasswordOnly";
 
 constexpr std::string_view kOthers = "Others";
 
@@ -46,7 +45,6 @@ enum class AuthenticatorCategory {
   kICloud,
   kWindows,
   kProfile,
-  kPassword,
   kOther,
 };
 
@@ -66,8 +64,6 @@ AuthenticatorCategory CategoryFromMechanism(const Mechanism& mechanism) {
       case AuthenticatorType::kOther:
         return AuthenticatorCategory::kOther;
     }
-  } else if (std::holds_alternative<Mechanism::Password>(mechanism.type)) {
-    return AuthenticatorCategory::kPassword;
   } else if (std::holds_alternative<Mechanism::WindowsAPI>(mechanism.type)) {
     return AuthenticatorCategory::kWindows;
   } else if (std::holds_alternative<Mechanism::ICloudKeychain>(
@@ -99,7 +95,6 @@ std::tuple<bool, bool, bool, bool> AuthenticatorsAvailable(
       case AuthenticatorCategory::kWindows:
         has_win = true;
         break;
-      case AuthenticatorCategory::kPassword:
       case AuthenticatorCategory::kOther:
         break;
     }
@@ -170,7 +165,6 @@ void RecordPriorityOptionShown(const Mechanism& mechanism) {
     case AuthenticatorCategory::kWindows:
       metric_to_emit = kWinOnly;
       break;
-    case AuthenticatorCategory::kPassword:
     case AuthenticatorCategory::kOther:
       break;
   }
@@ -215,9 +209,6 @@ void RecordMechanismClick(const Mechanism& mech) {
       break;
     case AuthenticatorCategory::kWindows:
       metric_to_emit = kWinOnly;
-      break;
-    case AuthenticatorCategory::kPassword:
-      metric_to_emit = kPasswordOnly;
       break;
     case AuthenticatorCategory::kOther:
       metric_to_emit = kOthers;
@@ -299,11 +290,6 @@ void RecordWindowsHelloCancelled() {
 
 void RecordWindowsHelloSuccess() {
   base::RecordAction(base::UserMetricsAction("WebAuthn.WinHello.Success"));
-}
-
-void RecordContextMenuEntryClick() {
-  base::RecordAction(base::UserMetricsAction(
-      "WebAuthn.ContextMenu.PasskeyFromAnotherDeviceClicked"));
 }
 
 }  // namespace webauthn::user_actions

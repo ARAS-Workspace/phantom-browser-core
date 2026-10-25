@@ -31,8 +31,6 @@
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
@@ -58,16 +56,9 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/autofill/content/browser/test_autofill_client_injector.h"
-#include "components/autofill/content/browser/test_autofill_driver_injector.h"
-#include "components/autofill/content/browser/test_autofill_manager_injector.h"
 #include "components/autofill/content/browser/test_content_autofill_client.h"
-#include "components/autofill/content/browser/test_content_autofill_driver.h"
-#include "components/autofill/core/browser/foundations/autofill_manager_test_api.h"
-#include "components/autofill/core/browser/foundations/test_autofill_driver.h"
-#include "components/autofill/core/browser/foundations/test_browser_autofill_manager.h"
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
-#include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/password_manager/core/browser/features/password_features.h"
@@ -108,7 +99,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/context_menu_data/context_menu_data.h"
 #include "third_party/blink/public/common/context_menu_data/edit_flags.h"
-#include "third_party/blink/public/common/dom/dom_node_id.h"
 #include "third_party/blink/public/mojom/context_menu/context_menu.mojom.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/base/clipboard/clipboard.h"
@@ -815,93 +805,6 @@ TEST_F(RenderViewContextMenuPrefsTest,
 
   EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
   EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB));
-}
-
-class RenderViewContextMenuUsePasskeyFromAnotherDeviceTest
-    : public RenderViewContextMenuPrefsTest {
- public:
-  void SetUp() override { RenderViewContextMenuPrefsTest::SetUp(); }
-
-  const GURL get_url() { return GURL("https://foo.com"); }
-
-  RenderViewContextMenuUsePasskeyFromAnotherDeviceTest() = default;
-
-  autofill::FormData CreateFormWithSingleField(bool is_webauthn = false) {
-    autofill::FormFieldData field = autofill::test::CreateTestFormField(
-        /*label=*/"label", /*name=*/"name",
-        /*value=*/"", autofill::FormControlType::kInputText,
-        /*autocomplete=*/is_webauthn ? "webauthn" : "");
-    field.set_host_frame(autofill_driver()->GetFrameToken());
-
-    autofill::FormData form;
-    form.set_renderer_id(autofill::test::MakeFormRendererId());
-    form.set_url(get_url());
-    form.set_fields({field});
-    return form;
-  }
-
-  std::unique_ptr<TestRenderViewContextMenu> CreateFormAndDisplayMenu(
-      bool is_webauthn_form) {
-    auto form = CreateFormWithSingleField(is_webauthn_form);
-    NotifyFormManagerAndWait(form);
-
-    content::ContextMenuParams params = CreateParams(MenuItem::EDITABLE);
-    params.form_renderer_id = blink::DOMNodeIdType(form.renderer_id().value());
-    params.field_renderer_id =
-        blink::DOMNodeIdType(form.fields()[0].renderer_id().value());
-
-    auto menu = std::make_unique<TestRenderViewContextMenu>(
-        *web_contents()->GetPrimaryMainFrame(), params);
-    menu->Init();
-    return menu;
-  }
-
-  void NotifyFormManagerAndWait(autofill::FormData form) {
-    autofill::TestAutofillManagerWaiter waiter(
-        autofill_manager(), {autofill::AutofillManagerEvent::kFormsSeen});
-    autofill_manager().OnFormsSeen(
-        {form}, {}, autofill::AutofillManagerTestApi::pass_key());
-    ASSERT_TRUE(waiter.Wait());
-  }
-
- protected:
-  autofill::TestContentAutofillDriver* autofill_driver() {
-    return af_driver_injector_[main_rfh()];
-  }
-
-  autofill::AutofillManager& autofill_manager() {
-    return autofill_driver()->GetAutofillManager();
-  }
-
-  ChromeWebAuthnCredentialsDelegate* webauthn_delegate() {
-    return ChromeWebAuthnCredentialsDelegateFactory::GetFactory(
-               content::WebContents::FromRenderFrameHost(main_rfh()))
-        ->GetDelegateForFrame(main_rfh());
-  }
-
- private:
-  autofill::test::AutofillUnitTestEnvironment test_environment_;
-  autofill::TestAutofillClientInjector<autofill::TestContentAutofillClient>
-      af_client_injector;
-  autofill::TestAutofillDriverInjector<autofill::TestContentAutofillDriver>
-      af_driver_injector_;
-  autofill::TestAutofillManagerInjector<autofill::TestBrowserAutofillManager>
-      af_manager_injector_;
-};
-
-// Verify that "Use passkey from another device" is not displayed on
-// non-WebAuthn fields.
-TEST_F(RenderViewContextMenuUsePasskeyFromAnotherDeviceTest,
-       UsePasskeyFromAnotherDeviceNotInContextMenuWhenNonWebauthnField) {
-  NavigateAndCommit(get_url());
-  webauthn_delegate()->OnCredentialsReceived(
-      {}, ChromeWebAuthnCredentialsDelegate::SecurityKeyOrHybridFlowAvailable(
-              true));
-
-  auto menu = CreateFormAndDisplayMenu(/*is_webauthn_form=*/false);
-
-  EXPECT_FALSE(
-      menu->IsItemPresent(IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE));
 }
 
 class RenderViewContextMenuHideSuggestionsTest

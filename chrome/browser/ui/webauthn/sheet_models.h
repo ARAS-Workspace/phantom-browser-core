@@ -469,7 +469,6 @@ class AuthenticatorMultiSourcePickerSheetModel
   std::vector<int> primary_passkey_indices_;
   std::vector<int> secondary_passkey_indices_;
   std::u16string primary_passkeys_label_;
-  bool has_passwords_ = false;
 };
 
 class AuthenticatorPriorityMechanismSheetModel

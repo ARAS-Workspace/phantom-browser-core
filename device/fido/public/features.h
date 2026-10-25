@@ -38,15 +38,6 @@ BASE_DECLARE_FEATURE(kWebAuthnICloudKeychainForInactiveWithoutDrive);
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnAmbientSignin);
 
-enum class WebAuthnAmbientSigninDisplay {
-  kSuggestionChip,
-  kAnchoredMessage,
-};
-
-COMPONENT_EXPORT(FIDO_PUBLIC)
-extern const base::FeatureParam<WebAuthnAmbientSigninDisplay>
-    kWebAuthnAmbientSigninDisplayParam;
-
 // Enables the WebAuthn Signal API for Windows Hello.
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnHelloSignal);

@@ -38,16 +38,12 @@
 #include "base/types/strong_alias.h"
 #include "build/build_config.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/webauthn/authenticator_reference.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_controller.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
-#include "components/password_manager/core/browser/passkey_credential.h"
-#include "components/password_manager/core/browser/password_form.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
@@ -63,7 +59,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
-#include "url/gurl.h"
 
 namespace {
 
@@ -228,12 +223,6 @@ const device::DiscoverableCredentialMetadata kCred1FromICloudKeychain(
     {4},
     kUser1,
     /*provider_name=*/std::nullopt);
-const device::DiscoverableCredentialMetadata kCred1From3p(
-    device::AuthenticatorType::kICloudKeychain,
-    "rp.com",
-    {4},
-    kUser1,
-    "Bitwarden");
 const device::DiscoverableCredentialMetadata kCred1FromChromeOS(
     device::AuthenticatorType::kChromeOS,
     "rp.com",
@@ -925,10 +914,11 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
                                              : UIPresentation::kModal);
     UpdateModelBeforeStartFlow(model.get(), transports_info,
                                /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
+    controller.StartFlow(std::move(transports_info));
     if (is_autofill) {
       EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
-      controller.TransitionToModalWebAuthnRequest();
+      controller
+          .StartGuidedFlowForMostLikelyTransportOrShowMechanismSelection();
     }
 
     EXPECT_EQ(test.expected_first_step, model->step());
@@ -966,7 +956,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, NoAvailableTransports) {
       device::AttestationConveyancePreference::kNone;
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
   EXPECT_EQ(Step::kErrorNoAvailableTransports, model->step());
   testing::Mock::VerifyAndClearExpectations(&mock_observer);
 
@@ -1013,7 +1003,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, AwaitingAcknowledgement) {
     EXPECT_CALL(mock_observer, OnStepTransition());
     UpdateModelBeforeStartFlow(model.get(), transports_info,
                                /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
+    controller.StartFlow(std::move(transports_info));
 #if BUILDFLAG(IS_MAC)
     EXPECT_EQ(Step::kChromeProfileCreatePasskey, model->step());
 #else
@@ -1070,7 +1060,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
   controller.SetUIPresentation(UIPresentation::kAutofill);
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
   task_environment()->RunUntilIdle();
   EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
   EXPECT_TRUE(model->should_dialog_be_closed());
@@ -1114,7 +1104,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
   controller.SetUIPresentation(UIPresentation::kAutofill);
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
   EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
   EXPECT_TRUE(model->should_dialog_be_closed());
   EXPECT_EQ(request_num_called, 0);
@@ -1146,7 +1136,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, ConditionalUICancelRequest) {
   controller.SetUIPresentation(UIPresentation::kAutofill);
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
   EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
   testing::Mock::VerifyAndClearExpectations(&mock_observer);
 
@@ -1184,7 +1174,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, PlatformVirtualAuthenticator) {
   transports_info.recognized_credentials = {kCred2};
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
   EXPECT_EQ(request_future.Get(), "virtual-authenticator");
 }
 #endif  // BUILDFLAG(IS_MAC)
@@ -1229,7 +1219,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, PreSelect) {
     transports_info.recognized_credentials = {kCred1FromICloudKeychain, kCred2};
     UpdateModelBeforeStartFlow(model.get(), transports_info,
                                /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
+    controller.StartFlow(std::move(transports_info));
 
     if (has_empty_allow_list) {
       EXPECT_EQ(model->step(), Step::kSelectPriorityMechanism);
@@ -1295,7 +1285,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
   transports_info.recognized_credentials = {cred};
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
 
   controller.OnAccountPreselected(cred.cred_id);
   ASSERT_TRUE(base::test::RunUntil([&] { return preselect_num_called == 1; }));
@@ -1322,7 +1312,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Crbug1503187) {
       account_preselected_callback.Callback());
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
 }
 
 TEST_F(AuthenticatorRequestDialogControllerTest, DeduplicateAccounts) {
@@ -1355,7 +1345,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, DeduplicateAccounts) {
         account_preselected_callback.Callback());
     UpdateModelBeforeStartFlow(model.get(), transports_info,
                                /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
+    controller.StartFlow(std::move(transports_info));
     ASSERT_EQ(model->priority_mechanism_index.has_value(),
               test.type_of_priority_mechanism.has_value());
     if (!test.type_of_priority_mechanism.has_value()) {
@@ -1419,7 +1409,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Dispatch) {
           device::AuthenticatorType::kICloudKeychain);
       UpdateModelBeforeStartFlow(model.get(), transports_info,
                                  /*is_off_the_record=*/false);
-      controller.StartFlow(std::move(transports_info), {});
+      controller.StartFlow(std::move(transports_info));
       if (should_create_in_icloud_keychain) {
         EXPECT_EQ(request_callback.WaitForResult(), kICloudKeychainId);
       } else {
@@ -1487,7 +1477,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
         account_preselected_callback.Callback());
     UpdateModelBeforeStartFlow(model.get(), transports_info,
                                /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
+    controller.StartFlow(std::move(transports_info));
 
     EXPECT_EQ(model->step(), Step::kPlatformAuthenticator);
     device::DiscoverableCredentialMetadata descriptor =
@@ -1501,38 +1491,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
 }
 
 #endif
-
-// Tests that iCloud Keychain passkeys are listed in conditional UI with the
-// correct label.
-// Regression test for crbug.com/409806800.
-TEST_F(AuthenticatorRequestDialogControllerTest,
-       ListICloudKeychainPasskeysInConditionalUI) {
-  NavigateAndCommit(GURL("rp.com"));
-
-  ChromeWebAuthnCredentialsDelegate* delegate =
-      ChromeWebAuthnCredentialsDelegateFactory::GetFactory(web_contents())
-          ->GetDelegateForFrame(web_contents()->GetPrimaryMainFrame());
-  ASSERT_TRUE(delegate);
-
-  TransportAvailabilityInfo transports_info;
-  transports_info.request_type = device::FidoRequestType::kGetAssertion;
-  transports_info.recognized_credentials = {kCred1From3p};
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-  controller.SetUIPresentation(UIPresentation::kAutofill);
-  UpdateModelBeforeStartFlow(model.get(), transports_info,
-                             /*is_off_the_record=*/false);
-  controller.StartFlow(transports_info, {});
-
-  const std::vector<password_manager::PasskeyCredential>* autofill_passkeys =
-      delegate->GetPasskeys().value();
-  ASSERT_TRUE(autofill_passkeys);
-  EXPECT_EQ(autofill_passkeys->size(), 1u);
-  EXPECT_THAT(
-      base::UTF16ToUTF8(autofill_passkeys->at(0).GetAuthenticatorLabel()),
-      testing::HasSubstr("Bitwarden"));
-}
 
 TEST_F(AuthenticatorRequestDialogControllerTest, MechanismsFromUserAccounts) {
   // Set up a model with two local passkeys and a GPM passkey.
@@ -1558,7 +1516,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, MechanismsFromUserAccounts) {
       device::AuthenticatorType::kOther);
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
 
   // Entries will be sorted by username. So the first entry should correspond to
   // the first local passkey.
@@ -1624,7 +1582,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
 
   UpdateModelBeforeStartFlow(model.get(), transports_info,
                              /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
 
   // Verify that no iCloud Keychain mechanism was added.
   bool icloud_mechanism_found = false;
@@ -1673,7 +1631,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
   transports_info.has_icloud_keychain = true;
   transports_info.available_transports = {AuthenticatorTransport::kInternal};
   transports_info.transport_list_did_include_internal = true;
-  controller.StartFlow(std::move(transports_info), {});
+  controller.StartFlow(std::move(transports_info));
 
   // Verify that the request automatically dispatched to iCloud Keychain.
   EXPECT_EQ(request_callback.WaitForResult(), kICloudKeychainId);
@@ -1694,74 +1652,3 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
 }
 
 #endif  // BUILDFLAG(IS_MAC)
-
-TEST_F(AuthenticatorRequestDialogControllerTest, PopulatePasswordsWithOrigin) {
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-
-  // Setup TransportAvailabilityInfo
-  device::FidoRequestHandlerBase::TransportAvailabilityInfo tai;
-  tai.request_type = device::FidoRequestType::kGetAssertion;
-  tai.available_transports = {};
-
-  // Create PasswordCredentials
-  std::vector<std::unique_ptr<password_manager::PasswordForm>> passwords;
-
-  // 1. Exact Match
-  auto exact_match = std::make_unique<password_manager::PasswordForm>();
-  exact_match->username_value = u"user_exact";
-  exact_match->url = GURL("https://example.com/login");
-  exact_match->signon_realm = "https://example.com/";
-  exact_match->match_type = password_manager::PasswordForm::MatchType::kExact;
-  passwords.push_back(std::move(exact_match));
-
-  // 2. PSL Match
-  auto psl_match = std::make_unique<password_manager::PasswordForm>();
-  psl_match->username_value = u"user_psl";
-  psl_match->url = GURL("https://sub.example.com/login");
-  psl_match->signon_realm = "https://sub.example.com/";
-  psl_match->match_type = password_manager::PasswordForm::MatchType::kPSL;
-  passwords.push_back(std::move(psl_match));
-
-  // Start Flow
-  model->relying_party_id = "example.com";
-  UpdateModelBeforeStartFlow(model.get(), tai, /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(tai), std::move(passwords));
-
-  // Verify Mechanisms
-  ASSERT_EQ(model->mechanisms.size(), 2u);
-
-  // Helper to find mechanism by username
-  auto find_mechanism = [&](const std::u16string& username)
-      -> const AuthenticatorRequestDialogModel::Mechanism* {
-    for (const auto& mech : model->mechanisms) {
-      if (mech.name == username) {
-        return &mech;
-      }
-    }
-    return nullptr;
-  };
-
-  auto get_origin = [](const AuthenticatorRequestDialogModel::Mechanism* mech)
-      -> std::optional<std::u16string> {
-    if (const auto* password =
-            std::get_if<AuthenticatorRequestDialogModel::Mechanism::Password>(
-                &mech->type)) {
-      return password->value().origin;
-    }
-    return std::nullopt;
-  };
-
-  // 1. Exact Match: Origin should be empty
-  const auto* mech_exact = find_mechanism(u"user_exact");
-  ASSERT_TRUE(mech_exact);
-  EXPECT_FALSE(get_origin(mech_exact).has_value());
-
-  // 2. PSL Match: Origin should be "https://sub.example.com/"
-  const auto* mech_psl = find_mechanism(u"user_psl");
-  ASSERT_TRUE(mech_psl);
-  auto origin_psl = get_origin(mech_psl);
-  EXPECT_TRUE(origin_psl.has_value());
-  EXPECT_EQ(origin_psl.value(), u"sub.example.com");
-}

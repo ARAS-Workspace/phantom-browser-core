@@ -73,6 +73,4 @@ void RecordCombinedSelectorCancelButtonClicked();
 
 }  // namespace webauthn::metrics
 
-void ReportConditionalUiPasskeyCount(int passkey_count);
-
 #endif  // CHROME_BROWSER_WEBAUTHN_WEBAUTHN_METRICS_UTIL_H_

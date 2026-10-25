@@ -19,11 +19,11 @@
 #include "base/compiler_specific.h"
 #include "base/containers/span.h"
 #include "base/feature_list.h"
-#include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
+#include "base/metrics/histogram_functions.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
@@ -73,7 +73,6 @@
 #include "extensions/common/url_pattern.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "net/base/url_util.h"
-#include "third_party/blink/public/mojom/credentialmanagement/credential_type_flags.mojom.h"
 #include "third_party/icu/source/common/unicode/locid.h"
 #include "ui/base/page_transition_types.h"
 #include "ui/base/window_open_disposition.h"
@@ -85,7 +84,6 @@
 #include "ui/views/widget/widget.h"
 #endif
 
-using PasswordCredentials = PasswordCredentialFetcher::PasswordCredentials;
 using UIPresentation = ChromeAuthenticatorRequestDelegate::UIPresentation;
 using TransportAvailabilityInfo =
     device::FidoRequestHandlerBase::TransportAvailabilityInfo;
@@ -172,9 +170,7 @@ ChromeAuthenticatorRequestDelegate::ChromeAuthenticatorRequestDelegate(
           GetRenderFrameHost())),
       dialog_controller_(std::make_unique<AuthenticatorRequestDialogController>(
           dialog_model_.get(),
-          GetRenderFrameHost())),
-      barrier_(
-          std::make_unique<UiReadinessBarrier>(this, dialog_model_.get())) {
+          GetRenderFrameHost())) {
   dialog_model_->observers.AddObserver(this);
   if (g_observer) {
     g_observer->Created(this);
@@ -318,18 +314,12 @@ void ChromeAuthenticatorRequestDelegate::RegisterActionCallbacks(
   immediate_not_found_callback_ = std::move(immediate_not_found_callback);
   start_over_callback_ = std::move(start_over_callback);
   account_preselected_callback_ = std::move(account_preselected_callback);
-  password_selected_callback_ = std::move(password_selected_callback);
   request_callback_ = request_callback;
   cancel_ui_timeout_callback_ = std::move(cancel_ui_timeout_callback);
 
   dialog_controller_->SetRequestCallback(request_callback);
   dialog_controller_->SetAccountPreselectedCallback(
       account_preselected_callback_);
-  if (password_ui_controller_) {
-    password_ui_controller_->SetPasswordSelectedCallback(base::BindRepeating(
-        &ChromeAuthenticatorRequestDelegate::OnPasswordSelected,
-        weak_ptr_factory_.GetWeakPtr()));
-  }
 }
 
 void ChromeAuthenticatorRequestDelegate::ConfigureDiscoveries(
@@ -353,9 +343,13 @@ void ChromeAuthenticatorRequestDelegate::ConfigureDiscoveries(
   }
 
   // If the discovery factory is not provided, it means that the request is
-  // for passwords only.
+  // for passwords only. Passwords are not supported, so a default transport
+  // availability is synthesized and the request is rejected as having no
+  // credentials.
   if (!discovery_factory) {
-    MaybeStartPasswordFetch(origin, /*synthesize_tai=*/true);
+    TransportAvailabilityInfo tai;
+    tai.request_type = device::FidoRequestType::kGetAssertion;
+    OnTransportAvailabilityEnumerated(std::move(tai));
     return;
   }
 
@@ -369,8 +363,6 @@ void ChromeAuthenticatorRequestDelegate::ConfigureDiscoveries(
 #if BUILDFLAG(IS_MAC)
   ConfigureICloudKeychain(request_source, rp_id);
 #endif
-
-  MaybeStartPasswordFetch(origin, /*synthesize_tai=*/false);
 }
 
 void ChromeAuthenticatorRequestDelegate::SetHints(
@@ -379,42 +371,6 @@ void ChromeAuthenticatorRequestDelegate::SetHints(
     g_observer->HintsSet(hints);
   }
   dialog_controller_->SetHints(hints);
-}
-
-void ChromeAuthenticatorRequestDelegate::MaybeStartPasswordFetch(
-    const url::Origin& origin,
-    bool synthesize_tai) {
-  if (PasswordsUsable() && GetRenderFrameHost()->IsInPrimaryMainFrame()) {
-    if (!password_ui_controller_) {
-      password_ui_controller_ =
-          std::make_unique<PasswordCredentialUIController>(
-              render_frame_host_id_, dialog_model_.get());
-      if (password_selected_callback_) {
-        password_ui_controller_->SetPasswordSelectedCallback(
-            base::BindRepeating(
-                &ChromeAuthenticatorRequestDelegate::OnPasswordSelected,
-                weak_ptr_factory_.GetWeakPtr()));
-      }
-    }
-    password_fetcher_ = PasswordCredentialFetcher::Create(GetRenderFrameHost());
-    password_fetcher_->FetchPasswords(
-        origin.GetURL(),
-        base::BindOnce(
-            &ChromeAuthenticatorRequestDelegate::OnPasswordCredentialsReceived,
-            AsWeakPtr()));
-
-    if (synthesize_tai) {
-      // The UI logic currently waits for both the password fetch and the
-      // transport availability enumeration to complete before showing. In
-      // password-only requests, there is no FidoRequestHandler to provide the
-      // transport availability, so we must synthesize a default one to unblock
-      // the UI.
-      // TODO(crbug.com/473447690): Decouple the UI layer from TAI.
-      TransportAvailabilityInfo tai;
-      tai.request_type = device::FidoRequestType::kGetAssertion;
-      OnTransportAvailabilityEnumerated(std::move(tai));
-    }
-  }
 }
 
 void ChromeAuthenticatorRequestDelegate::SelectAccount(
@@ -444,11 +400,6 @@ void ChromeAuthenticatorRequestDelegate::SelectAccount(
 
 bool ChromeAuthenticatorRequestDelegate::webauthn_ui_enabled() const {
   return dialog_controller_->ui_presentation() != UIPresentation::kDisabled;
-}
-
-void ChromeAuthenticatorRequestDelegate::SetCredentialTypes(
-    int credential_type_flags) {
-  credential_types_ = credential_type_flags;
 }
 
 void ChromeAuthenticatorRequestDelegate::SetCredentialIdFilter(
@@ -481,7 +432,7 @@ void ChromeAuthenticatorRequestDelegate::OnTransportAvailabilityEnumerated(
     return;
   }
 
-  barrier_->SetTransportAvailabilityInfo(std::move(data));
+  ShowUI(std::move(data));
 }
 
 bool ChromeAuthenticatorRequestDelegate::EmbedderControlsAuthenticatorDispatch(
@@ -582,16 +533,6 @@ void ChromeAuthenticatorRequestDelegate::OnCancelRequest() {
   std::move(cancel_callback_).Run();
 }
 
-void ChromeAuthenticatorRequestDelegate::SetPasswordUIControllerForTesting(
-    std::unique_ptr<PasswordCredentialUIController> controller) {
-  password_ui_controller_ = std::move(controller);
-}
-
-void ChromeAuthenticatorRequestDelegate::SetPasswordFetcherForTesting(
-    std::unique_ptr<PasswordCredentialFetcher> fetcher) {
-  password_fetcher_ = std::move(fetcher);
-}
-
 content::RenderFrameHost*
 ChromeAuthenticatorRequestDelegate::GetRenderFrameHost() const {
   content::RenderFrameHost* ret =
@@ -610,8 +551,7 @@ Profile* ChromeAuthenticatorRequestDelegate::profile() const {
 }
 
 bool ChromeAuthenticatorRequestDelegate::MaybeHandleImmediateMediation(
-    const TransportAvailabilityInfo& data,
-    const PasswordCredentials& passwords) {
+    const TransportAvailabilityInfo& data) {
   if (data.request_type != device::FidoRequestType::kGetAssertion ||
       dialog_controller_->ui_presentation() !=
           UIPresentation::kModalImmediate) {
@@ -638,7 +578,7 @@ bool ChromeAuthenticatorRequestDelegate::MaybeHandleImmediateMediation(
     }
   }
 
-  if (data.recognized_credentials.size() + passwords.size() == 0) {
+  if (data.recognized_credentials.empty()) {
     base::UmaHistogramEnumeration(
         "WebAuthentication.GetAssertion.Immediate.RejectionReason",
         content::ImmediateMediationRejectionReason::kNoCredentials);
@@ -648,11 +588,10 @@ bool ChromeAuthenticatorRequestDelegate::MaybeHandleImmediateMediation(
   return false;
 }
 
-void ChromeAuthenticatorRequestDelegate::ShowUI(TransportAvailabilityInfo tai,
-                                                PasswordCredentials passwords) {
+void ChromeAuthenticatorRequestDelegate::ShowUI(TransportAvailabilityInfo tai) {
   FilterRecognizedCredentials(&tai);
 
-  if (MaybeHandleImmediateMediation(tai, passwords)) {
+  if (MaybeHandleImmediateMediation(tai)) {
     std::move(immediate_not_found_callback_).Run();
     return;
   }
@@ -670,28 +609,13 @@ void ChromeAuthenticatorRequestDelegate::ShowUI(TransportAvailabilityInfo tai,
     return;
   }
 
-  dialog_controller_->SetCredentialTypes(credential_types_);
   UpdateModelForTransportAvailability(tai);
 
-  dialog_controller_->StartFlow(std::move(tai), std::move(passwords));
+  dialog_controller_->StartFlow(std::move(tai));
 
   if (g_observer) {
     g_observer->UIShown(this);
   }
-}
-
-bool ChromeAuthenticatorRequestDelegate::PasswordsUsable() {
-  if (!(credential_types_ &
-        static_cast<int>(blink::mojom::CredentialTypeFlags::kPassword))) {
-    return false;
-  }
-
-  UIPresentation ui_presentation = dialog_controller_->ui_presentation();
-  if (ui_presentation == UIPresentation::kAmbient) {
-    return true;
-  }
-
-  return ui_presentation == UIPresentation::kModalImmediate;
 }
 
 void ChromeAuthenticatorRequestDelegate::FilterRecognizedCredentials(
@@ -876,24 +800,6 @@ void ChromeAuthenticatorRequestDelegate::ConfigureICloudKeychain(
 }
 
 #endif
-
-void ChromeAuthenticatorRequestDelegate::OnPasswordSelected(
-    password_manager::CredentialInfo info) {
-  if (password_fetcher_) {
-    password_fetcher_->UpdateDateLastUsed(
-        info.id.value_or(std::u16string()),
-        info.password.value_or(std::u16string()));
-    password_fetcher_.reset();
-  }
-  if (password_selected_callback_) {
-    password_selected_callback_.Run(info);
-  }
-}
-
-void ChromeAuthenticatorRequestDelegate::OnPasswordCredentialsReceived(
-    PasswordCredentials credentials) {
-  barrier_->SetPasswordCredentials(std::move(credentials));
-}
 
 void ChromeAuthenticatorRequestDelegate::UpdateModelForTransportAvailability(
     const TransportAvailabilityInfo& tai) {

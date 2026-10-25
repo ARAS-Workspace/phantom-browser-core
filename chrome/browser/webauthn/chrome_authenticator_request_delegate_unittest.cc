@@ -23,7 +23,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
 #include "build/build_config.h"
-#include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
@@ -145,12 +144,8 @@ class TestAuthenticatorModelObserver final
 };
 
 TEST_F(ChromeAuthenticatorRequestDelegateTest, ConditionalUI) {
-  // The RenderFrame has to be live for the ChromeWebAuthnCredentialsDelegate to
-  // be created.
   content::WebContentsTester::For(web_contents())
       ->NavigateAndCommit(GURL("https://example.com"));
-  ChromeWebAuthnCredentialsDelegateFactory::CreateForWebContents(
-      web_contents());
 
   // Enabling conditional mode should cause the modal dialog to stay hidden at
   // the beginning of a request. An omnibar icon might be shown instead.
