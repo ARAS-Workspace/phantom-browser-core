@@ -20,7 +20,6 @@
 #include "components/autofill/core/browser/foundations/scoped_autofill_managers_observation.h"
 #include "components/autofill/core/common/password_generation_util.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/credential_management/content_credential_manager.h"
 #include "components/critical_actions/core/browser/critical_action_types.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_service_observer.h"
@@ -281,9 +280,6 @@ class ChromePasswordManagerClient
 
 #if defined(UNIT_TEST)
   bool was_store_ever_called() const { return was_store_ever_called_; }
-  bool has_binding_for_credential_manager() const {
-    return content_credential_manager_.HasBinding();
-  }
   base::WeakPtr<PasswordGenerationPopupControllerImpl>
   generation_popup_controller() {
     return popup_controller_;
@@ -299,9 +295,6 @@ class ChromePasswordManagerClient
       CrossDomainConfirmationPopupFactory factory) {
     cross_domain_confirmation_popup_factory_for_testing_ = std::move(factory);
   }
-
-  credential_management::ContentCredentialManager*
-  GetContentCredentialManager();
 
   password_manager::UndoPasswordChangeController*
   GetUndoPasswordChangeController() override;
@@ -328,7 +321,6 @@ class ChromePasswordManagerClient
 
   // content::WebContentsObserver overrides.
   void PrimaryPageChanged(content::Page& page) override;
-  void WebContentsDestroyed() override;
   void ResourceLoadComplete(
       content::RenderFrameHost* render_frame_host,
       const content::GlobalRequestID& request_id,
@@ -402,11 +394,6 @@ class ChromePasswordManagerClient
   password_manager::PasswordManager password_manager_;
   password_manager::PasswordFeatureManagerImpl password_feature_manager_;
   password_manager::HttpAuthManagerImpl httpauth_manager_;
-
-  // As a mojo service, will be registered into service registry
-  // of the main frame host by ChromeContentBrowserClient
-  // once main frame host was created.
-  credential_management::ContentCredentialManager content_credential_manager_;
 
   content::RenderFrameHostReceiverSet<autofill::mojom::PasswordGenerationDriver>
       password_generation_driver_receivers_;

@@ -50,7 +50,6 @@ static_library("browser") {
     ":autofill_shared_storage_proto",
     "//base:i18n",
     "//components/autofill/core/browser/integrators/password_manager",
-    "//components/credential_management:browser",
     "//components/page_load_metrics/browser",
     "//components/prefs",
     "//components/profile_metrics",
@@ -109,7 +108,6 @@ source_set("test_support") {
   public_deps = [
     ":browser",
     "//components/autofill/core/browser:test_support",
-    "//components/credential_management:browser",
     "//content/public/browser",
     "//content/test:test_support",
   ]

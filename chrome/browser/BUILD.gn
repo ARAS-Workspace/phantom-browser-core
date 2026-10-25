@@ -758,7 +758,6 @@ source_set("core") {
     "//components/content_settings/browser",
     "//components/content_settings/browser/ui",
     "//components/crash/core/app",
-    "//components/credential_management:browser",
     "//components/custom_handlers",
     "//components/data_sharing/public:features",
     "//components/device_event_log",

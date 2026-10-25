@@ -79,7 +79,6 @@
 #include "components/password_manager/content/browser/password_manager_log_router_factory.h"
 #include "components/password_manager/content/browser/password_requirements_service_factory.h"
 #include "components/password_manager/core/browser/browser_save_password_progress_logger.h"
-#include "components/password_manager/core/browser/credential_manager_impl.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/hsts_query.h"
 #include "components/password_manager/core/browser/http_auth_manager.h"
@@ -1103,11 +1102,6 @@ Profile* ChromePasswordManagerClient::GetProfile() const {
   return Profile::FromBrowserContext(web_contents()->GetBrowserContext());
 }
 
-credential_management::ContentCredentialManager*
-ChromePasswordManagerClient::GetContentCredentialManager() {
-  return &content_credential_manager_;
-}
-
 password_manager::UndoPasswordChangeController*
 ChromePasswordManagerClient::GetUndoPasswordChangeController() {
   return &undo_password_change_controller_;
@@ -1127,8 +1121,6 @@ ChromePasswordManagerClient::ChromePasswordManagerClient(
           g_browser_process->local_state(),
           SyncServiceFactory::GetForProfile(GetProfile())),
       httpauth_manager_(this),
-      content_credential_manager_(
-          std::make_unique<password_manager::CredentialManagerImpl>(this)),
       password_generation_driver_receivers_(web_contents, this),
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
       credentials_filter_(
@@ -1157,12 +1149,6 @@ void ChromePasswordManagerClient::PrimaryPageChanged(content::Page& page) {
   metrics_recorder_.reset();
 
   httpauth_manager_.OnDidFinishMainFrameNavigation();
-
-  // From this point on, the ContentCredentialManager will service API calls
-  // in the context of the new WebContents::GetLastCommittedURL, which may
-  // very well be cross-origin. Disconnect existing client, and drop pending
-  // requests.
-  content_credential_manager_.DisconnectBinding();
 
   // Hide form filling UI on navigating away.
   HideFillingUI();
@@ -1197,14 +1183,6 @@ void ChromePasswordManagerClient::RenderFrameDeleted(
       service->OnNavigationDiscarded(nav_id);
     }
   }
-}
-
-void ChromePasswordManagerClient::WebContentsDestroyed() {
-  // crbug.com/40133549
-  // Drop the connection before the WebContentsObserver destructors are invoked.
-  // Other classes may contain callbacks to the Mojo methods. Those callbacks
-  // don't like to be destroyed earlier than the pipe itself.
-  content_credential_manager_.DisconnectBinding();
 }
 
 void ChromePasswordManagerClient::ResourceLoadComplete(

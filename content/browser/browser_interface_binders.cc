@@ -145,7 +145,6 @@
 #include "third_party/blink/public/mojom/content_extraction/script_tools.mojom.h"
 #include "third_party/blink/public/mojom/content_index/content_index.mojom.h"
 #include "third_party/blink/public/mojom/cookie_store/cookie_store.mojom.h"
-#include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom.h"
 #include "third_party/blink/public/mojom/device/device.mojom.h"
 #include "third_party/blink/public/mojom/feature_observer/feature_observer.mojom.h"
 #include "third_party/blink/public/mojom/file/file_utilities.mojom.h"
@@ -827,8 +826,6 @@ void PopulateBinderMapWithContext(
       &EmptyBinderForFrame<blink::mojom::NoStatePrefetchProcessor>);
   map->Add<blink::mojom::AnchorElementMetricsHost>(
       &EmptyBinderForFrame<blink::mojom::AnchorElementMetricsHost>);
-  map->Add<blink::mojom::CredentialManager>(
-      &EmptyBinderForFrame<blink::mojom::CredentialManager>);
   map->Add<blink::mojom::LCPCriticalPathPredictorHost>(
       &EmptyBinderForFrame<blink::mojom::LCPCriticalPathPredictorHost>);
   map->Add<blink::mojom::ScriptToolHost>(

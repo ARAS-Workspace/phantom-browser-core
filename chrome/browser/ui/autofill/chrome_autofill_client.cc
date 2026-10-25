@@ -1099,15 +1099,6 @@ std::unique_ptr<AutofillManager> ChromeAutofillClient::CreateManager(
   return std::make_unique<BrowserAutofillManager>(&driver);
 }
 
-credential_management::ContentCredentialManager*
-ChromeAutofillClient::GetContentCredentialManager() {
-  if (auto* chrome_password_manager_client =
-          ChromePasswordManagerClient::FromWebContents(web_contents())) {
-    return chrome_password_manager_client->GetContentCredentialManager();
-  }
-  return nullptr;
-}
-
 OtpFieldDetector* ChromeAutofillClient::GetOtpFieldDetector() {
   return otp_field_detector_.get();
 }

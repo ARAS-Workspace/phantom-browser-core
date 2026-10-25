@@ -21,7 +21,6 @@ source_set("password_manager") {
     "//chrome/browser/webauthn",
     "//components/autofill/core/browser",
     "//components/autofill/core/common",
-    "//components/credential_management:browser",
     "//components/critical_actions/core/browser",
     "//components/keyed_service/content",
     "//components/keyed_service/core",

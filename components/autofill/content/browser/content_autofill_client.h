@@ -11,9 +11,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_user_data.h"
 
-namespace credential_management {
-class ContentCredentialManager;
-}
 namespace autofill {
 
 class PasswordManagerAutofillHelper;
@@ -42,11 +39,6 @@ class ContentAutofillClient
   virtual std::unique_ptr<AutofillManager> CreateManager(
       base::PassKey<ContentAutofillDriver> pass_key,
       ContentAutofillDriver& driver) = 0;
-
-  // Returns the ContentCredentialManager for the WebContents that handles
-  // navigator.credentials requests or nullptr if none is available.
-  virtual credential_management::ContentCredentialManager*
-  GetContentCredentialManager() = 0;
 
   // Implementation of AutofillClient:
   bool DocumentUsedWebOTP() final;

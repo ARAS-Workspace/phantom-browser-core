@@ -1,7 +1,6 @@
 include_rules = [
   "+components/affiliations",
   "+components/autofill/core/browser",
-  "+components/credential_management",
   "+components/device_reauth",
   "+components/favicon/core",
   "+components/favicon_base",
