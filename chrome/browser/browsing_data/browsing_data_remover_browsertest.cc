@@ -51,8 +51,6 @@
 #include "components/history/core/common/pref_names.h"
 #include "components/keyed_service/core/service_access_type.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
-#include "components/password_manager/core/browser/features/password_features.h"
-#include "components/password_manager/core/browser/features/password_manager_features_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/core/browser/account_reconcilor.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -946,8 +944,8 @@ const std::vector<std::string> kSupportsOriginFilteringImpl{
     "TrustTokens",
 };
 const std::vector<std::string> kSupportsOriginFilteringDelegate{
-    "Cookies",           "DisableAutoSigninForProfilePasswords",
-    "DomainReliability", "MediaDeviceSalts",
+    "DomainReliability",
+    "MediaDeviceSalts",
     "Synchronous",
 };
 

@@ -165,12 +165,6 @@ class ChromeBrowsingDataRemoverDelegate
   // that calls OnTaskComplete(). The Remover is complete once all the closures
   // created by this method have been invoked.
   base::OnceClosure CreateTaskCompletionClosure(TracingDataType data_type);
-  // Like CreateTaskCompletionClosure(), but allows tracking success/failure of
-  // the task. If |success = false| is passed to the callback, |data_type_mask|
-  // will be added to |failed_data_types_|.
-  base::OnceCallback<void(bool /* success */)> CreateTaskCompletionCallback(
-      TracingDataType data_type,
-      uint64_t data_type_mask);
 
   // Same as CreateTaskCompletionClosure() but guarantees that
   // OnTaskComplete() is called if the task is dropped. That can typically
@@ -191,10 +185,6 @@ class ChromeBrowsingDataRemoverDelegate
 #endif
 
   std::unique_ptr<device::fido::PlatformCredentialStore> MakeCredentialStore();
-
-  // See `deferred_disable_passwords_auto_signin_cb_`.
-  void DisablePasswordsAutoSignin(
-      const base::RepeatingCallback<bool(const GURL&)>& url_filter);
 
   // The profile for which the data will be deleted.
   raw_ptr<Profile> profile_;
@@ -226,16 +216,6 @@ class ChromeBrowsingDataRemoverDelegate
 
   // Used if we need to clear history.
   base::CancelableTaskTracker history_task_tracker_;
-
-  // PasswordStore::DisableAutoSignInForOrigins() is required when wiping
-  // DATA_TYPE_COOKIES, but that must be deferred until any password deletions
-  // have completed, to avoid resurrecting passwords (c.f. crbug.com/325323180).
-  // This field serves that: it'll be executed in OnTasksComplete() when all
-  // other tasks are done. Executing it adds to `pending_sub_tasks_` again.
-  // OnBrowsingDataRemoverDone() is only called after the (async) auto-signin
-  // disabling has completed.
-  // Note disabling auto sign-in is asynchronous.
-  base::OnceClosure deferred_disable_passwords_auto_signin_cb_;
 
   std::unique_ptr<device::fido::PlatformCredentialStore> credential_store_;
 

@@ -12,7 +12,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/browsing_data/counters/cache_counter.h"
-#include "chrome/browser/browsing_data/counters/signin_data_counter.h"
 #include "chrome/browser/browsing_data/counters/site_data_counter.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
@@ -20,7 +19,6 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/browsing_data/core/features.h"
-#include "components/password_manager/core/browser/password_store/test_password_store.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/signin_pref_names.h"
@@ -130,91 +128,6 @@ TEST_F(BrowsingDataCounterUtilsTest, HostedAppsCounterResult) {
   }
 }
 #endif
-
-// Tests the output for "Passwords and passkeys".
-TEST_F(BrowsingDataCounterUtilsTest, DeletePasswordsAndSigninData) {
-  // This test assumes that the strings are served exactly as defined,
-  // i.e. that the locale is set to the default "en".
-  ASSERT_EQ("en", TestingBrowserProcess::GetGlobal()->GetApplicationLocale());
-
-  auto password_store =
-      base::MakeRefCounted<password_manager::TestPasswordStore>();
-  password_store->Init();
-
-  // This counter does not really count anything; we just need a reference to
-  // pass to the SigninDataResult ctor.
-  browsing_data::SigninDataCounter counter(
-      /*profile_store=*/password_store, /*account_store=*/nullptr,
-      /*pref_service=*/nullptr, SyncServiceFactory::GetForProfile(GetProfile()),
-      /*opt_platform_credential_store=*/nullptr);
-
-  // Use a separate struct for input to make test cases easier to read after
-  // auto formatting.
-  struct TestInput {
-    int num_passwords;
-    int num_account_passwords;
-    int num_webauthn_credentials;
-    bool sync_enabled;
-    std::vector<std::string> domain_examples;
-    std::vector<std::string> account_domain_examples;
-  };
-  // Sign-in data is referred to as passkeys on macOS only currently.
-  auto signin_data_str = [](size_t n) {
-    DCHECK(n > 0);
-    return n == 1 ? "sign-in data for 1 account"
-                  : base::StringPrintf("sign-in data for %zu accounts", n);
-  };
-  const struct TestCase {
-    TestInput input;
-    std::string expected_output;
-  } kTestCases[] = {
-      {{0, 0, 0, false, {}, {}}, "None"},
-      {{0, 0, 0, true, {}, {}}, "None"},
-      {{1, 0, 0, false, {"a.com"}, {}}, "1 password (for a.com)"},
-      {{1, 0, 0, true, {"a.com"}, {}}, "1 password (for a.com, synced)"},
-      {{2, 0, 0, false, {"a.com"}, {}}, "2 passwords (for a.com)"},
-      {{2, 0, 0, false, {"a.com", "b.com"}, {}},
-       "2 passwords (for a.com, b.com)"},
-      {{2, 0, 0, true, {"a.com", "b.com"}, {}},
-       "2 passwords (for a.com, b.com, synced)"},
-      {{0, 2, 0, false, {}, {"x.com", "y.com"}},
-       "2 passwords in your account (for x.com, y.com)"},
-      {{0, 0, 1, false, {}, {}}, signin_data_str(1)},
-      {{0, 0, 1, true, {}, {}}, signin_data_str(1)},
-      {{0, 0, 2, false, {}, {}}, signin_data_str(2)},
-      {{0, 0, 2, true, {}, {}}, signin_data_str(2)},
-      {{1, 0, 2, false, {"a.de"}, {}},
-       "1 password (for a.de); " + signin_data_str(2)},
-      {{2, 0, 1, false, {"a.de", "b.de"}, {}},
-       "2 passwords (for a.de, b.de); " + signin_data_str(1)},
-      {{2, 0, 3, true, {"a.de", "b.de"}, {}},
-       "2 passwords (for a.de, b.de, synced); " + signin_data_str(3)},
-      {{4, 0, 2, false, {"a.de", "b.de"}, {}},
-       "4 passwords (for a.de, b.de, and 2 more); " + signin_data_str(2)},
-      {{6, 0, 0, true, {"a.de", "b.de", "c.de", "d.de", "e.de", "f.de"}, {}},
-       "6 passwords (for a.de, b.de, and 4 more, synced)"},
-      {{2, 1, 1, false, {"a.de", "b.de"}, {"c.de"}},
-       "2 passwords (for a.de, b.de); 1 password in your account (for "
-       "c.de); " +
-           signin_data_str(1)},
-  };
-  for (const auto& test_case : kTestCases) {
-    auto& input = test_case.input;
-    browsing_data::SigninDataCounter::SigninDataResult result(
-        &counter, input.num_passwords, input.num_account_passwords,
-        input.num_webauthn_credentials, input.sync_enabled,
-        input.domain_examples, input.account_domain_examples);
-    SCOPED_TRACE(base::StringPrintf(
-        "Test params: %d password(s), %d account password(s), %d data, %d sync",
-        input.num_passwords, input.num_account_passwords,
-        input.num_webauthn_credentials, input.sync_enabled));
-    std::string output = base::UTF16ToASCII(
-        GetChromeCounterTextFromResult(&result, GetProfile()));
-    EXPECT_EQ(test_case.expected_output, output);
-  }
-
-  password_store->ShutdownOnUIThread();
-}
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
