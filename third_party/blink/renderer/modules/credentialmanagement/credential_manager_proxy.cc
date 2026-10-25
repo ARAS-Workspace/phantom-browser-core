@@ -15,22 +15,10 @@ namespace blink {
 CredentialManagerProxy::CredentialManagerProxy(LocalDOMWindow& window)
     : Supplement<LocalDOMWindow>(window),
       authenticator_(window.GetExecutionContext()),
-      credential_manager_(window.GetExecutionContext()),
       webotp_service_(window.GetExecutionContext()),
       federated_request_service_(window.GetExecutionContext()) {}
 
 CredentialManagerProxy::~CredentialManagerProxy() = default;
-
-mojom::blink::CredentialManager* CredentialManagerProxy::CredentialManager() {
-  if (!credential_manager_.is_bound()) {
-    LocalFrame* frame = GetSupplementable()->GetFrame();
-    DCHECK(frame);
-    frame->GetBrowserInterfaceBroker().GetInterface(
-        credential_manager_.BindNewPipeAndPassReceiver(
-            frame->GetTaskRunner(TaskType::kUserInteraction)));
-  }
-  return credential_manager_.get();
-}
 
 mojom::blink::Authenticator* CredentialManagerProxy::Authenticator() {
   if (!authenticator_.is_bound()) {
@@ -121,7 +109,6 @@ CredentialManagerProxy* CredentialManagerProxy::From(
 
 void CredentialManagerProxy::Trace(Visitor* visitor) const {
   visitor->Trace(authenticator_);
-  visitor->Trace(credential_manager_);
   visitor->Trace(webotp_service_);
   visitor->Trace(federated_request_service_);
   Supplement<LocalDOMWindow>::Trace(visitor);

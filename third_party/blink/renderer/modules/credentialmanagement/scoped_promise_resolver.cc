@@ -36,11 +36,6 @@ void ScopedPromiseResolver::OnConnectionError() {
           DOMExceptionCode::kNotSupportedError,
           "Error connecting to Federated Credential service."));
       break;
-    case ConnectionType::kCredentialManager:
-      resolver_->Reject(MakeGarbageCollected<DOMException>(
-          DOMExceptionCode::kNotSupportedError,
-          "Error connecting to Credential Management service."));
-      break;
   }
 }
 

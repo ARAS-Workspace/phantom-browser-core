@@ -19,7 +19,6 @@ class ScopedPromiseResolver {
   enum class ConnectionType {
     kAuthenticator,
     kFedCm,
-    kCredentialManager,
   };
 
   explicit ScopedPromiseResolver(ScriptPromiseResolverBase* resolver,

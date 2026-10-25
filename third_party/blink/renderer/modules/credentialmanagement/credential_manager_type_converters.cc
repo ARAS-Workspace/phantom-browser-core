@@ -49,9 +49,6 @@
 #include "third_party/blink/renderer/core/keywords.h"
 #include "third_party/blink/renderer/core/typed_arrays/dom_array_buffer.h"
 #include "third_party/blink/renderer/core/typed_arrays/dom_array_piece.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/credential.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/federated_credential.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/password_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/public_key_credential.h"
 #include "third_party/blink/renderer/platform/bindings/enumeration_base.h"
 #include "third_party/blink/renderer/platform/bindings/v8_binding.h"
@@ -71,9 +68,6 @@ using blink::mojom::blink::AuthenticatorAttachment;
 using blink::mojom::blink::AuthenticatorSelectionCriteria;
 using blink::mojom::blink::AuthenticatorSelectionCriteriaPtr;
 using blink::mojom::blink::AuthenticatorTransport;
-using blink::mojom::blink::CredentialInfo;
-using blink::mojom::blink::CredentialInfoPtr;
-using blink::mojom::blink::CredentialType;
 using blink::mojom::blink::CurrentUserDetailsOptions;
 using blink::mojom::blink::CurrentUserDetailsOptionsPtr;
 using blink::mojom::blink::Hint;
@@ -147,57 +141,6 @@ blink::Vector<uint8_t> Base64UnpaddedURLDecodeOrCheck(
 }
 
 }  // namespace
-
-// static
-CredentialInfoPtr TypeConverter<CredentialInfoPtr, blink::Credential*>::Convert(
-    blink::Credential* credential) {
-  auto info = CredentialInfo::New();
-  info->id = credential->id();
-  if (credential->IsPasswordCredential()) {
-    ::blink::PasswordCredential* password_credential =
-        static_cast<::blink::PasswordCredential*>(credential);
-    info->type = CredentialType::PASSWORD;
-    info->password = password_credential->password();
-    info->name = password_credential->name();
-    info->icon = password_credential->iconURL();
-    info->federation = url::SchemeHostPort();
-  } else {
-    DCHECK(credential->IsFederatedCredential());
-    ::blink::FederatedCredential* federated_credential =
-        static_cast<::blink::FederatedCredential*>(credential);
-    info->type = CredentialType::FEDERATED;
-    info->password = blink::g_empty_string;
-    scoped_refptr<const blink::SecurityOrigin> origin =
-        federated_credential->GetProviderAsOrigin();
-    info->federation = url::SchemeHostPort(
-        origin->Protocol().Utf8(), origin->Host().Utf8(), origin->Port());
-    info->name = federated_credential->name();
-    info->icon = federated_credential->iconURL();
-  }
-  return info;
-}
-
-// static
-blink::Credential*
-TypeConverter<blink::Credential*, CredentialInfoPtr>::Convert(
-    const CredentialInfoPtr& info) {
-  switch (info->type) {
-    case CredentialType::FEDERATED:
-      return blink::FederatedCredential::Create(
-          info->id,
-          blink::SecurityOrigin::CreateFromValidTuple(
-              blink::String::FromUtf8(info->federation.scheme()),
-              blink::String::FromUtf8(info->federation.host()),
-              info->federation.port()),
-          info->name, info->icon);
-    case CredentialType::PASSWORD:
-      return blink::PasswordCredential::Create(info->id, info->password,
-                                               info->name, info->icon);
-    case CredentialType::EMPTY:
-      return nullptr;
-  }
-  NOTREACHED();
-}
 
 #if BUILDFLAG(IS_ANDROID)
 static blink::Vector<blink::Vector<uint32_t>> UvmEntryToArray(

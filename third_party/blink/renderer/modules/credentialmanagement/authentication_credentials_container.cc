@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "device/fido/public/fido_constants.h"
 #include "mojo/public/mojom/base/values.mojom-blink.h"
-#include "services/network/public/cpp/is_potentially_trustworthy.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/sms/webotp_constants.h"
 #include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom-blink.h"
@@ -40,7 +39,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_credential_properties_output.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_current_user_details_options.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_federated_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_provider_config.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_provider_request_options.h"
@@ -51,7 +49,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_rp_entity.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_user_entity.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_union_htmlformelement_passwordcredentialdata.h"
 #include "third_party/blink/renderer/core/dom/abort_signal.h"
 #include "third_party/blink/renderer/core/dom/dom_exception.h"
 #include "third_party/blink/renderer/core/dom/scoped_abort_state.h"
@@ -72,11 +69,9 @@
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_manager_type_converters.h"  // IWYU pragma: keep
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_metrics.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_utils.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/federated_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/identity_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/identity_credential_error.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/otp_credential.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/password_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/public_key_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/scoped_promise_resolver.h"
 #include "third_party/blink/renderer/platform/bindings/exception_code.h"
@@ -99,9 +94,6 @@ using mojom::blink::AttestationConveyancePreference;
 using mojom::blink::AuthenticationExtensionsClientOutputsPtr;
 using mojom::blink::AuthenticatorAttachment;
 using mojom::blink::AuthenticatorStatus;
-using mojom::blink::CredentialInfo;
-using mojom::blink::CredentialInfoPtr;
-using mojom::blink::CredentialManagerError;
 using mojom::blink::CredentialMediationRequirement;
 using mojom::blink::WebAuthnDOMExceptionDetailsPtr;
 using MojoPublicKeyCredentialCreationOptions =
@@ -390,20 +382,6 @@ void AssertSecurityRequirementsBeforeResponse(
   }
 }
 
-// Checks if the icon URL is an a-priori authenticated URL.
-// https://w3c.github.io/webappsec-credential-management/#dom-credentialuserdata-iconurl
-bool IsIconURLNullOrSecure(const KURL& url) {
-  if (url.IsNull()) {
-    return true;
-  }
-
-  if (!url.IsValid()) {
-    return false;
-  }
-
-  return network::IsUrlPotentiallyTrustworthy(GURL(url));
-}
-
 // Checks if the size of the supplied ArrayBuffer or ArrayBufferView is at most
 // the maximum size allowed.
 bool IsArrayBufferOrViewBelowSizeLimit(
@@ -420,29 +398,6 @@ bool IsCredentialDescriptorListBelowSizeLimit(
     const HeapVector<Member<PublicKeyCredentialDescriptor>>& list) {
   return list.size() <= mojom::blink::kPublicKeyCredentialDescriptorListMaxSize;
 }
-
-DOMException* CredentialManagerErrorToDOMException(
-    CredentialManagerError reason) {
-  switch (reason) {
-    case CredentialManagerError::PENDING_REQUEST:
-      return MakeGarbageCollected<DOMException>(
-          DOMExceptionCode::kInvalidStateError,
-          "A request is already pending.");
-    case CredentialManagerError::PASSWORD_STORE_UNAVAILABLE:
-      return MakeGarbageCollected<DOMException>(
-          DOMExceptionCode::kNotSupportedError,
-          "The password store is unavailable.");
-    case CredentialManagerError::UNKNOWN:
-      return MakeGarbageCollected<DOMException>(
-          DOMExceptionCode::kNotReadableError,
-          "An unknown error occurred while talking "
-          "to the credential manager.");
-    case CredentialManagerError::SUCCESS:
-      NOTREACHED();
-  }
-  return nullptr;
-}
-
 
 void OnRequestToken(std::unique_ptr<ScopedPromiseResolver> scoped_resolver,
                     std::unique_ptr<ScopedAbortState> scoped_abort_state,
@@ -513,13 +468,6 @@ void OnRequestToken(std::unique_ptr<ScopedPromiseResolver> scoped_resolver,
   }
 }
 
-void OnStoreComplete(std::unique_ptr<ScopedPromiseResolver> scoped_resolver) {
-  auto* resolver = scoped_resolver->Release()->DowncastTo<Credential>();
-  AssertSecurityRequirementsBeforeResponse(
-      resolver, RequiredOriginType::kSecureAndSameWithAncestors);
-  resolver->Resolve();
-}
-
 void OnPreventSilentAccessComplete(
     std::unique_ptr<ScopedPromiseResolver> scoped_resolver) {
   auto* resolver = scoped_resolver->Release()->DowncastTo<IDLUndefined>();
@@ -527,36 +475,6 @@ void OnPreventSilentAccessComplete(
   AssertSecurityRequirementsBeforeResponse(resolver, required_origin_type);
 
   resolver->Resolve();
-}
-
-void OnGetComplete(std::unique_ptr<ScopedPromiseResolver> scoped_resolver,
-                   RequiredOriginType required_origin_type,
-                   Mediation mediation,
-
-                   CredentialManagerError error,
-                   CredentialInfoPtr credential_info) {
-  auto* resolver =
-      scoped_resolver->Release()->DowncastTo<IDLNullable<Credential>>();
-
-  AssertSecurityRequirementsBeforeResponse(resolver, required_origin_type);
-  if (error != CredentialManagerError::SUCCESS) {
-    DCHECK(!credential_info);
-    if (mediation == Mediation::IMMEDIATE) {
-      UseCounter::Count(resolver->GetExecutionContext(),
-                        WebFeature::kCredentialsGetImmediateMediationFailure);
-    }
-    resolver->Reject(CredentialManagerErrorToDOMException(error));
-    return;
-  }
-  DCHECK(credential_info);
-  UseCounter::Count(resolver->GetExecutionContext(),
-                    WebFeature::kCredentialManagerGetReturnedCredential);
-  if (mediation == Mediation::IMMEDIATE) {
-    UseCounter::Count(
-        resolver->GetExecutionContext(),
-        WebFeature::kCredentialsGetImmediateMediationPasswordSuccess);
-  }
-  resolver->Resolve(mojo::ConvertTo<Credential*>(std::move(credential_info)));
 }
 
 DOMArrayBuffer* VectorToDOMArrayBuffer(const Vector<uint8_t> buffer) {
@@ -763,11 +681,7 @@ void OnAuthenticatorGetCredentialComplete(
         std::move(get_assertion_response->dom_exception_details));
     return;
   }
-  auto password_response =
-      std::move(get_credential_response->get_password_response());
-  OnGetComplete(std::move(scoped_resolver), RequiredOriginType::kSecure,
-                mediation, CredentialManagerError::SUCCESS,
-                std::move(password_response));
+  NOTREACHED();
 }
 
 void OnSmsReceive(ScriptPromiseResolver<IDLNullable<Credential>>* resolver,
@@ -898,17 +812,9 @@ void EmitImmediateUiModeUseCounters(ExecutionContext* context,
                                     const CredentialRequestOptions* options) {
   CHECK(options->hasUiMode() &&
         options->uiMode() == V8CredentialUiModeRequirement::Enum::kImmediate);
-  if (options->hasPublicKey() && options->password()) {
-    UseCounter::Count(
-        context,
-        WebFeature::kCredentialsGetImmediateMediationWithWebAuthnAndPasswords);
-  } else if (options->hasPublicKey()) {
+  if (options->hasPublicKey()) {
     UseCounter::Count(
         context, WebFeature::kCredentialsGetImmediateMediationWithWebAuthnOnly);
-  } else if (options->password()) {
-    UseCounter::Count(
-        context,
-        WebFeature::kCredentialsGetImmediateMediationWithPasswordsOnly);
   }
 }
 
@@ -963,8 +869,7 @@ void LogResidentKeyRequirement(PublicKeyCredentialCreationOptions* public_key) {
 }
 
 bool HasCredentialTypeInRequest(const CredentialRequestOptions* options) {
-  return options->hasFederated() || options->hasIdentity() ||
-         options->password() || options->hasOtp() || options->hasPublicKey();
+  return options->hasIdentity() || options->hasOtp() || options->hasPublicKey();
 }
 
 class FedCmRequestAbortAlgorithm final : public AbortSignal::Algorithm {
@@ -1407,20 +1312,6 @@ ScriptPromise<IDLNullable<Credential>> AuthenticationCredentialsContainer::get(
     return promise;
   }
 
-  // TODO(cbiesinger): Consider removing the hasIdentity() check after FedCM
-  // ships. Before then, it is useful for RPs to pass both identity and
-  // federated while transitioning from the older to the new API.
-  if (options->hasFederated() && options->federated()->hasProviders() &&
-      options->federated()->providers().size() > 0 && !options->hasIdentity()) {
-    UseCounter::Count(
-        context, WebFeature::kCredentialManagerGetLegacyFederatedCredential);
-  }
-
-  if (options->hasPassword() && options->password()) {
-    UseCounter::Count(context,
-                      WebFeature::kCredentialManagerGetPasswordCredential);
-  }
-
   if (options->hasPublicKey()) {
     ForwardRequestToAuthenticator(script_state, resolver, options);
     return promise;
@@ -1457,69 +1348,15 @@ ScriptPromise<IDLNullable<Credential>> AuthenticationCredentialsContainer::get(
     return promise;
   }
 
-  Vector<KURL> providers;
-  if (options->hasFederated() && options->federated()->hasProviders()) {
-    for (const auto& provider : options->federated()->providers()) {
-      KURL url = KURL(NullUrl(), provider);
-      if (url.IsValid()) {
-        providers.push_back(std::move(url));
-      }
-    }
-  }
-  CredentialMediationRequirement requirement;
-  if (options->mediation() ==
-      V8CredentialMediationRequirement::Enum::kConditional) {
-    resolver->Reject(MakeGarbageCollected<DOMException>(
-        DOMExceptionCode::kNotSupportedError,
-        "Conditional mediation is not supported for this credential type"));
-    return promise;
-  }
-  if (IsImmediateGetRequest(*options)) {
-    if (options->password()) {
-      ForwardRequestToAuthenticator(script_state, resolver, options);
-      return promise;
-    }
-    resolver->Reject(MakeGarbageCollected<DOMException>(
-        DOMExceptionCode::kNotSupportedError,
-        "Immediate uiMode is not supported for this credential type"));
-    return promise;
-  }
-  switch (options->mediation().AsEnum()) {
-    case V8CredentialMediationRequirement::Enum::kSilent:
-      UseCounter::Count(context,
-                        WebFeature::kCredentialManagerGetMediationSilent);
-      requirement = CredentialMediationRequirement::kSilent;
-      break;
-    case V8CredentialMediationRequirement::Enum::kOptional:
-      UseCounter::Count(context,
-                        WebFeature::kCredentialManagerGetMediationOptional);
-      requirement = CredentialMediationRequirement::kOptional;
-      break;
-    case V8CredentialMediationRequirement::Enum::kRequired:
-      UseCounter::Count(context,
-                        WebFeature::kCredentialManagerGetMediationRequired);
-      requirement = CredentialMediationRequirement::kRequired;
-      break;
-    case V8CredentialMediationRequirement::Enum::kConditional:
-      NOTREACHED();
-  }
-
-  auto* credential_manager =
-      CredentialManagerProxy::From(script_state)->CredentialManager();
-  credential_manager->Get(
-      requirement, options->password(), std::move(providers),
-      BindOnce(&OnGetComplete,
-               std::make_unique<ScopedPromiseResolver>(
-                   resolver,
-                   ScopedPromiseResolver::ConnectionType::kCredentialManager),
-               required_origin_type, Mediation::MODAL));
-
+  resolver->Reject(MakeGarbageCollected<DOMException>(
+      DOMExceptionCode::kNotSupportedError,
+      "No credential type was specified in the request."));
   return promise;
 }
 
 ScriptPromise<Credential> AuthenticationCredentialsContainer::store(
     ScriptState* script_state,
-    Credential* credential,
+    Credential*,
     ExceptionState& exception_state) {
   if (!script_state->ContextIsValid()) {
     exception_state.ThrowDOMException(DOMExceptionCode::kInvalidStateError,
@@ -1531,50 +1368,9 @@ ScriptPromise<Credential> AuthenticationCredentialsContainer::store(
       MakeGarbageCollected<ScriptPromiseResolver<Credential>>(script_state);
   auto promise = resolver->Promise();
 
-  if (!(credential->IsFederatedCredential() ||
-        credential->IsPasswordCredential())) {
-    resolver->Reject(MakeGarbageCollected<DOMException>(
-        DOMExceptionCode::kNotSupportedError,
-        "Store operation not permitted for this credential type."));
-    return promise;
-  }
-
-  if (!CheckSecurityRequirementsBeforeRequest(
-          resolver, RequiredOriginType::kSecureAndSameWithAncestors)) {
-    return promise;
-  }
-
-  if (credential->IsFederatedCredential()) {
-    UseCounter::Count(resolver->GetExecutionContext(),
-                      WebFeature::kCredentialManagerStoreFederatedCredential);
-  } else if (credential->IsPasswordCredential()) {
-    UseCounter::Count(resolver->GetExecutionContext(),
-                      WebFeature::kCredentialManagerStorePasswordCredential);
-  }
-
-  const KURL& url =
-      credential->IsFederatedCredential()
-          ? static_cast<const FederatedCredential*>(credential)->iconURL()
-          : static_cast<const PasswordCredential*>(credential)->iconURL();
-  if (!IsIconURLNullOrSecure(url)) {
-    resolver->Reject(MakeGarbageCollected<DOMException>(
-        DOMExceptionCode::kSecurityError, "'iconURL' should be a secure URL"));
-    return promise;
-  }
-
-  auto* credential_manager =
-      CredentialManagerProxy::From(script_state)->CredentialManager();
-
-  DCHECK_NE(mojom::blink::CredentialType::EMPTY,
-            CredentialInfo::From(credential)->type);
-
-  credential_manager->Store(
-      CredentialInfo::From(credential),
-      BindOnce(&OnStoreComplete,
-               std::make_unique<ScopedPromiseResolver>(
-                   resolver,
-                   ScopedPromiseResolver::ConnectionType::kCredentialManager)));
-
+  resolver->Reject(MakeGarbageCollected<DOMException>(
+      DOMExceptionCode::kNotSupportedError,
+      "Store operation not permitted for this credential type."));
   return promise;
 }
 
@@ -1612,44 +1408,13 @@ AuthenticationCredentialsContainer::create(
     return promise;
   }
 
-  if ((options->hasPassword() + options->hasFederated() +
-       options->hasPublicKey()) != 1) {
+  if (!options->hasPublicKey()) {
     resolver->Reject(MakeGarbageCollected<DOMException>(
         DOMExceptionCode::kNotSupportedError,
-        "Only exactly one of 'password', 'federated', and 'publicKey' "
-        "credential types are currently supported."));
+        "Only the 'publicKey' credential type is currently supported."));
     return promise;
   }
 
-  if (options->hasPassword()) {
-    UseCounter::Count(context,
-                      WebFeature::kCredentialManagerCreatePasswordCredential);
-    auto* password_credentials =
-        options->password()->IsPasswordCredentialData()
-            ? PasswordCredential::Create(
-                  options->password()->GetAsPasswordCredentialData(),
-                  exception_state)
-            : PasswordCredential::Create(
-                  options->password()->GetAsHTMLFormElement(), exception_state);
-    if (exception_state.HadException()) [[unlikely]] {
-      return {};
-    }
-    resolver->Resolve(password_credentials);
-    return promise;
-  }
-  if (options->hasFederated()) {
-    UseCounter::Count(context,
-                      WebFeature::kCredentialManagerCreateFederatedCredential);
-    auto* federated_credentials =
-        FederatedCredential::Create(options->federated(), exception_state);
-    if (exception_state.HadException()) [[unlikely]] {
-      return {};
-    }
-
-    resolver->Resolve(federated_credentials);
-    return promise;
-  }
-  DCHECK(options->hasPublicKey());
   UseCounter::Count(context,
                     WebFeature::kCredentialManagerCreatePublicKeyCredential);
 
@@ -1925,16 +1690,6 @@ AuthenticationCredentialsContainer::preventSilentAccess(
     return promise;
   }
 
-  auto* credential_manager =
-      CredentialManagerProxy::From(script_state)->CredentialManager();
-  credential_manager->PreventSilentAccess(
-      BindOnce(&OnPreventSilentAccessComplete,
-               std::make_unique<ScopedPromiseResolver>(
-                   resolver,
-                   ScopedPromiseResolver::ConnectionType::kCredentialManager)));
-
-  // TODO(https://crbug.com/1441075): Unify the implementation for
-  // different CredentialTypes and avoid the duplication eventually.
   auto* service =
       CredentialManagerProxy::From(script_state)->FederatedRequestService();
   service->PreventSilentAccess(
@@ -1969,8 +1724,7 @@ void AuthenticationCredentialsContainer::ForwardRequestToAuthenticator(
       options->mediation() ==
           V8CredentialMediationRequirement::Enum::kConditional) {
     // Unsupported ambient credential types:
-    if (options->hasOtp() || options->hasIdentity() ||
-        options->hasFederated()) {
+    if (options->hasOtp() || options->hasIdentity()) {
       resolver->Reject(MakeGarbageCollected<DOMException>(
           DOMExceptionCode::kNotSupportedError,
           "Unsupported combination of credential types requested."));
@@ -2138,7 +1892,6 @@ void AuthenticationCredentialsContainer::ForwardRequestToAuthenticator(
 
   auto* authenticator =
       CredentialManagerProxy::From(script_state)->Authenticator();
-  get_credential_options->password = options->password();
   authenticator->GetCredential(
       std::move(get_credential_options),
       BindOnce(
@@ -2171,10 +1924,6 @@ void AuthenticationCredentialsContainer::GetForIdentity(
   }
 
   ExecutionContext* context = ExecutionContext::From(script_state);
-
-  // TODO(https://crbug.com/1441075): Ideally the logic should be handled in
-  // CredentialManager via Get. However currently it's only for password
-  // management and we should refactor the logic to make it generic.
 
   ContentSecurityPolicy* policy =
       context->GetContentSecurityPolicyForCurrentWorld();

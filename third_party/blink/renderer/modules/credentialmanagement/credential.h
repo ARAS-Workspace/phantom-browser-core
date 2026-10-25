@@ -12,8 +12,6 @@
 
 namespace blink {
 
-class ExceptionState;
-class KURL;
 class ScriptState;
 template <typename IDLType>
 class ScriptPromise;
@@ -26,8 +24,6 @@ class MODULES_EXPORT Credential : public ScriptWrappable {
   ~Credential() override;
   void Trace(Visitor*) const override;
 
-  virtual bool IsPasswordCredential() const { return false; }
-  virtual bool IsFederatedCredential() const { return false; }
   virtual bool IsPublicKeyCredential() const { return false; }
   virtual bool IsOTPCredential() const { return false; }
   virtual bool IsIdentityCredential() const { return false; }
@@ -40,10 +36,6 @@ class MODULES_EXPORT Credential : public ScriptWrappable {
 
  protected:
   Credential(const String& id, const String& type);
-
-  // Parses a String into a KURL that is potentially empty or null. Throws an
-  // exception via |exceptionState| if an invalid URL is produced.
-  static KURL ParseStringAsURLOrThrow(const String&, ExceptionState&);
 
  private:
   String id_;

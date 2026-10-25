@@ -430,7 +430,6 @@ source_set("unit_tests") {
     "credentialmanagement/authentication_credentials_container_test.cc",
     "credentialmanagement/credential_manager_type_converters_unittest.cc",
     "credentialmanagement/identity_provider_test.cc",
-    "credentialmanagement/password_credential_test.cc",
     "credentialmanagement/public_key_credential_unittest.cc",
     "csspaint/document_paint_definition_test.cc",
     "csspaint/nativepaint/background_color_paint_definition_test.cc",

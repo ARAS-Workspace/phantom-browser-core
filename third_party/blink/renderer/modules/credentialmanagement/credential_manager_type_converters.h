@@ -8,7 +8,6 @@
 #include <optional>
 
 #include "mojo/public/cpp/bindings/type_converter.h"
-#include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom-blink.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom-blink-forward.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink-forward.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink.h"
@@ -27,7 +26,6 @@ class AuthenticationExtensionsCmtgKeyOutputs;
 class AuthenticationExtensionsPRFInputs;
 class AuthenticationExtensionsPRFValues;
 class AuthenticatorSelectionCriteria;
-class Credential;
 class CurrentUserDetailsOptions;
 class IdentityCredentialDisconnectOptions;
 class IdentityProviderAccount;
@@ -50,21 +48,6 @@ class V8UnionArrayBufferOrArrayBufferView;
 }  // namespace blink
 
 namespace mojo {
-
-// blink::mojom::blink::CredentialManager --------------------------
-
-template <>
-struct TypeConverter<blink::mojom::blink::CredentialInfoPtr,
-                     blink::Credential*> {
-  static blink::mojom::blink::CredentialInfoPtr Convert(blink::Credential*);
-};
-
-template <>
-struct TypeConverter<blink::Credential*,
-                     blink::mojom::blink::CredentialInfoPtr> {
-  static blink::Credential* Convert(
-      const blink::mojom::blink::CredentialInfoPtr&);
-};
 
 // "Reverse" converters. These convert from from Mojo structures to
 // IDL-generated structures.

@@ -6,7 +6,6 @@
 #define THIRD_PARTY_BLINK_RENDERER_MODULES_CREDENTIALMANAGEMENT_CREDENTIAL_MANAGER_PROXY_H_
 
 #include "base/functional/callback_forward.h"
-#include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom-blink.h"
 #include "third_party/blink/public/mojom/sms/webotp_service.mojom-blink.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom-blink.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink.h"
@@ -21,9 +20,10 @@ namespace blink {
 
 class ScriptState;
 
-// Owns the client end of the mojo::CredentialManager interface connection to an
-// implementation that services requests in the security context of the window
-// supplemented by this CredentialManagerProxy instance.
+// Owns the client ends of the mojo interface connections (Authenticator,
+// WebOTPService, FederatedRequestService) to implementations that service
+// requests in the security context of the window supplemented by this
+// CredentialManagerProxy instance.
 //
 // This facilitates routing API calls to be serviced in the correct security
 // context, even if the `window.navigator.credentials` instance from one
@@ -40,8 +40,6 @@ class MODULES_EXPORT CredentialManagerProxy
 
   explicit CredentialManagerProxy(LocalDOMWindow&);
   virtual ~CredentialManagerProxy();
-
-  mojom::blink::CredentialManager* CredentialManager();
 
   mojom::blink::Authenticator* Authenticator();
 
@@ -65,7 +63,6 @@ class MODULES_EXPORT CredentialManagerProxy
   void OnFederatedRequestServiceConnectionError();
 
   HeapMojoRemote<mojom::blink::Authenticator> authenticator_;
-  HeapMojoRemote<mojom::blink::CredentialManager> credential_manager_;
   HeapMojoRemote<mojom::blink::WebOTPService> webotp_service_;
   HeapMojoRemote<mojom::blink::FederatedRequestService>
       federated_request_service_;

@@ -31,7 +31,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_credential_creation_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_credential_ui_mode_requirement.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_federated_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_credential_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_provider_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential.h"
@@ -47,19 +46,15 @@
 #include "third_party/blink/renderer/core/frame/frame_test_helpers.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/local_frame.h"
-#include "third_party/blink/renderer/core/testing/gc_object_liveness_observer.h"
 #include "third_party/blink/renderer/core/typed_arrays/dom_array_buffer.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_manager_proxy.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/federated_credential.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/password_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/public_key_credential.h"
 #include "third_party/blink/renderer/platform/bindings/exception_state.h"
 #include "third_party/blink/renderer/platform/bindings/wrapper_type_info.h"
 #include "third_party/blink/renderer/platform/heap/collection_support/heap_vector.h"
 #include "third_party/blink/renderer/platform/testing/runtime_enabled_features_test_helpers.h"
 #include "third_party/blink/renderer/platform/testing/task_environment.h"
-#include "third_party/blink/renderer/platform/testing/unit_test_helpers.h"
 #include "third_party/blink/renderer/platform/weborigin/security_origin.h"
 #include "third_party/blink/renderer/platform/wtf/functional.h"
 #include "third_party/blink/renderer/platform/wtf/vector.h"
@@ -67,64 +62,6 @@
 namespace blink {
 
 namespace {
-
-class MockCredentialManager : public mojom::blink::CredentialManager {
- public:
-  MockCredentialManager() = default;
-
-  MockCredentialManager(const MockCredentialManager&) = delete;
-  MockCredentialManager& operator=(const MockCredentialManager&) = delete;
-
-  ~MockCredentialManager() override {}
-
-  void Bind(mojo::PendingReceiver<::blink::mojom::blink::CredentialManager>
-                receiver) {
-    receiver_.Bind(std::move(receiver));
-    receiver_.set_disconnect_handler(
-        BindOnce(&MockCredentialManager::Disconnected, Unretained(this)));
-  }
-
-  void Disconnected() { disconnected_ = true; }
-
-  bool IsDisconnected() const { return disconnected_; }
-
-  void WaitForCallToGet() {
-    if (get_callback_) {
-      return;
-    }
-
-    loop_.Run();
-  }
-
-  void InvokeGetCallback() {
-    EXPECT_TRUE(receiver_.is_bound());
-
-    auto info = blink::mojom::blink::CredentialInfo::New();
-    info->type = blink::mojom::blink::CredentialType::EMPTY;
-    std::move(get_callback_)
-        .Run(blink::mojom::blink::CredentialManagerError::SUCCESS,
-             std::move(info));
-  }
-
- protected:
-  void Store(blink::mojom::blink::CredentialInfoPtr credential,
-             StoreCallback callback) override {}
-  void PreventSilentAccess(PreventSilentAccessCallback callback) override {}
-  void Get(blink::mojom::blink::CredentialMediationRequirement mediation,
-           bool include_passwords,
-           const Vector<::blink::KURL>& federations,
-           GetCallback callback) override {
-    get_callback_ = std::move(callback);
-    loop_.Quit();
-  }
-
- private:
-  mojo::Receiver<::blink::mojom::blink::CredentialManager> receiver_{this};
-
-  GetCallback get_callback_;
-  bool disconnected_ = false;
-  base::RunLoop loop_;
-};
 
 class MockAuthenticatorInterface : public mojom::blink::Authenticator {
  public:
@@ -460,23 +397,9 @@ class CredentialManagerTestingContext {
 
  public:
   explicit CredentialManagerTestingContext(
-      MockCredentialManager* mock_credential_manager,
       MockAuthenticatorInterface* mock_authenticator = nullptr,
       MockFederatedRequestService* mock_federated_request_service = nullptr)
       : dummy_context_(KURL("https://example.test")) {
-    if (mock_credential_manager) {
-      DomWindow().GetBrowserInterfaceBroker().SetBinderForTesting(
-          ::blink::mojom::blink::CredentialManager::Name_,
-          BindRepeating(
-              [](MockCredentialManager* mock_credential_manager,
-                 mojo::ScopedMessagePipeHandle handle) {
-                mock_credential_manager->Bind(
-                    mojo::PendingReceiver<
-                        ::blink::mojom::blink::CredentialManager>(
-                        std::move(handle)));
-              },
-              Unretained(mock_credential_manager)));
-    }
     if (mock_authenticator) {
       DomWindow().GetBrowserInterfaceBroker().SetBinderForTesting(
           ::blink::mojom::blink::Authenticator::Name_,
@@ -506,8 +429,6 @@ class CredentialManagerTestingContext {
 
   ~CredentialManagerTestingContext() {
     DomWindow().GetBrowserInterfaceBroker().SetBinderForTesting(
-        ::blink::mojom::blink::CredentialManager::Name_, {});
-    DomWindow().GetBrowserInterfaceBroker().SetBinderForTesting(
         ::blink::mojom::blink::Authenticator::Name_, {});
     DomWindow().GetBrowserInterfaceBroker().SetBinderForTesting(
         ::blink::mojom::blink::FederatedRequestService::Name_, {});
@@ -528,7 +449,7 @@ TEST(AuthenticationCredentialsContainerTest, FedCmDisabledRejectsPromise) {
 
   MockFederatedRequestService mock_federated_request_service;
   CredentialManagerTestingContext context(
-      /*mock_credential_manager=*/nullptr, /*mock_authenticator=*/nullptr,
+      /*mock_authenticator=*/nullptr,
       /*mock_federated_request_service=*/&mock_federated_request_service);
 
   CredentialRequestOptions* options = CredentialRequestOptions::Create();
@@ -563,8 +484,7 @@ class MockPublicKeyCredential : public Credential {
 
 TEST(AuthenticationCredentialsContainerTest, GetRequest_DefaultOptions) {
   test::TaskEnvironment task_environment;
-  MockCredentialManager mock_credential_manager;
-  CredentialManagerTestingContext context(&mock_credential_manager);
+  CredentialManagerTestingContext context;
 
   // Calling get() with default options (no credential type set) should reject
   // with NotSupportedError.
@@ -585,63 +505,10 @@ TEST(AuthenticationCredentialsContainerTest, GetRequest_DefaultOptions) {
             "No credential type was specified in the request.");
 }
 
-// The completion callbacks for pending mojom::CredentialManager calls each own
-// a persistent handle to a ScriptPromiseResolverBase instance. Ensure that if
-// the document is destroyed while a call is pending, it can still be freed up.
-TEST(AuthenticationCredentialsContainerTest, PendingGetRequest_NoGCCycles) {
-  test::TaskEnvironment task_environment;
-  MockCredentialManager mock_credential_manager;
-  GCObjectLivenessObserver<Document> document_observer;
-
-  {
-    CredentialManagerTestingContext context(&mock_credential_manager);
-    document_observer.Observe(context.DomWindow().document());
-    CredentialRequestOptions* options = CredentialRequestOptions::Create();
-    options->setPassword(true);
-    AuthenticationCredentialsContainer::credentials(
-        *context.DomWindow().navigator())
-        ->get(context.GetScriptState(), options, IGNORE_EXCEPTION_FOR_TESTING);
-    mock_credential_manager.WaitForCallToGet();
-  }
-  test::RunPendingTasks();
-
-  ThreadState::Current()->CollectAllGarbageForTesting();
-
-  ASSERT_TRUE(document_observer.WasCollected());
-
-  mock_credential_manager.InvokeGetCallback();
-  ASSERT_TRUE(mock_credential_manager.IsDisconnected());
-}
-
-// If the document is detached before the request is resolved, the promise
-// should be left unresolved, and there should be no crashes.
-TEST(AuthenticationCredentialsContainerTest,
-     PendingGetRequest_NoCrashOnResponseAfterDocumentShutdown) {
-  test::TaskEnvironment task_environment;
-  MockCredentialManager mock_credential_manager;
-  CredentialManagerTestingContext context(&mock_credential_manager);
-
-  CredentialRequestOptions* options = CredentialRequestOptions::Create();
-  options->setPassword(true);
-
-  auto promise = AuthenticationCredentialsContainer::credentials(
-                     *context.DomWindow().navigator())
-                     ->get(context.GetScriptState(), options,
-                           IGNORE_EXCEPTION_FOR_TESTING);
-  mock_credential_manager.WaitForCallToGet();
-
-  context.DomWindow().FrameDestroyed();
-
-  mock_credential_manager.InvokeGetCallback();
-
-  EXPECT_EQ(v8::Promise::kPending, promise.V8Promise()->State());
-}
-
 TEST(AuthenticationCredentialsContainerTest,
      RejectPublicKeyCredentialStoreOperation) {
   test::TaskEnvironment task_environment;
-  MockCredentialManager mock_credential_manager;
-  CredentialManagerTestingContext context(&mock_credential_manager);
+  CredentialManagerTestingContext context;
 
   auto promise = AuthenticationCredentialsContainer::credentials(
                      *context.DomWindow().navigator())
@@ -652,116 +519,11 @@ TEST(AuthenticationCredentialsContainerTest,
   EXPECT_EQ(v8::Promise::kRejected, promise.V8Promise()->State());
 }
 
-TEST(AuthenticationCredentialsContainerTest,
-     GetPasswordAndFederatedCredentialUseCounters) {
-  test::TaskEnvironment task_environment;
-  {
-    // Password only.
-    MockCredentialManager mock_credential_manager;
-    CredentialManagerTestingContext context(&mock_credential_manager);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetPasswordCredential);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential);
-    auto* request_options = CredentialRequestOptions::Create();
-    request_options->setPassword(true);
-    AuthenticationCredentialsContainer::credentials(
-        *context.DomWindow().navigator())
-        ->get(context.GetScriptState(), request_options,
-              IGNORE_EXCEPTION_FOR_TESTING);
-    mock_credential_manager.WaitForCallToGet();
-    EXPECT_TRUE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetPasswordCredential));
-    EXPECT_FALSE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential));
-
-    mock_credential_manager.InvokeGetCallback();
-  }
-
-  {
-    // Federated only.
-    MockCredentialManager mock_credential_manager;
-    CredentialManagerTestingContext context(&mock_credential_manager);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetPasswordCredential);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential);
-    auto* request_options = CredentialRequestOptions::Create();
-    auto* federated_cred_options = FederatedCredentialRequestOptions::Create();
-    federated_cred_options->setProviders({"idp.example"});
-    request_options->setFederated(federated_cred_options);
-    AuthenticationCredentialsContainer::credentials(
-        *context.DomWindow().navigator())
-        ->get(context.GetScriptState(), request_options,
-              IGNORE_EXCEPTION_FOR_TESTING);
-    mock_credential_manager.WaitForCallToGet();
-    EXPECT_FALSE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetPasswordCredential));
-    EXPECT_TRUE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential));
-
-    mock_credential_manager.InvokeGetCallback();
-  }
-
-  {
-    // Federated and Password.
-    MockCredentialManager mock_credential_manager;
-    CredentialManagerTestingContext context(&mock_credential_manager);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetPasswordCredential);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential);
-    auto* request_options = CredentialRequestOptions::Create();
-    auto* federated_cred_options = FederatedCredentialRequestOptions::Create();
-    federated_cred_options->setProviders({"idp.example"});
-    request_options->setFederated(federated_cred_options);
-    request_options->setPassword(true);
-    AuthenticationCredentialsContainer::credentials(
-        *context.DomWindow().navigator())
-        ->get(context.GetScriptState(), request_options,
-              IGNORE_EXCEPTION_FOR_TESTING);
-    mock_credential_manager.WaitForCallToGet();
-    EXPECT_TRUE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetPasswordCredential));
-    EXPECT_TRUE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential));
-
-    mock_credential_manager.InvokeGetCallback();
-  }
-
-  {
-    // Federated and Password but empty federated providers.
-    MockCredentialManager mock_credential_manager;
-    CredentialManagerTestingContext context(&mock_credential_manager);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetPasswordCredential);
-    context.DomWindow().document()->ClearUseCounterForTesting(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential);
-    auto* request_options = CredentialRequestOptions::Create();
-    auto* federated_cred_options = FederatedCredentialRequestOptions::Create();
-    federated_cred_options->setProviders({});
-    request_options->setFederated(federated_cred_options);
-    request_options->setPassword(true);
-    AuthenticationCredentialsContainer::credentials(
-        *context.DomWindow().navigator())
-        ->get(context.GetScriptState(), request_options,
-              IGNORE_EXCEPTION_FOR_TESTING);
-    mock_credential_manager.WaitForCallToGet();
-    EXPECT_TRUE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetPasswordCredential));
-    EXPECT_FALSE(context.DomWindow().document()->IsUseCounted(
-        WebFeature::kCredentialManagerGetLegacyFederatedCredential));
-
-    mock_credential_manager.InvokeGetCallback();
-  }
-}
-
 TEST(AuthenticationCredentialsContainerTest, PublicKeyConditionalMediationUkm) {
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   ukm::TestAutoSetUkmRecorder recorder;
   context.DomWindow().document()->View()->ResetUkmAggregatorForTesting();
@@ -818,7 +580,7 @@ TEST_F(AuthenticationCredentialsContainerActiveModeMultiIdpTest,
   test::TaskEnvironment task_environment;
   MockFederatedRequestService mock_federated_request_service;
   CredentialManagerTestingContext context(
-      /*mock_credential_manager=*/nullptr, /*mock_authenticator=*/nullptr,
+      /*mock_authenticator=*/nullptr,
       /*mock_federated_request_service=*/&mock_federated_request_service);
 
   CredentialRequestOptions* options = CredentialRequestOptions::Create();
@@ -852,8 +614,7 @@ TEST(AuthenticationCredentialsContainerTest,
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* request_options = CredentialRequestOptions::Create();
   request_options->setUiMode(V8CredentialUiModeRequirement::Enum::kImmediate);
@@ -888,8 +649,7 @@ TEST(AuthenticationCredentialsContainerTest,
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* request_options = CredentialRequestOptions::Create();
   request_options->setUiMode(V8CredentialUiModeRequirement::Enum::kImmediate);
@@ -928,8 +688,7 @@ TEST(AuthenticationCredentialsContainerTest,
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* request_options = CredentialRequestOptions::Create();
   request_options->setUiMode(V8CredentialUiModeRequirement::Enum::kImmediate);
@@ -965,8 +724,7 @@ TEST(AuthenticationCredentialsContainerTest,
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* request_options = CredentialRequestOptions::Create();
   request_options->setUiMode(V8CredentialUiModeRequirement::Enum::kImmediate);
@@ -1007,8 +765,7 @@ TEST(AuthenticationCredentialsContainerTest, PublicKeyCspMetric) {
   base::HistogramTester histogram_tester;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   // Set CSP to block connections to everything except self.
   context.DomWindow().GetContentSecurityPolicy()->AddPolicies(
@@ -1060,8 +817,7 @@ TEST(AuthenticationCredentialsContainerTest, PublicKeyCreateCspMetric) {
   base::HistogramTester histogram_tester;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   // Set CSP to block connections to everything except self.
   context.DomWindow().GetContentSecurityPolicy()->AddPolicies(
@@ -1127,8 +883,7 @@ TEST(AuthenticationCredentialsContainerTest,
   test::TaskEnvironment task_environment;
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   context.DomWindow().document()->ClearUseCounterForTesting(
       WebFeature::kWebAuthnConditionalCreate);
@@ -1182,8 +937,7 @@ TEST(AuthenticationCredentialsContainerTest, PublicKeyCreateCmtgKeyExtension) {
   ScopedWebAuthenticationCmtgKeyForTest cmtg_key_enabled(true);
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* creation_options = CredentialCreationOptions::Create();
   auto* public_key_creation_options =
@@ -1245,8 +999,7 @@ TEST(AuthenticationCredentialsContainerTest, PublicKeyGetCmtgKeyExtension) {
   ScopedWebAuthenticationCmtgKeyForTest cmtg_key_enabled(true);
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   auto* request_options = CredentialRequestOptions::Create();
   auto* public_key_request_options =
@@ -1297,8 +1050,7 @@ TEST(AuthenticationCredentialsContainerTest, PublicKeyCrossDeviceFallbackUrl) {
   ScopedWebAuthenticationCrossDeviceFallbackUrlForTest enabled(true);
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   mock_authenticator.Reset();
   auto* request_options = CredentialRequestOptions::Create();
@@ -1351,8 +1103,7 @@ TEST(AuthenticationCredentialsContainerTest,
   ScopedWebAuthenticationCrossDeviceFallbackUrlForTest enabled(true);
 
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
 
   mock_authenticator.Reset();
   auto* request_options = CredentialRequestOptions::Create();
@@ -1397,7 +1148,7 @@ TEST(AuthenticationCredentialsContainerTest,
 
   MockFederatedRequestService mock_federated_request_service;
   CredentialManagerTestingContext context(
-      /*mock_credential_manager=*/nullptr, /*mock_authenticator=*/nullptr,
+      /*mock_authenticator=*/nullptr,
       /*mock_federated_request_service=*/&mock_federated_request_service);
 
   // First request: Active mode
@@ -1476,7 +1227,7 @@ TEST(AuthenticationCredentialsContainerTest,
 
   MockFederatedRequestService mock_federated_request_service;
   CredentialManagerTestingContext context(
-      /*mock_credential_manager=*/nullptr, /*mock_authenticator=*/nullptr,
+      /*mock_authenticator=*/nullptr,
       /*mock_federated_request_service=*/&mock_federated_request_service);
 
   // First request: Passive mode
@@ -1553,8 +1304,7 @@ TEST(AuthenticationCredentialsContainerTest,
      WebAuthnAttachmentAndHintsUseCounters) {
   test::TaskEnvironment task_environment;
   MockAuthenticatorInterface mock_authenticator;
-  CredentialManagerTestingContext context(/*mock_credential_manager=*/nullptr,
-                                          &mock_authenticator);
+  CredentialManagerTestingContext context(&mock_authenticator);
   struct TestCase {
     std::optional<String> attachment;
     Vector<String> hints;
