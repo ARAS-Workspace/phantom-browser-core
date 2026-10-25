@@ -230,15 +230,6 @@ void ToastService::RegisterToasts(
           features::IsRoundedIconsEnabled() ? kInfoIcon : kInfoOldIcon)
           .Build());
 
-  toast_registry_->RegisterToast(
-      ToastId::kAutoSignIn,
-      ToastSpecification::Builder(features::IsRoundedIconsEnabled()
-                                      ? vector_icons::kPasswordManagerIcon
-                                      : vector_icons::kPasswordManagerOldIcon,
-                                  IDS_MANAGE_PASSWORDS_AUTO_SIGNIN_TOAST_BODY)
-          .AddMenu()
-          .Build());
-
   if (base::FeatureList::IsEnabled(
           autofill::features::kAutofillAiWalletPrivatePasses) ||
       base::FeatureList::IsEnabled(

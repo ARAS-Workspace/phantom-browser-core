@@ -22,7 +22,6 @@
 #include "cc/paint/skia_paint_canvas.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller_utils.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/views/autofill/payments/payments_view_util.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_base_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_row_content_view.h"
@@ -648,8 +647,9 @@ std::optional<ui::ImageModel> GetIconImageModelFromIcon(Suggestion::Icon icon) {
                                           : vector_icons::kUndoOldIcon,
                                       kIconSize);
     case Suggestion::Icon::kGooglePasswordManager:
-      return ImageModelFromVectorIcon(GooglePasswordManagerVectorIcon(),
-                                      kGooglePasswordManagerIconSize);
+      return ImageModelFromVectorIcon(
+          ::features::IsRoundedIconsEnabled() ? kVpnKeyFilledIcon : kKeyOldIcon,
+          kGooglePasswordManagerIconSize);
     case Suggestion::Icon::kGooglePay:
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       return ui::ImageModel::FromImageGenerator(

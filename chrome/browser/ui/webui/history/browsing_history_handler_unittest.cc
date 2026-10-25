@@ -509,7 +509,7 @@ TEST_F(BrowsingHistoryHandlerTest, CriticalActionsPopulatedForActorVisits) {
       results->value[0]->critical_actions[0]->tooltip,
       l10n_util::GetStringUTF8(IDS_HISTORY_CRITICAL_ACTION_PASSWORD_TOOLTIP));
   EXPECT_EQ(results->value[0]->critical_actions[0]->linkout_url,
-            "chrome://password-manager/passwords/actor-example.com");
+            "chrome://settings/");
 }
 
 TEST_F(BrowsingHistoryHandlerTest,

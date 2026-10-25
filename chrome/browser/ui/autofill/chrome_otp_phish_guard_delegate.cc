@@ -6,7 +6,6 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/web_contents.h"
 
@@ -21,16 +20,9 @@ void ChromeOtpPhishGuardDelegate::StartOtpPhishGuardCheck(
     const GURL& main_frame_url,
     const GURL& frame_to_fill_url,
     base::OnceCallback<void(bool)> callback) {
-  auto* password_manager_client =
-      ChromePasswordManagerClient::FromWebContents(&web_contents_.get());
-  bool is_actor_task_ongoing =
-      password_manager_client && password_manager_client->IsActorTaskActive();
-
-  // If Safe Browsing is disabled/unavailable and an actor task is ongoing,
-  // do not consider the check successful (report unsafe / is_malicious = true).
   // Post task to ensure callback is always invoked asynchronously.
   base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-      FROM_HERE, base::BindOnce(std::move(callback), is_actor_task_ongoing));
+      FROM_HERE, base::BindOnce(std::move(callback), /*is_phishing=*/false));
 }
 
 }  // namespace autofill

@@ -263,12 +263,8 @@ void ClearBrowsingDataHandler::OnClearingTaskFinished(
         history_notice_shown_times + 1);
   }
 
-  bool show_passwords_notice =
-      (failed_data_types & chrome_browsing_data_remover::DATA_TYPE_PASSWORDS);
-
   base::DictValue result;
   result.Set("showHistoryNotice", show_history_notice);
-  result.Set("showPasswordsNotice", show_passwords_notice);
 
   tabs::TabInterface* const tab =
       tabs::TabInterface::MaybeGetFromContents(web_ui()->GetWebContents());

@@ -95,7 +95,6 @@
 #include "chrome/browser/ui/exclusive_access/keyboard_lock_controller.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
@@ -1093,10 +1092,7 @@ void RenderViewContextMenu::InitMenu() {
       !(features::IsMenuSimplificationEnabled() && editable) &&
       content_type_->SupportsGroup(
           ContextMenuContentType::ITEM_GROUP_SEARCH_PROVIDER) &&
-      params_.misspelled_word.empty() &&
-      (params_.page_url != GetGooglePasswordManagerSubPageURLStr() &&
-       params_.page_url != chrome::kChromeUIPasswordManagerCheckupURL &&
-       params_.page_url != chrome::kChromeUIPasswordManagerSettingsURL)) {
+      params_.misspelled_word.empty()) {
     AppendSearchProvider();
   }
 

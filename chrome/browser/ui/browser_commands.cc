@@ -83,7 +83,6 @@
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
@@ -2054,22 +2053,6 @@ void ShowVirtualCardEnrollBubble(BrowserWindowInterface* browser) {
   if (controller) {
     controller->ReshowBubble();
   }
-}
-
-void ManagePasswordsForPage(BrowserWindowInterface* browser) {
-  auto* const user_education = BrowserUserEducationInterface::From(browser);
-  user_education->NotifyFeaturePromoFeatureUsed(
-      feature_engagement::kIPHPasswordsManagementBubbleAfterSaveFeature,
-      FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  user_education->NotifyFeaturePromoFeatureUsed(
-      feature_engagement::kIPHPasswordsManagementBubbleDuringSigninFeature,
-      FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  WebContents* const web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  ManagePasswordsUIController* controller =
-      ManagePasswordsUIController::FromWebContents(web_contents);
-  controller->QueueOrShowBubble(
-      /*user_action=*/!controller->IsAutomaticallyOpeningBubble());
 }
 
 bool CanSendTabToSelf(BrowserWindowInterface* browser) {

@@ -51,7 +51,6 @@
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/personal_context/first_run/personal_context_first_run_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_eligibility_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
@@ -462,13 +461,6 @@ personal_context::PersonalContextEligibilityService*
 ChromeAutofillClient::GetPersonalContextEligibilityService() const {
   Profile* profile = GetProfile();
   return PersonalContextEligibilityServiceFactory::GetForProfile(profile);
-}
-
-PasswordManagerDelegate* ChromeAutofillClient::GetPasswordManagerDelegate(
-    const FieldGlobalId& field_id) {
-  ChromePasswordManagerClient* client =
-      ChromePasswordManagerClient::FromWebContents(web_contents());
-  return client ? client->GetAutofillDelegate(field_id) : nullptr;
 }
 
 void ChromeAutofillClient::GetAiPageContent(GetAiPageContentCallback callback) {

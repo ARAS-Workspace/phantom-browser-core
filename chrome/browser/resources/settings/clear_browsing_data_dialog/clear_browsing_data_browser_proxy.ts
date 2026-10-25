@@ -52,7 +52,6 @@ export enum BrowsingDataType {
  */
 export interface ClearBrowsingDataResult {
   showHistoryNotice: boolean;
-  showPasswordsNotice: boolean;
 }
 
 /**

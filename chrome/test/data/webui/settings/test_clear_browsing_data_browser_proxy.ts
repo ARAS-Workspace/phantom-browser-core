@@ -39,7 +39,7 @@ export class TestClearBrowsingDataBrowserProxy extends TestBrowserProxy
     webUIListenerCallback('browsing-data-removing', true);
     return this.clearBrowsingDataPromise_ !== null ?
         this.clearBrowsingDataPromise_ :
-        Promise.resolve({showHistoryNotice: false, showPasswordsNotice: false});
+        Promise.resolve({showHistoryNotice: false});
   }
 
   initialize() {

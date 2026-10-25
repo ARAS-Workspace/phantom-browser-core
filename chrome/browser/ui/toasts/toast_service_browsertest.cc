@@ -40,6 +40,7 @@ constexpr auto kDeprecatedToastIds =
          /*kSkillSaved=*/24,
          /*kSkillDeleted=*/25,
          /*kTranslate=*/27,
+         /*kAutoSignIn=*/30,
          /*kMultistepFilterSuggestion=*/31,
          /*kMultistepFilterSuggestionRecent=*/32,
          /*kSkillSavedWithoutInvokeButton=*/33,

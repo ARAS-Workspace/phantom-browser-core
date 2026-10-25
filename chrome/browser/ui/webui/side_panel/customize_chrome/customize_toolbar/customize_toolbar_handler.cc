@@ -59,9 +59,6 @@ MojoActionForChromeAction(actions::ActionId action_id) {
       return side_panel::customize_chrome::mojom::ActionId::kForward;
     case kActionNewIncognitoWindow:
       return side_panel::customize_chrome::mojom::ActionId::kNewIncognitoWindow;
-    case kActionShowPasswordsBubbleOrPage:
-      return side_panel::customize_chrome::mojom::ActionId::
-          kShowPasswordManager;
     case kActionShowPaymentsBubbleOrPage:
       return side_panel::customize_chrome::mojom::ActionId::kShowPaymentMethods;
     case kActionShowAddressesBubbleOrPage:
@@ -124,8 +121,6 @@ std::optional<actions::ActionId> ChromeActionForMojoAction(
       return kActionForward;
     case side_panel::customize_chrome::mojom::ActionId::kNewIncognitoWindow:
       return kActionNewIncognitoWindow;
-    case side_panel::customize_chrome::mojom::ActionId::kShowPasswordManager:
-      return kActionShowPasswordsBubbleOrPage;
     case side_panel::customize_chrome::mojom::ActionId::kShowPaymentMethods:
       return kActionShowPaymentsBubbleOrPage;
     case side_panel::customize_chrome::mojom::ActionId::kShowAddresses:

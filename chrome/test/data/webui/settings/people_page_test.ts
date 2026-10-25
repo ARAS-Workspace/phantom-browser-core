@@ -124,11 +124,6 @@ suite('ProfileInfoTests', function() {
         value: true,
       },
       {
-        key: 'profile.password_manager_leak_detection',
-        type: chrome.settingsPrivate.PrefType.BOOLEAN,
-        value: true,
-      },
-      {
         key: 'safebrowsing.enabled',
         type: chrome.settingsPrivate.PrefType.BOOLEAN,
         value: true,

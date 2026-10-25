@@ -30,7 +30,6 @@
 #include "chrome/browser/extensions/test_extension_environment.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
@@ -42,7 +41,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/side_panel/mock_side_panel_ui.h"
 #include "chrome/browser/ui/tabs/page_context_eligibility_helper.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -759,52 +757,6 @@ TEST_F(RenderViewContextMenuPrefsTest,
       prefs::kAllowFileSelectionDialogs, false);
 
   EXPECT_FALSE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SAVELINKAS));
-}
-
-// Verify that item "Search web for" on password Manager - passwords is not
-// present
-TEST_F(RenderViewContextMenuPrefsTest,
-       SearchWebForOptionOnPasswordsManagerSubPageIsDisabled) {
-  content::ContextMenuParams params =
-      CreateParams(MenuItem::SELECTION | MenuItem::EDITABLE);
-  params.page_url = GURL(GetGooglePasswordManagerSubPageURLStr());
-  auto menu = std::make_unique<TestRenderViewContextMenu>(
-      *web_contents()->GetPrimaryMainFrame(), params);
-  menu->set_selection_navigation_url(GURL("https://www.foo.com/"));
-  menu->Init();
-
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB));
-}
-
-// Verify that item "Search web for" on password check is not present
-TEST_F(RenderViewContextMenuPrefsTest,
-       SearchWebForOptionOnPasswordManagerCheckIsDisabled) {
-  content::ContextMenuParams params =
-      CreateParams(MenuItem::SELECTION | MenuItem::EDITABLE);
-  params.page_url = GURL(chrome::kChromeUIPasswordManagerCheckupURL);
-  auto menu = std::make_unique<TestRenderViewContextMenu>(
-      *web_contents()->GetPrimaryMainFrame(), params);
-  menu->set_selection_navigation_url(GURL("https://www.foo.com/"));
-  menu->Init();
-
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB));
-}
-
-// Verify that item "Search web for" on password settings is not present
-TEST_F(RenderViewContextMenuPrefsTest,
-       SearchWebForOptionOnPasswordManagerSettingsIsDisabled) {
-  content::ContextMenuParams params =
-      CreateParams(MenuItem::SELECTION | MenuItem::EDITABLE);
-  params.page_url = GURL(chrome::kChromeUIPasswordManagerSettingsURL);
-  auto menu = std::make_unique<TestRenderViewContextMenu>(
-      *web_contents()->GetPrimaryMainFrame(), params);
-  menu->set_selection_navigation_url(GURL("https://www.foo.com/"));
-  menu->Init();
-
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB));
 }
 
 class RenderViewContextMenuHideSuggestionsTest

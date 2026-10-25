@@ -144,8 +144,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
   GetPersonalContextEligibilityState() const override;
   personal_context::PersonalContextEligibilityService*
   GetPersonalContextEligibilityService() const override;
-  PasswordManagerDelegate* GetPasswordManagerDelegate(
-      const FieldGlobalId& field_id) final;
   void GetAiPageContent(GetAiPageContentCallback callback) final;
   AutofillAiManager* GetAutofillAiManager() final;
   AutofillAiPersonalContextAccessManager*

@@ -13,10 +13,8 @@
 #include "base/strings/stringprintf.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/run_until.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/test_timeouts.h"
 #include "build/build_config.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_browsertest_util.h"
 #include "chrome/browser/ui/browser.h"
@@ -1785,43 +1783,6 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessInteractivePDFTest,
 // launches.
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(SitePerProcessInteractivePDFTest);
 #endif  // BUILDFLAG(ENABLE_PDF)
-
-class SitePerProcessAutofillTest : public SitePerProcessInteractiveBrowserTest {
- public:
-  SitePerProcessAutofillTest() : SitePerProcessInteractiveBrowserTest() {}
-
-  SitePerProcessAutofillTest(const SitePerProcessAutofillTest&) = delete;
-  SitePerProcessAutofillTest& operator=(const SitePerProcessAutofillTest&) =
-      delete;
-
-  ~SitePerProcessAutofillTest() override = default;
-
-  void SetupMainTab() {
-    // Add a fresh new WebContents for which we add our own version of the
-    // ChromePasswordManagerClient that uses a custom TestAutofillClient.
-    std::unique_ptr<content::WebContents> new_contents =
-        content::WebContents::Create(
-            content::WebContents::CreateParams(browser()
-                                                   ->tab_strip_model()
-                                                   ->GetActiveWebContents()
-                                                   ->GetBrowserContext()));
-    ASSERT_TRUE(new_contents);
-    ASSERT_FALSE(
-        ChromePasswordManagerClient::FromWebContents(new_contents.get()));
-
-    // Create ChromePasswordManagerClient and verify it exists for the new
-    // WebContents.
-    ChromePasswordManagerClient::CreateForWebContents(new_contents.get());
-    ASSERT_TRUE(
-        ChromePasswordManagerClient::FromWebContents(new_contents.get()));
-
-    browser()->tab_strip_model()->AppendWebContents(std::move(new_contents),
-                                                    true);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
 
 // Waits until transforming |sample_point| from |render_frame_host| coordinates
 // to its root frame's view's coordinates matches |transformed_point| within a

@@ -861,9 +861,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_VIRTUAL_CARD_ENROLL:
       ShowVirtualCardEnrollBubble(browser_);
       break;
-    case IDC_MANAGE_PASSWORDS_FOR_PAGE:
-      ManagePasswordsForPage(browser_);
-      break;
     case IDC_SEND_TAB_TO_SELF:
       SendTabToSelf(browser_);
       break;
@@ -1467,9 +1464,6 @@ void BrowserCommandController::InitCommandState() {
 
   command_updater_->UpdateCommandEnabled(IDC_OPEN_IN_PWA_WINDOW,
                                          web_app::CanPopOutWebApp(profile()));
-
-  // Page-related commands
-  command_updater_->UpdateCommandEnabled(IDC_MANAGE_PASSWORDS_FOR_PAGE, true);
 
   // Zoom
   command_updater_->UpdateCommandEnabled(kZoomMenuId, true);
