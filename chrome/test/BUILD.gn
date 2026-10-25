@@ -71,7 +71,6 @@ static_library("test_support") {
     "//chrome/browser/component_updater",
     "//chrome/browser/lifetime",
     "//chrome/browser/omnibox",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/performance_manager:test_support",
     "//chrome/browser/profiles:misc",
@@ -523,7 +522,6 @@ static_library("test_support") {
     ]
     deps += [
       "//chrome/browser/ui/color:mixers",
-      "//chrome/browser/ui/passwords:impl",
       "//chrome/browser/ui/views:layout_provider",
       "//components/color",
       "//components/omnibox/browser:test_support",
@@ -593,7 +591,6 @@ source_set("platform_browser_tests") {
     "//chrome/browser/metrics:platform_browser_tests",
     "//chrome/browser/net:platform_browser_tests",
     "//chrome/browser/optimization_guide",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/policy:platform_browser_tests",
     "//chrome/browser/policy:test_support",
@@ -950,8 +947,6 @@ test("browser_tests") {
     "//chrome/browser/page_content_annotations",
     "//chrome/browser/page_content_annotations:browser_tests",
     "//chrome/browser/page_load_metrics:browser_tests",
-    "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager:impl",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:browser_tests",
     "//chrome/browser/permissions",
@@ -1148,7 +1143,6 @@ test("browser_tests") {
     "//chrome/browser/ui/views/new_tab_footer:browser_tests",
     "//chrome/browser/ui/views/page_action",
     "//chrome/browser/ui/views/page_info",
-    "//chrome/browser/ui/views/passwords:password_bubble_view_base",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button_browser_tests",
     "//chrome/browser/ui/views/side_panel",
@@ -1816,8 +1810,6 @@ test("browser_tests") {
     "//chrome/browser/ui/animation",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/omnibox:test_support",
-    "//chrome/browser/ui/passwords",
-    "//chrome/browser/ui/passwords/bubble_controllers",
     "//chrome/browser/ui/profiles",
     "//chrome/browser/ui/search",
     "//chrome/browser/ui/startup",
@@ -2718,8 +2710,6 @@ test("unit_tests") {
     "//chrome/browser/page_content_annotations:unit_tests",
     "//chrome/browser/page_load_metrics",
     "//chrome/browser/page_load_metrics:unit_tests",
-    "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager:impl",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:unit_tests",
@@ -3142,10 +3132,6 @@ test("unit_tests") {
   if (!is_chrome_for_testing) {
     deps += [ "//chrome/browser/ai:unit_tests" ]
   }
-
-  # TODO(crbug.com/437811373): Remove this dependency when
-  # display_account_info_unittest.cc gets componentized.
-  deps += [ "//chrome/browser/ui/passwords" ]
 
   # Duplicate these tests here because PathService has more providers in
   # unit_tests than in base_unittests.
@@ -4187,7 +4173,6 @@ static_library("test_support_ui") {
     "//chrome/browser/lifetime",
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/omnibox",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/predictors",
     "//chrome/browser/privacy_sandbox:headers",
@@ -4470,7 +4455,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/notifications:interactive_ui_tests",
     "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/page_content_annotations",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/permissions",
     "//chrome/browser/permissions:interactive_ui_tests",
@@ -4532,7 +4516,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/omnibox:interactive_ui_tests",
     "//chrome/browser/ui/omnibox/omnibox_everywhere:interactive_ui_tests",
     "//chrome/browser/ui/page_action:icon_type",
-    "//chrome/browser/ui/passwords:impl",
     "//chrome/browser/ui/profiles",
     "//chrome/browser/ui/select_file_policy",
     "//chrome/browser/ui/send_tab_to_self:interactive_ui_tests",
@@ -4570,7 +4553,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/views/location_bar",
     "//chrome/browser/ui/views/new_tab_footer",
     "//chrome/browser/ui/views/page_action",
-    "//chrome/browser/ui/views/passwords:password_bubble_view_base",
     "//chrome/browser/ui/views/performance_controls",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button",
     "//chrome/browser/ui/views/send_tab_to_self:interactive_ui_tests",
@@ -5195,7 +5177,6 @@ test("captured_sites_interactive_tests") {
     "//chrome/browser/autofill",
     "//chrome/browser/autofill:test_support_ui",
     "//chrome/browser/devtools",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/ssl",
     "//chrome/browser/sync",

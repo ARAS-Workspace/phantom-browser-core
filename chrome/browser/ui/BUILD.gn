@@ -558,8 +558,6 @@ static_library("ui") {
     "//chrome/browser/page_info",
     "//chrome/browser/page_load_metrics",
     "//chrome/browser/page_load_metrics:impl",
-    "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager:impl",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:impl",
     "//chrome/browser/permissions",
@@ -620,8 +618,6 @@ static_library("ui") {
     "//chrome/browser/ui/omnibox:impl",
     "//chrome/browser/ui/page_info",
     "//chrome/browser/ui/page_info:impl",
-    "//chrome/browser/ui/passwords",
-    "//chrome/browser/ui/passwords:impl",
     "//chrome/browser/ui/prefs",
     "//chrome/browser/ui/prefs:impl",
     "//chrome/browser/ui/profiles",
@@ -873,11 +869,6 @@ static_library("ui") {
     "//chrome/browser/notifications:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
-    # following headers get componentized:
-    # c/b/ui/browser.h, browser_window.h
-    "//chrome/browser/password_manager:impl",
-
-    # TODO(crbug.com/353332589): Remove this circular dependency when the
     # following header gets componentized:
     # c/b/ui/browser.h
     "//chrome/browser/permissions",
@@ -984,11 +975,6 @@ static_library("ui") {
     # following header gets componentized:
     # c/b/ui/network_profile_bubble.h
     "//chrome/browser/prefs:impl",
-
-    # TODO(crbug.com/437811373): Remove this circular dependency when the
-    # following headers get componentized:
-    # - c/b/ui/browser.h
-    "//chrome/browser/ui/passwords:impl",
 
     # ssl:impl includes headers from //chrome/browser/ui that can't be
     # split out yet (e.g. browser.h).
@@ -1113,8 +1099,6 @@ static_library("ui") {
     "//chrome/browser/ui/focus:impl",
     "//chrome/browser/ui/fullscreen",
     "//chrome/browser/ui/fullscreen:impl",
-    "//chrome/browser/ui/passwords/bubble_controllers",
-    "//chrome/browser/ui/passwords/bubble_controllers:impl",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/performance_controls:impl",
     "//chrome/browser/ui/shared_highlighting",
@@ -2141,9 +2125,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/page_action:impl",
       "//chrome/browser/ui/views/page_info",
       "//chrome/browser/ui/views/page_info:impl",
-      "//chrome/browser/ui/views/passwords",
-      "//chrome/browser/ui/views/passwords:impl",
-      "//chrome/browser/ui/views/passwords:password_bubble_view_base",
       "//chrome/browser/ui/views/performance_controls",
       "//chrome/browser/ui/views/performance_controls:impl",
       "//chrome/browser/ui/views/permissions",

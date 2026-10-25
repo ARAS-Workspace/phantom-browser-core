@@ -29,7 +29,6 @@ source_set("impl") {
 
   deps = [
     ":login",
-    "//chrome/browser/password_manager",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/tab_contents",
     "//components/no_state_prefetch/browser",

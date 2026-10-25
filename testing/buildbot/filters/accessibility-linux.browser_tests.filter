@@ -181,9 +181,5 @@
 -WebUITabStripContainerViewTest.*
 -WebUITabStripDevToolsTest.*
 
-# Flaky at least on Linux: crbug.com/502373073
--PasswordGenerationInteractiveTest.PopupShownManuallyAndPasswordErased
--PasswordGenerationInteractiveTest.PopupShownAndPasswordSelected
-
 # Times out on Linux accessibility: crbug.com/546479367
 -PKIMetadataComponentChromeRootStoreMtcMetadataTest.Revocation*

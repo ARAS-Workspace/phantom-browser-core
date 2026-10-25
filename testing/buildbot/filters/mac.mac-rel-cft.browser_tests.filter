@@ -68,7 +68,6 @@ BrowserRootViewBrowserTest.*
 -*JavaScriptTests.testElementRegionTest
 -All/GetDisplayMediaChangeSourceBrowserTest.*
 -All/PageSpecificSiteDataDialogBrowserTest.*
--All/PasswordGenerationPopupViewBrowsertest.*
 -All/TabSharingUIViewsBrowserTest.*
 -BackForwardCachePageLoadMetricsObserverBrowserTest.CumulativeLayoutShiftAfterBackForwardCacheRestore
 -BackForwardCachePageLoadMetricsObserverBrowserTest.LayoutShiftNormalization_AfterBackForwardCacheRestore

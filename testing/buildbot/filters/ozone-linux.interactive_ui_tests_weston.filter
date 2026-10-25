@@ -40,7 +40,6 @@
 -MediaDialogViewBrowserTest.PictureInPicture
 -NotificationsTestWithFakeMediaStream.ShouldQueueDuringScreenPresent
 -OmniboxViewViewsTest.SelectionClipboard
--PasswordBubbleInteractiveUiTest.AutoSigninNoFocus
 -PopupBlockerBrowserTest.ModalPopUnder
 -SameSiteSubframe/DragAndDropBrowserTest.CrossTabDrag/0
 -StartupBrowserCreatorTest.LastUsedProfileActivated

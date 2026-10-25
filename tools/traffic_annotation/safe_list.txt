@@ -101,7 +101,6 @@ missing_new_fields,chrome/browser/ssl/certificate_error_reporter.cc
 missing_new_fields,chrome/browser/ssl/sct_reporting_service.cc
 missing_new_fields,chrome/browser/ui/ash/assistant/search_and_assistant_enabled_checker.cc
 missing_new_fields,chrome/browser/ui/omnibox/chrome_omnibox_navigation_observer.cc
-missing_new_fields,chrome/browser/ui/passwords/account_avatar_fetcher.cc
 missing_new_fields,chrome/browser/ui/views/qrcode_generator/qrcode_generator_bubble.cc
 missing_new_fields,chrome/browser/ui/views/sharing_hub/screenshot/screenshot_captured_bubble.cc
 missing_new_fields,chrome/browser/ui/views/webid/account_selection_bubble_view.cc

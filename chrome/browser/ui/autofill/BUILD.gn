@@ -67,7 +67,6 @@ source_set("autofill") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/autofill/payments",
     "//chrome/browser/ui/page_action:icon_type",
-    "//chrome/browser/ui/passwords",
     "//components/application_locale_storage",
     "//components/autofill/content/browser",
     "//components/autofill/core/browser",
@@ -125,10 +124,7 @@ source_set("autofill") {
     sources += [ "autofill_popup_controller_impl_mac.h" ]
   }
 
-  allow_circular_includes_from = [
-    "//chrome/browser/ui/autofill/payments",
-    "//chrome/browser/ui/passwords",
-  ]
+  allow_circular_includes_from = [ "//chrome/browser/ui/autofill/payments" ]
 }
 
 source_set("impl") {
@@ -161,7 +157,6 @@ source_set("impl") {
     "//chrome/browser/history",
     "//chrome/browser/metrics",
     "//chrome/browser/optimization_guide",
-    "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/personal_context",
     "//chrome/browser/personal_context/first_run",
@@ -176,7 +171,6 @@ source_set("impl") {
     "//chrome/browser/ui/autofill/payments",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/page_info",
-    "//chrome/browser/ui/passwords",
     "//chrome/browser/webdata_services",
     "//components/account_settings",
     "//components/autofill/content/browser",

@@ -284,10 +284,6 @@ IN_PROC_BROWSER_TEST_F(BrowserUserEducationServiceBrowserTest,
        IPHFailureReason::kLegacyPromoNoScreenReader, "crbug.com/40910932"},
 
       // Toast IPH that probably need session impact updated.
-      {&feature_engagement::kIPHPasswordsManagementBubbleAfterSaveFeature,
-       IPHFailureReason::kWrongSessionImpact, "crbug.com/40267191"},
-      {&feature_engagement::kIPHPasswordsManagementBubbleDuringSigninFeature,
-       IPHFailureReason::kWrongSessionImpact, "crbug.com/40267191"},
       {&feature_engagement::kIPHProfileSwitchFeature,
        IPHFailureReason::kWrongSessionImpact, "crbug.com/40267191"},
       {&feature_engagement::kIPHTabAudioMutingFeature,

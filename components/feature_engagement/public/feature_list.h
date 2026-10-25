@@ -79,18 +79,6 @@ DEFINE_VARIATION_PARAM(kIPHMultistepFilterPromoFeature,
 DEFINE_VARIATION_PARAM(kIPHLensOverlayFeature, "IPH_LensOverlay");
 DEFINE_VARIATION_PARAM(kIPHLensOverlayTranslateButtonFeature,
                        "IPH_LensOverlayTranslateButton");
-DEFINE_VARIATION_PARAM(kIPHPasswordsSavePrimingPromoFeature,
-                       "IPH_PasswordsSavePrimingPromo");
-DEFINE_VARIATION_PARAM(kIPHPasswordsSaveRecoveryPromoFeature,
-                       "IPH_PasswordsSaveRecoveryPromo");
-DEFINE_VARIATION_PARAM(kIPHPasswordsManagementBubbleAfterSaveFeature,
-                       "IPH_PasswordsManagementBubbleAfterSave");
-DEFINE_VARIATION_PARAM(kIPHPasswordsManagementBubbleDuringSigninFeature,
-                       "IPH_PasswordsManagementBubbleDuringSignin");
-DEFINE_VARIATION_PARAM(kIPHPasswordManagerShortcutFeature,
-                       "IPH_PasswordManagerShortcut");
-DEFINE_VARIATION_PARAM(kIPHPasswordSharingFeature,
-                       "IPH_PasswordSharingFeature");
 DEFINE_VARIATION_PARAM(kIPHPdfInkSignaturesFeature, "IPH_PdfInkSignatures");
 DEFINE_VARIATION_PARAM(kIPHPdfSearchifyFeature, "IPH_PdfSearchifyFeature");
 DEFINE_VARIATION_PARAM(kIPHPdfTextAnnotationsFeature, "IPH_PdfTextAnnotations");
@@ -238,10 +226,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHHistorySearchFeature),
         VARIATION_ENTRY(kIPHMemorySaverModeFeature),
         VARIATION_ENTRY(kIPHMultistepFilterPromoFeature),
-        VARIATION_ENTRY(kIPHPasswordManagerShortcutFeature),
-        VARIATION_ENTRY(kIPHPasswordSharingFeature),
-        VARIATION_ENTRY(kIPHPasswordsManagementBubbleAfterSaveFeature),
-        VARIATION_ENTRY(kIPHPasswordsManagementBubbleDuringSigninFeature),
         VARIATION_ENTRY(kIPHPdfInkSignaturesFeature),
         VARIATION_ENTRY(kIPHPdfSearchifyFeature),
         VARIATION_ENTRY(kIPHPdfTextAnnotationsFeature),

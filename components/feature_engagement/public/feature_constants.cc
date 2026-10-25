@@ -121,24 +121,6 @@ BASE_FEATURE(kIPHLensOverlayTranslateButtonFeature,
 BASE_FEATURE(kIPHTabAudioMutingFeature,
              "IPH_TabAudioMuting",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordsSavePrimingPromoFeature,
-             "IPH_PasswordsSavePrimingPromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordsSaveRecoveryPromoFeature,
-             "IPH_PasswordsSaveRecoveryPromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordsManagementBubbleAfterSaveFeature,
-             "IPH_PasswordsManagementBubbleAfterSave",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordsManagementBubbleDuringSigninFeature,
-             "IPH_PasswordsManagementBubbleDuringSignin",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordManagerShortcutFeature,
-             "IPH_PasswordManagerShortcut",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPasswordSharingFeature,
-             "IPH_PasswordSharingFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHPdfInkSignaturesFeature,
              "IPH_PdfInkSignatures",
              base::FEATURE_ENABLED_BY_DEFAULT);

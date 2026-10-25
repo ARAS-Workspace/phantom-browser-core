@@ -46,9 +46,6 @@ inline constexpr char kGoogleAccountDeviceActivityURL[] =
 inline constexpr char kGoogleTwoFactorIntersitialURL[] =
     "https://myaccount.google.com/interstitials/twosvrequired";
 
-// URL of the Google Password Manager.
-inline constexpr char kGooglePasswordManagerURL[] = "";
-
 // The URL for the "Learn more" page for the usage/crash reporting option in the
 // first run dialog.
 inline constexpr char kLearnMoreReportingURL[] =

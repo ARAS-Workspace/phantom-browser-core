@@ -690,50 +690,6 @@ void MaybeRegisterChromeFeaturePromos(
           FeaturePromoSpecification::AcceleratorInfo())
           .SetBubbleArrow(HelpBubbleArrow::kTopCenter)));
 
-  // kIPHPasswordsSavePrimingPromo:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHPasswordsSavePrimingPromoFeature,
-          kToolbarAvatarButtonElementId,
-          IDS_PASSWORDS_SAVE_PRIMING_PROMO_BODY_TEMPLATE,
-          IDS_PASSWORDS_SAVE_PRIMING_PROMO_SCREENREADER,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetMetadata(
-              137, "dfried@chromium.org",
-              "Triggered when the user navigates a page with an eligible login "
-              "form, and they have no saved passwords.")));
-
-  // kIPHPasswordsSavePrimingPromo:
-  registry.RegisterFeature(
-      std::move(FeaturePromoSpecification::CreateForToastPromo(
-                    feature_engagement::kIPHPasswordsSaveRecoveryPromoFeature,
-                    kPasswordsOmniboxKeyIconElementId,
-                    IDS_PASSWORDS_SAVE_RECOVERY_PROMO_BODY,
-                    IDS_PASSWORDS_SAVE_RECOVERY_PROMO_SCREENREADER,
-                    FeaturePromoSpecification::AcceleratorInfo())
-                    .SetMetadata(137, "dfried@chromium.org",
-                                 "Triggered when the user logs into a page "
-                                 "they have blocklisted")));
-
-  // kIPHPasswordsManagementBubbleAfterSaveFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHPasswordsManagementBubbleAfterSaveFeature,
-          kPasswordsOmniboxKeyIconElementId,
-          IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_AFTER_SAVE,
-          IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_AFTER_SAVE_SCREENREADER,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetMetadata(113, "mamir@chromium.org",
-                       "Triggered once when user has saved a password.")));
-
-  // kIPHPasswordsManagementBubbleDuringSigninFeature:
-  registry.RegisterFeature(FeaturePromoSpecification::CreateForToastPromo(
-      feature_engagement::kIPHPasswordsManagementBubbleDuringSigninFeature,
-      kPasswordsOmniboxKeyIconElementId,
-      IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN,
-      IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN_SCREENREADER,
-      FeaturePromoSpecification::AcceleratorInfo()));
-
 #if BUILDFLAG(ENABLE_PDF_INK2)
   // kIPHPdfInkSignaturesFeature:
   registry.RegisterFeature(std::move(

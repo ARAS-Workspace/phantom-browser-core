@@ -36,7 +36,6 @@
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -50,7 +49,6 @@
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_node.h"
 #include "components/data_sharing/public/features.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/signin/public/base/consent_level.h"
@@ -399,33 +397,6 @@ void ShowContentSettings(BrowserWindowInterface* browser,
 void ShowClearBrowsingDataDialog(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("ClearBrowsingData_ShowDlg"));
   ShowSettingsSubPage(browser, kClearBrowserDataSubPage);
-}
-
-void ShowPasswordManager(BrowserWindowInterface* bwi) {
-  base::RecordAction(UserMetricsAction("Options_ShowPasswordManager"));
-  ShowSingletonTabIgnorePathOverwriteNTP(bwi,
-                                         GURL(kChromeUIPasswordManagerURL));
-}
-
-void ShowPasswordManagerSettings(BrowserWindowInterface* bwi) {
-  base::RecordAction(UserMetricsAction("Options_ShowPasswordManagerSettings"));
-  ShowSingletonTabIgnorePathOverwriteNTP(
-      bwi, GURL(kChromeUIPasswordManagerSettingsURL));
-}
-
-void ShowPasswordDetailsPage(BrowserWindowInterface* browser,
-                             const std::string& password_domain_name) {
-  base::RecordAction(
-      UserMetricsAction("Options_ShowPasswordDetailsInPasswordManager"));
-  std::string url = base::StrCat(
-      {GetGooglePasswordManagerSubPageURLStr(), "/", password_domain_name});
-  ShowSingletonTabIgnorePathOverwriteNTP(browser, GURL(url));
-}
-
-void ShowPasswordCheck(BrowserWindowInterface* browser) {
-  base::RecordAction(UserMetricsAction("Options_ShowPasswordCheck"));
-  ShowSingletonTabIgnorePathOverwriteNTP(
-      browser, GURL(kChromeUIPasswordManagerCheckupURL));
 }
 
 void ShowImportDialog(BrowserWindowInterface* browser) {

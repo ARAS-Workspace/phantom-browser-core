@@ -20,7 +20,6 @@ class BrowserProcessImpl;
 class BrowserWindowInterface;
 class CampaignsManagerClientImpl;
 class ChromeMetricsServiceClient;
-class ChromePasswordManagerClient;
 class GlobalFeatures;
 class HttpsFirstModeService;
 class NavigationMetricsRecorder;
@@ -152,7 +151,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class safe_browsing::internal::ReporterRunner;
   friend class segmentation_platform::FieldTrialRegisterImpl;
   friend class ChromeMetricsServiceClient;
-  friend class ChromePasswordManagerClient;
   friend class NavigationMetricsRecorder;
   friend class ChromeBrowserMainExtraPartsGpu;
   friend class BrowserWindowInterface;

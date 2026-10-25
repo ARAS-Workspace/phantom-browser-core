@@ -41,26 +41,6 @@ FeatureConfig CreateAlwaysTriggerConfig(const base::Feature* feature) {
 std::optional<FeatureConfig> GetClientSideFeatureConfig(
     const base::Feature* feature) {
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
-  if (kIPHPasswordsManagementBubbleAfterSaveFeature.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    config.trigger =
-        EventConfig("password_saved", Comparator(LESS_THAN, 1), 360, 360);
-    config.session_rate = Comparator(ANY, 0);
-    config.availability = Comparator(ANY, 0);
-    return config;
-  }
-
-  if (kIPHPasswordsManagementBubbleDuringSigninFeature.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    config.trigger =
-        EventConfig("signin_flow_detected", Comparator(LESS_THAN, 1), 360, 360);
-    config.session_rate = Comparator(ANY, 0);
-    config.availability = Comparator(ANY, 0);
-    return config;
-  }
-
   if (kIPHProfileSwitchFeature.name == feature->name) {
     FeatureConfig config;
     config.valid = true;
@@ -316,31 +296,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     config.used =
         EventConfig("companion_side_panel_region_search_button_clicked",
                     Comparator(EQUAL, 0), 360, 360);
-    return config;
-  }
-
-  if (kIPHPasswordManagerShortcutFeature.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(EQUAL, 0);
-    config.trigger = EventConfig("iph_password_manager_shortcut_triggered",
-                                 Comparator(EQUAL, 0), 360, 360);
-    config.used = EventConfig("password_manager_shortcut_created",
-                              Comparator(EQUAL, 0), 360, 360);
-    return config;
-  }
-
-  if (kIPHPasswordSharingFeature.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(ANY, 0);
-    config.session_rate_impact.type = SessionRateImpact::Type::NONE;
-    config.trigger = EventConfig("password_sharing_iph_triggered",
-                                 Comparator(EQUAL, 0), 360, 360);
-    config.used = EventConfig("password_share_button_clicked",
-                              Comparator(EQUAL, 0), 360, 360);
     return config;
   }
 

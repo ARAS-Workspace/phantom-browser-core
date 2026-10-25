@@ -42,7 +42,6 @@ class ConfirmBubbleViews;
 class ConstrainedWindowTestDialog;
 class CreateChromeApplicationShortcutView;
 class CreateShortcutConfirmationView;
-class CredentialLeakDialogView;
 class CryptoModulePasswordDialogView;
 class DeprecatedAppsDialogView;
 class DesktopMediaPickerDialogView;
@@ -707,7 +706,6 @@ class VIEWS_EXPORT DialogDelegateView : public DialogDelegate, public View {
   friend class ::ConstrainedWindowTestDialog;
   friend class ::CreateChromeApplicationShortcutView;
   friend class ::CreateShortcutConfirmationView;
-  friend class ::CredentialLeakDialogView;
   friend class ::CryptoModulePasswordDialogView;
   friend class ::DeprecatedAppsDialogView;
   friend class ::DesktopMediaPickerDialogView;

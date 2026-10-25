@@ -92,11 +92,6 @@ void ShowContentSettings(BrowserWindowInterface* browser,
 void ShowSettingsSubPageInTabbedBrowser(BrowserWindowInterface* browser,
                                         std::string_view sub_page);
 void ShowClearBrowsingDataDialog(BrowserWindowInterface* browser);
-void ShowPasswordManager(BrowserWindowInterface* bwi);
-void ShowPasswordManagerSettings(BrowserWindowInterface* bwi);
-void ShowPasswordDetailsPage(BrowserWindowInterface* browser,
-                             const std::string& password_domain_name);
-void ShowPasswordCheck(BrowserWindowInterface* browser);
 void ShowImportDialog(BrowserWindowInterface* browser);
 void ShowAboutChrome(BrowserWindowInterface* browser);
 void ShowSearchEngineSettings(BrowserWindowInterface* browser);

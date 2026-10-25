@@ -101,19 +101,6 @@ history::VisitContextAnnotations::BrowserType GetBrowserType(
   }
 }
 
-history::VisitContentAnnotations::PasswordState
-ConvertSessionsPasswordStateToHistory(
-    sessions::SerializedNavigationEntry::PasswordState password_state) {
-  switch (password_state) {
-    case sessions::SerializedNavigationEntry::PASSWORD_STATE_UNKNOWN:
-      return history::VisitContentAnnotations::PasswordState::kUnknown;
-    case sessions::SerializedNavigationEntry::NO_PASSWORD_FIELD:
-      return history::VisitContentAnnotations::PasswordState::kNoPasswordField;
-    case sessions::SerializedNavigationEntry::HAS_PASSWORD_FIELD:
-      return history::VisitContentAnnotations::PasswordState::kHasPasswordField;
-  }
-}
-
 }  // namespace
 
 HistoryTabHelper::HistoryTabHelper(WebContents* web_contents)
@@ -382,20 +369,6 @@ void HistoryTabHelper::OnURLVisited(
     app_id_ = std::nullopt;
   }
   history_service->RemoveObserver(this);
-}
-
-void HistoryTabHelper::OnPasswordStateUpdated(
-    sessions::SerializedNavigationEntry::PasswordState password_state) {
-  if (history::HistoryService* hs = GetHistoryService()) {
-    NavigationEntry* entry =
-        web_contents()->GetController().GetLastCommittedEntry();
-    if (entry) {
-      hs->SetPasswordStateForVisit(
-          history::ContextIDForWebContents(web_contents()),
-          entry->GetUniqueID(), web_contents()->GetLastCommittedURL(),
-          ConvertSessionsPasswordStateToHistory(password_state));
-    }
-  }
 }
 
 void HistoryTabHelper::DidFinishNavigation(

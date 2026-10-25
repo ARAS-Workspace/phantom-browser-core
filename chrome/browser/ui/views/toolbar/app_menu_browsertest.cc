@@ -366,12 +366,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest, InvokeUi_help) {
 #endif
 
 // TODO(crbug.com/375132024): Re-enable test.
-IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest,
-                       DISABLED_InvokeUi_passwords_and_autofill) {
-  ShowAndVerifyUi();
-}
-
-// TODO(crbug.com/375132024): Re-enable test.
 IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest, DISABLED_InvokeUi_extensions) {
   ShowAndVerifyUi();
 }

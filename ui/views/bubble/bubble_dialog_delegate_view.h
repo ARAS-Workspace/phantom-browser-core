@@ -45,7 +45,6 @@
 #include "ui/base/cocoa/bubble_closer.h"
 #endif
 
-class AccountChooserDialogView;
 class AppDialogView;
 class AnnouncementView;
 class BruschettaUninstallerView;
@@ -823,7 +822,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   // DO NOT ADD TO THIS LIST!
   // These existing cases are "grandfathered in", but there shouldn't be more.
   // See comments atop class.
-  friend class ::AccountChooserDialogView;
   friend class ::AnnouncementView;
   friend class ::AppDialogView;
   friend class ::BruschettaUninstallerView;

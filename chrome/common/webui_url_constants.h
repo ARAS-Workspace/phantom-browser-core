@@ -178,16 +178,6 @@ inline constexpr char kChromeUIOrganizerPanelHost[] =
     "organizer-panel.top-chrome";
 inline constexpr char kChromeUIOrganizerPanelURL[] =
     "chrome://organizer-panel.top-chrome/";
-inline constexpr char kChromeUIPasswordManagerCheckupURL[] =
-    "chrome://password-manager/checkup?start=true";
-inline constexpr char kChromeUIPasswordManagerInternalsHost[] =
-    "password-manager-internals";
-inline constexpr char kChromeUIPasswordManagerSettingsURL[] =
-    "chrome://password-manager/settings";
-inline constexpr char kChromeUIPasswordManagerURL[] =
-    "chrome://password-manager";
-inline constexpr char kChromeUiPasswordChangeUrl[] =
-    "chrome://password-manager/settings/password-change";
 inline constexpr char kChromeUIPolicyHost[] = "policy";
 inline constexpr char kChromeUIPolicyLogsURL[] = "chrome://policy/logs";
 inline constexpr char kChromeUIPolicyTestURL[] = "chrome://policy/test";
@@ -402,8 +392,6 @@ inline constexpr char kManageProfileSubPage[] = "manageProfile";
 inline constexpr char kAiHelpMeWriteSubpage[] = "ai/helpMeWrite";
 inline constexpr char kOnDeviceSiteDataSubpage[] = "content/siteData";
 inline constexpr char kOnStartupSubPage[] = "onStartup";
-inline constexpr char kPasskeysSubPage[] = "passkeys";
-inline constexpr char kPasswordManagerSubPage[] = "passwords";
 inline constexpr char kPaymentsSubPage[] = "payments";
 inline constexpr char kIdentityDocsSubPage[] = "identityDocs";
 inline constexpr char kTravelSubPage[] = "travel";

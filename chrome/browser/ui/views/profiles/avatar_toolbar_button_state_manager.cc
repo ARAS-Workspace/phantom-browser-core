@@ -1641,15 +1641,6 @@ void AvatarToolbarButtonStateManager::RegisterObserver(Observer* observer) {
 
 void AvatarToolbarButtonStateManager::HandleButtonPressed(
     bool is_source_accelerator) {
-  if (browser_ &&
-      BrowserUserEducationInterface::From(browser_)->IsFeaturePromoActive(
-          feature_engagement::kIPHPasswordsSavePrimingPromoFeature)) {
-    BrowserUserEducationInterface::From(browser_)
-        ->NotifyFeaturePromoFeatureUsed(
-            feature_engagement::kIPHPasswordsSavePrimingPromoFeature,
-            FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  }
-
   // Notify observers before the action is performed to allow them to close any
   // open dialogs.
   NotifyButtonPressed();

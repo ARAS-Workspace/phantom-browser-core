@@ -47,11 +47,6 @@ class TabDialogs : public base::SupportsUserData::Data {
       content::RenderWidgetHost* render_widget_host) = 0;
   virtual bool IsShowingHungRendererDialog() = 0;
 
-  // Shows or hides the ManagePasswords bubble.
-  // Pass true for |user_action| if this is a user initiated action.
-  virtual void ShowManagePasswordsBubble(bool user_action) = 0;
-  virtual void HideManagePasswordsBubble() = 0;
-
  protected:
   static const void* UserDataKey();
 };

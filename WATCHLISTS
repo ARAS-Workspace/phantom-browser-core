@@ -1757,8 +1757,6 @@
     },
     'password_manager': {
       'filepath': 'chrome/.*/password_'\
-                  '|chrome/browser/ui/passwords'\
-                  '|chrome/browser/ui/views/passwords'\
                   '|components/autofill.*password'
                   '|components/password_'\
                   '|^ios/chrome/browser/passwords'\
