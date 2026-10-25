@@ -17,7 +17,6 @@
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/net/net_error_tab_helper.h"
 #include "chrome/browser/net_benchmarking.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
 #include "chrome/browser/signin/google_accounts_private_api_host.h"
@@ -29,7 +28,6 @@
 #include "components/metrics/call_stacks/call_stack_profile_collector.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
-#include "components/password_manager/content/browser/content_password_manager_driver_factory.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/surface_embed/browser/surface_embed_host.h"
@@ -275,24 +273,6 @@ void ChromeContentBrowserClient::
             },
             &render_frame_host));
   }
-  associated_registry.AddInterface<autofill::mojom::PasswordGenerationDriver>(
-      base::BindRepeating(
-          [](content::RenderFrameHost* render_frame_host,
-             mojo::PendingAssociatedReceiver<
-                 autofill::mojom::PasswordGenerationDriver> receiver) {
-            ChromePasswordManagerClient::BindPasswordGenerationDriver(
-                std::move(receiver), render_frame_host);
-          },
-          &render_frame_host));
-  associated_registry.AddInterface<
-      autofill::mojom::PasswordManagerDriver>(base::BindRepeating(
-      [](content::RenderFrameHost* render_frame_host,
-         mojo::PendingAssociatedReceiver<autofill::mojom::PasswordManagerDriver>
-             receiver) {
-        password_manager::ContentPasswordManagerDriverFactory::
-            BindPasswordManagerDriver(std::move(receiver), render_frame_host);
-      },
-      &render_frame_host));
   associated_registry.AddInterface<record_replay::mojom::RecordReplayDriver>(
       base::BindRepeating(&ChromeRecordReplayClient::BindRecordReplayDriver,
                           &render_frame_host));

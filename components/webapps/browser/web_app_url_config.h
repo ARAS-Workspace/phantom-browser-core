@@ -19,11 +19,10 @@ namespace webapps {
 // - URLs with inner URLs (e.g., blob: or filesystem:)
 // - about:blank
 // - WebUI URLs (chrome://, chrome-untrusted://, devtools://) except for
-//   chrome://password-manager and test-registered hosts
+//   test-registered hosts
 // Returns true for:
 // - HTTP and HTTPS URLs
 // - chrome-extension:// URLs (on platforms where extension apps are allowed)
-// - chrome://password-manager
 bool IsUrlEligibleForWebApp(const GURL& url);
 
 // Adds chrome://`host` as an origin that IsUrlEligibleForWebApp will consider

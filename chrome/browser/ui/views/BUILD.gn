@@ -297,8 +297,6 @@ source_set("login_view") {
   sources = [ "login_view.cc" ]
   public_deps = [
     "//base",
-    "//chrome/browser/ui/login",
-    "//components/password_manager/core/browser",
     "//ui/views",
   ]
   deps = [

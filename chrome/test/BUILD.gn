@@ -1336,7 +1336,6 @@ test("browser_tests") {
     "//components/passage_embeddings/core",
     "//components/passage_embeddings/core:test_support",
     "//components/password_manager/content/browser",
-    "//components/password_manager/content/common",
     "//components/password_manager/core/browser/features:password_features",
     "//components/password_manager/core/browser/form_parsing",
     "//components/password_manager/core/browser/sharing",

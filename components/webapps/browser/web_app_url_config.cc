@@ -9,7 +9,6 @@
 #include "base/functional/bind.h"
 #include "base/no_destructor.h"
 #include "build/build_config.h"
-#include "components/password_manager/content/common/web_ui_constants.h"
 #include "content/public/common/url_constants.h"
 #include "url/gurl.h"
 #include "url/url_constants.h"
@@ -47,10 +46,9 @@ bool IsUrlEligibleForWebApp(const GURL& url) {
     return true;
   }
 
-  // chrome://password-manager is eligible, as are test-registered hosts.
+  // Test-registered chrome:// hosts are eligible.
   if (url.SchemeIs(content::kChromeUIScheme) &&
-      (url.GetHost() == password_manager::kChromeUIPasswordManagerHost ||
-       ValidChromeUrlHostsForTesting().contains(url.GetHost()))) {
+      ValidChromeUrlHostsForTesting().contains(url.GetHost())) {
     return true;
   }
 

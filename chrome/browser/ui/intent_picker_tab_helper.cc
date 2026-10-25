@@ -34,11 +34,9 @@
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
-#include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/services/app_service/public/cpp/app_types.h"
 #include "components/services/app_service/public/cpp/icon_types.h"
 #include "content/public/browser/navigation_handle.h"
-#include "content/public/common/url_constants.h"
 #include "ui/base/models/image_model.h"
 #include "ui/gfx/favicon_size.h"
 #include "ui/gfx/image/image.h"
@@ -92,13 +90,6 @@ bool IsValidWebContentsForIntentPicker(content::WebContents* web_contents) {
 
 bool IsValidIntentPickerUrl(const GURL& url, bool is_error_page) {
   if (url.SchemeIsHTTPOrHTTPS() && !is_error_page) {
-    return true;
-  }
-
-  // chrome://password-manager is a valid PWA, so it should be considered when
-  // evaluating whether to show the intent picker.
-  if (url.SchemeIs(content::kChromeUIScheme) &&
-      url.host() == password_manager::kChromeUIPasswordManagerHost) {
     return true;
   }
 

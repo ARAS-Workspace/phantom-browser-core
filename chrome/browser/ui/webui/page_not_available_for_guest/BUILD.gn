@@ -12,7 +12,6 @@ source_set("page_not_available_for_guest") {
     "//base",
     "//chrome/browser/profiles:profile",
     "//chrome/common",
-    "//components/password_manager/content/common",
     "//components/strings:components_strings_grit",
     "//content/public/browser",
     "//ui/base",

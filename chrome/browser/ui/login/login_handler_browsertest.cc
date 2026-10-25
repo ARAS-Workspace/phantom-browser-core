@@ -148,8 +148,7 @@ class LoginHandlerFake : public LoginHandler {
                           std::u16string_view password) override;
   void NotifyAuthCancelled() override;
   bool BuildViewImpl(const std::u16string& authority,
-                     const std::u16string& explanation,
-                     LoginModelData* login_model_data) override {
+                     const std::u16string& explanation) override {
     return true;
   }
   void CloseDialog() override {}

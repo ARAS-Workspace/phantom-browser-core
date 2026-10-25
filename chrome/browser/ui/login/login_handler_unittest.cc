@@ -36,69 +36,67 @@ const struct TestCase {
   struct {
     const char* const authority;
     const char* const explanation;
-    const char* const signon_realm;
   } expected;
 } kTestCases[]{
     // Insecure proxy
     {kHttpUrl,
      {PROXY, kBasicAuthScheme, kFooRealm, "http://example.com"},
-     {"The proxy http://example.com", kInsecureProxy, "example.com:80/Foo"}},
+     {"The proxy http://example.com", kInsecureProxy}},
 
     // Insecure proxy on non-standard port
     {kHttpUrl,
      {PROXY, kBasicAuthScheme, kFooRealm, "http://example.com:8009"},
-     {"The proxy http://example.com:8009", kInsecureProxy,
-      "example.com:8009/Foo"}},
+     {"The proxy http://example.com:8009", kInsecureProxy}},
 
     // Secure proxy
     {kHttpUrl,
      {PROXY, kBasicAuthScheme, kFooRealm, "https://example.com"},
-     {"The proxy https://example.com", "", "example.com:443/Foo"}},
+     {"The proxy https://example.com", ""}},
 
     // Secure proxy on non-standard port
     {kHttpUrl,
      {PROXY, kBasicAuthScheme, kFooRealm, "https://example.com:446"},
-     {"The proxy https://example.com:446", "", "example.com:446/Foo"}},
+     {"The proxy https://example.com:446", ""}},
 
     // localhost
     {kHttpUrl,
      {PROXY, kBasicAuthScheme, kFooRealm, "http://localhost:7323"},
-     {"The proxy http://localhost:7323", "", "localhost:7323/Foo"}},
+     {"The proxy http://localhost:7323", ""}},
 
     // Secure server
     {"https://www.nowhere.org/dir/index.html",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 
     // URL uses default port.
     {"https://www.nowhere.org:443/dir/index.html",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 
     // URL uses non-default port.
     {"https://www.nowhere.org:8443/dir/index.html",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org:8443", "", "https://www.nowhere.org:8443/Foo"}},
+     {"https://www.nowhere.org:8443", ""}},
 
     // URL has no trailing slash.
     {"https://www.nowhere.org",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 
     // username:password
     {"https://foo:bar@www.nowhere.org/dir/index.html",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 
     // query
     {"https://www.nowhere.org/dir/index.html?id=965362",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 
     // reference
     {"https://www.nowhere.org/dir/index.html#toc",
      {SERVER, kBasicAuthScheme, kFooRealm, nullptr},
-     {"https://www.nowhere.org", "", "https://www.nowhere.org/Foo"}},
+     {"https://www.nowhere.org", ""}},
 };
 
 std::u16string ExpectedAuthority(bool is_proxy, const char* prefix) {
@@ -154,9 +152,6 @@ TEST(LoginHandlerTest, DialogStringsAndRealm) {
               authority);
     EXPECT_STREQ(test_case.expected.explanation,
                  base::UTF16ToASCII(explanation).c_str());
-
-    EXPECT_STREQ(test_case.expected.signon_realm,
-                 LoginHandler::GetSignonRealm(request_url, auth_info).c_str());
   }
 }
 
@@ -236,18 +231,4 @@ TEST_F(LoginHandlerWithWebContentsTest, ProxyChallengerCancelsForPrompt) {
   content::NavigationThrottle::ThrottleCheckResult result =
       helper->WillProcessMainFrameUnauthorizedResponse(&handle);
   EXPECT_EQ(content::NavigationThrottle::CANCEL, result.action());
-}
-
-TEST(LoginHandlerTest, MakeInputForPasswordManager) {
-  GURL request_url("https://requested.test/page");
-  net::AuthChallengeInfo auth_info;
-  auth_info.is_proxy = false;
-  auth_info.challenger = url::SchemeHostPort(request_url);
-  auth_info.scheme = "basic";
-  auth_info.realm = "realm";
-
-  password_manager::PasswordForm form =
-      LoginHandler::MakeInputForPasswordManager(request_url, auth_info);
-  EXPECT_EQ(form.url, GURL("https://requested.test"));
-  EXPECT_EQ(form.scheme, password_manager::PasswordForm::Scheme::kBasic);
 }

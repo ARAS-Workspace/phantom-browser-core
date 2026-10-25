@@ -1022,9 +1022,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::optional<int> GetCpuPerformanceTierOverride(
       content::BrowserContext* browser_context) override;
 
-  void RecordAssistedLogin(
-      content::ContentBrowserClient::AssistedLoginType login_type) override;
-
   std::optional<bool> GetOverrideValueForStaticStorageQuota(
       content::BrowserContext* browser_context) override;
 

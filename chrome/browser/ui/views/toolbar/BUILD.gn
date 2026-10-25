@@ -229,7 +229,6 @@ source_set("impl") {
     "//components/autofill/core/common:features",
     "//components/feature_engagement/public",
     "//components/omnibox/browser",
-    "//components/password_manager/content/common",
     "//components/performance_manager",
     "//components/send_tab_to_self",
     "//components/sessions",

@@ -11,7 +11,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/command_updater_impl.h"
-#include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/ui/autofill/chrome_autofill_client.h"
@@ -277,9 +276,8 @@ void SimpleWebViewDialog::StartLoad(const GURL& url) {
   WebContents* web_contents = GetWebViewWebContents();
   DCHECK(web_contents);
 
-  // Create the password manager and autofill client that are needed.
+  // Create the autofill client that is needed.
   autofill::ChromeAutofillClient::CreateForWebContents(web_contents);
-  ChromePasswordManagerClient::CreateForWebContents(web_contents);
 
   web_view_->LoadInitialURL(url,
                             views::WebView::HttpsUpgradePolicy::kNoUpgrade);

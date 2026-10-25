@@ -191,7 +191,6 @@ source_set("incognito_allowed_url") {
   deps = [
     "//chrome/browser/signin:signin_promo",
     "//chrome/common",
-    "//components/password_manager/content/common",
     "//components/signin/public/base",
     "//url",
   ]
@@ -683,7 +682,6 @@ static_library("ui") {
     "//components/omnibox/browser:vector_icons",
     "//components/optimization_guide/content/browser",
     "//components/password_manager/content/browser",
-    "//components/password_manager/content/common",
     "//components/performance_manager",
     "//components/permissions",
     "//components/policy/core/browser",
@@ -1240,7 +1238,6 @@ static_library("ui") {
     "//components/multistep_filter/core:features",
     "//components/notebooks/internals/webui",
     "//components/paint_preview/public",
-    "//components/password_manager/content/common",
     "//components/password_manager/core/browser/leak_detection",
     "//components/services/app_service",
     "//components/ui_metrics",

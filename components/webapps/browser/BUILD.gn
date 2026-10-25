@@ -108,7 +108,6 @@ source_set("browser") {
     "//components/favicon/content",
     "//components/favicon/core",
     "//components/favicon_base",
-    "//components/password_manager/content/common",
     "//components/permissions",
     "//components/security_state/core",
     "//components/segmentation_platform/public",

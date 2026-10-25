@@ -100,7 +100,6 @@ if (toolkit_views) {
       "//chrome/browser/webauthn",
       "//chrome/common",
       "//components/feature_engagement/public:feature_constants",
-      "//components/password_manager/content/common",
       "//components/policy/core/common",
       "//components/prefs",
       "//components/sync/base:features",

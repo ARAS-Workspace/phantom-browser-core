@@ -10,7 +10,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "url/gurl.h"
 
@@ -33,8 +32,7 @@ bool IsHostAllowedInIncognito(const GURL& url) {
   return host != chrome::kChromeUISettingsHost &&
          host != chrome::kChromeUIHelpHost &&
          host != chrome::kChromeUIHistoryHost &&
-         host != chrome::kChromeUIExtensionsHost &&
-         host != password_manager::kChromeUIPasswordManagerHost;
+         host != chrome::kChromeUIExtensionsHost;
 }
 
 }  // namespace

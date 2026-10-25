@@ -13,8 +13,6 @@ source_set("login") {
   ]
   public_deps = [
     "//base",
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/browser:password_form",
     "//content/public/browser",
     "//net",
     "//url",
@@ -34,7 +32,6 @@ source_set("impl") {
     "//chrome/browser/password_manager",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/tab_contents",
-    "//components/autofill/core/browser",
     "//components/no_state_prefetch/browser",
     "//components/strings:components_strings",
     "//components/url_formatter",

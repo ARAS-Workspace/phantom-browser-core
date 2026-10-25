@@ -29,7 +29,6 @@
 #include "chrome/browser/ssl/typed_navigation_upgrade_throttle.h"
 #include "chrome/browser/ui/blocked_content/tab_under_navigation_throttle.h"
 #include "chrome/browser/ui/login/login_navigation_throttle.h"
-#include "chrome/browser/ui/passwords/well_known_change_password_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/navigation_capturing_redirection_throttle.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
@@ -286,8 +285,6 @@ void CreateAndAddChromeThrottlesForNavigation(
 #endif  // BUILDFLAG(ENABLE_PDF)
 
   TabUnderNavigationThrottle::MaybeCreateAndAdd(registry);
-
-  WellKnownChangePasswordNavigationThrottle::MaybeCreateAndAdd(registry);
 
   content::BrowserContext* context =
       handle.GetWebContents()->GetBrowserContext();
