@@ -1264,7 +1264,6 @@ source_set("browser") {
     "//chrome:strings",
     "//chrome/browser/accessibility:impl",
     "//chrome/browser/account_settings",
-    "//chrome/browser/affiliations",
     "//chrome/browser/ai",
     "//chrome/browser/ai:impl",
     "//chrome/browser/autocomplete",

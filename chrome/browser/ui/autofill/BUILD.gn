@@ -110,8 +110,6 @@ source_set("autofill") {
   ]
   public_deps += [
     "//components/autofill/core/browser",
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/browser:password_form",
     "//components/renderer_context_menu",
     "//components/user_education/common",
     "//third_party/abseil-cpp:absl",

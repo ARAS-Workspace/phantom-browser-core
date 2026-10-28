@@ -128,8 +128,6 @@ enum class SyncToSigninMigrationStatsTableCleanupStep {
   kMaxValue = kCleanupFinishedAndPrefCleared
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:SyncToSigninMigrationStatsTableCleanupStep)
-void RecordSyncToSigninMigrationStatsTableCleanupStep(
-    SyncToSigninMigrationStatsTableCleanupStep step);
 
 }  // namespace syncer
 

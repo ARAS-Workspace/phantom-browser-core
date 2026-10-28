@@ -238,11 +238,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "AutofillInternalsService",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    "PasswordManagerBlocklist",
-#endif
-    "PasswordManagerInternalsService",
-    "PasswordRequirementsServiceFactory",
     "WebDataService",
 
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
@@ -285,9 +280,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "AutocompleteControllerEmitter",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    "PasswordManagerBlocklist",
-#endif
 
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
     // which does not yet have an implementation using `ProfileSelections`.

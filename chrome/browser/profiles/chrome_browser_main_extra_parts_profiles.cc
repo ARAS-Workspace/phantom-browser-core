@@ -13,7 +13,6 @@
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/accessibility/page_colors_controller_factory.h"
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
-#include "chrome/browser/affiliations/affiliation_service_factory.h"
 #include "chrome/browser/ai/ai_data_keyed_service_factory.h"
 #include "chrome/browser/autocomplete/autocomplete_classifier_factory.h"
 #include "chrome/browser/autocomplete/document_suggestions_service_factory.h"
@@ -118,11 +117,6 @@
 #include "chrome/browser/page_info/merchant_trust_service_factory.h"
 #include "chrome/browser/page_load_metrics/observers/https_engagement_metrics/https_engagement_service_factory.h"
 #include "chrome/browser/passage_embeddings/passage_embedder_model_observer_factory.h"
-#include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/password_manager/factories/field_info_manager_factory.h"
-#include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
-#include "chrome/browser/password_manager/factories/password_reuse_manager_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/performance_manager/persistence/site_data/site_data_cache_facade_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/permissions/one_time_permissions_tracker_factory.h"
@@ -220,9 +214,6 @@
 #include "components/captive_portal/core/buildflags.h"
 #include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/offline_pages/buildflags/buildflags.h"
-#include "components/password_manager/content/browser/password_manager_log_router_factory.h"
-#include "components/password_manager/content/browser/password_requirements_service_factory.h"
-#include "components/password_manager/core/browser/password_manager_blocklist_policy.h"
 #include "components/permissions/features.h"
 #include "components/policy/core/browser/url_list/policy_blocklist_service.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -252,7 +243,6 @@
 #include "chrome/browser/metrics/critical_user_journeys/critical_user_journey_service_factory.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_profile_session_durations_service_factory.h"
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
-#include "chrome/browser/password_manager/factories/password_counter_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager_factory.h"
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
 #include "chrome/browser/record_replay/task_service_factory.h"
@@ -412,7 +402,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   AccountBookmarkSyncServiceFactory::GetInstance();
   AccountConsistencyModeManagerFactory::GetInstance();
   AccountInvestigatorFactory::GetInstance();
-  AccountPasswordStoreFactory::GetInstance();
   AccountPreviewDataServiceFactory::GetInstance();
   AccountReconcilorFactory::GetInstance();
   AccountSettingServiceFactory::GetInstance();
@@ -421,7 +410,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   AccountsPolicyManagerFactory::GetInstance();
   search_integrity::SearchIntegrityFactory::GetInstance();
 #endif
-  AffiliationServiceFactory::GetInstance();
   AiDataKeyedServiceFactory::GetInstance();
   AnnouncementNotificationServiceFactory::GetInstance();
   apps::AppServiceProxyFactory::GetInstance();
@@ -536,7 +524,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   FederatedIdentityApiPermissionContextFactory::GetInstance();
   FederatedIdentityAutoReauthnPermissionContextFactory::GetInstance();
   FederatedIdentityPermissionContextFactory::GetInstance();
-  FieldInfoManagerFactory::GetInstance();
   FileSystemAccessPermissionContextFactory::GetInstance();
   FindBarStateFactory::GetInstance();
   finds::FindsServiceFactory::GetInstance();
@@ -616,14 +603,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   page_image_service::ImageServiceFactory::EnsureFactoryBuilt();
   PageColorsControllerFactory::GetInstance();
   passage_embeddings::PassageEmbedderModelObserverFactory::GetInstance();
-  password_manager::PasswordManagerLogRouterFactory::GetInstance();
-  password_manager::PasswordRequirementsServiceFactory::GetInstance();
-  PasswordCounterFactory::GetInstance();
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  PasswordManagerBlocklistPolicyFactory::GetInstance();
-#endif
-  PasswordManagerSettingsServiceFactory::GetInstance();
-  PasswordReuseManagerFactory::GetInstance();
   if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_DESKTOP) {
     performance_manager::SiteDataCacheFacadeFactory::GetInstance();
   }
@@ -657,7 +636,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   PrivacySandboxSettingsFactory::GetInstance();
   PrivateVerificationTokensServiceFactory::GetInstance();
   ProfileNetworkContextServiceFactory::GetInstance();
-  ProfilePasswordStoreFactory::GetInstance();
   ProfileStatisticsFactory::GetInstance();
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();

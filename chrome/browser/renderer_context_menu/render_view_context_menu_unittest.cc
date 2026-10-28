@@ -30,7 +30,6 @@
 #include "chrome/browser/extensions/test_extension_environment.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
@@ -59,9 +58,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
-#include "components/password_manager/core/browser/features/password_features.h"
-#include "components/password_manager/core/browser/password_manager_test_utils.h"
-#include "components/password_manager/core/browser/password_store/mock_password_store_interface.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -329,11 +325,6 @@ class RenderViewContextMenuPrefsTest
     DownloadCoreServiceFactory::GetForBrowserContext(profile())
         ->SetDownloadManagerDelegateForTesting(
             std::make_unique<ChromeDownloadManagerDelegate>(profile()));
-    ProfilePasswordStoreFactory::GetInstance()->SetTestingFactory(
-        GetBrowserContext(),
-        base::BindRepeating(&password_manager::BuildPasswordStoreInterface<
-                            content::BrowserContext,
-                            password_manager::MockPasswordStoreInterface>));
     SyncServiceFactory::GetInstance()->SetTestingFactory(
         GetBrowserContext(),
         base::BindRepeating([](content::BrowserContext* context)

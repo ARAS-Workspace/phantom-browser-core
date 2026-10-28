@@ -64,8 +64,6 @@
 #include "chrome/browser/notifications/platform_notification_service_factory.h"
 #include "chrome/browser/notifications/platform_notification_service_impl.h"
 #include "chrome/browser/origin_trials/origin_trials_factory.h"
-#include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/permissions/permission_manager_factory.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
@@ -928,8 +926,6 @@ void ProfileImpl::OnLocaleReady(CreateMode create_mode) {
   CHECK(!IdentityManagerFactory::GetForProfileIfExists(this));
   CHECK(!SyncServiceFactory::HasSyncService(this));
   CHECK(!BookmarkModelFactory::GetForBrowserContextIfExists(this));
-  CHECK(!ProfilePasswordStoreFactory::HasStore(this));
-  CHECK(!AccountPasswordStoreFactory::HasStore(this));
   CHECK(!ThemeServiceFactory::GetForProfileIfExists(this));
 
   if (create_mode == CreateMode::kAsynchronous) {
