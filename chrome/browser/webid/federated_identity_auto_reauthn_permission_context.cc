@@ -8,37 +8,38 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/password_manager/core/browser/password_manager_setting.h"
-#include "components/password_manager/core/browser/password_manager_settings_service.h"
+#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
+#include "components/pref_registry/pref_registry_syncable.h"
+#include "components/prefs/pref_service.h"
 #include "content/public/browser/web_contents.h"
 #include "url/origin.h"
 
 FederatedIdentityAutoReauthnPermissionContext::
     FederatedIdentityAutoReauthnPermissionContext(
         HostContentSettingsMap* host_content_settings_map,
-        permissions::PermissionDecisionAutoBlocker* permission_autoblocker)
+        permissions::PermissionDecisionAutoBlocker* permission_autoblocker,
+        PrefService* pref_service)
     : host_content_settings_map_(host_content_settings_map),
-      permission_autoblocker_(permission_autoblocker) {}
+      permission_autoblocker_(permission_autoblocker),
+      pref_service_(pref_service) {}
 
 FederatedIdentityAutoReauthnPermissionContext::
     ~FederatedIdentityAutoReauthnPermissionContext() = default;
 
-void FederatedIdentityAutoReauthnPermissionContext::
-    OnPasswordManagerSettingsServiceInitialized(
-        password_manager::PasswordManagerSettingsService* settings_service) {
-  password_manager_settings_service_ = settings_service;
-}
-
-void FederatedIdentityAutoReauthnPermissionContext::Shutdown() {
-  password_manager_settings_service_ = nullptr;
+// static
+void FederatedIdentityAutoReauthnPermissionContext::RegisterProfilePrefs(
+    user_prefs::PrefRegistrySyncable* registry) {
+  registry->RegisterBooleanPref(
+      password_manager::prefs::kCredentialsEnableAutosignin, true,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PRIORITY_PREF);
 }
 
 bool FederatedIdentityAutoReauthnPermissionContext::
     IsAutoReauthnSettingEnabled() {
-  return password_manager_settings_service_ &&
-         password_manager_settings_service_->IsSettingEnabled(
-             password_manager::PasswordManagerSetting::kAutoSignIn) &&
+  return pref_service_ &&
+         pref_service_->GetBoolean(
+             password_manager::prefs::kCredentialsEnableAutosignin) &&
          host_content_settings_map_->GetDefaultContentSetting(
              ContentSettingsType::FEDERATED_IDENTITY_AUTO_REAUTHN_PERMISSION,
              /*provider_id=*/nullptr) != ContentSetting::CONTENT_SETTING_BLOCK;

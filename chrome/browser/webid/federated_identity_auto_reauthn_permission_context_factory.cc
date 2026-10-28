@@ -50,5 +50,11 @@ FederatedIdentityAutoReauthnPermissionContextFactory::
   Profile* profile = Profile::FromBrowserContext(browser_context);
   return std::make_unique<FederatedIdentityAutoReauthnPermissionContext>(
       HostContentSettingsMapFactory::GetForProfile(profile),
-      PermissionDecisionAutoBlockerFactory::GetForProfile(profile));
+      PermissionDecisionAutoBlockerFactory::GetForProfile(profile),
+      profile->IsRegularProfile() ? profile->GetPrefs() : nullptr);
+}
+
+void FederatedIdentityAutoReauthnPermissionContextFactory::RegisterProfilePrefs(
+    user_prefs::PrefRegistrySyncable* registry) {
+  FederatedIdentityAutoReauthnPermissionContext::RegisterProfilePrefs(registry);
 }

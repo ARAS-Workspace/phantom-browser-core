@@ -5,7 +5,6 @@
 #include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context.h"
 
 #include "base/test/bind.h"
-#include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context_factory.h"
@@ -27,13 +26,9 @@ class FederatedIdentityAutoReauthnPermissionContextTest
   ~FederatedIdentityAutoReauthnPermissionContextTest() override = default;
 };
 
-// Tests PasswordManagerSettingsService correctly hooks itself as a cyclic
-// dependency. Regression test for crbug.com/428112191.
+// Tests that FedCM auto re-authn is enabled by default for a regular profile.
 IN_PROC_BROWSER_TEST_F(FederatedIdentityAutoReauthnPermissionContextTest,
                        AutoReauthnSettingEnabledByDefault) {
-  // Force PasswordManagerSettingsService instantiation.
-  PasswordManagerSettingsServiceFactory::GetForProfile(browser()->GetProfile());
-
   EXPECT_TRUE(
       FederatedIdentityAutoReauthnPermissionContextFactory::GetForProfile(
           browser()->GetProfile())

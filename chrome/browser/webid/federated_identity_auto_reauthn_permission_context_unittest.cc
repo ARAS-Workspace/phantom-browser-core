@@ -4,19 +4,10 @@
 
 #include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context.h"
 
-#include "base/containers/flat_map.h"
-#include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
-#include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
-#include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context_factory.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
-#include "components/password_manager/core/browser/fake_password_manager_settings_service.h"
-#include "components/password_manager/core/browser/password_manager_setting.h"
-#include "components/password_manager/core/browser/password_manager_settings_service.h"
+#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -30,16 +21,14 @@ CreateAndRegisterPrefs() {
   auto pref_service =
       std::make_unique<sync_preferences::TestingPrefServiceSyncable>();
   HostContentSettingsMap::RegisterProfilePrefs(pref_service->registry());
+  FederatedIdentityAutoReauthnPermissionContext::RegisterProfilePrefs(
+      pref_service->registry());
   return pref_service;
 }
 
 class FederatedIdentityAutoReauthnPermissionContextTest : public testing::Test {
  public:
-  FederatedIdentityAutoReauthnPermissionContextTest() {
-    context_.OnPasswordManagerSettingsServiceInitialized(
-        &password_manager_settings_service_);
-
-  }
+  FederatedIdentityAutoReauthnPermissionContextTest() = default;
 
   FederatedIdentityAutoReauthnPermissionContextTest(
       const FederatedIdentityAutoReauthnPermissionContextTest&) = delete;
@@ -55,6 +44,14 @@ class FederatedIdentityAutoReauthnPermissionContextTest : public testing::Test {
 
   HostContentSettingsMap& host_content_settings_map() {
     return *host_content_settings_map_;
+  }
+
+  permissions::PermissionDecisionAutoBlocker* permission_autoblocker() {
+    return &permission_decision_auto_blocker_;
+  }
+
+  sync_preferences::TestingPrefServiceSyncable* pref_service() {
+    return pref_service_.get();
   }
 
   ContentSetting GetContentSetting(const GURL& rp_url) {
@@ -82,9 +79,8 @@ class FederatedIdentityAutoReauthnPermissionContextTest : public testing::Test {
   permissions::PermissionDecisionAutoBlocker permission_decision_auto_blocker_{
       host_content_settings_map_.get()};
   FederatedIdentityAutoReauthnPermissionContext context_{
-      host_content_settings_map_.get(), &permission_decision_auto_blocker_};
-  password_manager::FakePasswordManagerSettingsService
-      password_manager_settings_service_;
+      host_content_settings_map_.get(), &permission_decision_auto_blocker_,
+      pref_service_.get()};
 };
 
 // Test that FedCM auto re-authn is opt-in by default.
@@ -93,6 +89,24 @@ TEST_F(FederatedIdentityAutoReauthnPermissionContextTest,
   GURL rp_url("https://rp.com");
   EXPECT_TRUE(context().IsAutoReauthnSettingEnabled());
   EXPECT_FALSE(context().IsAutoReauthnEmbargoed(url::Origin::Create(rp_url)));
+}
+
+// Test that FedCM auto re-authn is disabled when the auto sign-in pref is off.
+TEST_F(FederatedIdentityAutoReauthnPermissionContextTest,
+       AutoReauthnDisabledByPref) {
+  pref_service()->SetBoolean(
+      password_manager::prefs::kCredentialsEnableAutosignin, false);
+  EXPECT_FALSE(context().IsAutoReauthnSettingEnabled());
+}
+
+// Test that FedCM auto re-authn is disabled without a pref service, which is
+// the case for off-the-record and guest profiles.
+TEST_F(FederatedIdentityAutoReauthnPermissionContextTest,
+       AutoReauthnDisabledWithoutPrefService) {
+  FederatedIdentityAutoReauthnPermissionContext context_without_prefs(
+      &host_content_settings_map(), permission_autoblocker(),
+      /*pref_service=*/nullptr);
+  EXPECT_FALSE(context_without_prefs.IsAutoReauthnSettingEnabled());
 }
 
 // Test that
