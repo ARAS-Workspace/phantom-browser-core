@@ -60,8 +60,6 @@ BASE_FEATURE(kClearUndecryptablePasswordsOnSync,
 
 BASE_FEATURE(kCredentialManagementUnifiedUi, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kDebugUiForOtps, base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kDisablePasswordChangeFromNewPasswordFields,
              base::FEATURE_ENABLED_BY_DEFAULT);
 

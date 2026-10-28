@@ -13,8 +13,6 @@
 
 namespace autofill {
 
-class PasswordManagerAutofillHelper;
-
 // Common base class for those AutofillClients that have the //content layer.
 //
 // There must be at most one instance per content::WebContents.
@@ -42,8 +40,6 @@ class ContentAutofillClient
 
   // Implementation of AutofillClient:
   bool DocumentUsedWebOTP() final;
-  PasswordManagerAutofillHelperDelegate* GetPasswordManagerAutofillHelper()
-      override;
   AutofillManager* GetAutofillManagerForPrimaryMainFrame() override;
   std::u16string_view GetPageTitle() const override;
 
@@ -51,8 +47,6 @@ class ContentAutofillClient
   friend class content::WebContentsUserData<ContentAutofillClient>;
 
   ContentAutofillDriverFactory autofill_driver_factory_;
-  std::unique_ptr<PasswordManagerAutofillHelper>
-      password_manager_autofill_helper_;
 
   WEB_CONTENTS_USER_DATA_KEY_DECL();
 };

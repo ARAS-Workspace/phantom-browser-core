@@ -9,11 +9,9 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <variant>
 #include <vector>
 
 #include "base/check.h"
-#include "base/check_op.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
@@ -21,12 +19,10 @@
 #include "base/memory/weak_ptr.h"
 #include "base/notreached.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/ui/autofill/autofill_popup_controller.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller_utils.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/views/autofill/payments/bnpl_issuer_linked_pill.h"
-#include "chrome/browser/ui/views/autofill/popup/lazy_loading_image_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_base_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_cell_utils.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_row_content_view.h"
@@ -42,7 +38,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
-#include "components/password_manager/core/common/password_manager_constants.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/user_education/common/new_badge/new_badge_controller.h"
 #include "components/user_education/views/new_badge_label.h"
@@ -74,8 +69,6 @@ namespace autofill {
 
 namespace {
 
-constexpr int kCustomIconSize = 16;
-
 // The size of a close or delete icon.
 constexpr int kCloseIconSize = 16;
 
@@ -92,10 +85,6 @@ constexpr auto kPopupItemTypesUsingLeadingIcons = DenseSet<SuggestionType>(
      SuggestionType::kUndo, SuggestionType::kViewPasswordDetails,
      SuggestionType::kPendingStateSignin,
      SuggestionType::kWebauthnSignInWithAnotherDevice});
-
-// Max width for the username and masked password.
-constexpr int kAutofillPopupUsernameMaxWidth = 272;
-constexpr int kAutofillPopupPasswordMaxWidth = 108;
 
 // Max width for the Autofill suggestion text.
 constexpr int kAutofillSuggestionMaxWidth = 192;
@@ -407,105 +396,6 @@ std::unique_ptr<PopupRowContentView> CreateSaveAndFillRowContentView(
   return view;
 }
 
-std::unique_ptr<views::Label> CreatePasswordDescriptionLabel(
-    const Suggestion& suggestion) {
-  if (suggestion.additional_label.empty()) {
-    return nullptr;
-  }
-  auto label = std::make_unique<views::Label>(
-      suggestion.additional_label, views::style::CONTEXT_DIALOG_BODY_TEXT,
-      views::style::STYLE_SECONDARY);
-  label->SetElideBehavior(gfx::ELIDE_HEAD);
-  label->SetMaximumWidthSingleLine(kAutofillPopupUsernameMaxWidth);
-  return label;
-}
-
-std::unique_ptr<views::View> CreatePasswordSubtextView(
-    const Suggestion& suggestion) {
-  CHECK_EQ(suggestion.labels.size(), 1u);
-  CHECK_EQ(suggestion.labels[0].size(), 1u);
-
-  const auto& label = suggestion.labels[0][0].value;
-  auto label_view = std::make_unique<views::Label>(
-      label, views::style::CONTEXT_DIALOG_BODY_TEXT,
-      IsDeactivatedPasswordOrPasskey(suggestion)
-          ? kDisabledTextStyle
-          : views::style::STYLE_SECONDARY);
-  // Password labels are obfuscated using password replacement character. Manual
-  // fallback suggestions display credential username, which is not obfuscated
-  // and should not be truncated.
-  const bool is_password_label =
-      label.find_first_not_of(
-          password_manager::constants::kPasswordReplacementChar) ==
-      std::u16string::npos;
-  if (is_password_label) {
-    label_view->SetElideBehavior(gfx::TRUNCATE);
-    label_view->SetMaximumWidthSingleLine(kAutofillPopupPasswordMaxWidth);
-  } else {
-    label_view->SetElideBehavior(gfx::ELIDE_HEAD);
-    label_view->SetMaximumWidthSingleLine(kAutofillPopupUsernameMaxWidth);
-  }
-  return label_view;
-}
-
-// If the `Suggestion::custom_icon` holds the `FaviconDetails` alternative,
-// the icon should be loaded lazily. For this case, this method creates a
-// `LazyLoadingImageView` to be passed to `CreatePasswordPopupRowContentView()`
-// as the `icon`. Otherwise, it returns an icon created by `GetIconImageView()`.
-std::unique_ptr<views::View> GetPasswordIconView(
-    const Suggestion& suggestion,
-    PasswordFaviconLoader* favicon_loader) {
-  if (!std::holds_alternative<Suggestion::FaviconDetails>(
-          suggestion.custom_icon)) {
-    return popup_cell_utils::GetIconImageView(suggestion);
-  }
-
-  CHECK(favicon_loader);
-  std::optional<ui::ImageModel> suggestion_icon_model =
-      popup_cell_utils::GetIconImageModelFromIcon(suggestion.icon);
-  ui::ImageModel placeholder_icon =
-      suggestion_icon_model
-          ? std::move(*suggestion_icon_model)
-          : popup_cell_utils::ImageModelFromVectorIcon(
-                ::features::IsRoundedIconsEnabled() ? kGlobeIcon
-                                                    : kGlobeOldIcon,
-                kCustomIconSize);
-
-  return std::make_unique<LazyLoadingImageView>(
-      gfx::Size(kCustomIconSize, kCustomIconSize), std::move(placeholder_icon),
-      base::BindOnce(
-          &PasswordFaviconLoader::Load, base::Unretained(favicon_loader),
-          std::get<Suggestion::FaviconDetails>(suggestion.custom_icon)));
-}
-
-std::unique_ptr<PopupRowContentView> CreatePasswordPopupRowContentView(
-    const Suggestion& suggestion,
-    std::optional<user_education::DisplayNewBadge> show_new_badge,
-    std::optional<AutofillPopupController::SuggestionFilterMatch> filter_match,
-    PasswordFaviconLoader* favicon_loader) {
-  auto view = std::make_unique<PopupRowContentView>();
-
-  // Add the actual views.
-  std::unique_ptr<views::Label> main_text_label =
-      CreateMainTextLabel(suggestion, show_new_badge);
-  main_text_label->SetMaximumWidthSingleLine(kAutofillPopupUsernameMaxWidth);
-  if (filter_match) {
-    main_text_label->SetTextStyleRange(kMainTextStyleHighlighted,
-                                       filter_match->main_text_match);
-  }
-
-  std::vector<std::unique_ptr<views::View>> subtext_views;
-  if (!suggestion.labels.empty()) {
-    subtext_views.push_back(CreatePasswordSubtextView(suggestion));
-  }
-  popup_cell_utils::AddSuggestionContentToView(
-      suggestion, std::move(main_text_label), CreateMinorTextLabels(suggestion),
-      CreatePasswordDescriptionLabel(suggestion), std::move(subtext_views),
-      GetPasswordIconView(suggestion, favicon_loader), *view);
-
-  return view;
-}
-
 std::unique_ptr<PopupRowContentView> CreateBnplPopupRowContentView(
     const Suggestion& suggestion,
     FillingProduct main_filling_product) {
@@ -702,8 +592,8 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     PopupRowView::AccessibilitySelectionDelegate& a11y_selection_delegate,
     PopupRowView::SelectionDelegate& selection_delegate,
     int line_number,
-    std::optional<AutofillPopupController::SuggestionFilterMatch> filter_match,
-    PasswordFaviconLoader* favicon_loader) {
+    std::optional<AutofillPopupController::SuggestionFilterMatch>
+        filter_match) {
   CHECK(controller);
 
   const Suggestion& suggestion = controller->GetSuggestionAt(line_number);
@@ -740,15 +630,6 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
       return std::make_unique<PopupRowView>(
           a11y_selection_delegate, selection_delegate, controller, line_number,
           popup_cell_utils::CreatePasskeyQrCodePopupRowContentView(suggestion));
-    case SuggestionType::kAccountStoragePasswordEntry:
-    case SuggestionType::kBackupPasswordEntry:
-    case SuggestionType::kPasswordEntry:
-    case SuggestionType::kTroubleSigningInEntry:
-      return std::make_unique<PopupRowView>(
-          a11y_selection_delegate, selection_delegate, controller, line_number,
-          CreatePasswordPopupRowContentView(suggestion, show_new_badge,
-                                            std::move(filter_match),
-                                            favicon_loader));
     case SuggestionType::kSaveAndFillCreditCardEntry: {
       return std::make_unique<PopupRowView>(
           a11y_selection_delegate, selection_delegate, controller, line_number,
@@ -789,6 +670,7 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
                                     /*filter_match=*/std::nullopt));
     }
 
+    case SuggestionType::kAccountStoragePasswordEntry:
     case SuggestionType::kAddressEntry:
     case SuggestionType::kAddressEntryOnTyping:
     case SuggestionType::kAddressFieldByFieldFilling:
@@ -799,6 +681,7 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kAutofillAiOtherShipments:
     case SuggestionType::kAutofillAiPrivateInferenceNotice:
+    case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
@@ -826,6 +709,7 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     case SuggestionType::kMerchantPromoCodeEntry:
     case SuggestionType::kOneTimePasswordEntry:
     case SuggestionType::kOpenGemini:
+    case SuggestionType::kPasswordEntry:
     case SuggestionType::kPasswordFieldByFieldFilling:
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kPersonalContextNotice:
@@ -833,6 +717,7 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     case SuggestionType::kScanCreditCard:
     case SuggestionType::kSeePromoCodeDetails:
     case SuggestionType::kTitle:
+    case SuggestionType::kTroubleSigningInEntry:
     case SuggestionType::kUndo:
     case SuggestionType::kViewPasswordDetails:
     case SuggestionType::kWebauthnCredential:

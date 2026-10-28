@@ -88,7 +88,6 @@
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_suggestion.h"
 #include "components/autofill/core/browser/integrators/optimization_guide/autofill_optimization_guide_decider.h"
 #include "components/autofill/core/browser/integrators/password_form_classification.h"
-#include "components/autofill/core/browser/integrators/password_manager/password_manager_delegate.h"
 #include "components/autofill/core/browser/logging/log_manager.h"
 #include "components/autofill/core/browser/metrics/autofill_in_devtools_metrics.h"
 #include "components/autofill/core/browser/metrics/autofill_metrics.h"
@@ -122,7 +121,6 @@
 #include "components/autofill/core/browser/suggestions/autocomplete_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/autofill_ai/autofill_ai_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/one_time_passwords/otp_suggestion_generator.h"
-#include "components/autofill/core/browser/suggestions/passkeys/passkey_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/payments/credit_card_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/payments/iban_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/payments/merchant_promo_code_suggestion_generator.h"
@@ -565,13 +563,6 @@ void MaybeImportFromSubmittedForm(AutofillClient& client,
   client.GetSingleFieldFillRouter().OnWillSubmitForm(form.ToFormData(), &form);
 }
 
-bool ShouldShowWebauthnHybridEntryPoint(const FormFieldData& field) {
-  const std::optional<AutocompleteParsingResult>& autocomplete =
-      field.parsed_autocomplete();
-  return autocomplete.has_value() &&  // Assume no autocomplete if not parsed.
-         autocomplete->webauthn;      // Field must have "webauthn" annotation.
-}
-
 void LogSuggestionGenerationMetrics(
     const std::vector<Suggestion>& suggestions,
     base::TimeTicks suggestion_generation_start_time) {
@@ -995,27 +986,8 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
   auto [form_structure, autofill_field] =
       FindMutableFormAndField(form.global_id(), field_id);
 
-  if (password_request.has_value()) {
-    if (PasswordManagerDelegate* password_delegate =
-            client().GetPasswordManagerDelegate(field_id)) {
-      // This block implements the following behavior: For an <input
-      // type="password"> field, do not show a dropdown if the current value is
-      // non empty (typically manually typed) or autofilled, and close any
-      // previously opened dropdown.
-      // Note that `FormFieldData::is_autofilled_according_to_renderer()` is
-      // preferred here over `AutofillField::last_modifier()` because PWM does
-      // not mutate `AutofillField::field_modifiers_`.
-      if (field.form_control_type() == FormControlType::kInputPassword &&
-          !field.value().empty() &&
-          !field.is_autofilled_according_to_renderer()) {
-        client().HideSuggestions(SuggestionHidingReason::kFieldValueChanged,
-                                 /*product=*/std::nullopt);
-        return;
-      }
-      password_delegate->ShowSuggestions(password_request->field);
-      return;
-    }
-  } else if (IsPasswordsAutofillManuallyTriggered(trigger_source)) {
+  if (!password_request.has_value() &&
+      IsPasswordsAutofillManuallyTriggered(trigger_source)) {
     return;
   }
 
@@ -1489,32 +1461,6 @@ void BrowserAutofillManager::GenerateSuggestionsAndMaybeShowUIPhase2(
       std::move(on_suggestions_returned));
 }
 
-std::vector<Suggestion>
-BrowserAutofillManager::CreatePasskeySuggestionsForMerge(
-    const FormFieldData& field) {
-  if (!ShouldShowWebauthnHybridEntryPoint(field)) {
-    return {};
-  }
-  PasswordManagerDelegate* password_delegate =
-      client().GetPasswordManagerDelegate(field.global_id());
-  if (!password_delegate) {
-    return {};
-  }
-
-  // If any field **on the page** allows starting the hybrid passkey flow,
-  // these suggestions become available.
-  std::vector<Suggestion> suggestions;
-  if (std::optional<Suggestion> inline_qr_suggestion =
-          password_delegate->GetWebauthnInlineQrCodeSuggestion()) {
-    suggestions.push_back(*std::move(inline_qr_suggestion));
-  }
-  if (std::optional<Suggestion> passkey_suggestion =
-          password_delegate->GetWebauthnSignInWithAnotherDeviceSuggestion()) {
-    suggestions.push_back(*std::move(passkey_suggestion));
-  }
-  return suggestions;
-}
-
 void BrowserAutofillManager::MergePasskeysAndExistingSuggestions(
     std::vector<Suggestion>& suggestions,
     std::vector<Suggestion> passkey_suggestions) {
@@ -1532,13 +1478,6 @@ void BrowserAutofillManager::GenerateFooter(
     base::ScopedClosureRunner scoped_on_after,
     bool show_suggestions,
     std::vector<Suggestion> suggestions) {
-  std::vector<Suggestion> passkey_suggestions =
-      CreatePasskeySuggestionsForMerge(field);
-  if (!passkey_suggestions.empty()) {
-    MergePasskeysAndExistingSuggestions(suggestions,
-                                        std::move(passkey_suggestions));
-  }
-
   OnGenerateSuggestionsComplete(form.global_id(), field, trigger_source,
                                 context, suggestion_generation_start_time,
                                 show_suggestions, std::move(suggestions),
@@ -1795,25 +1734,6 @@ void BrowserAutofillManager::UndoAutofill(
     } else if (filling_product == FillingProduct::kCreditCard) {
       metrics_->credit_card_form_event_logger.OnDidUndoAutofill();
     }
-  }
-}
-
-void BrowserAutofillManager::DelegateSelectToPasswordManager(
-    const Suggestion& suggestion,
-    const FieldGlobalId& trigger_field_id) {
-  if (PasswordManagerDelegate* password_delegate =
-          client().GetPasswordManagerDelegate(trigger_field_id)) {
-    password_delegate->SelectSuggestion(suggestion);
-  }
-}
-
-void BrowserAutofillManager::DelegateAcceptToPasswordManager(
-    const Suggestion& suggestion,
-    const AutofillSuggestionDelegate::SuggestionMetadata& metadata,
-    const FieldGlobalId& trigger_field_id) {
-  if (PasswordManagerDelegate* password_delegate =
-          client().GetPasswordManagerDelegate(trigger_field_id)) {
-    password_delegate->AcceptSuggestion(suggestion, metadata);
   }
 }
 
@@ -2856,16 +2776,9 @@ std::vector<Suggestion> BrowserAutofillManager::GetLoyaltyCardSuggestions(
   if (!valuables_manager) {
     return {};
   }
-  const PasswordFormClassification password_form_classification =
-      base::FeatureList::IsEnabled(
-          features::kAutofillEnableNonAffiliatedLoyaltyCardsFilling)
-          ? client().ClassifyAsPasswordForm(*this, form_structure->global_id(),
-                                            autofill_field->global_id())
-          : PasswordFormClassification();
-
   return GetSuggestionsForLoyaltyCards(form, form_structure, field,
                                        autofill_field,
-                                       password_form_classification, client());
+                                       PasswordFormClassification(), client());
 }
 
 // TODO(crbug.com/40219607) Eliminate and replace with a listener?
@@ -3374,15 +3287,9 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
   }
   if (relevant_filling_products.contains(FillingProduct::kLoyaltyCard) &&
       client().GetValuablesDataManager()) {
-    const PasswordFormClassification password_form_classification =
-        base::FeatureList::IsEnabled(
-            features::kAutofillEnableNonAffiliatedLoyaltyCardsFilling)
-            ? client().ClassifyAsPasswordForm(*this, form_id, field.global_id())
-            : PasswordFormClassification();
-
     suggestion_generators_.push_back(
         std::make_unique<LoyaltyCardSuggestionGenerator>(
-            password_form_classification));
+            PasswordFormClassification()));
   }
   if (relevant_filling_products.contains(FillingProduct::kIdentityCredential)) {
     if (IdentityCredentialDelegate* delegate =
@@ -3392,10 +3299,6 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
         suggestion_generators_.push_back(std::move(suggestion_generator));
       }
     }
-  }
-  if (relevant_filling_products.contains(FillingProduct::kPasskey)) {
-    suggestion_generators_.push_back(
-        std::make_unique<PasskeySuggestionGenerator>());
   }
   if (relevant_filling_products.contains(FillingProduct::kOneTimePassword) &&
       otp_manager_) {

@@ -65,7 +65,6 @@
 #include "chrome/browser/ui/autofill/autofill_bubble_controller_base.h"
 #include "chrome/browser/ui/autofill/autofill_dialog_controller_impl.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller.h"
-#include "chrome/browser/ui/autofill/chrome_otp_phish_guard_delegate.h"
 #include "chrome/browser/ui/autofill/edit_address_profile_dialog_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/chrome_payments_autofill_client.h"
 #include "chrome/browser/ui/autofill/payments/credit_card_scanner_controller.h"
@@ -127,13 +126,6 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/proto/features/common_quality_data.pb.h"
-#include "components/password_manager/content/browser/content_password_manager_driver.h"
-#include "components/password_manager/content/browser/password_form_classification_util.h"
-#include "components/password_manager/core/browser/features/password_features.h"
-#include "components/password_manager/core/browser/password_manager_metrics_util.h"
-#include "components/password_manager/core/browser/password_manager_util.h"
-#include "components/password_manager/core/browser/password_requirements_service.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/personal_context/first_run/personal_context_first_run_service.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -969,9 +961,7 @@ ChromeAutofillClient::ChromeAutofillClient(content::WebContents* web_contents)
       ablation_study_(g_browser_process->local_state()),
       identity_credential_delegate_(web_contents),
       otp_field_detector_(std::make_unique<OtpFieldDetector>(this)),
-      email_verifier_delegate_(std::make_unique<EmailVerifierDelegate>(this)),
-      otp_phish_guard_delegate_(
-          std::make_unique<ChromeOtpPhishGuardDelegate>(web_contents)) {
+      email_verifier_delegate_(std::make_unique<EmailVerifierDelegate>(this)) {
   // Initialize StrikeDatabase so its cache will be loaded and ready to use
   // when requested by other Autofill classes.
   GetStrikeDatabase();
@@ -1095,10 +1085,6 @@ OtpFieldDetector* ChromeAutofillClient::GetOtpFieldDetector() {
   return otp_field_detector_.get();
 }
 
-OtpPhishGuardDelegate* ChromeAutofillClient::GetOtpPhishGuardDelegate() {
-  return nullptr;
-}
-
 FormPredictionsTracker* ChromeAutofillClient::GetFormPredictionsTracker() {
   return form_predictions_tracker_.get();
 }
@@ -1116,13 +1102,6 @@ void ChromeAutofillClient::set_test_addresses(
 base::span<const AutofillProfile> ChromeAutofillClient::GetTestAddresses()
     const {
   return test_addresses_;
-}
-
-PasswordFormClassification ChromeAutofillClient::ClassifyAsPasswordForm(
-    AutofillManager& manager,
-    FormGlobalId form_id,
-    FieldGlobalId field_id) const {
-  return password_manager::ClassifyAsPasswordForm(manager, form_id, field_id);
 }
 
 optimization_guide::ModelQualityLogsUploaderService*

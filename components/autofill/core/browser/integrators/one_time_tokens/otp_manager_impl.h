@@ -14,7 +14,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
-#include "base/time/time.h"
 #include "base/types/expected.h"
 #include "components/autofill/core/browser/foundations/autofill_manager.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_manager.h"
@@ -95,7 +94,6 @@ class OtpManagerImpl : public OtpManager, public AutofillManager::Observer {
                      one_time_tokens::OneTimeTokenRetrievalError>
           token_or_error);
 
-  // Callback for `OtpPhishGuardDelegate::StartOtpPhishGuardCheck`.
   void MaybeShowOtpSuggestions(one_time_tokens::OneTimeToken token,
                                OneTimeTokensPhishGuardVerdict verdict);
 
@@ -120,10 +118,6 @@ class OtpManagerImpl : public OtpManager, public AutofillManager::Observer {
   // a callback corresponds to the desire to show an autofill dropdown. A new
   // call to `GetOtpSuggestions()` invalidates the previous call.
   GetOtpSuggestionsCallback last_pending_get_suggestions_callback_;
-  url::Origin last_pending_field_origin_;
-
-  // The time when the phish guard check was started.
-  base::TimeTicks phish_guard_check_start_time_;
 
   // The received OTPs. This is used to store the OTPs between the phishing
   // check and the actual display of the suggestions.

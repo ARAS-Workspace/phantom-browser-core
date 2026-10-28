@@ -11,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
@@ -25,7 +24,6 @@
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_field_detector.h"
-#include "components/autofill/core/browser/integrators/one_time_tokens/otp_phish_guard_delegate.h"
 #include "components/autofill/core/browser/logging/log_manager.h"
 #include "components/autofill/core/common/autofill_internals/log_message.h"
 #include "components/autofill/core/common/autofill_internals/logging_scope.h"
@@ -39,7 +37,6 @@
 #include "components/one_time_tokens/core/browser/one_time_token_service.h"
 #include "components/one_time_tokens/core/browser/one_time_token_type.h"
 #include "components/one_time_tokens/core/browser/util/expiring_subscription.h"
-#include "components/password_manager/core/browser/features/password_features.h"
 
 using one_time_tokens::ExpiringSubscriptionHandle;
 using one_time_tokens::OneTimeToken;
@@ -76,18 +73,8 @@ void OtpManagerImpl::GetOtpSuggestions(
     return;
   }
 
-  // TODO(crbug.com/415273270) This is just a hack to prepopulate the OTPs in
-  // case no real backend is triggered. The feature definition should migrate to
-  // autofill.
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kDebugUiForOtps)) {
-    std::move(callback).Run({"Identified OTP field."});
-    return;
-  }
-
   // TODO(crbug.com/415273270): Do not fill OTP suggestions into opaque origin
   // iframes.
-  last_pending_field_origin_ = origin;
   last_pending_get_suggestions_callback_ = std::move(callback);
 
   // This queries OTPs from the backend and calls `OnOneTimeTokenReceived` to
@@ -198,37 +185,10 @@ void OtpManagerImpl::OnOneTimeTokenReceived(
     owner_->GetOtpFormEventLogger().OnOtpAvailable();
   }
 
-  // We run PhishGuard check to make sure OTPs are not shown to users on
-  // potential phishing sites.
-  if (OtpPhishGuardDelegate* delegate =
-          owner_->client().GetOtpPhishGuardDelegate()) {
-    phish_guard_check_start_time_ = base::TimeTicks::Now();
-    base::UmaHistogramBoolean(
-        "Autofill.OneTimeTokens.PhishGuard.CheckPerformed", true);
-    LOG_AF(owner_->client().GetCurrentLogManager())
-        << LoggingScope::kOneTimeTokens
-        << "PhishGuard check initiated for OTP token delivery.";
-    delegate->StartOtpPhishGuardCheck(
-        owner_->client().GetLastCommittedPrimaryMainFrameURL(),
-        last_pending_field_origin_.GetURL(),
-        base::BindOnce(
-            [](base::WeakPtr<OtpManagerImpl> self, OneTimeToken token,
-               bool is_phishing_site) {
-              if (self) {
-                self->MaybeShowOtpSuggestions(
-                    std::move(token),
-                    is_phishing_site
-                        ? OneTimeTokensPhishGuardVerdict::kPhishing
-                        : OneTimeTokensPhishGuardVerdict::kNotPhishing);
-              }
-            },
-            weak_ptr_factory_.GetWeakPtr(), std::move(token)));
-  } else {
-    base::UmaHistogramBoolean(
-        "Autofill.OneTimeTokens.PhishGuard.CheckPerformed", false);
-    MaybeShowOtpSuggestions(std::move(token),
-                            OneTimeTokensPhishGuardVerdict::kUnknown);
-  }
+  base::UmaHistogramBoolean("Autofill.OneTimeTokens.PhishGuard.CheckPerformed",
+                            false);
+  MaybeShowOtpSuggestions(std::move(token),
+                          OneTimeTokensPhishGuardVerdict::kUnknown);
 }
 
 void OtpManagerImpl::MaybeShowOtpSuggestions(
@@ -237,11 +197,6 @@ void OtpManagerImpl::MaybeShowOtpSuggestions(
   LOG_AF(owner_->client().GetCurrentLogManager())
       << LoggingScope::kOneTimeTokens
       << "PhishGuard check completed with verdict: " << verdict;
-  if (!phish_guard_check_start_time_.is_null()) {
-    base::UmaHistogramTimes(
-        "Autofill.OneTimeTokens.PhishGuard.Latency",
-        base::TimeTicks::Now() - phish_guard_check_start_time_);
-  }
 
   base::UmaHistogramEnumeration("Autofill.OneTimeTokens.PhishGuard.Verdict",
                                 verdict);

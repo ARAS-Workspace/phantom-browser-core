@@ -29,12 +29,8 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "chrome/browser/favicon/large_icon_service_factory.h"
-#include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
 #include "chrome/browser/media/webrtc/desktop_capture_access_handler.h"
 #include "chrome/browser/platform_util.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/autofill/autofill_popup_controller.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller_utils.h"
@@ -73,8 +69,6 @@
 #include "components/autofill/core/common/aliases.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
-#include "components/favicon/core/large_icon_service.h"
-#include "components/image_fetcher/core/image_fetcher_service.h"
 #include "components/input/native_web_keyboard_event.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
@@ -438,7 +432,6 @@ bool PopupViewViews::Show(
     return false;
   }
   MaybeAnnounceCurrentTabAndFootnote();
-  MaybeAnnouncePasswordRecoveryPopup();
   MaybeAnnounceLoadingState();
   if (!MaybeA11yFocusInformationalSuggestion()) {
     return false;
@@ -844,7 +837,6 @@ void PopupViewViews::OnSuggestionsChanged(bool prefer_prev_arrow_side) {
   }
 
   MaybeAutoSelectSuggestion();
-  MaybeAnnouncePasswordRecoveryPopup();
   MaybeAnnounceLoadingState();
   if (!MaybeA11yFocusInformationalSuggestion()) {
     return;
@@ -1066,20 +1058,6 @@ void PopupViewViews::ShowIPHFeaturePromos() {
   }
 }
 
-void PopupViewViews::MaybeAnnouncePasswordRecoveryPopup() {
-  if (!controller_ || controller_->GetSuggestions().empty()) {
-    return;
-  }
-
-  if (controller_->GetSuggestionAt(0).type ==
-      SuggestionType::kBackupPasswordEntry) {
-    a11y_announcer_.Run(
-        l10n_util::GetStringUTF16(
-            IDS_PASSWORD_MANAGER_UI_PASSWORD_RECOVERY_SHOWN_A11Y_ANNOUNCEMENT),
-        /*polite=*/true);
-  }
-}
-
 void PopupViewViews::MaybeAnnounceLoadingState() {
   if (!controller_ || controller_->GetSuggestions().empty()) {
     return;
@@ -1188,18 +1166,6 @@ void PopupViewViews::InitViews() {
                        .SetOrientation(views::BoxLayout::Orientation::kVertical)
                        .Build());
 
-  BrowserWindowInterface* browser = GetBrowser();
-  if (Profile* profile = browser ? browser->GetProfile() : nullptr) {
-    auto* favicon_service =
-        LargeIconServiceFactory::GetForBrowserContext(profile);
-    auto* image_fetcher =
-        ImageFetcherServiceFactory::GetForKey(profile->GetProfileKey())
-            ->GetImageFetcher(
-                image_fetcher::ImageFetcherConfig::kInMemoryWithDiskCache);
-    password_favicon_loader_ = std::make_unique<PasswordFaviconLoaderImpl>(
-        favicon_service, image_fetcher);
-  }
-
   CreateSuggestionViews();
   UpdateAccessibleStates();
 }
@@ -1287,7 +1253,7 @@ void PopupViewViews::CreateSuggestionViews() {
           PopupRowView* row_view = body_builder.AddRow(CreatePopupRowView(
               controller(), /*a11y_selection_delegate=*/*this,
               /*selection_delegate=*/*this, current_line_number,
-              std::move(filter_match), password_favicon_loader_.get()));
+              std::move(filter_match)));
 
           // Set appropriate element ids for IPH targets, it is important to
           // set them earlier to make sure the elements are discoverable later

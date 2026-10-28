@@ -18,7 +18,6 @@
 #include "base/memory/weak_ptr.h"
 #include "base/timer/timer.h"
 #include "chrome/browser/ui/autofill/autofill_popup_view.h"
-#include "chrome/browser/ui/views/autofill/popup/password_favicon_loader.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_base_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_interactive_row_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_row_view.h"
@@ -215,10 +214,6 @@ class PopupViewViews : public PopupBaseView,
       AutoselectFirstSuggestion force_by_trigger_source =
           AutoselectFirstSuggestion(false));
 
-  // If the current suggestions are for password recovery, announces it to the
-  // user.
-  void MaybeAnnouncePasswordRecoveryPopup();
-
   // If the current suggestions are for loading, announces it to the user.
   void MaybeAnnounceLoadingState();
 
@@ -362,8 +357,6 @@ class PopupViewViews : public PopupBaseView,
 
   // Parent's popup view. Present in sub-popups (non-root) only.
   std::optional<base::WeakPtr<ExpandablePopupParentView>> parent_;
-
-  std::unique_ptr<PasswordFaviconLoaderImpl> password_favicon_loader_;
 
   // The implementation of the a11y announcer. When testing the announcements,
   // it's replaced with a mock function.

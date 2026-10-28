@@ -223,7 +223,6 @@ Refer to README.md for content description and update process.
  <item id="cws_fetch_item_snippet" added_in_milestone="124" content_hash_code="06b8ded9" os_list="windows,chromeos,linux" file_path="extensions/browser/webstore_data_fetcher.cc" />
  <item id="lens_overlay" added_in_milestone="125" content_hash_code="03ef5586" os_list="linux,windows,chromeos,android" file_path="chrome/browser/ui/lens/lens_overlay_query_controller.cc" />
  <item id="dbsc_registration" added_in_milestone="127" content_hash_code="03c42469" os_list="windows,linux" file_path="net/device_bound_sessions/url_fetcher.cc" />
- <item id="autofill_password_favicon_fetch" added_in_milestone="128" content_hash_code="00df689d" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/views/autofill/popup/password_favicon_loader.cc" />
  <item id="enterprise_companion_event_logging" added_in_milestone="128" content_hash_code="06883e8e" os_list="linux,windows" file_path="chrome/enterprise_companion/event_logger.cc" />
  <item id="plus_address_preallocation" added_in_milestone="129" content_hash_code="05275659" os_list="linux,windows,android,chromeos" file_path="components/plus_addresses/core/browser/plus_address_http_client_impl.cc" />
  <item id="contextual_search_resolve_debug" added_in_milestone="129" content_hash_code="0322e0ed" os_list="linux,windows,android,chromeos" file_path="components/touch_to_search/core/browser/contextual_search_delegate_impl.cc" />

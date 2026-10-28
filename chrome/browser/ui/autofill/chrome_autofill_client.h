@@ -31,7 +31,6 @@
 #include "components/autofill/core/browser/form_predictions_tracker.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
-#include "components/autofill/core/browser/integrators/password_form_classification.h"
 #include "components/autofill/core/browser/logging/log_manager.h"
 #include "components/autofill/core/browser/metrics/form_interactions_ukm_logger.h"
 #include "components/autofill/core/browser/single_field_fillers/single_field_fill_router.h"
@@ -69,7 +68,6 @@ class EmailVerificationPopupController;
 class EmailVerifierDelegate;
 class FormFieldData;
 class OtpFieldDetector;
-class ChromeOtpPhishGuardDelegate;
 class LogRouter;
 enum class SuggestionType;
 
@@ -219,10 +217,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
   void NotifyIphFeatureUsed(AutofillClient::IphFeature feature) final;
   void set_test_addresses(std::vector<AutofillProfile> test_addresses) final;
   base::span<const AutofillProfile> GetTestAddresses() const final;
-  PasswordFormClassification ClassifyAsPasswordForm(
-      AutofillManager& manager,
-      FormGlobalId form_id,
-      FieldGlobalId field_id) const final;
   optimization_guide::ModelQualityLogsUploaderService* GetMqlsUploadService()
       override;
   void ShowEntityImportBubble(
@@ -275,7 +269,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
       ContentAutofillDriver& driver) final;
 
   OtpFieldDetector* GetOtpFieldDetector() override;
-  OtpPhishGuardDelegate* GetOtpPhishGuardDelegate() override;
 
   FormPredictionsTracker* GetFormPredictionsTracker() override;
 
@@ -353,7 +346,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
   ContentIdentityCredentialDelegate identity_credential_delegate_;
   std::unique_ptr<OtpFieldDetector> otp_field_detector_;
   std::unique_ptr<EmailVerifierDelegate> email_verifier_delegate_;
-  std::unique_ptr<ChromeOtpPhishGuardDelegate> otp_phish_guard_delegate_;
 
   std::unique_ptr<FormPredictionsTracker> form_predictions_tracker_;
 

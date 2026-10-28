@@ -21,8 +21,6 @@
 #include "components/autofill/core/browser/filling/filling_product.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
-#include "components/autofill/core/browser/integrators/password_form_classification.h"
-#include "components/autofill/core/browser/integrators/password_manager/password_manager_delegate.h"
 #include "components/autofill/core/browser/integrators/touch_to_fill/touch_to_fill_autofill_delegate.h"
 #include "components/autofill/core/browser/payments/credit_card_access_manager.h"
 #include "components/autofill/core/browser/studies/autofill_ablation_study.h"
@@ -146,17 +144,6 @@ AutofillClient::GetPersonalContextEligibilityState() const {
 personal_context::PersonalContextEligibilityService*
 AutofillClient::GetPersonalContextEligibilityService() const {
   return nullptr;
-}
-
-PasswordManagerDelegate* AutofillClient::GetPasswordManagerDelegate(
-    const FieldGlobalId& field_id) {
-  return nullptr;
-}
-
-const PasswordManagerDelegate* AutofillClient::GetPasswordManagerDelegate(
-    const FieldGlobalId& field_id) const {
-  return const_cast<AutofillClient*>(this)->GetPasswordManagerDelegate(
-      field_id);
 }
 
 void AutofillClient::GetAiPageContent(GetAiPageContentCallback callback) {
@@ -335,13 +322,6 @@ base::span<const AutofillProfile> AutofillClient::GetTestAddresses() const {
   return {};
 }
 
-PasswordFormClassification AutofillClient::ClassifyAsPasswordForm(
-    AutofillManager& manager,
-    FormGlobalId form_id,
-    FieldGlobalId field_id) const {
-  return {};
-}
-
 const syncer::SyncService* AutofillClient::GetSyncService() const {
   return const_cast<const syncer::SyncService*>(
       const_cast<AutofillClient*>(this)->GetSyncService());
@@ -416,16 +396,7 @@ bool AutofillClient::DocumentUsedWebOTP() {
   return false;
 }
 
-PasswordManagerAutofillHelperDelegate*
-AutofillClient::GetPasswordManagerAutofillHelper() {
-  return nullptr;
-}
-
 AutofillManager* AutofillClient::GetAutofillManagerForPrimaryMainFrame() {
-  return nullptr;
-}
-
-OtpPhishGuardDelegate* AutofillClient::GetOtpPhishGuardDelegate() {
   return nullptr;
 }
 

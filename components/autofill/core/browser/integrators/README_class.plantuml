@@ -18,12 +18,10 @@ interface "AutofillSuggestionDelegate" as asd
 class "AutofillExternalDelegate" as aed
 class "PasswordAutofillManager" as pam
 class "BrowserAutofillManager" as bam {
-  # client().GetPasswordManagerDelegate()
   # touch_to_fill_delegate
 }
 
 'The BrowserAutofillManager has numerous delegates to different components.
-pmd "1" -* "1" bam
 bam "1" *- "1" ttfd
 aed "1" ---o "1" bam
 

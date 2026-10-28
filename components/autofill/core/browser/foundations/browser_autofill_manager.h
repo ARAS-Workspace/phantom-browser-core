@@ -38,7 +38,6 @@
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/metrics/otp_form_event_logger.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_manager.h"
-#include "components/autofill/core/browser/integrators/password_manager/password_manager_delegate.h"
 #include "components/autofill/core/browser/integrators/touch_to_fill/touch_to_fill_autofill_delegate.h"
 #include "components/autofill/core/browser/integrators/touch_to_fill/touch_to_fill_payment_method_delegate.h"
 #include "components/autofill/core/browser/metrics/autofill_metrics.h"
@@ -195,16 +194,6 @@ class BrowserAutofillManager : public AutofillManager {
   virtual void UndoAutofill(mojom::ActionPersistence action_persistence,
                             const FormGlobalId& form_id,
                             const FieldGlobalId& trigger_field_id);
-
-  // Defers the suggestion selection to the password manager.
-  void DelegateSelectToPasswordManager(const Suggestion& suggestion,
-                                       const FieldGlobalId& trigger_field_id);
-
-  // Defers the suggestion selection to the password manager.
-  void DelegateAcceptToPasswordManager(
-      const Suggestion& suggestion,
-      const AutofillSuggestionDelegate::SuggestionMetadata& metadata,
-      const FieldGlobalId& trigger_field_id);
 
   void DidShowSuggestions(
       base::span<const Suggestion> suggestions,
@@ -605,13 +594,6 @@ class BrowserAutofillManager : public AutofillManager {
   void MergePasskeysAndExistingSuggestions(
       std::vector<Suggestion>& suggestions,
       std::vector<Suggestion> passkey_suggestions);
-
-  // Creates passkey suggestions that will be used in
-  // MergePasskeysAndExistingSuggestions.
-  // TODO(crbug.com/409962888): Remove after new suggestion generation logic is
-  // launched.
-  std::vector<Suggestion> CreatePasskeySuggestionsForMerge(
-      const FormFieldData& field);
 
   // Combines identity credential suggestions and existing suggestions into a
   // single list, prioritizing identity credential suggestions first.

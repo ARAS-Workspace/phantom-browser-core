@@ -42,9 +42,7 @@
 #include "components/autofill/core/browser/integrators/at_memory/at_memory_query_service.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/mock_autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
-#include "components/autofill/core/browser/integrators/one_time_tokens/otp_phish_guard_delegate.h"
 #include "components/autofill/core/browser/integrators/optimization_guide/mock_autofill_optimization_guide_decider.h"
-#include "components/autofill/core/browser/integrators/password_manager/password_manager_delegate.h"
 #include "components/autofill/core/browser/logging/log_manager.h"
 #include "components/autofill/core/browser/logging/log_router.h"
 #include "components/autofill/core/browser/logging/text_log_receiver.h"
@@ -269,11 +267,6 @@ class TestAutofillClientTemplate : public T {
 
   IdentityCredentialDelegate* GetIdentityCredentialDelegate() override {
     return identity_credential_delegate_.get();
-  }
-
-  PasswordManagerDelegate* GetPasswordManagerDelegate(
-      const FieldGlobalId& field_id) override {
-    return password_manager_delegate_.get();
   }
 
   test::AutofillTestingPrefService* GetPrefs() override {
@@ -544,15 +537,6 @@ class TestAutofillClientTemplate : public T {
 #endif  // BUILDFLAG(IS_MAC)
   }
 
-  OtpPhishGuardDelegate* GetOtpPhishGuardDelegate() override {
-    return otp_phish_guard_delegate_.get();
-  }
-
-  void set_otp_phish_guard_delegate(
-      std::unique_ptr<OtpPhishGuardDelegate> otp_phish_guard_delegate) {
-    otp_phish_guard_delegate_ = std::move(otp_phish_guard_delegate);
-  }
-
   void set_test_addresses(
       std::vector<AutofillProfile> test_addresses) override {
     for (AutofillProfile& profile : test_addresses) {
@@ -776,11 +760,6 @@ class TestAutofillClientTemplate : public T {
     identity_credential_delegate_ = std::move(identity_credential_delegate);
   }
 
-  void set_password_manager_delegate(
-      std::unique_ptr<PasswordManagerDelegate> password_manager_delegate) {
-    password_manager_delegate_ = std::move(password_manager_delegate);
-  }
-
   void set_suggestion_ui_session_id(
       std::optional<AutofillClient::SuggestionUiSessionId> session_id) {
     suggestion_ui_session_id_ = session_id;
@@ -841,14 +820,12 @@ class TestAutofillClientTemplate : public T {
   raw_ptr<personal_context::PersonalContextEligibilityService>
       personal_context_eligibility_service_ = nullptr;
   std::unique_ptr<GoogleGroupsManager> google_groups_manager_;
-  std::unique_ptr<OtpPhishGuardDelegate> otp_phish_guard_delegate_;
   std::unique_ptr<AtMemoryQueryService> at_memory_query_service_;
   std::unique_ptr<AtMemoryManager> at_memory_manager_;
   personal_context::PersonalContextEligibilityState
       personal_context_eligibility_state_ =
           personal_context::PersonalContextEligibilityState::kEligible;
   std::unique_ptr<IdentityCredentialDelegate> identity_credential_delegate_;
-  std::unique_ptr<PasswordManagerDelegate> password_manager_delegate_;
   TestAddressNormalizer test_address_normalizer_;
   std::unique_ptr<::testing::NiceMock<MockAutofillOptimizationGuideDecider>>
       mock_autofill_optimization_guide_decider_ = std::make_unique<

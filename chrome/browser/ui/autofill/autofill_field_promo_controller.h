@@ -51,16 +51,12 @@ namespace autofill {
 // should happen in the same spot as the hide calls of the existing controller.
 //
 // 3. Hiding becomes trickier when some hiding events cannot be captured by
-// the `AutofillPopupHideHelper`. Two such events are interesting for the IPH:
+// the `AutofillPopupHideHelper`. One such event is interesting for the IPH:
 //
 // 3.a. Scrolling. The IPH should be hidden in the same place where the autofill
 // popup is hidden (currently in `BrowserAutofillManager::OnHidePopupImpl()`).
 // This method is called from the renderer not only on scroll, but hiding the
 // IPH in extra scenarios is not a disadvantage.
-//
-// 3.b. Overlapping with password generation prompt. The IPH should be hidden in
-// the same place where the autofill popup is hidden (currently in
-// `password_manager_util.cc::UserTriggeredManualGenerationFromContextMenu()`).
 //
 // 4. The IPH has to be hidden right before the autofill popup is shown
 // (currently in `ChromeAutofillClient::ShowAutofillSuggestions()`), because the

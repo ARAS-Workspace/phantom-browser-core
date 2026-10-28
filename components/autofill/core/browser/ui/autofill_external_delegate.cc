@@ -744,11 +744,6 @@ void AutofillExternalDelegate::DidSelectSuggestion(
           mojom::ActionPersistence::kPreview, last_query_.form_id,
           last_query_.field_id, suggestion);
       break;
-    case SuggestionType::kWebauthnPasskeyQrCode:
-    case SuggestionType::kWebauthnSignInWithAnotherDevice:
-      manager_->DelegateSelectToPasswordManager(suggestion,
-                                                last_query_.field_id);
-      break;
     case SuggestionType::kAllLoyaltyCardsEntry:
     case SuggestionType::kAtMemoryAiDisclosure:
     case SuggestionType::kAtMemoryFetching:
@@ -805,6 +800,8 @@ void AutofillExternalDelegate::DidSelectSuggestion(
     case SuggestionType::kTroubleSigningInEntry:
     case SuggestionType::kViewPasswordDetails:
     case SuggestionType::kWebauthnCredential:
+    case SuggestionType::kWebauthnPasskeyQrCode:
+    case SuggestionType::kWebauthnSignInWithAnotherDevice:
       NOTREACHED();  // Should be handled elsewhere.
   }
 }
@@ -1050,11 +1047,6 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
 #else
       NOTREACHED();
 #endif
-    case SuggestionType::kWebauthnPasskeyQrCode:
-    case SuggestionType::kWebauthnSignInWithAnotherDevice:
-      manager_->DelegateAcceptToPasswordManager(suggestion, metadata,
-                                                last_query_.field_id);
-      break;
     case SuggestionType::kAtMemorySearchAffordance:
       if (AtMemoryManager* am = manager_->client().GetAtMemoryManager()) {
         am->OnSearchSubmitted(suggestion.main_text.value);
@@ -1096,6 +1088,8 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kTroubleSigningInEntry:
     case SuggestionType::kViewPasswordDetails:
     case SuggestionType::kWebauthnCredential:
+    case SuggestionType::kWebauthnPasskeyQrCode:
+    case SuggestionType::kWebauthnSignInWithAnotherDevice:
       NOTREACHED();  // Should be handled elsewhere.
   }
 

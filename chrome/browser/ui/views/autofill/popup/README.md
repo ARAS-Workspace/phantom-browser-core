@@ -72,7 +72,7 @@ These classes serve the following purposes:
 There are currently about ~30 different `SuggestionType`s, that correspond to a different type of popup row. When a new type is added and it cannot be properly processed by `CreatePopupRowView()`, use the
 following steps to support it by the popup UI:
 * Create a new factory method for `PopupRowContentView` (or even for `PopupRowView` if needed, e.g. `CreateAutocompleteRowWithDeleteButton()`),
-  e.g. `CreatePasswordPopupRowContentView()` in [popup_row_factory_utils.cc](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/views/autofill/popup/popup_row_factory_utils.cc).
+  e.g. `CreateFooterPopupRowContentView()` in [popup_row_factory_utils.cc](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/views/autofill/popup/popup_row_factory_utils.cc).
 * Call it when appropriate in [`CreatePopupRowView()`](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/views/autofill/popup/popup_row_factory_utils.cc).
 * Add/update tests in `popup_row_factory_utils_unittest.cc` if some testable logic was affected.
 * Add a pixel test to `popup_row_factory_utils_browsertest.cc`. In most cases adding the newly added suggestion type to `kSuggestions` will suffice.

@@ -4,54 +4,20 @@
 
 #include "chrome/browser/ui/autofill/autofill_context_menu_manager.h"
 
-#include <algorithm>
-#include <string>
-
 #include "base/containers/fixed_flat_set.h"
-#include "base/feature_list.h"
-#include "base/metrics/user_metrics.h"
-#include "base/metrics/user_metrics_action.h"
 #include "base/notreached.h"
-#include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
-#include "chrome/browser/password_manager/factories/password_counter_factory.h"
-#include "chrome/browser/personal_context/personal_context_eligibility_service_factory.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/autofill/content/browser/content_autofill_driver.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/foundations/autofill_driver.h"
-#include "components/autofill/core/browser/foundations/autofill_manager.h"
-#include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/common/aliases.h"
-#include "components/autofill/core/common/autofill_features.h"
-#include "components/password_manager/content/browser/content_password_manager_driver.h"
-#include "components/password_manager/core/browser/password_autofill_manager.h"
-#include "components/password_manager/core/browser/password_counter.h"
-#include "components/password_manager/core/browser/password_manager_client.h"
-#include "components/password_manager/core/browser/password_manager_util.h"
-#include "components/password_manager/core/browser/password_manual_fallback_metrics_recorder.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/personal_context/core/personal_context_types.h"
-#include "components/prefs/pref_service.h"
 #include "components/renderer_context_menu/render_view_context_menu_base.h"
-#include "components/vector_icons/vector_icons.h"
-#include "ui/base/l10n/l10n_util.h"
-#include "ui/base/models/image_model.h"
-#include "ui/base/ui_base_features.h"
-#include "ui/color/color_id.h"
 #include "ui/menus/simple_menu_model.h"
-#include "url/origin.h"
 
 namespace autofill {
 
 namespace {
-
-using ::password_manager::ContentPasswordManagerDriver;
 
 bool ShouldShowAutofillContextMenu(const content::ContextMenuParams& params) {
   if (params.is_content_editable_for_autofill) {
@@ -111,21 +77,8 @@ bool IsAutofillCustomCommandId(
     AutofillContextMenuManager::CommandId command_id) {
   static constexpr auto kAutofillCommands = base::MakeFixedFlatSet<int>({
       IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_AT_MEMORY,
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD,
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS,
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD,
   });
   return kAutofillCommands.contains(command_id.value());
-}
-
-// Returns true if the field is a username or password field.
-bool IsPasswordFormField(ContentPasswordManagerDriver& password_manager_driver,
-                         const content::ContextMenuParams& params) {
-  const FieldRendererId current_field_renderer_id(
-      params.field_renderer_id.value());
-  return password_manager_driver.GetPasswordManager()
-      ->GetPasswordFormCache()
-      ->GetPasswordForm(&password_manager_driver, current_field_renderer_id);
 }
 
 }  // namespace
@@ -175,12 +128,6 @@ void AutofillContextMenuManager::ExecuteCommand(int command_id) {
     ExecuteFallbackForAtMemoryCommand(*autofill_driver);
     return;
   }
-
-  if (command_id ==
-      IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD) {
-    ExecuteFallbackForSelectPasswordCommand(*autofill_driver);
-    return;
-  }
 }
 
 bool AutofillContextMenuManager::MaybeAddAtMemoryItem() {
@@ -226,124 +173,8 @@ void AutofillContextMenuManager::MaybeAddAutofillManualFallbackItems() {
     return;
   }
 
-  content::RenderFrameHost* rfh = delegate_->GetRenderFrameHost();
-  if (!rfh) {
-    return;
-  }
-
-  ContentPasswordManagerDriver* password_manager_driver =
-      ContentPasswordManagerDriver::GetForRenderFrameHost(rfh);
-
-  bool add_passwords_fallback = false;
-
-  // Do not show password manager context menu options for input fields that
-  // cannot be filled by the driver. See crbug.com/40061116.
-  if (password_manager_driver) {
-    add_passwords_fallback =
-        ShouldAddPasswordsManualFallbackItem(*password_manager_driver);
-  }
-
-  if (add_passwords_fallback) {
-    Profile* profile = Profile::FromBrowserContext(rfh->GetBrowserContext());
-    password_manager::PasswordCounter* counter =
-        PasswordCounterFactory::GetForProfile(profile);
-    const bool select_passwords_option_shown =
-        counter && counter->autofillable_passwords() > 0;
-    AddPasswordsManualFallbackItems(*password_manager_driver,
-                                    select_passwords_option_shown);
-
-    if (select_passwords_option_shown) {
-      LogSelectPasswordManualFallbackContextMenuEntryShown(
-          CHECK_DEREF(password_manager_driver));
-    }
-  }
-  const bool add_at_memory_fallback = MaybeAddAtMemoryItem();
-
-  if (add_passwords_fallback || add_at_memory_fallback) {
+  if (MaybeAddAtMemoryItem()) {
     menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-}
-
-bool AutofillContextMenuManager::ShouldAddPasswordsManualFallbackItem(
-    ContentPasswordManagerDriver& driver) {
-  if (!driver.CanShowAutofillUi()) {
-    return false;
-  }
-  // Password suggestions should not be triggered on text areas.
-  if (params_.form_control_type == blink::mojom::FormControlType::kTextArea) {
-    return false;
-  }
-
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kPasswordManualFallbackSecurityChecks) &&
-      (!driver.HasValidURL(/*may_kill_renderer*/ false) ||
-       !driver.IsRenderFrameHostSupported())) {
-    return false;
-  }
-  return driver.GetPasswordManager()->GetClient()->IsFillingEnabled(
-      driver.GetLastCommittedOrigin(), driver.GetLastCommittedURL());
-}
-
-void AutofillContextMenuManager::AddPasswordsManualFallbackItems(
-    ContentPasswordManagerDriver& password_manager_driver,
-    bool add_select_password_option) {
-  const bool add_password_generation_option =
-      password_manager_util::ManualPasswordGenerationEnabled(
-          &password_manager_driver) &&
-      password_manager_driver.IsPasswordFieldForPasswordManager(
-          FieldRendererId(params_.field_renderer_id.value()),
-          params_.form_control_type);
-  const bool add_import_passwords_option = !add_select_password_option;
-
-  if (add_select_password_option) {
-    menu_model_->AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD,
-        IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD);
-
-    if (::features::IsMenuSimplificationEnabled()) {
-      menu_model_->SetIconForCommandId(
-          IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD,
-          ui::ImageModel::FromVectorIcon(
-              ::features::IsRoundedIconsEnabled()
-                  ? vector_icons::kPasswordManagerIcon
-                  : vector_icons::kPasswordManagerOldIcon,
-              ui::kColorMenuIcon, ui::SimpleMenuModel::kDefaultIconSize));
-    }
-  }
-  if (add_password_generation_option) {
-    menu_model_->AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD,
-        IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD);
-  }
-  if (add_import_passwords_option) {
-    menu_model_->AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS,
-        IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS);
-  }
-}
-
-void AutofillContextMenuManager::
-    LogSelectPasswordManualFallbackContextMenuEntryShown(
-        ContentPasswordManagerDriver& password_manager_driver) {
-  password_manager_driver.GetPasswordAutofillManager()
-      ->GetPasswordManualFallbackMetricsRecorder()
-      .ContextMenuEntryShown(
-          /*classified_as_target_filling_password=*/
-          IsPasswordFormField(password_manager_driver, params_));
-}
-
-void AutofillContextMenuManager::
-    LogSelectPasswordManualFallbackContextMenuEntryAccepted() {
-  content::RenderFrameHost* rfh = delegate_->GetRenderFrameHost();
-  ContentPasswordManagerDriver* password_manager_driver =
-      rfh ? ContentPasswordManagerDriver::GetForRenderFrameHost(rfh) : nullptr;
-
-  if (password_manager_driver) {
-    password_manager_driver->GetPasswordAutofillManager()
-        ->GetPasswordManualFallbackMetricsRecorder()
-        .ContextMenuEntryAccepted(/*classified_as_target_filling_password=*/
-                                  IsPasswordFormField(*password_manager_driver,
-                                                      params_));
   }
 }
 
@@ -353,23 +184,6 @@ void AutofillContextMenuManager::ExecuteFallbackForAtMemoryCommand(
       {driver.GetFrameToken(),
        FieldRendererId(params_.field_renderer_id.value())},
       AutofillSuggestionTriggerSource::kAtMemoryContextMenu);
-}
-
-void AutofillContextMenuManager::ExecuteFallbackForSelectPasswordCommand(
-    AutofillDriver& autofill_driver) {
-  autofill_driver.RendererShouldTriggerSuggestions(
-      /*field_id=*/{autofill_driver.GetFrameToken(),
-                    FieldRendererId(params_.field_renderer_id.value())},
-      AutofillSuggestionTriggerSource::kManualFallbackPasswords);
-
-  LogSelectPasswordManualFallbackContextMenuEntryAccepted();
-}
-
-void AutofillContextMenuManager::MaybeMarkLastItemAsNewFeature(
-    const base::Feature& feature) {
-  menu_model_->SetIsNewFeatureAt(menu_model_->GetItemCount() - 1,
-                                 UserEducationService::MaybeShowNewBadge(
-                                     delegate_->GetBrowserContext(), feature));
 }
 
 }  // namespace autofill

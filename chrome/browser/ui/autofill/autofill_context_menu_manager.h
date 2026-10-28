@@ -5,7 +5,6 @@
 #ifndef CHROME_BROWSER_UI_AUTOFILL_AUTOFILL_CONTEXT_MENU_MANAGER_H_
 #define CHROME_BROWSER_UI_AUTOFILL_AUTOFILL_CONTEXT_MENU_MANAGER_H_
 
-#include "base/feature_list.h"
 #include "base/memory/raw_ptr.h"
 #include "base/types/strong_alias.h"
 #include "components/autofill/core/common/unique_ids.h"
@@ -14,10 +13,6 @@
 #include "ui/menus/simple_menu_model.h"
 
 class RenderViewContextMenuBase;
-
-namespace password_manager {
-class ContentPasswordManagerDriver;
-}  // namespace password_manager
 
 namespace autofill {
 
@@ -59,56 +54,17 @@ class AutofillContextMenuManager : public RenderViewContextMenuObserver {
   }
 
  private:
-  // Conditionally adds the address, payments and / or passwords Autofill manual
-  // fallbacks to the context menu model depending on whether there's data to
-  // suggest.
+  // Conditionally adds the Autofill manual fallbacks to the context menu model
+  // depending on whether there's data to suggest.
   void MaybeAddAutofillManualFallbackItems();
 
   // Adds the AtMemory manual fallback item if the feature is enabled. Returns
   // true if the item was added, false otherwise.
   bool MaybeAddAtMemoryItem();
 
-  // Checks if the currently focused field is a password field and whether
-  // password filling is enabled.
-  bool ShouldAddPasswordsManualFallbackItem(
-      password_manager::ContentPasswordManagerDriver& password_manager_driver);
-
-  // Adds the passwords manual fallback context menu entries.
-  //
-  // The entries are displayed in the following order:
-  // - "Select password" iff the user has passwords saved. This entry triggers
-  // password suggestions.
-  // - "Suggest password..." iff the user can generate passwords for the current
-  // field.
-  // - "Use passkey from another device" iff the field suppors passkeys.
-  // - "Import passwords" iff the user does not have password saves. This entry
-  // opens chrome://password-manager.
-  //
-  // Not all 4 entries have to be displayed. If an entry does not meet its
-  // criterion to be displayed, the entry will be skipped.
-  void AddPasswordsManualFallbackItems(
-      password_manager::ContentPasswordManagerDriver& password_manager_driver,
-      bool add_select_password_option);
-
-  // Out of all password entries, this method is only interested in the "select
-  // password" entry, because the rest of them don't trigger suggestions and are
-  // recorded by default separately (outside `AutofillContextMenuManager`).
-  void LogSelectPasswordManualFallbackContextMenuEntryShown(
-      password_manager::ContentPasswordManagerDriver& password_manager_drivern);
-
-  void LogSelectPasswordManualFallbackContextMenuEntryAccepted();
-
   // Triggers @memory search popup on the field that the context menu was
   // opened on.
   void ExecuteFallbackForAtMemoryCommand(AutofillDriver& driver);
-
-  // Triggers passwords suggestions on the field that the context menu was
-  // opened on.
-  void ExecuteFallbackForSelectPasswordCommand(AutofillDriver& driver);
-
-  // Marks the last added menu item as a new feature, depending on the response
-  // from the `UserEducationService`.
-  void MaybeMarkLastItemAsNewFeature(const base::Feature& feature);
 
   const raw_ptr<ui::SimpleMenuModel> menu_model_;
   const raw_ptr<RenderViewContextMenuBase> delegate_;

@@ -130,10 +130,7 @@ class FormDataImporter;
 class FormFieldData;
 class LogManager;
 class OtpFieldDetector;
-class OtpPhishGuardDelegate;
 class FormPredictionsTracker;
-struct PasswordFormClassification;
-class PasswordManagerDelegate;
 class PersonalDataManager;
 struct SelectOption;
 struct Suggestion;
@@ -145,7 +142,6 @@ class ValuablesDataManager;
 class AutofillAiPersonalContextAccessManager;
 class EntitySuppressionManager;
 class VotesUploader;
-class PasswordManagerAutofillHelperDelegate;
 class WalletPassAccessManager;
 
 namespace autofill_metrics {
@@ -509,13 +505,6 @@ class AutofillClient {
   virtual personal_context::PersonalContextEligibilityService*
   GetPersonalContextEligibilityService() const;
 
-  // Returns the `PasswordManagerDelegate` responsible to provide
-  // password suggestions for the given `field_id`.
-  virtual PasswordManagerDelegate* GetPasswordManagerDelegate(
-      const FieldGlobalId& field_id);
-  const PasswordManagerDelegate* GetPasswordManagerDelegate(
-      const FieldGlobalId& field_id) const;
-
   // Gets the preferences associated with the client.
   virtual PrefService* GetPrefs() = 0;
   virtual const PrefService* GetPrefs() const = 0;
@@ -753,18 +742,6 @@ class AutofillClient {
   virtual base::span<const AutofillProfile> GetTestAddresses() const
       LIFETIME_BOUND;
 
-  // Returns the heuristics predictions for the renderer form to which
-  // `field_id` belongs inside the form with `form_id`. The browser form with
-  // `form_id` is decomposed into renderer forms prior to running Password
-  // Manager heuristics.
-  // If the form cannot be found, `PasswordFormClassification::kNoPasswordForm`
-  // is returned.
-  virtual PasswordFormClassification ClassifyAsPasswordForm(
-      AutofillManager& manager,
-      FormGlobalId form_id,
-      FieldGlobalId field_id) const;
-
-
   // Returns the service used in order to log metrics into MQLS.
   virtual optimization_guide::ModelQualityLogsUploaderService*
   GetMqlsUploadService();
@@ -823,10 +800,6 @@ class AutofillClient {
   // May return null on platforms where OTPs are not supported.
   virtual OtpFieldDetector* GetOtpFieldDetector();
 
-  // Returns the delegate for OTP phish guard, which can be used to perform
-  // security checks before offering an OTP. May return nullptr.
-  virtual OtpPhishGuardDelegate* GetOtpPhishGuardDelegate();
-
   // Returns the `FormPredictionsTracker` for the current tab. May return null
   // on platforms where it is not supported.
   virtual FormPredictionsTracker* GetFormPredictionsTracker();
@@ -838,10 +811,6 @@ class AutofillClient {
   // exists only for the main frame because only the main frame has the
   // permission to call the WeOTP API.
   virtual bool DocumentUsedWebOTP();
-
-  // Returns the helper for Password Manager integrations.
-  virtual PasswordManagerAutofillHelperDelegate*
-  GetPasswordManagerAutofillHelper();
 
   // Returns the AutofillManager instance for the current frame/tab.
   virtual AutofillManager* GetAutofillManagerForPrimaryMainFrame();
