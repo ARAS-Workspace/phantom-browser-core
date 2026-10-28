@@ -953,7 +953,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
                                        syncer::USER_CONSENTS};
   allowed_types.PutAll(syncer::ControlTypes());
   allowed_types.Put(syncer::CONTACT_INFO);
-  allowed_types.Put(syncer::PASSWORDS);
 
   if (base::FeatureList::IsEnabled(
           switches::kEnablePreferencesAccountStorage)) {
@@ -1055,10 +1054,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   if (base::FeatureList::IsEnabled(syncer::kSeparateLocalAndAccountThemes)) {
     allowed_types.Put(syncer::THEMES);
   }
-
-  // These types are excluded on Android as they run outside Chrome.
-  allowed_types.Put(syncer::INCOMING_PASSWORD_SHARING_INVITATION);
-  allowed_types.Put(syncer::OUTGOING_PASSWORD_SHARING_INVITATION);
 
 #if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(

@@ -31,8 +31,6 @@ namespace {
 syncer::DataType GetDataTypeFromAccessPoint(
     signin_metrics::AccessPoint access_point) {
   switch (access_point) {
-    case signin_metrics::AccessPoint::kPasswordBubble:
-      return syncer::PASSWORDS;
     case signin_metrics::AccessPoint::kAddressBubble:
       return syncer::CONTACT_INFO;
     case signin_metrics::AccessPoint::kBookmarkBubble:

@@ -67,7 +67,6 @@ enum class Flow {
 // Maps to a subset of `signin_metrics::AccessPoint`. Is used for both signin
 // and sync promos.
 enum class SignInPromoType {
-  kPassword,
   kAddress,
   kBookmark,
   kExtension,

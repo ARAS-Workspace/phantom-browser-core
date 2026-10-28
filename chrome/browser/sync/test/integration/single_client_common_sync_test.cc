@@ -595,9 +595,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientFeatureToTransportSyncTest,
       syncer::DataTypeHistogramValue(syncer::BOOKMARKS), 1);
   histograms.ExpectBucketCount(
       "Sync.ClearMetadataWhileStopped",
-      syncer::DataTypeHistogramValue(syncer::PASSWORDS), 1);
-  histograms.ExpectBucketCount(
-      "Sync.ClearMetadataWhileStopped",
       syncer::DataTypeHistogramValue(syncer::AUTOFILL_WALLET_DATA), 1);
 
   // But for data types that use a single model in both transport mode and

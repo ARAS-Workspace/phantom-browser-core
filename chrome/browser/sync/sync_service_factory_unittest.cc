@@ -107,11 +107,7 @@ class SyncServiceFactoryTest : public testing::Test {
     datatypes.Put(syncer::DICTIONARY);
 #endif
 
-    // Common types. This excludes PASSWORDS,
-    // INCOMING_PASSWORD_SHARING_INVITATION and
-    // INCOMING_PASSWORD_SHARING_INVITATION, because the password store factory
-    // is null for testing and hence no controller gets instantiated for those
-    // types.
+    // Common types.
     datatypes.Put(syncer::AUTOFILL);
     datatypes.Put(syncer::AUTOFILL_PROFILE);
     datatypes.Put(syncer::AUTOFILL_WALLET_CREDENTIAL);

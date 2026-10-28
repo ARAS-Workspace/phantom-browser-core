@@ -1186,14 +1186,8 @@ base::DictValue PeopleHandler::GetSyncStatusDictionary() const {
                   GetStringUTF16(status_labels.button_string_id));
   sync_status.Set("secondaryButtonActionText",
                   GetStringUTF16(status_labels.secondary_button_string_id));
-  sync_status.Set(
-      "hasError",
-      status_labels.message_type == SyncStatusMessageType::kSyncError ||
-          status_labels.message_type ==
-              SyncStatusMessageType::kPasswordsOnlySyncError);
-  sync_status.Set("hasPasswordsOnlyError",
-                  status_labels.message_type ==
-                      SyncStatusMessageType::kPasswordsOnlySyncError);
+  sync_status.Set("hasError", status_labels.message_type ==
+                                  SyncStatusMessageType::kSyncError);
   sync_status.Set("statusAction",
                   GetSyncErrorAction(status_labels.action_type));
 

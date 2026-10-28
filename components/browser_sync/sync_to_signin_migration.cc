@@ -21,7 +21,6 @@
 #include "components/bookmarks/common/bookmark_constants.h"
 #include "components/bookmarks/common/bookmark_features.h"
 #include "components/browser_sync/browser_sync_switches.h"
-#include "components/password_manager/core/browser/password_manager_constants.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/base/gaia_id_hash.h"
 #include "components/signin/public/base/signin_pref_names.h"
@@ -269,9 +268,6 @@ void UndoSyncToSigninMigration(PrefService* pref_service) {
   // and start over with the local-or-syncable store. Or the file move didn't
   // happen for some reason. Either way, nothing to be done here.
 
-  // Passwords: Same as bookmarks, this is an atomic file move. Nothing to be
-  // done here.
-
   // ReadingList: The migration is asynchronous. Most likely it has been
   // completed by this point, but in case it's still pending, stop attempting it
   // now.
@@ -449,19 +445,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                     syncer::DataTypeToHistogramSuffix(syncer::BOOKMARKS)}),
       bookmarks_decision);
 
-  // On Android no password migration is required here, because other layers
-  // were responsible for migrating the user to the local+account model in the
-  // past.
-  const SyncToSigninMigrationDataTypeDecision passwords_decision =
-      GetSyncToSigninMigrationDataTypeDecision(
-          pref_service, syncer::PASSWORDS,
-          syncer::prefs::internal::kSyncPasswords);
-  base::UmaHistogramEnumeration(
-      base::StrCat({"Sync.SyncToSigninMigrationDecision.",
-                    GetHistogramMigratingOrNotInfix(doing_migration),
-                    syncer::DataTypeToHistogramSuffix(syncer::PASSWORDS)}),
-      passwords_decision);
-
   const SyncToSigninMigrationDataTypeDecision reading_list_decision =
       GetSyncToSigninMigrationDataTypeDecision(
           pref_service, syncer::READING_LIST,
@@ -553,22 +536,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
 
   bool migration_successful = true;
   std::vector<BlockingOperation> blocking_operations;
-
-  // Move passwords DB file, if password sync is enabled.
-  if (passwords_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
-    base::FilePath from_path =
-        profile_path.Append(password_manager::kLoginDataForProfileFileName);
-    base::FilePath to_path =
-        profile_path.Append(password_manager::kLoginDataForAccountFileName);
-    blocking_operations.push_back(
-        base::BindOnce(&RenameFileAndReportSuccess, from_path, to_path,
-                       "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove"));
-    // Mark clearing of the stats table from the newly migrated password store.
-    pref_service->SetBoolean(
-        syncer::prefs::kCleanUpStatsTableFromAccountPasswordStore, true);
-    syncer::RecordSyncToSigninMigrationStatsTableCleanupStep(
-        syncer::SyncToSigninMigrationStatsTableCleanupStep::kCleanupRequested);
-  }
 
   // Move bookmarks json file, if bookmark sync is enabled.
   if (bookmarks_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {

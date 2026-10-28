@@ -166,21 +166,6 @@ SyncStatusLabels GetAvatarSyncErrorLabelsForSettings(
               button_string_id, IDS_SYNC_EMPTY_STRING,
               SyncStatusActionType::kReauthenticate};
 
-    case syncer::SyncService::UserActionableError::
-        kNeedsTrustedVaultKeyForPasswords:
-      return {SyncStatusMessageType::kPasswordsOnlySyncError,
-              IDS_SETTINGS_ERROR_PASSWORDS_USER_ERROR_DESCRIPTION,
-              button_string_id, IDS_PROFILES_ACCOUNT_REMOVAL_TITLE,
-              SyncStatusActionType::kRetrieveTrustedVaultKeys};
-
-    case syncer::SyncService::UserActionableError::
-        kTrustedVaultRecoverabilityDegradedForPasswords:
-      return {
-          SyncStatusMessageType::kPasswordsOnlySyncError,
-          IDS_SETTINGS_ERROR_RECOVERABILITY_DEGRADED_FOR_PASSWORDS_USER_ERROR_DESCRIPTION,
-          button_string_id, IDS_PROFILES_ACCOUNT_REMOVAL_TITLE,
-          SyncStatusActionType::kRetrieveTrustedVaultKeys};
-
     case syncer::SyncService::UserActionableError::kNeedsPassphrase: {
       return {
           SyncStatusMessageType::kSyncError,
@@ -192,6 +177,10 @@ SyncStatusLabels GetAvatarSyncErrorLabelsForSettings(
           SyncStatusActionType::kEnterPassphrase};
     }
 
+    case syncer::SyncService::UserActionableError::
+        kNeedsTrustedVaultKeyForPasswords:
+    case syncer::SyncService::UserActionableError::
+        kTrustedVaultRecoverabilityDegradedForPasswords:
     case syncer::SyncService::UserActionableError::
         kTrustedVaultRecoverabilityDegradedForEverything:
     case syncer::SyncService::UserActionableError::
@@ -244,14 +233,8 @@ std::u16string GetAvatarSyncErrorDescription(
       return l10n_util::GetStringUTF16(IDS_PROFILES_DICE_SYNC_PAUSED_TITLE);
     case syncer::SyncService::UserActionableError::
         kNeedsTrustedVaultKeyForPasswords:
-      return l10n_util::GetStringFUTF16(
-          IDS_SYNC_ERROR_PASSWORDS_USER_MENU_ERROR_DESCRIPTION,
-          base::UTF8ToUTF16(user_email));
     case syncer::SyncService::UserActionableError::
         kTrustedVaultRecoverabilityDegradedForPasswords:
-      return l10n_util::GetStringFUTF16(
-          IDS_SYNC_ERROR_RECOVERABILITY_DEGRADED_FOR_PASSWORDS_USER_MENU_ERROR_DESCRIPTION,
-          base::UTF8ToUTF16(user_email));
     case syncer::SyncService::UserActionableError::
         kTrustedVaultRecoverabilityDegradedForEverything:
       return l10n_util::GetStringFUTF16(

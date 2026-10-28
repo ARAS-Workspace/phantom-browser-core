@@ -35,10 +35,6 @@ std::optional<int> GetDeviceStringId(
 std::optional<int> GetPromoMessageId(syncer::DataType data_type,
                                      bool has_device) {
   switch (data_type) {
-    case syncer::PASSWORDS:
-      return has_device
-                 ? IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS_WITH_DEVICE
-                 : IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS;
     case syncer::BOOKMARKS:
       return has_device
                  ? IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_BOOKMARKS_WITH_DEVICE
@@ -56,10 +52,6 @@ std::optional<int> GetPromoMessageId(syncer::DataType data_type,
 std::optional<int> GetProfileSeparationMessageId(syncer::DataType data_type,
                                                  bool has_device) {
   switch (data_type) {
-    case syncer::PASSWORDS:
-      return has_device
-                 ? IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS_WITH_DEVICE
-                 : IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS;
     case syncer::BOOKMARKS:
       return has_device
                  ? IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_BOOKMARKS_WITH_DEVICE

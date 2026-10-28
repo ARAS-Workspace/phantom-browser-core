@@ -64,8 +64,6 @@ constexpr int kSigninPromoDismissedThreshold = 2;
 
 syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
   switch (type) {
-    case SignInPromoType::kPassword:
-      return syncer::PASSWORDS;
     case SignInPromoType::kAddress:
       return syncer::CONTACT_INFO;
     case SignInPromoType::kBookmark:
@@ -79,7 +77,6 @@ syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
 
 bool PromoTypeHasSyncableData(SignInPromoType type) {
   switch (type) {
-    case SignInPromoType::kPassword:
     case SignInPromoType::kAddress:
     case SignInPromoType::kBookmark:
     case SignInPromoType::kExtension:
@@ -99,18 +96,6 @@ int GetAddressPromoShownCount(Profile& profile, const GaiaId& gaia_id) {
       base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)
           ? prefs::kAddressSignInPromoShownCountPerProfileForLimitsExperiment
           : prefs::kAddressSignInPromoShownCountPerProfile);
-}
-
-int GetPasswordPromoShownCount(Profile& profile, const GaiaId& gaia_id) {
-  if (!gaia_id.empty()) {
-    return SigninPrefs(*profile.GetPrefs())
-        .GetPasswordSigninPromoImpressionCount(gaia_id);
-  }
-
-  return profile.GetPrefs()->GetInteger(
-      base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)
-          ? prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment
-          : prefs::kPasswordSignInPromoShownCountPerProfile);
 }
 
 int GetBookmarkPromoShownCount(Profile& profile, const GaiaId& gaia_id) {
@@ -136,9 +121,6 @@ int GetContextualPromoDismissCountPerSignedOutProfile(Profile& profile,
     case SignInPromoType::kAddress:
       return profile.GetPrefs()->GetInteger(
           prefs::kAddressSignInPromoDismissCountPerProfileForLimitsExperiment);
-    case SignInPromoType::kPassword:
-      return profile.GetPrefs()->GetInteger(
-          prefs::kPasswordSignInPromoDismissCountPerProfileForLimitsExperiment);
     case SignInPromoType::kBookmark:
       return profile.GetPrefs()->GetInteger(
           prefs::kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment);
@@ -160,9 +142,6 @@ int GetContextualPromoDismissCountPerAccount(Profile& profile,
     case SignInPromoType::kAddress:
       return SigninPrefs(*profile.GetPrefs())
           .GetAddressSigninPromoDismissCount(gaia_id);
-    case SignInPromoType::kPassword:
-      return SigninPrefs(*profile.GetPrefs())
-          .GetPasswordSigninPromoDismissCount(gaia_id);
     case SignInPromoType::kBookmark:
       return SigninPrefs(*profile.GetPrefs())
           .GetBookmarkSigninPromoDismissCount(gaia_id);
@@ -190,9 +169,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
   switch (type) {
     case SignInPromoType::kAddress:
       show_count = GetAddressPromoShownCount(profile, account.gaia);
-      break;
-    case SignInPromoType::kPassword:
-      show_count = GetPasswordPromoShownCount(profile, account.gaia);
       break;
     case SignInPromoType::kBookmark:
       if (!base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
@@ -364,14 +340,6 @@ bool ShouldShowExtensionSignInPromo(Profile& profile,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-bool ShouldShowPasswordSignInPromo(Profile& profile) {
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  return ShouldShowSignInPromoCommon(profile, SignInPromoType::kPassword);
-#else
-  return false;
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-}
-
 bool ShouldShowAddressSignInPromo(Profile& profile,
                                   const autofill::AutofillProfile& address) {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -419,8 +387,7 @@ bool ShouldShowBookmarkSignInPromo(Profile& profile) {
 
 bool IsBubbleSigninPromo(signin_metrics::AccessPoint access_point) {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  return access_point == signin_metrics::AccessPoint::kPasswordBubble ||
-         access_point == signin_metrics::AccessPoint::kAddressBubble ||
+  return access_point == signin_metrics::AccessPoint::kAddressBubble ||
          (base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp) &&
           access_point == signin_metrics::AccessPoint::kBookmarkBubble);
 #else
@@ -455,8 +422,6 @@ bool IsSignInPromo(signin_metrics::AccessPoint access_point) {
 SignInPromoType GetSignInPromoTypeFromAccessPoint(
     signin_metrics::AccessPoint access_point) {
   switch (access_point) {
-    case signin_metrics::AccessPoint::kPasswordBubble:
-      return SignInPromoType::kPassword;
     case signin_metrics::AccessPoint::kAddressBubble:
       return SignInPromoType::kAddress;
     case signin_metrics::AccessPoint::kBookmarkBubble:
@@ -485,13 +450,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
   if (account.gaia.empty()) {
     const char* pref_name;
     switch (promo_type) {
-      case SignInPromoType::kPassword:
-        pref_name =
-            base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)
-                ? prefs::
-                      kPasswordSignInPromoShownCountPerProfileForLimitsExperiment
-                : prefs::kPasswordSignInPromoShownCountPerProfile;
-        break;
       case SignInPromoType::kAddress:
         pref_name =
             base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)
@@ -522,10 +480,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
   // Record the pref for the account that was used for the promo, either because
   // it is signed into the web or in sign in pending state.
   switch (promo_type) {
-    case SignInPromoType::kPassword:
-      SigninPrefs(*profile->GetPrefs())
-          .IncrementPasswordSigninPromoImpressionCount(account.gaia);
-      return;
     case SignInPromoType::kAddress:
       SigninPrefs(*profile->GetPrefs())
           .IncrementAddressSigninPromoImpressionCount(account.gaia);

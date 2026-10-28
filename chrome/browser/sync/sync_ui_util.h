@@ -29,8 +29,6 @@ enum class SyncStatusMessageType {
   kSynced,
   // A sync error (such as invalid credentials) has occurred.
   kSyncError,
-  // Same as kSyncError but affecting passwords only.
-  kPasswordsOnlySyncError,
 };
 
 // The action associated with the sync status in settings.

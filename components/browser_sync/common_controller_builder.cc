@@ -42,13 +42,6 @@
 #include "components/history/core/browser/sync/history_data_type_controller.h"
 #include "components/history/core/browser/sync/history_delete_directives_data_type_controller.h"
 #include "components/notebooks/public/notebooks_service.h"
-#include "components/password_manager/core/browser/password_store/password_store_interface.h"
-#include "components/password_manager/core/browser/sharing/incoming_password_sharing_invitation_data_type_controller.h"
-#include "components/password_manager/core/browser/sharing/outgoing_password_sharing_invitation_data_type_controller.h"
-#include "components/password_manager/core/browser/sharing/password_receiver_service.h"
-#include "components/password_manager/core/browser/sharing/password_sender_service.h"
-#include "components/password_manager/core/browser/sync/password_data_type_controller.h"
-#include "components/password_manager/core/browser/sync/password_local_data_batch_uploader.h"
 #include "components/prefs/pref_service.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/search_engines/template_url_service.h"
@@ -287,25 +280,6 @@ void CommonControllerBuilder::SetPasskeyModel(
   passkey_model_.Set(passkey_model);
 }
 
-void CommonControllerBuilder::SetPasswordReceiverService(
-    password_manager::PasswordReceiverService* password_receiver_service) {
-  password_receiver_service_.Set(password_receiver_service);
-}
-
-void CommonControllerBuilder::SetPasswordSenderService(
-    password_manager::PasswordSenderService* password_sender_service) {
-  password_sender_service_.Set(password_sender_service);
-}
-
-void CommonControllerBuilder::SetPasswordStore(
-    const scoped_refptr<password_manager::PasswordStoreInterface>&
-        profile_password_store,
-    const scoped_refptr<password_manager::PasswordStoreInterface>&
-        account_password_store) {
-  profile_password_store_.Set(profile_password_store);
-  account_password_store_.Set(account_password_store);
-}
-
 void CommonControllerBuilder::SetPrefService(PrefService* pref_service) {
   pref_service_.Set(pref_service);
 }
@@ -412,22 +386,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::SESSIONS)) {
     add_controller(CreateSessionsDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::PASSWORDS)) {
-    add_controller(CreatePasswordsDataTypeController());
-  }
-
-  if (!disabled_types.Has(syncer::INCOMING_PASSWORD_SHARING_INVITATION) &&
-      !disabled_types.Has(syncer::PASSWORDS)) {
-    add_controller(
-        CreateIncomingPasswordSharingInvitationDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::OUTGOING_PASSWORD_SHARING_INVITATION) &&
-      !disabled_types.Has(syncer::PASSWORDS)) {
-    add_controller(
-        CreateOutgoingPasswordSharingInvitationDataTypeController(sync_service));
   }
 
   if (!disabled_types.Has(syncer::PREFERENCES)) {
@@ -702,43 +660,6 @@ CommonControllerBuilder::CreateSessionsDataTypeController(
   return std::make_unique<sync_sessions::SessionDataTypeController>(
       sync_service, pref_service_.value(), std::move(full_sync_mode_delegate),
       std::move(transport_mode_delegate));
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreatePasswordsDataTypeController() {
-  // |profile_password_store_| can be null in tests.
-  if (!profile_password_store_.value()) {
-    return nullptr;
-  }
-  return std::make_unique<password_manager::PasswordDataTypeController>(
-      profile_password_store_.value()->CreateSyncControllerDelegate(),
-      account_password_store_.value()
-          ? account_password_store_.value()->CreateSyncControllerDelegate()
-          : nullptr,
-      std::make_unique<password_manager::PasswordLocalDataBatchUploader>(
-          profile_password_store_.value(), account_password_store_.value()));
-}
-
-std::unique_ptr<syncer::DataTypeController> CommonControllerBuilder::
-    CreateIncomingPasswordSharingInvitationDataTypeController(
-        syncer::SyncService* sync_service) {
-  if (!profile_password_store_.value() || !password_receiver_service_.value()) {
-    return nullptr;
-  }
-  return std::make_unique<
-      password_manager::IncomingPasswordSharingInvitationDataTypeController>(
-      sync_service, password_receiver_service_.value(), pref_service_.value());
-}
-
-std::unique_ptr<syncer::DataTypeController> CommonControllerBuilder::
-    CreateOutgoingPasswordSharingInvitationDataTypeController(
-        syncer::SyncService* sync_service) {
-  if (!profile_password_store_.value() || !password_sender_service_.value()) {
-    return nullptr;
-  }
-  return std::make_unique<
-      password_manager::OutgoingPasswordSharingInvitationDataTypeController>(
-      sync_service, password_sender_service_.value(), pref_service_.value());
 }
 
 std::unique_ptr<syncer::DataTypeController>

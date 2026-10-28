@@ -23,7 +23,6 @@
 #include "chrome/common/chrome_paths.h"
 #include "components/browser_sync/sync_engine_factory_impl.h"
 #include "components/network_time/network_time_tracker.h"
-#include "components/password_manager/core/browser/features/password_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/model/data_type_store_service.h"

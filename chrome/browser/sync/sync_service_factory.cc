@@ -25,10 +25,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/notebooks/notebooks_service_factory.h"
-#include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/password_manager/factories/password_receiver_service_factory.h"
-#include "chrome/browser/password_manager/factories/password_sender_service_factory.h"
-#include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/prefs/pref_service_syncable_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_key.h"
@@ -65,7 +61,6 @@
 #include "components/browser_sync/common_controller_builder.h"
 #include "components/collaboration/public/collaboration_service.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/password_manager/core/browser/sharing/password_receiver_service.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
@@ -182,14 +177,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
   builder.SetDataTypeStoreService(
       DataTypeStoreServiceFactory::GetForProfile(profile));
   builder.SetPasskeyModel(nullptr);
-  builder.SetPasswordReceiverService(
-      PasswordReceiverServiceFactory::GetForProfile(profile));
-  builder.SetPasswordSenderService(
-      PasswordSenderServiceFactory::GetForProfile(profile));
-  builder.SetPasswordStore(ProfilePasswordStoreFactory::GetForProfile(
-                               profile, ServiceAccessType::IMPLICIT_ACCESS),
-                           AccountPasswordStoreFactory::GetForProfile(
-                               profile, ServiceAccessType::IMPLICIT_ACCESS));
   builder.SetPrefService(profile->GetPrefs());
   builder.SetPrefServiceSyncable(PrefServiceSyncableFromProfile(profile));
   builder.SetTabGroupSyncService(GetTabGroupSyncService(profile));
@@ -318,30 +305,6 @@ std::unique_ptr<KeyedService> BuildSyncService(
       std::make_unique<syncer::SyncServiceImpl>(std::move(init_params));
   sync_service->Initialize(CreateControllers(profile, sync_service.get()));
 
-  // Notify the PasswordStore of complete initialisation to resolve a circular
-  // dependency.
-  auto profile_password_store = ProfilePasswordStoreFactory::GetForProfile(
-      profile, ServiceAccessType::EXPLICIT_ACCESS);
-  // PasswordStoreInterface may be null in tests.
-  if (profile_password_store) {
-    profile_password_store->OnSyncServiceInitialized(sync_service.get());
-  }
-
-  auto account_password_store = AccountPasswordStoreFactory::GetForProfile(
-      profile, ServiceAccessType::EXPLICIT_ACCESS);
-
-  if (account_password_store) {
-    account_password_store->OnSyncServiceInitialized(sync_service.get());
-  }
-
-  // Notify PasswordReceiverService of complete initialization to resolve a
-  // circular dependency.
-  password_manager::PasswordReceiverService* password_receiver_service =
-      PasswordReceiverServiceFactory::GetForProfile(profile);
-  if (password_receiver_service) {
-    password_receiver_service->OnSyncServiceInitialized(sync_service.get());
-  }
-
   SendTabToSelfSyncServiceFactory::GetForProfile(profile)
       ->OnSyncServiceInitialized(sync_service.get());
 
@@ -399,7 +362,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(AboutSigninInternalsFactory::GetInstance());
   DependsOn(AccountSettingServiceFactory::GetInstance());
   DependsOn(AccountBookmarkSyncServiceFactory::GetInstance());
-  DependsOn(AccountPasswordStoreFactory::GetInstance());
   DependsOn(BookmarkModelFactory::GetInstance());
   DependsOn(BookmarkUndoServiceFactory::GetInstance());
   DependsOn(browser_sync::UserEventServiceFactory::GetInstance());
@@ -416,9 +378,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(LocalOrSyncableBookmarkSyncServiceFactory::GetInstance());
   DependsOn(notebooks::NotebooksServiceFactory::GetInstance());
-  DependsOn(PasswordReceiverServiceFactory::GetInstance());
-  DependsOn(PasswordSenderServiceFactory::GetInstance());
-  DependsOn(ProfilePasswordStoreFactory::GetInstance());
 
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());

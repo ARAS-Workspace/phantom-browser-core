@@ -124,9 +124,6 @@ class SigninPrefs {
   int IncrementChromeSigninInterceptionDismissCount(const GaiaId& gaia_id);
   int GetChromeSigninInterceptionDismissCount(const GaiaId& gaia_id) const;
 
-  void IncrementPasswordSigninPromoImpressionCount(const GaiaId& gaia_id);
-  int GetPasswordSigninPromoImpressionCount(const GaiaId& gaia_id) const;
-
   void IncrementAddressSigninPromoImpressionCount(const GaiaId& gaia_id);
   int GetAddressSigninPromoImpressionCount(const GaiaId& gaia_id) const;
 
@@ -141,9 +138,6 @@ class SigninPrefs {
 
   void IncrementBookmarkSigninPromoDismissCount(const GaiaId& gaia_id);
   int GetBookmarkSigninPromoDismissCount(const GaiaId& gaia_id) const;
-
-  void IncrementPasswordSigninPromoDismissCount(const GaiaId& gaia_id);
-  int GetPasswordSigninPromoDismissCount(const GaiaId& gaia_id) const;
 
   void SetExtensionsExplicitBrowserSignin(const GaiaId& gaia_id, bool enabled);
   bool GetExtensionsExplicitBrowserSignin(const GaiaId& gaia_id) const;

@@ -166,12 +166,6 @@ const char kAddressSignInPromoShownCountPerProfileForLimitsExperiment[] =
 const char kBookmarkSignInPromoShownCountPerProfileForLimitsExperiment[] =
     "signin.BookmarkSignInPromoShownCountForLimitsExperiment";
 
-// Integer pref to store the number of times the password bubble signin promo
-// has been shown per profile while the user is signed out used for
-// SigninPromoLimitsExperiment.
-const char kPasswordSignInPromoShownCountPerProfileForLimitsExperiment[] =
-    "signin.PasswordSignInPromoShownCountForLimitsExperiment";
-
 // Integer which indicates whether enterprise profile separation is enforced or
 // disabled.
 const char kProfileSeparationSettings[] = "profile_separation.settings";

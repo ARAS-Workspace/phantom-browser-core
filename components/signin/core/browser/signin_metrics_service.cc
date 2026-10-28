@@ -111,9 +111,6 @@ void MaybeRecordWebSigninToChromeSigninTimes(
     case signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo:
       access_point_string = "ProfileMenu";
       break;
-    case signin_metrics::AccessPoint::kPasswordBubble:
-      access_point_string = "PasswordSigninPromo";
-      break;
     case signin_metrics::AccessPoint::kAddressBubble:
       access_point_string = "AddressSigninPromo";
       break;
@@ -133,6 +130,7 @@ void MaybeRecordWebSigninToChromeSigninTimes(
     case signin_metrics::AccessPoint::kUserManager:
     case signin_metrics::AccessPoint::kFullscreenSigninPromo:
     case signin_metrics::AccessPoint::kRecentTabs:
+    case signin_metrics::AccessPoint::kPasswordBubble:
     case signin_metrics::AccessPoint::kAutofillDropdown:
     case signin_metrics::AccessPoint::kResigninInfobar:
     case signin_metrics::AccessPoint::kMachineLogon:
@@ -490,17 +488,6 @@ void SigninMetricsService::MaybeRecordMetricsForPromoShowCountAtSignin(
               : pref_service_->GetInteger(
                     prefs::
                         kAddressSignInPromoShownCountPerProfileForLimitsExperiment),
-          /*min=*/1, /*exclusive_max=*/10, /*buckets=*/10);
-      break;
-    case signin_metrics::AccessPoint::kPasswordBubble:
-      base::UmaHistogramCustomCounts(
-          "Signin.ShowCountAtSignin.PasswordSigninPromo",
-          is_from_web_signin
-              ? SigninPrefs(pref_service_.get())
-                    .GetPasswordSigninPromoImpressionCount(account_info.gaia)
-              : pref_service_->GetInteger(
-                    prefs::
-                        kPasswordSignInPromoShownCountPerProfileForLimitsExperiment),
           /*min=*/1, /*exclusive_max=*/10, /*buckets=*/10);
       break;
     case signin_metrics::AccessPoint::kBookmarkBubble:

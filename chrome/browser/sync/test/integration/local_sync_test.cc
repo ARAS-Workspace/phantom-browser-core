@@ -96,7 +96,6 @@ IN_PROC_BROWSER_TEST_F(LocalSyncTest, ShouldStart) {
   syncer::DataTypeSet expected_active_data_types = {
       syncer::BOOKMARKS,
       syncer::PREFERENCES,
-      syncer::PASSWORDS,
       syncer::AUTOFILL_PROFILE,
       syncer::AUTOFILL,
       syncer::THEMES,

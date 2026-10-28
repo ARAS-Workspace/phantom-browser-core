@@ -61,85 +61,71 @@ int GetSubtitleID(bool is_signin_promo,
                   signin::SignInPromoType promo_type,
                   SignedInState signed_in_state) {
   switch (promo_type) {
-    case signin::SignInPromoType::kPassword: {
+    case signin::SignInPromoType::kAddress: {
       switch (signed_in_state) {
         case SignedInState::kSignedOut:
         case SignedInState::kWebOnlySignedIn:
-          return IDS_AUTOFILL_SIGNIN_PROMO_SUBTITLE_PASSWORD;
+          return IDS_AUTOFILL_SIGNIN_PROMO_SUBTITLE_ADDRESS;
         case SignedInState::kSignInPending:
-          return IDS_AUTOFILL_VERIFY_PROMO_SUBTITLE_PASSWORD;
+          return IDS_AUTOFILL_VERIFY_PROMO_SUBTITLE_ADDRESS;
         case SignedInState::kSignedIn:
         case SignedInState::kSyncing:
         case SignedInState::kSyncPaused:
           break;
       }
-      break;
-      case signin::SignInPromoType::kAddress: {
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-            return IDS_AUTOFILL_SIGNIN_PROMO_SUBTITLE_ADDRESS;
-          case SignedInState::kSignInPending:
-            return IDS_AUTOFILL_VERIFY_PROMO_SUBTITLE_ADDRESS;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-          case SignedInState::kSyncPaused:
-            break;
-        }
-      } break;
-      case signin::SignInPromoType::kBookmark: {
-        if (!is_signin_promo) {
-          return IDS_BOOKMARK_DICE_PROMO_SYNC_MESSAGE;
-        }
+    } break;
+    case signin::SignInPromoType::kBookmark: {
+      if (!is_signin_promo) {
+        return IDS_BOOKMARK_DICE_PROMO_SYNC_MESSAGE;
+      }
 
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-            return base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)
-                       ? IDS_BOOKMARK_INSTALLED_BUBBLE_PROMO_EXPLICIT_SIGNIN_MESSAGE
-                       : IDS_BOOKMARK_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE;
-          case SignedInState::kSignInPending:
-            return IDS_BOOKMARK_VERIFY_PROMO_SUBTITLE;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-          case SignedInState::kSyncPaused:
-            break;
-        }
-      } break;
-      case signin::SignInPromoType::kExtension: {
-        if (!is_signin_promo) {
-          return IDS_EXTENSION_INSTALLED_DICE_PROMO_SYNC_MESSAGE;
-        }
+      switch (signed_in_state) {
+        case SignedInState::kSignedOut:
+        case SignedInState::kWebOnlySignedIn:
+          return base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)
+                     ? IDS_BOOKMARK_INSTALLED_BUBBLE_PROMO_EXPLICIT_SIGNIN_MESSAGE
+                     : IDS_BOOKMARK_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE;
+        case SignedInState::kSignInPending:
+          return IDS_BOOKMARK_VERIFY_PROMO_SUBTITLE;
+        case SignedInState::kSignedIn:
+        case SignedInState::kSyncing:
+        case SignedInState::kSyncPaused:
+          break;
+      }
+    } break;
+    case signin::SignInPromoType::kExtension: {
+      if (!is_signin_promo) {
+        return IDS_EXTENSION_INSTALLED_DICE_PROMO_SYNC_MESSAGE;
+      }
 
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-            return IDS_EXTENSION_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE;
-          case SignedInState::kSignInPending:
-            return IDS_EXTENSION_VERIFY_PROMO_SUBTITLE;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-          case SignedInState::kSyncPaused:
-            break;
-        }
-      } break;
-      case signin::SignInPromoType::kSendTabToSelf: {
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-            return base::FeatureList::IsEnabled(
-                       send_tab_to_self::kSendTabToSelfEnhancedDesktopUI)
-                       ? IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_BODY
-                       : IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_LABEL;
-          case SignedInState::kSignInPending:
-          case SignedInState::kSyncPaused:
-            return IDS_SEND_TAB_TO_SELF_VERIFY_ITS_YOU_PROMO_LABEL;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-            break;
-        }
-      } break;
-    }
+      switch (signed_in_state) {
+        case SignedInState::kSignedOut:
+        case SignedInState::kWebOnlySignedIn:
+          return IDS_EXTENSION_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE;
+        case SignedInState::kSignInPending:
+          return IDS_EXTENSION_VERIFY_PROMO_SUBTITLE;
+        case SignedInState::kSignedIn:
+        case SignedInState::kSyncing:
+        case SignedInState::kSyncPaused:
+          break;
+      }
+    } break;
+    case signin::SignInPromoType::kSendTabToSelf: {
+      switch (signed_in_state) {
+        case SignedInState::kSignedOut:
+        case SignedInState::kWebOnlySignedIn:
+          return base::FeatureList::IsEnabled(
+                     send_tab_to_self::kSendTabToSelfEnhancedDesktopUI)
+                     ? IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_BODY
+                     : IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_LABEL;
+        case SignedInState::kSignInPending:
+        case SignedInState::kSyncPaused:
+          return IDS_SEND_TAB_TO_SELF_VERIFY_ITS_YOU_PROMO_LABEL;
+        case SignedInState::kSignedIn:
+        case SignedInState::kSyncing:
+          break;
+      }
+    } break;
   }
 
   NOTREACHED();
@@ -222,13 +208,6 @@ void IncrementContextualPromoDismissCountPerSignedOutProfile(
   }
 
   switch (promo_type) {
-    case signin::SignInPromoType::kPassword:
-      return profile->GetPrefs()->SetInteger(
-          prefs::kPasswordSignInPromoDismissCountPerProfileForLimitsExperiment,
-          profile->GetPrefs()->GetInteger(
-              prefs::
-                  kPasswordSignInPromoDismissCountPerProfileForLimitsExperiment) +
-              1);
     case signin::SignInPromoType::kAddress:
       return profile->GetPrefs()->SetInteger(
           prefs::kAddressSignInPromoDismissCountPerProfileForLimitsExperiment,
@@ -263,10 +242,6 @@ void IncrementContextualPromoDismissCountPerAccount(
   }
 
   switch (promo_type) {
-    case signin::SignInPromoType::kPassword:
-      SigninPrefs(*profile->GetPrefs())
-          .IncrementPasswordSigninPromoDismissCount(account.gaia);
-      break;
     case signin::SignInPromoType::kAddress:
       SigninPrefs(*profile->GetPrefs())
           .IncrementAddressSigninPromoDismissCount(account.gaia);

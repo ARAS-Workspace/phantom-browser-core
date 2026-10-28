@@ -44,9 +44,6 @@ bool ShouldShowExtensionSignInPromo(Profile& profile,
                                     const extensions::Extension& extension);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-// Whether we should show the sign in promo after a password was saved.
-bool ShouldShowPasswordSignInPromo(Profile& profile);
-
 // Whether we should show the sign in promo after `address` was saved.
 bool ShouldShowAddressSignInPromo(Profile& profile,
                                   const autofill::AutofillProfile& address);

@@ -741,8 +741,6 @@ void AddSyncAccountControlStrings(content::WebUIDataSource* html_source) {
       {"settingsCheckboxLabel", IDS_SETTINGS_SETTINGS_CHECKBOX_LABEL},
       {"syncNotWorking", IDS_SETTINGS_PEOPLE_SYNC_NOT_WORKING},
       {"syncDisabled", IDS_PROFILES_DICE_SYNC_DISABLED_TITLE},
-      {"syncPasswordsNotWorking",
-       IDS_SETTINGS_PEOPLE_SYNC_PASSWORDS_NOT_WORKING},
       {"useAnotherAccount", IDS_SETTINGS_PEOPLE_SYNC_ANOTHER_ACCOUNT},
       {"changeAccount", IDS_SETTINGS_CHANGE_ACCOUNT},
       {"syncAdvancedPageTitle", IDS_SETTINGS_NEW_SYNC_ADVANCED_PAGE_TITLE},

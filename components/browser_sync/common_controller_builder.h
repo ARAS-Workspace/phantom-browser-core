@@ -66,12 +66,6 @@ namespace notebooks {
 class NotebooksService;
 }  // namespace notebooks
 
-namespace password_manager {
-class PasswordReceiverService;
-class PasswordSenderService;
-class PasswordStoreInterface;
-}  // namespace password_manager
-
 namespace send_tab_to_self {
 class SendTabToSelfSyncService;
 }  // namespace send_tab_to_self
@@ -166,15 +160,6 @@ class CommonControllerBuilder {
 
   void SetPasskeyModel(webauthn::PasskeyModel* passkey_model);
 
-  void SetPasswordReceiverService(
-      password_manager::PasswordReceiverService* password_receiver_service);
-  void SetPasswordSenderService(
-      password_manager::PasswordSenderService* password_sender_service);
-  void SetPasswordStore(
-      const scoped_refptr<password_manager::PasswordStoreInterface>&
-          profile_password_store,
-      const scoped_refptr<password_manager::PasswordStoreInterface>&
-          account_password_store);
   void SetPrefService(PrefService* pref_service);
   void SetPrefServiceSyncable(
       sync_preferences::PrefServiceSyncable* pref_service_syncable);
@@ -229,14 +214,6 @@ class CommonControllerBuilder {
       syncer::SyncService* sync_service,
       version_info::Channel channel);
   std::unique_ptr<syncer::DataTypeController> CreateSessionsDataTypeController(
-      syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreatePasswordsDataTypeController();
-  std::unique_ptr<syncer::DataTypeController>
-  CreateIncomingPasswordSharingInvitationDataTypeController(
-      syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateOutgoingPasswordSharingInvitationDataTypeController(
       syncer::SyncService* sync_service);
   std::unique_ptr<syncer::DataTypeController>
   CreatePreferencesDataTypeController(version_info::Channel channel);
@@ -333,10 +310,6 @@ class CommonControllerBuilder {
   SafeOptional<raw_ptr<history::HistoryService>> history_service_;
   SafeOptional<raw_ptr<syncer::DataTypeStoreService>> data_type_store_service_;
   SafeOptional<raw_ptr<webauthn::PasskeyModel>> passkey_model_;
-  SafeOptional<raw_ptr<password_manager::PasswordReceiverService>>
-      password_receiver_service_;
-  SafeOptional<raw_ptr<password_manager::PasswordSenderService>>
-      password_sender_service_;
   SafeOptional<raw_ptr<PrefService>> pref_service_;
   SafeOptional<raw_ptr<sync_preferences::PrefServiceSyncable>>
       pref_service_syncable_;
@@ -351,10 +324,6 @@ class CommonControllerBuilder {
       profile_autofill_web_data_service_;
   SafeOptional<scoped_refptr<autofill::AutofillWebDataService>>
       account_autofill_web_data_service_;
-  SafeOptional<scoped_refptr<password_manager::PasswordStoreInterface>>
-      profile_password_store_;
-  SafeOptional<scoped_refptr<password_manager::PasswordStoreInterface>>
-      account_password_store_;
   SafeOptional<raw_ptr<sync_bookmarks::BookmarkSyncService>>
       local_or_syncable_bookmark_sync_service_;
   SafeOptional<raw_ptr<sync_bookmarks::BookmarkSyncService>>

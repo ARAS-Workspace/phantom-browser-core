@@ -455,9 +455,6 @@ export class SettingsSyncAccountControlElement extends
     if (this.syncStatus.statusAction === StatusAction.REAUTHENTICATE) {
       return loadTimeData.getString('syncPaused');
     }
-    if (this.syncStatus.hasPasswordsOnlyError) {
-      return loadTimeData.getString('syncPasswordsNotWorking');
-    }
     return loadTimeData.getString('syncNotWorking');
   }
 

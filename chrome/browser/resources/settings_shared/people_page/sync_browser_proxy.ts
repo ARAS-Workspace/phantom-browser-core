@@ -39,7 +39,6 @@ export interface SyncStatus {
   disabled?: boolean;
   domain?: string;
   hasError?: boolean;
-  hasPasswordsOnlyError?: boolean;
   hasUnrecoverableError?: boolean;
   managed?: boolean;
   firstSetupInProgress?: boolean;

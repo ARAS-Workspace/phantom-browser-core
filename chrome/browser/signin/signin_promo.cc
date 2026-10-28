@@ -183,8 +183,6 @@ void RegisterProfilePrefs(
   registry->RegisterIntegerPref(prefs::kDiceSigninUserMenuPromoCount, 0);
   registry->RegisterIntegerPref(
       prefs::kAutofillSignInPromoDismissCountPerProfile, 0);
-  registry->RegisterIntegerPref(prefs::kPasswordSignInPromoShownCountPerProfile,
-                                0);
   registry->RegisterIntegerPref(prefs::kAddressSignInPromoShownCountPerProfile,
                                 0);
   registry->RegisterIntegerPref(prefs::kBookmarkSignInPromoShownCountPerProfile,
@@ -203,11 +201,7 @@ void RegisterProfilePrefs(
   registry->RegisterIntegerPref(
       prefs::kBookmarkSignInPromoShownCountPerProfileForLimitsExperiment, 0);
   registry->RegisterIntegerPref(
-      prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment, 0);
-  registry->RegisterIntegerPref(
       prefs::kAddressSignInPromoDismissCountPerProfileForLimitsExperiment, 0);
-  registry->RegisterIntegerPref(
-      prefs::kPasswordSignInPromoDismissCountPerProfileForLimitsExperiment, 0);
   registry->RegisterIntegerPref(
       prefs::kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment, 0);
 }
