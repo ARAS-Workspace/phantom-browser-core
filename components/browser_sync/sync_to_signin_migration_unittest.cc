@@ -539,7 +539,6 @@ TEST_P(SyncToSigninMigrationTest, UndoFeaturePreventsMigration) {
   ASSERT_TRUE(sync_service_.HasSyncConsent());
   ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
       syncer::BOOKMARKS,
-      syncer::PASSWORDS,
       syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
@@ -637,7 +636,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncAndAllDataTypesActive) {
   ASSERT_TRUE(sync_service_.HasSyncConsent());
   ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
       syncer::BOOKMARKS,
-      syncer::PASSWORDS,
       syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
@@ -686,9 +684,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncAndAllDataTypesActive) {
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
   histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
-      /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-  histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -709,14 +704,9 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncActiveButNotDataTypes) {
 
   // ReadingList is not selected.
   sync_service_.GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, {syncer::UserSelectableType::kBookmarks,
-                                  syncer::UserSelectableType::kPasswords});
-  // Passwords is selected, but failed to actually start up (e.g. disabled by
-  // policy).
-  sync_service_.SetFailedDataTypes({syncer::PASSWORDS});
+      /*sync_everything=*/false, {syncer::UserSelectableType::kBookmarks});
 
   ASSERT_TRUE(sync_service_.GetActiveDataTypes().Has(syncer::BOOKMARKS));
-  ASSERT_FALSE(sync_service_.GetActiveDataTypes().Has(syncer::PASSWORDS));
   ASSERT_FALSE(sync_service_.GetActiveDataTypes().Has(syncer::READING_LIST));
 
   // Save the above state to prefs.
@@ -750,11 +740,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncActiveButNotDataTypes) {
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-  // Passwords was not active, even though it was enabled.
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
-      /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-      1);
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeDisabled*/ 1, 1);
@@ -767,7 +752,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
   ASSERT_TRUE(sync_service_.HasSyncConsent());
   ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
       syncer::BOOKMARKS,
-      syncer::PASSWORDS,
       syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
@@ -806,8 +790,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.BOOKMARK", 0);
   histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.DryRun.PASSWORD", 0);
-  histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.READING_LIST", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.EXTENSION", 0);
@@ -817,10 +799,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
     // The individual data types were not active and so should not be migrated.
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK",
-        /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-        1);
-    histograms.ExpectUniqueSample(
-        "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
     histograms.ExpectUniqueSample(
@@ -841,8 +819,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
     // The overall migration didn't run.
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK", 0);
-    histograms.ExpectTotalCount(
-        "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD", 0);
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST", 0);
     histograms.ExpectTotalCount(
@@ -876,8 +852,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, NotSignedIn) {
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.BOOKMARK", 0);
   histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.DryRun.PASSWORD", 0);
-  histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.READING_LIST", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.EXTENSION", 0);
@@ -885,8 +859,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, NotSignedIn) {
                               0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK", 0);
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST", 0);
   histograms.ExpectTotalCount(
@@ -903,7 +875,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncTransport) {
             syncer::SyncService::TransportState::ACTIVE);
   ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
       syncer::BOOKMARKS,
-      syncer::PASSWORDS,
       syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
@@ -930,8 +901,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncTransport) {
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.BOOKMARK", 0);
   histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.DryRun.PASSWORD", 0);
-  histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.READING_LIST", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.EXTENSION", 0);
@@ -939,8 +908,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncTransport) {
                               0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK", 0);
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST", 0);
   histograms.ExpectTotalCount(
@@ -977,10 +944,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
     histograms.ExpectUniqueSample(
-        "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
-        /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-        1);
-    histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
@@ -1006,8 +969,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK", 0);
     histograms.ExpectTotalCount(
-        "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-    histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST", 0);
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision." + infix + ".EXTENSION", 0);
@@ -1024,10 +985,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
                                   /*kNotMigratedYet*/ 3, 1);
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
-        /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-        1);
-    histograms.ExpectUniqueSample(
-        "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
     histograms.ExpectUniqueSample(
@@ -1101,10 +1058,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayPassed) {
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
   histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
-      /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-      1);
-  histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
@@ -1161,9 +1114,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_AuthErrorResolved) {
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
   histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
-      /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-  histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -1211,8 +1161,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.BOOKMARK", 0);
   histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision.DryRun.PASSWORD", 0);
-  histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.READING_LIST", 0);
   histograms.ExpectTotalCount(
       "Sync.SyncToSigninMigrationDecision.DryRun.EXTENSION", 0);
@@ -1222,10 +1170,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
     // The individual data types were not active and so should not be migrated.
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK",
-        /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
-        1);
-    histograms.ExpectUniqueSample(
-        "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
     histograms.ExpectUniqueSample(
@@ -1246,8 +1190,6 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
     // The overall migration didn't run.
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK", 0);
-    histograms.ExpectTotalCount(
-        "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD", 0);
     histograms.ExpectTotalCount(
         "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST", 0);
     histograms.ExpectTotalCount(
@@ -1448,7 +1390,6 @@ class SyncToSigninMigrationDataTypesTest
     ASSERT_TRUE(sync_service_.HasSyncConsent());
     ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
         syncer::BOOKMARKS,
-        syncer::PASSWORDS,
         syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         syncer::EXTENSIONS,
@@ -1476,13 +1417,6 @@ class SyncToSigninMigrationDataTypesTest
   base::FilePath GetEncryptedBookmarksAccountStorePath() const {
     return fake_profile_dir_.GetPath().Append(
         bookmarks::kEncryptedAccountBookmarksFileName);
-  }
-
-  base::FilePath GetPasswordsLocalStorePath() const {
-    return fake_profile_dir_.GetPath().AppendASCII("Login Data");
-  }
-  base::FilePath GetPasswordsAccountStorePath() const {
-    return fake_profile_dir_.GetPath().AppendASCII("Login Data For Account");
   }
 
   bool IsBlockingAllowed() const { return BlockingAllowed(GetParam()); }
@@ -1747,159 +1681,6 @@ TEST_P(SyncToSigninMigrationDataTypesTest,
       -base::File::FILE_ERROR_NOT_FOUND, 1);
 }
 
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_BothExist) {
-  // Both password stores exist on disk. The account store is empty, since it
-  // was unused pre-migration. This is the typical pre-migration state.
-  base::WriteFile(GetPasswordsLocalStorePath(), "local passwords");
-  base::WriteFile(GetPasswordsAccountStorePath(), "");
-
-  base::HistogramTester histograms;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The local file should have been moved over the account one.
-  EXPECT_FALSE(base::PathExists(GetPasswordsLocalStorePath()));
-  EXPECT_TRUE(base::PathExists(GetPasswordsAccountStorePath()));
-
-  std::string account_contents;
-  ASSERT_TRUE(base::ReadFileToString(GetPasswordsAccountStorePath(),
-                                     &account_contents));
-  EXPECT_EQ(account_contents, "local passwords");
-
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove",
-      -base::File::FILE_OK, 1);
-}
-
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_OnlyLocalExists) {
-  // Only the local store exists on disk; the account store doesn't. This is
-  // uncommon, but could happen upgrades directly from an old Chrome version
-  // that didn't have an account store yet.
-  base::WriteFile(GetPasswordsLocalStorePath(), "local passwords");
-
-  base::HistogramTester histograms;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The local file should have been renamed to the account one.
-  EXPECT_FALSE(base::PathExists(GetPasswordsLocalStorePath()));
-  EXPECT_TRUE(base::PathExists(GetPasswordsAccountStorePath()));
-
-  std::string account_contents;
-  ASSERT_TRUE(base::ReadFileToString(GetPasswordsAccountStorePath(),
-                                     &account_contents));
-  EXPECT_EQ(account_contents, "local passwords");
-
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove",
-      -base::File::FILE_OK, 1);
-}
-
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_OnlyAccountExists) {
-  // Only the account store exists on disk; the local store doesn't. This
-  // should be impossible in practice, except maybe in rare error cases.
-  base::WriteFile(GetPasswordsAccountStorePath(), "account passwords");
-
-  base::HistogramTester histograms;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The migration shouldn't have done anything; the account store should still
-  // exist with the same contents.
-  EXPECT_FALSE(base::PathExists(GetPasswordsLocalStorePath()));
-  EXPECT_TRUE(base::PathExists(GetPasswordsAccountStorePath()));
-
-  std::string account_contents;
-  ASSERT_TRUE(base::ReadFileToString(GetPasswordsAccountStorePath(),
-                                     &account_contents));
-  EXPECT_EQ(account_contents, "account passwords");
-
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove",
-      -base::File::FILE_ERROR_NOT_FOUND, 1);
-}
-
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_NoneExists) {
-  // Neither of the two stores exist on disk. This should be impossible in
-  // practice, except maybe in rare error cases.
-
-  base::HistogramTester histograms;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The migration shouldn't have done anything; still neither of the stores
-  // should exist.
-  EXPECT_FALSE(base::PathExists(GetPasswordsLocalStorePath()));
-  EXPECT_FALSE(base::PathExists(GetPasswordsAccountStorePath()));
-
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove",
-      -base::File::FILE_ERROR_NOT_FOUND, 1);
-}
-
-#if BUILDFLAG(IS_POSIX)
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_FolderNotWritable) {
-  // Both password stores exist on disk. The account store is empty, since it
-  // was unused pre-migration. This is the typical pre-migration state.
-  base::WriteFile(GetPasswordsLocalStorePath(), "local passwords");
-  base::WriteFile(GetPasswordsAccountStorePath(), "");
-  // However, the folder containing the files is (for some reason) not writable,
-  // so the move/rename can't actually happen. This should not happen in
-  // practice (if it does, Chrome will likely be very broken). This test mostly
-  // verifies that nothing catastrophic happens, e.g. no crash.
-  int mode = 0;
-  ASSERT_TRUE(
-      base::GetPosixFilePermissions(fake_profile_dir_.GetPath(), &mode));
-  mode &= ~base::FILE_PERMISSION_WRITE_BY_USER;
-  mode &= ~base::FILE_PERMISSION_WRITE_BY_GROUP;
-  mode &= ~base::FILE_PERMISSION_WRITE_BY_OTHERS;
-  ASSERT_TRUE(base::SetPosixFilePermissions(fake_profile_dir_.GetPath(), mode));
-
-  base::HistogramTester histograms;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // Nothing should have changed.
-  EXPECT_TRUE(base::PathExists(GetPasswordsLocalStorePath()));
-  EXPECT_TRUE(base::PathExists(GetPasswordsAccountStorePath()));
-
-  std::string local_contents;
-  ASSERT_TRUE(
-      base::ReadFileToString(GetPasswordsLocalStorePath(), &local_contents));
-  EXPECT_EQ(local_contents, "local passwords");
-  std::string account_contents;
-  ASSERT_TRUE(base::ReadFileToString(GetPasswordsAccountStorePath(),
-                                     &account_contents));
-  EXPECT_EQ(account_contents, "");
-
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove",
-      -base::File::FILE_ERROR_ACCESS_DENIED, 1);
-}
-#endif  // BUILDFLAG(IS_POSIX)
-
-TEST_P(SyncToSigninMigrationDataTypesTest, MarkStatsTableToBeCleanedUp) {
-  ASSERT_FALSE(pref_service_.GetBoolean(
-      syncer::prefs::kCleanUpStatsTableFromAccountPasswordStore));
-
-  base::HistogramTester histograms;
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The clean-up does not happen right away, but rather a pref is set
-  // to mark that it should be cleaned up.
-  EXPECT_TRUE(pref_service_.GetBoolean(
-      syncer::prefs::kCleanUpStatsTableFromAccountPasswordStore));
-  histograms.ExpectUniqueSample(
-      "Sync.SyncToSigninMigration.StatsTableCleanupStep",
-      syncer::SyncToSigninMigrationStatsTableCleanupStep::kCleanupRequested, 1);
-}
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 TEST_P(SyncToSigninMigrationDataTypesTest, MarkExtensionsToBeMigrated) {
   ASSERT_FALSE(pref_service_.GetBoolean(
@@ -1971,7 +1752,6 @@ class SyncToSigninMigrationUndoTest
     ASSERT_TRUE(sync_service_.HasSyncConsent());
     ASSERT_TRUE(sync_service_.GetActiveDataTypes().HasAll({
         syncer::BOOKMARKS,
-        syncer::PASSWORDS,
         syncer::READING_LIST,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         syncer::EXTENSIONS,

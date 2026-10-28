@@ -712,7 +712,7 @@ class ProfileMenuViewPixelTest
           .gaia_id = GaiaId(account_info.gaia),
           .preferred_data_types =
               {
-                  {syncer::PASSWORDS, signin::SyncDataQuartile::kAboveQ3},
+                  {syncer::BOOKMARKS, signin::SyncDataQuartile::kAboveQ3},
               },
           .other_device_form_factor =
               sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_DESKTOP,

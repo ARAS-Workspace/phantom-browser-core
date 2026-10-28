@@ -209,24 +209,11 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, HistoryCounter) {
   EXPECT_FALSE(IsSyncEnabled());
 
   // If the history deletion sync is not affected, the counter is not restarted.
-  syncer::UserSelectableTypeSet only_passwords = {
-      syncer::UserSelectableType::kPasswords};
-  sync_service->GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
-                                                    only_passwords);
-  sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
-                                                    only_passwords);
-  sync_blocker.reset();
-  EXPECT_FALSE(counter.HasTrackedTasksForTesting());
-  EXPECT_FALSE(CountingFinishedSinceLastAsked());
-
-  // Same in this case.
-  syncer::UserSelectableTypeSet autofill_and_passwords = {
-      syncer::UserSelectableType::kAutofill,
-      syncer::UserSelectableType::kPasswords};
+  syncer::UserSelectableTypeSet only_autofill = {
+      syncer::UserSelectableType::kAutofill};
   sync_blocker = sync_service->GetSetupInProgressHandle();
   sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, autofill_and_passwords);
+      /*sync_everything=*/false, only_autofill);
   sync_blocker.reset();
   EXPECT_FALSE(counter.HasTrackedTasksForTesting());
   EXPECT_FALSE(CountingFinishedSinceLastAsked());

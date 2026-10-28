@@ -140,14 +140,14 @@ IN_PROC_BROWSER_TEST_F(LocalSyncTest, ShouldHonorSelectedTypes) {
   ASSERT_TRUE(service->IsLocalSyncEnabled());
   ASSERT_FALSE(service->IsSyncFeatureEnabled());
   ASSERT_TRUE(service->GetActiveDataTypes().Has(syncer::BOOKMARKS));
-  ASSERT_TRUE(service->GetActiveDataTypes().Has(syncer::PASSWORDS));
+  ASSERT_TRUE(service->GetActiveDataTypes().Has(syncer::PREFERENCES));
 
   service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, {syncer::UserSelectableType::kPasswords});
+      /*sync_everything=*/false, {syncer::UserSelectableType::kPreferences});
 
   ASSERT_TRUE(SyncTransportActiveChecker(service).Wait());
 
-  EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::PASSWORDS));
+  EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::PREFERENCES));
   EXPECT_FALSE(service->GetActiveDataTypes().Has(syncer::BOOKMARKS));
 }
 

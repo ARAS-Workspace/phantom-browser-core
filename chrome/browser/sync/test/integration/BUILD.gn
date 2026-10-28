@@ -141,19 +141,8 @@ source_set("sync_integration_tests_impl") {
     "two_client_wallet_credential_sync_test.cc",
     "two_client_wallet_sync_test.cc",
   ]
-  if (is_mac || is_linux) {
-  }
-  if (is_linux) {
-  }
-  if (is_mac) {
-  }
   sources +=
       [ "select_type_and_migrate_local_data_items_when_active_sync_test.cc" ]
-
-  # TODO(crbug.com/478187672): Fix flakiness and enable on ASan.
-  if (is_linux && is_asan) {
-    sources -= []
-  }
 
   deps += [
     "//chrome:packed_resources",
@@ -257,10 +246,6 @@ source_set("sync_integration_test_support") {
     "multi_client_status_change_checker.h",
     "offer_helper.cc",
     "offer_helper.h",
-    "password_sharing_invitation_helper.cc",
-    "password_sharing_invitation_helper.h",
-    "passwords_helper.cc",
-    "passwords_helper.h",
     "performance/sync_timing_helper.cc",
     "performance/sync_timing_helper.h",
     "preferences_helper.cc",
@@ -318,7 +303,6 @@ source_set("sync_integration_test_support") {
     "//chrome/browser/autofill",
     "//chrome/browser/bookmarks",
     "//chrome/browser/history",
-    "//chrome/browser/password_manager/factories",
     "//chrome/browser/profiles",
     "//chrome/browser/search_engines",
     "//chrome/browser/send_tab_to_self",

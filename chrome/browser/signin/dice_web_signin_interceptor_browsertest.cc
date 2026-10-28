@@ -35,7 +35,6 @@
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/browser/signin/signin_browser_test_base.h"
 #include "chrome/browser/signin/web_signin_interceptor.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -53,7 +52,6 @@
 #include "components/account_id/account_id.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/metrics/profile_metrics_service.h"
-#include "components/password_manager/core/browser/features/password_manager_features_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/search_engines/search_engines_switches.h"
@@ -76,10 +74,7 @@
 #include "components/signin/public/identity_manager/tribool.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/pref_names.h"
-#include "components/sync/base/user_selectable_type.h"
 #include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync/service/sync_service.h"
-#include "components/sync/service/sync_user_settings.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_launcher.h"
 #include "google_apis/gaia/gaia_id.h"
@@ -862,12 +857,6 @@ IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorSigninBubbleBrowserTest,
 
   EXPECT_TRUE(IsChromeSignedIn());
 
-  // Check that the password account storage is enabled.
-  syncer::SyncService* sync_service =
-      SyncServiceFactory::GetForProfile(GetProfile());
-  EXPECT_TRUE(
-      password_manager::features_util::IsAccountStorageActive(sync_service));
-
   CheckHistograms(histogram_tester,
                   SigninInterceptionHeuristicOutcome::kInterceptChromeSignin);
   auto access_point = signin_metrics::AccessPoint::kChromeSigninInterceptBubble;
@@ -1017,8 +1006,6 @@ IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorSigninBubbleBrowserTest,
                                         SigninInterceptionResult::kDeclined);
 
   EXPECT_FALSE(IsChromeSignedIn());
-  EXPECT_FALSE(password_manager::features_util::IsAccountStorageActive(
-      SyncServiceFactory::GetForProfile(GetProfile())));
 
   CheckHistograms(histogram_tester,
                   SigninInterceptionHeuristicOutcome::kInterceptChromeSignin);
@@ -1358,46 +1345,6 @@ IN_PROC_BROWSER_TEST_F(
   // Still no reprompt.
   EXPECT_EQ(signin_prefs.GetChromeSigninBubbleRepromptCount(info.gaia), 0);
   EXPECT_TRUE(IsChromeSignedIn());
-}
-
-// Test the memory of the user's account storage preference.
-IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorSigninBubbleBrowserTest,
-                       DisableAccountStorage) {
-  // Setup account and accept intersection.
-  const std::string email("alice@example.com");
-  AccountInfo account_info =
-      MakeAccountInfoAvailableAndUpdate(email, /*hosted_domain=*/std::string());
-  ShowAndCompleteSigninBubbleWithResult(account_info,
-                                        SigninInterceptionResult::kAccepted);
-
-  // Check that the password account storage is enabled.
-  syncer::SyncService* sync_service =
-      SyncServiceFactory::GetForProfile(GetProfile());
-  EXPECT_TRUE(
-      password_manager::features_util::IsAccountStorageActive(sync_service));
-
-  // Disable account storage.
-  sync_service->GetUserSettings()->SetSelectedType(
-      syncer::UserSelectableType::kPasswords, false);
-
-  // Check that the password account storage is disabled.
-  EXPECT_FALSE(
-      password_manager::features_util::IsAccountStorageActive(sync_service));
-
-  Signout();
-
-  // Check that the password account storage is false if there is no account.
-  EXPECT_FALSE(
-      password_manager::features_util::IsAccountStorageActive(sync_service));
-
-  // Log in again.
-  // Force a Chrome Signin. The bubble will not be shown again.
-  identity_test_env()->MakePrimaryAccountAvailable(
-      email, signin::ConsentLevel::kSignin);
-
-  // Check that the password account storage is still disabled.
-  EXPECT_FALSE(
-      password_manager::features_util::IsAccountStorageActive(sync_service));
 }
 
 // Test the recording of the user entering or resolving an inconsistent state

@@ -160,9 +160,9 @@ TEST_F(SigninPromoTabHelperTest,
                                         signin_metrics::AccessPoint::kSettings);
 
   // Simulate reauth but completed with a DIFFERENT access point (e.g.
-  // PasswordBubble).
+  // AddressBubble).
   AccountInfo extended_info = identity_manager()->FindExtendedAccountInfo(info);
-  extended_info.access_point = signin_metrics::AccessPoint::kPasswordBubble;
+  extended_info.access_point = signin_metrics::AccessPoint::kAddressBubble;
   signin::UpdateAccountInfoForAccount(identity_manager(), extended_info);
 
   signin::UpdatePersistentErrorOfRefreshTokenForAccount(

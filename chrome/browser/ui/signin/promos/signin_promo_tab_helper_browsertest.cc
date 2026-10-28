@@ -25,14 +25,14 @@ class SigninPromoTabHelperTest : public InProcessBrowserTest {
 };
 
 IN_PROC_BROWSER_TEST_F(SigninPromoTabHelperTest,
-                       CallPasswordMoveCallbackAfterSignInFromTab) {
+                       CallAddressMoveCallbackAfterSignInFromTab) {
   // Get the sign in tab with the correct access point.
   signin_ui_util::SignInFromSingleAccountPromo(
       browser()->GetProfile(), CoreAccountInfo(),
-      signin_metrics::AccessPoint::kPasswordBubble);
+      signin_metrics::AccessPoint::kAddressBubble);
   content::WebContents* sign_in_tab =
       signin_ui_util::GetSignInTabWithAccessPoint(
-          browser(), signin_metrics::AccessPoint::kPasswordBubble);
+          browser(), signin_metrics::AccessPoint::kAddressBubble);
 
   // Expect the callback for enabling account storage and moving the data to be
   // called.
@@ -43,14 +43,14 @@ IN_PROC_BROWSER_TEST_F(SigninPromoTabHelperTest,
       SigninPromoTabHelper::GetForWebContents(*sign_in_tab);
   user_data->InitializeCallbackAfterSignIn(
       /*completed_callback=*/completed_callback.Get(),
-      /*access_point=*/signin_metrics::AccessPoint::kPasswordBubble);
+      /*access_point=*/signin_metrics::AccessPoint::kAddressBubble);
 
   // Sign in, which will execute the callback.
   signin::MakeAccountAvailable(
       IdentityManagerFactory::GetForProfile(browser()->GetProfile()),
       signin::AccountAvailabilityOptionsBuilder()
           .AsPrimary(signin::ConsentLevel::kSignin)
-          .WithAccessPoint(signin_metrics::AccessPoint::kPasswordBubble)
+          .WithAccessPoint(signin_metrics::AccessPoint::kAddressBubble)
           .Build("test@gmail.com"));
 }
 

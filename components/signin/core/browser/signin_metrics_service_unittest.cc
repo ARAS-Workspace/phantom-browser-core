@@ -436,8 +436,6 @@ struct AccessPointParam {
 const AccessPointParam params[] = {
     {signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo,
      "Signin.WebSignin.TimeToChromeSignin.ProfileMenu"},
-    {signin_metrics::AccessPoint::kPasswordBubble,
-     "Signin.WebSignin.TimeToChromeSignin.PasswordSigninPromo"},
     {signin_metrics::AccessPoint::kAddressBubble,
      "Signin.WebSignin.TimeToChromeSignin.AddressSigninPromo"},
     {signin_metrics::AccessPoint::kBookmarkBubble,
@@ -739,8 +737,6 @@ class SigninMetricsServicePromoLimitsExperimentTest
   SigninMetricsServicePromoLimitsExperimentTest() {
     // Simulate registering it via signin_promo
     pref_service().registry()->RegisterIntegerPref(
-        prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment, 0);
-    pref_service().registry()->RegisterIntegerPref(
         prefs::kAddressSignInPromoShownCountPerProfileForLimitsExperiment, 0);
     pref_service().registry()->RegisterIntegerPref(
         prefs::kBookmarkSignInPromoShownCountPerProfileForLimitsExperiment, 0);
@@ -795,53 +791,6 @@ TEST_F(SigninMetricsServicePromoLimitsExperimentTest,
 
   histogram_tester.ExpectUniqueSample(
       "Signin.ShowCountAtSignin.AddressSigninPromo", show_count, 1);
-}
-
-TEST_F(SigninMetricsServicePromoLimitsExperimentTest,
-       PasswordPromoShownCountAtSigninFromWebSignin) {
-  base::HistogramTester histogram_tester;
-  CreateSigninMetricsService();
-
-  // Set a random profile value, to ensure that this is not the value being
-  // recorded.
-  const size_t unexpected_value = 8;
-  pref_service().SetInteger(
-      prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment,
-      unexpected_value);
-
-  SigninPrefs signin_prefs(pref_service());
-  GaiaId gaia_id("gaia_id_for_test_gmail.com");
-  const std::string email("test@gmail.com");
-  WebSignin(email);
-
-  const size_t show_count = 3;
-  ASSERT_NE(show_count, unexpected_value);
-  for (size_t i = 0; i < show_count; ++i) {
-    signin_prefs.IncrementPasswordSigninPromoImpressionCount(gaia_id);
-  }
-
-  Signin(email, signin_metrics::AccessPoint::kPasswordBubble, gaia_id);
-
-  histogram_tester.ExpectUniqueSample(
-      "Signin.ShowCountAtSignin.PasswordSigninPromo", show_count, 1);
-}
-
-TEST_F(SigninMetricsServicePromoLimitsExperimentTest,
-       PasswordPromoShownCountAtSigninFromSignedOut) {
-  base::HistogramTester histogram_tester;
-  CreateSigninMetricsService();
-
-  const size_t show_count = 3;
-  pref_service().SetInteger(
-      prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment,
-      show_count);
-
-  const std::string email("test@gmail.com");
-
-  Signin(email, signin_metrics::AccessPoint::kPasswordBubble);
-
-  histogram_tester.ExpectUniqueSample(
-      "Signin.ShowCountAtSignin.PasswordSigninPromo", show_count, 1);
 }
 
 TEST_F(SigninMetricsServicePromoLimitsExperimentTest,

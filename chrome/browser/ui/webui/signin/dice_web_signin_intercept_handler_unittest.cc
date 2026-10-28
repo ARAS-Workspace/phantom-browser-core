@@ -349,10 +349,10 @@ TEST_P(DiceWebSigninInterceptHandlerTest, BodyTextWithAccountPreviewData) {
     return;
   }
 
-  // Test with best data type (passwords) and device (phone).
+  // Test with best data type (autofill) and device (phone).
   signin::AccountPreviewDataService::AccountPreviewPreference pref;
   pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, signin::SyncDataQuartile::kAboveQ3});
+      {syncer::AUTOFILL, signin::SyncDataQuartile::kAboveQ3});
   pref.other_device_form_factor =
       sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_PHONE;
 
@@ -361,7 +361,7 @@ TEST_P(DiceWebSigninInterceptHandlerTest, BodyTextWithAccountPreviewData) {
   std::u16string device_str =
       l10n_util::GetStringUTF16(IDS_ACCOUNT_PREVIEW_DEVICE_PHONE);
   std::string expected_body_text = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS_WITH_DEVICE,
+      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_SAVED_INFO_WITH_DEVICE,
       base::UTF8ToUTF16(primary_account.GetGivenName().value_or("")),
       base::UTF8ToUTF16(intercepted_account.GetEmail()), device_str);
   const std::string* body_text_ptr = parameters.FindString("bodyText");
@@ -464,10 +464,10 @@ TEST_P(DiceWebSigninInterceptHandlerChromeSigninInterceptionTest,
     return;
   }
 
-  // Test with best data type (passwords) and device (phone).
+  // Test with best data type (autofill) and device (phone).
   signin::AccountPreviewDataService::AccountPreviewPreference pref;
   pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, signin::SyncDataQuartile::kAboveQ3});
+      {syncer::AUTOFILL, signin::SyncDataQuartile::kAboveQ3});
   pref.other_device_form_factor =
       sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_PHONE;
 
@@ -476,7 +476,7 @@ TEST_P(DiceWebSigninInterceptHandlerChromeSigninInterceptionTest,
   std::u16string device_str =
       l10n_util::GetStringUTF16(IDS_ACCOUNT_PREVIEW_DEVICE_PHONE);
   std::string expected_subtitle = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS_WITH_DEVICE, device_str);
+      IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_SAVED_INFO_WITH_DEVICE, device_str);
   const std::string* subtitle_ptr = parameters.FindString("subtitle");
   ASSERT_TRUE(subtitle_ptr);
   EXPECT_EQ(*subtitle_ptr, expected_subtitle);

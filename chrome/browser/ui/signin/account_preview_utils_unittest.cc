@@ -21,21 +21,6 @@ TEST(AccountPreviewUtilsTest, EmptyPreferenceReturnsNullopt) {
   EXPECT_EQ(GetAccountPreviewPromoSubtitle(pref), std::nullopt);
 }
 
-TEST(AccountPreviewUtilsTest, PreferenceWithPasswordsAndDevice) {
-  AccountPreviewDataService::AccountPreviewPreference pref;
-  pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
-  pref.other_device_form_factor =
-      sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_PHONE;
-
-  std::u16string device_str =
-      l10n_util::GetStringUTF16(IDS_ACCOUNT_PREVIEW_DEVICE_PHONE);
-  std::string expected = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS_WITH_DEVICE, device_str);
-
-  EXPECT_EQ(GetAccountPreviewPromoSubtitle(pref), expected);
-}
-
 TEST(AccountPreviewUtilsTest, PreferenceWithBookmarksAndDevice) {
   AccountPreviewDataService::AccountPreviewPreference pref;
   pref.preferred_data_types.push_back(
@@ -81,17 +66,6 @@ TEST(AccountPreviewUtilsTest, PreferenceWithSavedInfoAndDevice) {
 
     EXPECT_EQ(GetAccountPreviewPromoSubtitle(pref), expected);
   }
-}
-
-TEST(AccountPreviewUtilsTest, PreferenceWithPasswordsWithoutDevice) {
-  AccountPreviewDataService::AccountPreviewPreference pref;
-  pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
-
-  std::string expected =
-      l10n_util::GetStringUTF8(IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS);
-
-  EXPECT_EQ(GetAccountPreviewPromoSubtitle(pref), expected);
 }
 
 TEST(AccountPreviewUtilsTest, PreferenceWithBookmarksWithoutDevice) {
@@ -143,10 +117,10 @@ TEST(AccountPreviewUtilsTest,
   pref.preferred_data_types.push_back(
       {syncer::HISTORY, SyncDataQuartile::kAboveQ3});
   pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
+      {syncer::BOOKMARKS, SyncDataQuartile::kAboveQ3});
 
   std::string expected =
-      l10n_util::GetStringUTF8(IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS);
+      l10n_util::GetStringUTF8(IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_BOOKMARKS);
 
   EXPECT_EQ(GetAccountPreviewPromoSubtitle(pref), expected);
 }
@@ -156,24 +130,6 @@ TEST(AccountPreviewUtilsTest, ProfileSeparationEmptyPreferenceReturnsNullopt) {
   EXPECT_EQ(GetAccountPreviewProfileSeparationSubtitle(
                 "Elisa", "bob.beckett@gmail.com", pref),
             std::nullopt);
-}
-
-TEST(AccountPreviewUtilsTest, ProfileSeparationWithPasswordsAndDevice) {
-  AccountPreviewDataService::AccountPreviewPreference pref;
-  pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
-  pref.other_device_form_factor =
-      sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_PHONE;
-
-  std::u16string device_str =
-      l10n_util::GetStringUTF16(IDS_ACCOUNT_PREVIEW_DEVICE_PHONE);
-  std::string expected = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS_WITH_DEVICE,
-      u"Elisa", u"bob.beckett@gmail.com", device_str);
-
-  EXPECT_EQ(GetAccountPreviewProfileSeparationSubtitle(
-                "Elisa", "bob.beckett@gmail.com", pref),
-            expected);
 }
 
 TEST(AccountPreviewUtilsTest, ProfileSeparationWithBookmarksAndDevice) {
@@ -230,20 +186,6 @@ TEST(AccountPreviewUtilsTest, ProfileSeparationWithSavedInfoAndDevice) {
                   "Elisa", "bob.beckett@gmail.com", pref),
               expected);
   }
-}
-
-TEST(AccountPreviewUtilsTest, ProfileSeparationWithPasswordsWithoutDevice) {
-  AccountPreviewDataService::AccountPreviewPreference pref;
-  pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
-
-  std::string expected = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS, u"Elisa",
-      u"bob.beckett@gmail.com");
-
-  EXPECT_EQ(GetAccountPreviewProfileSeparationSubtitle(
-                "Elisa", "bob.beckett@gmail.com", pref),
-            expected);
 }
 
 TEST(AccountPreviewUtilsTest, ProfileSeparationWithBookmarksWithoutDevice) {
@@ -308,10 +250,10 @@ TEST(
   pref.preferred_data_types.push_back(
       {syncer::HISTORY, SyncDataQuartile::kAboveQ3});
   pref.preferred_data_types.push_back(
-      {syncer::PASSWORDS, SyncDataQuartile::kAboveQ3});
+      {syncer::BOOKMARKS, SyncDataQuartile::kAboveQ3});
 
   std::string expected = l10n_util::GetStringFUTF8(
-      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS, u"Elisa",
+      IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_BOOKMARKS, u"Elisa",
       u"bob.beckett@gmail.com");
 
   EXPECT_EQ(GetAccountPreviewProfileSeparationSubtitle(

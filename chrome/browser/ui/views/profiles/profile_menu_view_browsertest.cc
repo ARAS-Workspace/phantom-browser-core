@@ -916,7 +916,7 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebOnlyTest, AccountPreferenceSubtitle) {
       .gaia_id = GaiaId(account_info_.gaia),
       .preferred_data_types =
           {
-              {syncer::PASSWORDS, signin::SyncDataQuartile::kAboveQ3},
+              {syncer::BOOKMARKS, signin::SyncDataQuartile::kAboveQ3},
           },
       .other_device_form_factor =
           sync_pb::SyncEnums_DeviceFormFactor_DEVICE_FORM_FACTOR_DESKTOP,

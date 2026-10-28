@@ -9,7 +9,6 @@
 #include "base/command_line.h"
 #include "base/memory/raw_ptr.h"
 #include "base/run_loop.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
@@ -23,12 +22,8 @@
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/cookie_helper.h"
 #include "chrome/browser/sync/test/integration/encryption_helper.h"
-#include "chrome/browser/sync/test/integration/password_sharing_invitation_helper.h"
-#include "chrome/browser/sync/test/integration/passwords_helper.h"
 #include "chrome/browser/sync/test/integration/single_client_status_change_checker.h"
 #include "chrome/browser/sync/test/integration/status_change_checker.h"
-#include "chrome/browser/sync/test/integration/sync_disabled_checker.h"
-#include "chrome/browser/sync/test/integration/sync_engine_stopped_checker.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
@@ -37,9 +32,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "components/browser_sync/browser_sync_switches.h"
 #include "components/metrics/metrics_service.h"
-#include "components/password_manager/core/browser/features/password_manager_features_util.h"
-#include "components/password_manager/core/browser/password_store/password_form_converters.h"
-#include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/sync/base/data_type.h"
@@ -49,7 +41,6 @@
 #include "components/sync/engine/loopback_server/loopback_server_entity.h"
 #include "components/sync/model/crypto/key_derivation_params.h"
 #include "components/sync/model/crypto/nigori.h"
-#include "components/sync/nigori/cross_user_sharing_keys.h"
 #include "components/sync/nigori/cross_user_sharing_public_private_key_pair.h"
 #include "components/sync/nigori/cryptographer_impl.h"
 #include "components/sync/protocol/nigori_local_data.pb.h"
@@ -66,7 +57,6 @@
 #include "components/trusted_vault/test/fake_security_domains_server.h"
 #include "components/trusted_vault/trusted_vault_client.h"
 #include "components/trusted_vault/trusted_vault_connection.h"
-#include "components/trusted_vault/trusted_vault_histograms.h"
 #include "components/trusted_vault/trusted_vault_server_constants.h"
 #include "components/trusted_vault/trusted_vault_service.h"
 #include "components/variations/synthetic_trial_registry.h"
@@ -75,7 +65,6 @@
 #include "content/public/test/test_launcher.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "google_apis/gaia/gaia_switches.h"
-#include "google_apis/gaia/gaia_urls.h"
 #include "net/base/features.h"
 #include "net/dns/mock_host_resolver.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -86,21 +75,15 @@ namespace {
 
 using fake_server::GetServerNigori;
 using fake_server::SetNigoriInFakeServer;
-using password_sharing_helper::CreateDefaultIncomingInvitation;
-using password_sharing_helper::CreateDefaultSenderDisplayInfo;
-using password_sharing_helper::CreateEncryptedIncomingInvitationSpecifics;
 using syncer::BuildCustomPassphraseNigoriSpecifics;
 using syncer::BuildKeystoreNigoriSpecifics;
 using syncer::BuildTrustedVaultNigoriSpecifics;
 using syncer::KeyParamsForTesting;
 using syncer::KeystoreKeyParamsForTesting;
 using syncer::Pbkdf2PassphraseKeyParamsForTesting;
-using syncer::TrustedVaultKeyParamsForTesting;
 using testing::Eq;
 using testing::NotNull;
 using testing::SizeIs;
-
-constexpr int kKeyPairVersion = 0;
 
 // This constant matches SyncSigninDelegate's internal implementation when using
 // fake accounts. Ideally it shouldn't be hardcoded here and instead the fake
@@ -114,15 +97,6 @@ MATCHER_P(IsDataEncryptedWith, key_params, "") {
       syncer::NigoriPassKey::ForTesting(), key_params.derivation_params,
       key_params.password);
   return encrypted_data.key_name() == nigori->GetKeyName();
-}
-
-syncer::CrossUserSharingKeys GenerateNewKeyPair() {
-  syncer::CrossUserSharingKeys cross_user_sharing_keys =
-      syncer::CrossUserSharingKeys::CreateEmpty();
-  syncer::CrossUserSharingPublicPrivateKeyPair key_pair =
-      syncer::CrossUserSharingPublicPrivateKeyPair::GenerateNewKeyPair();
-  cross_user_sharing_keys.SetKeyPair(std::move(key_pair), kKeyPairVersion);
-  return cross_user_sharing_keys;
 }
 
 class WifiConfigurationsSyncActiveChecker
@@ -167,27 +141,6 @@ class TabClosedChecker : public StatusChangeChecker,
 
  private:
   bool closed_ = false;
-};
-
-// Used to wait until IsTrustedVaultKeyRequiredForPreferredDataTypes() returns
-// true.
-class TrustedVaultKeyRequiredForPreferredDataTypesChecker
-    : public SingleClientStatusChangeChecker {
- public:
-  explicit TrustedVaultKeyRequiredForPreferredDataTypesChecker(
-      syncer::SyncServiceImpl* service)
-      : SingleClientStatusChangeChecker(service) {}
-  ~TrustedVaultKeyRequiredForPreferredDataTypesChecker() override = default;
-
- protected:
-  // StatusChangeChecker implementation.
-  bool IsExitConditionSatisfied(std::ostream* os) override {
-    *os << "Waiting until trusted vault key is required for preferred "
-           "datatypes";
-    return service()
-        ->GetUserSettings()
-        ->IsTrustedVaultKeyRequiredForPreferredDataTypes();
-  }
 };
 
 class FakeSecurityDomainsServerMemberStatusChecker
@@ -264,23 +217,6 @@ class SingleClientNigoriSyncTest
     return GetParam();
   }
 
-  password_manager::PasswordForm::Store GetPasswordStoreType() const {
-    if (GetSetupSyncMode() == SetupSyncMode::kSyncTransportOnly) {
-      return password_manager::PasswordForm::Store::kAccountStore;
-    }
-    return password_manager::PasswordForm::Store::kProfileStore;
-  }
-
-  password_manager::PasswordStoreInterface* GetPasswordStore() {
-    return passwords_helper::GetPasswordStoreInterface(0,
-                                                       GetPasswordStoreType());
-  }
-
-  [[nodiscard]] bool WaitForPasswordForms(
-      const std::vector<password_manager::PasswordForm>& forms) const {
-    return PasswordFormsChecker(0, forms, GetPasswordStoreType()).Wait();
-  }
-
   std::vector<variations::ActiveGroupId> GetSyntheticFieldTrials() {
     return g_browser_process->metrics_service()
         ->GetSyntheticTrialRegistry()
@@ -336,82 +272,6 @@ class SingleClientNigoriCrossUserSharingPublicPrivateKeyPairSyncTest
 
   ~SingleClientNigoriCrossUserSharingPublicPrivateKeyPairSyncTest() override =
       default;
-
-  void InjectInvitationToServer(
-      const sync_pb::IncomingPasswordSharingInvitationSpecifics&
-          invitation_specifics) {
-    sync_pb::EntitySpecifics specifics;
-    specifics.mutable_incoming_password_sharing_invitation()->CopyFrom(
-        invitation_specifics);
-    GetFakeServer()->InjectEntity(
-        syncer::PersistentUniqueClientEntity::CreateFromSpecificsForTesting(
-            /*non_unique_name=*/"",
-            /*client_tag=*/
-            specifics.incoming_password_sharing_invitation().guid(), specifics,
-            /*creation_time=*/0, /*last_modified_time=*/0));
-  }
-
-  // Returns the current public key from the server.
-  sync_pb::CrossUserSharingPublicKey GetPublicKeyFromServer() const {
-    sync_pb::NigoriSpecifics nigori_specifics;
-    CHECK(fake_server::GetServerNigori(GetFakeServer(), &nigori_specifics));
-    CHECK(nigori_specifics.has_cross_user_sharing_public_key());
-    return nigori_specifics.cross_user_sharing_public_key();
-  }
-
-  void InjectNigoriWithCrossUserSharingKey(
-      const std::vector<uint8_t>& keystore_key,
-      const syncer::CrossUserSharingKeys& key_pair) {
-    const KeyParamsForTesting keystore_key_params =
-        KeystoreKeyParamsForTesting(keystore_key);
-    SetNigoriInFakeServer(
-        BuildKeystoreNigoriSpecificsWithCrossUserSharingKeys(
-            /*keybag_keys_params=*/{keystore_key_params},
-            /*keystore_decryptor_params*/ {keystore_key_params},
-            /*keystore_key_params=*/keystore_key_params,
-            /*cross_user_sharing_keys=*/key_pair,
-            /*cross_user_sharing_public_key=*/
-            syncer::CrossUserSharingPublicKey::CreateByImport(
-                key_pair.GetKeyPair(kKeyPairVersion).GetRawPublicKey())
-                .value(),
-            /*cross_user_sharing_public_key_version=*/kKeyPairVersion),
-        GetFakeServer());
-  }
-
-  // This method injects a Nigori node with two different generated keys for
-  // public and private keys. This causes the key pair to mismatch.
-  void InjectNigoriWithCorruptedCrossUserSharingKey(
-      const std::vector<uint8_t>& keystore_key) {
-    const KeyParamsForTesting keystore_key_params =
-        KeystoreKeyParamsForTesting(keystore_key);
-    SetNigoriInFakeServer(
-        BuildKeystoreNigoriSpecificsWithCrossUserSharingKeys(
-            /*keybag_keys_params=*/{keystore_key_params},
-            /*keystore_decryptor_params*/ {keystore_key_params},
-            /*keystore_key_params=*/keystore_key_params,
-            /*cross_user_sharing_keys=*/GenerateNewKeyPair(),
-            /*cross_user_sharing_public_key=*/
-            syncer::CrossUserSharingPublicKey::CreateByImport(
-                GenerateNewKeyPair()
-                    .GetKeyPair(kKeyPairVersion)
-                    .GetRawPublicKey())
-                .value(),
-            /*cross_user_sharing_public_key_version=*/kKeyPairVersion),
-        GetFakeServer());
-  }
-
-  // Waits for the Nigori node to be downloaded from the server. Avoid using
-  // this method if possible (e.g. prefer waiting for passphrase type change).
-  bool WaitForNigoriDownloaded() {
-    // There is no easy way to wait for Cryptographer update to make it sure
-    // that the new key pair is propagated, so use bookmarks to verify that
-    // there was a sync cycle before testing password sharing.
-    // TODO(crbug.com/41483767): consider waiting for Cryptographer update
-    // rather than relying on bookmarks.
-    GetFakeServer()->InjectEntity(bookmarks_helper::CreateBookmarkServerEntity(
-        u"title", GURL("http://abc.com")));
-    return bookmarks_helper::BookmarksTitleChecker(0, u"title", 1).Wait();
-  }
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -439,60 +299,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
               Eq(sync_pb::NigoriSpecifics::KEYSTORE_PASSPHRASE));
   EXPECT_TRUE(specifics.keybag_is_frozen());
   EXPECT_TRUE(specifics.has_keystore_migration_time());
-}
-
-// Tests that client can decrypt passwords, encrypted with implicit passphrase.
-// Test first injects implicit passphrase Nigori and encrypted password form to
-// fake server and then checks that client successfully received and decrypted
-// this password form.
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
-                       ShouldDecryptWithImplicitPassphraseNigori) {
-  const KeyParamsForTesting kKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  sync_pb::NigoriSpecifics specifics;
-  std::unique_ptr<syncer::CryptographerImpl> cryptographer =
-      syncer::CryptographerImpl::FromSingleKeyForTesting(
-          kKeyParams.password, kKeyParams.derivation_params);
-  *specifics.mutable_encryption_keybag() =
-      cryptographer->ExportEncryptedKeyBag();
-  SetNigoriInFakeServer(specifics, GetFakeServer());
-
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, kKeyParams.password, kKeyParams.derivation_params,
-      GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  EXPECT_TRUE(GetSyncService(0)->GetUserSettings()->SetDecryptionPassphrase(
-      kKeyParams.password));
-  EXPECT_TRUE(WaitForPasswordForms({password_form}));
-}
-
-// Tests that client can decrypt passwords, encrypted with keystore key in case
-// Nigori node contains only this key. We first inject keystore Nigori and
-// encrypted password form to fake server and then check that client
-// successfully received and decrypted this password form.
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
-                       ShouldDecryptWithKeystoreNigori) {
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  SetNigoriInFakeServer(BuildKeystoreNigoriSpecifics(
-                            /*keybag_keys_params=*/{kKeystoreKeyParams},
-                            /*keystore_decryptor_params=*/kKeystoreKeyParams,
-                            /*keystore_key_params=*/kKeystoreKeyParams),
-                        GetFakeServer());
-
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, kKeystoreKeyParams.password,
-      kKeystoreKeyParams.derivation_params, GetFakeServer());
-  ASSERT_TRUE(SetupSync());
-  EXPECT_TRUE(WaitForPasswordForms({password_form}));
 }
 
 IN_PROC_BROWSER_TEST_P(
@@ -532,226 +338,6 @@ IN_PROC_BROWSER_TEST_P(
                   {{kTitle, kUrl}},
                   /*cryptographer=*/nullptr)
                   .Wait());
-}
-
-// Tests that client can decrypt passwords, encrypted with default key, while
-// Nigori node is in backward-compatible keystore mode (i.e. default key isn't
-// a keystore key, but keystore decryptor token contains this key and encrypted
-// with a keystore key).
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
-                       ShouldDecryptWithBackwardCompatibleKeystoreNigori) {
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  const KeyParamsForTesting kDefaultKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("password");
-  SetNigoriInFakeServer(
-      BuildKeystoreNigoriSpecifics(
-          /*keybag_keys_params=*/{kDefaultKeyParams, kKeystoreKeyParams},
-          /*keystore_decryptor_params*/ {kDefaultKeyParams},
-          /*keystore_key_params=*/kKeystoreKeyParams),
-      GetFakeServer());
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, kDefaultKeyParams.password,
-      kDefaultKeyParams.derivation_params, GetFakeServer());
-  ASSERT_TRUE(SetupSync());
-  EXPECT_TRUE(WaitForPasswordForms({password_form}));
-}
-
-// Tests that client can decrypt |pending_keys| with implicit passphrase in
-// backward-compatible keystore mode, when |keystore_decryptor_token| is
-// non-decryptable (corrupted). Additionally verifies that there is no
-// regression causing crbug.com/40668359.
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriSyncTest,
-    ShouldDecryptWithImplicitPassphraseInBackwardCompatibleKeystoreMode) {
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-
-  // Emulates mismatch between keystore key returned by the server and keystore
-  // key used in NigoriSpecifics.
-  std::vector<uint8_t> corrupted_keystore_key = keystore_keys[0];
-  corrupted_keystore_key.push_back(42u);
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(corrupted_keystore_key);
-  const KeyParamsForTesting kDefaultKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("password");
-  SetNigoriInFakeServer(
-      BuildKeystoreNigoriSpecifics(
-          /*keybag_keys_params=*/{kDefaultKeyParams, kKeystoreKeyParams},
-          /*keystore_decryptor_params*/ {kDefaultKeyParams},
-          /*keystore_key_params=*/kKeystoreKeyParams),
-      GetFakeServer());
-
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, kDefaultKeyParams.password,
-      kDefaultKeyParams.derivation_params, GetFakeServer());
-  ASSERT_TRUE(SetupSync(NO_WAITING));
-
-  EXPECT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-  EXPECT_TRUE(GetSyncService(0)->GetUserSettings()->SetDecryptionPassphrase(
-      "password"));
-  EXPECT_TRUE(WaitForPasswordForms({password_form}));
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriSyncTest,
-    ShouldFollowRewritingKeystoreMigrationWhenDataNonDecryptable) {
-  // Setup with implicit passphrase.
-  const KeyParamsForTesting kPassphraseKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  sync_pb::NigoriSpecifics specifics;
-  std::unique_ptr<syncer::CryptographerImpl> cryptographer =
-      syncer::CryptographerImpl::FromSingleKeyForTesting(
-          kPassphraseKeyParams.password,
-          kPassphraseKeyParams.derivation_params);
-  *specifics.mutable_encryption_keybag() =
-      cryptographer->ExportEncryptedKeyBag();
-  SetNigoriInFakeServer(specifics, GetFakeServer());
-
-  // Mimic passwords encrypted with implicit passphrase stored by the server.
-  const password_manager::PasswordForm password_form1 =
-      passwords_helper::CreateTestPasswordForm(1, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form1, kPassphraseKeyParams.password,
-      kPassphraseKeyParams.derivation_params, GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-
-  // Add local passwords.
-  const password_manager::PasswordForm password_form2 =
-      passwords_helper::CreateTestPasswordForm(2, GetPasswordStoreType());
-  GetPasswordStore()->AddLogin(
-      password_manager::FromPasswordForm(password_form2));
-
-  // Mimic server-side keystore migration:
-  // 1. Issue CLIENT_DATA_OBSOLETE.
-  // 2. Delete server-side passwords (without creating tombstones).
-  // 3. Rewrite server-side nigori with keystore one (this also triggers an
-  // invalidation, so client should see CLIENT_DATA_OBSOLETE).
-  GetFakeServer()->TriggerError(sync_pb::SyncEnums::CLIENT_DATA_OBSOLETE);
-  GetFakeServer()->DeleteAllEntitiesForDataType(syncer::PASSWORDS);
-
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  SetNigoriInFakeServer(BuildKeystoreNigoriSpecifics(
-                            /*keybag_keys_params=*/{kKeystoreKeyParams},
-                            /*keystore_decryptor_params*/ {kKeystoreKeyParams},
-                            /*keystore_key_params=*/kKeystoreKeyParams),
-                        GetFakeServer());
-  // Nigori change triggers invalidation, so client should observe
-  // CLIENT_DATA_OBSOLETE and stop the engine.
-  ASSERT_TRUE(syncer::SyncEngineStoppedChecker(GetSyncService(0)).Wait());
-
-  // Make server return SUCCESS so that sync can initialize.
-  GetFakeServer()->TriggerError(sync_pb::SyncEnums::SUCCESS);
-  ASSERT_TRUE(GetClient(0)->AwaitEngineInitialization());
-
-  // Verify client and server side state (|password_form1| is lost, while
-  // |password_form2| is retained and committed to the server).
-  EXPECT_TRUE(WaitForPasswordForms({password_form2}));
-  EXPECT_TRUE(ServerPasswordsEqualityChecker(
-                  {password_form2}, kKeystoreKeyParams.password,
-                  kKeystoreKeyParams.derivation_params)
-                  .Wait());
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriSyncTest,
-    ShouldFollowRewritingKeystoreMigrationWhenDataDecryptable) {
-  // Setup with implicit passphrase.
-  const KeyParamsForTesting kPassphraseKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  sync_pb::NigoriSpecifics specifics;
-  std::unique_ptr<syncer::CryptographerImpl> cryptographer =
-      syncer::CryptographerImpl::FromSingleKeyForTesting(
-          kPassphraseKeyParams.password,
-          kPassphraseKeyParams.derivation_params);
-  *specifics.mutable_encryption_keybag() =
-      cryptographer->ExportEncryptedKeyBag();
-  SetNigoriInFakeServer(specifics, GetFakeServer());
-
-  // Mimic passwords encrypted with implicit passphrase stored by the server.
-  const password_manager::PasswordForm password_form1 =
-      passwords_helper::CreateTestPasswordForm(1, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form1, kPassphraseKeyParams.password,
-      kPassphraseKeyParams.derivation_params, GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-
-  // Mimic that passphrase is provided by the user.
-  ASSERT_TRUE(GetSyncService(0)->GetUserSettings()->SetDecryptionPassphrase(
-      kPassphraseKeyParams.password));
-  ASSERT_TRUE(PassphraseAcceptedChecker(GetSyncService(0)).Wait());
-  ASSERT_TRUE(WaitForPasswordForms({password_form1}));
-
-  // Add local passwords.
-  const password_manager::PasswordForm password_form2 =
-      passwords_helper::CreateTestPasswordForm(2, GetPasswordStoreType());
-  GetPasswordStore()->AddLogin(
-      password_manager::FromPasswordForm(password_form2));
-
-  // Mimic server-side keystore migration:
-  // 1. Issue CLIENT_DATA_OBSOLETE.
-  // 2. Delete server-side passwords (without creating tombstones).
-  // 3. Rewrite server-side nigori with keystore one (this also triggers an
-  // invalidation, so client should see CLIENT_DATA_OBSOLETE).
-  GetFakeServer()->TriggerError(sync_pb::SyncEnums::CLIENT_DATA_OBSOLETE);
-  GetFakeServer()->DeleteAllEntitiesForDataType(syncer::PASSWORDS);
-
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  SetNigoriInFakeServer(BuildKeystoreNigoriSpecifics(
-                            /*keybag_keys_params=*/{kKeystoreKeyParams},
-                            /*keystore_decryptor_params*/ {kKeystoreKeyParams},
-                            /*keystore_key_params=*/kKeystoreKeyParams),
-                        GetFakeServer());
-  // Nigori change triggers invalidation, so client should observe
-  // CLIENT_DATA_OBSOLETE and stop the engine.
-  ASSERT_TRUE(syncer::SyncEngineStoppedChecker(GetSyncService(0)).Wait());
-
-  // Make server return SUCCESS so that sync can initialize.
-  GetFakeServer()->TriggerError(sync_pb::SyncEnums::SUCCESS);
-  ASSERT_TRUE(GetClient(0)->AwaitEngineInitialization());
-
-  // Verify client and server side state.
-  if (GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly) {
-    // In transport mode, previous passwords should have been lost. However,
-    // newly-created passwords should be uploaded using the keystore key.
-    const password_manager::PasswordForm password_form3 =
-        passwords_helper::CreateTestPasswordForm(3, GetPasswordStoreType());
-    GetPasswordStore()->AddLogin(
-        password_manager::FromPasswordForm(password_form3));
-    EXPECT_TRUE(ServerPasswordsEqualityChecker(
-                    {password_form3}, kKeystoreKeyParams.password,
-                    kKeystoreKeyParams.derivation_params)
-                    .Wait());
-  } else {
-    // With sync the feature enabled, both passwords should be stored and
-    // encrypted with keystore passphrase.
-    EXPECT_TRUE(WaitForPasswordForms({password_form1, password_form2}));
-    EXPECT_TRUE(
-        ServerPasswordsEqualityChecker({password_form1, password_form2},
-                                       kKeystoreKeyParams.password,
-                                       kKeystoreKeyParams.derivation_params)
-            .Wait());
-  }
 }
 
 IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
@@ -797,107 +383,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriSyncTest,
   EXPECT_TRUE(ContainsTrialAndGroupName(
       GetSyntheticFieldTrials(),
       syncer::kTrustedVaultAutoUpgradeSyntheticFieldTrialName, kGroupName));
-}
-
-// Tests that a client with an implicit passphrase accepts a remote migration to
-// keystore passphrase, when the local keybag is unlocked or decryptable as a
-// result of the user having entered their implicit passphrase.
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriSyncTest,
-    ShouldAcceptRemoteMigrationToKeystoreFromUnlockedImplicitPassphrase) {
-  const KeyParamsForTesting kKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  sync_pb::NigoriSpecifics specifics;
-  std::unique_ptr<syncer::CryptographerImpl> cryptographer =
-      syncer::CryptographerImpl::FromSingleKeyForTesting(
-          kKeyParams.password, kKeyParams.derivation_params);
-  *specifics.mutable_encryption_keybag() =
-      cryptographer->ExportEncryptedKeyBag();
-  SetNigoriInFakeServer(specifics, GetFakeServer());
-
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, kKeyParams.password, kKeyParams.derivation_params,
-      GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-  ASSERT_EQ(GetSyncService(0)->GetPassphraseType(),
-            syncer::PassphraseType::kImplicitPassphrase);
-
-  ASSERT_TRUE(GetSyncService(0)->GetUserSettings()->SetDecryptionPassphrase(
-      kKeyParams.password));
-  ASSERT_TRUE(WaitForPasswordForms({password_form}));
-
-  // Mimic a transition to keystore passphrase on the server.
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  SetNigoriInFakeServer(BuildKeystoreNigoriSpecifics(
-                            /*keybag_keys_params=*/{kKeystoreKeyParams},
-                            /*keystore_decryptor_params*/ {kKeystoreKeyParams},
-                            /*keystore_key_params=*/kKeystoreKeyParams),
-                        GetFakeServer());
-  EXPECT_TRUE(PassphraseTypeChecker(GetSyncService(0),
-                                    syncer::PassphraseType::kKeystorePassphrase)
-                  .Wait());
-  // The password should have been re-encrypted.
-  EXPECT_TRUE(ServerPasswordsEqualityChecker(
-                  {password_form}, kKeystoreKeyParams.password,
-                  kKeystoreKeyParams.derivation_params)
-                  .Wait());
-}
-
-// Tests that a client with an implicit passphrase accepts a remote migration to
-// keystore passphrase, when the local keybag cannot be decrypted, because the
-// user didn't enter their implicit passphrase.
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriSyncTest,
-    ShouldAcceptRemoteMigrationToKeystoreFromImplicitPassphraseWithoutKey) {
-  const KeyParamsForTesting kKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  sync_pb::NigoriSpecifics specifics;
-  std::unique_ptr<syncer::CryptographerImpl> cryptographer =
-      syncer::CryptographerImpl::FromSingleKeyForTesting(
-          kKeyParams.password, kKeyParams.derivation_params);
-  *specifics.mutable_encryption_keybag() =
-      cryptographer->ExportEncryptedKeyBag();
-  SetNigoriInFakeServer(specifics, GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-  ASSERT_EQ(GetSyncService(0)->GetPassphraseType(),
-            syncer::PassphraseType::kImplicitPassphrase);
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // Mimic a transition to keystore passphrase on the server.
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  SetNigoriInFakeServer(BuildKeystoreNigoriSpecifics(
-                            /*keybag_keys_params=*/{kKeystoreKeyParams},
-                            /*keystore_decryptor_params*/ {kKeystoreKeyParams},
-                            /*keystore_key_params=*/kKeystoreKeyParams),
-                        GetFakeServer());
-  EXPECT_TRUE(PassphraseTypeChecker(GetSyncService(0),
-                                    syncer::PassphraseType::kKeystorePassphrase)
-                  .Wait());
-  EXPECT_TRUE(PasswordSyncActiveChecker(GetSyncService(0)).Wait());
-
-  // Verify that newly saved passwords are encrypted with keystore passphrase.
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  GetPasswordStore()->AddLogin(
-      password_manager::FromPasswordForm(password_form));
-  EXPECT_TRUE(ServerPasswordsEqualityChecker(
-                  {password_form}, kKeystoreKeyParams.password,
-                  kKeystoreKeyParams.derivation_params)
-                  .Wait());
 }
 
 IN_PROC_BROWSER_TEST_P(
@@ -949,44 +434,6 @@ IN_PROC_BROWSER_TEST_P(
   syncer::CrossUserSharingPublicPrivateKeyPair private_key(*fixed_private_key);
   EXPECT_THAT(specifics.cross_user_sharing_public_key().x25519_public_key(),
               testing::ElementsAreArray(private_key.GetRawPublicKey()));
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriCrossUserSharingPublicPrivateKeyPairSyncTest,
-    ShouldPreferServerKeyPair) {
-  // Generates a local key pair and uploads it to the server.
-  ASSERT_TRUE(SetupSync());
-
-  sync_pb::NigoriSpecifics specifics;
-  ASSERT_TRUE(GetServerNigori(GetFakeServer(), &specifics));
-  ASSERT_TRUE(specifics.has_cross_user_sharing_public_key());
-
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  ASSERT_THAT(
-      specifics.encryption_keybag(),
-      IsDataEncryptedWith(KeystoreKeyParamsForTesting(keystore_keys.back())));
-
-  // Mimic server-side Nigori update by some other client. Current client should
-  // honor the server version of the key pair with the same version.
-  syncer::CrossUserSharingKeys new_key_pair = GenerateNewKeyPair();
-  InjectNigoriWithCrossUserSharingKey(keystore_keys.front(), new_key_pair);
-  ASSERT_TRUE(WaitForNigoriDownloaded());
-
-  // Add a new invitation encrypted using the new generated public key. The
-  // client should be able to decrypt this invitation.
-  PasswordFormsAddedChecker password_forms_added_checker(
-      GetPasswordStore(),
-      /*expected_new_password_forms=*/1);
-  InjectInvitationToServer(CreateEncryptedIncomingInvitationSpecifics(
-      CreateDefaultIncomingInvitation("username", "password"),
-      CreateDefaultSenderDisplayInfo(),
-      /*recipient_public_key=*/GetPublicKeyFromServer(),
-      syncer::CrossUserSharingPublicPrivateKeyPair::GenerateNewKeyPair()));
-
-  // Wait the invitation to be processed and the password stored.
-  EXPECT_TRUE(password_forms_added_checker.Wait());
 }
 
 IN_PROC_BROWSER_TEST_P(
@@ -1090,58 +537,6 @@ IN_PROC_BROWSER_TEST_P(
     ShouldRecreateKeyPairUponClientServerInconsistency) {
   ASSERT_TRUE(SetupClients());
   EXPECT_TRUE(ServerCrossUserSharingPublicKeyChangedChecker().Wait());
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriCrossUserSharingPublicPrivateKeyPairSyncTest,
-    PRE_ShouldRecreateKeyPairUponCorruptedServerKeyPair) {
-  ASSERT_TRUE(SetupSync());
-
-  sync_pb::NigoriSpecifics specifics;
-  ASSERT_TRUE(GetServerNigori(GetFakeServer(), &specifics));
-  ASSERT_TRUE(
-      specifics.cross_user_sharing_public_key().has_x25519_public_key());
-
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  ASSERT_THAT(
-      specifics.encryption_keybag(),
-      IsDataEncryptedWith(KeystoreKeyParamsForTesting(keystore_keys.back())));
-
-  InjectNigoriWithCorruptedCrossUserSharingKey(keystore_keys.front());
-
-  // When the Nigori node is downloaded, the new state is also stored to the
-  // disk.
-  ASSERT_TRUE(WaitForNigoriDownloaded());
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriCrossUserSharingPublicPrivateKeyPairSyncTest,
-    ShouldRecreateKeyPairUponCorruptedServerKeyPair) {
-  base::HistogramTester histogram_tester;
-  const std::string old_public_key =
-      GetPublicKeyFromServer().x25519_public_key();
-  ASSERT_FALSE(old_public_key.empty());
-  ASSERT_TRUE(SetupClients());
-  ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());
-
-  EXPECT_TRUE(
-      ServerCrossUserSharingPublicKeyChangedChecker(old_public_key).Wait());
-
-  // Add a new invitation encrypted using the new generated public key. The
-  // client should be able to decrypt this invitation.
-  PasswordFormsAddedChecker password_forms_added_checker(
-      GetPasswordStore(),
-      /*expected_new_password_forms=*/1);
-  InjectInvitationToServer(CreateEncryptedIncomingInvitationSpecifics(
-      CreateDefaultIncomingInvitation("username", "password"),
-      CreateDefaultSenderDisplayInfo(),
-      /*recipient_public_key=*/GetPublicKeyFromServer(),
-      syncer::CrossUserSharingPublicPrivateKeyPair::GenerateNewKeyPair()));
-
-  // Wait the invitation to be processed and the password stored.
-  EXPECT_TRUE(password_forms_added_checker.Wait());
 }
 
 // Performs initial sync for Nigori, but doesn't allow initialized Nigori to be
@@ -1257,157 +652,6 @@ INSTANTIATE_TEST_SUITE_P(
     GetSyncTestModes(),
     testing::PrintToStringParamName());
 
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
-                       ShouldAcceptEncryptionKeysFromTheWebIfSyncEnabled) {
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // Verify the profile-menu error string.
-  ASSERT_THAT(GetSyncService(0)->GetUserActionableError(),
-              Eq(syncer::SyncService::UserActionableError::
-                     kNeedsTrustedVaultKeyForPasswords));
-
-  // There needs to be an existing tab for the second tab (the retrieval flow)
-  // to be closeable via javascript.
-  chrome::AddTabAt(GetBrowser(0), GURL(url::kAboutBlankURL), /*index=*/0,
-                   /*foreground=*/true);
-
-  ASSERT_EQ(GetSyncService(0)->GetAccountInfo().gaia, kDefaultGaiaId);
-
-  base::HistogramTester histogram_tester;
-
-  // Mimic opening a web page where the user can interact with the retrieval
-  // flow.
-  OpenTabForSyncKeyRetrieval(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-  ASSERT_THAT(GetBrowser(0)->tab_strip_model()->GetActiveWebContents(),
-              NotNull());
-
-  // Wait until the page closes, which indicates successful completion.
-  EXPECT_TRUE(
-      TabClosedChecker(GetBrowser(0)->tab_strip_model()->GetActiveWebContents())
-          .Wait());
-
-  EXPECT_TRUE(PasswordSyncActiveChecker(GetSyncService(0)).Wait());
-  EXPECT_FALSE(GetSyncService(0)
-                   ->GetUserSettings()
-                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.RecoveryFlowTriggeredEndpoint",
-      trusted_vault::TrustedVaultRecoveryFlowEndpoint::kDesktop, 1);
-
-  // Verify the profile-menu error string is empty.
-  EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
-            syncer::SyncService::UserActionableError::kNone);
-}
-
-// Regression test for crbug.com/40930088: test verifies that client is able to
-// fix degraded recoverability if trusted vault keys were obtained by key
-// retrieval. In particular, this requires plumbing correct key version
-// (verified by FakeSecurityDomainsServer).
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriWithWebApiTest,
-    ShouldAddRecoveryMethodAfterAcceptingEncryptionKeysFromWeb) {
-  // Setup SecurityDomainsServer to mimic that it has a single non-constant key.
-  GetSecurityDomainsServer()->ResetDataToState({kTestEncryptionKey},
-                                               kTestEncryptionKeyVersion);
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-
-  // There needs to be an existing tab for the second tab (the retrieval flow)
-  // to be closeable via javascript.
-  chrome::AddTabAt(GetBrowser(0), GURL(url::kAboutBlankURL), /*index=*/0,
-                   /*foreground=*/true);
-
-  // Mimic opening a web page where the user can interact with the retrieval
-  // flow.
-  OpenTabForSyncKeyRetrieval(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-  ASSERT_THAT(GetBrowser(0)->tab_strip_model()->GetActiveWebContents(),
-              NotNull());
-
-  // Wait until the page closes and passwords are active, which indicates
-  // successful completion.
-  ASSERT_TRUE(
-      TabClosedChecker(GetBrowser(0)->tab_strip_model()->GetActiveWebContents())
-          .Wait());
-  ASSERT_TRUE(PasswordSyncActiveChecker(GetSyncService(0)).Wait());
-  ASSERT_FALSE(GetSyncService(0)
-                   ->GetUserSettings()
-                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-
-  // Now mimic entering degraded recoverability state.
-  GetSecurityDomainsServer()->RequirePublicKeyToAvoidRecoverabilityDegraded(
-      kTestRecoveryMethodPublicKey);
-  ASSERT_TRUE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
-
-  // Note: this test doesn't expect degraded recoverability state to be shown
-  // (this is not needed and requires more sophisticated setup, because client
-  // normally doesn't refresh this state often). Instead, it expects relevant
-  // API to work as intended and verifies that client state is sufficient to
-  // add recovery method.
-  OpenTabForSyncKeyRecoverabilityDegraded(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-  // Expect two members: one corresponds to the client and another to
-  // kTestRecoveryMethodPublicKey.
-  EXPECT_TRUE(FakeSecurityDomainsServerMemberStatusChecker(
-                  /*expected_member_count=*/2, kTestEncryptionKey,
-                  GetSecurityDomainsServer())
-                  .Wait());
-  EXPECT_FALSE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
-                       ShouldAcceptEncryptionKeysFromSubFrameIfSyncEnabled) {
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // Mimic opening a page that embeds the retrieval page as a cross-origin
-  // iframe.
-  chrome::AddTabAt(
-      GetBrowser(0),
-      embedded_https_test_server().GetURL(
-          "foo.com", base::StringPrintf(
-                         "/sync/encryption_keys_retrieval_with_iframe.html?%s",
-                         GaiaUrls::GetInstance()
-                             ->SigninChromeSyncKeysRetrievalUrl(
-                                 /*account_index=*/0)
-                             .spec()
-                             .c_str())),
-      /*index=*/0,
-      /*foreground=*/true);
-
-  // Wait until the keys-missing error gets resolved.
-  EXPECT_TRUE(PasswordSyncActiveChecker(GetSyncService(0)).Wait());
-  EXPECT_FALSE(GetSyncService(0)
-                   ->GetUserSettings()
-                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-}
-
 // TODO(crbug.com/40276245): Some changes desired once test confirmed to be
 // deflaked:
 // 1. ShouldRecordTrustedVaultErrorShownOnStartupWhenErrorNotShown does almost
@@ -1461,7 +705,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
   EXPECT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsTrustedVaultRecoverabilityDegraded());
-  EXPECT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
 
   // Verify the profile-menu error string is empty.
   EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
@@ -1527,132 +770,6 @@ IN_PROC_BROWSER_TEST_P(
   EXPECT_TRUE(GetSyncService(0)
                   ->GetUserSettings()
                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  EXPECT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriWithWebApiTest,
-    ShouldRemotelyTransitFromTrustedVaultToKeystorePassphrase) {
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // There needs to be an existing tab for the second tab (the retrieval flow)
-  // to be closeable via javascript.
-  chrome::AddTabAt(GetBrowser(0), GURL(url::kAboutBlankURL), /*index=*/0,
-                   /*foreground=*/true);
-
-  // Mimic opening a web page where the user can interact with the retrieval
-  // flow.
-  OpenTabForSyncKeyRetrieval(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-  ASSERT_THAT(GetBrowser(0)->tab_strip_model()->GetActiveWebContents(),
-              NotNull());
-
-  // Wait until the page closes, which indicates successful completion.
-  EXPECT_TRUE(
-      TabClosedChecker(GetBrowser(0)->tab_strip_model()->GetActiveWebContents())
-          .Wait());
-
-  // Mimic remote transition to keystore passphrase.
-  const std::vector<std::vector<uint8_t>>& keystore_keys =
-      GetFakeServer()->GetKeystoreKeys();
-  ASSERT_THAT(keystore_keys, SizeIs(1));
-  const KeyParamsForTesting kKeystoreKeyParams =
-      KeystoreKeyParamsForTesting(keystore_keys.back());
-  const KeyParamsForTesting kTrustedVaultKeyParams =
-      TrustedVaultKeyParamsForTesting(kTestEncryptionKey);
-  SetNigoriInFakeServer(
-      BuildKeystoreNigoriSpecifics(
-          /*keybag_keys_params=*/{kTrustedVaultKeyParams, kKeystoreKeyParams},
-          /*keystore_decryptor_params*/ {kKeystoreKeyParams},
-          /*keystore_key_params=*/kKeystoreKeyParams),
-      GetFakeServer());
-
-  // Ensure that client can decrypt with both |kTrustedVaultKeyParams|
-  // and |kKeystoreKeyParams|.
-  const password_manager::PasswordForm password_form1 =
-      passwords_helper::CreateTestPasswordForm(1, GetPasswordStoreType());
-  const password_manager::PasswordForm password_form2 =
-      passwords_helper::CreateTestPasswordForm(2, GetPasswordStoreType());
-
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form1, kKeystoreKeyParams.password,
-      kKeystoreKeyParams.derivation_params, GetFakeServer());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form2, kTrustedVaultKeyParams.password,
-      kTrustedVaultKeyParams.derivation_params, GetFakeServer());
-
-  EXPECT_TRUE(WaitForPasswordForms({password_form1, password_form2}));
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriWithWebApiTest,
-    ShouldRemotelyTransitFromTrustedVaultToCustomPassphrase) {
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // There needs to be an existing tab for the second tab (the retrieval flow)
-  // to be closeable via javascript.
-  chrome::AddTabAt(GetBrowser(0), GURL(url::kAboutBlankURL), /*index=*/0,
-                   /*foreground=*/true);
-
-  // Mimic opening a web page where the user can interact with the retrieval
-  // flow.
-  OpenTabForSyncKeyRetrieval(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-  ASSERT_THAT(GetBrowser(0)->tab_strip_model()->GetActiveWebContents(),
-              NotNull());
-
-  // Wait until the page closes, which indicates successful completion.
-  EXPECT_TRUE(
-      TabClosedChecker(GetBrowser(0)->tab_strip_model()->GetActiveWebContents())
-          .Wait());
-
-  // Mimic remote transition to custom passphrase.
-  const KeyParamsForTesting kCustomPassphraseKeyParams =
-      Pbkdf2PassphraseKeyParamsForTesting("passphrase");
-  const KeyParamsForTesting kTrustedVaultKeyParams =
-      TrustedVaultKeyParamsForTesting(kTestEncryptionKey);
-  SetNigoriInFakeServer(BuildCustomPassphraseNigoriSpecifics(
-                            kCustomPassphraseKeyParams, kTrustedVaultKeyParams),
-                        GetFakeServer());
-
-  EXPECT_TRUE(PassphraseRequiredChecker(GetSyncService(0)).Wait());
-  EXPECT_TRUE(GetSyncService(0)->GetUserSettings()->SetDecryptionPassphrase(
-      kCustomPassphraseKeyParams.password));
-  EXPECT_TRUE(PassphraseAcceptedChecker(GetSyncService(0)).Wait());
-
-  // Ensure that client can decrypt with both |kTrustedVaultKeyParams|
-  // and |kCustomPassphraseKeyParams|.
-  const password_manager::PasswordForm password_form1 =
-      passwords_helper::CreateTestPasswordForm(1, GetPasswordStoreType());
-  const password_manager::PasswordForm password_form2 =
-      passwords_helper::CreateTestPasswordForm(2, GetPasswordStoreType());
-
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form1, kCustomPassphraseKeyParams.password,
-      kCustomPassphraseKeyParams.derivation_params, GetFakeServer());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form2, kTrustedVaultKeyParams.password,
-      kTrustedVaultKeyParams.derivation_params, GetFakeServer());
-
-  EXPECT_TRUE(WaitForPasswordForms({password_form1, password_form2}));
 }
 
 IN_PROC_BROWSER_TEST_P(
@@ -1675,7 +792,6 @@ IN_PROC_BROWSER_TEST_P(
   ASSERT_TRUE(GetSyncService(0)
                   ->GetUserSettings()
                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
 
   histogram_tester.ExpectUniqueSample("Sync.TrustedVaultErrorShownOnStartup",
                                       /*sample=*/true,
@@ -1741,7 +857,6 @@ IN_PROC_BROWSER_TEST_P(
   ASSERT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
 
   histogram_tester.ExpectUniqueSample("Sync.TrustedVaultErrorShownOnStartup",
                                       /*sample=*/false,
@@ -2008,61 +1123,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
   EXPECT_FALSE(GetSecurityDomainsServer()->ReceivedInvalidRequest());
 }
 
-// If device was successfully registered with constant key, it should silently
-// follow key rotation and transit to trusted vault passphrase without going
-// through key retrieval flow.
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
-                       ShouldFollowInitialKeyRotation) {
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(FakeSecurityDomainsServerMemberStatusChecker(
-                  /*expected_member_count=*/1,
-                  /*expected_trusted_vault_key=*/
-                  trusted_vault::GetConstantTrustedVaultKey(),
-                  GetSecurityDomainsServer())
-                  .Wait());
-
-  // Rotate trusted vault key and mimic transition to trusted vault passphrase
-  // type.
-  base::HistogramTester histogram_tester;
-  std::vector<uint8_t> new_trusted_vault_key =
-      GetSecurityDomainsServer()->RotateTrustedVaultKey(
-          /*last_trusted_vault_key=*/trusted_vault::
-              GetConstantTrustedVaultKey());
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics(
-                            /*trusted_vault_keys=*/{new_trusted_vault_key}),
-                        GetFakeServer());
-
-  // Inject password encrypted with trusted vault key and verify client is able
-  // to decrypt it.
-  const KeyParamsForTesting trusted_vault_key_params =
-      TrustedVaultKeyParamsForTesting(new_trusted_vault_key);
-  const password_manager::PasswordForm password_form =
-      passwords_helper::CreateTestPasswordForm(0, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form, trusted_vault_key_params.password,
-      trusted_vault_key_params.derivation_params, GetFakeServer());
-  EXPECT_TRUE(WaitForPasswordForms({password_form}));
-  EXPECT_FALSE(GetSecurityDomainsServer()->ReceivedInvalidRequest());
-
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.RecoverKeysOutcome.ChromeSync",
-      /*sample=*/trusted_vault::TrustedVaultRecoverKeysOutcomeForUMA::kSuccess,
-      /*expected_bucket_count=*/1);
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.DownloadKeysStatus.PhysicalDevice.ChromeSync",
-      /*sample=*/trusted_vault::TrustedVaultDownloadKeysStatusForUMA::kSuccess,
-      /*expected_bucket_count=*/1);
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.SecurityDomainServiceURLFetchResponse.DownloadKeys",
-      /*sample=*/200,
-      /*expected_bucket_count=*/1);
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.SecurityDomainServiceURLFetchResponse.DownloadKeys."
-      "ChromeSync",
-      /*sample=*/200,
-      /*expected_bucket_count=*/1);
-}
-
 // Regression test for crbug.com/40802753: after following key rotation the
 // client should still send all trusted vault keys (including keys that predate
 // key rotation) to the server when adding recovery method.
@@ -2110,88 +1170,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
   EXPECT_FALSE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
 }
 
-// This test verifies that client handles security domain reset and able to
-// register again after that and follow key rotation.
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
-                       ShouldFollowKeyRotationAfterSecurityDomainReset) {
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(FakeSecurityDomainsServerMemberStatusChecker(
-                  /*expected_member_count=*/1,
-                  /*expected_trusted_vault_key=*/
-                  trusted_vault::GetConstantTrustedVaultKey(),
-                  GetSecurityDomainsServer())
-                  .Wait());
-
-  // Rotate trusted vault key and mimic transition to trusted vault passphrase
-  // type.
-  std::vector<uint8_t> trusted_vault_key1 =
-      GetSecurityDomainsServer()->RotateTrustedVaultKey(
-          /*last_trusted_vault_key=*/trusted_vault::
-              GetConstantTrustedVaultKey());
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics(
-                            /*trusted_vault_keys=*/{trusted_vault_key1}),
-                        GetFakeServer());
-
-  // Ensure that client has finished following key rotation by verifying
-  // passwords are decryptable.
-  const KeyParamsForTesting trusted_vault_key_params1 =
-      TrustedVaultKeyParamsForTesting(trusted_vault_key1);
-  const password_manager::PasswordForm password_form1 =
-      passwords_helper::CreateTestPasswordForm(1, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form1, trusted_vault_key_params1.password,
-      trusted_vault_key_params1.derivation_params, GetFakeServer());
-  ASSERT_TRUE(WaitForPasswordForms({password_form1}));
-
-  // Reset security domain state and mimic sync data reset.
-  GetSecurityDomainsServer()->ResetData();
-  GetFakeServer()->ClearServerData();
-
-  if (GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTheFeature) {
-    // If sync the feature is enabled, the sync reset via dashboard should have
-    // turned it off. Wait until the client is aware of reset.
-    ASSERT_TRUE(SyncDisabledChecker(GetSyncService(0)).Wait());
-
-    ASSERT_TRUE(SetupSync());
-  }
-
-  // Make sure that client is able to follow key rotation with fresh security
-  // domain state.
-  ASSERT_TRUE(FakeSecurityDomainsServerMemberStatusChecker(
-                  /*expected_member_count=*/1,
-                  /*expected_trusted_vault_key=*/
-                  trusted_vault::GetConstantTrustedVaultKey(),
-                  GetSecurityDomainsServer())
-                  .Wait());
-
-  std::vector<uint8_t> trusted_vault_key2 =
-      GetSecurityDomainsServer()->RotateTrustedVaultKey(
-          /*last_trusted_vault_key=*/trusted_vault::
-              GetConstantTrustedVaultKey());
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics(
-                            /*trusted_vault_keys=*/{trusted_vault_key2}),
-                        GetFakeServer());
-
-  const KeyParamsForTesting trusted_vault_key_params2 =
-      TrustedVaultKeyParamsForTesting(trusted_vault_key2);
-  const password_manager::PasswordForm password_form2 =
-      passwords_helper::CreateTestPasswordForm(2, GetPasswordStoreType());
-  passwords_helper::InjectEncryptedServerPassword(
-      password_form2, trusted_vault_key_params2.password,
-      trusted_vault_key_params2.derivation_params, GetFakeServer());
-
-  if (GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly) {
-    // With sync the transport , `password_form1` is permanently deleted, as it
-    // doesn't exist server-side.
-    EXPECT_TRUE(WaitForPasswordForms({password_form2}));
-  } else {
-    // |password_form1| has never been deleted locally, so client should have
-    // both forms now if sync the feature is enabled.
-    EXPECT_TRUE(WaitForPasswordForms({password_form1, password_form2}));
-  }
-  EXPECT_FALSE(GetSecurityDomainsServer()->ReceivedInvalidRequest());
-}
-
 IN_PROC_BROWSER_TEST_P(
     SingleClientNigoriSyncTest,
     ShouldPauseSyncForEncryptedTypesWhenKeystoreKeysRequired) {
@@ -2225,53 +1203,9 @@ IN_PROC_BROWSER_TEST_P(
   EXPECT_TRUE(
       bookmarks_helper::BookmarksTitleChecker(0, kBookmarkTitle, 1).Wait());
 
-  // Passwords are encrypted and should be paused.
-  EXPECT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
   // The user-facing error should NOT indicate that a passphrase is required,
   // nor should it show any user-actionable errors.
   EXPECT_FALSE(GetSyncService(0)->GetUserSettings()->IsPassphraseRequired());
-  EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
-            syncer::SyncService::UserActionableError::kNone);
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
-                       ShouldAcceptEncryptionKeysFromTheWebInTransportMode) {
-  // Mimic the account using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SignIn());
-  ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
-
-  // The error is now shown, because PASSWORDS is trying to sync. The data
-  // type isn't active yet though due to the missing encryption keys.
-  ASSERT_TRUE(
-      TrustedVaultKeyRequiredForPreferredDataTypesChecker(GetSyncService(0))
-          .Wait());
-  ASSERT_THAT(GetSyncService(0)->GetUserActionableError(),
-              Eq(syncer::SyncService::UserActionableError::
-                     kNeedsTrustedVaultKeyForPasswords));
-  ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
-
-  // Let's resolve the error. Mimic opening the web page where the user would
-  // interact with the retrieval flow. Add an extra tab so the flow tab can be
-  // closed via javascript.
-  chrome::AddTabAt(GetBrowser(0), GURL(url::kAboutBlankURL), /*index=*/0,
-                   /*foreground=*/true);
-  OpenTabForSyncKeyRetrieval(
-      GetBrowser(0),
-      trusted_vault::TrustedVaultUserActionTriggerForUMA::kProfileMenu);
-
-  // Wait until the page closes, which indicates successful completion.
-  ASSERT_THAT(GetBrowser(0)->tab_strip_model()->GetActiveWebContents(),
-              NotNull());
-  EXPECT_TRUE(
-      TabClosedChecker(GetBrowser(0)->tab_strip_model()->GetActiveWebContents())
-          .Wait());
-
-  // PASSWORDS should become active and the error should disappear.
-  EXPECT_TRUE(PasswordSyncActiveChecker(GetSyncService(0)).Wait());
   EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
             syncer::SyncService::UserActionableError::kNone);
 }
@@ -2304,7 +1238,7 @@ IN_PROC_BROWSER_TEST_P(
                                                              /*degraded=*/true)
                   .Wait());
 
-  // The error is now shown, because PASSWORDS is trying to sync.
+  // The error is now shown, because an encrypted data type is trying to sync.
   ASSERT_THAT(GetSyncService(0)->GetUserActionableError(),
               Eq(syncer::SyncService::UserActionableError::
                      kTrustedVaultRecoverabilityDegradedForPasswords));
