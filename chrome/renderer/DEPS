@@ -41,8 +41,6 @@ include_rules = [
   "+components/page_load_metrics/renderer",
   "+components/paint_preview/buildflags",
   "+components/paint_preview/renderer",
-  "+components/password_manager/content/renderer",
-  "+components/password_manager/core/common",
   "+components/permissions/features.h",
   "+components/pdf/common",
   "+components/pdf/renderer",

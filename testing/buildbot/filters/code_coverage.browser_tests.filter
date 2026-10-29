@@ -1,6 +1,5 @@
 # TODO(crbug.com/40637833): Enable this.
 -ContentScriptApiTest.ContentScriptBlobFetch
--CredentialManagerBrowserTest.*
 -DiceManageAccountBrowserTest.ClearManagedProfileOnStartup
 -PopupTrackerBrowserTest.ControlClick_HasTracker
 -ProfileStatisticsBrowserTest.GatherStatistics

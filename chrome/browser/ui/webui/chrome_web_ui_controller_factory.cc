@@ -67,7 +67,6 @@
 #include "chrome/browser/web_applications/model/web_app_icon_types.h"
 #include "chrome/browser/web_applications/web_app_icon_manager.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "media/base/media_switches.h"
 #include "ui/gfx/codec/png_codec.h"
 #include "ui/gfx/image/image_skia_rep.h"

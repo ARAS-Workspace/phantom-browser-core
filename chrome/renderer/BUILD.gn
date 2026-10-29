@@ -141,7 +141,6 @@ static_library("renderer") {
     "//components/page_content_annotations/core:features",
     "//components/page_load_metrics/renderer",
     "//components/paint_preview/buildflags",
-    "//components/password_manager/core/common",
     "//components/pdf/common:constants",
     "//components/pdf/common:util",
     "//components/permissions:permissions_common",

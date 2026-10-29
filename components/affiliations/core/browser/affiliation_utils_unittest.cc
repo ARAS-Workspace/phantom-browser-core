@@ -256,6 +256,35 @@ TEST_F(AffiliationUtilsTest, GetAndroidPackageDisplayName) {
   }
 }
 
+TEST_F(AffiliationUtilsTest, IsExtendedPublicSuffixDomainMatch) {
+  const struct {
+    const char* url1;
+    const char* url2;
+    bool expected;
+  } kTestCases[] = {
+      // Same registrable domain, regardless of scheme and path.
+      {"https://example.com/login", "http://example.com/cart", true},
+      // Subdomains of the same registrable domain.
+      {"https://www.example.com/", "https://shop.example.com/", true},
+      {"https://example.co.uk/", "https://m.example.co.uk/", true},
+      // Different registrable domains, including private registries.
+      {"https://example.com/", "https://example.org/", false},
+      {"https://example.co.uk/", "https://other.co.uk/", false},
+      {"https://foo.blogspot.com/", "https://bar.blogspot.com/", false},
+      // Hosts without a registrable domain never match.
+      {"https://192.168.100.1/", "https://192.168.100.1/", false},
+      // Invalid URLs never match.
+      {"not a url", "https://example.com/", false},
+      {"", "", false},
+  };
+  for (const auto& test_case : kTestCases) {
+    const GURL url1(test_case.url1);
+    const GURL url2(test_case.url2);
+    EXPECT_EQ(test_case.expected,
+              IsExtendedPublicSuffixDomainMatch(url1, url2, {}));
+  }
+}
+
 struct MainDomainTestCase {
   std::string url;
   std::string expected_result;

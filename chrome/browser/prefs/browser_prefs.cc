@@ -128,7 +128,6 @@
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/page_info/core/merchant_trust_service.h"
-#include "components/password_manager/core/browser/password_manager.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/pref_names.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -953,7 +952,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   omnibox_everywhere::prefs::RegisterLocalStatePrefs(registry);
   optimization_guide::prefs::RegisterLocalStatePrefs(registry);
   optimization_guide::model_execution::prefs::RegisterLocalStatePrefs(registry);
-  password_manager::PasswordManager::RegisterLocalPrefs(registry);
   policy::BrowserPolicyConnector::RegisterPrefs(registry);
   policy::LocalTestPolicyProvider::RegisterLocalStatePrefs(registry);
   policy::ManagementService::RegisterLocalStatePrefs(registry);
@@ -1122,7 +1120,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   optimization_guide::prefs::RegisterProfilePrefs(registry);
   optimization_guide::model_execution::prefs::RegisterProfilePrefs(registry);
   PageColorsController::RegisterProfilePrefs(registry);
-  password_manager::PasswordManager::RegisterProfilePrefs(registry);
   performance_manager::user_tuning::prefs::RegisterProfilePrefs(registry);
   permissions::RegisterProfilePrefs(registry);
   PermissionBubbleMediaAccessHandler::RegisterProfilePrefs(registry);

@@ -187,7 +187,6 @@ static_library("common_lib") {
     "//components/offline_pages/core:switches",
     "//components/omnibox/common",
     "//components/page_load_metrics/common:page_load_metrics_mojom",
-    "//components/password_manager/core/common",
     "//components/policy:generated",
     "//components/policy/core/common",
     "//components/prefs",

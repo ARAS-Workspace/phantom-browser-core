@@ -52,7 +52,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"

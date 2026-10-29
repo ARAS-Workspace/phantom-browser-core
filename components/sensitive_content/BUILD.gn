@@ -8,10 +8,7 @@ source_set("sensitive_content") {
     "sensitive_content_manager.cc",
     "sensitive_content_manager.h",
   ]
-  deps = [
-    "//components/password_manager/content/browser:password_form_classification_util",
-    "//content/public/browser",
-  ]
+  deps = [ "//content/public/browser" ]
   public_deps = [
     ":features",
     "//base",

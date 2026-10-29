@@ -14,7 +14,6 @@
 #include "components/history_clusters/core/features.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"

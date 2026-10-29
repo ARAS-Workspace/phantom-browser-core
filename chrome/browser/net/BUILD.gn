@@ -422,6 +422,7 @@ source_set("interactive_ui_tests") {
     "//chrome/browser",
     "//chrome/browser:chrome_browser_main",
     "//chrome/test:test_support",
+    "//components/password_manager/core/browser:password_switches",
     "//content/test:test_support",
   ]
   if (is_linux && use_dbus) {

@@ -18,7 +18,6 @@ static_library("page_info") {
     "//components/keyed_service/core",
     "//components/optimization_guide/core",
     "//components/page_info/core",
-    "//components/password_manager/core/browser",
     "//components/permissions",
     "//components/prefs",
     "//components/privacy_sandbox",

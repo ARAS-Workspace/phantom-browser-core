@@ -1,6 +1,5 @@
 include_rules = [
   "+components/autofill",
-  "+components/password_manager",
   "+content/public/browser",
   "+content/public/test",
   "+ui/android",

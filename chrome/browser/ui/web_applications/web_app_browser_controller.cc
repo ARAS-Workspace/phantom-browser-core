@@ -55,7 +55,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
-#include "components/password_manager/core/common/password_manager_features.h"
 #include "components/services/app_service/public/cpp/app_registry_cache.h"
 #include "components/services/app_service/public/cpp/app_types.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
