@@ -6,7 +6,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "components/history_clusters/core/features.h"
-#include "components/history_embeddings/core/history_embeddings_features.h"
 #include "components/sync/base/features.h"
 #include "content/public/test/browser_test.h"
 
@@ -55,10 +54,6 @@ IN_PROC_BROWSER_TEST_F(HistoryTest, SearchedLabel) {
   RunTest("history/searched_label_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(HistoryTest, HistoryEmbeddingsPromo) {
-  RunTest("history/history_embeddings_promo_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(HistoryTest, HistorySideBarFooter) {
   RunTest("history/history_side_bar_footer_test.js", "mocha.run()");
 }
@@ -101,10 +96,6 @@ IN_PROC_BROWSER_TEST_F(HistoryListTest, CancellingSelectionOfMultipleItems) {
 IN_PROC_BROWSER_TEST_F(HistoryListTest,
                        SelectionOfMultipleItemsUsingShiftClick) {
   RunTestCase("SelectionOfMultipleItemsUsingShiftClick");
-}
-
-IN_PROC_BROWSER_TEST_F(HistoryListTest, DisablingCtrlAOnSyncedTabsPage) {
-  RunTestCase("DisablingCtrlAOnSyncedTabsPage");
 }
 
 IN_PROC_BROWSER_TEST_F(HistoryListTest, SettingFirstAndLastItems) {
@@ -207,35 +198,4 @@ IN_PROC_BROWSER_TEST_F(HistoryListTest, MAYBE_ResizingLoadsMore) {
 
 IN_PROC_BROWSER_TEST_F(HistoryListTest, SharedMenuClosesOnFocusout) {
   RunTestCase("SharedMenuClosesOnFocusout");
-}
-
-class HistoryWithHistoryEmbeddingsTest : public WebUIMochaBrowserTest {
- protected:
-  HistoryWithHistoryEmbeddingsTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{history_embeddings::kHistoryEmbeddings,
-        },
-        /*disabled_features=*/{});
-    set_test_loader_host(chrome::kChromeUIHistoryHost);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(HistoryWithHistoryEmbeddingsTest, HistoryAppTest) {
-  RunTest("history/history_app_test.js", "runMochaSuite('HistoryAppTest')");
-}
-
-// TODO(crbug.com/458161947): Re-enable flaky test
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#define MAYBE_HistoryAppUnoPhase2FollowUpTest \
-  DISABLED_HistoryAppUnoPhase2FollowUpTest
-#else
-#define MAYBE_HistoryAppUnoPhase2FollowUpTest HistoryAppUnoPhase2FollowUpTest
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-IN_PROC_BROWSER_TEST_F(HistoryWithHistoryEmbeddingsTest,
-                       MAYBE_HistoryAppUnoPhase2FollowUpTest) {
-  RunTest("history/history_app_test.js",
-          "runMochaSuite('HistoryAppUnoPhase2FollowUpTest')");
 }

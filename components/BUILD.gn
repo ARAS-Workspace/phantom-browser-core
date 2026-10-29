@@ -341,7 +341,6 @@ test("components_unittests") {
       "//components/heavy_ad_intervention:unit_tests",
       "//components/history/content/browser:unit_tests",
       "//components/history_clusters/core:unit_tests",
-      "//components/history_embeddings/core:unit_tests",
       "//components/infobars/content:unit_tests",
       "//components/input:unit_tests",
       "//components/javascript_dialogs:unit_tests",
@@ -433,7 +432,6 @@ test("components_unittests") {
 
   deps += [
     "//components/crash/core/app:unit_tests",
-    "//components/history_embeddings/content:unit_tests",
     "//components/page_content_annotations/content:unit_tests",
   ]
 

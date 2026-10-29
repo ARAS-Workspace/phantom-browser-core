@@ -169,7 +169,6 @@ source_set("browser_tests") {
     "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
-    "//components/passage_embeddings/core:test_support",
     "//content/test:test_support",
     "//testing/gmock",
   ]

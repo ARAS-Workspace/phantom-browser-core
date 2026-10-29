@@ -9,11 +9,9 @@
 
 #include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/bind.h"
 #include "base/test/test_future.h"
 #include "build/build_config.h"
 #include "chrome/browser/ai/ai_data_keyed_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -32,13 +30,10 @@
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
 #include "components/autofill/core/common/form_data.h"
-#include "components/history_embeddings/core/mock_answerer.h"
-#include "components/history_embeddings/core/mock_intent_classifier.h"
 #include "components/network_session_configurator/common/network_switches.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/proto/features/actions_data.pb.h"
 #include "components/optimization_guide/proto/features/common_quality_data.pb.h"
-#include "components/passage_embeddings/core/passage_embeddings_test_util.h"
 #include "components/tabs/public/tab_group.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
@@ -74,18 +69,6 @@ class AiDataKeyedServiceBrowserTest : public InProcessBrowserTest {
     host_resolver()->AddRule("*", "127.0.0.1");
     https_server_->AddDefaultHandlers(GetChromeTestDataDir());
     ASSERT_TRUE(https_server_->Start());
-
-    HistoryEmbeddingsServiceFactory::GetInstance()->SetTestingFactory(
-        browser()->GetProfile(),
-        base::BindLambdaForTesting([this](content::BrowserContext* context) {
-          return HistoryEmbeddingsServiceFactory::
-              BuildServiceInstanceForBrowserContextForTesting(
-                  context,
-                  passage_embeddings_test_env_.embedder_metadata_provider(),
-                  passage_embeddings_test_env_.embedder(),
-                  std::make_unique<history_embeddings::MockAnswerer>(),
-                  std::make_unique<history_embeddings::MockIntentClassifier>());
-        }));
   }
 
   AiDataKeyedService& ai_data_service() {
@@ -133,7 +116,6 @@ class AiDataKeyedServiceBrowserTest : public InProcessBrowserTest {
 
  private:
   autofill::test::AutofillBrowserTestEnvironment autofill_test_environment_;
-  passage_embeddings::TestEnvironment passage_embeddings_test_env_;
   std::unique_ptr<net::EmbeddedTestServer> https_server_ =
       std::make_unique<net::EmbeddedTestServer>(
           net::EmbeddedTestServer::TYPE_HTTPS);

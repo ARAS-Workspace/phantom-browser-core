@@ -6,7 +6,6 @@ import type {CrA11yAnnouncerMessagesSentEvent, HistoryAppElement, HistoryEntry, 
 import {BrowserProxyImpl, CrRouter} from 'chrome://history/history.js';
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
-import {isMac} from 'chrome://resources/js/platform.js';
 import {PromiseResolver} from 'chrome://resources/js/promise_resolver.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertGT, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {pressAndReleaseKeyOn} from 'chrome://webui-test/keyboard_mock_interactions.js';
@@ -213,22 +212,6 @@ suite('HistoryListTest', function() {
     assertDeepEquals(
         ['https://www.google.com', 'https://www.example.com'],
         getHistoryData().map(i => i.title));
-  });
-
-  // See http://crbug.com/41390626.
-  test('DisablingCtrlAOnSyncedTabsPage', async function() {
-    await finishSetup(TEST_HISTORY_RESULTS);
-    app.shadowRoot.querySelector('history-router')!.selectedPage = 'syncedTabs';
-    await microtasksFinished();
-    const field = toolbar.$.mainToolbar.getSearchField();
-    field.blur();
-    assertFalse(field.showingSearch);
-
-    const modifier = isMac ? 'meta' : 'ctrl';
-    pressAndReleaseKeyOn(document.body, 65, modifier, 'a');
-
-    assertDeepEquals(
-        [false, false, false, false], getHistoryData().map(i => i.selected));
   });
 
   test('SettingFirstAndLastItems', async function() {
@@ -801,24 +784,14 @@ suite('HistoryListTest', function() {
       return (await a11yMessagesEventPromise).detail.messages[0];
     }
 
-    let singleResultMessage =
+    const singleResultMessage =
         await getMessagesForResults('some query', [TEST_HISTORY_RESULTS[0]!]);
     assertEquals(`Found 1 search result for 'some query'`, singleResultMessage);
 
-    let multipleResultsMessage =
+    const multipleResultsMessage =
         await getMessagesForResults('new query', TEST_HISTORY_RESULTS);
     assertEquals(
         `Found 4 search results for 'new query'`, multipleResultsMessage);
-
-    loadTimeData.overrideValues({enableHistoryEmbeddings: true});
-    singleResultMessage =
-        await getMessagesForResults('some query', [TEST_HISTORY_RESULTS[0]!]);
-    assertEquals(`Found 1 exact match for 'some query'`, singleResultMessage);
-
-    multipleResultsMessage =
-        await getMessagesForResults('new query', TEST_HISTORY_RESULTS);
-    assertEquals(
-        `Found 4 exact matches for 'new query'`, multipleResultsMessage);
   });
 
   test('ScrollingLoadsMore', async () => {

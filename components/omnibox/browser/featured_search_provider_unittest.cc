@@ -18,7 +18,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
-#include "components/history_embeddings/core/history_embeddings_features.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/autocomplete_match_type.h"
@@ -207,14 +206,10 @@ TEST_F(FeaturedSearchProviderTest, NonAtPrefix) {
 }
 
 TEST_F(FeaturedSearchProviderTest, DoesNotSupportMatchesOnFocus) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
-  features.InitWithFeaturesAndParameters(
-      {{history_embeddings::kHistoryEmbeddings, {}}},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({}, {omnibox::kStarterPackIPH});
 
   AutocompleteInput input(u"@tabs", metrics::OmniboxEventProto::OTHER,
                           TestSchemeClassifier());
@@ -417,14 +412,11 @@ TEST_F(FeaturedSearchProviderTest, ZeroSuggestStarterPackIPHSuggestion) {
 
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestStarterPackIPHSuggestion_DeleteMatch) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
   features.InitWithFeaturesAndParameters(
       {
-          {history_embeddings::kHistoryEmbeddings, {}},
           {omnibox::kStarterPackExpansion, {}},
           {omnibox::kStarterPackIPH, {}},
       },
@@ -506,15 +498,11 @@ TEST_F(FeaturedSearchProviderTest,
 
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestFeaturedSiteSearchIPHSuggestion_DeleteMatch) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
-  features.InitWithFeaturesAndParameters(
-      {{history_embeddings::kHistoryEmbeddings, {}},
-       {omnibox::kStarterPackExpansion, {}}},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion},
+                            {omnibox::kStarterPackIPH});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -561,16 +549,11 @@ TEST_F(FeaturedSearchProviderTest,
 
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestStarterPackIPHAfterFeaturedSiteSearchIPHDeleted) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
-  features.InitWithFeaturesAndParameters(
-      {{history_embeddings::kHistoryEmbeddings, {}},
-       {omnibox::kStarterPackExpansion, {}},
-       {omnibox::kStarterPackIPH, {}}},
-      {});
+  features.InitWithFeatures(
+      {omnibox::kStarterPackExpansion, omnibox::kStarterPackIPH}, {});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -676,15 +659,11 @@ TEST_F(FeaturedSearchProviderTest,
 
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestEnterpriseSearchAggregatorIPHSuggestion_DeleteMatch) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
-  features.InitWithFeaturesAndParameters(
-      {{history_embeddings::kHistoryEmbeddings, {}},
-       {omnibox::kStarterPackExpansion, {}}},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion},
+                            {omnibox::kStarterPackIPH});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -723,16 +702,11 @@ TEST_F(FeaturedSearchProviderTest,
 TEST_F(
     FeaturedSearchProviderTest,
     ZeroSuggestFeaturedSiteSearchIPHAfterEnterpriseSearchAggregatorIPHDeleted) {
-  history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-      base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-        parameters.omnibox_scoped = false;
-      }));
+  // Keep the @history scope promo IPH from being shown in the zero state.
+  client_->GetPrefs()->SetBoolean(omnibox::kDismissedHistoryScopePromo, true);
   base::test::ScopedFeatureList features;
-  features.InitWithFeaturesAndParameters(
-      {{history_embeddings::kHistoryEmbeddings, {}},
-       {omnibox::kStarterPackExpansion, {}},
-       {omnibox::kStarterPackIPH, {}}},
-      {});
+  features.InitWithFeatures(
+      {omnibox::kStarterPackExpansion, omnibox::kStarterPackIPH}, {});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -791,153 +765,25 @@ TEST_F(FeaturedSearchProviderTest, HistoryEmbedding_Iphs) {
   zero_input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
   AutocompleteInput non_zero_input(u"x", metrics::OmniboxEventProto::OTHER,
                                    TestSchemeClassifier());
-  AutocompleteInput scope_input(u"@history", metrics::OmniboxEventProto::OTHER,
-                                TestSchemeClassifier());
 
-  auto mock_setting = [&](bool setting_visible, bool setting_opted_in) {
-    CHECK(!setting_opted_in || setting_visible);
-    EXPECT_CALL(*client_, IsHistoryEmbeddingsSettingVisible())
-        .WillRepeatedly(testing::Return(setting_visible));
-    EXPECT_CALL(*client_, IsHistoryEmbeddingsEnabled())
-        .WillRepeatedly(testing::Return(setting_opted_in));
-  };
-
-  // No IPH is shown when the feature is disabled.
+  // '@history' promo is shown in the zero state.
   {
-    history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-        base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-          parameters.omnibox_scoped = false;
-        }));
-    base::test::ScopedFeatureList disabled_features;
-    disabled_features.InitAndEnableFeatureWithParameters(
-        history_embeddings::kHistoryEmbeddings, {});
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(zero_input, {});
-    }
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(scope_input, {});
-    }
+    SCOPED_TRACE("");
+    RunAndVerifyIph(zero_input,
+                    {{IphType::kHistoryScopePromo,
+                      u"Type @history to search your browsing history"}});
   }
-
-  // '@history' promo is shown when embeddings is not opted-in (even if the
-  // feature is enabled).
+  // Not shown for non-zero input.
   {
-    base::test::ScopedFeatureList features;
-    features.InitWithFeatures({{history_embeddings::kHistoryEmbeddings}}, {});
-    mock_setting(false, false);
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(zero_input,
-                      {{IphType::kHistoryScopePromo,
-                        u"Type @history to search your browsing history"}});
-    }
-    // Not shown for non-zero input.
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-
-    // '@history' AI promo is shown when embeddings is opted-in.
-    mock_setting(true, true);
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(
-          zero_input,
-          {{IphType::kHistoryEmbeddingsScopePromo,
-            u"Type @history to search your browsing history, powered by AI"}});
-    }
-    // Not shown for non-zero input.
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-
-    // chrome://settings/ai/historySearch promo shown when not opted-in and in
-    // @history scope.
-    mock_setting(true, false);
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(
-          scope_input,
-          {{IphType::kHistoryEmbeddingsSettingsPromo,
-            // Should end with whitespace since there's a link following it.
-            u"For a more powerful way to search your browsing history, turn "
-            u"on ",
-            u"History search, powered by AI",
-            GURL("chrome://settings/ai/historySearch")}});
-    }
-    // Not shown for unscoped inputs. Zero input will show the '@history' promo
-    // tested above, so just test `non_zero_input` here.
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-    // Not shown if the setting isn't available.
-    mock_setting(false, false);
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(scope_input, {});
-    }
-
-    // Disclaimer shown when opted-in and in @history scope.
-    mock_setting(true, true);
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(
-          scope_input,
-          {{IphType::kHistoryEmbeddingsDisclaimer,
-            // Should end with whitespace since there's a link following it.
-            u"Your searches, best matches, and their page contents are sent to "
-            u"Google and may be seen by human reviewers to improve this "
-            u"feature. "
-            u"This is an experimental feature and won't always get it right. ",
-            u"Learn more", GURL("chrome://settings/ai/historySearch")}});
-    }
-    // Not shown for unscoped inputs. Zero input will show the '@history' AI
-    // promo tested above, so just test `non_zero_input` here.
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-  }
-
-  // Not shown if omnibox entry is disabled, even if embeddings is overall
-  // enabled.
-  {
-    history_embeddings::ScopedFeatureParametersForTesting feature_parameters(
-        base::BindOnce([](history_embeddings::FeatureParameters& parameters) {
-          parameters.omnibox_scoped = false;
-        }));
-    base::test::ScopedFeatureList features_without_omnibox;
-    features_without_omnibox.InitAndEnableFeatureWithParameters(
-        history_embeddings::kHistoryEmbeddings, {});
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(zero_input, {});
-    }
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(non_zero_input, {});
-    }
-    {
-      SCOPED_TRACE("");
-      RunAndVerifyIph(scope_input, {});
-    }
+    SCOPED_TRACE("");
+    RunAndVerifyIph(non_zero_input, {});
   }
 }
 
 TEST_F(FeaturedSearchProviderTest, IphShownLimit) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures({{omnibox::kStarterPackExpansion},
-                             {omnibox::kStarterPackIPH},
-                             {history_embeddings::kHistoryEmbeddings}},
-                            {});
+  features.InitWithFeatures(
+      {omnibox::kStarterPackExpansion, omnibox::kStarterPackIPH}, {});
   AddStarterPackEntriesToTemplateUrlService();
   AutocompleteInput input;
   input.set_focus_type(metrics::INTERACTION_FOCUS);
@@ -993,8 +839,7 @@ TEST_F(FeaturedSearchProviderTest, IphShownLimit) {
 
 TEST_F(FeaturedSearchProviderTest, OffTheRecord_HistoryEmbeddings) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures({history_embeddings::kHistoryEmbeddings},
-                            {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({}, {omnibox::kStarterPackIPH});
   AddStarterPackEntriesToTemplateUrlService();
   AutocompleteInput input;
   input.set_focus_type(metrics::INTERACTION_FOCUS);

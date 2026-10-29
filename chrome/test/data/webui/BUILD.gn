@@ -72,7 +72,6 @@ source_set("browser_tests") {
     "sandbox/sandbox_browsertest.cc",
     "settings/settings_browsertest.cc",
     "side_panel/customize_chrome/customize_chrome_browsertest.cc",
-    "side_panel/history_clusters/history_clusters_browsertest.cc",
     "subresource_filter/subresource_filter_internals_browsertest.cc",
     "tab_group_home/tab_group_home_browsertest.cc",
     "tab_search/split_view_browsertest.cc",
@@ -90,10 +89,7 @@ source_set("browser_tests") {
   ]
 
   sources += [ "cr_components/cr_components_browsertest.cc" ]
-  deps += [
-    "//components/history_clusters/core",
-    "//components/history_embeddings/core",
-  ]
+  deps += [ "//components/history_clusters/core" ]
 
   if (enable_extensions_core) {
     sources += [ "extensions/extensions_browsertest.cc" ]
@@ -147,8 +143,6 @@ source_set("browser_tests") {
     "//components/history/core/common",
     "//components/history_clusters/core",
     "//components/history_clusters/history_clusters_internals/webui:constants",
-    "//components/history_embeddings/content",
-    "//components/history_embeddings/core",
     "//components/language/core/browser",
     "//components/multistep_filter/core",
     "//components/performance_manager",
@@ -369,7 +363,6 @@ generate_grd("build_grd") {
     "cr_components/cr_shortcut_input:build_grdp",
     "cr_components/help_bubble:build_grdp",
     "cr_components/history_clusters:build_grdp",
-    "cr_components/history_embeddings:build_grdp",
     "cr_components/searchbox:build_grdp",
     "cr_components/theme_color_picker:build_grdp",
     "css:build_grdp",
@@ -413,7 +406,6 @@ generate_grd("build_grd") {
     "$target_gen_dir/cr_components/cr_shortcut_input/resources.grdp",
     "$target_gen_dir/cr_components/help_bubble/resources.grdp",
     "$target_gen_dir/cr_components/history_clusters/resources.grdp",
-    "$target_gen_dir/cr_components/history_embeddings/resources.grdp",
     "$target_gen_dir/cr_components/searchbox/resources.grdp",
     "$target_gen_dir/cr_components/theme_color_picker/resources.grdp",
     "$target_gen_dir/css/resources.grdp",
