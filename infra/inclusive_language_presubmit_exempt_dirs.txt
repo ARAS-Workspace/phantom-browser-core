@@ -52,7 +52,6 @@ chrome/browser/extensions/commands
 chrome/browser/first_run
 chrome/browser/mac
 chrome/browser/metrics
-chrome/browser/password_manager
 chrome/browser/prefs
 chrome/browser/privacy
 chrome/browser/resources/chromeos/network_ui/third_party
@@ -570,7 +569,6 @@ third_party/polymer/v3_0/components-chromium/paper-spinner
 third_party/polymer/v3_0/components-chromium/paper-tooltip
 third_party/polymer/v3_0/components-chromium/polymer
 third_party/polymer/v3_0/components-chromium/polymer/lib/elements
-third_party/private-join-and-compute
 third_party/private_membership
 third_party/protobuf
 third_party/protobuf/bazel/toolchains

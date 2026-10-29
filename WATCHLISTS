@@ -1392,7 +1392,6 @@
     },
     'ios_transactions': {
       'filepath': 'components/autofill/ios|'\
-                  'components/password_manager/ios|'\
                   'ios/chrome/browser/autofill|'\
                   'ios/chrome/browser/passwords|'\
                   'ios/chrome/browser/settings/ui_bundled/autofill|'\

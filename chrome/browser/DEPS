@@ -228,7 +228,6 @@ include_rules = [
   "+components/paint_preview/browser",
   "+components/paint_preview/buildflags",
   "+components/passage_embeddings",
-  "+components/password_manager/content/browser",
   "+components/password_manager/core/browser",
   "+components/password_manager/core/common",
   "+components/performance_manager/public",

@@ -570,8 +570,7 @@ void AutofillExternalDelegate::OnAutofillAvailabilityEvent(
       last_query_.field_id, suggestion_availability);
 }
 
-std::variant<AutofillDriver*, password_manager::PasswordManagerDriver*>
-AutofillExternalDelegate::GetDriver_DoNotUse() {
+AutofillDriver* AutofillExternalDelegate::GetDriver_DoNotUse() {
   return &manager_->driver();
 }
 

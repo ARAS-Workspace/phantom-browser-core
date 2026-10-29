@@ -124,8 +124,6 @@ missing_new_fields,components/omnibox/browser/base_search_provider.cc
 missing_new_fields,components/omnibox/browser/document_suggestions_service.cc
 missing_new_fields,components/omnibox/browser/remote_suggestions_service.cc
 missing_new_fields,components/omnibox/browser/search_provider.cc
-missing_new_fields,components/password_manager/core/browser/generation/password_requirements_spec_fetcher_impl.cc
-missing_new_fields,components/password_manager/core/browser/well_known_change_password_state.cc
 missing_new_fields,components/permissions/prediction_service/prediction_service.cc
 missing_new_fields,components/policy/core/browser/signin/user_cloud_signin_restriction_policy_fetcher.cc
 missing_new_fields,components/policy/core/common/cloud/external_policy_data_fetcher.cc

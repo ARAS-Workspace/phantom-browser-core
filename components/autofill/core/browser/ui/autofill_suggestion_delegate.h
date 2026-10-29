@@ -6,7 +6,6 @@
 #define COMPONENTS_AUTOFILL_CORE_BROWSER_UI_AUTOFILL_SUGGESTION_DELEGATE_H_
 
 #include <string>
-#include <variant>
 
 #include "base/check.h"
 #include "base/containers/span.h"
@@ -15,10 +14,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
 #include "components/autofill/core/browser/ui/tabbed_pane_enums.h"
 #include "components/autofill/core/common/unique_ids.h"
-
-namespace password_manager {
-class PasswordManagerDriver;
-}
 
 namespace autofill {
 
@@ -73,9 +68,7 @@ class AutofillSuggestionDelegate {
   virtual bool IsSearching() const = 0;
 
   // Will be removed together with kAutofillSimplifyFocusCheck.
-  virtual std::variant<AutofillDriver*,
-                       password_manager::PasswordManagerDriver*>
-  GetDriver_DoNotUse() = 0;
+  virtual AutofillDriver* GetDriver_DoNotUse() = 0;
 
   // Called when Autofill `suggestions` are shown.
   // `parent_suggestion_metadata` contains metadata about the parent suggestion

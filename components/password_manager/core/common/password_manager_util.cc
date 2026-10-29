@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include "base/i18n/char_iterator.h"
-#include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
 #include "components/autofill/core/common/autofill_regexes.h"
 #include "components/autofill/core/common/form_data.h"
@@ -46,19 +45,6 @@ bool IsMeaningfulNameOrId(std::u16string_view s) {
 }
 
 }  // namespace
-
-bool FormContainsWebauthnAutocomplete(const autofill::FormData& form) {
-  return std::ranges::any_of(
-      form.fields(), [](const autofill::FormFieldData& field) {
-        std::vector<std::string_view> tokens = base::SplitStringPiece(
-            field.autocomplete_attribute(), base::kWhitespaceASCII,
-            base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-
-        return !tokens.empty() &&
-               base::EqualsCaseInsensitiveASCII(
-                   tokens.back(), constants::kAutocompleteWebAuthn);
-      });
-}
 
 bool IsRendererRecognizedCredentialForm(const autofill::FormData& form) {
   // TODO(crbug.com/40276126): Consolidate with the parsing logic in

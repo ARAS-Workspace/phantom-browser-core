@@ -6,10 +6,7 @@ static_library("common") {
   sources = [
     "credential_manager_types.cc",
     "credential_manager_types.h",
-    "driver_id.h",
     "password_manager_pref_names.h",
-    "password_manager_ui.cc",
-    "password_manager_ui.h",
     "password_manager_util.cc",
     "password_manager_util.h",
   ]
@@ -19,8 +16,6 @@ static_library("common") {
     "//components/autofill/core/common",
     "//components/autofill/core/common:autofill_regex",
     "//components/autofill/core/common/mojom:mojo_types",
-    "//sql",
-    "//third_party/abseil-cpp:absl",
   ]
 
   public_deps = [

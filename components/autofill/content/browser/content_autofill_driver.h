@@ -28,10 +28,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-namespace password_manager {
-class ContentPasswordManagerDriver;
-}
-
 namespace autofill {
 
 namespace mojom {
@@ -166,11 +162,6 @@ class ContentAutofillDriver : public AutofillDriver,
   void BindPendingReceiver(
       mojo::PendingAssociatedReceiver<mojom::AutofillDriver> pending_receiver,
       base::PassKey<ContentAutofillDriverFactory> pass_key);
-
-  const mojo::AssociatedRemote<mojom::AutofillAgent>& GetAutofillAgent(
-      base::PassKey<password_manager::ContentPasswordManagerDriver> pass_key) {
-    return GetAutofillAgent();
-  }
 
   // autofill::AutofillDriver:
   // These are the non-event functions from autofill::AutofillDriver. The events

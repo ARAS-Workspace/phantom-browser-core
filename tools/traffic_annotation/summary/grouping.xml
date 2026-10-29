@@ -56,7 +56,6 @@ after discussions on the right group.
       <annotation id="pdf_plugin_placeholder"/>
       <annotation id="render_view_context_menu"/>
       <annotation id="omnibox_navigation_observer"/>
-      <annotation id="well_known_path_that_should_not_exist"/>
       <annotation id="devtools_free_data_source"/>
       <annotation id="download_internals_webui_source"/>
       <annotation id="downloads_dom_handler"/>
@@ -65,7 +64,6 @@ after discussions on the right group.
       <annotation id="parallel_download_job"/>
       <annotation id="omnibox_suggest_deletion"/>
       <annotation id="omnibox_suggest"/>
-      <annotation id="password_requirements_spec_fetch"/>
       <annotation id="proxy_config_settings"/>
       <annotation id="qr_code_save"/>
       <annotation id="desktop_screenshot_save"/>
@@ -126,7 +124,6 @@ after discussions on the right group.
       <annotation id="bookmarks_image_fetcher"/>
       <annotation id="back_navigation_cache_query"/>
       <annotation id="cws_info_service"/>
-      <annotation id="password_sharing_recipients"/>
       <annotation id="iwa_update_discovery_update_manifest"/>
       <annotation id="iwa_update_discovery_web_bundle"/>
       <annotation id="blink_fetch_later_manager"/>

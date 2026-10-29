@@ -862,7 +862,6 @@ static_library("browser") {
     "integrators/optimization_guide/autofill_optimization_guide_decider.cc",
     "integrators/optimization_guide/autofill_optimization_guide_decider.h",
     "integrators/password_form_classification.h",
-    "integrators/password_manager/password_manager_delegate.h",
     "integrators/personal_context/personal_context_autofill_util.cc",
     "integrators/personal_context/personal_context_autofill_util.h",
     "integrators/touch_to_fill/touch_to_fill_autofill_delegate.h",

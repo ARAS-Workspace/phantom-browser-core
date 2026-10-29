@@ -18,11 +18,9 @@
 #include "components/autofill/core/common/form_field_data.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/tracker.h"
-#include "components/password_manager/content/browser/content_password_manager_driver.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
-#include "third_party/abseil-cpp/absl/functional/overload.h"
 
 // UserEducationService is not implemented on Android.
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
@@ -256,18 +254,8 @@ bool ShouldResetIdleBarrier(AutofillSuggestionTriggerSource trigger_source) {
 
 content::RenderFrameHost* GetRenderFrameHost_DoNotUse(
     AutofillSuggestionDelegate& delegate) {
-  return std::visit(
-      absl::Overload{
-          [](AutofillDriver* driver) {
-            return static_cast<ContentAutofillDriver*>(driver)
-                ->render_frame_host();
-          },
-          [](password_manager::PasswordManagerDriver* driver) {
-            return static_cast<password_manager::ContentPasswordManagerDriver*>(
-                       driver)
-                ->render_frame_host();
-          }},
-      delegate.GetDriver_DoNotUse());
+  return static_cast<ContentAutofillDriver*>(delegate.GetDriver_DoNotUse())
+      ->render_frame_host();
 }
 
 bool IsAncestorOf(content::RenderFrameHost* ancestor,
