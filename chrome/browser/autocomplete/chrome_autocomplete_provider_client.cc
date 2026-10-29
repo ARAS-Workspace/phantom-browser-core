@@ -32,8 +32,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history/top_sites_factory.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/omnibox/geolocation_header_service_factory.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/preloading/prefetch/search_prefetch/search_prefetch_service.h"
@@ -60,7 +58,6 @@
 #include "components/history/core/browser/top_sites.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/features.h"
-#include "components/history_embeddings/content/history_embeddings_service.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/omnibox/browser/actions/omnibox_pedal_provider.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
@@ -197,11 +194,6 @@ history::HistoryService* ChromeAutocompleteProviderClient::GetHistoryService() {
 history_clusters::HistoryClustersService*
 ChromeAutocompleteProviderClient::GetHistoryClustersService() {
   return HistoryClustersServiceFactory::GetForBrowserContext(profile_);
-}
-
-history_embeddings::HistoryEmbeddingsSearch*
-ChromeAutocompleteProviderClient::GetHistoryEmbeddingsSearch() {
-  return HistoryEmbeddingsServiceFactory::GetForProfile(profile_);
 }
 
 scoped_refptr<history::TopSites>
@@ -455,15 +447,6 @@ bool ChromeAutocompleteProviderClient::IsIncognitoModeAvailable() const {
 
 bool ChromeAutocompleteProviderClient::IsSharingHubAvailable() const {
   return sharing_hub::SharingHubOmniboxEnabled(profile_);
-}
-
-bool ChromeAutocompleteProviderClient::IsHistoryEmbeddingsEnabled() const {
-  return history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile_);
-}
-
-bool ChromeAutocompleteProviderClient::IsHistoryEmbeddingsSettingVisible()
-    const {
-  return history_embeddings::IsHistoryEmbeddingsSettingVisible(profile_);
 }
 
 std::optional<bool> ChromeAutocompleteProviderClient::IsPagePaywalled() const {

@@ -26,7 +26,6 @@
 #include "ui/views/controls/image_view.h"
 #include "ui/views/view.h"
 
-class OmniboxLocalAnswerHeaderView;
 class OmniboxMatchCellView;
 class OmniboxPopupViewViews;
 class OmniboxResultSelectionIndicator;
@@ -154,9 +153,6 @@ class OmniboxResultView : public views::View {
   // This separator runs along the top edge to visually divide the toolbelt
   // match from other matches.
   raw_ptr<views::Separator> divider_line_;
-
-  // The answer header; e.g. 'Summary' or 'Generating...'. Lazily initialized.
-  raw_ptr<OmniboxLocalAnswerHeaderView> local_answer_header_ = nullptr;
 
   // The icon, contents, description, etc depicting the match.
   raw_ptr<OmniboxMatchCellView> suggestion_view_;

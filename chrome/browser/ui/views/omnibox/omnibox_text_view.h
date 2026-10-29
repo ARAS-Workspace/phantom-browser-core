@@ -72,9 +72,6 @@ class OmniboxTextView : public views::View {
   void SetMultilineAnswerText(const omnibox::FormattedString& formatted_string,
                               const omnibox::AnswerType& answer_type);
 
-  // Used for history embedding answers.
-  void SetMultilineText(const std::u16string& text);
-
   // Get the height of one line of text.  This is handy if the view might have
   // multiple lines.
   int GetLineHeight() const;

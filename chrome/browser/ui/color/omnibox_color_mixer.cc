@@ -30,7 +30,6 @@ void ApplyGM3OmniboxTextColor(ui::ColorMixer& mixer,
                               const ui::ColorProviderKey& key) {
   mixer[kColorOmniboxText] = {ui::kColorSysOnSurface};
   mixer[kColorOmniboxTextDimmed] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorOmniboxResultsTextAnswer] = {ui::kColorSysOnSurfacePrimary};
   mixer[kColorOmniboxSelectionBackground] = {ui::kColorSysStateTextHighlight};
   mixer[kColorOmniboxSelectionForeground] = {ui::kColorSysStateOnTextHighlight};
 
@@ -162,9 +161,6 @@ void ApplyCR2023OmniboxExpandedStateColors(ui::ColorMixer& mixer,
 // custom theme).
 void ApplyOmniboxCR2023FallbackColors(ui::ColorMixer& mixer,
                                       const ui::ColorProviderKey& key) {
-  // Fallbacks for colors set in `ApplyGM3OmniboxTextColor()`:
-  mixer[kColorOmniboxResultsTextAnswer] = {ui::kColorSysOnSurfacePrimary};
-
   // Fallbacks for colors set in `ApplyCR2023OmniboxExpandedStateColors()`:
   mixer[kColorOmniboxResultsBackgroundHoverOverlay] = {
       ui::SetAlpha(ui::GetColorWithMaxContrast(kColorOmniboxResultsBackground),
@@ -303,7 +299,6 @@ void AddOmniboxColorMixer(ui::ColorProvider* provider,
   mixer[kColorOmniboxResultsBackgroundSelected] = ui::BlendTowardMaxContrast(
       ui::GetColorWithMaxContrast(kColorOmniboxResultsTextSelected),
       gfx::kGoogleGreyAlpha200);
-  mixer[kColorOmniboxResultsChipBackground] = {ui::kColorSysNeutralContainer};
   mixer[kColorOmniboxComposeboxContextEntrypointBackground] =
       ui::AlphaBlend({ui::kColorSysStateHoverOnSubtle},
                      {kColorOmniboxResultsBackground}, 0xFF);

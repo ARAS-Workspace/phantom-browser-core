@@ -143,7 +143,6 @@ class ChromeOmniboxClient final : public OmniboxClient {
       base::OnceCallback<void(base::WeakPtr<content::NavigationHandle>)>
           callback);
   void OpenIphLink(GURL gurl) override;
-  bool IsHistoryEmbeddingsEnabled() const override;
   void MaybePrewarmForDefaultSearchEngine(PrewarmTrigger trigger) override;
   base::WeakPtr<OmniboxClient> AsWeakPtr() override;
   Profile* profile() { return profile_; }

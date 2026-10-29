@@ -30,7 +30,6 @@
 #include "build/android_buildflags.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "components/history_embeddings/core/history_embeddings_features.h"
 #include "components/omnibox/browser/actions/omnibox_action.h"
 #include "components/omnibox/browser/actions/omnibox_action_concepts.h"
 #include "components/omnibox/browser/actions/omnibox_action_in_suggest.h"
@@ -305,10 +304,6 @@ AutocompleteMatch::AutocompleteMatch(const AutocompleteMatch& match)
       iph_type(match.iph_type),
       iph_link_text(match.iph_link_text),
       iph_link_url(match.iph_link_url),
-      history_embeddings_answer_header_text(
-          match.history_embeddings_answer_header_text),
-      history_embeddings_answer_header_loading(
-          match.history_embeddings_answer_header_loading),
       feedback_type(match.feedback_type),
       matching_tab_group_uuid(match.matching_tab_group_uuid) {}
 
@@ -375,10 +370,6 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   iph_type = std::move(match.iph_type);
   iph_link_text = std::move(match.iph_link_text);
   iph_link_url = std::move(match.iph_link_url);
-  history_embeddings_answer_header_text =
-      std::move(match.history_embeddings_answer_header_text);
-  history_embeddings_answer_header_loading =
-      std::move(match.history_embeddings_answer_header_loading);
   feedback_type = std::move(match.feedback_type);
   matching_tab_group_uuid = std::move(match.matching_tab_group_uuid);
   return *this;
@@ -449,10 +440,6 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   iph_type = match.iph_type;
   iph_link_text = match.iph_link_text;
   iph_link_url = match.iph_link_url;
-  history_embeddings_answer_header_text =
-      match.history_embeddings_answer_header_text;
-  history_embeddings_answer_header_loading =
-      match.history_embeddings_answer_header_loading;
   feedback_type = match.feedback_type;
   matching_tab_group_uuid = match.matching_tab_group_uuid;
 
@@ -1344,12 +1331,11 @@ bool AutocompleteMatch::ShouldHideBasedOnStarterPack(
 
 void AutocompleteMatch::GetKeywordUiState(
     const TemplateURLService* template_url_service,
-    bool is_history_embeddings_enabled,
     KeywordState* keyword_state,
     std::u16string* keyword_out,
     std::u16string* keyword_placeholder_out) const {
-  *keyword_placeholder_out = GetKeywordPlaceholder(
-      GetTemplateURL(template_url_service), is_history_embeddings_enabled);
+  *keyword_placeholder_out =
+      GetKeywordPlaceholder(GetTemplateURL(template_url_service));
   if (associated_keyword.empty()) {
     keyword_out->assign(
         IsExplicitlyInvokedKeyword(template_url_service) ? keyword : u"");
@@ -1376,12 +1362,8 @@ bool AutocompleteMatch::IsExplicitlyInvokedKeyword(
 
 // static
 std::u16string AutocompleteMatch::GetKeywordPlaceholder(
-    const TemplateURL* template_url,
-    bool is_history_embeddings_enabled) {
+    const TemplateURL* template_url) {
   if (!template_url) {
-    return std::u16string();
-  }
-  if (!history_embeddings::GetFeatureParameters().omnibox_scoped) {
     return std::u16string();
   }
   if (template_url->CreatedByEnterpriseSearchAggregatorPolicy()) {
@@ -1393,9 +1375,7 @@ std::u16string AutocompleteMatch::GetKeywordPlaceholder(
       message_id = IDS_OMNIBOX_BOOKMARKS_SCOPE_PLACEHOLDER_TEXT;
       break;
     case template_url_starter_pack_data::StarterPackId::kHistory:
-      message_id = is_history_embeddings_enabled
-                       ? IDS_OMNIBOX_HISTORY_EMBEDDINGS_SCOPE_PLACEHOLDER_TEXT
-                       : IDS_OMNIBOX_HISTORY_SCOPE_PLACEHOLDER_TEXT;
+      message_id = IDS_OMNIBOX_HISTORY_SCOPE_PLACEHOLDER_TEXT;
       break;
     case template_url_starter_pack_data::StarterPackId::kTabs:
       message_id = IDS_OMNIBOX_TABS_SCOPE_PLACEHOLDER_TEXT;

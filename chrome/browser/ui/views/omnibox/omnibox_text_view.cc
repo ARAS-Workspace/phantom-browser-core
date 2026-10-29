@@ -190,27 +190,6 @@ void OmniboxTextView::SetMultilineAnswerText(
                            /*is_headline=*/false);
 }
 
-void OmniboxTextView::SetMultilineText(const std::u16string& text) {
-  // This is a "dirty" check to check if this call is a no-op and no state
-  // change is required. It works only because `SetMultilineText()` is the only
-  // place to set max lines to 3. It's not 100% correct because some of the
-  // other setters don't reset max lines back to 1. Ideally, all these setter
-  // methods would have a clean and robust way to verify no state change is
-  // required and early exit. See comment at `wrap_text_lines_`'s declaration.
-  if (!cached_classifications_ && GetText() == text && render_text_ &&
-      render_text_->max_lines() == 3) {
-    return;
-  }
-  cached_classifications_.reset();
-  render_text_ = CreateRenderText(text);
-  render_text_->SetColor(result_view_->GetColorProvider()->GetColor(
-      kColorOmniboxResultsTextAnswer));
-  render_text_->SetMultiline(true);
-  render_text_->SetMaxLines(3);
-  wrap_text_lines_ = true;
-  OnStyleChanged();
-}
-
 int OmniboxTextView::GetLineHeight() const {
   return font_height_;
 }

@@ -249,9 +249,8 @@ WebuiOmniboxHandler::CreateAutocompleteMatch(
     KeywordState keyword_state;
     std::u16string keyword;
     std::u16string keyword_placeholder;
-    match.GetKeywordUiState(turl_service,
-                            controller_->client()->IsHistoryEmbeddingsEnabled(),
-                            &keyword_state, &keyword, &keyword_placeholder);
+    match.GetKeywordUiState(turl_service, &keyword_state, &keyword,
+                            &keyword_placeholder);
 
     // Map the .cc `KeywordState` to mojom `KeywordType`. The .cc `KeywordState`
     // does not distinguish between hint (aka chip) and instant keywords. It

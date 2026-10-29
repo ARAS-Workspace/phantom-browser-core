@@ -40,7 +40,6 @@
 #include "base/trace_event/memory_dump_manager.h"
 #include "build/android_buildflags.h"
 #include "build/build_config.h"
-#include "components/history_embeddings/core/history_embeddings_features.h"
 #include "components/omnibox/browser/actions/omnibox_action_in_suggest.h"
 #include "components/omnibox/browser/actions/omnibox_pedal_provider.h"
 #include "components/omnibox/browser/autocomplete_enums.h"
@@ -57,7 +56,6 @@
 #include "components/omnibox/browser/document_provider.h"
 #include "components/omnibox/browser/enterprise_search_aggregator_provider.h"
 #include "components/omnibox/browser/featured_search_provider.h"
-#include "components/omnibox/browser/history_embeddings_provider.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
 #include "components/omnibox/browser/history_quick_provider.h"
 #include "components/omnibox/browser/history_url_provider.h"
@@ -710,15 +708,12 @@ void AutocompleteController::OnProviderUpdate(
   }
 
   // Allow some providers to trigger updates after `stop_timer_` has fired.
-  // TODO(crbug.com/364303536) This is a temporary fix for allowing history
-  //   embedding answers to `UpdateResults()` after `stop_timer_` has fired.
   // TODO(crbug.com/408512535): This is a temporary fix for allowing the
   //   contextual search provider to `UpdateResults()` after `stop_timer_` has
   //   fired.
   bool allow_post_done_updates =
       provider &&
-      (provider->type() == AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS ||
-       provider->type() == AutocompleteProvider::TYPE_UNSCOPED_EXTENSION ||
+      (provider->type() == AutocompleteProvider::TYPE_UNSCOPED_EXTENSION ||
        provider->type() == AutocompleteProvider::TYPE_CONTEXTUAL_SEARCH ||
        provider->type() ==
            AutocompleteProvider::TYPE_ENTERPRISE_SEARCH_AGGREGATOR);
@@ -977,10 +972,9 @@ bool AutocompleteController::ShouldRunProvider(
                   template_url_starter_pack_data::StarterPackId::kBookmarks);
 
         // @History starter pack scope - run the history providers & featured
-        // search for embeddings IPH suggestions.
+        // search.
         case AutocompleteProvider::TYPE_HISTORY_QUICK:
         case AutocompleteProvider::TYPE_HISTORY_URL:
-        case AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS:
         case AutocompleteProvider::TYPE_FEATURED_SEARCH:
           return (keyword_turl->starter_pack_id() ==
                   template_url_starter_pack_data::StarterPackId::kHistory);
@@ -1047,8 +1041,6 @@ bool AutocompleteController::ShouldRunProvider(
 
     case AutocompleteProvider::TYPE_OPEN_TAB:
       return config_.unscoped_open_tab_suggestions;
-    case AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS:
-      return history_embeddings::GetFeatureParameters().omnibox_unscoped;
     default:
       break;
   }
@@ -1114,10 +1106,6 @@ void AutocompleteController::InitializeAsyncProviders(int provider_types) {
       search_provider_) {
     providers_.push_back(base::MakeRefCounted<CalculatorProvider>(
         provider_client_.get(), this, search_provider_));
-  }
-  if (provider_types & AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS) {
-    providers_.push_back(base::MakeRefCounted<HistoryEmbeddingsProvider>(
-        provider_client_.get(), this));
   }
   if (provider_types & AutocompleteProvider::TYPE_UNSCOPED_EXTENSION) {
     auto unscoped_extension_provider =
@@ -2175,9 +2163,7 @@ void AutocompleteController::MaybeCleanIphSuggestions(
   bool has_toolbelt = std::ranges::any_of(result->begin(), result->end(),
                                           &AutocompleteMatch::IsToolbelt);
   if (has_toolbelt) {
-    result->EraseMatchesWhere([](const auto& match) {
-      return match.IsIphSuggestion() &&
-             match.iph_type != IphType::kHistoryEmbeddingsDisclaimer;
-    });
+    result->EraseMatchesWhere(
+        [](const auto& match) { return match.IsIphSuggestion(); });
   }
 }

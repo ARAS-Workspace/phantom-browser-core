@@ -67,14 +67,6 @@ static constexpr int kWeatherImageSize = 24;
 // Size of the weather's round square background.
 static constexpr int kWeatherBackgroundSize = 28;
 
-// The vertical gap between the contents and descriptions for multiline answers.
-static constexpr int kHistoryEmbeddingAnswerGap = 3;
-
-// The vertical padding above and below the description for multiline answers.
-// Chosen so that the vertical distance between the bottom of the answer text
-// and the bottom of the hover fill is the same as for other, 1-line matches.
-static constexpr int kHistoryEmbeddingAnswerBottomPadding = 8;
-
 ////////////////////////////////////////////////////////////////////////////////
 // PlaceholderImageSource:
 
@@ -235,9 +227,6 @@ void OmniboxMatchCellView::OnMatchUpdate(const OmniboxResultView* result_view,
     layout_style_ = LayoutStyle::TOOLBELT;
   } else if (match.IsIphSuggestion()) {
     layout_style_ = LayoutStyle::IPH_SUGGESTION;
-  } else if (match.type ==
-             AutocompleteMatchType::Type::HISTORY_EMBEDDINGS_ANSWER) {
-    layout_style_ = LayoutStyle::HISTORY_EMBEDDING_ANSWER;
   } else {
     layout_style_ = LayoutStyle::DEFAULT_NON_SEARCH_SUGGESTION;
   }
@@ -250,9 +239,7 @@ void OmniboxMatchCellView::OnMatchUpdate(const OmniboxResultView* result_view,
           : kColorOmniboxText);
 
   // Set up the separator.
-  separator_view_->SetSize(layout_style_ ==
-                                       LayoutStyle::HISTORY_EMBEDDING_ANSWER ||
-                                   match.description.empty()
+  separator_view_->SetSize(match.description.empty()
                                ? gfx::Size()
                                : separator_view_->GetPreferredSize());
 
@@ -330,10 +317,6 @@ void OmniboxMatchCellView::OnMatchUpdate(const OmniboxResultView* result_view,
     description_view_->SetMultilineAnswerText(
         /*formatted_string=*/answer_data.subhead(),
         /*answer_type=*/match.answer_type);
-  } else if (layout_style_ == LayoutStyle::HISTORY_EMBEDDING_ANSWER) {
-    content_view_->SetMultilineText(match.contents);
-    description_view_->SetTextWithStyling(match.description,
-                                          match.description_class);
   } else {
     content_view_->SetTextWithStyling(match.contents, match.contents_class);
     description_view_->SetTextWithStyling(match.description,
@@ -479,34 +462,6 @@ void OmniboxMatchCellView::Layout(PassKey) {
   x += text_indent;
   const int text_width = child_area.width() - text_indent;
 
-  if (layout_style_ == LayoutStyle::HISTORY_EMBEDDING_ANSWER) {
-    if (description_view_->GetText().empty()) {
-      content_view_->SetBounds(x, y, text_width,
-                               content_view_->GetHeightForWidth(text_width));
-      return;
-    }
-
-    // Position contents above description. Leave `kHistoryEmbeddingAnswerGap`
-    // between them; and `kHistoryEmbeddingAnswerBottomPadding` between the
-    // bottom of description and the bottom of this `OmniboxMatchCellView`.
-    int needed_content_height =
-        content_view_->GetText().empty()
-            ? 0
-            : content_view_->GetHeightForWidth(text_width);
-    int needed_description_height = description_view_->GetText().empty()
-                                        ? 0
-                                        : description_view_->GetLineHeight();
-    int top_padding = row_height - needed_content_height -
-                      needed_description_height - kHistoryEmbeddingAnswerGap -
-                      kHistoryEmbeddingAnswerBottomPadding;
-    content_view_->SetBounds(x, y + top_padding, text_width,
-                             needed_content_height);
-    description_view_->SetBounds(
-        x, content_view_->bounds().bottom() + kHistoryEmbeddingAnswerGap,
-        text_width, needed_description_height);
-    return;
-  }
-
   int content_width = content_view_->GetPreferredSize().width();
   int description_width = description_view_->GetVisible()
                               ? description_view_->GetPreferredSize().width()
@@ -544,54 +499,23 @@ void OmniboxMatchCellView::Layout(PassKey) {
 
 gfx::Size OmniboxMatchCellView::CalculatePreferredSize(
     const views::SizeBounds& available_size) const {
-  // Compute width before height because height for multiline suggestions (e.g.,
-  // `HISTORY_EMBEDDING_ANSWER`) will depend on how many lines they require,
-  // which will in turn depend on available width.
-  int width;
-  if (layout_style_ == LayoutStyle::HISTORY_EMBEDDING_ANSWER) {
-    // Use `parent()` width instead of `width()` or any other size-methods on
-    // self because `CalculatePreferredSize()` is called before self has been
-    // sized; `width()` and all size-methods on self will return stale sizes for
-    // new & changed matches and for old matches when the browser is resized.
-    width = parent()->width();
-  } else {
-    // 1-line suggestions can't naively consume the entire parent width because
-    // that would shift the history embedding chip, tab switch button, and
-    // keyword button to the right.
-    width = GetInsets().width() + GetTextIndent() +
-            tail_suggest_common_prefix_width_ +
-            content_view_->GetPreferredSize().width() +
-            iph_link_view_->GetPreferredSize().width();
-    const int description_width =
-        description_view_->GetVisible()
-            ? description_view_->GetPreferredSize().width()
-            : 0;
-    if (description_width > 0) {
-      width += separator_view_->GetPreferredSize().width() + description_width;
-    }
+  // 1-line suggestions can't naively consume the entire parent width because
+  // that would shift the tab switch button and keyword button to the right.
+  int width = GetInsets().width() + GetTextIndent() +
+              tail_suggest_common_prefix_width_ +
+              content_view_->GetPreferredSize().width() +
+              iph_link_view_->GetPreferredSize().width();
+  const int description_width =
+      description_view_->GetVisible()
+          ? description_view_->GetPreferredSize().width()
+          : 0;
+  if (description_width > 0) {
+    width += separator_view_->GetPreferredSize().width() + description_width;
   }
 
   int height;
-  if (layout_style_ == LayoutStyle::HISTORY_EMBEDDING_ANSWER) {
-    if (content_view_->GetText().empty() &&
-        description_view_->GetText().empty()) {
-      // Answers can hide `OmniboxMatchCellView`, only displaying their
-      // `OmniboxLocalAnswerHeaderView`.
-      height = 0;
-    } else if (description_view_->GetText().empty()) {
-      // In the error cases, answers can display only contents.
-      height = 28;
-    } else {
-      // Enough room to display the contents, description, a gap between them,
-      // and padding above and below them.
-      int available_width_for_text =
-          width - GetTextIndent() - GetInsets().width();
-      height = content_view_->GetHeightForWidth(available_width_for_text) +
-               description_view_->GetLineHeight() + kHistoryEmbeddingAnswerGap +
-               kHistoryEmbeddingAnswerBottomPadding;
-    }
-  } else if (layout_style_ == LayoutStyle::IPH_SUGGESTION ||
-             layout_style_ == LayoutStyle::TOOLBELT) {
+  if (layout_style_ == LayoutStyle::IPH_SUGGESTION ||
+      layout_style_ == LayoutStyle::TOOLBELT) {
     // IPH and toolbelt suggestions have extra height.
     height = kRowHeight + 4;
   } else {
@@ -654,12 +578,6 @@ int OmniboxMatchCellView::GetTextIndent() const {
   if (layout_style_ == LayoutStyle::IPH_SUGGESTION &&
       icon_view_->GetPreferredSize() == gfx::Size{}) {
     return kIphTextIndent;
-  }
-
-  // Answers don't have an icon, and their text needs to line up with the icons
-  // of other suggestions, so they need a smaller indent.
-  if (layout_style_ == LayoutStyle::HISTORY_EMBEDDING_ANSWER) {
-    return 18;
   }
 
   // For normal matches, the gap between the left edge of this view and the

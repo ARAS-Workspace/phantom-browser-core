@@ -45,9 +45,6 @@ enum ChromeTextContext {
   // Text in the suggestions section header in the omnibox dropdown.
   CONTEXT_OMNIBOX_SECTION_HEADER,
 
-  // Text for suggestion row chips; e.g. the history embeddings chip.
-  CONTEXT_OMNIBOX_POPUP_ROW_CHIP,
-
   // Text for toolbelt buttons.
   CONTEXT_OMNIBOX_TOOLBELT_BUTTON,
 

@@ -391,14 +391,12 @@
   E_CPONLY(kColorOmniboxResultsButtonInkDropSelected) \
   E_CPONLY(kColorOmniboxResultsButtonInkDropSelectedRowHovered) \
   E_CPONLY(kColorOmniboxResultsButtonInkDropSelectedRowSelected) \
-  E_CPONLY(kColorOmniboxResultsChipBackground) \
   E_CPONLY(kColorOmniboxResultsFocusIndicator) \
   E_CPONLY(kColorOmniboxResultsIcon) \
   E_CPONLY(kColorOmniboxResultsIconGM3Background) \
   E_CPONLY(kColorOmniboxResultsIconSelected) \
   E_CPONLY(kColorOmniboxResultsIconHovered) \
   E_CPONLY(kColorOmniboxResultsStarterPackIcon) \
-  E_CPONLY(kColorOmniboxResultsTextAnswer) \
   E_CPONLY(kColorOmniboxResultsTextDimmed) \
   E_CPONLY(kColorOmniboxResultsTextDimmedSelected) \
   E_CPONLY(kColorOmniboxResultsTextNegative) \

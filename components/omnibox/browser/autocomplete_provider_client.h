@@ -51,10 +51,6 @@ namespace history_clusters {
 class HistoryClustersService;
 }
 
-namespace history_embeddings {
-class HistoryEmbeddingsSearch;
-}
-
 namespace network {
 class SharedURLLoaderFactory;
 }
@@ -90,8 +86,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   virtual AutocompleteClassifier* GetAutocompleteClassifier() = 0;
   virtual history::HistoryService* GetHistoryService() = 0;
   virtual history_clusters::HistoryClustersService* GetHistoryClustersService();
-  virtual history_embeddings::HistoryEmbeddingsSearch*
-  GetHistoryEmbeddingsSearch();
   virtual scoped_refptr<history::TopSites> GetTopSites() = 0;
   virtual bookmarks::BookmarkModel* GetBookmarkModel() = 0;
   virtual history::URLDatabase* GetInMemoryDatabase() = 0;
@@ -219,12 +213,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
 
   // Returns true if the sharing hub command is enabled.
   virtual bool IsSharingHubAvailable() const;
-
-  // Returns true if history embeddings is enabled and user has opted in.
-  virtual bool IsHistoryEmbeddingsEnabled() const;
-
-  // Returns true if history embeddings is enabled and user can opt in/out.
-  virtual bool IsHistoryEmbeddingsSettingVisible() const;
 
   // Returns true if the page contains the paywall hint in the HTML. Returns
   // false if the page does not contain the paywall hint. Returns std::nullopt

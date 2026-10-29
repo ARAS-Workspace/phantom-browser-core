@@ -22,7 +22,6 @@
 #include "components/omnibox/browser/actions/omnibox_action.h"
 #include "components/omnibox/browser/autocomplete_match_type.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
-#include "components/omnibox/browser/vector_icons.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
@@ -45,76 +44,7 @@
 #include "ui/views/layout/flex_layout.h"
 #include "ui/views/layout/layout_manager.h"
 #include "ui/views/painter.h"
-#include "ui/views/view_class_properties.h"
 #include "ui/views/view_utils.h"
-
-// A chip, like the history embeddings chip. Contains icon & text. Can not be
-// focused or selected.
-class OmniboxSuggestionRowChip : public views::MdTextButton {
-  METADATA_HEADER(OmniboxSuggestionRowChip, views::MdTextButton)
-
- public:
-  OmniboxSuggestionRowChip(const std::u16string& text,
-                           const gfx::VectorIcon& icon)
-      : MdTextButton({},
-                     text,
-                     CONTEXT_OMNIBOX_POPUP_ROW_CHIP,
-                     /*use_text_color_for_icon=*/true),
-        icon_(&icon) {
-    // Default margin of the suggestion row's children is (0, 4, 0, 8). Remove
-    // the left margin for chips per UX decision.
-    SetProperty(
-        views::kMarginsKey,
-        gfx::Insets::TLBR(0, 0, 0,
-                          ChromeLayoutProvider::Get()->GetDistanceMetric(
-                              views::DISTANCE_RELATED_BUTTON_HORIZONTAL)));
-
-    SetImageLabelSpacing(5);
-    SetCustomPadding(gfx::Insets::VH(0, 7));
-    SetCornerRadius(100);  // Large number to ensure 100% rounded.
-
-    views::InkDrop::Get(this)->GetInkDrop()->SetShowHighlightOnHover(false);
-  }
-
-  OmniboxSuggestionRowChip(const OmniboxSuggestionRowChip&) = delete;
-  OmniboxSuggestionRowChip& operator=(const OmniboxSuggestionRowChip&) = delete;
-
-  ~OmniboxSuggestionRowChip() override = default;
-
-  void SetThemeState(OmniboxPartState theme_state) {
-    if (theme_state_ == theme_state) {
-      return;
-    }
-    theme_state_ = theme_state;
-    OnThemeChanged();
-  }
-
-  void OnThemeChanged() override {
-    MdTextButton::OnThemeChanged();
-    // We can't use colors from NativeTheme as the omnibox theme might be
-    // different (for example, if the NTP colors are customized).
-    const auto* const color_provider = GetColorProvider();
-    SetImageModel(
-        views::Button::STATE_NORMAL,
-        ui::ImageModel::FromVectorIcon(*icon_, kColorOmniboxResultsIcon, 10));
-    SetEnabledTextColors(
-        color_provider->GetColor(ui::kColorSysOnSurfaceSubtle));
-  }
-
-  void UpdateBackgroundColor() override {
-    const auto* const color_provider = GetColorProvider();
-    const SkColor color =
-        color_provider->GetColor(kColorOmniboxResultsChipBackground);
-    SetBackground(views::CreateRoundedRectBackground(color, GetCornerRadii()));
-  }
-
- private:
-  raw_ptr<const gfx::VectorIcon> icon_;
-  OmniboxPartState theme_state_ = OmniboxPartState::NORMAL;
-};
-
-BEGIN_METADATA(OmniboxSuggestionRowChip)
-END_METADATA
 
 class OmniboxSuggestionButtonRowLayout : public views::LayoutManager {
  public:
@@ -426,7 +356,6 @@ void OmniboxSuggestionButtonRowView::BuildViews() {
   // Clear and reset existing views. Reset all raw_ptr instances first to avoid
   // dangling.
   previous_active_button_ = nullptr;
-  embeddings_chip_ = nullptr;
   keyword_button_ = nullptr;
   action_buttons_.clear();
   RemoveAllChildViews();
@@ -441,10 +370,6 @@ void OmniboxSuggestionButtonRowView::BuildViews() {
   // text depends on the actual match. That shouldn't produce a flicker, because
   // it's called directly from OmniboxResultView::SetMatch(). If this flickers,
   // then so does everything else in the result view.
-
-  embeddings_chip_ = AddChildView(std::make_unique<OmniboxSuggestionRowChip>(
-      l10n_util::GetStringUTF16(IDS_OMNIBOX_HISTORY_EMBEDDING_HINT),
-      omnibox::kSparkIcon));
 
   {
     OmniboxPopupSelection selection(model_index_,
@@ -503,9 +428,6 @@ void OmniboxSuggestionButtonRowView::UpdateFromModel() {
     BuildViews();
   }
 
-  embeddings_chip_->SetVisible(match().type ==
-                               AutocompleteMatchType::HISTORY_EMBEDDINGS);
-
   if (match().HasInstantKeyword(
           popup_view_->controller()->client()->GetTemplateURLService())) {
     keyword_button_->SetVisible(false);
@@ -551,7 +473,7 @@ void OmniboxSuggestionButtonRowView::UpdateFromModel() {
   }
 
   const bool is_any_child_visible =
-      embeddings_chip_->GetVisible() || keyword_button_->GetVisible() ||
+      keyword_button_->GetVisible() ||
       std::ranges::any_of(action_buttons_, [](const auto& action_button) {
         return action_button->GetVisible();
       });
@@ -576,9 +498,6 @@ void OmniboxSuggestionButtonRowView::SelectionStateChanged() {
 
 void OmniboxSuggestionButtonRowView::SetThemeState(
     OmniboxPartState theme_state) {
-  if (embeddings_chip_) {
-    embeddings_chip_->SetThemeState(theme_state);
-  }
   if (keyword_button_) {
     keyword_button_->SetThemeState(theme_state);
   }

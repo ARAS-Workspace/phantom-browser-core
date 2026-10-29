@@ -35,7 +35,6 @@
 #include "chrome/browser/extensions/api/omnibox/omnibox_api.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/omnibox/autocomplete_controller_emitter_factory.h"
 #include "chrome/browser/page_load_metrics/chrome_initiator_location.h"
 #include "chrome/browser/predictors/autocomplete_action_predictor.h"
@@ -857,10 +856,6 @@ void ChromeOmniboxClient::OpenIphLink(GURL gurl) {
   NavigateParams params(profile_, gurl, transition);
   params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   Navigate(&params);
-}
-
-bool ChromeOmniboxClient::IsHistoryEmbeddingsEnabled() const {
-  return history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile_);
 }
 
 void ChromeOmniboxClient::MaybePrewarmForDefaultSearchEngine(

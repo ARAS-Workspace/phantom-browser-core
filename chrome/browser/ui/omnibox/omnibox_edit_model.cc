@@ -1523,9 +1523,8 @@ void OmniboxEditModel::OnCurrentMatchChanged() {
   std::u16string keyword;
   std::u16string keyword_placeholder;
   TemplateURLService* service = controller_->client()->GetTemplateURLService();
-  match.GetKeywordUiState(service,
-                          controller_->client()->IsHistoryEmbeddingsEnabled(),
-                          &keyword_state, &keyword, &keyword_placeholder);
+  match.GetKeywordUiState(service, &keyword_state, &keyword,
+                          &keyword_placeholder);
 
   if (!is_keyword_selected() && is_keyword_selected(keyword_state)) {
     // We just entered keyword mode, so remove the keyword from the input.
@@ -1843,9 +1842,8 @@ void OmniboxEditModel::SetPopupSelection(OmniboxPopupSelection new_selection,
   std::u16string keyword;
   std::u16string keyword_placeholder;
   TemplateURLService* service = controller_->client()->GetTemplateURLService();
-  match.GetKeywordUiState(service,
-                          controller_->client()->IsHistoryEmbeddingsEnabled(),
-                          &keyword_state, &keyword, &keyword_placeholder);
+  match.GetKeywordUiState(service, &keyword_state, &keyword,
+                          &keyword_placeholder);
 
   // Don't update the edit model if entering or leaving keyword mode; doing so
   // breaks keyword mode. Updating when there is no line change is necessary
@@ -1933,26 +1931,6 @@ std::u16string OmniboxEditModel::GetPopupAccessibilityLabelForCurrentSelection(
 
   const AutocompleteMatch& match =
       autocomplete_controller()->result().match_at(line);
-
-  if (match.type == AutocompleteMatchType::HISTORY_EMBEDDINGS_ANSWER) {
-    // This match type is a special case that puts its primary meaningful
-    // content (the answer) into the `description` and repurposes other fields.
-    // So using `fill_into_edit` or `inline_autocompletion` or even just match
-    // `contents` doesn't make sense in this case. Instead, we provide the
-    // screen reader with the header ("Summary") and then the answer in
-    // `description`, and finally the URL details in `contents` (includes date).
-    return AutocompleteMatchType::ToAccessibilityLabel(
-        match,
-        autocomplete_controller()->GetSuggestionGroupHeaderText(
-            match.suggestion_group_id),
-        base::StrCat({
-            match.history_embeddings_answer_header_text,
-            match.description,
-            match.contents,
-        }),
-        line, autocomplete_controller()->result().size(), u"",
-        label_prefix_length);
-  }
 
   int additional_message_id = 0;
   std::u16string additional_message;

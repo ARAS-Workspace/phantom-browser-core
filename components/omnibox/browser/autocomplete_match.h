@@ -587,10 +587,7 @@ struct AutocompleteMatch {
   // `keyword_state` will be set to `KeywordState::kNone`.
   // `keyword_placeholder_out` will be set to any placeholder text the keyword
   // wants to display. Set for both hint and non-hint keyword modes.
-  // `is_history_embeddings_enabled` will affect the placeholder text for the
-  // @history keyword.
   void GetKeywordUiState(const TemplateURLService* template_url_service,
-                         bool is_history_embeddings_enabled,
                          KeywordState* keyword_state,
                          std::u16string* keyword_out,
                          std::u16string* keyword_placeholder_out) const;
@@ -605,9 +602,7 @@ struct AutocompleteMatch {
   // TemplateURL, returned for both hint and non-hint keyword modes.
   // The `template_url` may be nullptr and this method often defaults to
   // returning the empty string.
-  static std::u16string GetKeywordPlaceholder(
-      const TemplateURL* template_url,
-      bool is_history_embeddings_enabled);
+  static std::u16string GetKeywordPlaceholder(const TemplateURL* template_url);
 
   // Returns the `TemplateURL` associated with this match. This may be nullptr
   // if the match has no keyword OR if the keyword no longer corresponds to a
@@ -1073,12 +1068,6 @@ struct AutocompleteMatch {
   // their contents/description text.
   std::u16string iph_link_text;
   GURL iph_link_url;
-
-  // The text to show above the match contents & description for
-  // `HISTORY_EMBEDDINGS_ANSWER` matches.
-  std::u16string history_embeddings_answer_header_text;
-  // Whether the answer is still loading and should therefore show a throbber.
-  bool history_embeddings_answer_header_loading = false;
 
   // The user feedback on the match.
   FeedbackType feedback_type = FeedbackType::kNone;

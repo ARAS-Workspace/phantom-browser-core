@@ -69,11 +69,6 @@ FakeAutocompleteProviderClient::GetHistoryClustersService() {
   return history_clusters_service_;
 }
 
-history_embeddings::HistoryEmbeddingsSearch*
-FakeAutocompleteProviderClient::GetHistoryEmbeddingsSearch() {
-  return history_embeddings_search_.get();
-}
-
 bookmarks::BookmarkModel* FakeAutocompleteProviderClient::GetBookmarkModel() {
   return bookmark_model_.get();
 }

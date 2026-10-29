@@ -146,10 +146,6 @@ gfx::Image OmniboxClient::GetFaviconForIconUrl(
   return gfx::Image();
 }
 
-bool OmniboxClient::IsHistoryEmbeddingsEnabled() const {
-  return false;
-}
-
 omnibox::InputState OmniboxClient::GetInputState() const {
   return omnibox::InputState();
 }

@@ -19,7 +19,6 @@
 #include "chrome/browser/ui/omnibox/omnibox_theme.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/location_bar/selected_keyword_view.h"
-#include "chrome/browser/ui/views/omnibox/omnibox_local_answer_header_view.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_match_cell_view.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_view_views.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_suggestion_button_row_view.h"
@@ -162,7 +161,6 @@ OmniboxResultView::OmniboxResultView(OmniboxPopupViewViews* popup_view,
   // OmniboxResultView (FillLayout)
   //   selection_indicator_
   //   local_answer_header_and_suggestion_and_buttons_ (BoxLayout vertical)
-  //     local_answer_header_ (added lazily)
   //     divider_line_
   //     suggestion_and_buttons (FlexLayout horizontal)
   //       suggestion_and_button_row (FlexLayout horizontal)
@@ -383,20 +381,6 @@ void OmniboxResultView::SetMatch(const AutocompleteMatch& match) {
   }
 
   button_row_->UpdateFromModel();
-
-  if (match_.type == AutocompleteMatchType::Type::HISTORY_EMBEDDINGS_ANSWER) {
-    if (!local_answer_header_) {
-      local_answer_header_ =
-          local_answer_header_and_suggestion_and_buttons_->AddChildViewAt(
-              std::make_unique<OmniboxLocalAnswerHeaderView>(), 0);
-    }
-    local_answer_header_->SetText(match.history_embeddings_answer_header_text);
-    local_answer_header_->SetVisible(true);
-    local_answer_header_->SetThrobberVisibility(
-        match.history_embeddings_answer_header_loading);
-  } else if (local_answer_header_) {
-    local_answer_header_->SetVisible(false);
-  }
 
   ApplyThemeAndRefreshIcons();
   InvalidateLayout();
