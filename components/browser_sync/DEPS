@@ -14,7 +14,6 @@ include_rules = [
   "+components/history/core/browser",
   "+components/history/core/common",
   "+components/keyed_service/core",
-  "+components/notebooks/public",
   "+components/prefs",
   "+components/saved_tab_groups/public",
   "+components/search_engines",

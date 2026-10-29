@@ -24,7 +24,6 @@
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
-#include "chrome/browser/notebooks/notebooks_service_factory.h"
 #include "chrome/browser/prefs/pref_service_syncable_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_key.h"
@@ -189,8 +188,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
       TabContextSyncServiceFactory::GetForProfile(profile));
   builder.SetUserEventService(
       browser_sync::UserEventServiceFactory::GetForProfile(profile));
-  builder.SetNotebooksService(
-      notebooks::NotebooksServiceFactory::GetForProfile(profile));
 
   return builder.Build(/*disabled_types=*/{}, sync_service,
                        chrome::GetChannel());
@@ -377,8 +374,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(HistoryServiceFactory::GetInstance());
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(LocalOrSyncableBookmarkSyncServiceFactory::GetInstance());
-  DependsOn(notebooks::NotebooksServiceFactory::GetInstance());
-
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());

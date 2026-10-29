@@ -48,9 +48,6 @@ BASE_DECLARE_FEATURE(kNewTabPageCustomizationThemeSync);
 // Enables syncing of usage metadata for loyalty cards.
 BASE_DECLARE_FEATURE(kSyncLoyaltyCardMetadata);
 
-// Enables syncing Notebooks.
-BASE_DECLARE_FEATURE(kSyncNotebook);
-
 // Enables syncing history journeys.
 BASE_DECLARE_FEATURE(kSyncJourney);
 

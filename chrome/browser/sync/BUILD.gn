@@ -94,7 +94,6 @@ source_set("sync") {
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/history",
     "//chrome/browser/metrics",
-    "//chrome/browser/notebooks",
     "//chrome/browser/signin",
     "//chrome/browser/subscription_eligibility",
     "//chrome/browser/ui/navigator",

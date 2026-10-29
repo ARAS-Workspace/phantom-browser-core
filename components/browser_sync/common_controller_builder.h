@@ -62,10 +62,6 @@ namespace history {
 class HistoryService;
 }  // namespace history
 
-namespace notebooks {
-class NotebooksService;
-}  // namespace notebooks
-
 namespace send_tab_to_self {
 class SendTabToSelfSyncService;
 }  // namespace send_tab_to_self
@@ -156,7 +152,6 @@ class CommonControllerBuilder {
   void SetIdentityManager(signin::IdentityManager* identity_manager);
   void SetDataTypeStoreService(
       syncer::DataTypeStoreService* data_type_store_service);
-  void SetNotebooksService(notebooks::NotebooksService* notebooks_service);
 
   void SetPasskeyModel(webauthn::PasskeyModel* passkey_model);
 
@@ -250,8 +245,6 @@ class CommonControllerBuilder {
   CreateSharedCommentDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateContextualTaskDataTypeController();
-  std::unique_ptr<syncer::DataTypeController>
-  CreateNotebookDataTypeController();
   std::unique_ptr<syncer::DataTypeController> CreateJourneyDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateWebauthnCredentialDataTypeController(syncer::SyncService* sync_service);
@@ -340,7 +333,6 @@ class CommonControllerBuilder {
   SafeOptional<raw_ptr<sync_tab_context::TabContextSyncService>>
       tab_context_sync_service_;
   SafeOptional<raw_ptr<TemplateURLService>> template_url_service_;
-  SafeOptional<raw_ptr<notebooks::NotebooksService>> notebooks_service_;
 };
 
 }  // namespace browser_sync
