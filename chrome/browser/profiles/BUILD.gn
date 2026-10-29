@@ -615,7 +615,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/heavy_ad_intervention",
     "//chrome/browser/history",
     "//chrome/browser/history_clusters",
-    "//chrome/browser/history_embeddings",
     "//chrome/browser/language",
     "//chrome/browser/loader",
     "//chrome/browser/login_detection",

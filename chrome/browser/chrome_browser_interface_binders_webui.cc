@@ -34,7 +34,6 @@
 #include "ui/webui/tracked_element/tracked_element_handler.h"
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 
-#include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
@@ -94,7 +93,6 @@ void BindTrackedElementHandlerRestricted(
   DCHECK(controller);
 
   const bool is_allowed = controller->GetAs<UserEducationInternalsUI>() ||
-                          controller->GetAs<HistoryUI>() ||
                           controller->GetAs<ProfilePickerUI>() || false;
 
   if (!is_allowed) {

@@ -1218,24 +1218,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered once per-app when a link is captured and "
                        "opened in a browser tab.")));
 
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHHistorySearchFeature,
-          kHistorySearchInputElementId, IDS_HISTORY_EMBEDDINGS_IPH_BODY,
-          IDS_HISTORY_EMBEDDINGS_IPH_ACTION,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle promo_handle) {
-                chrome::ShowSettingsSubPage(GetBrowser(ctx),
-                                            chrome::kHistorySearchSubpage);
-              }))
-          .SetCustomActionIsDefault(true)
-          .SetCustomActionDismissText(IDS_NO_THANKS)
-          .SetBubbleArrow(HelpBubbleArrow::kTopLeft)
-          .SetInAnyContext(true)
-          .SetMetadata(130, "johntlee@chromium.org",
-                       "Triggered after user lands on chrome://history.")));
-
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // kIPHVerticalTabstripTutorialFeature:

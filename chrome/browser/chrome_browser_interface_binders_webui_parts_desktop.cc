@@ -8,7 +8,6 @@
 #include "base/functional/bind.h"
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/side_panel/history/history_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
@@ -76,7 +75,6 @@
 #include "ui/webui/resources/cr_components/history/foreign_sessions.mojom.h"
 #include "ui/webui/resources/cr_components/history/history.mojom.h"
 #include "ui/webui/resources/cr_components/history_clusters/history_clusters.mojom.h"
-#include "ui/webui/resources/cr_components/history_embeddings/history_embeddings.mojom.h"
 #include "ui/webui/resources/cr_components/most_visited/most_visited.mojom.h"
 #include "ui/webui/resources/cr_components/theme_color_picker/theme_color_picker.mojom.h"
 
@@ -158,29 +156,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
           HistoryClustersSidePanelUI>(map);
     }
   }
-  if (history_embeddings::IsHistoryEmbeddingsFeatureEnabled()) {
-    if (history_clusters_service &&
-        history_clusters_service->is_journeys_feature_flag_enabled()) {
-      if (HistorySidePanelCoordinator::IsSupported()) {
-        RegisterWebUIControllerInterfaceBinder<
-            history_embeddings::mojom::PageHandlerFactory, HistoryUI,
-            HistorySidePanelUI>(map);
-      } else {
-        RegisterWebUIControllerInterfaceBinder<
-            history_embeddings::mojom::PageHandlerFactory, HistoryUI,
-            HistoryClustersSidePanelUI>(map);
-      }
-    } else {
-      if (HistorySidePanelCoordinator::IsSupported()) {
-        RegisterWebUIControllerInterfaceBinder<
-            history_embeddings::mojom::PageHandlerFactory, HistorySidePanelUI,
-            HistoryUI>(map);
-      } else {
-        RegisterWebUIControllerInterfaceBinder<
-            history_embeddings::mojom::PageHandlerFactory, HistoryUI>(map);
-      }
-    }
-  }
 
   if (HistorySidePanelCoordinator::IsSupported()) {
     RegisterWebUIControllerInterfaceBinder<
@@ -214,7 +189,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 
   RegisterWebUIControllerInterfaceBinder<
       help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
-      HistoryUI, ProfilePickerUI>(map);
+      ProfilePickerUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::BookmarksPageHandlerFactory, BookmarksSidePanelUI>(

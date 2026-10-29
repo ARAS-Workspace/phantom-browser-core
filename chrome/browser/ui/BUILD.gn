@@ -537,7 +537,6 @@ static_library("ui") {
     "//chrome/browser/first_run:impl",
     "//chrome/browser/history",
     "//chrome/browser/history_clusters",
-    "//chrome/browser/history_embeddings",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/language",
     "//chrome/browser/lifetime",
@@ -1182,7 +1181,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/zoom",
     "//chrome/browser/ui/webui/color_pipeline_internals",
     "//chrome/browser/ui/webui/cr_components/history_clusters",
-    "//chrome/browser/ui/webui/cr_components/history_embeddings",
     "//chrome/browser/ui/webui/customize_buttons",
     "//chrome/browser/ui/webui/customize_buttons:impl",
     "//chrome/browser/ui/webui/infobar_internals",
@@ -1263,10 +1261,6 @@ static_library("ui") {
   # "//chrome/browser:browser_public_dependencies". Non-android circular
   # dependencies
   allow_circular_includes_from += [
-    # history_embeddings includes headers from //chrome/browser/ui (e.g.
-    # browser.h, browser_window.h) that can't be split out yet.
-    "//chrome/browser/ui/webui/cr_components/history_embeddings",
-
     # history includes headers from //chrome/browser/ui (e.g. browser.h)
     # that can't be split out yet.
     "//chrome/browser/ui/webui/history",
@@ -2724,7 +2718,6 @@ group("ui_public_dependencies") {
     "//ui/base/dragdrop/mojom:mojom_headers",
     "//ui/views",
     "//ui/views/controls/webview",
-    "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
   ]
   if (chrome_root_store_cert_management_ui) {
     public_deps += [ "//chrome/browser/resources/certificate_manager:mojom" ]

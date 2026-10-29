@@ -83,7 +83,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history/top_sites_factory.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
 #include "chrome/browser/language/accept_languages_service_factory.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/language/url_language_histogram_factory.h"
@@ -540,7 +539,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   GoogleGroupsManagerFactory::GetInstance();
   HeavyAdServiceFactory::GetInstance();
   HistoryClustersServiceFactory::EnsureFactoryBuilt();
-  HistoryEmbeddingsServiceFactory::GetInstance();
   HistoryServiceFactory::GetInstance();
   HistoryUiFaviconRequestHandlerFactory::GetInstance();
   HostContentSettingsMapFactory::GetInstance();

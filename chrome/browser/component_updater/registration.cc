@@ -12,10 +12,8 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/component_updater/crl_set_component_installer.h"
 #include "chrome/browser/component_updater/pki_metadata_component_installer.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/common/chrome_paths.h"
 #include "components/component_updater/component_updater_service.h"
-#include "components/component_updater/installer_policies/history_search_strings_component_installer.h"
 
 namespace component_updater {
 
@@ -52,9 +50,6 @@ void RegisterComponentsForUpdate() {
 
   base::FilePath path;
   if (base::PathService::Get(chrome::DIR_USER_DATA, &path)) {
-    if (!history_embeddings::IsHistoryEmbeddingsFeatureEnabled()) {
-      DeleteHistorySearchStringsComponent(path);
-    }
     base::ThreadPool::PostTask(
         FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
         base::BindOnce(&DeleteOldComponents, path));

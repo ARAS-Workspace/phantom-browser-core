@@ -274,20 +274,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorHistoryPageSeparator] = {ui::kColorSysSurfaceVariant};
   mixer[kColorHistoryPageText] = {ui::kColorSysOnSurfaceSubtle};
 
-  // History Embeddings colors.
-  mixer[kColorHistoryEmbeddingsBackground] = {
-      ui::kColorSysBaseContainerElevated};
-  mixer[kColorHistoryEmbeddingsDivider] = {ui::kColorSysDivider};
-  mixer[kColorHistoryEmbeddingsForeground] = {ui::kColorSysOnSurface};
-  mixer[kColorHistoryEmbeddingsForegroundSubtle] = {
-      ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorHistoryEmbeddingsImageBackground] = {
-      ui::kColorSysNeutralContainer};
-  mixer[kColorHistoryEmbeddingsImageBackgroundGradientEnd] = {
-      ui::kColorSysGradientTertiary};
-  mixer[kColorHistoryEmbeddingsImageBackgroundGradientStart] = {
-      ui::kColorSysGradientPrimary};
-
   if (!ShouldApplyChromeMaterialOverrides(key)) {
     return;
   }

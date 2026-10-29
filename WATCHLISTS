@@ -753,7 +753,6 @@
     },
     'chrome_intelligence': {
       'filepath': 'history_clusters'\
-                  '|history_embeddings'\
                   '|image_service'\
                   '|ios/chrome/browser/text_selection'\
                   '|model_execution'\

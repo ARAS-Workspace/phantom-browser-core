@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "base/command_line.h"
 #include "base/functional/bind.h"
@@ -21,15 +20,12 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/page_image_service/image_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/cr_components/history/history_util.h"
 #include "chrome/browser/ui/webui/cr_components/history_clusters/history_clusters_util.h"
-#include "chrome/browser/ui/webui/cr_components/history_embeddings/history_embeddings_handler.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
 #include "chrome/browser/ui/webui/history/browsing_history_handler.h"
 #include "chrome/browser/ui/webui/history/history_identity_state_watcher.h"
@@ -50,17 +46,16 @@
 #include "components/history_clusters/core/config.h"
 #include "components/history_clusters/core/features.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
-#include "components/history_embeddings/core/history_embeddings_features.h"
 #include "components/page_image_service/image_service.h"
 #include "components/page_image_service/image_service_handler.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
+#include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/webui/web_ui_util.h"
-#include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/webui_util.h"
 
 namespace {
@@ -100,27 +95,6 @@ content::WebUIDataSource* CreateAndAddHistoryUIHTMLSource(Profile* profile) {
   source->AddBoolean("isGlicEnabled", false);
   source->AddBoolean("isGlicWebActuationAvailable", false);
 
-  bool enable_history_embeddings =
-      history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile);
-  source->AddBoolean("enableHistoryEmbeddings", enable_history_embeddings);
-  source->AddBoolean(
-      "maybeShowEmbeddingsIph",
-      history_embeddings::IsHistoryEmbeddingsSettingVisible(profile) &&
-          !enable_history_embeddings);
-
-  static constexpr webui::LocalizedString kHistoryEmbeddingsStrings[] = {
-      {"historyEmbeddingsPromoLabel", IDS_HISTORY_EMBEDDINGS_PROMO_LABEL},
-      {"historyEmbeddingsPromoClose", IDS_HISTORY_EMBEDDINGS_PROMO_CLOSE},
-      {"historyEmbeddingsPromoHeading", IDS_HISTORY_EMBEDDINGS_PROMO_HEADING},
-      {"historyEmbeddingsPromoBody", IDS_HISTORY_EMBEDDINGS_PROMO_BODY},
-      {"historyEmbeddingsAnswersPromoHeading",
-       IDS_HISTORY_EMBEDDINGS_ANSWERS_PROMO_HEADING},
-      {"historyEmbeddingsAnswersPromoBody",
-       IDS_HISTORY_EMBEDDINGS_ANSWERS_PROMO_BODY},
-      {"historyEmbeddingsPromoSettingsLinkText",
-       IDS_HISTORY_EMBEDDIGNS_PROMO_SETTINGS_LINK_TEXT},
-  };
-  source->AddLocalizedStrings(kHistoryEmbeddingsStrings);
   source->AddBoolean("isBrowsingHistoryActorIntegrationM3Enabled",
                      history::IsBrowsingHistoryActorIntegrationM3Enabled());
   source->AddBoolean("isCriticalActionsEnabled", is_critical_actions_enabled);
@@ -171,9 +145,6 @@ HistoryUI::HistoryUI(content::WebUI* web_ui)
   web_ui->AddMessageHandler(
       std::make_unique<HistoryLoginHandler>(base::BindRepeating(
           &HistoryUI::UpdateDataSource, base::Unretained(this))));
-
-  ui::TrackedElementHandlerDocumentSingleton::Register(
-      this, std::vector<ui::ElementIdentifier>{kHistorySearchInputElementId});
 }
 
 HistoryUI::~HistoryUI() = default;
@@ -185,23 +156,6 @@ scoped_refptr<base::RefCountedMemory> HistoryUI::GetFaviconResourceBytes(
     ui::ResourceScaleFactor scale_factor) {
   return ui::ResourceBundle::GetSharedInstance().LoadDataResourceBytesForScale(
       IDR_HISTORY_FAVICON, scale_factor);
-}
-
-void HistoryUI::BindInterface(
-    mojo::PendingReceiver<history_embeddings::mojom::PageHandlerFactory>
-        pending_page_handler_factory) {
-  history_embeddings_handler_factory_receiver_.reset();
-  history_embeddings_handler_factory_receiver_.Bind(
-      std::move(pending_page_handler_factory));
-}
-
-void HistoryUI::CreatePageHandler(
-    mojo::PendingRemote<history_embeddings::mojom::Page> page,
-    mojo::PendingReceiver<history_embeddings::mojom::PageHandler> receiver) {
-  history_embeddings_handler_ = std::make_unique<HistoryEmbeddingsHandler>(
-      std::move(receiver), std::move(page),
-      Profile::FromWebUI(web_ui())->GetWeakPtr(), web_ui(),
-      /*for_side_panel=*/false);
 }
 
 void HistoryUI::BindInterface(
@@ -262,22 +216,4 @@ void HistoryUI::UpdateDataSource() {
 
   content::WebUIDataSource::Update(profile, chrome::kChromeUIHistoryHost,
                                    std::move(update));
-}
-
-void HistoryUI::BindInterface(
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
-        pending_receiver) {
-  if (help_bubble_handler_factory_receiver_.is_bound()) {
-    help_bubble_handler_factory_receiver_.reset();
-  }
-  help_bubble_handler_factory_receiver_.Bind(std::move(pending_receiver));
-}
-
-void HistoryUI::CreateHelpBubbleHandler(
-    mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
-    mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler) {
-  help_bubble_handler_ = std::make_unique<user_education::HelpBubbleHandler>(
-      std::move(handler), std::move(client),
-      ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
-          web_ui()->GetRenderFrameHost()));
 }

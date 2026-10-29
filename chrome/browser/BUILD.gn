@@ -773,7 +773,6 @@ source_set("core") {
     "//components/history/content/browser",
     "//components/history_clusters/core",
     "//components/history_clusters/history_clusters_internals/webui",
-    "//components/history_embeddings/core",
     "//components/javascript_dialogs",
     "//components/language/core/browser",
     "//components/language/core/common",
@@ -1236,7 +1235,6 @@ source_set("browser") {
     "//chrome/browser/google",
     "//chrome/browser/headless:initializer",
     "//chrome/browser/history",
-    "//chrome/browser/history_embeddings",
     "//chrome/browser/ntp_tiles",
     "//chrome/browser/obsolete_system",
     "//chrome/browser/privacy_sandbox:headers",
@@ -1332,7 +1330,6 @@ source_set("browser") {
     "//chrome/browser/history:impl",
     "//chrome/browser/history_clusters",
     "//chrome/browser/history_clusters:impl",
-    "//chrome/browser/history_embeddings:impl",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/language",
     "//chrome/browser/language:impl",
@@ -1951,7 +1948,6 @@ source_set("browser") {
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     "//ui/webui/resources/cr_components/history:mojo_bindings",
     "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
-    "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
   ]
 
   #!is_android

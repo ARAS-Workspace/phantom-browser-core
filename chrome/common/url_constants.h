@@ -103,10 +103,6 @@ inline constexpr char kAddNewProfileOnDesktopLearnMoreURL[] =
 inline constexpr char kComposeLearnMorePageURL[] =
     "https://support.google.com/chrome?p=help_me_write";
 
-// The URL for the Settings page to enable history search.
-inline constexpr char16_t kHistorySearchSettingURL[] =
-    u"chrome://settings/ai/historySearch";
-
 // The URL for the "Learn more" link in the enterprise disclaimer for managed
 // profile in the Signin Intercept bubble.
 inline constexpr char kSigninInterceptManagedDisclaimerLearnMoreURL[] =

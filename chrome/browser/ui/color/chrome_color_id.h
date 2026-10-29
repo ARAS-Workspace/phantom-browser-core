@@ -207,14 +207,6 @@
   E_CPONLY(kColorHistoryPageBookmarkStar) \
   E_CPONLY(kColorHistoryPageSeparator) \
   E_CPONLY(kColorHistoryPageText) \
-  /* History embedding colors. */ \
-  E_CPONLY(kColorHistoryEmbeddingsBackground) \
-  E_CPONLY(kColorHistoryEmbeddingsDivider) \
-  E_CPONLY(kColorHistoryEmbeddingsForeground) \
-  E_CPONLY(kColorHistoryEmbeddingsForegroundSubtle) \
-  E_CPONLY(kColorHistoryEmbeddingsImageBackground) \
-  E_CPONLY(kColorHistoryEmbeddingsImageBackgroundGradientEnd) \
-  E_CPONLY(kColorHistoryEmbeddingsImageBackgroundGradientStart) \
   /* InfoBar colors. */ \
   E_CPONLY(kColorInfoBarBackground) \
   E_CPONLY(kColorInfoBarButtonIcon) \

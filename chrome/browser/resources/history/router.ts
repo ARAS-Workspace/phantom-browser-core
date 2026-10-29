@@ -54,7 +54,6 @@ export class HistoryRouterElement extends CrLitElement {
     includeUserVisits: true,
     includeActorVisits: true,
   };
-  timeRangeStart?: Date;
 
   private eventTracker_: EventTracker = new EventTracker();
 
@@ -114,9 +113,6 @@ export class HistoryRouterElement extends CrLitElement {
     if (this.queryState.searchTerm) {
       queryParams.set('q', this.queryState.searchTerm);
     }
-    if (this.queryState.after) {
-      queryParams.set('after', this.queryState.after);
-    }
     router.setQueryParams(queryParams);
   }
 
@@ -132,18 +128,7 @@ export class HistoryRouterElement extends CrLitElement {
   }
 
   private onQueryParamsChanged_(newParams: URLSearchParams) {
-    const changes: {search: string, after?: string} = {search: ''};
-    changes.search = newParams.get('q') || '';
-    let after = '';
-    const afterFromParams = newParams.get('after');
-    if (!!afterFromParams && afterFromParams.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const afterAsDate = new Date(afterFromParams);
-      if (!isNaN(afterAsDate.getTime())) {
-        after = afterFromParams;
-      }
-    }
-    changes.after = after;
-    this.fire('change-query', changes);
+    this.fire('change-query', {search: newParams.get('q') || ''});
   }
 }
 

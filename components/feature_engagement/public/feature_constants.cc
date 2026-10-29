@@ -47,9 +47,6 @@ BASE_FEATURE(kIPHDiscardRingFeature,
 BASE_FEATURE(kIPHExplicitBrowserSigninPreferenceRememberedFeature,
              "IPH_ExplicitBrowserSigninPreferenceRemembered",
              base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHHistorySearchFeature,
-             "IPH_HistorySearch",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 BASE_FEATURE(kIPHExtensionsMenuFeature,
              "IPH_ExtensionsMenu",

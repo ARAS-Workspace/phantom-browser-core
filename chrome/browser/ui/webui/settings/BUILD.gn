@@ -165,7 +165,6 @@ source_set("impl") {
     "//chrome/browser/google",
     "//chrome/browser/gpu",
     "//chrome/browser/history",
-    "//chrome/browser/history_embeddings",
     "//chrome/browser/lifetime",
     "//chrome/browser/media",
     "//chrome/browser/media/prefs",

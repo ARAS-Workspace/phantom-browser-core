@@ -35,8 +35,6 @@ static_library("installer_policies_no_content_deps") {
 
 static_library("installer_policies_with_content_deps") {
   sources = [
-    "history_search_strings_component_installer.cc",
-    "history_search_strings_component_installer.h",
     "prediction_model_component_installer.cc",
     "prediction_model_component_installer.h",
   ]
@@ -44,8 +42,6 @@ static_library("installer_policies_with_content_deps") {
   deps = [
     "//base",
     "//components/component_updater",
-    "//components/history_embeddings/core",
-    "//components/omnibox/common",
     "//components/optimization_guide/core",
     "//components/update_client",
   ]

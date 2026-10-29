@@ -41,7 +41,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHFocusHelpBubbleScreenReaderPromoFeature,
     &kIPHGMCCastStartStopFeature,
     &kIPHGMCLocalMediaCastingFeature,
-    &kIPHHistorySearchFeature,
     &kIPHLensOverlayFeature,
     &kIPHLensOverlayTranslateButtonFeature,
     &kIPHMemorySaverModeFeature,

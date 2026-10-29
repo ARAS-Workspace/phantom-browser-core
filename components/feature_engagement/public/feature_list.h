@@ -56,7 +56,6 @@ DEFINE_VARIATION_PARAM(kIPHComposeMSBBSettingsFeature,
 DEFINE_VARIATION_PARAM(kIPHDiscardRingFeature, "IPH_DiscardRing");
 DEFINE_VARIATION_PARAM(kIPHExplicitBrowserSigninPreferenceRememberedFeature,
                        "IPH_ExplicitBrowserSigninPreferenceRemembered");
-DEFINE_VARIATION_PARAM(kIPHHistorySearchFeature, "IPH_HistorySearch");
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 DEFINE_VARIATION_PARAM(kIPHExtensionsMenuFeature, "IPH_ExtensionsMenu");
 DEFINE_VARIATION_PARAM(kIPHExtensionsRequestAccessButtonFeature,
@@ -223,7 +222,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHExplicitBrowserSigninPreferenceRememberedFeature),
         VARIATION_ENTRY(kIPHGMCCastStartStopFeature),
         VARIATION_ENTRY(kIPHGMCLocalMediaCastingFeature),
-        VARIATION_ENTRY(kIPHHistorySearchFeature),
         VARIATION_ENTRY(kIPHMemorySaverModeFeature),
         VARIATION_ENTRY(kIPHMultistepFilterPromoFeature),
         VARIATION_ENTRY(kIPHPdfInkSignaturesFeature),

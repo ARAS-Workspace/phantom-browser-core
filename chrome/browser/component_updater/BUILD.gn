@@ -65,7 +65,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser/accessibility",
     "//chrome/browser/ai",
-    "//chrome/browser/history_embeddings",
     "//chrome/browser/net",
     "//chrome/browser/permissions",
     "//chrome/browser/update_client",
