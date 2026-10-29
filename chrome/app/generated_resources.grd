@@ -293,9 +293,6 @@ are declared in tools/grit/grit_args.gni.
       <!-- Media live preview specific strings -->
       <part file="media_live_preview_strings.grdp" />
 
-      <!-- Notebooks specific strings -->
-      <part file="notebooks_strings.grdp" />
-
       <!-- Profiles specific strings -->
       <part file="profiles_strings.grdp" />
 
