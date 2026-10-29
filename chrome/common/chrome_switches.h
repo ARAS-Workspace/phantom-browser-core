@@ -138,7 +138,6 @@ extern const char kNoFirstRun[];
 extern const char kNoPings[];
 extern const char kNoProxyServer[];
 extern const char kNoStartupWindow[];
-extern const char kNotebookHomeURL[];
 extern const char kOnTheFlyMhtmlHashComputation[];
 extern const char kOpenInNewWindow[];
 extern const char kFocus[];

@@ -202,8 +202,6 @@ after discussions on the right group.
       <annotation id="tab_context_ephemeral_key_fetch"/>
       <annotation id="enterprise_skills_fetcher"/>
       <annotation id="iwa_dev_ui_update_manifest"/>
-      <annotation id="notebooks_service_create_notebook"/>
-      <annotation id="notebooks_service_create_notebook_source"/>
       <annotation id="fetch_user_data_processing_consent"/>
     </sender>
   </group>

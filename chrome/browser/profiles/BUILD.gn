@@ -620,7 +620,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/login_detection",
     "//chrome/browser/lookalikes",
     "//chrome/browser/media/webrtc",
-    "//chrome/browser/notebooks",
     "//chrome/browser/notifications",
     "//chrome/browser/omnibox",
     "//chrome/browser/optimization_guide",

@@ -1214,7 +1214,6 @@ static_library("ui") {
     "//components/app_constants",
     "//components/autofill/core/browser",
     "//components/multistep_filter/core:features",
-    "//components/notebooks/internals/webui",
     "//components/paint_preview/public",
     "//components/services/app_service",
     "//components/ui_metrics",

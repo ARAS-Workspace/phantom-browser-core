@@ -283,7 +283,5 @@ Refer to README.md for content description and update process.
  <item id="safe_browsing_v5_get_hash" added_in_milestone="152" content_hash_code="042aa735" os_list="linux,windows,android,chromeos" file_path="components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.cc" />
  <item id="tab_context_ephemeral_key_fetch" added_in_milestone="152" content_hash_code="01f989a9" os_list="linux,windows,chromeos,android" file_path="components/sync_tab_context/http_rpc_based_ephemeral_key_fetcher.cc" />
  <item id="iwa_dev_ui_update_manifest" added_in_milestone="153" type="partial" second_id="iwa_update_manifest_fetcher" content_hash_code="03008323" os_list="linux,windows,chromeos" semantics_fields="1,2,3,6" policy_fields="3,5" file_path="chrome/browser/ui/webui/iwa_dev/iwa_dev_page_handler.cc" />
- <item id="notebooks_service_create_notebook" added_in_milestone="152" content_hash_code="00b284b0" os_list="linux,windows,android,chromeos" file_path="components/notebooks/internal/notebooks_network_service_impl.cc" />
- <item id="notebooks_service_create_notebook_source" added_in_milestone="152" content_hash_code="02552ad6" os_list="linux,windows,android,chromeos" file_path="components/notebooks/internal/notebooks_network_service_impl.cc" />
  <item id="fetch_user_data_processing_consent" added_in_milestone="153" content_hash_code="036ac1e5" os_list="linux,windows,android,chromeos" file_path="components/one_time_tokens/core/browser/user_data_processing_consent_fetcher.cc" />
 </annotations>

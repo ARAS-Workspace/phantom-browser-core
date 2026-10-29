@@ -275,7 +275,6 @@
 
 #include "chrome/browser/multistep_filter/core/multistep_filter_log_router_factory.h"
 #include "chrome/browser/multistep_filter/core/multistep_filter_service_factory.h"
-#include "chrome/browser/notebooks/notebooks_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "device/fido/public/features.h"
 #if BUILDFLAG(IS_LINUX)
@@ -573,7 +572,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
   net::ServerCertificateDatabaseServiceFactory::GetInstance();
 #endif
-  notebooks::NotebooksServiceFactory::GetInstance();
   NotificationDisplayServiceFactory::GetInstance();
   NotificationMetricsLoggerFactory::GetInstance();
   NotificationsEngagementServiceFactory::GetInstance();
