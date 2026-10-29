@@ -27,8 +27,6 @@ per-file *settings*strings*.grdp=sideyilmaz@chromium.org
 
 per-file vr_strings.grdp=file://chrome/browser/vr/OWNERS
 
-per-file password_manager_ui_strings.grdp=file://components/password_manager/OWNERS
-
 per-file certificate_manager.grdp=file://net/cert/OWNERS
 
 # Non-GRD rules.

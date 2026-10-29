@@ -336,11 +336,6 @@ are declared in tools/grit/grit_args.gni.
         <part file="whats_new_strings.grdp" />
       </if>
 
-       <!-- Password Manager strings -->
-      <if expr="not is_android">
-        <part file="password_manager_ui_strings.grdp" />
-      </if>
-
       <!-- Printing specific strings -->
       <if expr="enable_printing">
         <part file="printing_strings.grdp" />
@@ -886,9 +881,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_GENERATEPASSWORD" desc="The name of the Generate Password command in the content area context menu">
             Suggest password...
           </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE" desc="The name of the Use passkey from another device command in the content area context menu">
-            Use passkey from another device
-          </message>
           <message name="IDS_CONTENT_CONTEXT_MORE_APPS" desc="The label for the parent item of the submenu in the content area context menu.">
             More
           </message>
@@ -901,15 +893,6 @@ are declared in tools/grit/grit_args.gni.
           <!-- TODO(481979475): remove non translateable flag  -->
           <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_AT_MEMORY" desc="Main action pattern for enhanced autofill. It functions as a concise command in the content area context menu explaining that Chrome will locate relevant information and insert it into a form." translateable="false">
             Find and fill
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD" desc="This is a context menu entry in the passwords submenu. It triggers the password selection bubble.">
-            Select password
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS" desc="This is a context menu entry. It opens chrome://password-manager. It can be either in the context menu (for non-syncing users) or in the passwords submenu (for syncing users).">
-            Import passwords
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD" desc="This is a context menu entry in the passwords submenu. It triggers password generation.">
-            Suggest password...
           </message>
         </if>
         <if expr="use_titlecase">
@@ -1206,9 +1189,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_GENERATEPASSWORD" desc="In Title Case: The name of the Generate Password command in the content area context menu">
             Suggest Password...
           </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE" desc="In Title Case: The name of the Use passkey from another device command in the content area context menu">
-            Use Passkey from Another Device
-          </message>
           <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FEEDBACK" desc="In Title Case: The name of the Autofill Feedback command in the content area context menu">
             Help Improve Autofill
           </message>
@@ -1219,15 +1199,6 @@ are declared in tools/grit/grit_args.gni.
           <!-- TODO(359570730): remove non translateable flag  -->
           <message name="IDS_CONTENT_CONTEXT_AUTOFILL_PREDICTION_IMPROVEMENTS" desc="In Title Case: The name of the Autofill manual fallback for payment methods attribute command in the content area context menu." translateable="false">
             Autocomplete
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SELECT_PASSWORD" desc="In Title Case: This is a context menu entry in the passwords submenu. It triggers the password selection bubble.">
-            Select Password
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_IMPORT_PASSWORDS" desc="In Title Case: This is a context menu entry. It opens chrome://password-manager. It can be either in the context menu (for non-syncing users) or in the passwords submenu (for syncing users).">
-            Import Passwords
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_SUGGEST_PASSWORD" desc="In Title Case: This is a context menu entry in the passwords submenu. It triggers password generation.">
-            Suggest Password...
           </message>
         </if>
 
@@ -6663,51 +6634,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
         Unknown
       </message>
 
-      <message name="IDS_PASSWORD_MANAGER_ACCOUNT_CHOOSER_TITLE" desc="The title of the account chooser dialog.">
-        Sign in as
-      </message>
-
-      <if expr="not use_titlecase">
-        <message name="IDS_PASSWORD_GENERATION_SUGGESTION_GPM" desc="Text shown next to a generated password describing it as a suggestion.">
-          Use strong password
-        </message>
-        <message name="IDS_PASSWORD_GENERATION_SUGGESTION_GPM_WITHOUT_STRONG" desc="Text shown next to a generated password describing it as a suggestion.">
-          Use suggested password
-        </message>
-        <message name="IDS_PASSWORD_GENERATION_NUDGE_CANCEL_BUTTON" desc="Text shown on a cancel button in the password generation flow.">
-          Choose your own
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_CONFIRM_SAVED_TITLE" desc="The title text used in the passwords bubble after the user has saved a password.">
-          Password saved
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_CONFIRM_UPDATE_TITLE" desc="The title text used in the passwords bubble after the user has updated a password.">
-          Password updated
-        </message>
-      </if>
-      <if expr="use_titlecase">
-        <message name="IDS_PASSWORD_GENERATION_SUGGESTION_GPM" desc="In Title Case: Text shown next to a generated password describing it as a suggestion.">
-          Use Strong Password
-        </message>
-        <message name="IDS_PASSWORD_GENERATION_SUGGESTION_GPM_WITHOUT_STRONG" desc="In Title Case: Text shown next to a generated password describing it as a suggestion.">
-          Use Suggested Password
-        </message>
-        <message name="IDS_PASSWORD_GENERATION_NUDGE_CANCEL_BUTTON" desc="Text shown on a cancel button in the password generation flow.">
-          Choose Your Own
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_CONFIRM_SAVED_TITLE" desc="The title text used in the passwords bubble after the user has saved a password.">
-          Password Saved
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_CONFIRM_UPDATE_TITLE" desc="The title text used in the passwords bubble after the user has updated a password.">
-          Password Updated
-        </message>
-      </if>
-
-       <message name="IDS_PASSWORD_GENERATION_EDITING_SUGGESTION" desc="Notification text next to the generated password assuring the user that the password has been saved.">
-        Saved password
-      </message>
-      <message name="IDS_SAVE_PASSWORD" desc="The title of the save password bubble when a password can be saved." formatter_data="android_java">
-        Save password?
-      </message>
       <message name="IDS_SAVE_ACCOUNT" desc="The title of the save password bubble when a federated credential can be saved.">
         Save username?
       </message>
@@ -6719,9 +6645,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
       <message name="IDS_ADD_USERNAME_BODY" desc="Body text in the add username bubble.">
         To help Google Password Manager save your sign-in info, add your username for this site
-      </message>
-      <message name="IDS_UPDATE_PASSWORD" desc="The title of the save password bubble when a password can be updated.">
-        Update password?
       </message>
       <message name="IDS_VERIFY_IT_IS_YOU" desc="The title of the password manager error message when the user needs to sign in to save a password.">
         Verify it's you
@@ -6740,39 +6663,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
           Sign in
         </message>
       </if>
-      <message name="IDS_SAVE_PASSWORD_DIFFERENT_DOMAINS_TITLE" desc="The title of the save password bubble when the submitted form origin isn't equal to the page origin.">
-        Save password for <ph name="ORIGIN">$1<ex>example.com</ex></ph>?
-      </message>
-      <message name="IDS_UPDATE_PASSWORD_DIFFERENT_DOMAINS_TITLE" desc="The title of the update password bubble when the submitted form origin isn't equal to saved credentials origin.">
-        Update password for <ph name="ORIGIN">$1<ex>example.com</ex></ph>?
-      </message>
-      <message name="IDS_SAVE_PASSWORD_FOOTER" desc="The footer text of the bubble that offers user to save a password to Chrome.">
-        Passwords are saved in your Google Account so you can use them on any device
-      </message>
-      <message name="IDS_PASSWORD_BUBBLES_PASSWORD_MANAGER_LINK_TEXT_SYNCED_TO_ACCOUNT" desc="The text of the Google Password Manager links displayed on Password Manager bubbles footer when the credentials are synced to the Google account.">
-        Google Password Manager
-      </message>
-      <message name="IDS_PASSWORD_BUBBLES_FOOTER_SYNCED_TO_ACCOUNT" desc="The footer text of the bubbles that offers users to save, update or manage stored passwords in Chrome and synced to their Google account.">
-        You can use saved passwords on any device. They're saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> for <ph name="EMAIL">$2<ex>user@gmail.com</ex></ph>.
-      </message>
-      <message name="IDS_PASSWORD_BUBBLES_FOOTER_TRUSTED_VAULT_ERROR" desc="The footer text of the bubbles when there is a trusted vault error, telling the user their passwords are saved to Google Password Manager.">
-        Your passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> for <ph name="EMAIL">$2<ex>user@gmail.com</ex></ph>.
-      </message>
-      <message name="IDS_PASSWORD_BUBBLES_SUBTITLE_TRUSTED_VAULT_ERROR" desc="The subtitle of the password bubble when saving is blocked by a trusted vault error, telling the user they need to verify their identity to get passwords on all devices.">
-        Verify it's you to get it on all devices with your Google Account
-      </message>
-      <message name="IDS_PASSWORD_BUBBLES_FOOTER_SAVING_ON_DEVICE" desc="The footer text of the bubbles that offers users to save, update or manage stored passwords only locally in Chrome.">
-        Passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> on this device.
-      </message>
-      <message name="IDS_PASSWORD_GENERATION_PROMPT_GOOGLE_PASSWORD_MANAGER" desc="Autofill dropdown text describing password generation.">
-          You won't need to remember this password. It will be saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> for <ph name="EMAIL">$2<ex>user@gmail.com</ex></ph>.
-      </message>
-      <message name="IDS_PASSWORD_GENERATION_NUDGE_TITLE" desc="Autofill dropdown title describing password generation.">
-          <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> created a strong password for this website
-      </message>
-      <message name="IDS_PASSWORD_MANAGEMENT_BUBBLE_FOOTER_ACCOUNT_STORE_USERS" desc="The footer text of the managment bubble the lists saved password for this website. This is used only for account store users.">
-        Passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph>.
-      </message>
       <message name="IDS_PASSWORD_SAVED_CONFIRMATION_MESSAGE_DESCRIPTION" desc="The description in the Google Password Manager's message that appears after saving a password. This message might be shown after saving a generated password or after the user fixed an error that then allowed for the password to be saved.">
         You can view and manage saved passwords in Google Password Manager
       </message>
@@ -6782,58 +6672,16 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_PASSWORD_MANAGER_UPDATE_PASSWORD_SIGNED_IN_MESSAGE_DESCRIPTION" desc="The description of the Google Password Manager's update password message when the user is signed in.">
         In Google Password Manager for <ph name="ACCOUNT">$1<ex>user@gmail.com</ex></ph>
       </message>
-      <message name="IDS_PASSWORD_CROSS_DOMAIN_FILLING_CONFIRMATION_TITLE" desc="The title of the cross domain filling confirmation popup.">
-        Use your <ph name="PASSWORD_DOMAIN">$1<ex>example.com</ex> password?</ph>
-      </message>
-      <message name="IDS_PASSWORD_CROSS_DOMAIN_FILLING_CONFIRMATION_DESCRIPTION" desc="The description of the cross domain filling confirmation popup.">
-        You will use your <ph name="PASSWORD_DOMAIN">$1<ex>example.com</ex></ph> password on <ph name="DOMAIN">$2<ex>example.de</ex></ph>. Only use your password if you trust <ph name="DOMAIN">$2<ex>example.de</ex></ph>.
-      </message>
-      <message name="IDS_PASSWORD_CROSS_DOMAIN_FILLING_CONFIRMATION_CONFIRM_BUTTON_LABEL" desc="The confirmation button label of the cross domain filling confirmation popup.">
-        Use Password
-      </message>
-      <message name="IDS_PASSWORD_CROSS_DOMAIN_FILLING_WARNING_DESCRIPTION"
-      desc="The description of the cross domain password filling warning popup.">
-        <ph name="PASSWORD_DOMAIN">$1<ex>example.com</ex></ph> and <ph name="DOMAIN">$2<ex>example.de</ex></ph> seem to be related. Make sure you trust <ph name="DOMAIN">$2<ex>example.de</ex></ph> before using your password.
-      </message>
       <if expr="use_titlecase">
         <message name="IDS_PASSWORD_MANAGER_ACCOUNT_CHOOSER_SIGN_IN" desc="In Title Case: The title of the Sign in button in the account chooser when there is one account.">
           Sign In
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_MANAGE_PASSWORDS_BUTTON" desc="In Title Case: The label of the 'Manage Passwords' button in the manage-passwords bubble.">
-          Manage Passwords
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_MANAGE_PASSWORD_BUTTON" desc="In Title Case: The label of the 'Manage Password' button in the password details bubble.">
-          Manage Password
         </message>
       </if>
       <if expr="not use_titlecase">
         <message name="IDS_PASSWORD_MANAGER_ACCOUNT_CHOOSER_SIGN_IN" desc="The title of the Sign in button in the account chooser when there is one account.">
           Sign in
         </message>
-        <message name="IDS_PASSWORD_MANAGER_MANAGE_PASSWORDS_BUTTON" desc="The label of the 'Manage passwords' link in the manage-passwords bubble.">
-          Manage passwords
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_MANAGE_PASSWORD_BUTTON" desc="The label of the 'Manage password' link in the password details bubble.">
-          Manage password
-        </message>
       </if>
-      <message name="IDS_SETTINGS_PASSWORDS_ANDROID_APP" desc="Label for the app a password is for when displaying a credential and the real app display name could not be obtained.">
-        App (<ph name="ANDROID_PACKAGE_NAME">$1<ex>com.netflix.mediaclient</ex></ph>)
-      </message>
-      <message name="IDS_SHARED_PASSWORDS_NOTIFICATION_GOT_IT_BUTTON" desc="The button text on the shared passwords notification bubble to inform the user that one of the stored passwords for this website has been received via the password sharing feature.">
-        Got it
-      </message>
-      <message name="IDS_SHARED_PASSWORDS_NOTIFICATION_TEXT_SINGLE_PASSWORD" desc="The text that is displayed in the shared passwords notification bubble to inform the user that one the stored passwords for this website has been received via the password sharing feature.">
-        <ph name="SENDER_NAME">$1<ex>Elisa Becket</ex></ph> has shared a password with you for <ph name="WEBSITE_NAME">$2<ex>amazon.com</ex></ph>. You can use it in the sign-in form.
-      </message>
-      <message name="IDS_SHARED_PASSWORDS_NOTIFICATION_TEXT_MULTIPLE_PASSWORD" desc="The text that is displayed in the shared passwords notification bubble to inform the user that many of the stored passwords for this website has been received via the password sharing feature.">
-        There are passwords shared with you for <ph name="WEBSITE_NAME">$1<ex>amazon.com</ex></ph>. You can use them in the sign-in form.
-      </message>
-      <message name="IDS_SHARED_PASSWORDS_NOTIFICATION_TITLE" desc="The title text that is used in the shared passwords notification bubble to inform the user that one of the stored passwords for this website has been received via the password sharing feature.">
-        {NUM_PASSWORDS, plural,
-        =1 {New password for this site}
-        other {New passwords for this site}}
-      </message>
       <!-- Password manager onboarding strings -->
       <message name="IDS_PASSWORD_MANAGER_ONBOARDING_TITLE_A" desc="The title shown in the password manager onboarding dialog.">
         Save your passwords?
@@ -9834,7 +9682,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
         </message>
       </if>
 
-      <!--TODO(crbug.com/339262105): Clean up the old password promo methods after the generic promo launch.-->
       <!--iOS password promo strings-->
       <if expr="_google_chrome">
         <if expr="not is_android">
@@ -10460,8 +10307,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
         You can now give your browser a new look at any time from the Customize Chrome menu
       </message>
 
-      <!-- Password Manager Tutorial Strings -->
-
       <!-- Lens Overlay Tutorial Strings -->
       <message name="IDS_TUTORIAL_LENS_OVERLAY_CLICK_ADDRESS_BAR" desc="The description of the 'click the address bar' step in Lens overlay tutorial">
         Click the address bar
@@ -10531,9 +10376,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_PASSWORDS_AUTO_SIGNIN_DESCRIPTION" desc="Text under 'Auto sign-in' checkbox">
         Automatically sign in to websites using stored credentials. When the feature is disabled, you will be asked for confirmation every time before signing in to a website.
       </message>
-      <message name="IDS_PASSWORDS_VIA_FEDERATION" desc="Text for federated credential's value.">
-        with <ph name="PROVIDER">$1<ex>facebook.com</ex></ph>
-      </message>
 
       <!-- Confirm MessageBox Dialog -->
       <message name="IDS_CONFIRM_MESSAGEBOX_YES_BUTTON_LABEL" desc="Confirm MessageBox Dialog's 'Yes' button text">
@@ -10565,74 +10407,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
 
       <!-- Password Manager -->
-      <if expr="use_titlecase">
-        <message name="IDS_PASSWORD_MANAGER_CANCEL_BUTTON" desc="Label for the 'dismiss' button in the Manage Password bubble/Update Password infobar. These UIs ask the user if they wish to perform some action with saved passwords, e.g. updating or deleting them; the button dismisses the UI without taking the suggested action.">
-          No Thanks
-        </message>
-      </if>
-      <if expr="not use_titlecase">
-        <message name="IDS_PASSWORD_MANAGER_CANCEL_BUTTON" desc="Label for the 'dismiss' button in the Manage Password bubble/Update Password infobar. These UIs ask the user if they wish to perform some action with saved passwords, e.g. updating or deleting them; the button dismisses the UI without taking the suggested action.">
-          No thanks
-        </message>
-      </if>
-      <message name="IDS_PASSWORD_MANAGER_USERNAME_LABEL" desc="Label for the username field in a prompt to store new credential" formatter_data="android_java">
-        Username
-      </message>
-      <message name="IDS_PASSWORD_MANAGER_PASSWORD_LABEL" desc="Label for the password field in a prompt to store new credential" formatter_data="android_java">
-        Password
-      </message>
       <if expr="not is_android">
-        <message name="IDS_PASSWORD_MANAGER_UPDATED_BUBBLE_TITLE" desc="Title of the bubble notifying the user that the password was updated.">
-          Password updated
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_MORE_TO_FIX_BODY_MESSAGE_GOOGLE_PASSWORD_MANAGER" desc="The content of the bubble notifying that there are no more problems with compromised credentials.">
-          {COUNT, plural,
-          =1 {Successfully changed the compromised password.
-
-You have # more compromised password. Google Password Manager recommends checking this password now.}
-          other {Successfully changed the compromised password.
-
-You have # more compromised passwords. Google Password Manager recommends checking these passwords now.}}
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_SAFE_STATE_BODY_MESSAGE_GOOGLE_PASSWORD_MANAGER" desc="The content of the bubble notifying that there are more problems to fix after the user changed a compromised password.">
-          Successfully changed the compromised password.
-
-Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph>.
-        </message>
-
-        <if expr="not use_titlecase">
-          <message name="IDS_PASSWORD_MANAGER_CHECK_REMAINING_BUTTON" desc="Button text to check left compromised passwords.">
-            Check remaining passwords
-          </message>
-        </if>
-        <if expr="use_titlecase">
-          <message name="IDS_PASSWORD_MANAGER_CHECK_REMAINING_BUTTON" desc="In Title Case: Button text to check left compromised passwords.">
-            Check Remaining Passwords
-          </message>
-        </if>
-
-        <message name="IDS_PASSWORD_MANAGER_SAVE_BUTTON" desc="Save button text for password manager">
-          Save
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_MOVE_BUBBLE_CANCEL_BUTTON" desc="Text for the cancel button in the password manager move bubble.">
-          No thanks
-        </message>
-        <if expr="use_titlecase">
-          <message name="IDS_PASSWORD_MANAGER_UPDATE_BUTTON" desc="In Title Case: Update button text for password manager">
-            Update Password
-          </message>
-        </if>
-        <if expr="not use_titlecase">
-          <message name="IDS_PASSWORD_MANAGER_UPDATE_BUTTON" desc="Update button text for password manager">
-            Update password
-          </message>
-        </if>
-        <message name="IDS_PASSWORD_MANAGER_SHORT_UPDATE_BUTTON" desc="Update button text for password manager for short width dialog">
-          Update
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_BUBBLE_BLOCKLIST_BUTTON" desc="Button text for the 'Save Password' bubble's 'Never remember for this site' option">
-          Never
-        </message>
         <message name="IDS_PASSWORD_MANAGER_DESTINATION_DROPDOWN_ACCESSIBLE_NAME" desc="Accessible name of destination dropdown in the password save bubble">
           Select where to save your password
         </message>
@@ -10648,70 +10423,13 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
         <message name="IDS_PASSWORD_MANAGER_IPH_BODY_SAVE_TO_ACCOUNT" desc="Body of the in Product Help shown when the 'Save to account` is selected">
           You can save this password in your Google Account or only on this device
         </message>
-        <message name="IDS_PASSWORDS_SAVE_PRIMING_PROMO_BODY_TEMPLATE" is_accessibility_with_no_ui="true" desc="Placeholder for string to be shown for IPH prompting users to consider saving passwords">
-          <ph name="message">$1<ex>Use Google Password Manager to sign in faster</ex></ph>
-        </message>
-        <message name="IDS_PASSWORDS_SAVE_PRIMING_PROMO_BODY_SIGNED_IN" desc="Body of IPH prompting users to consider saving passwords">
-          Use Google Password Manager to sign in faster to sites from any of your devices
-        </message>
-        <message name="IDS_PASSWORDS_SAVE_PRIMING_PROMO_BODY_NOT_SIGNED_IN" desc="Body of IPH prompting users to consider saving passwords">
-          To save strong passwords with Google Password Manager, sign in to Chrome
-        </message>
-        <message name="IDS_PASSWORDS_SAVE_PRIMING_PROMO_SCREENREADER" is_accessibility_with_no_ui="true" desc="Screenreader text for IPH prompting users to consider saving passwords">
-          You can save passwords with Google Password Manager when you are signed in to Chrome
-        </message>
-        <message name="IDS_PASSWORDS_SAVE_RECOVERY_PROMO_BODY" desc="Body of IPH prompting users to reconsider saving passwords">
-          To save your password to Google Password Manager, click the key
-        </message>
-        <message name="IDS_PASSWORDS_SAVE_RECOVERY_PROMO_SCREENREADER" is_accessibility_with_no_ui="true" desc="Screenreader text for IPH prompting users to reconsider saving passwords">
-          To save your password to Google Password Manager, the Password Manager icon in the Location Bar
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_BLOCKED" desc="Text for the 'Manage Passwords' when the user has blocked saving passwords for this site">
-          Never for this site
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_AFTER_SAVE" desc="Body of the in Product Help shown after saving a password informing the user about the password management bubble">
-          To view your password or add a note about it, click the key icon
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_AFTER_SAVE_SCREENREADER" desc="Text announced with the in Product Help after saving a password informing the user about the password management bubble">
-          To view your password or add a note about it, select manage your passwords in the search and address bar
-        </message>
         <message name="IDS_PASSWORD_MANAGER_IPH_ACCOUNT_STORAGE_TOGGLE" desc="Body of the in Product Help for account storage toggle in Password Manager.">
           You can turn off this setting to save your passwords only on this device
         </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN" desc="Body of the in Product Help shown during sign-in flows informing the user about the password management bubble">
-          You saved a note for a password on this site. To view it, click the key icon.
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN_SCREENREADER" desc="Text announced with the in Product Help shown during sign-in flows informing the user about the password management bubble">
-          You saved a note for a password on this site. To view it, select manage your passwords in the search and address bar.
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_SAVE" desc="Text for the 'Manage Passwords' icon's 'password to be saved' state">
-          Save your password
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_MANAGE" desc="Text for the 'Manage Passwords' icon's 'saving passwords' state">
-          Manage your passwords
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_MOVE" desc="Text for the 'Manage Passwords' icon's 'move password to account' state">
-          Move your password
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_PROTECT" desc="Text for the 'Manage Passwords' icon's 'protect passwords' state">
-          Protect your passwords
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_SHARED_NOTIFICATION" desc="Text for the 'Manage Passwords' icon's 'shared password notification' state">
-          New password received
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_TOOLTIP_KEYCHAIN_ERROR" desc="Text for the 'Manage Passwords' icon's 'keychain error' state">
-          Fix password error
-        </message>
       </if>
       <if expr="is_android">
-        <message name="IDS_PASSWORD_MANAGER_SAVE_BUTTON" desc="Mobile: Button text for the 'Save Password' infobar's 'Remember password' option"  formatter_data="android_java">
-          Save
-        </message>
         <message name="IDS_PASSWORD_MANAGER_BLOCKLIST_BUTTON" desc="Mobile: Button text for the 'Save Password' infobar's 'Never remember for this site' option">
           Never
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_UPDATE_BUTTON" desc="Label for the 'update' button in the Update Password infobar. This infobar asks if the user wishes to update the saved password for a site to a new password the user has just entered; the button applies the suggested update." formatter_data="android_java">
-          Update
         </message>
         <message name="IDS_PASSWORD_MANAGER_CONTINUE_BUTTON" desc="Label for the 'continue' button in the Update Password prompt that will be followed by username confirmation dialog. This prompt asks if the user wishes to update the saved password for a site to a new password the user has just entered; the button applies the suggested update.">
           Continue
@@ -13976,17 +13694,11 @@ This can include information about installed software, files, your browser, the 
         </message>
 
         <!-- Account Preview Signin Promo Subtitles -->
-        <message name="IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS_WITH_DEVICE" desc="Subtitle of a sign-in promo informing the user they can access their passwords from their other device.">
-          Sign in to get your passwords and more from <ph name="DEVICE">$1<ex>your phone</ex></ph>
-        </message>
         <message name="IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_BOOKMARKS_WITH_DEVICE" desc="Subtitle of a sign-in promo informing the user they can access their bookmarks from their other device.">
           Sign in to get your bookmarks and more from <ph name="DEVICE">$1<ex>your phone</ex></ph>
         </message>
         <message name="IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_SAVED_INFO_WITH_DEVICE" desc="Subtitle of a sign-in promo informing the user they can access their saved info (such as autofill data, addresses, and payment methods) from their other device.">
           Sign in to get your saved info and more from <ph name="DEVICE">$1<ex>your phone</ex></ph>
-        </message>
-        <message name="IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_PASSWORDS" desc="Subtitle of a sign-in promo informing the user they can access their passwords on all their devices.">
-          Sign in to get your passwords and more on all your devices
         </message>
         <message name="IDS_ACCOUNT_PREVIEW_PROMO_SUBTITLE_BOOKMARKS" desc="Subtitle of a sign-in promo informing the user they can access their bookmarks on all their devices.">
           Sign in to get your bookmarks and more on all your devices
@@ -14363,12 +14075,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       </message>
       <message name="IDS_SYNC_ERROR_USER_MENU_TITLE" desc="Title of the sync/signin error header of desktop user menu.">
         Sync isn't working
-      </message>
-      <message name="IDS_SYNC_ERROR_PASSWORDS_USER_MENU_ERROR_DESCRIPTION" desc="Error description of the sync/signin error header of desktop user menu.">
-        Verify it's you to use and save passwords in your account, <ph name="ACCOUNT_EMAIL">$1<ex>elisa.beckett@gmail.com</ex></ph>
-      </message>
-      <message name="IDS_SYNC_ERROR_RECOVERABILITY_DEGRADED_FOR_PASSWORDS_USER_MENU_ERROR_DESCRIPTION" desc="Error description of a sync error header of desktop user menu that prompts the user to add recovery options.">
-        Verify it's you to make sure you can always use the passwords in your account, <ph name="ACCOUNT_EMAIL">$1<ex>elisa.beckett@gmail.com</ex></ph>
       </message>
       <message name="IDS_SYNC_NEEDS_VERIFICATION_BUBBLE_VIEW_TITLE" desc="Title in the sync error bubble view/notification for the case where sync needs to verify the user.">
         Sync needs to verify it's you
@@ -15403,74 +15109,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_MANAGE_PASSWORDS_LINK" desc="The text for a link to the user's saved passwords. This is inserted into an infobar or a bubble that the browser shows to the user. The infobar and the bubble use a separate string in the translation console that has a placeholder for this link title.">
         Google Account
       </message>
-      <message name="IDS_MANAGE_PASSWORDS_TITLE" desc="The title text that is used in the manage passwords bubble when a password is autofilled or after a user has stored a password.">
-        Saved passwords for this site
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_NO_PASSWORDS_TITLE" desc="The title text that is used in the manage passwords bubble when no passwords are available.">
-        No passwords saved for this site
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_DIFFERENT_DOMAIN_TITLE" desc="The title text that is used in the manage passwords bubble when a password is autofilled or after a user has stored a password.">
-        Saved passwords for <ph name="ORIGIN">$1<ex>example.com</ex></ph>
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_DIFFERENT_DOMAIN_NO_PASSWORDS_TITLE" desc="The title text that is used in the manage passwords bubble when no passwords are available for a different domain.">
-        No passwords saved for <ph name="ORIGIN">$1<ex>example.com</ex></ph>
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_SHOW_PASSWORD" desc="The tooltip of a button that is used in the manage pending password bubble for revealing the password.">
-        Show password
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_HIDE_PASSWORD" desc="The tooltip of a button that is used in the manage pending password bubble for hiding the password.">
-        Hide password
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_EMPTY_NOTE" desc="The text displayed in the note label when the note is empty in the credential details view of the password management bubble.">
-        No note added
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_EDIT_USERNAME_TOOLTIP" desc="The tooltip of a button that is used in the credential details view of the password management bubble for editing the username.">
-        Edit username
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_EDIT_NOTE_TOOLTIP" desc="The tooltip of a button that is used in the credential details view of the password management bubble for editing the note attached to the password.">
-        Edit note
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_NOTE_ACCESSIBLE_NAME" desc="Name used by screen readers for the password note label in the credential details view of the password management bubble.">
-        Note: <ph name="NOTE">$1<ex>note</ex></ph>
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_NOTE_TEXTFIELD" is_accessibility_with_no_ui="true" desc="Name used by screen readers for the note text field in the credential details view of the password management bubble.">
-        Note
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_UPDATE" desc="The text of the button to update the credential details in the password management bubble.">
-        Update
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_USERNAME_ACCESSIBLE_NAME" desc="Name used by screen readers for the username label in the credential details view of the password management bubble.">
-        Username: <ph name="USERNAME">$1<ex>user@gmail.com</ex></ph>
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_USERNAME_TEXTFIELD" is_accessibility_with_no_ui="true" desc="Name used by screen readers for the username text field in the credential details view of the password management bubble.">
-        Username
-      </message>
-
-      <message name="IDS_MANAGE_PASSWORDS_AUTO_SIGNIN_TITLE_MD" desc="The title of the auto-signin toast in Material Design mode.">
-        Signing in as
-      </message>
-      <message name="IDS_MANAGE_PASSWORDS_AUTO_SIGNIN_TOAST_BODY" desc="The body of the auto-signin toast showing the username being signed in.">
-        Signed in as <ph name="USERNAME">$1<ex>user@example.com</ex></ph>
-      </message>
-      <message name="IDS_AUTO_SIGNIN_FIRST_RUN_TITLE_MANY_DEVICES" desc="The title of the dialog during the autosign-in first run experience for the Chrome syncing users.">
-        Sign in easily across devices
-      </message>
-      <message name="IDS_AUTO_SIGNIN_FIRST_RUN_TITLE_LOCAL_DEVICE" desc="The title of the dialog during the autosign-in first run experience for the Chrome signed out users.">
-        Sign in easily
-      </message>
-      <message name="IDS_AUTO_SIGNIN_FIRST_RUN_TEXT" desc="The text of the dialog during the autosign-in first run experience for the Chrome signed out users.">
-        <ph name="PASSWORD_MANAGER_BRAND">$1<ex>Google Password Manager</ex></ph> remembers how you signed in and automatically signs you in when possible. When off, you'll be asked for confirmation every time.
-      </message>
-      <if expr="use_titlecase">
-        <message name="IDS_AUTO_SIGNIN_FIRST_RUN_OK" desc="The text of the OK button in the dialog during the autosign-in first run experience.">
-          OK, Got It
-        </message>
-      </if>
-      <if expr="not use_titlecase">
-        <message name="IDS_AUTO_SIGNIN_FIRST_RUN_OK" desc="The text of the OK button in the dialog during the autosign-in first run experience.">
-          OK, got it
-        </message>
-      </if>
 
       <!-- Extra Mac UI Strings -->
       <if expr="is_macosx">
@@ -17317,11 +16955,7 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_WEBAUTHN_SIGN_IN_TO_WEBSITE_DIALOG_TITLE" desc="The title of a bubble that displays passkeys or passwords for signing in to a given site.">
         Sign in to <ph name="RP_ID">$1<ex>webauthn.io</ex></ph>
       </message>
-      <message name="IDS_WEBAUTHN_SIGN_IN_AS_PROMPT" desc="The text of a prompt that allows the user to sign in to a website using an account with the provided username." translateable="false">
-        Sign in as <ph name="USERNAME">$1<ex>elisa@example.com</ex></ph>
-      </message>
 
-      <!-- WebAuthn Automatic Passkey Upgrades -->
       <!-- Web-modal dialog shown during Digital Credential request -->
       <message name="IDS_WEB_DIGITAL_CREDENTIALS_BLUETOOTH_POWER_ON_MANUAL_TITLE">
         Turn on Bluetooth?
