@@ -200,8 +200,6 @@ after discussions on the right group.
       <annotation id="read_aloud_generate_text"/>
       <annotation id="read_aloud_synthesize"/>
       <annotation id="tab_context_ephemeral_key_fetch"/>
-      <annotation id="remote_actor_passbox_client"/>
-      <annotation id="remote_actor_permission_service"/>
       <annotation id="enterprise_skills_fetcher"/>
       <annotation id="iwa_dev_ui_update_manifest"/>
       <annotation id="notebooks_service_create_notebook"/>
@@ -241,7 +239,6 @@ after discussions on the right group.
   <group name="Child-protection and Safe Browsing Features">
     <sender name="Safe Browsing">
       <annotation id="client_download_request"/>
-      <annotation id="password_protection_request"/>
       <annotation id="safe_browsing_client_side_phishing_detector"/>
       <annotation id="safe_browsing_extended_reporting"/>
       <annotation id="safe_browsing_extension_telemetry"/>

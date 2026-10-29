@@ -1393,9 +1393,7 @@
     'ios_transactions': {
       'filepath': 'components/autofill/ios|'\
                   'ios/chrome/browser/autofill|'\
-                  'ios/chrome/browser/passwords|'\
-                  'ios/chrome/browser/settings/ui_bundled/autofill|'\
-                  'ios/chrome/browser/settings/ui_bundled/password',
+                  'ios/chrome/browser/settings/ui_bundled/autofill',
     },
     'ios_web': {
       'filepath': 'ios/web(_view)?/',
@@ -1758,7 +1756,6 @@
       'filepath': 'chrome/.*/password_'\
                   '|components/autofill.*password'
                   '|components/password_'\
-                  '|^ios/chrome/browser/passwords'\
     },
     'pdf': {
       'filepath': 'components/pdf/'\

@@ -525,10 +525,6 @@
     "META": {"sizes": {"includes": [10]}},
     "includes": [4720],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/reset_password/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [4730],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/settings/resources.grd": {
     "META": {"sizes": {"includes": [700],}},
     "includes": [4740],
