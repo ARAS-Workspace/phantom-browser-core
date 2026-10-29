@@ -23,7 +23,6 @@ source_set("browser_tests") {
     "cr_elements/cr_elements_browsertest.cc",
     "flags/flags_browsertest.cc",
     "js/js_browsertest.cc",
-    "notebooks_internals/notebooks_internals_browsertest.cc",
     "sync_internals/sync_internals_browsertest.cc",
   ]
 
@@ -35,7 +34,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/tabs/tab_group_home:constants",
     "//chrome/test:test_support",
-    "//components/notebooks/public",
     "//components/webui/chrome_urls/",
     "//ui/compositor",
   ]
@@ -335,14 +333,12 @@ generate_grd("build_grd") {
     "cr_elements:build_grdp",
     "flags:build_grdp",
     "js:build_grdp",
-    "notebooks_internals:build_grdp",
     "sync_internals:build_grdp",
   ]
 
   grdp_files = [
     "$target_gen_dir/chai_resources.grdp",
     "$target_gen_dir/chrome_urls/resources.grdp",
-    "$target_gen_dir/notebooks_internals/resources.grdp",
     "$target_gen_dir/cr_elements/resources.grdp",
     "$target_gen_dir/flags/resources.grdp",
     "$target_gen_dir/js/resources.grdp",

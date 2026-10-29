@@ -976,9 +976,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
       allowed_types.Put(syncer::ENCRYPTED_TAB_CONTEXT_CONTAINER);
       allowed_types.Put(syncer::ENCRYPTED_TAB_CONTEXT_ITEM);
     }
-    if (base::FeatureList::IsEnabled(syncer::kSyncNotebook)) {
-      allowed_types.Put(syncer::NOTEBOOK);
-    }
     allowed_types.Put(syncer::HISTORY);
     allowed_types.Put(syncer::HISTORY_DELETE_DIRECTIVES);
     allowed_types.Put(syncer::SAVED_TAB_GROUP);
@@ -1020,10 +1017,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
 
   if (base::FeatureList::IsEnabled(syncer::kNewTabPageCustomizationThemeSync)) {
     allowed_types.Put(syncer::THEMES_ANDROID);
-  }
-
-  if (base::FeatureList::IsEnabled(syncer::kSyncNotebook)) {
-    allowed_types.Put(syncer::NOTEBOOK);
   }
 
   if (base::FeatureList::IsEnabled(syncer::kSyncJourney)) {

@@ -30,16 +30,3 @@ source_set("webui") {
     "//ui/webui",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "notebooks_internals_page_handler_unittest.cc" ]
-
-  deps = [
-    ":webui",
-    "//base/test:test_support",
-    "//components/notebooks/public",
-    "//testing/gtest",
-    "//url",
-  ]
-}

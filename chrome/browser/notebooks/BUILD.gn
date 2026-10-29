@@ -29,22 +29,3 @@ source_set("factory") {
     "//content/public/browser",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-
-  sources = [
-    "notebooks_eligibility_service_factory_unittest.cc",
-    "notebooks_service_factory_unittest.cc",
-  ]
-
-  deps = [
-    ":notebooks",
-    "//base",
-    "//base/test:test_support",
-    "//chrome/test:test_support",
-    "//components/notebooks/public",
-    "//content/test:test_support",
-    "//testing/gtest",
-  ]
-}

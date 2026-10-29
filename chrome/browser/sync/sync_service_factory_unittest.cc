@@ -171,10 +171,6 @@ class SyncServiceFactoryTest : public testing::Test {
       datatypes.Put(syncer::ENCRYPTED_TAB_CONTEXT_ITEM);
     }
 
-    if (base::FeatureList::IsEnabled(syncer::kSyncNotebook)) {
-      datatypes.Put(syncer::NOTEBOOK);
-    }
-
     if (base::FeatureList::IsEnabled(syncer::kSyncJourney)) {
       datatypes.Put(syncer::JOURNEY);
     }
