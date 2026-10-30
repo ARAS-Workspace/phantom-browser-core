@@ -55,7 +55,6 @@ source_set("unit_tests") {
     "limited_entropy_randomization_unittest.cc",
     "safe_seed_manager_unittest.cc",
     "variations_field_trial_creator_unittest.cc",
-    "variations_network_clock_unittest.cc",
     "variations_service_unittest.cc",
     "variations_service_utils_unittest.cc",
   ]

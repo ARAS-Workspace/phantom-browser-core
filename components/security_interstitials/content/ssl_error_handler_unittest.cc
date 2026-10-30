@@ -23,7 +23,6 @@
 #include "components/captive_portal/core/buildflags.h"
 #include "components/captive_portal/core/captive_portal_testing_utils.h"
 #include "components/embedder_support/pref_names.h"
-#include "components/network_time/network_time_test_utils.h"
 #include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
@@ -116,16 +115,6 @@ const char kCertWithoutOrganizationOrCommonName[] =
     "dspwZ8CTOlcXnfdeRIjvgxnMZLax+OFEMJdY8sgyrI9c+rk2EfOUj5JVqFDvcsYy\n"
     "ejdBhjdieIv5dTbSjIXz+ljOOA==\n"
     "-----END CERTIFICATE-----";
-
-// Runs |quit_closure| on the UI thread once a URL request has been
-// seen. Returns a request that hangs.
-std::unique_ptr<net::test_server::HttpResponse> WaitForRequest(
-    base::OnceClosure quit_closure,
-    const net::test_server::HttpRequest& request) {
-  content::GetUIThreadTaskRunner({})->PostTask(FROM_HERE,
-                                               std::move(quit_closure));
-  return std::make_unique<net::test_server::HungResponse>();
-}
 
 class TestSSLErrorHandler : public SSLErrorHandler {
  public:
@@ -623,126 +612,6 @@ class SSLErrorAssistantProtoMITMSoftwareDisabledTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-class SSLErrorHandlerDateInvalidTest
-    : public content::RenderViewHostTestHarness {
- public:
-  SSLErrorHandlerDateInvalidTest()
-      : content::RenderViewHostTestHarness(
-            content::BrowserTaskEnvironment::REAL_IO_THREAD),
-        field_trial_test_(new network_time::FieldTrialTest()),
-        clock_(new base::SimpleTestClock),
-        tick_clock_(new base::SimpleTestTickClock),
-        test_server_(new net::EmbeddedTestServer) {
-    network_time::NetworkTimeTracker::RegisterPrefs(pref_service_.registry());
-
-    field_trial_test()->SetFeatureParams(
-        false, 0.0,
-        network_time::NetworkTimeTracker::FETCHES_IN_BACKGROUND_ONLY);
-  }
-
-  SSLErrorHandlerDateInvalidTest(const SSLErrorHandlerDateInvalidTest&) =
-      delete;
-  SSLErrorHandlerDateInvalidTest& operator=(
-      const SSLErrorHandlerDateInvalidTest&) = delete;
-
-  void SetUp() override {
-    content::RenderViewHostTestHarness::SetUp();
-    SSLErrorHandler::ResetConfigForTesting();
-
-    base::RunLoop run_loop;
-    std::unique_ptr<network::PendingSharedURLLoaderFactory>
-        pending_url_loader_factory;
-    content::GetIOThreadTaskRunner({})->PostTaskAndReply(
-        FROM_HERE,
-        base::BindOnce(CreateURLLoaderFactory, &pending_url_loader_factory),
-        run_loop.QuitClosure());
-    run_loop.Run();
-
-    shared_url_loader_factory_ = network::SharedURLLoaderFactory::Create(
-        std::move(pending_url_loader_factory));
-
-    tracker_ = std::make_unique<network_time::NetworkTimeTracker>(
-        std::unique_ptr<base::Clock>(clock_),
-        std::unique_ptr<base::TickClock>(tick_clock_), &pref_service_,
-        shared_url_loader_factory_, std::nullopt);
-    // Do this to be sure that |is_null| returns false.
-    clock_->Advance(base::Days(111));
-    tick_clock_->Advance(base::Days(222));
-
-    SSLErrorHandler::SetInterstitialDelayForTesting(base::TimeDelta());
-    ssl_info_.cert =
-        net::ImportCertFromFile(net::GetTestCertsDirectory(), "ok_cert.pem");
-    ssl_info_.cert_status = net::CERT_STATUS_DATE_INVALID;
-
-    delegate_ = new TestSSLErrorHandlerDelegate(web_contents(), ssl_info_);
-    error_handler_ = std::make_unique<TestSSLErrorHandler>(
-        std::unique_ptr<SSLErrorHandler::Delegate>(delegate_), web_contents(),
-        static_cast<net::Error>(
-            net::MapCertStatusToNetError(ssl_info_.cert_status)),
-        ssl_info_, tracker_.get(), GURL() /*request_url*/,
-        /*captive_portal_service=*/nullptr);
-
-    // Fix flakiness in case system time is off and triggers a bad clock
-    // interstitial. https://crbug.com/666821#c50
-    ssl_errors::SetBuildTimeForTesting(base::Time::Now());
-  }
-
-  void TearDown() override {
-    // Release the reference on TestSharedURLLoaderFactory before the test
-    // thread bundle flushes the IO thread so that it's destructed.
-    shared_url_loader_factory_ = nullptr;
-
-    if (error_handler()) {
-      EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-      error_handler_.reset(nullptr);
-    }
-    SSLErrorHandler::ResetConfigForTesting();
-
-    // content::RenderViewHostTestHarness::TearDown() simulates shutdown and as
-    // such destroys parts of the task environment required in these
-    // destructors.
-    test_server_.reset();
-    tracker_.reset();
-
-    content::RenderViewHostTestHarness::TearDown();
-  }
-
-  TestSSLErrorHandler* error_handler() { return error_handler_.get(); }
-  TestSSLErrorHandlerDelegate* delegate() { return delegate_; }
-
-  network_time::FieldTrialTest* field_trial_test() {
-    return field_trial_test_.get();
-  }
-
-  network_time::NetworkTimeTracker* tracker() { return tracker_.get(); }
-
-  net::EmbeddedTestServer* test_server() { return test_server_.get(); }
-
-  void ClearErrorHandler() { error_handler_.reset(nullptr); }
-
- private:
-  static void CreateURLLoaderFactory(
-      std::unique_ptr<network::PendingSharedURLLoaderFactory>*
-          pending_url_loader_factory) {
-    scoped_refptr<network::TestSharedURLLoaderFactory> factory =
-        base::MakeRefCounted<network::TestSharedURLLoaderFactory>();
-    // Holds a reference to |factory|.
-    *pending_url_loader_factory = factory->Clone();
-  }
-
-  net::SSLInfo ssl_info_;
-  std::unique_ptr<TestSSLErrorHandler> error_handler_;
-  raw_ptr<TestSSLErrorHandlerDelegate, DanglingUntriaged> delegate_;
-
-  std::unique_ptr<network_time::FieldTrialTest> field_trial_test_;
-  raw_ptr<base::SimpleTestClock, DanglingUntriaged> clock_;
-  raw_ptr<base::SimpleTestTickClock, DanglingUntriaged> tick_clock_;
-  TestingPrefServiceSimple pref_service_;
-  scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory_;
-  std::unique_ptr<network_time::NetworkTimeTracker> tracker_;
-  std::unique_ptr<net::EmbeddedTestServer> test_server_;
-};
-
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 
 TEST_F(SSLErrorHandlerNameMismatchTest,
@@ -1082,106 +951,6 @@ TEST_F(SSLErrorHandlerNameMismatchTest,
   histograms.ExpectBucketCount(
       SSLErrorHandler::GetHistogramNameForTesting(),
       SSLErrorHandler::SHOW_SSL_INTERSTITIAL_OVERRIDABLE, 1);
-}
-
-// Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989128
-#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
-#define MAYBE_TimeQueryStarted DISABLED_TimeQueryStarted
-#else
-#define MAYBE_TimeQueryStarted TimeQueryStarted
-#endif
-TEST_F(SSLErrorHandlerDateInvalidTest, MAYBE_TimeQueryStarted) {
-  base::HistogramTester histograms;
-  base::Time network_time;
-  base::TimeDelta uncertainty;
-  SSLErrorHandler::SetInterstitialDelayForTesting(base::Hours(1));
-  EXPECT_EQ(network_time::NetworkTimeTracker::NETWORK_TIME_NO_SYNC_ATTEMPT,
-            tracker()->GetNetworkTime(&network_time, &uncertainty));
-
-  // Enable network time queries and handle the error. A bad clock interstitial
-  // should be shown.
-  test_server()->RegisterRequestHandler(
-      base::BindRepeating(&network_time::GoodTimeResponseHandler));
-  EXPECT_TRUE(test_server()->Start());
-  tracker()->SetTimeServerURLForTesting(test_server()->GetURL("/"));
-  field_trial_test()->SetFeatureParams(
-      true, 0.0, network_time::NetworkTimeTracker::FETCHES_ON_DEMAND_ONLY);
-  error_handler()->StartHandlingError();
-
-  EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-  tracker()->WaitForFetchForTesting(123123123);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(delegate()->bad_clock_interstitial_shown());
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-}
-
-// Tests that an SSL interstitial is shown if the accuracy of the system
-// clock can't be determined because network time is unavailable.
-
-// Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989225
-#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
-#define MAYBE_NoTimeQueries DISABLED_NoTimeQueries
-#else
-#define MAYBE_NoTimeQueries NoTimeQueries
-#endif
-TEST_F(SSLErrorHandlerDateInvalidTest, MAYBE_NoTimeQueries) {
-  base::HistogramTester histograms;
-  base::Time network_time;
-  base::TimeDelta uncertainty;
-  EXPECT_EQ(network_time::NetworkTimeTracker::NETWORK_TIME_NO_SYNC_ATTEMPT,
-            tracker()->GetNetworkTime(&network_time, &uncertainty));
-
-  // Handle the error without enabling time queries. A bad clock interstitial
-  // should not be shown.
-  error_handler()->StartHandlingError();
-
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_FALSE(delegate()->bad_clock_interstitial_shown());
-  EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-}
-
-// Tests that an SSL interstitial is shown if determing the accuracy of
-// the system clock times out (e.g. because a network time query hangs).
-
-// Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989289
-#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
-#define MAYBE_TimeQueryHangs DISABLED_TimeQueryHangs
-#else
-#define MAYBE_TimeQueryHangs TimeQueryHangs
-#endif
-TEST_F(SSLErrorHandlerDateInvalidTest, MAYBE_TimeQueryHangs) {
-  base::HistogramTester histograms;
-  base::Time network_time;
-  base::TimeDelta uncertainty;
-  EXPECT_EQ(network_time::NetworkTimeTracker::NETWORK_TIME_NO_SYNC_ATTEMPT,
-            tracker()->GetNetworkTime(&network_time, &uncertainty));
-
-  // Enable network time queries and handle the error. Because the
-  // network time cannot be determined before the timer elapses, an SSL
-  // interstitial should be shown.
-  base::RunLoop wait_for_time_query_loop;
-  test_server()->RegisterRequestHandler(base::BindRepeating(
-      &WaitForRequest, wait_for_time_query_loop.QuitClosure()));
-  EXPECT_TRUE(test_server()->Start());
-  tracker()->SetTimeServerURLForTesting(test_server()->GetURL("/"));
-  field_trial_test()->SetFeatureParams(
-      true, 0.0, network_time::NetworkTimeTracker::FETCHES_ON_DEMAND_ONLY);
-  error_handler()->StartHandlingError();
-  EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-  wait_for_time_query_loop.Run();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(delegate()->bad_clock_interstitial_shown());
-  EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-
-  // Clear the error handler to test that, when the request completes,
-  // it doesn't try to call a callback on a deleted SSLErrorHandler.
-  ClearErrorHandler();
-
-  // Shut down the server to cancel the pending request.
-  ASSERT_TRUE(test_server()->ShutdownAndWaitUntilComplete());
 }
 
 // Tests that if a certificate matches the issuer common name regex of a MITM

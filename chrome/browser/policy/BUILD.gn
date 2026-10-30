@@ -301,10 +301,7 @@ source_set("policy_specific_browser_tests") {
     "//components/webrtc",
   ]
 
-  sources += [
-    "policy_startup_browsertest.cc",
-    "test/network_time_policy_browsertest.cc",
-  ]
+  sources += [ "policy_startup_browsertest.cc" ]
 
   sources += [ "test/variation_restrict_parameter_policy_browsertest.cc" ]
   deps += [ "//components/variations/service" ]
