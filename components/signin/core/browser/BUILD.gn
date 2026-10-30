@@ -103,7 +103,6 @@ static_library("browser") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "account_investigator_unittest.cc",
     "account_management_type_metrics_recorder_unittest.cc",
     "account_metrics_id_allocator_unittest.cc",
     "account_preview_data_fetcher_unittest.cc",
