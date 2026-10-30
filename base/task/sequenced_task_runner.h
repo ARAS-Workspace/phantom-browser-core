@@ -31,9 +31,6 @@ class AlsaPcmOutputStream;
 class AlsaPcmInputStream;
 class FakeAudioWorker;
 }  // namespace media
-namespace page_content_annotations {
-class PageStabilityMonitor;
-}  // namespace page_content_annotations
 namespace viz {
 class ExternalBeginFrameSourceWin;
 }  // namespace viz
@@ -77,7 +74,6 @@ class PostDelayedTaskPassKey {
   friend class blink::TimerBasedTickProvider;
   friend class blink::WebRtcTaskQueue;
   friend class PostDelayedTaskPassKeyForTesting;
-  friend class page_content_annotations::PageStabilityMonitor;
   friend class webrtc::ThreadWrapper;
   friend class media::AlsaPcmOutputStream;
   friend class media::AlsaPcmInputStream;

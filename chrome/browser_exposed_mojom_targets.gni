@@ -64,7 +64,6 @@ browser_exposed_mojom_targets = [
   "//components/content_settings/core/common:content_settings_enums",
   "//components/content_settings/core/common:content_settings_types",
   "//components/content_settings/core/common:mojo_bindings",
-  "//components/continuous_search/common/public/mojom:mojom",
   "//components/data_sharing/data_sharing_internals/webui:mojo_bindings",
   "//components/discardable_memory/public/mojom:mojom",
   "//components/dom_distiller/content/common/mojom:mojom",

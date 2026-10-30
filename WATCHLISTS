@@ -63,7 +63,6 @@
     },
     'ai_page_content' : {
       'filepath': 'chrome/browser/ai/ai_data_keyed_service|' \
-                  'chrome/browser/page_content_annotations/|' \
                   'components/optimization_guide/content/'
     },
     'ai_settings_page_desktop': {
@@ -758,7 +757,6 @@
                   '|model_execution'\
                   '|optimization_guide'\
                   '|optimization_hints'\
-                  '|page_content_annotations'\
                   '|passage_embeddings'\
                   '|services/on_device_model'\
                   '|third_party/eigen3'\

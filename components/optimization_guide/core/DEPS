@@ -6,7 +6,6 @@ include_rules = [
   "+components/component_updater/pref_names.h",
   "+components/crx_file",
   "+components/download/public/background_service",
-  "+components/page_content_annotations/core",
   "+components/services/unzip",
   "+components/signin/public",
   "+components/policy/core",

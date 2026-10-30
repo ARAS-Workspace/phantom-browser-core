@@ -20,7 +20,6 @@ source_set("passage_embeddings") {
     "//chrome/browser:browser_process",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles",
-    "//components/page_content_annotations/core",
     "//components/performance_manager",
     "//components/permissions:permissions_common",
     "//content/public/browser",
