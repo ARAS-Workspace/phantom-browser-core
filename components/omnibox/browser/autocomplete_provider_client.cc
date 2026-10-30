@@ -17,11 +17,6 @@ AutocompleteProviderClient::GetGeolocationHeaderService() const {
   return nullptr;
 }
 
-DocumentSuggestionsService*
-AutocompleteProviderClient::GetDocumentSuggestionsService() const {
-  return nullptr;
-}
-
 bool AutocompleteProviderClient::AllowDeletingBrowserHistory() const {
   return true;
 }

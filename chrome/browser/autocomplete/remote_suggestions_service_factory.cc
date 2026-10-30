@@ -5,7 +5,6 @@
 #include "chrome/browser/autocomplete/remote_suggestions_service_factory.h"
 
 #include "base/no_destructor.h"
-#include "chrome/browser/autocomplete/document_suggestions_service_factory.h"
 #include "chrome/browser/autocomplete/enterprise_search_aggregator_suggestions_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
@@ -31,8 +30,6 @@ RemoteSuggestionsServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
   return std::make_unique<RemoteSuggestionsService>(
-      DocumentSuggestionsServiceFactory::GetForProfile(
-          profile, /*create_if_necessary=*/true),
       EnterpriseSearchAggregatorSuggestionsServiceFactory::GetForProfile(
           profile, /*create_if_necessary=*/true),
       profile->GetDefaultStoragePartition()
@@ -50,7 +47,6 @@ RemoteSuggestionsServiceFactory::RemoteSuggestionsServiceFactory()
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOriginalOnly)
               .Build()) {
-  DependsOn(DocumentSuggestionsServiceFactory::GetInstance());
   DependsOn(EnterpriseSearchAggregatorSuggestionsServiceFactory::GetInstance());
 }
 

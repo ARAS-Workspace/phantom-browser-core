@@ -179,7 +179,6 @@ TEST_F(RemoteSuggestionsServiceTest, AttachCookies_ZeroPrefixSuggest) {
       }));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
@@ -209,7 +208,6 @@ TEST_F(RemoteSuggestionsServiceTest, AttachCookies_Suggest) {
       }));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
@@ -238,7 +236,6 @@ TEST_F(RemoteSuggestionsServiceTest, AttachCookies_DeleteSuggest) {
       }));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
   auto loader = service.StartDeletionRequest(
@@ -260,7 +257,6 @@ TEST_F(RemoteSuggestionsServiceTest, BypassCache) {
       }));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
@@ -294,7 +290,6 @@ TEST_F(RemoteSuggestionsServiceTest, Observer) {
           std::make_unique<TemplateURL>(template_url_data)));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
   TestObserver observer(&service);
@@ -343,7 +338,6 @@ TEST_F(RemoteSuggestionsServiceTest, ResponseTimeHistograms) {
           std::make_unique<TemplateURL>(template_url_data)));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
   TestObserver observer(&service);
@@ -467,7 +461,6 @@ TEST_F(RemoteSuggestionsServiceTest, Delegate) {
           std::make_unique<TemplateURL>(template_url_data)));
 
   RemoteSuggestionsService service(
-      /*document_suggestions_service_=*/nullptr,
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 

@@ -69,15 +69,6 @@ SyncSessionDurationsMetricsRecorder::SyncSessionDurationsMetricsRecorder(
   signin_status_ = DetermineBrowserSigninStatus();
   sync_status_ = DetermineSyncStatus();
 
-  // Check if we already know the signed in cookies. This will trigger a fetch
-  // if we don't have them yet.
-  signin::AccountsInCookieJarInfo accounts_in_cookie_jar_info =
-      identity_manager_->GetAccountsInCookieJar();
-  if (accounts_in_cookie_jar_info.AreAccountsFresh()) {
-    OnAccountsInCookieUpdated(accounts_in_cookie_jar_info,
-                              GoogleServiceAuthError::AuthErrorNone());
-  }
-
   DVLOG(1) << "Ready to track Session.TotalDuration metrics";
 }
 

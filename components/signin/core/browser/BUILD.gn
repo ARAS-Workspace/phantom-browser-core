@@ -9,8 +9,6 @@ static_library("browser") {
   sources = [
     "about_signin_internals.cc",
     "about_signin_internals.h",
-    "account_investigator.cc",
-    "account_investigator.h",
     "account_management_type_metrics_recorder.cc",
     "account_management_type_metrics_recorder.h",
     "account_metrics_id_allocator.cc",

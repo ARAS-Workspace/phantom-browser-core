@@ -34,7 +34,6 @@ class ImageServiceImplTest : public testing::Test {
 
   void SetUp() override {
     remote_suggestions_service_ = std::make_unique<RemoteSuggestionsService>(
-        /*document_suggestions_service=*/nullptr,
         /*enterprise_search_aggregator_suggestions_service=*/nullptr,
         test_url_loader_factory_.GetSafeWeakWrapper());
     test_opt_guide_ =

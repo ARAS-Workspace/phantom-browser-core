@@ -130,10 +130,14 @@ class SyncSessionDurationsMetricsRecorderTest : public testing::Test {
 };
 
 TEST_F(SyncSessionDurationsMetricsRecorderTest, WebSignedOut) {
+  SyncSessionDurationsMetricsRecorder metrics_recorder(
+      &sync_service_, identity_test_env_.identity_manager(),
+      &profile_metrics_service_);
   identity_test_env_.SetCookieAccounts({});
 
   base::HistogramTester ht;
-  StartAndEndSession(kSessionTime);
+  metrics_recorder.OnSessionStarted(base::TimeTicks::Now());
+  metrics_recorder.OnSessionEnded(kSessionTime);
 
   ExpectOneSessionWithDuration(ht, {"WithoutAccount"}, kSessionTime);
   ExpectNoSession(ht, {"WithAccount"});
@@ -142,11 +146,15 @@ TEST_F(SyncSessionDurationsMetricsRecorderTest, WebSignedOut) {
 }
 
 TEST_F(SyncSessionDurationsMetricsRecorderTest, WebSignedIn) {
+  SyncSessionDurationsMetricsRecorder metrics_recorder(
+      &sync_service_, identity_test_env_.identity_manager(),
+      &profile_metrics_service_);
   identity_test_env_.SetCookieAccounts(
       {{"foo@gmail.com", GaiaId("foo_gaia_id")}});
 
   base::HistogramTester ht;
-  StartAndEndSession(kSessionTime);
+  metrics_recorder.OnSessionStarted(base::TimeTicks::Now());
+  metrics_recorder.OnSessionEnded(kSessionTime);
 
   ExpectOneSessionWithDuration(ht, {"WithAccount"}, kSessionTime);
   ExpectNoSession(ht, {"WithoutAccount"});

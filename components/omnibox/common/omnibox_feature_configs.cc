@@ -12,7 +12,6 @@
 #include "base/strings/string_split.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/omnibox/common/omnibox_features.h"
 
 namespace omnibox_feature_configs {
 
@@ -296,37 +295,6 @@ Toolbelt::Toolbelt() {
 Toolbelt::Toolbelt(const Toolbelt&) = default;
 Toolbelt& Toolbelt::operator=(const Toolbelt&) = default;
 Toolbelt::~Toolbelt() = default;
-
-DocumentProvider::DocumentProvider() {
-  enabled = base::FeatureList::IsEnabled(omnibox::kDocumentProvider);
-  min_query_length =
-      base::FeatureParam<int>(&omnibox::kDocumentProvider,
-                              "DocumentProviderMinQueryLength", 4)
-          .Get();
-  debounce_delay_ms =
-      base::FeatureParam<int>(&omnibox::kDocumentProvider,
-                              "DocumentProviderDebounceDelayMs", 600)
-          .Get();
-  scope_backoff_to_profile =
-      base::FeatureParam<bool>(&omnibox::kDocumentProvider,
-                               "DocumentProviderScopeBackoffToProfile", false)
-          .Get();
-  backoff_duration = base::FeatureParam<base::TimeDelta>(
-                         &omnibox::kDocumentProvider,
-                         "DocumentProviderBackoffDuration", base::TimeDelta())
-                         .Get();
-  backoff_on_429 =
-      base::FeatureParam<bool>(&omnibox::kDocumentProvider,
-                               "DocumentProviderBackoffOn429", false)
-          .Get();
-}
-
-DocumentProvider::DocumentProvider(const DocumentProvider&) = default;
-DocumentProvider::DocumentProvider(DocumentProvider&&) = default;
-DocumentProvider& DocumentProvider::operator=(const DocumentProvider&) =
-    default;
-DocumentProvider& DocumentProvider::operator=(DocumentProvider&&) = default;
-DocumentProvider::~DocumentProvider() = default;
 
 BASE_FEATURE(AdjustOmniboxIndent::kAdjustOmniboxIndent,
              "AdjustOmniboxIndent",

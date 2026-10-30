@@ -90,30 +90,6 @@ BASE_FEATURE(kZeroSuggestPrefetchingOnSRP, ENABLED);
 // Web (i.e. non-NTP and non-SRP URLs).
 BASE_FEATURE(kZeroSuggestPrefetchingOnWeb, DISABLED);
 
-// Feature used to fetch document suggestions.
-BASE_FEATURE(kDocumentProvider, "OmniboxDocumentProvider", ENABLED);
-
-// If enabled, the authentication requirement for Drive suggestions is based on
-// whether the primary account is available, i.e., the user is signed into
-// Chrome, rarther than checking if any signed in account is available in the
-// cookie jar.
-BASE_FEATURE(kDocumentProviderPrimaryAccountRequirement,
-             "OmniboxDocumentProviderPrimaryAccountRequirement",
-             ENABLED);
-
-// If enabled, the primary account must be subject to enterprise policies in
-// order to receive Drive suggestions.
-BASE_FEATURE(kDocumentProviderEnterpriseEligibility,
-             "OmniboxDocumentProviderEnterpriseEligibility",
-             ENABLED);
-
-// If enabled, the enterprise eligibility requirement for Drive suggestions
-// is considered met even when the account capability is unknown. Has no effect
-// if kDocumentProviderEnterpriseEligibility is disabled.
-BASE_FEATURE(kDocumentProviderEnterpriseEligibilityWhenUnknown,
-             "OmniboxDocumentProviderEnterpriseEligibilityWhenUnknown",
-             DISABLED);
-
 // If enabled, the omnibox popup is not presented until the mouse button is
 // released.
 BASE_FEATURE(kShowPopupOnMouseReleased,

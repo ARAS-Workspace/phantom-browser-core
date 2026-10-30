@@ -321,7 +321,6 @@ after discussions on the right group.
       <annotation id="history_ui_favicon_request_handler_get_favicon"/>
     </sender>
     <sender name="Omnibox">
-      <annotation id="omnibox_documentsuggest"/>
       <annotation id="omnibox_zerosuggest"/>
       <annotation id="search_prefetch_service"/>
     </sender>

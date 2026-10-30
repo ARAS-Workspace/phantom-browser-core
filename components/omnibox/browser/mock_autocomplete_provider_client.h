@@ -15,7 +15,6 @@
 #include "components/omnibox/browser/actions/omnibox_pedal_provider.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/omnibox/browser/autocomplete_scheme_classifier.h"
-#include "components/omnibox/browser/document_suggestions_service.h"
 #include "components/omnibox/browser/keyword_extensions_delegate.h"
 #include "components/omnibox/browser/mock_tab_matcher.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
@@ -206,7 +205,6 @@ class MockAutocompleteProviderClient
   bool in_background_state_ = false;
 
   raw_ptr<TemplateURLService> template_url_service_;
-  std::unique_ptr<DocumentSuggestionsService> document_suggestions_service_;
   std::unique_ptr<RemoteSuggestionsService> remote_suggestions_service_;
   std::unique_ptr<ZeroSuggestCacheService> zero_suggest_cache_service_;
   std::unique_ptr<OmniboxPedalProvider> pedal_provider_;

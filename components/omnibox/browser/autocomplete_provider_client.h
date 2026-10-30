@@ -18,7 +18,6 @@
 
 class AutocompleteClassifier;
 class AutocompleteSchemeClassifier;
-class DocumentSuggestionsService;
 class GURL;
 class GeolocationHeaderService;
 class InMemoryURLIndex;
@@ -93,7 +92,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   virtual TemplateURLService* GetTemplateURLService() = 0;
   virtual const TemplateURLService* GetTemplateURLService() const = 0;
   virtual GeolocationHeaderService* GetGeolocationHeaderService() const;
-  virtual DocumentSuggestionsService* GetDocumentSuggestionsService() const;
   virtual RemoteSuggestionsService* GetRemoteSuggestionsService(
       bool create_if_necessary) const = 0;
   virtual ZeroSuggestCacheService* GetZeroSuggestCacheService() = 0;

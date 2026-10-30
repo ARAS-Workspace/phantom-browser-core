@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/memory/scoped_refptr.h"
-#include "components/omnibox/browser/document_suggestions_service.h"
 #include "components/omnibox/browser/omnibox_triggered_feature_service.h"
 #include "components/omnibox/browser/provider_state_service.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
@@ -17,10 +16,7 @@ MockAutocompleteProviderClient::MockAutocompleteProviderClient() {
   shared_factory_ =
       base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
           &test_url_loader_factory_);
-  document_suggestions_service_ = std::make_unique<DocumentSuggestionsService>(
-      /*identity_manager=*/nullptr, GetURLLoaderFactory());
   remote_suggestions_service_ = std::make_unique<RemoteSuggestionsService>(
-      document_suggestions_service_.get(),
       /*enterprise_search_aggregator_suggestions_service=*/nullptr,
       GetURLLoaderFactory());
   omnibox_triggered_feature_service_ =

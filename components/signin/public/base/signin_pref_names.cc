@@ -33,19 +33,6 @@ const char kAccountPreviewDataLastFetchAccounts[] =
 const char kAccountPreviewNonPeriodicFetchCountPref[] =
     "signin.account_preview_non_periodic_fetch_count";
 
-// A hash of the GAIA accounts present in the content area. Order does not
-// affect the hash, but signed in/out status will. Stored as the Base64 string.
-const char kGaiaCookieHash[] = "gaia_cookie.hash";
-
-// The last time that kGaiaCookieHash was last updated. Stored as a double that
-// should be converted into base::Time.
-const char kGaiaCookieChangedTime[] = "gaia_cookie.changed_time";
-
-// The last time that periodic reporting occured, to allow us to report as close
-// to once per intended interval as possible, through restarts.
-const char kGaiaCookiePeriodicReportTime[] =
-    "gaia_cookie.periodic_report_time_2";
-
 // Typically contains an obfuscated gaiaid. Some platforms may have
 // an email stored in this preference instead. This is transitional and will
 // eventually be fixed.

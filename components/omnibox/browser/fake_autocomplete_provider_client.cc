@@ -19,10 +19,6 @@
 FakeAutocompleteProviderClient::FakeAutocompleteProviderClient() {
   set_template_url_service(
       search_engines_test_enviroment_.template_url_service());
-  document_suggestions_service_ =
-      std::make_unique<DocumentSuggestionsService>(
-          /*identity_manager=*/nullptr,
-          /*url_loader_factory=*/nullptr);
 
   fake_tab_group_sync_service_ =
       std::make_unique<tab_groups::FakeTabGroupSyncService>();
@@ -75,11 +71,6 @@ bookmarks::BookmarkModel* FakeAutocompleteProviderClient::GetBookmarkModel() {
 
 InMemoryURLIndex* FakeAutocompleteProviderClient::GetInMemoryURLIndex() {
   return in_memory_url_index_.get();
-}
-
-DocumentSuggestionsService*
-FakeAutocompleteProviderClient::GetDocumentSuggestionsService() const {
-  return document_suggestions_service_.get();
 }
 
 scoped_refptr<ShortcutsBackend>

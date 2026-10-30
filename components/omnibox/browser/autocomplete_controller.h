@@ -35,7 +35,6 @@
 class BookmarkProvider;
 class ClipboardProvider;
 class ContextualSearchProvider;
-class DocumentProvider;
 class FeaturedSearchProvider;
 class HistoryFuzzyProvider;
 class HistoryQuickProvider;
@@ -487,7 +486,6 @@ class AutocompleteController : public AutocompleteProviderListener,
   Providers providers_;
   raw_ptr<BookmarkProvider> bookmark_provider_ = nullptr;
   raw_ptr<HistoryQuickProvider> history_quick_provider_ = nullptr;
-  raw_ptr<DocumentProvider> document_provider_ = nullptr;
   raw_ptr<HistoryURLProvider> history_url_provider_ = nullptr;
   raw_ptr<KeywordProvider> keyword_provider_ = nullptr;
   raw_ptr<UnscopedExtensionProvider> unscoped_extension_provider_ = nullptr;

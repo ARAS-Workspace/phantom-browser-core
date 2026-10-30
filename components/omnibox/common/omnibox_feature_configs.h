@@ -11,7 +11,6 @@
 #include "base/feature_list.h"
 #include "base/gtest_prod_util.h"
 #include "base/metrics/field_trial_params.h"
-#include "base/time/time.h"
 #include "base/values.h"
 
 class EnterpriseSearchManager;
@@ -332,36 +331,6 @@ struct AdjustOmniboxIndent : Config<AdjustOmniboxIndent> {
   int match_icon_indent_offset;
   // Amount by which the indentation of the omnibox match text is offset.
   int match_text_indent_offset;
-};
-
-// If enabled, allow document provider requests when all other conditions are
-// met.
-struct DocumentProvider : Config<DocumentProvider> {
-  DocumentProvider();
-  DocumentProvider(const DocumentProvider&);
-  DocumentProvider(DocumentProvider&&);
-  DocumentProvider& operator=(const DocumentProvider&);
-  DocumentProvider& operator=(DocumentProvider&&);
-  ~DocumentProvider();
-  bool enabled;
-  // The minimum input length required before requesting document suggestions.
-  size_t min_query_length;
-  // The delay in milliseconds to debounce requests by.
-  int debounce_delay_ms;
-  // Whether to scope backoff state to the profile instead of the current
-  // window.
-  bool scope_backoff_to_profile;
-  // How long to continue backing off from making new document suggestion
-  // requests after receiving a backoff signal, when the backoff state is scoped
-  // to the profile. If this is set to 0 (the default value) or a negative
-  // value, the backoff state never resets. If this is set to a positive value,
-  // the backoff state is reset after the specified amount of time. The value
-  // can be supplied using --enable-features or in an experiment config using
-  // the string representation expected by `base::TimeDeltaFromString()` (e.g.
-  // "10m" or "12h"). Has no effect when `scope_backoff_to_profile` is false.
-  base::TimeDelta backoff_duration;
-  // Whether to trigger backoff when the response code is HTTP 429.
-  bool backoff_on_429;
 };
 
 // If enabled, pretends all matches are allowed to be default. This is very

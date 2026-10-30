@@ -27,7 +27,6 @@
 #include "net/traffic_annotation/network_traffic_annotation.h"
 #include "url/gurl.h"
 
-class DocumentSuggestionsService;
 class EnterpriseSearchAggregatorSuggestionsService;
 
 using EnterpriseSearchAggregatorSuggestionType =
@@ -93,8 +92,7 @@ enum class RemoteRequestEvent {
 };
 
 // A service to fetch suggestions from a search provider's suggest endpoint.
-// Used by ZeroSuggestProvider, SearchProvider, DocumentProvider, and
-// ImageService.
+// Used by ZeroSuggestProvider, SearchProvider, and ImageService.
 //
 // This service is always sent the user's authentication state, so the
 // suggestions always can be personalized. This service is also sometimes sent
@@ -122,10 +120,6 @@ class RemoteSuggestionsService : public KeyedService {
         base::optional_ref<std::string> response_body) {}
   };
 
-  // Called when the transfer has started asynchronously, e.g., after obtaining
-  // an OAuth token.
-  using StartCallback = base::OnceCallback<void(
-      std::unique_ptr<network::SimpleURLLoader> loader)>;
   // Called when the transfer is done. `response_code` is the response status
   // code. A status code of 200 indicates that the request has succeeded and
   // `response_body` is populated.
@@ -133,8 +127,8 @@ class RemoteSuggestionsService : public KeyedService {
       base::OnceCallback<void(const network::SimpleURLLoader* source,
                               const int response_code,
                               std::optional<std::string> response_body)>;
-  // Same as `StartCallback` but for requests that are associated with a
-  // `request_index`.
+  // Called when the transfer has started asynchronously, e.g., after obtaining
+  // an OAuth token, for requests that are associated with a `request_index`.
   using IndexedStartCallback = base::RepeatingCallback<void(
       const int request_index,
       std::unique_ptr<network::SimpleURLLoader> loader)>;
@@ -172,7 +166,6 @@ class RemoteSuggestionsService : public KeyedService {
   };
 
   RemoteSuggestionsService(
-      DocumentSuggestionsService* document_suggestions_service,
       EnterpriseSearchAggregatorSuggestionsService*
           enterprise_search_aggregator_suggestions_service,
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
@@ -229,18 +222,6 @@ class RemoteSuggestionsService : public KeyedService {
       CompletionCallback completion_callback,
       base::optional_ref<const base::TimeDelta> timeout = std::nullopt);
 
-  // Creates and starts a document suggestion request for `query` asynchronously
-  // after obtaining an OAuth2 token for the signed-in users.
-  void CreateDocumentSuggestionsRequest(
-      const std::u16string& query,
-      bool is_off_the_record,
-      metrics::OmniboxEventProto::PageClassification page_classification,
-      StartCallback start_callback,
-      CompletionCallback completion_callback);
-
-  // Stops creating the request. Already created requests aren't affected.
-  void StopCreatingDocumentSuggestionsRequest();
-
   // Creates and starts an enterprise search aggregator suggestion request using
   //  `suggest_url` and `response_body` asynchronously after obtaining an OAuth2
   //  token for signed-in enterprise users.
@@ -286,16 +267,6 @@ class RemoteSuggestionsService : public KeyedService {
       metrics::OmniboxEventProto::PageClassification page_classification,
       network::SimpleURLLoader* loader,
       const std::string& request_body);
-  // Called when the transfer has started asynchronously, e.g., after obtaining
-  // an OAuth token. Notifies `observers_` and calls `start_callback` to
-  // transfer the ownership of `loader` to the caller.
-  void OnRequestStartedAsync(
-      const base::UnguessableToken& request_id,
-      RemoteRequestType request_type,
-      metrics::OmniboxEventProto::PageClassification page_classification,
-      StartCallback start_callback,
-      std::unique_ptr<network::SimpleURLLoader> loader,
-      const std::string& request_body);
   void OnIndexedRequestStartedAsync(
       const base::UnguessableToken& request_id,
       RemoteRequestType request_type,
@@ -325,9 +296,6 @@ class RemoteSuggestionsService : public KeyedService {
       int request_index,
       std::optional<std::string> response_body);
 
-  // May be nullptr in OTR profiles. Otherwise guaranteed to outlive this due to
-  // the factories' dependency.
-  raw_ptr<DocumentSuggestionsService> document_suggestions_service_;
   // May be nullptr in OTR profiles. Otherwise guaranteed to outlive this due to
   // the factories' dependency.
   raw_ptr<EnterpriseSearchAggregatorSuggestionsService>

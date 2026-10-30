@@ -24,12 +24,6 @@ extern const char kAccountPreviewNonPeriodicFetchCountPref[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kAccountPreviewDataLastFetchAccounts[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kGaiaCookieHash[];
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kGaiaCookieChangedTime[];
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kGaiaCookiePeriodicReportTime[];
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesAccountId[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesConsentedToSync[];

@@ -53,7 +53,6 @@
 #include "components/omnibox/browser/calculator_provider.h"
 #include "components/omnibox/browser/clipboard_provider.h"
 #include "components/omnibox/browser/cross_device_tab_provider.h"
-#include "components/omnibox/browser/document_provider.h"
 #include "components/omnibox/browser/enterprise_search_aggregator_provider.h"
 #include "components/omnibox/browser/featured_search_provider.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
@@ -1091,10 +1090,6 @@ void AutocompleteController::InitializeAsyncProviders(int provider_types) {
         base::MakeRefCounted<HistoryURLProvider>(provider_client_.get(), this);
     history_url_provider_ = history_url_provider.get();
     providers_.push_back(std::move(history_url_provider));
-  }
-  if (provider_types & AutocompleteProvider::TYPE_DOCUMENT) {
-    document_provider_ = DocumentProvider::Create(provider_client_.get(), this);
-    providers_.push_back(document_provider_.get());
   }
   if (provider_types &
       AutocompleteProvider::TYPE_ENTERPRISE_SEARCH_AGGREGATOR) {

@@ -64,9 +64,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
            : 0) |
       AutocompleteProvider::TYPE_ZERO_SUGGEST |
       AutocompleteProvider::TYPE_ZERO_SUGGEST_LOCAL_HISTORY |
-      (base::FeatureList::IsEnabled(omnibox::kDocumentProvider)
-           ? AutocompleteProvider::TYPE_DOCUMENT
-           : 0) |
       (base::FeatureList::IsEnabled(omnibox::kOmniboxCrossDeviceTabZeroSuggest)
            ? AutocompleteProvider::TYPE_CROSS_DEVICE_TAB
            : 0) |

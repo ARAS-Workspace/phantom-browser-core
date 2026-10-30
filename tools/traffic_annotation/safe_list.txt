@@ -120,7 +120,6 @@ missing_new_fields,components/offline_pages/core/prefetch/prefetch_downloader_im
 missing_new_fields,components/offline_pages/core/prefetch/prefetch_request_fetcher.cc
 missing_new_fields,components/offline_pages/core/prefetch/visuals_fetch_by_url.cc
 missing_new_fields,components/omnibox/browser/base_search_provider.cc
-missing_new_fields,components/omnibox/browser/document_suggestions_service.cc
 missing_new_fields,components/omnibox/browser/remote_suggestions_service.cc
 missing_new_fields,components/omnibox/browser/search_provider.cc
 missing_new_fields,components/permissions/prediction_service/prediction_service.cc

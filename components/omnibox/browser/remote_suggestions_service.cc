@@ -19,7 +19,6 @@
 #include "base/time/time.h"
 #include "base/timer/elapsed_timer.h"
 #include "components/omnibox/browser/base_search_provider.h"
-#include "components/omnibox/browser/document_suggestions_service.h"
 #include "components/omnibox/browser/enterprise_search_aggregator_suggestions_service.h"
 #include "components/omnibox/browser/page_classification_functions.h"
 #include "components/search/search.h"
@@ -261,12 +260,10 @@ RemoteSuggestionsService::Delegate::Delegate() = default;
 RemoteSuggestionsService::Delegate::~Delegate() = default;
 
 RemoteSuggestionsService::RemoteSuggestionsService(
-    DocumentSuggestionsService* document_suggestions_service,
     EnterpriseSearchAggregatorSuggestionsService*
         enterprise_search_aggregator_suggestions_service,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
-    : document_suggestions_service_(document_suggestions_service),
-      enterprise_search_aggregator_suggestions_service_(
+    : enterprise_search_aggregator_suggestions_service_(
           enterprise_search_aggregator_suggestions_service),
       url_loader_factory_(url_loader_factory) {
   DCHECK(url_loader_factory);
@@ -497,41 +494,6 @@ RemoteSuggestionsService::StartZeroPrefixSuggestionsRequest(
   return loader;
 }
 
-void RemoteSuggestionsService::CreateDocumentSuggestionsRequest(
-    const std::u16string& query,
-    bool is_off_the_record,
-    metrics::OmniboxEventProto::PageClassification page_classification,
-    StartCallback start_callback,
-    CompletionCallback completion_callback) {
-  if (!document_suggestions_service_) {
-    return;
-  }
-
-  // Create a unique identifier for the request.
-  const base::UnguessableToken request_id = base::UnguessableToken::Create();
-
-  base::ElapsedTimer request_timer;
-  document_suggestions_service_->CreateDocumentSuggestionsRequest(
-      query, is_off_the_record,
-      base::BindOnce(&RemoteSuggestionsService::OnRequestCreated,
-                     weak_ptr_factory_.GetWeakPtr(), request_id),
-      base::BindOnce(&RemoteSuggestionsService::OnRequestStartedAsync,
-                     weak_ptr_factory_.GetWeakPtr(), request_id,
-                     /*request_type=*/RemoteRequestType::kDocumentSuggest,
-                     page_classification, std::move(start_callback)),
-      base::BindOnce(&RemoteSuggestionsService::OnRequestCompleted,
-                     weak_ptr_factory_.GetWeakPtr(), request_id,
-                     /*request_type=*/RemoteRequestType::kDocumentSuggest,
-                     std::move(request_timer), page_classification,
-                     std::move(completion_callback)));
-}
-
-void RemoteSuggestionsService::StopCreatingDocumentSuggestionsRequest() {
-  if (document_suggestions_service_) {
-    document_suggestions_service_->StopCreatingDocumentSuggestionsRequest();
-  }
-}
-
 void RemoteSuggestionsService::
     CreateEnterpriseSearchAggregatorSuggestionsRequest(
         const std::u16string& query,
@@ -684,18 +646,6 @@ void RemoteSuggestionsService::OnRequestStarted(
   observers_.Notify(&Observer::OnRequestStarted, request_id, loader,
                     request_body);
   LogRequestSent(request_type, page_classification);
-}
-
-void RemoteSuggestionsService::OnRequestStartedAsync(
-    const base::UnguessableToken& request_id,
-    RemoteRequestType request_type,
-    metrics::OmniboxEventProto::PageClassification page_classification,
-    StartCallback start_callback,
-    std::unique_ptr<network::SimpleURLLoader> loader,
-    const std::string& request_body) {
-  OnRequestStarted(request_id, request_type, page_classification, loader.get(),
-                   request_body);
-  std::move(start_callback).Run(std::move(loader));
 }
 
 void RemoteSuggestionsService::OnIndexedRequestStartedAsync(
