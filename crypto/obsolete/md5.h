@@ -114,11 +114,6 @@ namespace safe_browsing {
 std::string Md5AsHexForBodyDigest(std::string_view data);
 }
 
-namespace segmentation_platform {
-std::array<uint8_t, crypto::obsolete::kMd5Size> Md5ForUrlId(
-    std::string_view data);
-}
-
 namespace shell_util {
 std::string Md5AsBase32ForUserSpecificRegistrySuffix(std::string_view str);
 }
@@ -239,10 +234,6 @@ class CRYPTO_EXPORT Md5 {
   // TODO(crbug.com/454931298): get rid of this.
   friend std::string performance_manager::Md5AsHexForDatabaseKey(
       std::string_view input);
-
-  // TODO(crbug.com/455854083): get rid of this.
-  friend std::array<uint8_t, kSize> segmentation_platform::Md5ForUrlId(
-      std::string_view data);
 
   // TODO(crbug.com/456473948): get rid of this.
   friend std::array<uint8_t, kSize> spotlight::Md5ForSpotlightId(

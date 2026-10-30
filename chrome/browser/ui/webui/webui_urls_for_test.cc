@@ -92,7 +92,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://quota-internals",
       "chrome://saved-tab-groups-unsupported",
       "chrome://serviceworker-internals",
-      "chrome://segmentation-internals",
       "chrome://settings",
       "chrome://signin-internals",
       "chrome://site-engagement",

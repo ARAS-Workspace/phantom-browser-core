@@ -198,8 +198,6 @@ inline constexpr char kChromeUIRestartHost[] = "restart";
 inline constexpr char kChromeUIRestartURL[] = "chrome://restart/";
 inline constexpr char kChromeUISavedTabGroupsUnsupportedHost[] =
     "saved-tab-groups-unsupported";
-inline constexpr char kChromeUISegmentationInternalsHost[] =
-    "segmentation-internals";
 inline constexpr char kChromeUISettingsHost[] = "settings";
 inline constexpr char16_t kChromeUISettingsHost16[] = u"settings";
 inline constexpr char kChromeUISettingsURL[] = "chrome://settings/";

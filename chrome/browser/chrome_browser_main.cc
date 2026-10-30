@@ -67,7 +67,6 @@
 #include "chrome/browser/profiles/profile_manager_observer.h"
 #include "chrome/browser/profiles/profiles_state.h"
 #include "chrome/browser/profiling_host/chrome_browser_main_extra_parts_profiling.h"
-#include "chrome/browser/segmentation_platform/chrome_browser_main_extra_parts_segmentation_platform.h"
 #include "chrome/browser/sessions/chrome_serialized_navigation_driver.h"
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/startup_data.h"
@@ -687,9 +686,6 @@ std::unique_ptr<content::BrowserMainParts> ChromeBrowserMainParts::Create(
   // Always add ChromeBrowserMainExtraPartsGpu last to make sure
   // GpuDataManager initialization could pick up about:flags settings.
   main_parts->AddParts(std::make_unique<ChromeBrowserMainExtraPartsGpu>());
-
-  main_parts->AddParts(
-      std::make_unique<ChromeBrowserMainExtraPartsSegmentationPlatform>());
 
   return main_parts;
 }

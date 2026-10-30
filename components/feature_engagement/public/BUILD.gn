@@ -61,7 +61,6 @@ static_library("public") {
   deps = [
     "//build:branding_buildflags",
     "//components/keyed_service/core",
-    "//components/segmentation_platform/public",
     "//components/webui/flags",
     "//extensions/buildflags",
   ]

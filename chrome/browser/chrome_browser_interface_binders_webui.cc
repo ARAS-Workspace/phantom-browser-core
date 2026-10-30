@@ -19,7 +19,6 @@
 #include "chrome/browser/ui/webui/omnibox/omnibox_internals.mojom.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
 #include "chrome/browser/ui/webui/policy/policy_ui.h"
-#include "chrome/browser/ui/webui/segmentation_internals/segmentation_internals_ui.h"
 #include "chrome/browser/ui/webui/subresource_filter/subresource_filter_internals_ui.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/history_clusters/history_clusters_internals/webui/history_clusters_internals_ui.h"
@@ -127,10 +126,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       history_clusters_internals::mojom::PageHandlerFactory,
       HistoryClustersInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      segmentation_internals::mojom::PageHandlerFactory,
-      SegmentationInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<chrome_urls::mojom::PageHandlerFactory,
                                          chrome_urls::ChromeUrlsUI>(map);

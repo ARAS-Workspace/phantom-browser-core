@@ -149,8 +149,6 @@
 #include "components/search_engines/template_url_prepopulate_data.h"
 #include "components/security_interstitials/content/insecure_form_blocking_page.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
-#include "components/segmentation_platform/embedder/default_model/device_switcher_result_dispatcher.h"
-#include "components/segmentation_platform/public/segmentation_platform_service.h"
 #include "components/sessions/core/session_id_generator.h"
 #include "components/signin/core/browser/active_primary_accounts_metrics_recorder.h"
 #include "components/signin/public/base/signin_pref_names.h"
@@ -173,7 +171,6 @@
 #include "components/universal_optout/prefs.h"
 #include "components/update_client/update_client.h"
 #include "components/variations/service/variations_service.h"
-#include "components/visited_url_ranking/internal/url_grouping/group_suggestions_service_impl.h"
 #include "components/webui/chrome_urls/pref_names.h"
 #include "components/webui/flags/pref_service_flags_storage.h"
 #include "content/public/browser/render_process_host.h"
@@ -964,8 +961,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   RegisterScreenshotPrefs(registry);
   search_engines::SearchEngineChoiceService::RegisterLocalStatePrefs(registry);
   secure_origin_allowlist::RegisterPrefs(registry);
-  segmentation_platform::SegmentationPlatformService::RegisterLocalStatePrefs(
-      registry);
   sessions::SessionIdGenerator::RegisterPrefs(registry);
   signin::ActivePrimaryAccountsMetricsRecorder::RegisterLocalStatePrefs(
       registry);
@@ -1154,10 +1149,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   SearchPrefetchService::RegisterProfilePrefs(registry);
   security_interstitials::InsecureFormBlockingPage::RegisterProfilePrefs(
       registry);
-  segmentation_platform::SegmentationPlatformService::RegisterProfilePrefs(
-      registry);
-  segmentation_platform::DeviceSwitcherResultDispatcher::RegisterProfilePrefs(
-      registry);
   SearchPreloadService::RegisterProfilePrefs(registry);
   SessionStartupPref::RegisterProfilePrefs(registry);
   SigninPrefs::RegisterProfilePrefs(registry);
@@ -1171,8 +1162,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   TemplateURLPrepopulateData::RegisterProfilePrefs(registry);
   tab_groups::prefs::RegisterProfilePrefs(registry);
   universal_optout::prefs::RegisterProfilePrefs(registry);
-  visited_url_ranking::GroupSuggestionsServiceImpl::RegisterProfilePrefs(
-      registry);
   omnibox::RegisterProfilePrefs(registry);
   ZeroSuggestProvider::RegisterProfilePrefs(registry);
   NtpCustomBackgroundService::RegisterProfilePrefs(registry);

@@ -100,9 +100,6 @@ inline constexpr base::FilePath::CharType kSecurePreferencesFilename[] =
     FILE_PATH_LITERAL("Secure Preferences");
 inline constexpr base::FilePath::CharType kServiceStateFileName[] =
     FILE_PATH_LITERAL("Service State");
-inline constexpr base::FilePath::CharType
-    kSegmentationPlatformStorageDirName[] =
-        FILE_PATH_LITERAL("Segmentation Platform");
 inline constexpr base::FilePath::CharType kSingletonCookieFilename[] =
     FILE_PATH_LITERAL("SingletonCookie");
 inline constexpr base::FilePath::CharType kSingletonLockFilename[] =

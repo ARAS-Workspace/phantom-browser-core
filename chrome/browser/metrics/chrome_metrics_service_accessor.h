@@ -80,10 +80,6 @@ namespace settings {
 class MetricsReportingHandler;
 }
 
-namespace segmentation_platform {
-class FieldTrialRegisterImpl;
-}
-
 namespace browser_sync {
 class DeviceInfoSyncClientImpl;
 }  // namespace browser_sync
@@ -149,7 +145,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class safe_browsing::ChromeSafeBrowsingUIManagerDelegate;
   friend class safe_browsing::ServicesDelegateDesktop;
   friend class safe_browsing::internal::ReporterRunner;
-  friend class segmentation_platform::FieldTrialRegisterImpl;
   friend class ChromeMetricsServiceClient;
   friend class NavigationMetricsRecorder;
   friend class ChromeBrowserMainExtraPartsGpu;

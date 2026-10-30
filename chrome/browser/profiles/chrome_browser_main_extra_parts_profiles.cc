@@ -153,7 +153,6 @@
 #include "chrome/browser/search_engines/template_url_fetcher_factory.h"
 #include "chrome/browser/search_engines/template_url_prepopulate_data_resolver_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service_factory.h"
 #include "chrome/browser/sessions/session_data_service_factory.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
@@ -197,8 +196,6 @@
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "chrome/browser/universal_optout/universal_optout_service_factory.h"
 #include "chrome/browser/updates/announcement_notification/announcement_notification_service_factory.h"
-#include "chrome/browser/visited_url_ranking/group_suggestions_service_factory.h"
-#include "chrome/browser/visited_url_ranking/visited_url_ranking_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/iwa_permissions_policy_cache.h"
 #include "chrome/browser/webauthn/immediate_request_rate_limiter_factory.h"
 #include "chrome/browser/webdata_services/web_data_service_factory.h"
@@ -545,7 +542,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   IdentityManagerFactory::EnsureFactoryAndDependeeFactoriesBuilt();
   ImmediateRequestRateLimiterFactory::GetInstance();
   InMemoryURLIndexFactory::GetInstance();
-  visited_url_ranking::VisitedURLRankingServiceFactory::GetInstance();
   LanguageModelManagerFactory::GetInstance();
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
@@ -655,7 +651,6 @@ void ChromeBrowserMainExtraPartsProfiles::
     SearchEnginePreconnectorKeyedServiceFactory::GetInstance();
   }
   SearchPreloadServiceFactory::GetInstance();
-  segmentation_platform::SegmentationPlatformServiceFactory::GetInstance();
   send_tab_to_self::SendTabToSelfClientServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   SessionDataServiceFactory::GetInstance();
@@ -708,7 +703,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   universal_optout::UniversalOptOutServiceFactory::GetInstance();
   UrlLanguageHistogramFactory::GetInstance();
   UserEducationServiceFactory::GetInstance();
-  visited_url_ranking::GroupSuggestionsServiceFactory::GetInstance();
   InitialWebUIProfileServiceFactory::GetInstance();
   WaapUIMetricsServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_EXTENSIONS)

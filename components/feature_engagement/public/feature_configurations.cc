@@ -10,9 +10,6 @@
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/group_constants.h"
-#include "components/segmentation_platform/public/features.h"
-
-namespace {}  // namespace
 
 namespace feature_engagement {
 

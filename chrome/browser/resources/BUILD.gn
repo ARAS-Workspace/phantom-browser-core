@@ -12,10 +12,7 @@ import("//tools/grit/repack.gni")
 import("//ui/webui/webui_features.gni")
 
 group("resources") {
-  public_deps = [
-    "saved_tab_groups_unsupported:resources",
-    "segmentation_internals:resources",
-  ]
+  public_deps = [ "saved_tab_groups_unsupported:resources" ]
 
   if (enable_webui_ntp) {
     public_deps += [
@@ -216,7 +213,6 @@ group("dev_ui_resources") {
     "net_internals:resources",
     "omnibox:resources",
     "predictors:resources",
-    "segmentation_internals:resources",
     "subresource_filter:resources",
     "suggest_internals:resources",
     "//components/autofill/core/browser/autofill_and_password_manager_internals:resources",
@@ -281,7 +277,6 @@ repack("dev_ui_paks") {
     "$root_gen_dir/chrome/net_internals_resources.pak",
     "$root_gen_dir/chrome/omnibox_resources.pak",
     "$root_gen_dir/chrome/predictors_resources.pak",
-    "$root_gen_dir/chrome/segmentation_internals_resources.pak",
     "$root_gen_dir/chrome/subresource_filter_internals_resources.pak",
     "$root_gen_dir/chrome/suggest_internals_resources.pak",
     "$root_gen_dir/components/autofill_and_password_manager_internals_resources.pak",
