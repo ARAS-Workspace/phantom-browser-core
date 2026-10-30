@@ -55,9 +55,6 @@ class WebappsClientDesktop : public ChromeWebappsClient {
   bool IsMlPromotionBlockedByHistoryGuardrail(
       content::BrowserContext* browsing_context,
       const GURL& manifest_id) const override;
-  segmentation_platform::SegmentationPlatformService*
-  GetSegmentationPlatformService(
-      content::BrowserContext* browsing_context) const override;
   std::optional<webapps::AppId> GetAppIdForWebContents(
       content::WebContents* web_contents) override;
 
@@ -65,9 +62,6 @@ class WebappsClientDesktop : public ChromeWebappsClient {
   friend base::NoDestructor<WebappsClientDesktop>;
 
   WebappsClientDesktop() = default;
-
-  raw_ptr<segmentation_platform::SegmentationPlatformService>
-      segmentation_platform_service_for_testing_;
 };
 
 }  // namespace webapps

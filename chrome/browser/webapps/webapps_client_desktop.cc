@@ -4,12 +4,10 @@
 
 #include "chrome/browser/webapps/webapps_client_desktop.h"
 
-#include "base/check_is_test.h"
 #include "base/no_destructor.h"
 #include "build/build_config.h"
 #include "chrome/browser/banners/app_banner_manager_desktop.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/visited_manifest_manager.h"
@@ -258,18 +256,6 @@ bool WebappsClientDesktop::IsMlPromotionBlockedByHistoryGuardrail(
           /*currently_showing=*/std::nullopt);
   return synthetic_result.failure() ==
          user_education::FeaturePromoResult::kBlockedByGracePeriod;
-}
-
-segmentation_platform::SegmentationPlatformService*
-WebappsClientDesktop::GetSegmentationPlatformService(
-    content::BrowserContext* browser_context) const {
-  if (segmentation_platform_for_testing()) {  // IN-TEST
-    CHECK_IS_TEST();
-    return segmentation_platform_for_testing();  // IN-TEST
-  }
-  CHECK(browser_context);
-  return segmentation_platform::SegmentationPlatformServiceFactory::
-      GetForProfile(Profile::FromBrowserContext(browser_context));
 }
 
 std::optional<webapps::AppId> WebappsClientDesktop::GetAppIdForWebContents(

@@ -13,8 +13,6 @@
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/ui/webid/account_selection_view.h"
-#include "chrome/browser/webid/proto/fedcm_clickthrough_rate_metadata.pb.h"
-#include "components/segmentation_platform/public/result.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/page_user_data.h"
 #include "content/public/browser/webid/identity_request_dialog_controller.h"
@@ -28,14 +26,6 @@ namespace webid {
 enum class FederatedLoginResult;
 }  // namespace webid
 }  // namespace content
-
-namespace optimization_guide {
-class OptimizationGuideDecider;
-}
-
-namespace segmentation_platform {
-class SegmentationPlatformService;
-}
 
 using AccountSelectionCallback =
     content::IdentityRequestDialogController::AccountSelectionCallback;
@@ -54,38 +44,19 @@ class IdentityDialogController
     : public content::IdentityRequestDialogController,
       public AccountSelectionView::Delegate {
  public:
-  explicit IdentityDialogController(
-      content::WebContents* rp_web_contents,
-      segmentation_platform::SegmentationPlatformService* service = nullptr,
-      optimization_guide::OptimizationGuideDecider* decider = nullptr);
+  explicit IdentityDialogController(content::WebContents* rp_web_contents);
 
   IdentityDialogController(const IdentityDialogController&) = delete;
   IdentityDialogController& operator=(const IdentityDialogController&) = delete;
 
   ~IdentityDialogController() override;
 
-  // This enum describes the user action taken when the UI shown uses
-  // segmentation platform's UI volume recommendation and is used for
-  // histograms. Do not remove or modify existing values, but you may add new
-  // values at the end.
-  // LINT.IfChange(UserAction)
-
-  enum class UserAction {
-    // kSuccess = 0,  // Deprecated.
-    kIgnored = 1,
-    kClosed = 2,
-    kSuccess = 3,
-    kMaxValue = kSuccess
-  };
-
-  // LINT.ThenChange(//tools/metrics/histograms/metadata/blink/enums.xml:FedCmUserAction)
-
   // content::IdentityRequestDelegate
   int GetBrandIconMinimumSize(blink::mojom::RpMode rp_mode) override;
   int GetBrandIconIdealSize(blink::mojom::RpMode rp_mode) override;
 
   // content::IdentityRequestDialogController
-  void GetPassiveDialogVolume(GetPassiveDialogVolumeCallback cb) override;
+  using content::IdentityRequestDialogController::GetPassiveDialogVolume;
   bool ShowAccountsDialog(
       content::RelyingPartyData rp_data,
       const std::vector<IdentityProviderDataPtr>& identity_provider_data,
@@ -167,18 +138,6 @@ class IdentityDialogController
 
   // Set acting_task_id for testing purposes.
 
-  // Requests a UI volume recommendation from |segmentation_platform_service_|.
-  void RequestUiVolumeRecommendation(
-      segmentation_platform::ClassificationResultCallback callback);
-
-  void OnRequestUiVolumeRecommendationResultReceived(
-      const segmentation_platform::ClassificationResult&
-          ui_volume_recommendation);
-
-  // Records the action the user has taken on the UI shown when a UI volume
-  // recommendation from |segmentation_platform_service_| is used.
-  void CollectTrainingData(UserAction user_action);
-
  private:
   friend class IdentityDialogControllerTest;
   friend class IdentityDialogControllerBrowserTest;
@@ -186,9 +145,6 @@ class IdentityDialogController
   // Attempts to set `account_view_` if it is not already set -- directly on
   // Android, via TabFeatures on desktop.
   bool TrySetAccountView();
-
-  // Gets the clickthrough rate on the RP aggregated across all users.
-  webid::FedCmClickthroughRateMetadata GetFedCmClickthroughRateMetadata();
 
   // Whether to show FedCM UI or not.
   bool ShouldShowFedCmUi();
@@ -209,28 +165,6 @@ class IdentityDialogController
   // Wheter we invoked any show methods. UI may be shown be not invoked in cases
   // such as an active actor task.
   bool did_invoke_show_ui_ = false;
-  // Whether we show any FedCM UI or not. Excludes the loading dialog since that
-  // one is not something that modifies user state or is actionable by the user.
-  bool did_show_ui_ = false;
-  std::optional<content::IdentityRequestDialogController::PassiveDialogVolume>
-      passive_dialog_volume_;
-  GetPassiveDialogVolumeCallback passive_dialog_volume_callback_;
-
-  // Request ID associated with a |GetClassificationResult| call to
-  // |segmentation_platform_service_|. This is nullopt when the
-  // |GetClassificationResult| call has not returned a result yet.
-  std::optional<segmentation_platform::TrainingRequestId> training_request_id_;
-
-  // Service which returns a recommendation for UI volume.
-  raw_ptr<segmentation_platform::SegmentationPlatformService>
-      segmentation_platform_service_{nullptr};
-
-  // Optimization guide decider for information about URLs that have recently
-  // been navigated to. e.g. Aggregated FedCM clickthrough rate.
-  raw_ptr<optimization_guide::OptimizationGuideDecider>
-      optimization_guide_decider_{nullptr};
-
-  base::WeakPtrFactory<IdentityDialogController> weak_ptr_factory_{this};
 };
 
 #endif  // CHROME_BROWSER_UI_WEBID_IDENTITY_DIALOG_CONTROLLER_H_

@@ -7,22 +7,12 @@
 #include <memory>
 
 #include "base/check_is_test.h"
-#include "base/command_line.h"
-#include "base/feature_list.h"
 #include "base/memory/weak_ptr.h"
-#include "base/notreached.h"
 #include "base/run_loop.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/task_runner.h"
 #include "base/time/time.h"
-#include "components/segmentation_platform/public/constants.h"
-#include "components/segmentation_platform/public/prediction_options.h"
-#include "components/segmentation_platform/public/proto/segmentation_platform.pb.h"
-#include "components/segmentation_platform/public/result.h"
-#include "components/segmentation_platform/public/segmentation_platform_service.h"
-#include "components/segmentation_platform/public/types/processed_value.h"
 #include "components/webapps/browser/banners/app_banner_manager.h"
-#include "components/webapps/browser/features.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
 #include "components/webapps/browser/installable/metrics/site_manifest_metrics_task.h"
 #include "components/webapps/browser/installable/metrics/site_quality_metrics_task.h"
@@ -50,8 +40,6 @@
 namespace webapps {
 
 namespace {
-const char kDisableGuardrailsSwitch[] = "disable-ml-install-history-guardrails";
-
 enum class ManifestUrlInvalid {
   kEmpty = 0,
   kInvalid = 1,
@@ -210,30 +198,6 @@ void MLInstallabilityPromoter::AwaitMetricsCollectionTasksCompleteForTesting() {
   run_loop_for_testing_.reset();
 }
 
-GURL MLInstallabilityPromoter::GetProjectedManifestIdAfterMetricsCollection() {
-  switch (state_) {
-    case MLPipelineState::kInactive:
-    case MLPipelineState::kRunningMetricTasks:
-      NOTREACHED() << "Cannot get manifest id without metrics collected";
-    case MLPipelineState::kUKMCollectionComplete:
-    case MLPipelineState::kMLClassificationRequested:
-    case MLPipelineState::kWaitingForVisibility:
-    case MLPipelineState::kComplete:
-      break;
-  }
-  GURL manifest_id;
-  if (blink::IsEmptyManifest(manifest_)) {
-    manifest_id = site_url_.GetWithoutRef();
-  } else {
-    manifest_id = manifest_->id;
-    if (!manifest_id.is_valid()) {
-      manifest_id = site_url_.GetWithoutRef();
-    }
-  }
-  CHECK(manifest_id.is_valid()) << " invalid manifest_id: " << manifest_id;
-  return manifest_id;
-}
-
 void MLInstallabilityPromoter::EmitUKMs() {
   state_ = MLPipelineState::kUKMCollectionComplete;
   ukm::SourceId source_id =
@@ -317,104 +281,7 @@ void MLInstallabilityPromoter::EmitUKMs() {
 
 void MLInstallabilityPromoter::RequestMlClassification() {
   CHECK_EQ(state_, MLPipelineState::kUKMCollectionComplete);
-  state_ = MLPipelineState::kMLClassificationRequested;
-
-  if (!app_banner_manager_) {
-    state_ = MLPipelineState::kComplete;
-    return;
-  }
-  WebappsClient* client = WebappsClient::Get();
-  segmentation_platform::SegmentationPlatformService* segmentation =
-      client->GetSegmentationPlatformService(
-          web_contents()->GetBrowserContext());
-  if (!segmentation || !base::FeatureList::IsEnabled(
-                           features::kWebAppsEnableMLModelForPromotion)) {
-    state_ = MLPipelineState::kComplete;
-    return;
-  }
-  if (client->IsAppFullyInstalledForSiteUrl(web_contents()->GetBrowserContext(),
-                                            site_url_) ||
-      client->IsInAppBrowsingContext(web_contents())) {
-    // Finish the pipeline early if an app is installed here.
-    state_ = MLPipelineState::kComplete;
-    return;
-  }
-  if ((!manifest_ || !manifest_->has_valid_specified_start_url) &&
-      WebappsClient::Get()->IsUrlControlledBySeenManifest(
-          web_contents()->GetBrowserContext(), site_url_)) {
-    state_ = MLPipelineState::kComplete;
-    return;
-  }
-
-  auto input_context =
-      base::MakeRefCounted<segmentation_platform::InputContext>();
-  input_context->metadata_args = {
-      {"origin", segmentation_platform::processing::ProcessedValue(
-                     url::Origin::Create(site_url_).GetURL())},
-      {"site_url",
-       segmentation_platform::processing::ProcessedValue(site_url_)},
-      {"manifest_id", segmentation_platform::processing::ProcessedValue(
-                          GetProjectedManifestIdAfterMetricsCollection())}};
-  segmentation_platform::PredictionOptions prediction_options;
-  prediction_options.on_demand_execution = true;
-  segmentation->GetClassificationResult(
-      segmentation_platform::kWebAppInstallationPromoKey, prediction_options,
-      input_context,
-      base::BindOnce(&MLInstallabilityPromoter::OnClassificationResult,
-                     weak_factory_.GetWeakPtr()));
-}
-
-void MLInstallabilityPromoter::OnClassificationResult(
-    const segmentation_platform::ClassificationResult& result) {
-  CHECK_EQ(state_, MLPipelineState::kMLClassificationRequested);
   state_ = MLPipelineState::kComplete;
-  if (result.status != segmentation_platform::PredictionStatus::kSucceeded) {
-    return;
-  }
-  // TODO(crbug.com/40272826) Remove this.
-  if (!app_banner_manager_) {
-    // Exit pipeline early if the AppBannerManager is destroyed.
-    return;
-  }
-  WebappsClient* client = WebappsClient::Get();
-  if (client->IsAppFullyInstalledForSiteUrl(web_contents()->GetBrowserContext(),
-                                            site_url_)) {
-    // An installation could have occurred while executing the ML logic.
-    return;
-  }
-  GURL manifest_id = GetProjectedManifestIdAfterMetricsCollection();
-  bool has_icons = site_quality_metrics_.non_default_favicons_count > 0 ||
-                   !manifest_->icons.empty();
-  bool blocked_by_history_guardrails =
-      client->IsMlPromotionBlockedByHistoryGuardrail(
-          web_contents()->GetBrowserContext(), manifest_id);
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          kDisableGuardrailsSwitch)) {
-    blocked_by_history_guardrails = false;
-  }
-  // Promotion from this Ml result is blocked by guardrails if it doesn't have
-  // any icons, or if there has been a history of recent ignores. See the
-  // implementation of IsMlPromotionBlockedByHistoryGuardrail per platform for
-  // more details.
-  bool is_ml_promotion_blocked_by_guardrails =
-      !has_icons || blocked_by_history_guardrails;
-  ml_result_reporter_ = std::make_unique<MlInstallResultReporter>(
-      web_contents()->GetBrowserContext()->GetWeakPtr(), result.request_id,
-      result.ordered_labels[0], manifest_id,
-      is_ml_promotion_blocked_by_guardrails);
-
-  if (current_install_) {
-    current_install_->OnMlResultForInstallation(
-        base::PassKey<MLInstallabilityPromoter>(),
-        std::move(ml_result_reporter_));
-    return;
-  }
-
-  if (web_contents()->GetVisibility() != content::Visibility::VISIBLE) {
-    state_ = MLPipelineState::kWaitingForVisibility;
-    return;
-  }
-  MaybeReportResultToAppBannerManager();
 }
 
 void MLInstallabilityPromoter::MaybeReportResultToAppBannerManager() {

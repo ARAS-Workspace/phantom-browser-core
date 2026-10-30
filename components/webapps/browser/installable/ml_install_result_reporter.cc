@@ -8,11 +8,8 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/field_trial_params.h"
-#include "base/metrics/histogram_base.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/rand_util.h"
-#include "components/segmentation_platform/public/segmentation_platform_service.h"
-#include "components/segmentation_platform/public/trigger.h"
 #include "components/webapps/browser/banners/app_banner_manager.h"
 #include "components/webapps/browser/features.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
@@ -24,12 +21,10 @@ namespace webapps {
 
 MlInstallResultReporter::MlInstallResultReporter(
     base::WeakPtr<content::BrowserContext> browser_context,
-    segmentation_platform::TrainingRequestId training_request,
     std::string ml_output_label,
     const GURL& manifest_id,
     bool ml_promotion_blocked_by_guardrail)
     : browser_context_(browser_context),
-      training_request_(training_request),
       ml_output_label_(ml_output_label),
       manifest_id_(manifest_id),
       ml_promotion_blocked_by_guardrail_(ml_promotion_blocked_by_guardrail) {
@@ -86,8 +81,7 @@ void MlInstallResultReporter::ReportResultInternal(
     MlInstallResponse response) {
   WebappsClient* client = WebappsClient::Get();
   CHECK(client);
-  if (reported_ || !browser_context_ ||
-      !client->GetSegmentationPlatformService(browser_context_.get())) {
+  if (reported_ || !browser_context_) {
     return;
   }
   // This training request can only be reported once.
@@ -145,17 +139,6 @@ void MlInstallResultReporter::ReportResultInternal(
     base::UmaHistogramEnumeration("WebApp.MLInstallPromo.UserResponse",
                                   response);
   }
-
-  segmentation_platform::SegmentationPlatformService* segmentation =
-      client->GetSegmentationPlatformService(browser_context_.get());
-  segmentation_platform::TrainingLabels training_labels;
-  training_labels.output_metric =
-      std::make_pair("WebApps.MlInstall.DialogResponse",
-                     static_cast<base::HistogramBase::Sample32>(response));
-  segmentation->CollectTrainingData(
-      segmentation_platform::proto::SegmentId::
-          OPTIMIZATION_TARGET_WEB_APP_INSTALLATION_PROMO,
-      training_request_, training_labels, base::DoNothing());
 }
 
 }  // namespace webapps

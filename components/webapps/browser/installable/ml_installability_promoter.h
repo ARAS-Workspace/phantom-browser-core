@@ -12,7 +12,6 @@
 #include "base/run_loop.h"
 #include "base/time/time.h"
 #include "base/types/pass_key.h"
-#include "components/segmentation_platform/public/trigger.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
 #include "components/webapps/browser/installable/metrics/site_quality_metrics_task.h"
 #include "components/webapps/browser/installable/ml_install_result_reporter.h"
@@ -32,10 +31,6 @@ class StoragePartition;
 class WebContents;
 enum class Visibility;
 }  // namespace content
-
-namespace segmentation_platform {
-struct ClassificationResult;
-}  // namespace segmentation_platform
 
 namespace webapps {
 class AppBannerManager;
@@ -66,9 +61,6 @@ struct SiteInstallMetrics {
 //
 // If that is done properly, then this class will:
 // - Gather metrics on the given page load (to be used by ML model).
-// - Call the segmentation service via
-//   `AppBannerManager::GetSegmentationPlatformService()` to request
-//   classification for the `kWebAppInstallationPromoKey`.
 // - Automatically report the result to Ml if an installation is already showing
 //   (AKA triggered by the user or developer) and exit.
 // - Automatically reject the classification if the
@@ -85,7 +77,7 @@ struct SiteInstallMetrics {
 // The following methods are used from AppBannerManager:
 // `IsAppFullyInstalledForSiteUrl`, `IsAppPartiallyInstalledForSiteUrl`,
 // `SaveInstallation*`, `IsMlPromotionBlockedByHistoryGuardrail`,
-// `OnMlInstallPrediction`, `GetSegmentationPlatformService`.
+// `OnMlInstallPrediction`.
 //
 // Browsertests are located in
 // chrome/browser/web_applications/ml_promotion_browsertest.cc
@@ -142,12 +134,8 @@ class MLInstallabilityPromoter
   // contents changes to be properly measured.
   void MaybeCompleteMetricsCollection();
 
-  // Can only be called after metrics are collected.
-  GURL GetProjectedManifestIdAfterMetricsCollection();
   void EmitUKMs();
   void RequestMlClassification();
-  void OnClassificationResult(
-      const segmentation_platform::ClassificationResult& result);
   void MaybeReportResultToAppBannerManager();
 
   // contents::WebContentsObserver overrides

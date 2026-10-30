@@ -5,9 +5,6 @@
 #ifndef COMPONENTS_WEBAPPS_BROWSER_WEBAPPS_CLIENT_H_
 #define COMPONENTS_WEBAPPS_BROWSER_WEBAPPS_CLIENT_H_
 
-#include <memory>
-
-#include "base/auto_reset.h"
 #include "base/functional/callback_forward.h"
 #include "build/build_config.h"
 #include "components/security_state/core/security_state.h"
@@ -27,10 +24,6 @@ class WebContents;
 namespace infobars {
 class ContentInfoBarManager;
 }  // namespace infobars
-
-namespace segmentation_platform {
-class SegmentationPlatformService;
-}  // namespace segmentation_platform
 
 namespace url {
 class Origin;
@@ -129,31 +122,11 @@ class WebappsClient {
       content::BrowserContext* browsing_context,
       const GURL& manifest_id) const = 0;
 
-  virtual segmentation_platform::SegmentationPlatformService*
-  GetSegmentationPlatformService(
-      content::BrowserContext* browsing_context) const = 0;
-
-  using ScopedSegmentationServiceOverride = base::AutoReset<
-      std::unique_ptr<segmentation_platform::SegmentationPlatformService>>;
-  ScopedSegmentationServiceOverride OverrideSegmentationServiceForTesting(
-      std::unique_ptr<segmentation_platform::SegmentationPlatformService>
-          service);
-
   // Returns the id of the app that controls the last committed url of the given
   // `web_contents`.
   // Note: On Android this always returns `std::nullopt`.
   virtual std::optional<webapps::AppId> GetAppIdForWebContents(
       content::WebContents* web_contents) = 0;
-
- protected:
-  segmentation_platform::SegmentationPlatformService*
-  segmentation_platform_for_testing() const {
-    return segmentation_platform_for_testing_.get();
-  }
-
- private:
-  std::unique_ptr<segmentation_platform::SegmentationPlatformService>
-      segmentation_platform_for_testing_;
 };
 
 }  // namespace webapps

@@ -28,7 +28,6 @@ source_set("webapps_client") {
     "//components/security_state/core",
     "//components/webapps/common",
   ]
-  deps = [ "//components/segmentation_platform/public" ]
 }
 
 source_set("browser") {
@@ -110,7 +109,6 @@ source_set("browser") {
     "//components/favicon_base",
     "//components/permissions",
     "//components/security_state/core",
-    "//components/segmentation_platform/public",
     "//components/services/app_service/public/cpp:app_types",
     "//components/site_engagement/content",
     "//components/variations",

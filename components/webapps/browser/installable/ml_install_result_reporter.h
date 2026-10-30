@@ -8,7 +8,6 @@
 #include <optional>
 
 #include "base/memory/weak_ptr.h"
-#include "components/segmentation_platform/public/trigger.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
 #include "url/gurl.h"
 
@@ -45,7 +44,6 @@ class MlInstallResultReporter {
 
   MlInstallResultReporter(
       base::WeakPtr<content::BrowserContext> browser_context,
-      segmentation_platform::TrainingRequestId training_request,
       std::string ml_output_label,
       const GURL& manifest_id,
       bool ml_promotion_blocked_by_guardrail);
@@ -70,7 +68,6 @@ class MlInstallResultReporter {
                             MlInstallResponse response);
 
   const base::WeakPtr<content::BrowserContext> browser_context_;
-  const segmentation_platform::TrainingRequestId training_request_;
   std::string ml_output_label_;
   const GURL manifest_id_;
   bool ml_promotion_blocked_by_guardrail_;
