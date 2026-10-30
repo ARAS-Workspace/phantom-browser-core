@@ -18,7 +18,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "base/trace_event/trace_event.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/sync/base/custom_passphrase_bootstrap_token.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
@@ -101,33 +100,8 @@ SyncTransportDataStartupState ValidateSyncTransportData(
 
 }  // namespace
 
-class SyncEngineImpl::NetworkTimeObserverImpl
-    : public network_time::NetworkTimeTracker::NetworkTimeObserver {
- public:
-  NetworkTimeObserverImpl(network_time::NetworkTimeTracker* tracker,
-                          SyncEngineImpl* engine)
-      : network_time::NetworkTimeTracker::NetworkTimeObserver(tracker),
-        engine_(engine) {}
-
-  void OnNetworkTimeChanged(
-      const network_time::TimeTracker::TimeTrackerState state) override {}
-
-  void OnNetworkTimeTrackerDestroyed(
-      network_time::NetworkTimeTracker* tracker) override {
-    engine_->OnNetworkTimeTrackerDestroyed();
-  }
-
- private:
-  // Points to the owning `SyncEngineImpl` instance. This raw pointer is
-  // guaranteed to be safe because `NetworkTimeObserverImpl` is owned as a
-  // `std::unique_ptr` by `SyncEngineImpl`, meaning its lifetime is strictly
-  // bounded by and cannot exceed that of its owner.
-  raw_ptr<SyncEngineImpl> engine_;
-};
-
 SyncEngineImpl::SyncEngineImpl(
     const std::string& name,
-    network_time::NetworkTimeTracker* network_time_tracker,
     std::unique_ptr<ActiveDevicesProvider> active_devices_provider,
     std::unique_ptr<SyncTransportDataPrefs> prefs,
     const base::FilePath& sync_data_folder,
@@ -135,15 +109,10 @@ SyncEngineImpl::SyncEngineImpl(
     : sync_task_runner_(std::move(sync_task_runner)),
       name_(name),
       prefs_(std::move(prefs)),
-      active_devices_provider_(std::move(active_devices_provider)),
-      network_time_tracker_(network_time_tracker) {
+      active_devices_provider_(std::move(active_devices_provider)) {
   DCHECK(prefs_);
   backend_ = base::MakeRefCounted<SyncEngineBackend>(
       name_, sync_data_folder, weak_ptr_factory_.GetWeakPtr());
-  if (network_time_tracker_) {
-    network_time_observer_ =
-        std::make_unique<NetworkTimeObserverImpl>(network_time_tracker_, this);
-  }
 }
 
 SyncEngineImpl::~SyncEngineImpl() {
@@ -540,12 +509,6 @@ void SyncEngineImpl::RecordNigoriMemoryUsageAndCountsHistograms() {
       base::BindOnce(
           &SyncEngineBackend::RecordNigoriMemoryUsageAndCountsHistograms,
           backend_));
-}
-
-void SyncEngineImpl::OnNetworkTimeTrackerDestroyed() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  network_time_tracker_ = nullptr;
-  network_time_observer_.reset();
 }
 
 // static

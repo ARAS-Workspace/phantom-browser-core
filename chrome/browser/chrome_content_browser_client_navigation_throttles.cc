@@ -8,7 +8,6 @@
 #include "base/feature_list.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/custom_handlers/chrome_protocol_handler_navigation_throttle.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/data_sharing/data_sharing_navigation_throttle.h"
@@ -144,8 +143,7 @@ void HandleSSLErrorWrapper(
 
   SSLErrorHandler::HandleSSLError(
       web_contents, cert_error, ssl_info, request_url,
-      std::move(blocking_page_ready_callback),
-      g_browser_process->network_time_tracker(), captive_portal_service,
+      std::move(blocking_page_ready_callback), captive_portal_service,
       std::make_unique<ChromeSecurityBlockingPageFactory>(),
       is_ssl_error_override_allowed_for_origin);
 }

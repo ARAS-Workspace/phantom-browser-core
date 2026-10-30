@@ -804,7 +804,6 @@ source_set("impl") {
     "//components/history_clusters/core",
     "//components/infobars/content",
     "//components/language/core/browser",
-    "//components/network_time",
     "//components/pref_registry",
     "//components/proxy_config",
     "//components/reporting/encryption:primitives",

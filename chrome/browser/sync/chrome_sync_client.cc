@@ -16,13 +16,11 @@
 #include "base/syslog_logging.h"
 #include "base/task/sequenced_task_runner.h"
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/sync/glue/extensions_activity_monitor.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_paths.h"
 #include "components/browser_sync/sync_engine_factory_impl.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/model/data_type_store_service.h"
@@ -86,11 +84,6 @@ PrefService* ChromeSyncClient::GetPrefService() {
 signin::IdentityManager* ChromeSyncClient::GetIdentityManager() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   return identity_manager_;
-}
-
-network_time::NetworkTimeTracker* ChromeSyncClient::GetNetworkTimeTracker() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return g_browser_process->network_time_tracker();
 }
 
 base::FilePath ChromeSyncClient::GetLocalSyncBackendFolder() {

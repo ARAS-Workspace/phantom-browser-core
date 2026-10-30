@@ -56,7 +56,6 @@ include_rules = [
   "+components/messages",
   "+components/metrics",
   "+components/network_session_configurator/common",
-  "+components/network_time",
   "+components/offline_pages/buildflags",
   "+components/offline_pages/core",
   "+components/omnibox/browser",

@@ -43,7 +43,7 @@ SyncEngineFactoryImpl::CreateSyncEngine(
     const std::string& name,
     const signin::GaiaIdHash& gaia_id_hash) {
   return std::make_unique<syncer::SyncEngineImpl>(
-      name, sync_client_->GetNetworkTimeTracker(),
+      name,
       std::make_unique<browser_sync::ActiveDevicesProviderImpl>(
           device_info_tracker_, base::DefaultClock::GetInstance()),
       std::make_unique<syncer::SyncTransportDataPrefs>(

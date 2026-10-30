@@ -21,13 +21,10 @@
 #include "base/task/thread_pool.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
-#include "base/test/simple_test_clock.h"
-#include "base/test/simple_test_tick_clock.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/test/test_timeouts.h"
 #include "base/time/time.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/os_crypt/async/browser/test_utils.h"
 #include "components/os_crypt/async/common/encryptor.h"
 #include "components/prefs/testing_pref_service.h"
@@ -158,20 +155,6 @@ class SyncEngineImplTest : public testing::Test {
     ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
 
     SyncTransportDataPrefs::RegisterProfilePrefs(pref_service_.registry());
-    network_time::NetworkTimeTracker::RegisterPrefs(pref_service_.registry());
-
-    auto test_clock = std::make_unique<base::SimpleTestClock>();
-    test_clock_ = test_clock.get();
-    test_clock_->SetNow(base::Time::Now());
-
-    auto test_tick_clock = std::make_unique<base::SimpleTestTickClock>();
-    test_tick_clock_ = test_tick_clock.get();
-    test_tick_clock_->Advance(base::Seconds(1));
-
-    network_time_tracker_ = std::make_unique<network_time::NetworkTimeTracker>(
-        std::move(test_clock), std::move(test_tick_clock), &pref_service_,
-        /*url_loader_factory=*/nullptr,
-        network_time::NetworkTimeTracker::FETCHES_ON_DEMAND_ONLY);
 
     sync_task_runner_ = base::ThreadPool::CreateSequencedTaskRunner(
         {base::MayBlock(), base::TaskPriority::USER_VISIBLE,
@@ -182,8 +165,7 @@ class SyncEngineImplTest : public testing::Test {
         .WillByDefault(Return(
             ByMove(ActiveDevicesInvalidationInfo::CreateUninitialized())));
     backend_ = std::make_unique<SyncEngineImpl>(
-        "fakeDebugName", network_time_tracker_.get(),
-        std::move(mock_active_devices_provider),
+        "fakeDebugName", std::move(mock_active_devices_provider),
         std::make_unique<SyncTransportDataPrefs>(
             &pref_service_, signin::GaiaIdHash::FromGaiaId(kTestGaiaId)),
         temp_dir_.GetPath().Append(base::FilePath(kTestSyncDir)),
@@ -300,18 +282,11 @@ class SyncEngineImplTest : public testing::Test {
     run_loop.Run();
   }
 
-  network_time::NetworkTimeTracker* GetNetworkTimeTracker() {
-    return network_time_tracker_.get();
-  }
-
   base::test::TaskEnvironment task_environment_;
   base::ScopedTempDir temp_dir_;
   TestingPrefServiceSimple pref_service_;
   NiceMock<MockSyncEngineHost> mock_host_;
   scoped_refptr<base::SequencedTaskRunner> sync_task_runner_;
-  std::unique_ptr<network_time::NetworkTimeTracker> network_time_tracker_;
-  raw_ptr<base::SimpleTestClock> test_clock_ = nullptr;
-  raw_ptr<base::SimpleTestTickClock> test_tick_clock_ = nullptr;
   std::unique_ptr<SyncEngineImpl> backend_;
   std::unique_ptr<FakeSyncManagerFactory> fake_manager_factory_;
   raw_ptr<FakeSyncManager> fake_manager_ = nullptr;

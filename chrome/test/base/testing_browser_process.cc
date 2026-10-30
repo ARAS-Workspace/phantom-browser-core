@@ -12,8 +12,6 @@
 #include "base/path_service.h"
 #include "base/strings/string_util.h"
 #include "base/test/task_environment.h"
-#include "base/time/default_clock.h"
-#include "base/time/default_tick_clock.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browser_process_impl.h"
@@ -38,7 +36,6 @@
 #include "components/application_locale_storage/application_locale_storage.h"
 #include "components/embedder_support/origin_trials/origin_trials_settings_storage.h"
 #include "components/metrics/metrics_service.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/os_crypt/async/browser/test_utils.h"
 #include "components/permissions/permissions_client.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
@@ -518,19 +515,6 @@ TestingBrowserProcess::component_updater() {
   return component_updater_.get();
 }
 
-network_time::NetworkTimeTracker*
-TestingBrowserProcess::network_time_tracker() {
-  if (!network_time_tracker_) {
-    CHECK(local_state());
-    network_time_tracker_ = std::make_unique<network_time::NetworkTimeTracker>(
-        std::unique_ptr<base::Clock>(new base::DefaultClock()),
-        std::unique_ptr<base::TickClock>(new base::DefaultTickClock()),
-        local_state(), nullptr,
-        network_time::NetworkTimeTracker::FETCHES_ON_DEMAND_ONLY);
-  }
-  return network_time_tracker_.get();
-}
-
 resource_coordinator::ResourceCoordinatorParts*
 TestingBrowserProcess::resource_coordinator_parts() {
   if (!resource_coordinator_parts_) {
@@ -615,7 +599,6 @@ void TestingBrowserProcess::MaybeStartTearDown() {
   }
   is_torn_down_ = true;
 
-  network_time_tracker_.reset();
 #if BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
   notification_ui_manager_.reset();
 #endif

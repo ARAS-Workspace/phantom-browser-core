@@ -128,7 +128,6 @@ source_set("sync") {
     "//components/language/core/browser",
     "//components/language/core/common",
     "//components/metrics/demographics",
-    "//components/network_time",
     "//components/performance_manager",
     "//components/privacy_sandbox:privacy_sandbox_prefs",
     "//components/saved_tab_groups/public",

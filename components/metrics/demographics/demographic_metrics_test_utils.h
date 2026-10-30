@@ -11,7 +11,6 @@
 #include "base/time/time.h"
 #include "components/metrics/metrics_log_store.h"
 #include "components/metrics/metrics_service.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/test/fake_server.h"
 #include "third_party/metrics_proto/chrome_user_metrics_extension.pb.h"
@@ -43,14 +42,8 @@ void AddUserBirthYearAndGenderToSyncServer(
     int birth_year,
     UserDemographicsProto::Gender gender);
 
-// Updates the network time to approximately |now|.
-void UpdateNetworkTime(const base::Time& now,
-                       network_time::NetworkTimeTracker* time_tracker);
-
 // Returns the maximum eligible birth year for the given time. The returned year
-// is inclusive; i.e. years <= the returned year are eligible. In  order to
-// compute the synced test user's age, the network time should have already been
-// set to |now|.
+// is inclusive; i.e. years <= the returned year are eligible.
 int GetMaximumEligibleBirthYear(const base::Time& now);
 
 // Gets the noised birth year of the user, where the |raw_birth_year|

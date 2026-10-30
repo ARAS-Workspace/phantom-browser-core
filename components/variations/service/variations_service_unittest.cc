@@ -112,9 +112,6 @@ class TestVariationsServiceClient : public VariationsServiceClient {
       override {
     return test_shared_loader_factory_;
   }
-  network_time::NetworkTimeTracker* GetNetworkTimeTracker() override {
-    return nullptr;
-  }
   bool OverridesRestrictParameter(std::string* parameter) override {
     if (restrict_parameter_.empty()) {
       return false;

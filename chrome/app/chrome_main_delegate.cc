@@ -35,6 +35,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
 #include "base/threading/hang_watcher.h"
+#include "base/time/default_clock.h"
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "build/build_config.h"
@@ -67,7 +68,6 @@
 #include "components/metrics/persistent_histograms.h"
 #include "components/sampling_profiler/thread_profiler.h"
 #include "components/startup_metric_utils/common/startup_metric_utils.h"
-#include "components/variations/service/variations_network_clock.h"
 #include "components/variations/variations_ids_provider.h"
 #include "components/version_info/channel.h"
 #include "components/version_info/version_info.h"
@@ -720,18 +720,9 @@ ChromeMainDelegate::CreateVariationsIdsProvider() {
 #if defined(BUILDING_CHROME_RENDERER)
   NOTREACHED();
 #else   // defined(BUILDING_CHROME_RENDERER)
-  // At the time this method is called, the global browser instance is not yet
-  // created. This means the `NetworkTimeTracker` is still owned by the
-  // 'ChromeFeatureListCreator', which is within the `startup_data` held by the
-  // `ChromeContentBrowserClient`. Once the global browser instance is
-  // created, it will take over ownership of the NetworkTimeTracker.
-
   return ::variations::VariationsIdsProvider::CreateInstance(
       ::variations::VariationsIdsProvider::Mode::kUseSignedInState,
-      std::make_unique<::variations::VariationsNetworkClock>(
-          chrome_content_browser_client_->startup_data()
-              ->chrome_feature_list_creator()
-              ->network_time_tracker()));
+      std::make_unique<base::DefaultClock>());
 #endif  // defined(BUILDING_CHROME_RENDERER)
 }
 

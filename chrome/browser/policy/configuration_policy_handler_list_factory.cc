@@ -66,7 +66,6 @@
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/metrics/metrics_pref_names.h"
-#include "components/network_time/network_time_pref_names.h"
 #include "components/ntp_tiles/enterprise/ntp_shortcuts_policy_handler.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/omnibox/common/omnibox_features.h"
@@ -880,9 +879,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::BOOLEAN },
   { key::kForceEphemeralProfiles,
     prefs::kForceEphemeralProfiles,
-    base::Value::Type::BOOLEAN },
-  { key::kBrowserNetworkTimeQueriesEnabled,
-    network_time::prefs::kNetworkTimeQueriesEnabled,
     base::Value::Type::BOOLEAN },
   { key::kExternalProtocolDialogShowAlwaysOpenCheckbox,
     prefs::kExternalProtocolDialogShowAlwaysOpenCheckbox,

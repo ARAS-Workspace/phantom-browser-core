@@ -540,7 +540,6 @@ IN_PROC_BROWSER_TEST_P(UkmBrowserTestWithDemographics,
   base::HistogramTester histogram;
 
   const base::Time now = base::Time::Now();
-  test::UpdateNetworkTime(now, g_browser_process->network_time_tracker());
   const int test_birth_year = test::GetMaximumEligibleBirthYear(now);
   const UserDemographicsProto::Gender test_gender =
       UserDemographicsProto::GENDER_FEMALE;

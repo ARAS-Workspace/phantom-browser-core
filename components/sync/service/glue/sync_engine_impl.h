@@ -22,10 +22,6 @@
 #include "components/sync/engine/sync_engine.h"
 #include "components/sync/engine/sync_status.h"
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 namespace syncer {
 
 class ActiveDevicesProvider;
@@ -42,7 +38,6 @@ class SyncTransportDataPrefs;
 class SyncEngineImpl : public SyncEngine {
  public:
   SyncEngineImpl(const std::string& name,
-                 network_time::NetworkTimeTracker* network_time_tracker,
                  std::unique_ptr<ActiveDevicesProvider> active_devices_provider,
                  std::unique_ptr<SyncTransportDataPrefs> prefs,
                  const base::FilePath& sync_data_folder,
@@ -90,8 +85,6 @@ class SyncEngineImpl : public SyncEngine {
   void ClearNigoriDataForMigration() override;
   void GetNigoriNodeForDebugging(AllNodesCallback callback) override;
   void RecordNigoriMemoryUsageAndCountsHistograms() override;
-
-  void OnNetworkTimeTrackerDestroyed();
 
   static std::string GenerateCacheGUIDForTest();
 
@@ -185,15 +178,6 @@ class SyncEngineImpl : public SyncEngine {
   SyncStatus cached_status_;
 
   std::unique_ptr<ActiveDevicesProvider> active_devices_provider_;
-
-  // Observer helper to track NetworkTimeTracker lifetime.
-  class NetworkTimeObserverImpl;
-  std::unique_ptr<NetworkTimeObserverImpl> network_time_observer_;
-
-  // A pointer to the NetworkTimeTracker, which we observe via
-  // `network_time_observer_` to safely null out if it is destroyed before
-  // this class.
-  raw_ptr<network_time::NetworkTimeTracker> network_time_tracker_ = nullptr;
 
   // Checks that we're on the same sequence this was constructed on (UI
   // sequence).

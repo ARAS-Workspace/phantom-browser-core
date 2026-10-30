@@ -23,7 +23,6 @@ proto_library("key_pinning_proto") {
 
 source_set("net") {
   public = [
-    "cert_verifier_service_time_updater.h",
     "chrome_mojo_proxy_resolver_factory.h",
     "chrome_network_delegate.h",
     "chrome_report_sender.h",
@@ -70,8 +69,6 @@ source_set("net") {
     "//components/content_settings/core/browser:cookie_settings",
     "//components/error_page/common",
     "//components/keyed_service/core",
-    "//components/network_time",
-    "//components/network_time/time_tracker",
     "//components/offline_pages/buildflags",
     "//components/policy/core/browser",
     "//components/prefs",
@@ -108,7 +105,6 @@ source_set("net") {
 
 source_set("impl") {
   sources = [
-    "cert_verifier_service_time_updater.cc",
     "chrome_mojo_proxy_resolver_factory.cc",
     "chrome_network_delegate.cc",
     "chrome_report_sender.cc",

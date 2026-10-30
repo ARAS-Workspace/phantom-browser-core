@@ -50,11 +50,6 @@ ChromeVariationsServiceClient::GetURLLoaderFactory() {
       ->GetSharedURLLoaderFactory();
 }
 
-network_time::NetworkTimeTracker*
-ChromeVariationsServiceClient::GetNetworkTimeTracker() {
-  return g_browser_process->network_time_tracker();
-}
-
 bool ChromeVariationsServiceClient::OverridesRestrictParameter(
     std::string* parameter) {
   return false;

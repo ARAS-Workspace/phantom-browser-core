@@ -26,10 +26,6 @@ namespace installer {
 class InitialPreferences;
 }  // namespace installer
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 class ChromeMetricsServicesManagerClient;
 
 // The ChromeFeatureListCreator creates the FeatureList and classes required for
@@ -73,18 +69,11 @@ class ChromeFeatureListCreator {
   std::unique_ptr<policy::ChromeBrowserPolicyConnector>
   TakeChromeBrowserPolicyConnector();
 
-  // Passes ownership of the |network_time_tracker_| to the caller.
-  std::unique_ptr<network_time::NetworkTimeTracker> TakeNetworkTimeTracker();
-
   std::unique_ptr<installer::InitialPreferences> TakeInitialPrefs();
 
   PrefService* local_state() { return local_state_.get(); }
   policy::ChromeBrowserPolicyConnector* browser_policy_connector() {
     return browser_policy_connector_.get();
-  }
-  network_time::NetworkTimeTracker* network_time_tracker() {
-    CHECK(network_time_tracker_);
-    return network_time_tracker_.get();
   }
   const std::string& actual_locale() { return actual_locale_; }
 
@@ -99,7 +88,6 @@ class ChromeFeatureListCreator {
 
   void CreatePrefService();
   void ConvertFlagsToSwitches();
-  void CreateNetworkTimeTracker();
 
   // Sets up the field trials and related initialization. Call only after
   // about:flags have been converted to switches.
@@ -127,8 +115,6 @@ class ChromeFeatureListCreator {
   // This is owned by |metrics_services_manager_| but we need to expose it.
   raw_ptr<ChromeMetricsServicesManagerClient, AcrossTasksDanglingUntriaged>
       metrics_services_manager_client_;
-
-  std::unique_ptr<network_time::NetworkTimeTracker> network_time_tracker_;
 
   std::unique_ptr<metrics_services_manager::MetricsServicesManager>
       metrics_services_manager_;

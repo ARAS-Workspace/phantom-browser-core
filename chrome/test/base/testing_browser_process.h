@@ -162,8 +162,6 @@ class TestingBrowserProcess
 
   WebRtcLogUploader* webrtc_log_uploader() override;
 
-  network_time::NetworkTimeTracker* network_time_tracker() override;
-
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
@@ -286,8 +284,6 @@ class TestingBrowserProcess
   std::unique_ptr<subresource_filter::RulesetService>
       subresource_filter_ruleset_service_;
   std::unique_ptr<WebRtcLogUploader> webrtc_log_uploader_;
-
-  std::unique_ptr<network_time::NetworkTimeTracker> network_time_tracker_;
 
   // The following objects are not owned by TestingBrowserProcess:
   scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory_;

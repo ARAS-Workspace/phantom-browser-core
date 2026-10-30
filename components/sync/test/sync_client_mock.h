@@ -10,10 +10,6 @@
 #include "components/sync/service/sync_client.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 namespace syncer {
 
 class SyncClientMock : public SyncClient {
@@ -27,10 +23,6 @@ class SyncClientMock : public SyncClient {
 
   MOCK_METHOD(PrefService*, GetPrefService, (), (override));
   MOCK_METHOD(signin::IdentityManager*, GetIdentityManager, (), (override));
-  MOCK_METHOD(network_time::NetworkTimeTracker*,
-              GetNetworkTimeTracker,
-              (),
-              (override));
   MOCK_METHOD(base::FilePath, GetLocalSyncBackendFolder, (), (override));
   MOCK_METHOD(trusted_vault::TrustedVaultClient*,
               GetTrustedVaultClient,

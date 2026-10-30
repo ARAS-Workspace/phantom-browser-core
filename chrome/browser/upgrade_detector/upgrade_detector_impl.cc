@@ -31,7 +31,6 @@
 #include "chrome/browser/upgrade_detector/get_installed_version.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"

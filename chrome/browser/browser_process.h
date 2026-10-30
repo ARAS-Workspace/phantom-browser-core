@@ -88,10 +88,6 @@ namespace metrics_services_manager {
 class MetricsServicesManager;
 }
 
-namespace network_time {
-class NetworkTimeTracker;
-}
-
 namespace os_crypt_async {
 class KeyProvider;
 class OSCryptAsync;
@@ -257,8 +253,6 @@ class BrowserProcess {
   virtual component_updater::ComponentUpdateService* component_updater() = 0;
 
   virtual WebRtcLogUploader* webrtc_log_uploader() = 0;
-
-  virtual network_time::NetworkTimeTracker* network_time_tracker() = 0;
 
   // Returns the tab manager. On non-supported platforms, this returns null.
   // TODO(sebmarchand): Update callers to

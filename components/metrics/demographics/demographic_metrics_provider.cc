@@ -9,6 +9,7 @@
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
+#include "base/time/time.h"
 #include "components/sync/service/sync_service_utils.h"
 #include "third_party/metrics_proto/ukm/report.pb.h"
 
@@ -89,7 +90,7 @@ DemographicMetricsProvider::ProvideSyncedUserNoisedBirthYearAndGender() {
 
   UserDemographicsResult demographics_result =
       GetUserNoisedBirthYearAndGenderFromPrefs(
-          profile_client_->GetNetworkTime(), profile_client_->GetLocalState(),
+          base::Time::Now(), profile_client_->GetLocalState(),
           profile_client_->GetProfilePrefs());
   LogUserDemographicsStatusInHistogram(demographics_result.status());
 

@@ -116,7 +116,6 @@ missing_new_fields,components/domain_reliability/uploader.cc
 missing_new_fields,components/download/internal/common/download_item_impl.cc
 missing_new_fields,components/download/internal/common/parallel_download_job.cc
 missing_new_fields,components/favicon/core/history_ui_favicon_request_handler_impl.cc
-missing_new_fields,components/network_time/network_time_tracker.cc
 missing_new_fields,components/offline_pages/core/prefetch/prefetch_downloader_impl.cc
 missing_new_fields,components/offline_pages/core/prefetch/prefetch_request_fetcher.cc
 missing_new_fields,components/offline_pages/core/prefetch/visuals_fetch_by_url.cc

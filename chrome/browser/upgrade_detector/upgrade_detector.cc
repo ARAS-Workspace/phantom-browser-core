@@ -28,7 +28,6 @@
 #include "chrome/browser/upgrade_detector/version_history_client.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
@@ -346,19 +345,6 @@ base::TimeDelta UpgradeDetector::GetGracePeriod(
   return std::min(kDefaultGracePeriod, elevated_to_high_delta / 2);
 }
 
-bool UpgradeDetector::GetNetworkTimeWithFallback(base::Time& current_time) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (g_browser_process->network_time_tracker()->GetNetworkTime(
-          &current_time, /*uncertainty=*/nullptr) ==
-      network_time::NetworkTimeTracker::NETWORK_TIME_AVAILABLE) {
-    return true;
-  }
-  // When network time has not been initialized yet, simply rely on the
-  // machine's current time.
-  current_time = base::Time::Now();
-  return false;
-}
-
 // static
 bool UpgradeDetector::ShouldRelaunchFast() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -369,9 +355,7 @@ bool UpgradeDetector::ShouldRelaunchFast() {
   if (max_age.is_zero()) {
     return false;
   }
-  base::Time current_time;
-  GetNetworkTimeWithFallback(current_time);
-  return current_time - last_served_date_.value() > max_age;
+  return base::Time::Now() - last_served_date_.value() > max_age;
 }
 
 bool UpgradeDetector::ShouldFetchLastServedDate() const {

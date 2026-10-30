@@ -21,7 +21,6 @@
 #include "base/time/clock.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
 #include "components/security_interstitials/content/blocked_interception_blocking_page.h"
@@ -513,7 +512,6 @@ void SSLErrorHandler::HandleSSLError(
     base::OnceCallback<
         void(std::unique_ptr<security_interstitials::SecurityInterstitialPage>)>
         blocking_page_ready_callback,
-    network_time::NetworkTimeTracker* network_time_tracker,
     captive_portal::CaptivePortalService* captive_portal_service,
     std::unique_ptr<SecurityBlockingPageFactory> blocking_page_factory,
     bool user_can_proceed_past_interstitial /*=true*/) {
@@ -530,9 +528,9 @@ void SSLErrorHandler::HandleSSLError(
       std::move(blocking_page_factory),
       std::move(blocking_page_ready_callback));
   // Protected ctor.
-  auto* error_handler = new SSLErrorHandler(
-      std::move(delegate), web_contents, cert_error, ssl_info,
-      network_time_tracker, captive_portal_service, request_url);
+  auto* error_handler =
+      new SSLErrorHandler(std::move(delegate), web_contents, cert_error,
+                          ssl_info, captive_portal_service, request_url);
   web_contents->SetUserData(UserDataKey(), base::WrapUnique(error_handler));
   error_handler->StartHandlingError();
 }
@@ -604,7 +602,6 @@ SSLErrorHandler::SSLErrorHandler(
     content::WebContents* web_contents,
     net::Error cert_error,
     const net::SSLInfo& ssl_info,
-    network_time::NetworkTimeTracker* network_time_tracker,
     captive_portal::CaptivePortalService* captive_portal_service,
     const GURL& request_url)
     : content::WebContentsUserData<SSLErrorHandler>(*web_contents),
@@ -612,8 +609,7 @@ SSLErrorHandler::SSLErrorHandler(
       delegate_(std::move(delegate)),
       cert_error_(cert_error),
       ssl_info_(ssl_info),
-      request_url_(request_url),
-      network_time_tracker_(network_time_tracker)
+      request_url_(request_url)
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
       ,
       captive_portal_service_(captive_portal_service)
@@ -915,38 +911,11 @@ void SSLErrorHandler::DeleteSSLErrorHandler() {
 }
 
 void SSLErrorHandler::HandleCertDateInvalidError() {
-  const base::TimeTicks now = base::TimeTicks::Now();
-  timer_.Start(FROM_HERE, GetConfig().interstitial_delay(),
-               base::BindOnce(&SSLErrorHandler::HandleCertDateInvalidErrorImpl,
-                              base::Unretained(this), now));
-  // Try kicking off a time fetch to get an up-to-date estimate of the
-  // true time. This will only have an effect if network time is
-  // unavailable or if there is not already a query in progress.
-  //
-  // Pass a weak pointer as the callback; if the timer fires before the
-  // fetch completes and shows an interstitial, this SSLErrorHandler
-  // will be deleted.
-  if (!network_time_tracker_->StartTimeFetch(
-          base::BindOnce(&SSLErrorHandler::HandleCertDateInvalidErrorImpl,
-                         weak_ptr_factory_.GetWeakPtr(), now))) {
-    HandleCertDateInvalidErrorImpl(now);
-    return;
-  }
-
-  if (GetConfig().timer_started_callback()) {
-    GetConfig().timer_started_callback()->Run(web_contents());
-  }
-}
-
-void SSLErrorHandler::HandleCertDateInvalidErrorImpl(
-    base::TimeTicks started_handling_error) {
-  timer_.Stop();
   base::Clock* testing_clock = GetConfig().clock();
   const base::Time now =
       testing_clock ? testing_clock->Now() : base::Time::NowFromSystemTime();
 
-  ssl_errors::ClockState clock_state =
-      ssl_errors::GetClockState(now, network_time_tracker_);
+  ssl_errors::ClockState clock_state = ssl_errors::GetClockState(now);
   if (clock_state == ssl_errors::CLOCK_STATE_FUTURE ||
       clock_state == ssl_errors::CLOCK_STATE_PAST) {
     ShowBadClockInterstitial(now, clock_state);

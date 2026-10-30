@@ -9,7 +9,6 @@ include_rules = [
   "+components/keep_alive_registry",
   "+components/keyed_service",
   "+components/metrics",
-  "+components/network_time",
   "+components/prefs",
   "+components/variations",
   "+components/version_info",

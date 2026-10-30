@@ -39,7 +39,6 @@
 #include "components/metrics/metrics_provider.h"
 #include "components/metrics/metrics_service_client.h"
 #include "components/metrics/version_utils.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/variations/hashing.h"
@@ -100,23 +99,12 @@ int IncrementAndUpdate(PrefService* local_state, const std::string& key) {
 // |record_time_zone| is true, the time zone.
 void RecordCurrentTime(
     const base::Clock* clock,
-    const network_time::NetworkTimeTracker* network_time_tracker,
     bool record_time_zone,
     metrics::ChromeUserMetricsExtension::RealLocalTime* time) {
   // Record the current time and the clock used to determine the time.
-  base::Time now;
-  if (network_time_tracker != nullptr &&
-      network_time_tracker->GetNetworkTime(&now, nullptr) ==
-          network_time::NetworkTimeTracker::NETWORK_TIME_AVAILABLE) {
-    // |network_time_tracker| can be null in certain settings such as WebView
-    // (which doesn't run a NetworkTimeTracker) and tests.
-    time->set_time_source(
-        metrics::ChromeUserMetricsExtension::RealLocalTime::NETWORK_TIME_CLOCK);
-  } else {
-    now = clock->Now();
-    time->set_time_source(
-        metrics::ChromeUserMetricsExtension::RealLocalTime::CLIENT_CLOCK);
-  }
+  base::Time now = clock->Now();
+  time->set_time_source(
+      metrics::ChromeUserMetricsExtension::RealLocalTime::CLIENT_CLOCK);
   time->set_time_sec(now.ToTimeT());
 
   if (record_time_zone) {
@@ -230,22 +218,19 @@ MetricsLog::MetricsLog(const std::string& client_id,
                  session_id,
                  log_type,
                  base::DefaultClock::GetInstance(),
-                 client->GetNetworkTimeTracker(),
                  client) {}
 
 MetricsLog::MetricsLog(const std::string& client_id,
                        int session_id,
                        LogType log_type,
                        base::Clock* clock,
-                       const network_time::NetworkTimeTracker* network_clock,
                        MetricsServiceClient* client)
     : closed_(false),
       log_type_(log_type),
       client_(client),
       creation_time_(base::TimeTicks::Now()),
       has_environment_(false),
-      clock_(clock),
-      network_clock_(network_clock) {
+      clock_(clock) {
   uma_proto_.set_client_id(Hash(client_id));
   uma_proto_.set_session_id(session_id);
 
@@ -253,7 +238,7 @@ MetricsLog::MetricsLog(const std::string& client_id,
     // Don't record the time when creating a log because creating a log happens
     // on startups and setting the timezone requires ICU initialization that is
     // too expensive to run during this critical time.
-    RecordCurrentTime(clock_, network_clock_,
+    RecordCurrentTime(clock_,
                       /*record_time_zone=*/false,
                       uma_proto_.mutable_time_log_created());
   }
@@ -538,7 +523,7 @@ metrics::ChromeUserMetricsExtension::RealLocalTime
 MetricsLog::GetCurrentClockTime(bool record_time_zone) {
   CHECK_EQ(log_type_, MetricsLog::ONGOING_LOG);
   metrics::ChromeUserMetricsExtension::RealLocalTime time;
-  RecordCurrentTime(clock_, network_clock_, record_time_zone, &time);
+  RecordCurrentTime(clock_, record_time_zone, &time);
   return time;
 }
 

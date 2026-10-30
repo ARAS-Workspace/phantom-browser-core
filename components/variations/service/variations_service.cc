@@ -43,7 +43,6 @@
 #include "components/encrypted_messages/message_encrypter.h"
 #include "components/metrics/metrics_state_manager.h"
 #include "components/metrics/startup_visibility.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -104,9 +103,6 @@ const uint8_t kServerPublicKey[] = {
     0x31, 0x1a, 0x39, 0x5b, 0x76, 0xb1, 0x6b, 0x3d, 0x6a, 0x2b};
 
 const uint32_t kServerPublicKeyVersion = 1;
-
-// For the HTTP date headers, the resolution of the server time is 1 second.
-const uint32_t kServerTimeResolutionInSeconds = 1;
 
 // Timeout for fetching the variations seed.
 const base::TimeDelta kVariationsSeedFetchTimeout = base::Seconds(60);
@@ -940,16 +936,6 @@ void VariationsService::OnSimpleLoaderComplete(
   DCHECK(response_body);
 
   std::optional<base::Time> response_date = headers->GetDateValue();
-  // If the seed was fetched securely, opportunistically update the network time
-  // tracker with the headers time.
-  if (response_date && !last_request_was_http_retry_) {
-    DCHECK(!response_date->is_null());
-
-    const base::TimeDelta latency = now - last_request_started_time_;
-    client_->GetNetworkTimeTracker()->UpdateNetworkTime(
-        response_date.value(), base::Seconds(kServerTimeResolutionInSeconds),
-        latency, now);
-  }
 
   if (response_code == net::HTTP_NOT_MODIFIED) {
     // TODO(crbug.com/420652919): Reject responses without a date.

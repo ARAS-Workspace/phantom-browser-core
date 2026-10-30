@@ -30,7 +30,6 @@ class ChromeVariationsServiceClient
   // variations::VariationsServiceClient:
   base::Version GetVersionForSimulation() override;
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() override;
-  network_time::NetworkTimeTracker* GetNetworkTimeTracker() override;
   bool OverridesRestrictParameter(std::string* parameter) override;
   base::FilePath GetVariationsSeedFileDir() override;
   std::unique_ptr<variations::SeedResponse>

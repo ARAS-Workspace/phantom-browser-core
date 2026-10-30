@@ -12,10 +12,6 @@
 
 class PrefService;
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 namespace signin {
 class IdentityManager;
 }
@@ -46,9 +42,6 @@ class SyncClient {
   virtual PrefService* GetPrefService() = 0;
 
   virtual signin::IdentityManager* GetIdentityManager() = 0;
-
-  // Returns the network time tracker to retrieve synchronized network time.
-  virtual network_time::NetworkTimeTracker* GetNetworkTimeTracker() = 0;
 
   // Returns the path to the folder used for storing the local sync database.
   // It is only used when sync is running against a local backend.

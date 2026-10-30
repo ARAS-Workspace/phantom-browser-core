@@ -113,7 +113,6 @@
 #include "components/metrics/demographics/user_demographics.h"
 #include "components/metrics/metrics_pref_names.h"
 #include "components/metrics/metrics_reporting_choice_service.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 #include "components/ntp_tiles/enterprise/enterprise_shortcuts_manager_impl.h"
 #include "components/ntp_tiles/most_visited_sites.h"
@@ -943,7 +942,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   memory::EnterpriseMemoryLimitPrefObserver::RegisterPrefs(registry);
   metrics::RegisterDemographicsLocalStatePrefs(registry);
   metrics::TabStatsTracker::RegisterPrefs(registry);
-  network_time::NetworkTimeTracker::RegisterPrefs(registry);
   omnibox::RegisterLocalStatePrefs(registry);
   omnibox_everywhere::prefs::RegisterLocalStatePrefs(registry);
   optimization_guide::prefs::RegisterLocalStatePrefs(registry);

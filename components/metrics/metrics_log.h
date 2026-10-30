@@ -30,10 +30,6 @@ class Clock;
 class HistogramSamples;
 }  // namespace base
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 namespace metrics {
 
 // This SourceType is saved in Local state by unsent_log_store.cc and entries
@@ -98,14 +94,12 @@ class MetricsLog {
              int session_id,
              LogType log_type,
              MetricsServiceClient* client);
-  // As above, with a |clock| and |network_clock| to use to vend Now() calls. As
-  // with |client|, the caller must ensure both remain valid for the lifetime of
-  // this class.
+  // As above, with a |clock| to use to vend Now() calls. As with |client|, the
+  // caller must ensure both remain valid for the lifetime of this class.
   MetricsLog(const std::string& client_id,
              int session_id,
              LogType log_type,
              base::Clock* clock,
-             const network_time::NetworkTimeTracker* network_clock,
              MetricsServiceClient* client);
 
   MetricsLog(const MetricsLog&) = delete;
@@ -186,9 +180,9 @@ class MetricsLog {
   void RecordCurrentSessionData(DelegatingProvider* delegating_provider,
                                 PrefService* local_state);
 
-  // Returns the current time using |network_clock_| if non-null (falls back to
-  // |clock_| otherwise). If |record_time_zone| is true, the returned time will
-  // also be populated with the time zone. Must be called on the main thread.
+  // Returns the current time using |clock_|. If |record_time_zone| is true,
+  // the returned time will also be populated with the time zone. Must be
+  // called on the main thread.
   ChromeUserMetricsExtension::RealLocalTime GetCurrentClockTime(
       bool record_time_zone);
 
@@ -259,10 +253,6 @@ class MetricsLog {
   // The clock used to vend Time::Now().  Note that this is not used for the
   // static function MetricsLog::GetCurrentTime(). Can be overridden for tests.
   raw_ptr<base::Clock> clock_;
-
-  // The NetworkTimeTracker used to provide higher-quality wall clock times than
-  // |clock_| (when available). Can be overridden for tests.
-  raw_ptr<const network_time::NetworkTimeTracker> network_clock_;
 };
 
 }  // namespace metrics

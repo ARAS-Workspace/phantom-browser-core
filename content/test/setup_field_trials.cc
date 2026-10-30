@@ -49,9 +49,6 @@ class VariationServiceClient : public variations::VariationsServiceClient {
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() final {
     return nullptr;
   }
-  network_time::NetworkTimeTracker* GetNetworkTimeTracker() final {
-    return nullptr;
-  }
   version_info::Channel GetChannel() final {
     return version_info::Channel::UNKNOWN;
   }

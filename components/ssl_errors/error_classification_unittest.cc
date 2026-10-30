@@ -13,11 +13,6 @@
 #include "base/test/simple_test_clock.h"
 #include "base/test/simple_test_tick_clock.h"
 #include "base/test/task_environment.h"
-#include "base/time/default_clock.h"
-#include "base/time/default_tick_clock.h"
-#include "components/network_time/network_time_test_utils.h"
-#include "components/network_time/network_time_tracker.h"
-#include "components/prefs/testing_pref_service.h"
 #include "net/base/net_errors.h"
 #include "net/cert/x509_certificate.h"
 #include "net/test/cert_test_util.h"
@@ -25,9 +20,7 @@
 #include "net/test/embedded_test_server/http_response.h"
 #include "net/test/test_certificate_data.h"
 #include "net/test/test_data_directory.h"
-#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_shared_url_loader_factory.h"
-#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
@@ -40,20 +33,7 @@ const char kSslErrorCauseHistogram[] = "interstitial.ssl.cause.overridable";
 
 }  // namespace
 
-class SSLErrorClassificationTest : public ::testing::Test {
- public:
-  SSLErrorClassificationTest()
-      : field_trial_test_(new network_time::FieldTrialTest()) {}
-  network_time::FieldTrialTest* field_trial_test() {
-    return field_trial_test_.get();
-  }
-
- protected:
-  network::TestURLLoaderFactory test_url_loader_factory_;
-
- private:
-  std::unique_ptr<network_time::FieldTrialTest> field_trial_test_;
-};
+class SSLErrorClassificationTest : public ::testing::Test {};
 
 TEST_F(SSLErrorClassificationTest, TestNameMismatch) {
   scoped_refptr<net::X509Certificate> example_cert = net::ImportCertFromFile(
@@ -213,73 +193,15 @@ TEST_F(SSLErrorClassificationTest, TestPrivateURL) {
 TEST_F(SSLErrorClassificationTest, GetClockState) {
   // This test aims to obtain all possible return values of
   // |GetClockState|.
-  field_trial_test()->SetFeatureParams(
-      true, 0.0, network_time::NetworkTimeTracker::FETCHES_ON_DEMAND_ONLY);
-  TestingPrefServiceSimple pref_service;
-  network_time::NetworkTimeTracker::RegisterPrefs(pref_service.registry());
-  network_time::NetworkTimeTracker network_time_tracker(
-      std::make_unique<base::DefaultClock>(),
-      std::make_unique<base::DefaultTickClock>(), &pref_service,
-      base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
-          &test_url_loader_factory_),
-      std::nullopt);
-
   ssl_errors::SetBuildTimeForTesting(base::Time::Now());
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_UNKNOWN,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
+  EXPECT_EQ(ssl_errors::ClockState::CLOCK_STATE_UNKNOWN,
+            ssl_errors::GetClockState(base::Time::Now()));
 
   ssl_errors::SetBuildTimeForTesting(base::Time::Now() - base::Days(367));
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_FUTURE,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
+  EXPECT_EQ(ssl_errors::ClockState::CLOCK_STATE_FUTURE,
+            ssl_errors::GetClockState(base::Time::Now()));
 
   ssl_errors::SetBuildTimeForTesting(base::Time::Now() + base::Days(3));
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_PAST,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
-
-  // Intentionally leave the build time alone.  It should be ignored
-  // in favor of network time.
-  network_time_tracker.UpdateNetworkTime(
-      base::Time::Now() + base::Hours(1),
-      base::Seconds(1),         // resolution
-      base::Milliseconds(250),  // latency
-      base::TimeTicks::Now());  // posting time
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_PAST,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
-
-  network_time_tracker.UpdateNetworkTime(
-      base::Time::Now() - base::Hours(1),
-      base::Seconds(1),         // resolution
-      base::Milliseconds(250),  // latency
-      base::TimeTicks::Now());  // posting time
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_FUTURE,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
-
-  network_time_tracker.UpdateNetworkTime(
-      base::Time::Now(),
-      base::Seconds(1),         // resolution
-      base::Milliseconds(250),  // latency
-      base::TimeTicks::Now());  // posting time
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_OK,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
-
-  // Now clear the network time.  The build time should reassert
-  // itself.
-  network_time_tracker.ClearNetworkTimeForTesting();
-  ssl_errors::SetBuildTimeForTesting(base::Time::Now() + base::Days(3));
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_PAST,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
-
-  // Now set the build time to something reasonable.  We should be
-  // back to the know-nothing state.
-  ssl_errors::SetBuildTimeForTesting(base::Time::Now());
-  EXPECT_EQ(
-      ssl_errors::ClockState::CLOCK_STATE_UNKNOWN,
-      ssl_errors::GetClockState(base::Time::Now(), &network_time_tracker));
+  EXPECT_EQ(ssl_errors::ClockState::CLOCK_STATE_PAST,
+            ssl_errors::GetClockState(base::Time::Now()));
 }

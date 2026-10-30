@@ -35,29 +35,6 @@ void AddUserBirthYearAndGenderToSyncServer(
           /*last_modified_time=*/0));
 }
 
-void UpdateNetworkTime(const base::Time& now,
-                       network_time::NetworkTimeTracker* time_tracker) {
-  // Simulate the latency in the network to get the network time from the remote
-  // server.
-  constexpr base::TimeDelta kLatency = base::Milliseconds(10);
-
-  // Simulate the time taken to call UpdateNetworkTime() since the moment the
-  // callback was created. When not testing with the fake sync server, the
-  // callback is called when doing an HTTP request to the sync server.
-  constexpr base::TimeDelta kCallbackDelay = base::Milliseconds(10);
-
-  // Simulate a network time that is a bit earlier than the now time.
-  base::Time network_time = now - kCallbackDelay - kLatency;
-
-  // Simulate the time in ticks at the moment the UpdateNetworkTime callback
-  // function is created, which time should be at least 1 millisecond behind the
-  // moment the callback is run to pass the DCHECK.
-  base::TimeTicks post_time = base::TimeTicks::Now() - kCallbackDelay;
-
-  time_tracker->UpdateNetworkTime(
-      network_time, /*resolution=*/base::Milliseconds(1), kLatency, post_time);
-}
-
 int GetMaximumEligibleBirthYear(const base::Time& now) {
   constexpr int kEligibleAge = kUserDemographicsMinAgeInYears +
                                kUserDemographicsBirthYearNoiseOffsetRange;

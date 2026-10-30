@@ -13,7 +13,6 @@
 #include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
-#include "chrome/browser/net/cert_verifier_service_time_updater.h"
 #include "chrome/browser/net/proxy_config_monitor.h"
 #include "chrome/browser/net/stub_resolver_config_reader.h"
 #include "chrome/browser/ssl/ssl_config_service_manager.h"
@@ -295,8 +294,6 @@ class SystemNetworkContextManager {
 #endif  // BUILDFLAG(IS_LINUX)
 
   std::unique_ptr<CookieEncryptionProviderImpl> cookie_encryption_provider_;
-
-  std::unique_ptr<CertVerifierServiceTimeUpdater> cert_verifier_time_updater_;
 };
 
 #endif  // CHROME_BROWSER_NET_SYSTEM_NETWORK_CONTEXT_MANAGER_H_

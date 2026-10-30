@@ -191,7 +191,6 @@ class BrowserProcessImpl : public BrowserProcess,
   activity_reporter::ActivityReporter* activity_reporter() override;
   component_updater::ComponentUpdateService* component_updater() override;
   WebRtcLogUploader* webrtc_log_uploader() override;
-  network_time::NetworkTimeTracker* network_time_tracker() override;
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
@@ -229,7 +228,6 @@ class BrowserProcessImpl : public BrowserProcess,
   void CreateOptimizationGuideService();
   void CreateStatusTray();
   void CreateBackgroundModeManager();
-  void InitializeNetworkTimeTracker();
 
   void ApplyDefaultBrowserPolicy();
 
@@ -382,8 +380,6 @@ class BrowserProcessImpl : public BrowserProcess,
   // safely post base::Unretained(this) references to an internally owned task
   // queue, since after ~BrowserProcessImpl(), those tasks would no longer run.
   std::unique_ptr<WebRtcEventLogManager> webrtc_event_log_manager_;
-
-  std::unique_ptr<network_time::NetworkTimeTracker> network_time_tracker_;
 
   std::unique_ptr<resource_coordinator::ResourceCoordinatorParts>
       resource_coordinator_parts_;

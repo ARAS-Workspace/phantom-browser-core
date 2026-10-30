@@ -41,17 +41,12 @@ namespace content {
 class WebContents;
 }
 
-namespace network_time {
-class NetworkTimeTracker;
-}
-
 BASE_DECLARE_FEATURE(kMITMSoftwareInterstitial);
 
 // This class is responsible for deciding what type of interstitial to display
 // for an SSL validation error and actually displaying it. The display of the
 // interstitial might be delayed by a few seconds while trying to determine the
 // cause of the error. During this window, the class will:
-// - Check for a clock error
 // - Check for a known captive portal certificate SPKI
 // - Wait for a name-mismatch suggested URL
 // - or Wait for a captive portal result to arrive.
@@ -149,7 +144,6 @@ class SSLErrorHandler : public content::WebContentsUserData<SSLErrorHandler>,
       const net::SSLInfo& ssl_info,
       const GURL& request_url,
       BlockingPageReadyCallback blocking_page_ready_callback,
-      network_time::NetworkTimeTracker* network_time_tracker,
       captive_portal::CaptivePortalService* captive_portal_service,
       std::unique_ptr<SecurityBlockingPageFactory> blocking_page_factory,
       bool user_can_proceed_past_interstitial = true);
@@ -184,7 +178,6 @@ class SSLErrorHandler : public content::WebContentsUserData<SSLErrorHandler>,
                   content::WebContents* web_contents,
                   net::Error cert_error,
                   const net::SSLInfo& ssl_info,
-                  network_time::NetworkTimeTracker* network_time_tracker,
                   captive_portal::CaptivePortalService* captive_portal_service,
                   const GURL& request_url);
 
@@ -233,7 +226,6 @@ class SSLErrorHandler : public content::WebContentsUserData<SSLErrorHandler>,
   void DeleteSSLErrorHandler();
 
   void HandleCertDateInvalidError();
-  void HandleCertDateInvalidErrorImpl(base::TimeTicks started_handling_error);
 
   bool IsOnlyCertError(net::CertStatus only_cert_error_expected) const;
 
@@ -241,7 +233,6 @@ class SSLErrorHandler : public content::WebContentsUserData<SSLErrorHandler>,
   const net::Error cert_error_;
   const net::SSLInfo ssl_info_;
   const GURL request_url_;
-  raw_ptr<network_time::NetworkTimeTracker> network_time_tracker_;
 
   // The below field is unused if captive portal detection is not enabled,
   // which causes a compiler error.

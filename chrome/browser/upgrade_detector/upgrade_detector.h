@@ -228,10 +228,6 @@ class UpgradeDetector {
   // annoyance levels.
   static base::TimeDelta GetGracePeriod(base::TimeDelta elevated_to_high_delta);
 
-  // Returns the network time, falling back to system time if unavailable.
-  // Returns true if it's network time, or false if it's not.
-  bool GetNetworkTimeWithFallback(base::Time& network_time);
-
   // Returns true if `last_served_date_` is known and older than the number
   // of days specified by the RelaunchFastIfOutdated policy.
   bool ShouldRelaunchFast();

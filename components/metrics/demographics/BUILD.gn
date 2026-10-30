@@ -57,7 +57,6 @@ static_library("test_support") {
     "//base",
     "//components/metrics",
     "//components/metrics/demographics",
-    "//components/network_time",
     "//components/prefs",
     "//components/sync",
     "//components/sync:test_support",

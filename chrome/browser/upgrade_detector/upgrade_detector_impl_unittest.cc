@@ -23,7 +23,6 @@
 #include "chrome/browser/upgrade_detector/version_history_client.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_browser_process.h"
-#include "components/network_time/network_time_pref_names.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/version_info/version_info.h"
 #include "content/public/test/browser_task_environment.h"
@@ -137,8 +136,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
     TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetUserPref(
         prefs::kAttemptedToEnableAutoupdate,
         std::make_unique<base::Value>(true));
-    TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetUserPref(
-        network_time::prefs::kNetworkTimeQueriesEnabled, base::Value(false));
     UpgradeDetector::GetInstance()->Init();
   }
 

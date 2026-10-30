@@ -68,7 +68,6 @@ source_set("impl") {
     "//chrome/common:channel_info",
     "//chrome/common:constants",
     "//chrome/common:non_code_constants",
-    "//components/network_time",
     "//components/prefs",
     "//components/version_info",
     "//net",
@@ -145,7 +144,6 @@ source_set("unit_tests") {
 
   deps += [
     "//base:i18n",
-    "//components/network_time",
     "//content/test:test_support",
   ]
 }

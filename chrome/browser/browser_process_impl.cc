@@ -113,7 +113,6 @@
 #include "components/metrics/metrics_service.h"
 #include "components/metrics_services_manager/metrics_services_manager.h"
 #include "components/metrics_services_manager/metrics_services_manager_client.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/os_crypt/async/browser/os_crypt_async.h"
 #include "components/permissions/permissions_client.h"
 #include "components/policy/core/common/policy_service.h"
@@ -248,8 +247,6 @@ BrowserProcessImpl::BrowserProcessImpl(StartupData* startup_data)
           std::make_unique<signin::ActivePrimaryAccountsMetricsRecorder>(
               *local_state_)),
       platform_part_(std::make_unique<BrowserProcessPlatformPart>()),
-      network_time_tracker_(startup_data->chrome_feature_list_creator()
-                                ->TakeNetworkTimeTracker()),
       features_(GlobalFeatures::CreateGlobalFeatures()) {
   CHECK(!g_browser_process);
   g_browser_process = this;
@@ -259,10 +256,6 @@ BrowserProcessImpl::BrowserProcessImpl(StartupData* startup_data)
   DCHECK(browser_policy_connector_);
   DCHECK(local_state_);
   DCHECK(startup_data);
-
-  // The network time tracker is created (so that other early objects can
-  // subscribe to it) but it is not yet initialized.
-  CHECK(network_time_tracker_);
 
   // Most work should be done in Init().
 }
@@ -418,7 +411,6 @@ void BrowserProcessImpl::StartTearDown() {
   metrics_services_manager_client_ = nullptr;
   metrics_services_manager_.reset();
   intranet_redirect_detector_.reset();
-  network_time_tracker_.reset();
 
   system_notification_helper_.reset();
 
@@ -909,10 +901,6 @@ WebRtcLogUploader* BrowserProcessImpl::webrtc_log_uploader() {
   return webrtc_log_uploader_.get();
 }
 
-network_time::NetworkTimeTracker* BrowserProcessImpl::network_time_tracker() {
-  return network_time_tracker_.get();
-}
-
 resource_coordinator::TabManager* BrowserProcessImpl::GetTabManager() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return resource_coordinator_parts()->tab_manager();
@@ -1211,8 +1199,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
   features_->PreMainMessageLoopRun();
   platform_part_->PreMainMessageLoopRun();
 
-  InitializeNetworkTimeTracker();
-
   CreateNetworkQualityObserver();
 
   screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();
@@ -1308,13 +1294,6 @@ void BrowserProcessImpl::CreateSubresourceFilterRulesetService() {
           subresource_filter::kSafeBrowsingRulesetConfig, local_state(),
           user_data_dir,
           subresource_filter::SafeBrowsingRulesetPublisher::Factory());
-}
-
-void BrowserProcessImpl::InitializeNetworkTimeTracker() {
-  CHECK(!network_time_tracker_->is_initialized());
-  network_time_tracker_->Initialize(
-      local_state(),
-      system_network_context_manager()->GetSharedURLLoaderFactory());
 }
 
 void BrowserProcessImpl::ApplyDefaultBrowserPolicy() {

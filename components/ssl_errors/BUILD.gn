@@ -14,7 +14,6 @@ static_library("ssl_errors") {
     "//base",
     "//base:build_time",
     "//base:i18n",
-    "//components/network_time",
     "//components/strings",
     "//components/url_formatter",
     "//net",
@@ -29,8 +28,6 @@ source_set("unit_tests") {
   deps = [
     ":ssl_errors",
     "//base",
-    "//components/network_time",
-    "//components/network_time:network_time_test_support",
     "//components/prefs:test_support",
     "//net:test_support",
     "//services/network:test_support",

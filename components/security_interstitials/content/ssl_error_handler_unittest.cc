@@ -8,22 +8,17 @@
 #include <utility>
 #include <vector>
 
-#include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
-#include "base/metrics/field_trial.h"
 #include "base/run_loop.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
-#include "base/test/simple_test_clock.h"
-#include "base/test/simple_test_tick_clock.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "components/captive_portal/content/captive_portal_service.h"
 #include "components/captive_portal/core/buildflags.h"
 #include "components/captive_portal/core/captive_portal_testing_utils.h"
 #include "components/embedder_support/pref_names.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/security_interstitials/content/common_name_mismatch_handler.h"
@@ -41,11 +36,8 @@
 #include "net/http/http_response_headers.h"
 #include "net/ssl/ssl_info.h"
 #include "net/test/cert_test_util.h"
-#include "net/test/embedded_test_server/embedded_test_server.h"
-#include "net/test/embedded_test_server/http_response.h"
 #include "net/test/test_certificate_data.h"
 #include "net/test/test_data_directory.h"
-#include "services/network/test/test_shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace {
@@ -123,14 +115,12 @@ class TestSSLErrorHandler : public SSLErrorHandler {
       content::WebContents* web_contents,
       net::Error cert_error,
       const net::SSLInfo& ssl_info,
-      network_time::NetworkTimeTracker* network_time_tracker,
       const GURL& request_url,
       captive_portal::CaptivePortalService* captive_portal_service)
       : SSLErrorHandler(std::move(delegate),
                         web_contents,
                         cert_error,
                         ssl_info,
-                        network_time_tracker,
                         captive_portal_service,
                         request_url) {}
 
@@ -307,9 +297,7 @@ class SSLErrorHandlerNameMismatchTest
         std::unique_ptr<SSLErrorHandler::Delegate>(delegate_), web_contents(),
         static_cast<net::Error>(
             net::MapCertStatusToNetError(ssl_info_.cert_status)),
-        ssl_info_,
-        /*network_time_tracker=*/nullptr, GURL() /*request_url*/,
-        captive_portal_service_.get());
+        ssl_info_, GURL() /*request_url*/, captive_portal_service_.get());
   }
 
   void TearDown() override {
@@ -574,9 +562,7 @@ class SSLErrorAssistantProtoTest : public content::RenderViewHostTestHarness {
         std::unique_ptr<SSLErrorHandler::Delegate>(delegate_), web_contents(),
         static_cast<net::Error>(
             net::MapCertStatusToNetError(ssl_info_.cert_status)),
-        ssl_info_,
-        /*network_time_tracker=*/nullptr, GURL() /*request_url*/,
-        captive_portal_service_.get());
+        ssl_info_, GURL() /*request_url*/, captive_portal_service_.get());
   }
 
   net::SSLInfo ssl_info_;
@@ -1190,8 +1176,7 @@ TEST_F(SSLErrorHandlerTest, BlockedInterceptionInterstitial) {
       std::move(delegate), web_contents(),
       static_cast<net::Error>(
           net::MapCertStatusToNetError(ssl_info.cert_status)),
-      ssl_info,
-      /*network_time_tracker=*/nullptr, GURL() /*request_url*/,
+      ssl_info, GURL() /*request_url*/,
       /*captive_portal_service=*/nullptr);
 
   base::HistogramTester histograms;
@@ -1230,7 +1215,7 @@ TEST_F(SSLErrorHandlerTest, NonPrimaryMainframeShouldNotAffectSSLErrorHandler) {
       static_cast<net::Error>(
           net::MapCertStatusToNetError(ssl_info.cert_status)),
       ssl_info,
-      /*network_time_tracker=*/nullptr, /*request_url=*/GURL(),
+      /*request_url=*/GURL(),
       /*captive_portal_service=*/nullptr);
 
   auto* error_handler_ptr = error_handler.get();
@@ -1265,8 +1250,8 @@ TEST_F(SSLErrorHandlerTest, LocalSelfSignedInterstitial) {
 
   auto error_handler = std::make_unique<TestSSLErrorHandler>(
       std::move(delegate), web_contents(),
-      net::ERR_CERT_SELF_SIGNED_LOCAL_NETWORK, ssl_info,
-      /*network_time_tracker=*/nullptr, GURL() /*request_url*/, nullptr);
+      net::ERR_CERT_SELF_SIGNED_LOCAL_NETWORK, ssl_info, GURL() /*request_url*/,
+      nullptr);
 
   error_handler->StartHandlingError();
   EXPECT_FALSE(delegate_ptr->ssl_interstitial_shown());

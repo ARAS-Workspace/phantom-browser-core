@@ -9,7 +9,6 @@
 #include <optional>
 
 #include "base/feature_list.h"
-#include "base/time/time.h"
 #include "components/metrics/demographics/user_demographics.h"
 #include "components/metrics/metrics_log_uploader.h"
 #include "components/metrics/metrics_provider.h"
@@ -58,11 +57,6 @@ class DemographicMetricsProvider : public MetricsProvider,
 
     // Gets a pointer to the PrefService of the user profile.
     virtual PrefService* GetProfilePrefs() = 0;
-
-    // Gets the network time that represents now.
-    // TODO(crbug.com/40729596): Remove this function and replace with
-    // base::Time::Now().
-    virtual base::Time GetNetworkTime() const = 0;
   };
 
   DemographicMetricsProvider(

@@ -96,7 +96,6 @@
 #include "components/metrics/ui/form_factor_metrics_provider.h"
 #include "components/metrics/ui/screen_info_metrics_provider.h"
 #include "components/metrics/version_utils.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/omnibox/browser/omnibox_metrics_provider.h"
 #include "components/policy/core/common/enterprise_management_metrics_provider.h"
 #include "components/pref_registry/pref_registry_syncable.h"
@@ -306,19 +305,6 @@ class ProfileClientImpl
     return SyncServiceFactory::GetForProfile(profile);
   }
 
-  base::Time GetNetworkTime() const override {
-    base::Time time;
-    if (g_browser_process->network_time_tracker()->GetNetworkTime(&time,
-                                                                  nullptr) !=
-        network_time::NetworkTimeTracker::NETWORK_TIME_AVAILABLE) {
-      // Return null time to indicate that it could not get the network time. It
-      // is the responsibility of the client to have the strategy to deal with
-      // the absence of network time.
-      return base::Time();
-    }
-    return time;
-  }
-
  private:
   // Provides the same cached Profile each time.
   metrics::CachedMetricsProfile cached_metrics_profile_;
@@ -478,11 +464,6 @@ std::string ChromeMetricsServiceClient::GetApplicationLocale() {
     return language::GetApplicationLocale(g_browser_process->local_state());
   }
   return g_browser_process->GetApplicationLocale();
-}
-
-const network_time::NetworkTimeTracker*
-ChromeMetricsServiceClient::GetNetworkTimeTracker() {
-  return g_browser_process->network_time_tracker();
 }
 
 bool ChromeMetricsServiceClient::GetBrand(std::string* brand_code) {

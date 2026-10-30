@@ -37,10 +37,6 @@ namespace metrics::private_metrics {
 class PumaService;
 }
 
-namespace network_time {
-class NetworkTimeTracker;
-}
-
 namespace variations {
 class SyntheticTrialRegistry;
 }
@@ -103,9 +99,6 @@ class MetricsServiceClient {
   // the components that provide the application locale (e.g.,
   // //components/language) to avoid unnecessary bloat.
   virtual std::string GetApplicationLocale() = 0;
-
-  // Return a NetworkTimeTracker for access to a server-provided clock.
-  virtual const network_time::NetworkTimeTracker* GetNetworkTimeTracker() = 0;
 
   // Retrieves the brand code string associated with the install, returning
   // false if no brand code is available.

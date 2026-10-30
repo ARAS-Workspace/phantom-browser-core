@@ -21,10 +21,6 @@ namespace network {
 class SharedURLLoaderFactory;
 }
 
-namespace network_time {
-class NetworkTimeTracker;
-}
-
 class PrefService;
 
 namespace variations {
@@ -40,7 +36,6 @@ class VariationsServiceClient {
 
   virtual scoped_refptr<network::SharedURLLoaderFactory>
   GetURLLoaderFactory() = 0;
-  virtual network_time::NetworkTimeTracker* GetNetworkTimeTracker() = 0;
 
   // Returns whether the embedder overrides the value of the restrict parameter.
   // |parameter| is an out-param that will contain the value of the restrict

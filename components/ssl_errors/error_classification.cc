@@ -17,7 +17,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/network_time/network_time_tracker.h"
 #include "components/ssl_errors/error_info.h"
 #include "components/url_formatter/url_formatter.h"
 #include "net/base/network_change_notifier.h"
@@ -181,42 +180,7 @@ void RecordUMAStatisticsForClockInterstitial(bool overridable,
   }
 }
 
-ClockState GetClockState(
-    const base::Time& now_system,
-    const network_time::NetworkTimeTracker* network_time_tracker) {
-  base::Time now_network;
-  base::TimeDelta uncertainty;
-  const base::TimeDelta kNetworkTimeFudge = base::Minutes(5);
-  NetworkClockState network_state = NETWORK_CLOCK_STATE_MAX;
-  network_time::NetworkTimeTracker::NetworkTimeResult network_time_result =
-      network_time_tracker->GetNetworkTime(&now_network, &uncertainty);
-  switch (network_time_result) {
-    case network_time::NetworkTimeTracker::NETWORK_TIME_AVAILABLE:
-      if (now_system < now_network - uncertainty - kNetworkTimeFudge) {
-        network_state = NETWORK_CLOCK_STATE_CLOCK_IN_PAST;
-      } else if (now_system > now_network + uncertainty + kNetworkTimeFudge) {
-        network_state = NETWORK_CLOCK_STATE_CLOCK_IN_FUTURE;
-      } else {
-        network_state = NETWORK_CLOCK_STATE_OK;
-      }
-      break;
-    case network_time::NetworkTimeTracker::NETWORK_TIME_SYNC_LOST:
-      network_state = NETWORK_CLOCK_STATE_UNKNOWN_SYNC_LOST;
-      break;
-    case network_time::NetworkTimeTracker::NETWORK_TIME_NO_SYNC_ATTEMPT:
-      network_state = NETWORK_CLOCK_STATE_UNKNOWN_NO_SYNC_ATTEMPT;
-      break;
-    case network_time::NetworkTimeTracker::NETWORK_TIME_NO_SUCCESSFUL_SYNC:
-      network_state = NETWORK_CLOCK_STATE_UNKNOWN_NO_SUCCESSFUL_SYNC;
-      break;
-    case network_time::NetworkTimeTracker::NETWORK_TIME_FIRST_SYNC_PENDING:
-      network_state = NETWORK_CLOCK_STATE_UNKNOWN_FIRST_SYNC_PENDING;
-      break;
-    case network_time::NetworkTimeTracker::NETWORK_TIME_SUBSEQUENT_SYNC_PENDING:
-      network_state = NETWORK_CLOCK_STATE_UNKNOWN_SUBSEQUENT_SYNC_PENDING;
-      break;
-  }
-
+ClockState GetClockState(const base::Time& now_system) {
   ClockState build_time_state = CLOCK_STATE_UNKNOWN;
   base::Time build_time = g_testing_build_time.Get().is_null()
                               ? base::GetBuildTime()
@@ -226,25 +190,7 @@ ClockState GetClockState(
   } else if (now_system > build_time + base::Days(365)) {
     build_time_state = CLOCK_STATE_FUTURE;
   }
-
-  switch (network_state) {
-    case NETWORK_CLOCK_STATE_UNKNOWN_SYNC_LOST:
-    case NETWORK_CLOCK_STATE_UNKNOWN_NO_SYNC_ATTEMPT:
-    case NETWORK_CLOCK_STATE_UNKNOWN_NO_SUCCESSFUL_SYNC:
-    case NETWORK_CLOCK_STATE_UNKNOWN_FIRST_SYNC_PENDING:
-    case NETWORK_CLOCK_STATE_UNKNOWN_SUBSEQUENT_SYNC_PENDING:
-      return build_time_state;
-    case NETWORK_CLOCK_STATE_OK:
-      return CLOCK_STATE_OK;
-    case NETWORK_CLOCK_STATE_CLOCK_IN_PAST:
-      return CLOCK_STATE_PAST;
-    case NETWORK_CLOCK_STATE_CLOCK_IN_FUTURE:
-      return CLOCK_STATE_FUTURE;
-    case NETWORK_CLOCK_STATE_MAX:
-      NOTREACHED();
-  }
-
-  NOTREACHED();
+  return build_time_state;
 }
 
 void SetBuildTimeForTesting(const base::Time& testing_time) {

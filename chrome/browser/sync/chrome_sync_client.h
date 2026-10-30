@@ -13,10 +13,6 @@
 #include "components/sync/service/sync_client.h"
 #include "extensions/buildflags/buildflags.h"
 
-namespace network_time {
-class NetworkTimeTracker;
-}  // namespace network_time
-
 namespace syncer {
 class DataTypeStoreService;
 class DeviceInfoSyncService;
@@ -49,7 +45,6 @@ class ChromeSyncClient : public syncer::SyncClient {
   // SyncClient implementation.
   PrefService* GetPrefService() override;
   signin::IdentityManager* GetIdentityManager() override;
-  network_time::NetworkTimeTracker* GetNetworkTimeTracker() override;
   base::FilePath GetLocalSyncBackendFolder() override;
   trusted_vault::TrustedVaultClient* GetTrustedVaultClient() override;
   scoped_refptr<syncer::ExtensionsActivity> GetExtensionsActivity() override;

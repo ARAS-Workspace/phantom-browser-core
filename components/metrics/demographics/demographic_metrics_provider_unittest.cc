@@ -9,7 +9,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/simple_test_clock.h"
-#include "base/time/time.h"
 #include "base/values.h"
 #include "components/metrics/demographics/user_demographics.h"
 #include "components/metrics/metrics_log_uploader.h"
@@ -118,13 +117,6 @@ class TestProfileClient : public DemographicMetricsProvider::ProfileClient {
   PrefService* GetLocalState() override { return &pref_service_; }
 
   PrefService* GetProfilePrefs() override { return &pref_service_; }
-
-  base::Time GetNetworkTime() const override {
-    base::Time time;
-    auto result = base::Time::FromString("17 Jun 2019 00:00:00 UDT", &time);
-    DCHECK(result);
-    return time;
-  }
 
   void SetDemographicsInPrefs(int birth_year,
                               metrics::UserDemographicsProto_Gender gender) {
