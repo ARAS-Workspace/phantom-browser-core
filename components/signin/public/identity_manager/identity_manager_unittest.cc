@@ -398,6 +398,7 @@ class IdentityManagerTest : public testing::Test {
         token_service.get(), account_tracker_service.get(),
         primary_account_manager.get(), &pref_service_);
     init_params.signin_client = &signin_client_;
+    init_params.avoid_list_accounts_requests = avoid_list_accounts_requests_;
     init_params.account_fetcher_service = std::move(account_fetcher_service);
     init_params.account_tracker_service = std::move(account_tracker_service);
     init_params.gaia_cookie_manager_service =
@@ -444,12 +445,17 @@ class IdentityManagerTest : public testing::Test {
     return &test_url_loader_factory_;
   }
 
+  void set_avoid_list_accounts_requests(bool avoid) {
+    avoid_list_accounts_requests_ = avoid;
+  }
+
  private:
   base::ScopedTempDir temp_profile_dir_;
   base::test::TaskEnvironment task_environment_;
   sync_preferences::TestingPrefServiceSyncable pref_service_;
   network::TestURLLoaderFactory test_url_loader_factory_;
   TestSigninClient signin_client_;
+  bool avoid_list_accounts_requests_ = false;
   metrics::ProfileMetricsService profile_metrics_service_;
   std::unique_ptr<IdentityManager> identity_manager_;
   std::unique_ptr<TestIdentityManagerObserver> identity_manager_observer_;
@@ -1941,6 +1947,19 @@ TEST_F(IdentityManagerTest, GetAccountsInCookieJarWithNoAccounts) {
       updated_accounts_in_cookie_jar.GetPotentiallyInvalidSignedInAccounts()
           .empty());
   EXPECT_TRUE(updated_accounts_in_cookie_jar.GetSignedOutAccounts().empty());
+}
+
+TEST_F(IdentityManagerTest, GetAccountsInCookieJarAvoidsListAccountsRequests) {
+  set_avoid_list_accounts_requests(true);
+  RecreateIdentityManager();
+
+  const AccountsInCookieJarInfo accounts_in_cookie_jar =
+      identity_manager()->GetAccountsInCookieJar();
+  EXPECT_FALSE(accounts_in_cookie_jar.AreAccountsFresh());
+  identity_manager()->OnNetworkInitialized();
+  base::RunLoop().RunUntilIdle();
+
+  EXPECT_EQ(0, test_url_loader_factory()->NumPending());
 }
 
 TEST_F(IdentityManagerTest, GetAccountsInCookieJarWithOneAccount) {

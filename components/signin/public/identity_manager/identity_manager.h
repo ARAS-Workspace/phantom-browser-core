@@ -333,8 +333,9 @@ class IdentityManager : public KeyedService,
   // Provides the information of all accounts that are present in the Gaia
   // cookie in the cookie jar, ordered by their order in the cookie.
   //
-  // When `switches::kAvoidAutoTriggerListAccountsOnStale` is enabled, this
-  // method will not trigger an update even if the accounts are stale.
+  // When `switches::kAvoidAutoTriggerListAccountsOnStale` is enabled or when
+  // `InitParameters::avoid_list_accounts_requests` is set, this method will
+  // not trigger an update even if the accounts are stale.
   AccountsInCookieJarInfo GetAccountsInCookieJar() const;
 
   // Returns the accounts in the cookie jar without triggering an internal
@@ -439,6 +440,9 @@ class IdentityManager : public KeyedService,
     std::unique_ptr<DeviceAccountsSynchronizer> device_accounts_synchronizer;
     std::unique_ptr<DiagnosticsProvider> diagnostics_provider;
     raw_ptr<SigninClient> signin_client = nullptr;
+    // When true, GetAccountsInCookieJar() returns the cached accounts and
+    // OnNetworkInitialized() does not request /ListAccounts.
+    bool avoid_list_accounts_requests = false;
 
     InitParameters();
     InitParameters(InitParameters&&);
@@ -674,6 +678,9 @@ class IdentityManager : public KeyedService,
   std::unique_ptr<PrimaryAccountManager> primary_account_manager_;
   std::unique_ptr<AccountFetcherService> account_fetcher_service_;
   const raw_ptr<SigninClient> signin_client_;
+
+  // See `InitParameters::avoid_list_accounts_requests`.
+  const bool avoid_list_accounts_requests_;
 
   std::unique_ptr<IdentityMutator> identity_mutator_;
 

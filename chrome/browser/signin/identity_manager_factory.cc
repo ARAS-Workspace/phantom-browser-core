@@ -15,6 +15,7 @@
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/signin/account_consistency_mode_manager.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/pref_registry/pref_registry_syncable.h"
@@ -123,6 +124,10 @@ IdentityManagerFactory::BuildServiceInstanceForBrowserContext(
         CookieSettingsFactory::GetForProfile(profile);
     params.delete_signin_cookies_on_exit =
         signin::SettingsDeleteSigninCookiesOnExit(cookie_settings.get());
+    // IsDiceSignInAllowed() is false without an OAuth client; the cookie jar
+    // is then read from the cache only.
+    params.avoid_list_accounts_requests =
+        !AccountConsistencyModeManager::IsDiceSignInAllowed(/*entry=*/nullptr);
   }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 

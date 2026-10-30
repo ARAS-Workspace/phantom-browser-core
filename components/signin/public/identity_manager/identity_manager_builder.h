@@ -54,6 +54,9 @@ struct IdentityManagerBuildParams {
   std::unique_ptr<AccountFetcherFactory> account_fetcher_factory;
   std::unique_ptr<ProfileOAuth2TokenService> token_service;
   std::unique_ptr<AccountTrackerService> account_tracker_service;
+  // When true, `IdentityManager::GetAccountsInCookieJar()` returns the cached
+  // accounts and network initialization does not request /ListAccounts.
+  bool avoid_list_accounts_requests = false;
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   bool delete_signin_cookies_on_exit = false;

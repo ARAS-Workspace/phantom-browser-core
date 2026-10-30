@@ -141,6 +141,8 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
   init_params.primary_account_manager = std::move(primary_account_manager);
   init_params.token_service = std::move(token_service);
   init_params.signin_client = params->signin_client;
+  init_params.avoid_list_accounts_requests =
+      params->avoid_list_accounts_requests;
 
   return init_params;
 }
