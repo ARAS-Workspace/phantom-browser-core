@@ -41,11 +41,6 @@
 -LanguageDetectionJavascriptTest.LongTextContent
 -LanguageDetectionJavascriptTest.RetrieveBufferedTextContent
 
-# TODO(crbug.com/332939159): Test currently fails on iOS Blink.
--PageContentAnnotationsModelManagerTest.CalledTwice
--PageContentAnnotationsModelManagerTest.NotifyWhenModelAvailable_VisibilityOnly
--PageContentAnnotationsModelManagerTest.PageVisibility
-
 # TODO(crbug.com/40945936): Test currently fails on iOS blink. And,
 # https://crrev.com/c/5854580 changed some test type to value-parameterized
 # tests.

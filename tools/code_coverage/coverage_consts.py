@@ -258,7 +258,6 @@ FUZZERS_WITH_CORPORA = [
   'omnibox_view_fuzzer',
   'open_type_math_support_fuzzer',
   'optimization_guide_page_topics_fuzzer',
-  'optimization_guide_page_visibility_model_fuzzer',
   'origin_trial_token_fuzzer',
   'ots_fuzzer',
   'paint_op_buffer_fuzzer',

@@ -64,7 +64,6 @@ include_rules = [
   "+components/optimization_guide/content",
   "+components/optimization_guide/core",
   "+components/os_crypt/async",
-  "+components/page_content_annotations/core",
   "+components/password_manager/core/browser",
   "+components/performance_manager/public",
   "+components/performance_manager/scenario_api",

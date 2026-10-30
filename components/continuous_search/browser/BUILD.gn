@@ -18,20 +18,3 @@ source_set("browser") {
     "//url",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-
-  sources = [ "search_result_extractor_client_unittest.cc" ]
-
-  deps = [
-    ":browser",
-    "//base",
-    "//components/continuous_search/browser/test:test_support",
-    "//components/continuous_search/common/public/mojom",
-    "//content/test:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//url",
-  ]
-}

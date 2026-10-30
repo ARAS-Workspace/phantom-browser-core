@@ -117,35 +117,3 @@ source_set("test_support") {
     "//content/public/browser",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "annotate_page_content_request_unittest.cc",
-    "embeddings_candidate_generator_unittest.cc",
-    "page_content_extraction_service_unittest.cc",
-    "page_context_fetcher_unittest.cc",
-    "page_embeddings_service_unittest.cc",
-  ]
-  deps = [
-    ":content",
-    ":metrics",
-    ":page_embeddings",
-    "//components/feature_engagement/public:feature_constants",
-    "//components/feature_engagement/test:test_support",
-    "//components/optimization_guide/proto:optimization_guide_proto",
-    "//components/os_crypt/async/browser:test_support",
-    "//components/page_content_annotations/core",
-    "//components/page_content_annotations/core:features",
-    "//components/passage_embeddings/core:passage_embeddings_types",
-    "//components/passage_embeddings/core:test_support",
-    "//components/ukm:test_support",
-    "//content/test:test_support",
-    "//pdf:buildflags",
-    "//testing/gmock",
-    "//testing/gtest",
-  ]
-  if (enable_pdf) {
-    deps += [ "//components/pdf/browser" ]
-  }
-}
