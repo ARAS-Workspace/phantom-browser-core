@@ -64,9 +64,6 @@
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
-#include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
-#include "chrome/browser/segmentation_platform/ukm_data_manager_test_utils.h"
-#include "chrome/browser/segmentation_platform/ukm_database_client.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/test_signin_client_builder.h"
 
@@ -139,11 +136,9 @@
 #include "components/private_verification_tokens/common/private_verification_tokens_database.h"
 #include "components/private_verification_tokens/common/private_verification_tokens_token.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
-#include "components/segmentation_platform/public/features.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/site_isolation/pref_names.h"
 #include "components/sync/test/test_sync_service.h"
-#include "components/ukm/test_ukm_recorder.h"
 #include "content/public/browser/background_tracing.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -452,49 +447,6 @@ class RemoveFaviconTester {
   // Owned by TestingProfile.
   raw_ptr<history::HistoryService> history_service_ = nullptr;
   raw_ptr<favicon::FaviconService> favicon_service_ = nullptr;
-};
-
-class RemoveUkmDataTester {
- public:
-  static constexpr auto kSegmentId = segmentation_platform::proto::
-      OPTIMIZATION_TARGET_SEGMENTATION_CHROME_LOW_USER_ENGAGEMENT;
-
-  RemoveUkmDataTester() : test_utils_(&ukm_recorder_) {
-    test_utils_.PreProfileInit(
-        {{kSegmentId, test_utils_.GetSamplePageLoadMetadata("SELECT 1")}});
-  }
-
-  RemoveUkmDataTester(const RemoveUkmDataTester&) = delete;
-  RemoveUkmDataTester& operator=(const RemoveUkmDataTester&) = delete;
-
-  [[nodiscard]] bool Init(Profile* profile) {
-    test_utils_.SetupForProfile(profile);
-
-    // Run model overrides to start storing UKM metrics.
-    test_utils_.WaitForUkmObserverRegistration();
-
-    return true;
-  }
-
-  void TearDown(Profile* profile) { test_utils_.WillDestroyProfile(profile); }
-
-  [[nodiscard]] bool UkmDatabaseContainsURL(const GURL& url) {
-    return test_utils_.IsUrlInDatabase(url);
-  }
-
-  void AddURL(const GURL& url, base::Time time) {
-    test_utils_.RecordPageLoadUkm(url, time);
-
-    // Wait for URL to be written to database, UKM recorder needs to run all
-    // necessary tasks before sending observation.
-    while (!UkmDatabaseContainsURL(url)) {
-      base::RunLoop().RunUntilIdle();
-    }
-  }
-
- private:
-  ukm::TestUkmRecorder ukm_recorder_;
-  segmentation_platform::UkmDataManagerTestUtils test_utils_;
 };
 
 std::unique_ptr<KeyedService> BuildProtocolHandlerRegistry(
@@ -1566,61 +1518,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest,
             GetOriginTypeMask());
   EXPECT_FALSE(tester.HistoryContainsURL(kOrigin1));
   EXPECT_TRUE(tester.HistoryContainsURL(kOrigin2));
-}
-
-class ChromeBrowsingDataRemoverDelegateEnabledUkmDatabaseTest
-    : public ChromeBrowsingDataRemoverDelegateTest {
- public:
-  ChromeBrowsingDataRemoverDelegateEnabledUkmDatabaseTest() {
-    // Enable features that will trigger platform to store URLs in database.
-    feature_list_.InitWithFeatures(
-        {segmentation_platform::features::kSegmentationPlatformFeature,
-         segmentation_platform::features::
-             kSegmentationPlatformLowEngagementFeature,
-         segmentation_platform::features::kSegmentationPlatformUkmEngine},
-        {});
-  }
-
-  void SetUp() override {
-    tester_ = std::make_unique<RemoveUkmDataTester>();
-    ChromeBrowsingDataRemoverDelegateTest::SetUp();
-  }
-
-  void TearDown() override {
-    tester_->TearDown(GetProfile());
-    ChromeBrowsingDataRemoverDelegateTest::TearDown();
-    tester_.reset();
-  }
-
- protected:
-  std::unique_ptr<RemoveUkmDataTester> tester_;
-};
-
-TEST_F(ChromeBrowsingDataRemoverDelegateEnabledUkmDatabaseTest, RemoveUkmUrls) {
-  ASSERT_TRUE(tester_->Init(GetProfile()));
-
-  const base::Time timestamp1 = base::Time::Now();
-  const base::Time timestamp2 = timestamp1 + base::Hours(2);
-
-  const GURL kOrigin1("http://host1.com:1");
-  tester_->AddURL(kOrigin1, timestamp1);
-  const GURL kOrigin2("http://host2.com:1");
-  tester_->AddURL(kOrigin2, timestamp2);
-  ASSERT_TRUE(tester_->UkmDatabaseContainsURL(kOrigin2));
-
-  // Removing history URLs will remove URLs from the platform.
-  BlockUntilBrowsingDataRemoved(base::Time(), timestamp1 + base::Hours(1),
-                                constants::DATA_TYPE_HISTORY, false);
-
-  EXPECT_FALSE(tester_->UkmDatabaseContainsURL(kOrigin1));
-  EXPECT_TRUE(tester_->UkmDatabaseContainsURL(kOrigin2));
-
-  // Removing history URLs will remove URLs from the platform.
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_HISTORY, false);
-
-  EXPECT_FALSE(tester_->UkmDatabaseContainsURL(kOrigin1));
-  EXPECT_FALSE(tester_->UkmDatabaseContainsURL(kOrigin2));
 }
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest,

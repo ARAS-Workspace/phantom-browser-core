@@ -82,7 +82,6 @@ test("components_unittests") {
       "test/data/resource_provider/",
       "test/data/safe_browsing/",
       "test/data/search_engines/",
-      "test/data/segmentation_platform/",
       "test/data/service_worker/",
       "test/data/sessions/",
       "test/data/shared_highlighting/",
@@ -215,7 +214,6 @@ test("components_unittests") {
     "//components/search_engines:unit_tests",
     "//components/security_interstitials/core:unit_tests",
     "//components/security_state/core:unit_tests",
-    "//components/segmentation_platform:unit_tests",
     "//components/server_certificate_database:unit_tests",
     "//components/services/heap_profiling/public/cpp:unit_tests",
     "//components/services/patch:unit_tests",
@@ -257,7 +255,6 @@ test("components_unittests") {
     "//components/unified_consent:unit_tests",
     "//components/universal_optout:unit_tests",
     "//components/upload_list:unit_tests",
-    "//components/url_deduplication:unit_tests",
     "//components/url_formatter:unit_tests",
     "//components/url_formatter/spoof_checks/common_words:unit_tests",
     "//components/url_formatter/spoof_checks/top_domains:unit_tests",
@@ -311,7 +308,6 @@ test("components_unittests") {
     "//components/send_tab_to_self:unit_tests",
     "//components/sync_sessions:unit_tests",
     "//components/update_client:unit_tests",
-    "//components/visited_url_ranking/internal:unit_tests",
   ]
 
   if (use_blink) {
@@ -388,7 +384,6 @@ test("components_unittests") {
       "//components/user_education/common:unit_tests",
       "//components/value_store:unit_tests",
       "//components/visibility_timer:unit_tests",
-      "//components/visited_url_ranking/public:unit_tests",
       "//components/visitedlink/test:unit_tests",
       "//components/web_cache/browser:unit_tests",
       "//components/web_package:unit_tests",
