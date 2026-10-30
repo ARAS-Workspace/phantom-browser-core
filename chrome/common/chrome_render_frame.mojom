@@ -4,7 +4,6 @@
 
 module chrome.mojom;
 
-import "components/page_content_annotations/content/mojom/page_stability.mojom";
 import "mojo/public/mojom/base/string16.mojom";
 import "mojo/public/mojom/base/unguessable_token.mojom";
 import "skia/public/mojom/bitmap.mojom";

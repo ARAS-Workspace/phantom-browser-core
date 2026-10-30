@@ -35,6 +35,7 @@ source_set("browser_web_contents_delegate") {
     "//components/headless/console_message_logger",
     "//components/javascript_dialogs",
     "//components/page_load_metrics/browser",
+    "//components/paint_preview/browser",
     "//components/printing/browser",
     "//content/public/browser",
     "//ui/base",

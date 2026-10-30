@@ -7,7 +7,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <variant>
 
 #include "base/check.h"
 #include "base/metrics/histogram_functions.h"
@@ -15,15 +14,12 @@
 #include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "base/timer/elapsed_timer.h"
-#include "chrome/browser/page_content_annotations/page_content_extraction_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_focus_state.h"
-#include "components/optimization_guide/proto/features/common_quality_data.pb.h"
-#include "components/page_content_annotations/content/page_content_extraction_service.h"
 #include "components/search_engines/search_engine_type.h"
 #include "components/search_engines/search_engine_utils.h"
 #include "content/public/browser/navigation_handle.h"
@@ -103,22 +99,7 @@ void OmniboxTabHelper::ClearOmniboxInputState(
 OmniboxTabHelper::OmniboxTabHelper(content::WebContents* contents,
                                    Profile* profile)
     : content::WebContentsUserData<OmniboxTabHelper>(*contents),
-      content::WebContentsObserver(contents) {
-  // Only fetch the entire APC if the paywall signal feature flag is enabled AND
-  // the faster FrameMetadataObserver push service is disabled.
-  if (omnibox_feature_configs::ContextualSearch::Get().use_apc_paywall_signal &&
-      !base::FeatureList::IsEnabled(blink::features::kFrameMetadataObserver)) {
-    if (auto* service = page_content_annotations::
-            PageContentExtractionServiceFactory::GetForProfile(profile)) {
-      // TODO(crbug.com/426665820): There are currently two ways the paywall
-      // signal is being fetched. This uses the PageContentExtractionService
-      // which takes a while to run, but has been around longer so is safer.
-      // Eventually, once FrameMetadataObserver is well tested, this should be
-      // cleaned up in favor of that.
-      page_content_service_observation_.Observe(service);
-    }
-  }
-}
+      content::WebContentsObserver(contents) {}
 
 void OmniboxTabHelper::AddObserver(Observer* observer) {
   observers_.AddObserver(observer);
@@ -162,31 +143,6 @@ void OmniboxTabHelper::OnPopupVisibilityChanged(
 
 std::optional<bool> OmniboxTabHelper::IsPagePaywalled() {
   return page_has_apc_paywall_signal_;
-}
-
-void OmniboxTabHelper::OnPageContentExtracted(
-    content::Page& page,
-    page_content_annotations::PageContent page_content) {
-  page_content_annotations::RefCountedAnnotatedPageContentPtr
-      annotated_page_content_ptr =
-          page_content_annotations::GetAnnotatedPageContentPtrFromPageContent(
-              page_content);
-  if (!annotated_page_content_ptr) {
-    return;
-  }
-
-  // Ignore if the APC does not belong to the primary page of this tabs web
-  // contents.
-  if (&page != &(GetWebContents().GetPrimaryPage())) {
-    return;
-  }
-  page_has_apc_paywall_signal_ =
-      annotated_page_content_ptr->data.has_main_frame_data() &&
-      annotated_page_content_ptr->data.main_frame_data()
-          .has_paid_content_metadata() &&
-      annotated_page_content_ptr->data.main_frame_data()
-          .paid_content_metadata()
-          .contains_paid_content();
 }
 
 void OmniboxTabHelper::PrimaryPageChanged(content::Page& page) {
@@ -291,10 +247,9 @@ void OmniboxTabHelper::MaybeLogNavigationToPopupShownTimings(
 }
 
 void OmniboxTabHelper::MaybeLogPaywallSignal() {
-  // If the page content service is not observing, then the paywall signal is
+  // If the frame metadata observer is not bound, then the paywall signal is
   // unavailable to be fetched.
-  if (!page_content_service_observation_.IsObserving() &&
-      !paid_content_metadata_observer_receiver_.is_bound()) {
+  if (!paid_content_metadata_observer_receiver_.is_bound()) {
     return;
   }
 

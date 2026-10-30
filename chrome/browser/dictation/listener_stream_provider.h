@@ -21,7 +21,6 @@ class BrowserContext;
 }  // namespace content
 
 namespace dictation {
-class DictationContextFetcher;
 class StreamProviderDelegate;
 class Target;
 
@@ -55,8 +54,6 @@ class ListenerStreamProvider : public StreamProvider {
  private:
   DictationMultiplexer& GetMultiplexer() const;
   void StartStream(std::optional<DictationContext> context);
-  void OnStartContextCaptured(DictationContext result);
-  void OnAsyncContextCaptured(DictationContext result);
   void OnPendingInsertionsComplete();
 
   // Owns this
@@ -70,8 +67,6 @@ class ListenerStreamProvider : public StreamProvider {
   StreamState state_ = StreamState::kInitializing;
 
   bool is_final_for_testing_ = false;
-
-  std::unique_ptr<DictationContextFetcher> context_fetcher_;
 
   base::WeakPtrFactory<ListenerStreamProvider> weak_ptr_factory_{this};
 };

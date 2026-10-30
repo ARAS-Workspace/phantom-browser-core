@@ -40,7 +40,6 @@
 #include "components/no_state_prefetch/renderer/no_state_prefetch_utils.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/optimization_guide/content/renderer/page_text_agent.h"
-#include "components/page_content_annotations/content/renderer/page_stability_monitor.h"
 #include "components/variations/variations_switches.h"
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "content/public/common/bindings_policy.h"

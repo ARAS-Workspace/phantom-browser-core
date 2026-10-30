@@ -40,7 +40,6 @@
 #include "chrome/browser/ui/autofill/payments/wallet_reminder_notice_page_action_controller.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/context_highlight/context_highlight_tab_feature.h"
 #include "chrome/browser/ui/focus_tab_after_navigation_helper.h"
 #include "chrome/browser/ui/page_action/action_ids.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
@@ -319,9 +318,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
 
   bookmarkbar_preload_pipeline_manager_ =
       std::make_unique<BookmarkBarPreloadPipelineManager>(tab.GetContents());
-
-  context_highlight_tab_feature_ =
-      GetUserDataFactory().CreateInstance<ContextHighlightTabFeature>(tab, tab);
 
   new_tab_page_preload_pipeline_manager_ =
       std::make_unique<NewTabPagePreloadPipelineManager>(tab.GetContents());

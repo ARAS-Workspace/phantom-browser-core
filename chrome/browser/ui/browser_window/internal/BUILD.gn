@@ -49,7 +49,6 @@ source_set("internal") {
     "//chrome/browser/ui/browser_ui_controller",
     "//chrome/browser/ui/browser_web_contents_delegate",
     "//chrome/browser/ui/call_to_action",
-    "//chrome/browser/ui/context_highlight",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/find_bar",

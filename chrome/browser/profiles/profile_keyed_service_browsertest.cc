@@ -562,7 +562,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "OneTimePermissionsTrackerKeyedService",
     "OperationManager",
     "OptimizationGuideKeyedService",
-    "PageContentAnnotationsService",
     "PendingExtensionManager",
     "PermissionDecisionAutoBlocker",
     "PermissionHelper",
@@ -644,7 +643,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "WebRequestEventRouter",
     "WebRtcEventLogManagerKeyedService",
     "WriteQuotaChecker",
-    "ZeroSuggestCacheServiceFactory",
 
   };
   // clang-format on

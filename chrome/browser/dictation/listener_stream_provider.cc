@@ -8,7 +8,6 @@
 
 #include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/dictation/dictation_context_fetcher.h"
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/logging.h"
@@ -85,19 +84,7 @@ void ListenerStreamProvider::BindToTargetAndConnect(
 
   VT_LOG(browser_context_) << "Stream(" << stream_id_ << ")::" << __func__;
 
-  context_fetcher_ = std::make_unique<DictationContextFetcher>();
-  if (kSendContextAsync.Get()) {
-    StartStream(std::nullopt);
-    context_fetcher_->Fetch(
-        *target_,
-        base::BindOnce(&ListenerStreamProvider::OnAsyncContextCaptured,
-                       weak_ptr_factory_.GetWeakPtr()));
-  } else {
-    context_fetcher_->Fetch(
-        *target_,
-        base::BindOnce(&ListenerStreamProvider::OnStartContextCaptured,
-                       weak_ptr_factory_.GetWeakPtr()));
-  }
+  StartStream(std::nullopt);
 }
 
 void ListenerStreamProvider::StartStream(
@@ -129,32 +116,8 @@ void ListenerStreamProvider::StartStream(
       ->BroadcastEvent(std::move(event));
 }
 
-void ListenerStreamProvider::OnStartContextCaptured(DictationContext result) {
-  StartStream(std::move(result));
-}
-
-void ListenerStreamProvider::OnAsyncContextCaptured(DictationContext result) {
-  CHECK(stream_id_);
-
-  extensions::api::dictation_private::ContextUpdateDetails details;
-  details.stream_id = stream_id_.value();
-  details.context = ConvertToApiContext(std::move(result));
-
-  base::ListValue event_args =
-      extensions::api::dictation_private::OnContextUpdate::Create(details);
-
-  auto event = std::make_unique<extensions::Event>(
-      extensions::events::DICTATION_PRIVATE_ON_CONTEXT_UPDATE,
-      extensions::api::dictation_private::OnContextUpdate::kEventName,
-      std::move(event_args), browser_context_);
-
-  extensions::EventRouter::Get(browser_context_)
-      ->BroadcastEvent(std::move(event));
-}
-
 void ListenerStreamProvider::Stop() {
   VT_LOG(browser_context_) << "Stream(" << stream_id_ << ")::" << __func__;
-  context_fetcher_.reset();
 
   if (!stream_id_) {
     return;

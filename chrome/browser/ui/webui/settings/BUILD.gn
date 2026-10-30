@@ -237,6 +237,7 @@ source_set("impl") {
     "//components/personal_context/core",
     "//components/prefs",
     "//components/privacy_sandbox",
+    "//components/search",
     "//components/search_engines",
     "//components/signin/public/base",
     "//components/site_engagement/content",

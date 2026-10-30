@@ -78,7 +78,6 @@
 #include "components/content_capture/common/content_capture_features.h"
 #include "components/content_capture/renderer/content_capture_sender.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
-#include "components/continuous_search/renderer/search_result_extractor_impl.h"
 #include "components/country_codes/country_codes.h"
 #include "components/dom_distiller/content/renderer/distillability_agent.h"
 #include "components/dom_distiller/content/renderer/distiller_js_render_frame_observer.h"
@@ -97,8 +96,6 @@
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_render_frame_observer.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_utils.h"
-#include "components/page_content_annotations/content/renderer/page_stability_monitor_manager.h"
-#include "components/page_content_annotations/core/page_content_annotations_features.h"
 #include "components/page_load_metrics/renderer/metrics_render_frame_observer.h"
 #include "components/paint_preview/buildflags/buildflags.h"
 #include "components/pdf/common/constants.h"
@@ -532,13 +529,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
   if (render_frame->IsMainFrame())
     new webapps::WebPageMetadataAgent(render_frame);
 
-  const bool search_result_extractor_enabled =
-      render_frame->IsMainFrame() &&
-      page_content_annotations::features::ShouldExtractRelatedSearches();
-  if (search_result_extractor_enabled) {
-    continuous_search::SearchResultExtractorImpl::Create(render_frame);
-  }
-
   new NetErrorHelper(render_frame);
 
   new security_interstitials::SecurityInterstitialPageControllerDelegateImpl(
@@ -613,10 +603,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
   if (base::FeatureList::IsEnabled(features::kWebium)) {
     WebUIBrowserRendererExtension::Create(render_frame);
   }
-
-  // Wire up the PageStabilityMonitorManager to allow components to
-  // request stability monitors for this frame.
-  new page_content_annotations::PageStabilityMonitorManager(render_frame);
 }
 
 void ChromeContentRendererClient::WebViewCreated(

@@ -472,7 +472,6 @@ source_set("impl") {
     "//chrome/browser/ui/actions:actions_util",
     "//chrome/browser/ui/autofill",
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/ui/context_highlight",
     "//chrome/browser/ui/interaction",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/side_panel",

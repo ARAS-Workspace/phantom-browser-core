@@ -60,7 +60,6 @@ class CallToActionLock;
 class ColorProviderBrowserHelper;
 class CommentsSidePanelCoordinator;
 class ContentsBorderController;
-class ContextHighlightWindowFeature;
 
 class CookieControlsBubbleCoordinator;
 class DataSharingBubbleController;
@@ -503,9 +502,6 @@ class BrowserWindowFeatures {
   // Helper which implements the ContentSettingBubbleModel interface.
   std::unique_ptr<BrowserContentSettingBubbleModelDelegate>
       content_setting_bubble_model_delegate_;
-
-  std::unique_ptr<ContextHighlightWindowFeature>
-      context_highlight_window_feature_;
 
   // Member order dependencies:
   //   extension_window_controller_ depends on tab_list_bridge_.

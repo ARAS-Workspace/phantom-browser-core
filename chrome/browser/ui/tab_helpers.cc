@@ -4,9 +4,7 @@
 
 #include "chrome/browser/ui/tab_helpers.h"
 
-#include <cstdint>
 #include <memory>
-#include <optional>
 #include <utility>
 
 #include "base/command_line.h"
@@ -48,9 +46,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_web_contents_observer.h"
-#include "chrome/browser/page_content_annotations/multi_source_page_context_fetcher.h"
-#include "chrome/browser/page_content_annotations/page_content_annotations_service_factory.h"
-#include "chrome/browser/page_content_annotations/page_content_extraction_service_factory.h"
 #include "chrome/browser/page_info/about_this_site_tab_helper.h"
 #include "chrome/browser/page_info/page_info_features.h"
 #include "chrome/browser/page_load_metrics/page_load_metrics_initialize.h"
@@ -112,9 +107,6 @@
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
-#include "components/page_content_annotations/content/annotate_page_content_request.h"
-#include "components/page_content_annotations/content/page_content_annotations_web_contents_observer.h"
-#include "components/page_content_annotations/core/page_content_extraction_types.h"
 #include "components/page_info/core/features.h"
 #include "components/performance_manager/embedder/performance_manager_registry.h"
 #include "components/performance_manager/public/features.h"
@@ -122,7 +114,6 @@
 #include "components/permissions/permission_recovery_success_rate_tracker.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/search/ntp_features.h"
-#include "components/sessions/content/session_tab_helper.h"
 #include "components/site_engagement/content/site_engagement_helper.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/tabs/public/tab_interface.h"
@@ -200,15 +191,6 @@ namespace {
 
 const char kTabContentsAttachedTabHelpersUserDataKey[] =
     "TabContentsAttachedTabHelpers";
-
-std::optional<int64_t> GetPageContentAnnotationsTabId(
-    content::WebContents* web_contents) {
-  SessionID id = sessions::SessionTabHelper::IdForTab(web_contents);
-  if (id.is_valid()) {
-    return id.id();
-  }
-  return std::nullopt;
-}
 
 }  // namespace
 
@@ -316,25 +298,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   NavigationPredictorPreconnectClient::CreateForWebContents(web_contents);
   if (optimization_guide::features::IsOptimizationHintsEnabled()) {
     OptimizationGuideWebContentsObserver::CreateForWebContents(web_contents);
-  }
-  page_content_annotations::PageContentAnnotationsService*
-      page_content_annotations_service =
-          PageContentAnnotationsServiceFactory::GetForProfile(profile);
-  if (page_content_annotations_service) {
-    page_content_annotations::PageContentAnnotationsWebContentsObserver::
-        CreateForWebContents(web_contents, *page_content_annotations_service);
-
-    // TODO(b/478883979): Consider decoupling this from
-    // PageContentAnnotationsService.
-    auto* page_content_extraction_service = page_content_annotations::
-        PageContentExtractionServiceFactory::GetForProfile(profile);
-    if (page_content_extraction_service) {
-      page_content_annotations::AnnotatedPageContentRequest::
-          CreateForWebContents(
-              web_contents, *page_content_extraction_service,
-              base::BindRepeating(&page_content_annotations::FetchPageContext),
-              base::BindRepeating(&GetPageContentAnnotationsTabId));
-    }
   }
   InitializePageLoadMetricsForWebContents(web_contents);
   if (auto* pm_registry =

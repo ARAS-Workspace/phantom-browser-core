@@ -47,7 +47,6 @@
 #include "chrome/browser/ui/browser_window/public/embedder_browser_window_features.h"
 #include "chrome/browser/ui/browser_window_theme_observer.h"
 #include "chrome/browser/ui/call_to_action/call_to_action_lock.h"
-#include "chrome/browser/ui/context_highlight/context_highlight_window_feature.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/extensions/extension_installed_watcher.h"
 #include "chrome/browser/ui/find_bar/find_bar.h"
@@ -317,9 +316,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
 
   content_setting_bubble_model_delegate_ =
       std::make_unique<BrowserContentSettingBubbleModelDelegate>(browser);
-
-  context_highlight_window_feature_ =
-      std::make_unique<ContextHighlightWindowFeature>(*browser);
 
   cookie_controls_bubble_coordinator_ =
       GetUserDataFactory().CreateInstance<CookieControlsBubbleCoordinator>(
@@ -955,7 +951,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   // deterministically constructed.
   find_bar_controller_.reset();
   extension_installed_watcher_.reset();
-  context_highlight_window_feature_.reset();
   comments_side_panel_coordinator_.reset();
   if (auto* const provider = browser_elements_->AsA<BrowserElementsViews>()) {
     provider->TearDown();

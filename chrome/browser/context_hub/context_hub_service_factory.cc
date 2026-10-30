@@ -19,12 +19,10 @@
 #include "chrome/browser/context_hub/tab_group_store/in_memory_tab_group_store.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
-#include "chrome/browser/page_content_annotations/page_content_extraction_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/webui/context_hub/context_hub.mojom-features.h"
-#include "components/page_content_annotations/content/page_content_extraction_service.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "sql/database.h"
 
@@ -58,8 +56,6 @@ ContextHubServiceFactory::ContextHubServiceFactory()
   DependsOn(PersonalContextServiceFactory::GetInstance());
   DependsOn(OptimizationGuideKeyedServiceFactory::GetInstance());
   DependsOn(tab_groups::TabGroupSyncServiceFactory::GetInstance());
-  DependsOn(page_content_annotations::PageContentExtractionServiceFactory::
-                GetInstance());
 }
 
 ContextHubServiceFactory::~ContextHubServiceFactory() = default;
@@ -88,12 +84,6 @@ ContextHubServiceFactory::BuildServiceInstanceForBrowserContext(
   tab_groups::TabGroupSyncService* tab_group_sync_service =
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile);
   if (!tab_group_sync_service) {
-    return nullptr;
-  }
-  page_content_annotations::PageContentExtractionService*
-      page_content_extraction_service = page_content_annotations::
-          PageContentExtractionServiceFactory::GetForProfile(profile);
-  if (!page_content_extraction_service) {
     return nullptr;
   }
 
@@ -138,7 +128,7 @@ ContextHubServiceFactory::BuildServiceInstanceForBrowserContext(
 
   return std::make_unique<context_hub::ContextHubService>(
       profile, personal_context_service, optimization_guide_service,
-      tab_group_sync_service, page_content_extraction_service,
-      std::move(memory_bank), std::move(tab_group_store), std::move(backend),
+      tab_group_sync_service, std::move(memory_bank),
+      std::move(tab_group_store), std::move(backend),
       std::move(auto_todos_store));
 }

@@ -13,7 +13,6 @@
 #include "build/build_config.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/page_content_annotations/content/mojom/page_stability.mojom.h"
 #include "content/public/renderer/render_frame_observer.h"
 #include "mojo/public/cpp/bindings/associated_receiver_set.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
@@ -29,10 +28,6 @@ class Size;
 
 namespace optimization_guide {
 class PageTextAgent;
-}
-
-namespace page_content_annotations {
-class PageStabilityMonitor;
 }
 
 namespace language_detection {
