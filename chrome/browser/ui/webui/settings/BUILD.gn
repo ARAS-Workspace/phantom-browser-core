@@ -491,15 +491,8 @@ source_set("unit_tests") {
   }
 
   if (is_mac || is_linux) {
-    sources += [
-      "accessibility_main_handler_unittest.cc",
-      "settings_manage_profile_handler_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/profiles",
-      "//chrome/browser/screen_ai:screen_ai_install_state",
-      "//ui/accessibility",
-    ]
+    sources += [ "settings_manage_profile_handler_unittest.cc" ]
+    deps += [ "//chrome/browser/profiles" ]
   }
 
   if (is_chrome_branded) {

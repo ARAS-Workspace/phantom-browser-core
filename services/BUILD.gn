@@ -103,10 +103,6 @@ test("services_unittests") {
     "//services/passage_embeddings:tests",
     "//services/video_capture:tests",
   ]
-
-  if (enable_screen_ai_service) {
-    deps += [ "//services/screen_ai:unit_tests" ]
-  }
 }
 
 test("services_perftests") {

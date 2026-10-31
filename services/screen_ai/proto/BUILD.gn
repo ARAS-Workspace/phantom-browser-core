@@ -15,13 +15,6 @@ proto_library("proto") {
   cc_generator_options = "lite"
 }
 
-proto_library("view_hierarchy_proto_descriptor") {
-  sources = [ "view_hierarchy.proto" ]
-  generate_cc = false
-  generate_python = false
-  generate_descriptor = "view_hierarchy.descriptor"
-}
-
 source_set("proto_convertors") {
   sources = [
     "main_content_extractor_proto_convertor.cc",

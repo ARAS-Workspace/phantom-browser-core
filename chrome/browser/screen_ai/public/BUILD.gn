@@ -17,19 +17,3 @@ source_set("optical_character_recognizer") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
-
-source_set("test_support") {
-  testonly = true
-  sources = [
-    "test/fake_optical_character_recognizer.cc",
-    "test/fake_optical_character_recognizer.h",
-  ]
-
-  deps = [
-    "//base",
-    "//services/screen_ai/public/mojom",
-  ]
-  public_deps = [ ":optical_character_recognizer" ]
-
-  configs += [ "//build/config/compiler:wexit_time_destructors" ]
-}

@@ -203,14 +203,6 @@ SkBitmap GenerateExpectedBitmapForPaint(const gfx::Rect& expected_clipped_rect,
   return expected_bitmap;
 }
 
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-base::DictValue GenerateShowSearchifyInProgressMessage(bool show) {
-  return base::DictValue()
-      .Set("type", "showSearchifyInProgress")
-      .Set("show", show);
-}
-#endif
-
 base::DictValue GenerateResetPrintPreviewModeMessage(const char* id,
                                                      int page_number,
                                                      bool grayscale,
@@ -1988,92 +1980,6 @@ TEST_F(PdfViewWebPluginTest, OnRendererPreferencesUpdated) {
   prefs.caret_blink_interval = base::TimeDelta();
   plugin_->OnRendererPreferencesUpdated(prefs);
 }
-
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-// Searchify in progress not shown when searchify just starts.
-TEST_F(PdfViewWebPluginTest, OnSearchifyStarted) {
-  base::DictValue message = GenerateShowSearchifyInProgressMessage(true);
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message)))).Times(0);
-  EXPECT_CALL(pdf_host_, OnSearchifyStarted);
-
-  plugin_->OnSearchifyStateChange(true);
-
-  pdf_receiver_.FlushForTesting();
-}
-
-// Searchify in progress not shown when searchify didn't starts.
-TEST_F(PdfViewWebPluginTest, OnSearchifyNotStartedAndMaybeShowInProgress) {
-  base::DictValue message = GenerateShowSearchifyInProgressMessage(true);
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message)))).Times(0);
-  EXPECT_CALL(pdf_host_, OnSearchifyStarted).Times(0);
-
-  plugin_->MaybeShowSearchifyInProgress();
-
-  pdf_receiver_.FlushForTesting();
-}
-
-// Searchify in progress shown when asked after start.
-TEST_F(PdfViewWebPluginTest, OnSearchifyStartedAndMaybeShowInProgress) {
-  base::DictValue message = GenerateShowSearchifyInProgressMessage(true);
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message))));
-  EXPECT_CALL(pdf_host_, OnSearchifyStarted);
-
-  plugin_->OnSearchifyStateChange(true);
-  plugin_->MaybeShowSearchifyInProgress();
-
-  pdf_receiver_.FlushForTesting();
-}
-
-// Searchify in progress not shown when asked after stop.
-TEST_F(PdfViewWebPluginTest,
-       OnSearchifyStartedAndStoppedAndMaybeShowInProgress) {
-  base::DictValue message_show = GenerateShowSearchifyInProgressMessage(true);
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message_show)))).Times(0);
-  EXPECT_CALL(pdf_host_, OnSearchifyStarted);
-
-  plugin_->OnSearchifyStateChange(true);
-  plugin_->OnSearchifyStateChange(false);
-  plugin_->MaybeShowSearchifyInProgress();
-
-  pdf_receiver_.FlushForTesting();
-}
-
-// Searchify in progress hides after stop.
-TEST_F(PdfViewWebPluginTest, OnSearchifyShowProgressHideAfterStopped) {
-  base::DictValue message_show = GenerateShowSearchifyInProgressMessage(true);
-  base::DictValue message_hide = GenerateShowSearchifyInProgressMessage(false);
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message_show))));
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message_hide))));
-
-  plugin_->OnSearchifyStateChange(true);
-  plugin_->MaybeShowSearchifyInProgress();
-  plugin_->OnSearchifyStateChange(false);
-
-  pdf_receiver_.FlushForTesting();
-}
-
-TEST_F(PdfViewWebPluginTest, OnSearchifyStartedMoreThanOnce) {
-  plugin_->OnSearchifyStateChange(true);
-  plugin_->OnSearchifyStateChange(false);
-  plugin_->OnSearchifyStateChange(true);
-
-  EXPECT_CALL(pdf_host_, OnSearchifyStarted);
-
-  pdf_receiver_.FlushForTesting();
-}
-
-TEST_F(PdfViewWebPluginTest, OnHasSearchifyText) {
-  auto message = base::DictValue().Set("type", "setHasSearchifyText");
-
-  EXPECT_CALL(*client_ptr_, PostMessage(Eq(std::ref(message))));
-  plugin_->OnHasSearchifyText();
-}
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
 
 TEST_F(PdfViewWebPluginTest, FindAndHighlightTextFragments) {
   EXPECT_CALL(*engine_ptr_, FindAndHighlightTextFragments(

@@ -170,8 +170,6 @@
 # These tests require that accessibility is disabled at startup, or that there
 # is some other AXMode during the test, which will not be the case when
 # --force-renderer-accessibility is used.
--All/PdfOcrControllerBrowserTest.NotEnabledWithoutScreenReader/0
--AXMainNodeAnnotatorControllerBrowserTest.NotEnabledWithoutScreenReader
 -PersistentBackground/AutomationApiTestWithContextType.ImageLabels/0
 -PersistentBackground/AutomationApiTestWithContextType.TestRendererAccessibilityEnabled/0
 -ServiceWorker/AutomationApiTestWithContextType.ImageLabels/0

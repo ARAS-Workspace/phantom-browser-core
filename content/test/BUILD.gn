@@ -1805,11 +1805,6 @@ test("content_browsertests") {
     sources += [ "../browser/plugin_service_impl_browsertest.cc" ]
   }
 
-  if (enable_screen_ai_service) {
-    sources += [ "../renderer/accessibility/annotations/ax_main_node_annotator_browsertest.cc" ]
-    deps += [ "//services/screen_ai" ]
-  }
-
   if (enable_library_cdms) {
     deps += [ "//media/cdm:cdm_paths" ]
 

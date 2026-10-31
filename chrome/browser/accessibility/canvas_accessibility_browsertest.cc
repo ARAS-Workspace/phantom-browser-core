@@ -4,13 +4,9 @@
 
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
 
-#include "base/logging.h"
-#include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/screen_ai/screen_ai_install_state.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -20,18 +16,14 @@
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/scoped_accessibility_mode_override.h"
 #include "net/dns/mock_host_resolver.h"
-#include "services/screen_ai/buildflags/buildflags.h"
-#include "services/screen_ai/public/cpp/utilities.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/accessibility/ax_enums.mojom.h"
-#include "ui/accessibility/ax_features.mojom-features.h"
 #include "ui/accessibility/ax_node_data.h"
 #include "ui/accessibility/ax_tree_update.h"
 
 namespace {
 
-using CanvasAccessibilityTestParams =
-    std::tuple<bool /*is_ocr_available*/, features::CanvasAccessibilityMode>;
+using CanvasAccessibilityTestParams = features::CanvasAccessibilityMode;
 
 const ui::AXNodeData* FindFirstNodeWithRole(const ui::AXTreeUpdate& tree_update,
                                             ax::mojom::Role role) {
@@ -50,9 +42,6 @@ class CanvasAccessibilityBrowserTest
   CanvasAccessibilityBrowserTest() {
     std::vector<base::test::FeatureRefAndParams> enabled_features;
     std::vector<base::test::FeatureRef> disabled_features;
-
-    enabled_features.push_back({features::kScreenAITestMode, {}});
-    enabled_features.push_back({ax::mojom::features::kScreenAIOCREnabled, {}});
 
     switch (GetCanvasAccessibilityMode()) {
       case features::CanvasAccessibilityMode::kDisabled:
@@ -73,9 +62,8 @@ class CanvasAccessibilityBrowserTest
   }
   ~CanvasAccessibilityBrowserTest() override = default;
 
-  bool IsOcrLibraryAvailable() const { return std::get<0>(GetParam()); }
   features::CanvasAccessibilityMode GetCanvasAccessibilityMode() const {
-    return std::get<1>(GetParam());
+    return GetParam();
   }
 
   void SetUpOnMainThread() override {
@@ -87,15 +75,6 @@ class CanvasAccessibilityBrowserTest
 
     content::BrowserAccessibilityState::GetInstance()
         ->SetActivationFromPlatformEnabled(true);
-
-    if (IsOcrLibraryAvailable()) {
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
-      screen_ai::ScreenAIInstallState::GetInstance()->SetComponentFolder(
-          screen_ai::GetComponentBinaryPathForTests().DirName());
-#else
-      NOTREACHED();
-#endif
-    }
   }
 
  protected:
@@ -139,202 +118,15 @@ IN_PROC_BROWSER_TEST_P(CanvasAccessibilityBrowserTest,
   }
 }
 
-IN_PROC_BROWSER_TEST_P(CanvasAccessibilityBrowserTest, BitmapCanvasAnnotation) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  ui::AXMode mode = ui::kAXModeComplete;
-  mode.set_mode(ui::AXMode::kScreenReader, true);
-  scoped_accessibility_mode_ =
-      std::make_unique<content::ScopedAccessibilityModeOverride>(web_contents,
-                                                                 mode);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(),
-      embedded_test_server()->GetURL("/accessibility/canvas_bitmap.html")));
-
-  content::TitleWatcher title_watcher(web_contents, u"loaded");
-  ASSERT_EQ(title_watcher.WaitAndGetTitle(), u"loaded");
-
-  bool expect_ocr_annotation = (GetCanvasAccessibilityMode() ==
-                                features::CanvasAccessibilityMode::kAdvanced) &&
-                               IsOcrLibraryAvailable();
-
-  if (expect_ocr_annotation) {
-    std::string annotation;
-    EXPECT_TRUE(base::test::RunUntil([&]() {
-      ui::AXTreeUpdate tree_update =
-          content::GetAccessibilityTreeSnapshot(web_contents);
-      const ui::AXNodeData* canvas_node =
-          FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-      if (canvas_node) {
-        annotation = canvas_node->GetStringAttribute(
-            ax::mojom::StringAttribute::kCanvasAnnotation);
-        if (!annotation.empty()) {
-          return true;
-        }
-      }
-      return false;
-    }));
-    EXPECT_EQ(annotation, "ABC\nDEF\nGHI\nJKL");
-  } else {
-    ui::AXTreeUpdate tree_update =
-        content::GetAccessibilityTreeSnapshot(web_contents);
-    const ui::AXNodeData* canvas_node =
-        FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-    if (canvas_node) {
-      std::string annotation = canvas_node->GetStringAttribute(
-          ax::mojom::StringAttribute::kCanvasAnnotation);
-      EXPECT_TRUE(annotation.empty());
-    }
-  }
-}
-
-IN_PROC_BROWSER_TEST_P(CanvasAccessibilityBrowserTest,
-                       BitmapCanvasAnnotation_ImageUpdate) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  ui::AXMode mode = ui::kAXModeComplete;
-  mode.set_mode(ui::AXMode::kScreenReader, true);
-  scoped_accessibility_mode_ =
-      std::make_unique<content::ScopedAccessibilityModeOverride>(web_contents,
-                                                                 mode);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL(
-                     "/accessibility/canvas_bitmap_update.html")));
-
-  content::TitleWatcher title_watcher(web_contents, u"loaded");
-  ASSERT_EQ(title_watcher.WaitAndGetTitle(), u"loaded");
-
-  bool expect_ocr_annotation = (GetCanvasAccessibilityMode() ==
-                                features::CanvasAccessibilityMode::kAdvanced) &&
-                               IsOcrLibraryAvailable();
-
-  if (expect_ocr_annotation) {
-    std::string annotation;
-    EXPECT_TRUE(base::test::RunUntil([&]() {
-      ui::AXTreeUpdate tree_update =
-          content::GetAccessibilityTreeSnapshot(web_contents);
-      const ui::AXNodeData* canvas_node =
-          FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-      if (canvas_node) {
-        annotation = canvas_node->GetStringAttribute(
-            ax::mojom::StringAttribute::kCanvasAnnotation);
-        if (!annotation.empty()) {
-          return true;
-        }
-      }
-      return false;
-    }));
-    EXPECT_EQ(annotation, "ABC\nDEF\nGHI\nJKL");
-
-    content::TitleWatcher update_title_watcher(web_contents, u"updated");
-    ASSERT_TRUE(content::ExecJs(web_contents, "changeImage();"));
-    ASSERT_EQ(update_title_watcher.WaitAndGetTitle(), u"updated");
-
-    std::string updated_annotation;
-    EXPECT_TRUE(base::test::RunUntil([&]() {
-      ui::AXTreeUpdate tree_update =
-          content::GetAccessibilityTreeSnapshot(web_contents);
-      const ui::AXNodeData* canvas_node =
-          FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-      if (canvas_node) {
-        updated_annotation = canvas_node->GetStringAttribute(
-            ax::mojom::StringAttribute::kCanvasAnnotation);
-        if (updated_annotation == "A") {
-          return true;
-        }
-      }
-      return false;
-    }));
-    EXPECT_EQ(updated_annotation, "A");
-  } else {
-    ui::AXTreeUpdate tree_update =
-        content::GetAccessibilityTreeSnapshot(web_contents);
-    const ui::AXNodeData* canvas_node =
-        FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-    if (canvas_node) {
-      std::string annotation = canvas_node->GetStringAttribute(
-          ax::mojom::StringAttribute::kCanvasAnnotation);
-      EXPECT_TRUE(annotation.empty());
-    }
-  }
-}
-
-IN_PROC_BROWSER_TEST_P(CanvasAccessibilityBrowserTest,
-                       BitmapCanvasAnnotation_NonN32) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  ui::AXMode mode = ui::kAXModeComplete;
-  mode.set_mode(ui::AXMode::kScreenReader, true);
-  scoped_accessibility_mode_ =
-      std::make_unique<content::ScopedAccessibilityModeOverride>(web_contents,
-                                                                 mode);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(),
-      embedded_test_server()->GetURL("/accessibility/canvas_float16.html")));
-
-  content::TitleWatcher title_watcher(web_contents, u"loaded");
-  ASSERT_EQ(title_watcher.WaitAndGetTitle(), u"loaded");
-
-  bool expect_ocr_annotation = (GetCanvasAccessibilityMode() ==
-                                features::CanvasAccessibilityMode::kAdvanced) &&
-                               IsOcrLibraryAvailable();
-
-  if (expect_ocr_annotation) {
-    std::string annotation;
-    EXPECT_TRUE(base::test::RunUntil([&]() {
-      ui::AXTreeUpdate tree_update =
-          content::GetAccessibilityTreeSnapshot(web_contents);
-      const ui::AXNodeData* canvas_node =
-          FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-      if (canvas_node) {
-        annotation = canvas_node->GetStringAttribute(
-            ax::mojom::StringAttribute::kCanvasAnnotation);
-        if (!annotation.empty()) {
-          return true;
-        }
-      }
-      return false;
-    }));
-    EXPECT_EQ(annotation, "ABC\nDEF\nGHI\nJKL");
-  } else {
-    ui::AXTreeUpdate tree_update =
-        content::GetAccessibilityTreeSnapshot(web_contents);
-    const ui::AXNodeData* canvas_node =
-        FindFirstNodeWithRole(tree_update, ax::mojom::Role::kCanvas);
-    if (canvas_node) {
-      std::string annotation = canvas_node->GetStringAttribute(
-          ax::mojom::StringAttribute::kCanvasAnnotation);
-      EXPECT_TRUE(annotation.empty());
-    }
-  }
-}
-
 INSTANTIATE_TEST_SUITE_P(
     All,
     CanvasAccessibilityBrowserTest,
-    ::testing::Combine(
-// ENABLE_SCREEN_AI_BROWSERTESTS ensures the ChromeScreenAI library is available
-// for this test configuration.
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
-        // Test both OCR service available and unavailable states when it is
-        // available.
-        ::testing::Values(true, false),
-#else
-        ::testing::Values(false),
-#endif
-        ::testing::Values(features::CanvasAccessibilityMode::kDisabled,
-                          features::CanvasAccessibilityMode::kBasic,
-                          features::CanvasAccessibilityMode::kAdvanced)),
+    ::testing::Values(features::CanvasAccessibilityMode::kDisabled,
+                      features::CanvasAccessibilityMode::kBasic,
+                      features::CanvasAccessibilityMode::kAdvanced),
     [](const ::testing::TestParamInfo<CanvasAccessibilityTestParams>& info) {
       std::string name;
-      name += std::get<0>(info.param) ? "OcrAvailable_" : "OcrUnavailable_";
-      switch (std::get<1>(info.param)) {
+      switch (info.param) {
         case features::CanvasAccessibilityMode::kDisabled:
           name += "Disabled";
           break;

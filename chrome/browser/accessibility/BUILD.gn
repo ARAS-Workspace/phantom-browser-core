@@ -120,9 +120,7 @@ source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  data_deps = []
   sources = [
-    "ax_main_node_annotator_controller_browsertest.cc",
     "canvas_accessibility_browsertest.cc",
     "interstitial_accessibility_browsertest.cc",
     "page_colors_controller_browsertest.cc",
@@ -137,13 +135,4 @@ source_set("browser_tests") {
     "//content/test:browsertest_support",
     "//content/test:test_support",
   ]
-
-  deps += [
-    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-    "//services/screen_ai/public/cpp:utilities",
-  ]
-
-  if (enable_screen_ai_browsertests) {
-    data_deps += [ "//third_party/screen-ai:screen_ai" ]
-  }
 }

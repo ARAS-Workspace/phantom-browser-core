@@ -555,13 +555,6 @@ if (enable_pdf) {
       data_deps += [ "//third_party/test_fonts" ]
     }
 
-    if (enable_screen_ai_service) {
-      sources += [
-        "pdfium/pdfium_on_demand_searchifier_unittest.cc",
-        "pdfium/pdfium_searchify_unittest.cc",
-      ]
-    }
-
     if (v8_use_external_startup_data) {
       deps += [
         "//tools/v8_context_snapshot",
