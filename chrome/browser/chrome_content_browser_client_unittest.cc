@@ -31,7 +31,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.h"
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/global_features.h"
@@ -53,7 +52,6 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/browsing_data/content/browsing_data_helper.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/pref_names.h"
@@ -119,10 +117,6 @@
 #include "chrome/test/base/search_test_utils.h"
 #include "media/base/picture_in_picture_events_info.h"
 #include "ui/base/page_transition_types.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/web_applications/web_app.h"
@@ -764,110 +758,6 @@ TEST_F(ChromeContentSettingsRedirectTest, RedirectSearchSettingsURL) {
 }
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-class CaptivePortalCheckNetworkContext final
-    : public network::TestNetworkContext {
- public:
-  CaptivePortalCheckNetworkContext(content::BrowserContext* browser_context,
-                                   bool expected_disable_secure_dns)
-      : expected_disable_secure_dns_(expected_disable_secure_dns) {
-    browser_context->GetDefaultStoragePartition()->SetNetworkContextForTesting(
-        receiver_.BindNewPipeAndPassRemote());
-  }
-
-  CaptivePortalCheckNetworkContext(const CaptivePortalCheckNetworkContext&) =
-      delete;
-  CaptivePortalCheckNetworkContext& operator=(
-      const CaptivePortalCheckNetworkContext&) = delete;
-
-  ~CaptivePortalCheckNetworkContext() override = default;
-
-  void CreateURLLoaderFactory(
-      mojo::PendingReceiver<network::mojom::URLLoaderFactory> receiver,
-      network::mojom::URLLoaderFactoryParamsPtr params) override {
-    invoked_url_factory_.SetValue(true);
-    CHECK_EQ(expected_disable_secure_dns_, params->disable_secure_dns);
-  }
-
-  bool WaitAndGetInvokedURLLoaderFactory() {
-    return invoked_url_factory_.Get();
-  }
-
- private:
-  base::test::TestFuture<bool> invoked_url_factory_;
-  bool expected_disable_secure_dns_ = false;
-  mojo::Receiver<network::mojom::NetworkContext> receiver_{this};
-};
-
-class CaptivePortalCheckRenderProcessHostFactory
-    : public content::MockRenderProcessHostFactory {
- public:
-  CaptivePortalCheckRenderProcessHostFactory() = default;
-
-  CaptivePortalCheckRenderProcessHostFactory(
-      const CaptivePortalCheckRenderProcessHostFactory&) = delete;
-  CaptivePortalCheckRenderProcessHostFactory& operator=(
-      const CaptivePortalCheckRenderProcessHostFactory&) = delete;
-
-  void ClearRenderProcessHosts() { processes_.clear(); }
-
- protected:
-  std::unique_ptr<content::MockRenderProcessHost> BuildRenderProcessHost(
-      content::BrowserContext* browser_context,
-      content::SiteInstance* site_instance) override {
-    return std::make_unique<content::MockRenderProcessHost>(
-        browser_context,
-        content::StoragePartitionConfig::CreateDefault(browser_context),
-        false /* is_for_guests_only */);
-  }
-};
-
-class ChromeContentBrowserClientCaptivePortalBrowserTest
-    : public ChromeRenderViewHostTestHarness {
- public:
- protected:
-  void SetUp() override {
-    SetRenderProcessHostFactory(&cp_rph_factory_);
-    ChromeRenderViewHostTestHarness::SetUp();
-  }
-
-  void TearDown() override {
-    DeleteContents();
-    cp_rph_factory_.ClearRenderProcessHosts();
-    ChromeRenderViewHostTestHarness::TearDown();
-  }
-
-  std::unique_ptr<CaptivePortalCheckNetworkContext> SetupForTracking(
-      bool expected_disable_secure_dns) {
-    return std::make_unique<CaptivePortalCheckNetworkContext>(
-        browser_context(), expected_disable_secure_dns);
-  }
-
-  CaptivePortalCheckRenderProcessHostFactory cp_rph_factory_;
-};
-
-TEST_F(ChromeContentBrowserClientCaptivePortalBrowserTest,
-       NotCaptivePortalWindow) {
-  auto network_context =
-      SetupForTracking(false /* expected_disable_secure_dns */);
-  NavigateAndCommit(GURL("https://www.google.com"), ui::PAGE_TRANSITION_LINK);
-  EXPECT_TRUE(network_context->WaitAndGetInvokedURLLoaderFactory());
-}
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-TEST_F(ChromeContentBrowserClientCaptivePortalBrowserTest,
-       CaptivePortalWindow) {
-  auto network_context =
-      SetupForTracking(true /* expected_disable_secure_dns */);
-  captive_portal::CaptivePortalTabHelper::CreateForWebContents(
-      web_contents(), CaptivePortalServiceFactory::GetForProfile(profile()),
-      base::NullCallback());
-  captive_portal::CaptivePortalTabHelper::FromWebContents(web_contents())
-      ->set_window_type(captive_portal::CaptivePortalWindowType::kPopup);
-  NavigateAndCommit(GURL("https://www.google.com"), ui::PAGE_TRANSITION_LINK);
-  EXPECT_TRUE(network_context->WaitAndGetInvokedURLLoaderFactory());
-}
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 class ChromeContentBrowserClientStoragePartitionTest

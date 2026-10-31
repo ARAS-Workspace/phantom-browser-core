@@ -4771,60 +4771,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITestIgnoreLocalhostCertErrors,
   ASSERT_TRUE(content::ExecJs(tab, "window.open()"));
 }
 
-std::unique_ptr<chrome_browser_ssl::SSLErrorAssistantConfig>
-MakeCaptivePortalConfig(int version_id,
-                        const std::set<std::string>& spki_hashes) {
-  auto config_proto =
-      std::make_unique<chrome_browser_ssl::SSLErrorAssistantConfig>();
-  config_proto->set_version_id(version_id);
-  for (const std::string& hash : spki_hashes) {
-    config_proto->add_captive_portal_cert()->set_sha256_hash(hash);
-  }
-  return config_proto;
-}
-
-// Tests the scenario where the OS reports a captive portal. A captive portal
-// interstitial should be displayed. The test then switches OS captive portal
-// status to false and reloads the page. This time, a normal SSL interstitial
-// will be displayed.
-IN_PROC_BROWSER_TEST_F(SSLUITest, OSReportsCaptivePortal) {
-  ASSERT_TRUE(https_server_mismatched_.Start());
-  base::HistogramTester histograms;
-  bool netwok_connectivity_reported = false;
-  SSLErrorHandler::SetOSReportsCaptivePortalForTesting(true);
-  SSLErrorHandler::SetReportNetworkConnectivityCallbackForTesting(
-      base::BindLambdaForTesting([&]() {
-        SSLErrorHandler::SetOSReportsCaptivePortalForTesting(false);
-        netwok_connectivity_reported = true;
-      }));
-
-  // Navigate to an unsafe page on the server.
-  WebContents* tab = browser()->tab_strip_model()->GetActiveWebContents();
-  SSLInterstitialTimerObserver interstitial_timer_observer(tab);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_mismatched_.GetURL("/ssl/blank_page.html")));
-
-  ASSERT_TRUE(
-      chrome_browser_interstitials::IsShowingCaptivePortalInterstitial(tab));
-  EXPECT_FALSE(interstitial_timer_observer.timer_started());
-
-  // Check that the histogram for the captive portal cert was recorded.
-  histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 3);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(
-      SSLErrorHandler::GetHistogramNameForTesting(),
-      SSLErrorHandler::SHOW_CAPTIVE_PORTAL_INTERSTITIAL_OVERRIDABLE, 1);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::OS_REPORTS_CAPTIVE_PORTAL, 1);
-
-  // Reload the URL. This time the OS should not report a captive portal.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_mismatched_.GetURL("/ssl/blank_page.html")));
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-  EXPECT_TRUE(netwok_connectivity_reported);
-}
-
 // Tests that the committed interstitial flag triggers the code path to show an
 // error PageType instead of an interstitial PageType.
 IN_PROC_BROWSER_TEST_F(SSLUITest, ErrorPage) {

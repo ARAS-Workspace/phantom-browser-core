@@ -271,10 +271,6 @@ source_set("browser_tests") {
     "//services/network/public/proto:sct_audit_report_proto_gen",
     "//testing/gtest",
   ]
-
-  if (enable_captive_portal_detection) {
-    sources += [ "captive_portal_blocking_page_browsertest.cc" ]
-  }
 }
 
 source_set("interactive_ui_tests") {

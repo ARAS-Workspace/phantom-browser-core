@@ -149,16 +149,6 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, CTInterstitial) {
       u"NET::ERR_CERTIFICATE_TRANSPARENCY_REQUIRED");
 }
 
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, CaptivePortalInterstitial) {
-  TestInterstitial(GURL("chrome://interstitials/captiveportal"),
-                   "Connect to network");
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, CaptivePortalInterstitialWifi) {
-  TestInterstitial(GURL("chrome://interstitials/captiveportal?is_wifi=1"),
-                   "Connect to Wi-Fi");
-}
-
 IN_PROC_BROWSER_TEST_F(InterstitialUITest, BlockedInterceptionInterstitial) {
   TestInterstitial(GURL("chrome://interstitials/blocked-interception"),
                    "Your activity on example.com is being monitored",

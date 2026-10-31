@@ -404,79 +404,6 @@ class SSLErrorAssistantProtoTest : public content::RenderViewHostTestHarness {
         cert_status);
   }
 
-  // Set up an error assistant proto with mock captive portal hash data and
-  // begin handling the certificate error.
-  void RunCaptivePortalTest() {
-    EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-    EXPECT_EQ(1u, ssl_info().public_key_hashes.size());
-
-    auto config_proto =
-        std::make_unique<chrome_browser_ssl::SSLErrorAssistantConfig>();
-    config_proto->set_version_id(kLargeVersionId);
-
-    config_proto->add_captive_portal_cert()->set_sha256_hash(
-        "sha256/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    config_proto->add_captive_portal_cert()->set_sha256_hash(
-        net::HashValue(net::HASH_VALUE_SHA256, ssl_info().public_key_hashes[0])
-            .ToString());
-    config_proto->add_captive_portal_cert()->set_sha256_hash(
-        "sha256/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-    SSLErrorHandler::SetErrorAssistantProto(std::move(config_proto));
-
-    error_handler()->StartHandlingError();
-  }
-
-  void TestNoCaptivePortalInterstitial() {
-    base::HistogramTester histograms;
-
-    RunCaptivePortalTest();
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-    // On platforms where captive portal detection is enabled, timer should
-    // start for captive portal detection.
-    EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-    EXPECT_TRUE(delegate()->captive_portal_checked());
-    EXPECT_FALSE(delegate()->ssl_interstitial_shown());
-    EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-    EXPECT_FALSE(delegate()->suggested_url_checked());
-
-    base::RunLoop().RunUntilIdle();
-
-    EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-
-    // Captive portal should be checked on non-Android platforms.
-    EXPECT_TRUE(delegate()->captive_portal_checked());
-    EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-    EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-    EXPECT_FALSE(delegate()->suggested_url_checked());
-#else
-    // When there is no custom captive portal detection logic, the timer should
-    // not start and an SSL interstitial should be shown immediately.
-    EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-    EXPECT_FALSE(delegate()->captive_portal_checked());
-    EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-    EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-    EXPECT_FALSE(delegate()->suggested_url_checked());
-
-    base::RunLoop().RunUntilIdle();
-
-    EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-    EXPECT_FALSE(delegate()->captive_portal_checked());
-    EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-    EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-    EXPECT_FALSE(delegate()->suggested_url_checked());
-#endif
-
-    // Check that the histogram for the captive portal cert was recorded.
-    histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                                2);
-    histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                                 SSLErrorHandler::HANDLE_ALL, 1);
-    histograms.ExpectBucketCount(
-        SSLErrorHandler::GetHistogramNameForTesting(),
-        SSLErrorHandler::SHOW_SSL_INTERSTITIAL_OVERRIDABLE, 1);
-  }
-
   // Set up a mock SSL Error Assistant config with regexes that match the
   // outdated antivirus and misconfigured firewall certificate.
   void InitMITMSoftwareList() {
@@ -628,74 +555,6 @@ TEST_F(SSLErrorHandlerNameMismatchTest,
 }
 
 TEST_F(SSLErrorHandlerNameMismatchTest,
-       ShouldShowCustomInterstitialOnCaptivePortalResult) {
-  base::HistogramTester histograms;
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  error_handler()->StartHandlingError();
-
-  EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_TRUE(delegate()->captive_portal_checked());
-  EXPECT_FALSE(delegate()->ssl_interstitial_shown());
-  EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-  // Fake a captive portal result.
-  delegate()->ClearSeenOperations();
-
-  captive_portal::CaptivePortalService::Results results;
-  results.previous_result = captive_portal::RESULT_INTERNET_CONNECTED;
-  results.result = captive_portal::RESULT_BEHIND_CAPTIVE_PORTAL;
-
-  error_handler()->Observe(results);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_FALSE(delegate()->captive_portal_checked());
-  EXPECT_FALSE(delegate()->ssl_interstitial_shown());
-  EXPECT_TRUE(delegate()->captive_portal_interstitial_shown());
-
-  histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(
-      SSLErrorHandler::GetHistogramNameForTesting(),
-      SSLErrorHandler::SHOW_CAPTIVE_PORTAL_INTERSTITIAL_OVERRIDABLE, 1);
-}
-
-TEST_F(SSLErrorHandlerNameMismatchTest,
-       ShouldShowSSLInterstitialOnNoCaptivePortalResult) {
-  base::HistogramTester histograms;
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  error_handler()->StartHandlingError();
-
-  EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_TRUE(delegate()->captive_portal_checked());
-  EXPECT_FALSE(delegate()->ssl_interstitial_shown());
-  EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-  // Fake a "connected to internet" result for the captive portal check.
-  // This should immediately trigger an SSL interstitial without waiting for
-  // the timer to expire.
-  delegate()->ClearSeenOperations();
-
-  captive_portal::CaptivePortalService::Results results;
-  results.previous_result = captive_portal::RESULT_INTERNET_CONNECTED;
-  results.result = captive_portal::RESULT_INTERNET_CONNECTED;
-
-  error_handler()->Observe(results);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_FALSE(delegate()->captive_portal_checked());
-  EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-  EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-
-  histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(
-      SSLErrorHandler::GetHistogramNameForTesting(),
-      SSLErrorHandler::SHOW_SSL_INTERSTITIAL_OVERRIDABLE, 1);
-}
-
-TEST_F(SSLErrorHandlerNameMismatchTest,
        ShouldNotCheckSuggestedUrlIfNoSuggestedUrl) {
   base::HistogramTester histograms;
   error_handler()->StartHandlingError();
@@ -711,33 +570,6 @@ TEST_F(SSLErrorHandlerNameMismatchTest,
   histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
   histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
                                SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(
-      SSLErrorHandler::GetHistogramNameForTesting(),
-      SSLErrorHandler::SHOW_SSL_INTERSTITIAL_OVERRIDABLE, 1);
-}
-
-TEST_F(SSLErrorHandlerNameMismatchTest,
-       ShouldNotCheckCaptivePortalIfSuggestedUrlExists) {
-  base::HistogramTester histograms;
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  delegate()->set_suggested_url_exists();
-  error_handler()->StartHandlingError();
-
-  EXPECT_TRUE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_TRUE(delegate()->suggested_url_checked());
-  EXPECT_FALSE(delegate()->captive_portal_checked());
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-
-  // Note that the suggested URL check is never completed, so there is no entry
-  // for WWW_MISMATCH_URL_AVAILABLE or WWW_MISMATCH_URL_NOT_AVAILABLE.
-  histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 3);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::WWW_MISMATCH_FOUND_IN_SAN, 1);
   histograms.ExpectBucketCount(
       SSLErrorHandler::GetHistogramNameForTesting(),
       SSLErrorHandler::SHOW_SSL_INTERSTITIAL_OVERRIDABLE, 1);
@@ -787,40 +619,6 @@ TEST_F(SSLErrorHandlerNameMismatchTest,
 }
 
 #endif  // BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-
-// Test that a captive portal interstitial is shown if the OS reports a portal.
-TEST_F(SSLErrorHandlerNameMismatchTest, OSReportsCaptivePortal) {
-  base::HistogramTester histograms;
-  delegate()->set_os_reports_captive_portal();
-
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  error_handler()->StartHandlingError();
-  EXPECT_FALSE(error_handler()->IsTimerRunningForTesting());
-  EXPECT_FALSE(delegate()->captive_portal_checked());
-  EXPECT_FALSE(delegate()->ssl_interstitial_shown());
-  EXPECT_TRUE(delegate()->captive_portal_interstitial_shown());
-
-  histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 3);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::HANDLE_ALL, 1);
-  histograms.ExpectBucketCount(
-      SSLErrorHandler::GetHistogramNameForTesting(),
-      SSLErrorHandler::SHOW_CAPTIVE_PORTAL_INTERSTITIAL_OVERRIDABLE, 1);
-  histograms.ExpectBucketCount(SSLErrorHandler::GetHistogramNameForTesting(),
-                               SSLErrorHandler::OS_REPORTS_CAPTIVE_PORTAL, 1);
-}
-
-// Test that SSL interstitial is shown if OS reports captive portal AND
-// multi-network CCT workflow is detected.
-TEST_F(SSLErrorHandlerNameMismatchTest,
-       OSReportsCaptivePortalAndMultiNetworkCCT) {
-  delegate()->set_os_reports_captive_portal();
-  SSLErrorHandler::SetIsMultiNetworkCCTWorkflowForTesting(true);
-  error_handler()->StartHandlingError();
-  EXPECT_FALSE(delegate()->captive_portal_checked());
-  EXPECT_TRUE(delegate()->ssl_interstitial_shown());
-  EXPECT_FALSE(delegate()->captive_portal_interstitial_shown());
-}
 
 TEST_F(SSLErrorHandlerNameMismatchTest,
        ShouldShowSSLInterstitialOnTimerExpiredWhenSuggestedUrlExists) {

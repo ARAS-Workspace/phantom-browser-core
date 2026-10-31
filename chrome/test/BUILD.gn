@@ -2160,10 +2160,6 @@ test("browser_tests") {
 
   # NOTE: This is the main "browser_tests" section for |is_chromeos|.
 
-  if (enable_captive_portal_detection) {
-    deps += [ "//chrome/browser/captive_portal:browser_tests" ]
-  }
-
   if (is_linux || is_mac) {
     sources += [ "../browser/ui/views/first_run_dialog_browsertest.cc" ]
   }

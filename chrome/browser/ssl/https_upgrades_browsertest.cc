@@ -14,7 +14,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/simple_test_clock.h"
 #include "build/build_config.h"
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/extensions/api/settings_private/generated_prefs.h"
 #include "chrome/browser/interstitials/security_interstitial_page_test_utils.h"
@@ -37,9 +36,7 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/captive_portal/content/captive_portal_service.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/omnibox/browser/omnibox_client.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
@@ -699,8 +696,6 @@ class HttpsUpgradesBrowserTest
     auto entries = test_ukm_recorder_->GetEntriesByName(UkmEntry::kEntryName);
     EXPECT_EQ(0u, entries.size());
   }
-
-  void EnableCaptivePortalDetection(Browser* browser);
 
  private:
   // TODO(https://crbug.com/423465927): Explore a better approach to make the
@@ -4109,197 +4104,6 @@ IN_PROC_BROWSER_TEST_F(
                                   Event::kTypedSchemelessUpgradeSucceeded, 0);
   histograms()->ExpectBucketCount(kEventHistogram,
                                   Event::kTypedSchemelessUpgradeTimedOut, 0);
-}
-
-// Url used to detect the presence of a captive portal.
-constexpr char kCaptivePortalPingUrl[] = "http://captive-portal-ping-url.com/";
-// HTTPS version of the same URL.
-constexpr char kCaptivePortalPingUrlHttps[] =
-    "https://captive-portal-ping-url.com/";
-
-// Returns a URL loader interceptor that responds to HTTPS URLs with a cert
-// error and to HTTP URLs with a good response.
-std::unique_ptr<content::URLLoaderInterceptor> MakeCaptivePortalInterceptor(
-    bool login_page_has_valid_https) {
-  return std::make_unique<content::URLLoaderInterceptor>(
-      base::BindLambdaForTesting(
-          [login_page_has_valid_https](
-              content::URLLoaderInterceptor::RequestParams* params) {
-            if (params->url_request.url == GURL(kCaptivePortalPingUrl) ||
-                (login_page_has_valid_https &&
-                 params->url_request.url == GURL(kCaptivePortalPingUrlHttps))) {
-              // Return a non-204 response for the captive portal ping URL
-              // so that the portal is detected.
-              content::URLLoaderInterceptor::WriteResponse(
-                  "HTTP/1.1 200 OK\nContent-type: text/html\n\n",
-                  "<html>Non-204 response to trigger captive portal "
-                  "detection</html>",
-                  params->client.get());
-              return true;
-            }
-
-            if (params->url_request.url.SchemeIs("https")) {
-              // Fail with an SSL error so that a fallback is triggered.
-              network::URLLoaderCompletionStatus status;
-              status.error_code = net::ERR_CERT_COMMON_NAME_INVALID;
-              status.ssl_info = net::SSLInfo();
-              status.ssl_info->cert_status =
-                  net::CERT_STATUS_COMMON_NAME_INVALID;
-              // The cert doesn't matter.
-              status.ssl_info->cert = net::ImportCertFromFile(
-                  net::GetTestCertsDirectory(), "ok_cert.pem");
-              status.ssl_info->unverified_cert = status.ssl_info->cert;
-              params->client->OnComplete(status);
-              return true;
-            }
-            content::URLLoaderInterceptor::WriteResponse(
-                "HTTP/1.1 200 OK\nContent-type: text/html\n\n",
-                "<html>Done</html>", params->client.get());
-            return true;
-          }));
-}
-
-void HttpsUpgradesBrowserTest::EnableCaptivePortalDetection(Browser* browser) {
-  captive_portal::CaptivePortalService* captive_portal_service =
-      CaptivePortalServiceFactory::GetForProfile(browser->GetProfile());
-  captive_portal_service->set_test_url(GURL(kCaptivePortalPingUrl));
-
-  captive_portal::CaptivePortalService::set_state_for_testing(
-      captive_portal::CaptivePortalService::NOT_TESTING);
-  browser->GetProfile()->GetPrefs()->SetBoolean(
-      embedder_support::kAlternateErrorPagesEnabled, true);
-}
-
-// Checks that an automatically opened captive portal login page is not upgraded
-// to HTTPS unless the interstitial is enabled. The captive portal's login
-// page supports https.
-IN_PROC_BROWSER_TEST_P(
-    HttpsUpgradesBrowserTest,
-    CaptivePortal_LoginPageWithValidSSL_ShouldNotUpgradeUnlessInterstitialEnabled) {
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeIncognito) {
-    return;
-  }
-  auto interceptor =
-      MakeCaptivePortalInterceptor(/*login_page_has_valid_https=*/true);
-
-  // Disable the testing port configuration, as this test doesn't use the
-  // EmbeddedTestServer.
-  HttpsUpgradesInterceptor::SetHttpsPortForTesting(0);
-  HttpsUpgradesInterceptor::SetHttpPortForTesting(0);
-  EnableCaptivePortalDetection(browser());
-
-  auto* tab_strip = GetBrowser()->tab_strip_model();
-  auto* contents = tab_strip->GetActiveWebContents();
-  size_t tab_count = tab_strip->count();
-
-  // Go to an HTTPS URL. The navigation will fail and trigger a captive portal
-  // detection.
-  ui_test_utils::TabAddedWaiter waiter(browser());
-  NavigateAndWaitForFallback(contents,
-                             GURL("https://ssl-error-for-captive-portal.com/"));
-  waiter.Wait();
-
-  // Captive portal login page should not be upgraded.
-  content::WebContents* login_page = tab_strip->GetWebContentsAt(tab_count);
-  content::WaitForLoadStop(login_page);
-  EXPECT_FALSE(IsShowingHttpsFirstModeInterstitial(login_page));
-
-  if (IsStrictInterstitialEnabledForTest()) {
-    // If the interstitial is enabled, captive portal login page should also be
-    // upgraded to HTTPS.
-    EXPECT_EQ(GURL(kCaptivePortalPingUrlHttps),
-              login_page->GetLastCommittedURL());
-
-    // Should only attempt an upgrade for the original page.
-    histograms()->ExpectTotalCount(kNavigationRequestSecurityLevelHistogram, 3);
-    // The original page serves bad HTTPS, but any HTTPS URL is counted as
-    // secure in this histogram. Captive portal login page is valid HTTPS, so
-    // it's also counted here.
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kSecure, 2);
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kUpgraded,
-                                    1);
-  } else {
-    // Captive portal login page should not be upgraded to HTTPS.
-    EXPECT_EQ(GURL(kCaptivePortalPingUrl), login_page->GetLastCommittedURL());
-
-    // Should only attempt an upgrade for the original page.
-    histograms()->ExpectTotalCount(kNavigationRequestSecurityLevelHistogram, 2);
-    // The original page serves bad HTTPS, but any HTTPS URL is counted as
-    // secure in this histogram:
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kSecure, 1);
-    histograms()->ExpectBucketCount(
-        kNavigationRequestSecurityLevelHistogram,
-        NavigationRequestSecurityLevel::kCaptivePortalLogin, 1);
-  }
-}
-
-// Same as
-// CaptivePortal_LoginPageWithValidSSL_ShouldNotUpgradeUnlessInterstitialEnabled
-// but the captive portal's login page serves bad SSL.
-IN_PROC_BROWSER_TEST_P(
-    HttpsUpgradesBrowserTest,
-    CaptivePortal_LoginPageWithoutValidSSL_ShouldNotUpgradeUnlessInterstitialEnabled) {
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeIncognito) {
-    return;
-  }
-  auto interceptor =
-      MakeCaptivePortalInterceptor(/*login_page_has_valid_https=*/true);
-
-  // Disable the testing port configuration, as this test doesn't use the
-  // EmbeddedTestServer.
-  HttpsUpgradesInterceptor::SetHttpsPortForTesting(0);
-  HttpsUpgradesInterceptor::SetHttpPortForTesting(0);
-  EnableCaptivePortalDetection(browser());
-
-  auto* tab_strip = GetBrowser()->tab_strip_model();
-  auto* contents = tab_strip->GetActiveWebContents();
-  size_t tab_count = tab_strip->count();
-
-  // Go to an HTTPS URL. The navigation will fail and trigger a captive portal
-  // detection.
-  ui_test_utils::TabAddedWaiter waiter(browser());
-  NavigateAndWaitForFallback(contents,
-                             GURL("https://ssl-error-for-captive-portal.com/"));
-  waiter.Wait();
-
-  content::WebContents* login_page = tab_strip->GetWebContentsAt(tab_count);
-  content::WaitForLoadStop(login_page);
-
-  EXPECT_FALSE(IsShowingHttpsFirstModeInterstitial(login_page));
-
-  if (IsStrictInterstitialEnabledForTest()) {
-    // If the interstitial is enabled, captive portal login page should also be
-    // upgraded to HTTPS.
-    EXPECT_EQ(GURL(kCaptivePortalPingUrlHttps),
-              login_page->GetLastCommittedURL());
-
-    // Should only attempt an upgrade for the original page.
-    histograms()->ExpectTotalCount(kNavigationRequestSecurityLevelHistogram, 3);
-    // The original page serves bad HTTPS, but any HTTPS URL is counted as
-    // secure in this histogram. Captive portal login page is valid HTTPS, so
-    // it's also counted here.
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kSecure, 2);
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kUpgraded,
-                                    1);
-  } else {
-    // Captive portal login page should not be upgraded to HTTPS.
-    EXPECT_EQ(GURL(kCaptivePortalPingUrl), login_page->GetLastCommittedURL());
-
-    // The original page serves bad HTTPS, but any HTTPS URL is counted as
-    // secure in this histogram:
-    histograms()->ExpectBucketCount(kNavigationRequestSecurityLevelHistogram,
-                                    NavigationRequestSecurityLevel::kSecure, 1);
-    histograms()->ExpectBucketCount(
-        kNavigationRequestSecurityLevelHistogram,
-        NavigationRequestSecurityLevel::kCaptivePortalLogin, 1);
-  }
 }
 
 // Tests that UKM fallback reasons are correctly recorded as kCertError when

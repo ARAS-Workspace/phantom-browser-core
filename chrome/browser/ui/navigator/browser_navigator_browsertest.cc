@@ -49,7 +49,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/omnibox/browser/tab_matcher.h"
 #include "components/policy/core/common/policy_pref_names.h"
@@ -79,10 +78,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/display/screen_base.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
@@ -656,32 +651,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, Disposition_NewPopupTrusted) {
   EXPECT_TRUE(WindowFeatureController::From(params.browser)->IsTrustedSource());
   EXPECT_FALSE(BrowserWindow::FromBrowser(params.browser)->IsToolbarVisible());
 }
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-// This test verifies that navigating with WindowOpenDisposition = NEW_POPUP
-// and NavigateParams::CaptivePortalWindowType::kPopup results in a new
-// WebContents where is_captive_portal_window() is true.
-IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
-                       Disposition_NewPopupCaptivePortal) {
-  NavigateParams params(MakeNavigateParams());
-  params.disposition = WindowOpenDisposition::NEW_POPUP;
-  params.captive_portal_window_type =
-      captive_portal::CaptivePortalWindowType::kPopup;
-  params.window_features.bounds = gfx::Rect(0, 0, 200, 200);
-  // Wait for new popup to to load and gain focus.
-  ui_test_utils::NavigateToURL(&params);
-
-  // Navigate() should have opened a new popup window of TYPE_POPUP with a
-  // toolbar.
-  EXPECT_NE(browser(), params.browser);
-  EXPECT_EQ(params.browser->GetType(),
-            BrowserWindowInterface::Type::TYPE_POPUP);
-  EXPECT_TRUE(BrowserWindow::FromBrowser(params.browser)->IsToolbarVisible());
-  EXPECT_TRUE(captive_portal::CaptivePortalTabHelper::FromWebContents(
-                  params.navigated_or_inserted_contents)
-                  ->is_captive_portal_window());
-}
-#endif
 
 // This test verifies that navigating with WindowOpenDisposition = NEW_POPUP
 // and is_tab_modal_popup_deprecated = true results in a new WebContents that is

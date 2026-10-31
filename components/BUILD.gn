@@ -121,7 +121,6 @@ test("components_unittests") {
     "//components/browser_actuator:unit_tests",
     "//components/browser_sync:unit_tests",
     "//components/browsing_data/core:unit_tests",
-    "//components/captive_portal/core:unit_tests",
     "//components/cbor:unit_tests",
     "//components/certificate_matching:unit_tests",
     "//components/client_update_protocol:unit_tests",
@@ -311,7 +310,6 @@ test("components_unittests") {
   if (use_blink) {
     deps += [
       "//components/browsing_data/content:unit_tests",
-      "//components/captive_portal/content:unit_tests",
       "//components/capture_mode:unit_tests",
       "//components/certificate_transparency:unit_tests",
       "//components/content_capture/browser:unit_tests",

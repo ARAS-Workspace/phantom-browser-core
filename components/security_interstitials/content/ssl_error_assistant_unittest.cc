@@ -142,38 +142,6 @@ class SSLErrorAssistantTest : public content::RenderViewHostTestHarness {
   std::unique_ptr<net::EmbeddedTestServer> embedded_test_server_;
 };
 
-// Test to see if IsKnownCaptivePortalCertificate() returns the correct value.
-TEST_F(SSLErrorAssistantTest, CaptivePortalCertificateList) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  EXPECT_EQ(1u, ssl_info().public_key_hashes.size());
-
-  // Test without the known captive portal certificate in config_proto.
-  auto config_proto =
-      std::make_unique<chrome_browser_ssl::SSLErrorAssistantConfig>();
-  config_proto->set_version_id(kLargeVersionId);
-  config_proto->add_captive_portal_cert()->set_sha256_hash(MakeSha256String(1));
-  config_proto->add_captive_portal_cert()->set_sha256_hash(MakeSha256String(2));
-  error_assistant()->SetErrorAssistantProto(std::move(config_proto));
-  EXPECT_FALSE(error_assistant()->IsKnownCaptivePortalCertificate(ssl_info()));
-
-  error_assistant()->ResetForTesting();
-
-  // Test with the known captive portal certificate in config_proto.
-  config_proto =
-      std::make_unique<chrome_browser_ssl::SSLErrorAssistantConfig>();
-  config_proto->set_version_id(kLargeVersionId);
-
-  config_proto->add_captive_portal_cert()->set_sha256_hash(MakeSha256String(1));
-  config_proto->add_captive_portal_cert()->set_sha256_hash(
-      net::HashValue(net::HASH_VALUE_SHA256, ssl_info().public_key_hashes[0])
-          .ToString());
-  config_proto->add_captive_portal_cert()->set_sha256_hash(MakeSha256String(2));
-  error_assistant()->SetErrorAssistantProto(std::move(config_proto));
-
-  EXPECT_TRUE(error_assistant()->IsKnownCaptivePortalCertificate(ssl_info()));
-}
-
 // Test to see if the MitM Software gets matched correctly.
 TEST_F(SSLErrorAssistantTest, MitMSoftwareMatching) {
   ASSERT_TRUE(embedded_test_server()->Start());

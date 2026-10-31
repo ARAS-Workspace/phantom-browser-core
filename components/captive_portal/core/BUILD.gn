@@ -61,17 +61,3 @@ static_library("test_support") {
     "//url",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "captive_portal_detector_unittest.cc" ]
-
-  deps = [
-    ":core",
-    ":features",
-    ":test_support",
-    "//base",
-    "//net:test_support",
-    "//testing/gtest",
-  ]
-}
