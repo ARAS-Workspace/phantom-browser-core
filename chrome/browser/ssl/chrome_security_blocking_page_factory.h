@@ -5,10 +5,8 @@
 #ifndef CHROME_BROWSER_SSL_CHROME_SECURITY_BLOCKING_PAGE_FACTORY_H_
 #define CHROME_BROWSER_SSL_CHROME_SECURITY_BLOCKING_PAGE_FACTORY_H_
 
-#include "components/captive_portal/core/buildflags.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
 #include "components/security_interstitials/content/blocked_interception_blocking_page.h"
-#include "components/security_interstitials/content/captive_portal_blocking_page.h"
 #include "components/security_interstitials/content/https_only_mode_blocking_page.h"
 #include "components/security_interstitials/content/insecure_form_blocking_page.h"
 #include "components/security_interstitials/content/local_self_signed_blocking_page.h"
@@ -19,7 +17,6 @@
 #include "components/security_interstitials/core/https_only_mode_metrics.h"
 #include "net/base/net_errors.h"
 
-class BrowserWindowInterface;
 class Profile;
 
 // //chrome's implementation of the SecurityBlockingPageFactory interface.
@@ -49,12 +46,6 @@ class ChromeSecurityBlockingPageFactory : public SecurityBlockingPageFactory {
                                     int options_mask,
                                     const base::Time& time_triggered,
                                     const GURL& support_url) override;
-  std::unique_ptr<CaptivePortalBlockingPage> CreateCaptivePortalBlockingPage(
-      content::WebContents* web_contents,
-      const GURL& request_url,
-      const GURL& login_url,
-      const net::SSLInfo& ssl_info,
-      net::Error cert_error) override;
   std::unique_ptr<BadClockBlockingPage> CreateBadClockBlockingPage(
       content::WebContents* web_contents,
       net::Error cert_error,
@@ -91,23 +82,6 @@ class ChromeSecurityBlockingPageFactory : public SecurityBlockingPageFactory {
   // Overrides the calculation of whether the app is enterprise-managed for
   // tests.
   static void SetEnterpriseManagedForTesting(bool enterprise_managed);
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  // Opens a login tab if the profile's active window doesn't have one already.
-  static void OpenLoginTabForWebContents(content::WebContents* web_contents,
-                                         bool focus_tab);
-
-  // Opens a login tab in any profile tabbed window or
-  // creates a new browser if there's no any yet.
-  static void OpenLoginPageInAnyTabbedBrowserOrCreateOne(Profile* profile,
-                                                         bool focus_tab);
-
-  // Opens a login tab if not opened already in the browser
-  // provided by get_browser.
-  static void OpenLoginPageForBrowser(
-      base::FunctionRef<BrowserWindowInterface*()> get_browser,
-      bool focus_tab);
-#endif
 };
 
 #endif  // CHROME_BROWSER_SSL_CHROME_SECURITY_BLOCKING_PAGE_FACTORY_H_

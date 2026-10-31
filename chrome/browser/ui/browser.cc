@@ -121,7 +121,6 @@
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_utils.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/custom_handlers/protocol_handler.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/infobars/content/content_infobar_manager.h"
@@ -164,12 +163,6 @@
 #include "ui/gfx/text_elider.h"
 #include "ui/gfx/text_utils.h"
 #include "url/scheme_host_port.h"
-
-
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 using base::UserMetricsAction;
 using content::GlobalRenderFrameHostId;

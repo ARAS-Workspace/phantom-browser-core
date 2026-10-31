@@ -65,11 +65,6 @@
         "value": {},
         "description": "Settings that enable or disable features that require third-party network services provided by Google and your default search provider.",
         "properties": {
-          "alternateErrorPagesEnabled": {
-            "$ref": "types.ChromeSetting",
-            "value": ["alternateErrorPagesEnabled", {"type":"boolean"}],
-            "description": "If enabled, Chrome uses a web service to help resolve navigation errors. This preference's value is a boolean, defaulting to <code>true</code>."
-          },
           "autofillEnabled": {
             "$ref": "types.ChromeSetting",
             "value": ["autofillEnabled", {"type":"boolean"}],

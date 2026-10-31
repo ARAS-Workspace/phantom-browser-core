@@ -97,7 +97,6 @@
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
 #include "chrome/browser/navigation_predictor/search_engine_preconnector.h"
 #include "chrome/browser/navigation_predictor/search_engine_preconnector_keyed_service_factory.h"
-#include "chrome/browser/net/dns_probe_service_factory.h"
 #include "chrome/browser/net/profile_network_context_service_factory.h"
 #include "chrome/browser/notifications/metrics/notification_metrics_logger_factory.h"
 #include "chrome/browser/notifications/notification_display_service_factory.h"
@@ -202,7 +201,6 @@
 #include "chrome/common/chrome_features.h"
 #include "components/autofill/content/browser/autofill_log_router_factory.h"
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/permissions/features.h"
@@ -292,10 +290,6 @@
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/signin/bound_session_credentials/dice_bound_session_cookie_service_factory.h"
 #endif
-#endif
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -452,10 +446,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   browser_sync::UserEventServiceFactory::GetInstance();
   BrowserManagerServiceFactory::GetInstance();
   BrowsingDataHistoryObserverService::Factory::GetInstance();
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  CaptivePortalServiceFactory::GetInstance();
-#endif
-  chrome_browser_net::DnsProbeServiceFactory::GetInstance();
   chrome_colors::ChromeColorsFactory::GetInstance();
   ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
   ChromeBrowsingDataRemoverDelegateFactory::GetInstance();

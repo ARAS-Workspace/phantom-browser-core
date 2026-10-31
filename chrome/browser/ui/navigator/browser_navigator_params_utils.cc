@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/tabs/public/tab_interface.h"
@@ -22,10 +21,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/url_constants.h"
 #include "ui/base/window_open_disposition.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 content::NavigationController::LoadURLParams LoadURLParamsFromNavigateParams(
     NavigateParams* params) {
@@ -74,10 +69,7 @@ content::NavigationController::LoadURLParams LoadURLParamsFromNavigateParams(
 
   // |frame_tree_node_id| is invalid for main frame navigations.
   if (params->frame_tree_node_id.is_null()) {
-    bool force_no_https_upgrade =
-        params->url_typed_with_http_scheme ||
-        params->captive_portal_window_type !=
-            captive_portal::CaptivePortalWindowType::kNone;
+    bool force_no_https_upgrade = params->url_typed_with_http_scheme;
     std::unique_ptr<ChromeNavigationUIData> navigation_ui_data =
         ChromeNavigationUIData::CreateForMainFrameNavigation(
             target_contents, params->is_using_https_as_default_scheme,

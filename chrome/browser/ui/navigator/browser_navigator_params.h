@@ -16,7 +16,6 @@
 #include "build/android_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
-#include "components/captive_portal/core/captive_portal_types.h"
 #include "components/webapps/browser/navigation_data.h"
 #include "content/public/browser/child_process_host.h"
 #include "content/public/browser/global_request_id.h"
@@ -246,10 +245,6 @@ struct NavigateParams {
   // If disposition is NEW_WINDOW or NEW_POPUP, and |window_action| is set to
   // kNoAction, |window_action| will be set to kShowWindow.
   WindowAction window_action = WindowAction::kNoAction;
-
-  // Captive portal type for this browser window.
-  captive_portal::CaptivePortalWindowType captive_portal_window_type =
-      captive_portal::CaptivePortalWindowType::kNone;
 
   // If false then the navigation was not initiated by a user gesture. This
   // variable will be set to true for popups to get windows focus even if

@@ -70,11 +70,6 @@ class SSLErrorAssistant {
 
   ~SSLErrorAssistant();
 
-  // Returns true if any of the SHA256 hashes in |ssl_info| is of a captive
-  // portal certificate. The set of captive portal hashes is loaded on first
-  // use.
-  bool IsKnownCaptivePortalCertificate(const net::SSLInfo& ssl_info);
-
   // Returns the name of a known MITM software provider that matches the
   // certificate passed in as the |cert| parameter. Returns empty string if
   // there is no match.
@@ -102,12 +97,6 @@ class SSLErrorAssistant {
 
  private:
   void EnsureInitialized();
-
-  // SPKI hashes belonging to certs treated as captive portals. Null until the
-  // first time IsKnownCaptivePortalCertificate() or SetErrorAssistantProto()
-  // is called.
-  std::unique_ptr<absl::flat_hash_set<net::SHA256HashValue>>
-      captive_portal_spki_hashes_;
 
   // Data about a known MITM software pulled from the SSLErrorAssistant proto.
   // Null until MatchKnownMITMSoftware() is called.

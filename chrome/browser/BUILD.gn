@@ -14,7 +14,6 @@ import("//build/config/ui.gni")
 import("//chrome/browser/buildflags.gni")
 import("//chrome/browser/downgrade/buildflags.gni")
 import("//chrome/common/features.gni")
-import("//components/captive_portal/core/features.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
@@ -748,7 +747,6 @@ source_set("core") {
     "//components/browser_apis/tab_drag/sessions",
     "//components/browser_apis/tab_drag/sessions:impl",
     "//components/browser_sync:switches",
-    "//components/captive_portal/content",
     "//components/collaboration/public:features",
     "//components/color",
     "//components/content_capture/browser",
@@ -897,7 +895,6 @@ source_set("core") {
 
   if (is_mac || is_linux) {
     deps += [
-      "//chrome/browser/captive_portal",
       "//chrome/browser/headless:headless_extra_parts",
       "//chrome/browser/printing",
       "//chrome/browser/record_replay:impl",
@@ -2079,10 +2076,6 @@ source_set("browser") {
 
   if (enable_paint_preview) {
     deps += [ "//chrome/browser/paint_preview:services" ]
-  }
-
-  if (enable_captive_portal_detection) {
-    deps += [ "//chrome/browser/captive_portal" ]
   }
 
   if (is_mac) {

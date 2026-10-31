@@ -9,7 +9,6 @@ include_rules = [
 specific_include_rules = {
   ".*test.*": [
     "+chrome/browser/ui/views/frame",
-    "+components/captive_portal",
     "+components/web_package",
     "+skia/public/mojom/bitmap.mojom.h",
   ],

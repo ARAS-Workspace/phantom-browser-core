@@ -114,7 +114,6 @@ class ChromeNavigationUIData : public content::NavigationUIData {
   // This can happen in the following cases:
   // - the navigatioon was initiated by typing in the omnibox, and the
   // typed text had an explicit http scheme.
-  // - the navigation was initiated as a captive portal login.
   bool force_no_https_upgrade_ = false;
 
   // Id of the bookmark which started this navigation.

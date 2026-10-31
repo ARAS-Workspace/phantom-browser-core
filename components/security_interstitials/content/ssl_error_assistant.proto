@@ -8,16 +8,6 @@ option optimize_for = LITE_RUNTIME;
 
 package chrome_browser_ssl;
 
-message CaptivePortalCert {
-  // Sha256 hash of the certificate's public key. The fingerprint is prefixed
-  // with "sha256/" and encoded in base64 (same format as
-  // src/net/http/transport_security_state_static.pins)
-  // Example: sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-  //
-  // NOTE: Only leaf certs must be added here.
-  optional string sha256_hash = 1;
-}
-
 // The MITMSoftware list is used to match potential MITM software certificates.
 // The certificate issuer common name and organization names are matched against
 // the |issuer_common_name_pattern| and |issuer_organization_pattern| fields.
@@ -35,11 +25,10 @@ message MITMSoftware {
   optional string issuer_organization_regex = 3;
 }
 
-// Unlike MITMSoftware and CaptivePortalCert, DynamicInterstitial is used to
-// trigger a number of different interstitials based on a number of different
-// characteristics.
-// TODO(spqchan): Deprecate MITMSoftware and CaptivePortalCert and use
-// DynamicInterstitial in their place.
+// Unlike MITMSoftware, DynamicInterstitial is used to trigger a number of
+// different interstitials based on a number of different characteristics.
+// TODO(spqchan): Deprecate MITMSoftware and use DynamicInterstitial in its
+// place.
 // TODO(spqchan): Add additional fields for process list, registry key
 // keywords, etc.
 message DynamicInterstitial {
@@ -49,8 +38,7 @@ message DynamicInterstitial {
     INTERSTITIAL_PAGE_NONE = 0;
     // A standard SSL interstitial page.
     INTERSTITIAL_PAGE_SSL = 1;
-    // An interstitial page alerting the user that they are in a captive portal.
-    INTERSTITIAL_PAGE_CAPTIVE_PORTAL = 2;
+    reserved 2;
     // An interstitial page telling the user to fix misconfigured MITM software.
     INTERSTITIAL_PAGE_MITM_SOFTWARE = 3;
   }
@@ -115,7 +103,7 @@ message DynamicInterstitial {
 
 message SSLErrorAssistantConfig {
   optional uint32 version_id = 1;
-  repeated CaptivePortalCert captive_portal_cert = 2;
+  reserved 2;
   repeated MITMSoftware mitm_software = 3;
   repeated DynamicInterstitial dynamic_interstitial = 4;
 }

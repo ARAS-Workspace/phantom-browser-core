@@ -52,9 +52,6 @@ bool IsShowingInterstitial(content::WebContents* tab);
 // to simply look for the word "security" because that likely shows up on lots
 // of different types of interstitials, not just the type being tested for.
 
-// Returns true if |tab| is displaying a captive-portal related interstitial.
-bool IsShowingCaptivePortalInterstitial(content::WebContents* tab);
-
 // Returns true if |tab| is currently displaying an SSL-related interstitial.
 bool IsShowingSSLInterstitial(content::WebContents* tab);
 

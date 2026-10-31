@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/captive_portal/core/features.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
@@ -61,7 +60,6 @@ source_set("impl") {
     "//chrome/browser/renderer_context_menu",
     "//chrome/browser/ssl",
     "//chrome/browser/ui/tab_contents",
-    "//components/captive_portal/core:buildflags",
     "//components/guest_view/browser",
     "//components/pdf/common:constants",
     "//components/pdf/common:util",
@@ -76,13 +74,6 @@ source_set("impl") {
       "//chrome/browser/performance_manager",
       "//chrome/browser/task_manager",
     ]
-
-    if (enable_captive_portal_detection) {
-      deps += [
-        "//chrome/browser/captive_portal",
-        "//components/captive_portal/content",
-      ]
-    }
   }
 }
 

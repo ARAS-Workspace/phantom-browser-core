@@ -9,15 +9,7 @@
 #include "chrome/browser/performance_manager/public/guest_view_policy.h"
 #include "chrome/browser/task_manager/web_contents_tags.h"
 #include "chrome/common/buildflags.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 namespace extensions {
 
@@ -35,21 +27,6 @@ void ChromeGuestViewManagerDelegate::OnGuestAdded(
   task_manager::WebContentsTags::CreateForGuestContents(guest_web_contents);
 
   performance_manager::GuestViewAssociatedToWebContents(guest_web_contents);
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  // Attach Captive Portal helper to the WebView.
-  // TODO(crbug.com/40202416): update CaptivePortalTabHelper to handle MPArch
-  // guest pages.
-  Profile* profile =
-      Profile::FromBrowserContext(guest_web_contents->GetBrowserContext());
-  captive_portal::CaptivePortalTabHelper::CreateForWebContents(
-      guest_web_contents, CaptivePortalServiceFactory::GetForProfile(profile),
-      // tab_focus is false, because opening logging page here happens
-      // without user gesture.
-      base::BindRepeating(&ChromeSecurityBlockingPageFactory::
-                              OpenLoginPageInAnyTabbedBrowserOrCreateOne,
-                          profile, /*tab_focus=*/false));
-#endif
 }
 
 // ExtensionsGuestViewManagerDelegate::IsGuestAvailableToContextWithFeature()

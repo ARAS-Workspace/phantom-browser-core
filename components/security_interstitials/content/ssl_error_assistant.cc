@@ -77,22 +77,6 @@ absl::flat_hash_set<net::SHA256HashValue> HashesFromDynamicInterstitial(
   return hashes;
 }
 
-std::unique_ptr<absl::flat_hash_set<net::SHA256HashValue>>
-LoadCaptivePortalCertHashes(
-    const chrome_browser_ssl::SSLErrorAssistantConfig& proto) {
-  auto hashes = std::make_unique<absl::flat_hash_set<net::SHA256HashValue>>();
-  for (const chrome_browser_ssl::CaptivePortalCert& cert :
-       proto.captive_portal_cert()) {
-    std::optional<net::HashValue> value =
-        net::HashValue::FromString(cert.sha256_hash());
-    if (!value || value->tag() != net::HASH_VALUE_SHA256) {
-      continue;
-    }
-    hashes.get()->insert(value->sha256hashvalue());
-  }
-  return hashes;
-}
-
 std::unique_ptr<std::vector<MITMSoftwareType>> LoadMITMSoftwareList(
     const chrome_browser_ssl::SSLErrorAssistantConfig& proto) {
   auto mitm_software_list = std::make_unique<std::vector<MITMSoftwareType>>();
@@ -197,20 +181,6 @@ DynamicInterstitialInfo::DynamicInterstitialInfo(
 SSLErrorAssistant::SSLErrorAssistant() = default;
 
 SSLErrorAssistant::~SSLErrorAssistant() = default;
-
-bool SSLErrorAssistant::IsKnownCaptivePortalCertificate(
-    const net::SSLInfo& ssl_info) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  EnsureInitialized();
-  CHECK(error_assistant_proto_);
-
-  if (!captive_portal_spki_hashes_) {
-    captive_portal_spki_hashes_ =
-        LoadCaptivePortalCertHashes(*error_assistant_proto_);
-  }
-
-  return MatchSSLInfoWithHashes(ssl_info, *(captive_portal_spki_hashes_.get()));
-}
 
 std::optional<DynamicInterstitialInfo>
 SSLErrorAssistant::MatchDynamicInterstitial(const net::SSLInfo& ssl_info,
@@ -349,9 +319,6 @@ void SSLErrorAssistant::SetErrorAssistantProto(
 
   mitm_software_list_ = LoadMITMSoftwareList(*error_assistant_proto_);
 
-  captive_portal_spki_hashes_ =
-      LoadCaptivePortalCertHashes(*error_assistant_proto_);
-
   dynamic_interstitial_list_ =
       LoadDynamicInterstitialList(*error_assistant_proto_);
 }
@@ -364,7 +331,6 @@ void SSLErrorAssistant::EnsureInitialized() {
 void SSLErrorAssistant::ResetForTesting() {
   error_assistant_proto_.reset();
   mitm_software_list_.reset();
-  captive_portal_spki_hashes_.reset();
   dynamic_interstitial_list_.reset();
 }
 

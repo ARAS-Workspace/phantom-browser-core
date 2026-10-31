@@ -6,7 +6,6 @@ import("//device/vr/buildflags/buildflags.gni")
 
 static_library("embedder_support") {
   sources = [
-    "pref_names.h",
     "switches.cc",
     "switches.h",
   ]

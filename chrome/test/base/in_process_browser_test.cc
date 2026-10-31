@@ -41,7 +41,6 @@
 #include "chrome/browser/lifetime/termination_notification.h"
 #include "chrome/browser/navigation_predictor/search_engine_preconnector.h"
 #include "chrome/browser/net/chrome_network_delegate.h"
-#include "chrome/browser/net/net_error_tab_helper.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/notifications/notification_display_service_tester.h"
 #include "chrome/browser/predictors/loading_predictor_config.h"
@@ -77,7 +76,6 @@
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/test_launcher_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/feature_engagement/public/feature_list.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/os_crypt/async/browser/key_provider.h"
@@ -104,10 +102,6 @@
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "chrome/test/base/scoped_bundle_swizzler_mac.h"
 #include "components/os_crypt/common/os_crypt_switches.h"
-#endif
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_service.h"
 #endif
 
 #include "components/storage_monitor/test_storage_monitor.h"
@@ -349,14 +343,6 @@ void InProcessBrowserTest::SetUp() {
   // could be overridden on the command line manually.
   CHECK(command_line->HasSwitch(password_manager::kPasswordStore));
 #endif
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  captive_portal::CaptivePortalService::set_state_for_testing(
-      captive_portal::CaptivePortalService::DISABLED_FOR_TESTING);
-#endif
-
-  chrome_browser_net::NetErrorTabHelper::set_state_for_testing(
-      chrome_browser_net::NetErrorTabHelper::TESTING_FORCE_DISABLED);
 
   // Redirect the default download directory to a temporary directory.
   ASSERT_TRUE(default_download_dir_.CreateUniqueTempDir());

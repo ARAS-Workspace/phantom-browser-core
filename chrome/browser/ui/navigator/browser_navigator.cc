@@ -54,7 +54,6 @@
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/constrained_window/constrained_window_views.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/policy/core/common/policy_pref_names.h"
@@ -79,10 +78,6 @@
 
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
-#endif
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
 #endif
 
 using content::GlobalRequestID;
@@ -755,11 +750,6 @@ base::WeakPtr<content::NavigationHandle> NavigateImpl(
       apps::SetAppIdForWebContents(params->browser->GetProfile(),
                                    contents_to_navigate_or_insert,
                                    params->app_id);
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-      captive_portal::CaptivePortalTabHelper::FromWebContents(
-          contents_to_navigate_or_insert)
-          ->set_window_type(params->captive_portal_window_type);
-#endif
     } else {
       // ... otherwise if we're loading in the current tab, the target is the
       // same as the source.

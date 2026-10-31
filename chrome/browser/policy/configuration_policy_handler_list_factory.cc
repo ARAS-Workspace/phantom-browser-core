@@ -61,7 +61,6 @@
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/custom_handlers/pref_names.h"
 #include "components/domain_reliability/domain_reliability_prefs.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/language/core/browser/pref_names.h"
@@ -628,9 +627,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kWebAuthenticationRemoteDesktopAllowedOrigins,
     webauthn::pref_names::kRemoteDesktopAllowedOrigins,
     base::Value::Type::LIST },
-  { key::kAlternateErrorPagesEnabled,
-    embedder_support::kAlternateErrorPagesEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kBuiltInDnsClientEnabled,
     prefs::kBuiltInDnsClientEnabled,
     base::Value::Type::BOOLEAN },

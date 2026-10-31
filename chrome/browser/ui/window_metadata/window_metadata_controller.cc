@@ -19,17 +19,12 @@
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/favicon/core/favicon_driver.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/gfx/font_list.h"
 #include "ui/gfx/text_elider.h"
 #include "ui/gfx/text_utils.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 namespace {
 
@@ -203,21 +198,6 @@ std::u16string WindowMetadataController::GetWindowTitleFromWebContents(
     title = FormatTitleForDisplay(app_browser_controller
                                       ? app_browser_controller->GetTitle()
                                       : contents->GetTitle());
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-    // If the app name is requested and this is a captive portal window, the
-    // title should indicate that this is a captive portal window. Captive
-    // portal windows should always be pop-ups, and the is_captive_portal_window
-    // condition should not change over the lifetime of a WebContents.
-    if (include_app_name &&
-        captive_portal::CaptivePortalTabHelper::FromWebContents(contents) &&
-        captive_portal::CaptivePortalTabHelper::FromWebContents(contents)
-            ->is_captive_portal_window()) {
-      DCHECK(browser_->GetType() == BrowserWindowInterface::Type::TYPE_POPUP);
-      return l10n_util::GetStringFUTF16(
-          IDS_CAPTIVE_PORTAL_BROWSER_WINDOW_TITLE_FORMAT,
-          title.empty() ? CoreTabHelper::GetDefaultTitle() : title);
-    }
-#endif
   }
 
   // If there is no title, leave it empty for apps.

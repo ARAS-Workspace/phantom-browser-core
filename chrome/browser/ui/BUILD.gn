@@ -9,7 +9,6 @@ import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
 import("//chrome/browser/buildflags.gni")
 import("//chrome/common/features.gni")
-import("//components/captive_portal/core/features.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//content/browser/devtools/features.gni")
 import("//crypto/features.gni")
@@ -652,7 +651,6 @@ static_library("ui") {
     "//components/autofill/core/common:credit_card_number_validation",
     "//components/breadcrumbs/core:status",
     "//components/browser_sync",
-    "//components/captive_portal/content",
     "//components/client_hints/browser",
     "//components/consent_auditor/",
     "//components/content_capture/common",
@@ -743,10 +741,6 @@ static_library("ui") {
     # - c/b/ui/views/frame/browser_view.h
     "//chrome/browser/ui/views/file_system_access:impl",
   ]
-
-  if (enable_captive_portal_detection) {
-    deps += [ "//chrome/browser/captive_portal" ]
-  }
 
   if (enable_offline_pages) {
     deps += [ "//chrome/browser/offline_pages" ]

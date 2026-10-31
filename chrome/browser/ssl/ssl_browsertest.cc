@@ -93,7 +93,6 @@
 #include "components/policy/policy_constants.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
-#include "components/security_interstitials/content/captive_portal_blocking_page.h"
 #include "components/security_interstitials/content/common_name_mismatch_handler.h"
 #include "components/security_interstitials/content/insecure_form_blocking_page.h"
 #include "components/security_interstitials/content/insecure_form_navigation_throttle.h"
@@ -5397,7 +5396,7 @@ class SSLUIMITMSoftwareTest : public CertVerifierBrowserTest {
     SSLInterstitialTimerObserver interstitial_timer_observer(tab);
     ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetHSTSTestURL()));
     ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-    EXPECT_TRUE(interstitial_timer_observer.timer_started());
+    EXPECT_FALSE(interstitial_timer_observer.timer_started());
 
     // Check that a MITM software interstitial was not recorded in histogram.
     histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(),
@@ -5523,7 +5522,7 @@ IN_PROC_BROWSER_TEST_F(
   SSLInterstitialTimerObserver interstitial_timer_observer(tab);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetHSTSTestURL()));
   ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-  EXPECT_TRUE(interstitial_timer_observer.timer_started());
+  EXPECT_FALSE(interstitial_timer_observer.timer_started());
 
   // Check that a MITM software interstitial was not recorded in histogram.
   histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
@@ -5570,7 +5569,7 @@ IN_PROC_BROWSER_TEST_F(
   SSLInterstitialTimerObserver interstitial_timer_observer(tab);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetHSTSTestURL()));
   ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-  EXPECT_TRUE(interstitial_timer_observer.timer_started());
+  EXPECT_FALSE(interstitial_timer_observer.timer_started());
 
   // Check that a MITM software interstitial was not recorded in histogram.
   histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
@@ -5615,7 +5614,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIMITMSoftwareEnabledTest,
   SSLInterstitialTimerObserver interstitial_timer_observer(tab);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetHSTSTestURL()));
   ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-  EXPECT_TRUE(interstitial_timer_observer.timer_started());
+  EXPECT_FALSE(interstitial_timer_observer.timer_started());
 
   // Check that a MITM software interstitial was not recorded in histogram.
   histograms.ExpectTotalCount(SSLErrorHandler::GetHistogramNameForTesting(), 2);
@@ -5666,7 +5665,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIMITMSoftwareEnabledTest,
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
       browser(), https_server()->GetURL("/ssl/blank_page.html")));
   ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(tab));
-  EXPECT_TRUE(interstitial_timer_observer.timer_started());
+  EXPECT_FALSE(interstitial_timer_observer.timer_started());
 
   // Check that the histogram for an overridable SSL interstitial was
   // recorded.
@@ -6024,7 +6023,7 @@ class SSLUIDynamicInterstitialTest : public CertVerifierBrowserTest {
     chrome_browser_ssl::DynamicInterstitial* filter =
         config_proto->add_dynamic_interstitial();
     filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                      INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+                                      INTERSTITIAL_PAGE_MITM_SOFTWARE);
     filter->set_cert_error(
         chrome_browser_ssl::DynamicInterstitial::ERR_CERT_COMMON_NAME_INVALID);
 
@@ -6094,7 +6093,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, Match) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    ASSERT_EQ(CaptivePortalBlockingPage::kTypeForTesting,
+    ASSERT_EQ(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6129,7 +6128,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, MatchUnknownCertError) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    ASSERT_EQ(CaptivePortalBlockingPage::kTypeForTesting,
+    ASSERT_EQ(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6165,7 +6164,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest,
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    ASSERT_EQ(CaptivePortalBlockingPage::kTypeForTesting,
+    ASSERT_EQ(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6201,7 +6200,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest,
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    ASSERT_EQ(CaptivePortalBlockingPage::kTypeForTesting,
+    ASSERT_EQ(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6238,7 +6237,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, MismatchHash) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    EXPECT_NE(CaptivePortalBlockingPage::kTypeForTesting,
+    EXPECT_NE(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6274,7 +6273,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, MismatchCertError) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    EXPECT_NE(CaptivePortalBlockingPage::kTypeForTesting,
+    EXPECT_NE(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6309,7 +6308,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, MismatchCommonNameRegex) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    EXPECT_NE(CaptivePortalBlockingPage::kTypeForTesting,
+    EXPECT_NE(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6345,7 +6344,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest,
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    EXPECT_NE(CaptivePortalBlockingPage::kTypeForTesting,
+    EXPECT_NE(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }
@@ -6381,7 +6380,7 @@ IN_PROC_BROWSER_TEST_F(SSLUIDynamicInterstitialTest, MismatchWhenOverridable) {
     security_interstitials::SecurityInterstitialPage* interstitial_page =
         GetInterstitialDelegate(tab);
     ASSERT_TRUE(interstitial_page);
-    EXPECT_NE(CaptivePortalBlockingPage::kTypeForTesting,
+    EXPECT_NE(MITMSoftwareBlockingPage::kTypeForTesting,
               interstitial_page->GetTypeForTesting());
   }
 }

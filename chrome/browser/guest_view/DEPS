@@ -8,7 +8,6 @@ include_rules = [
   "+chrome/browser/ash/app_mode/kiosk_chrome_app_manager.h",
   "+chrome/browser/ash/app_mode/kiosk_controller.h",
   "+chrome/browser/ash/app_mode/kiosk_system_session.h",
-  "+chrome/browser/captive_portal/captive_portal_service_factory.h",
   "+chrome/browser/content_settings/host_content_settings_map_factory.h",
   "+chrome/browser/controlled_frame/controlled_frame_user_agent_util.h",
   "+chrome/browser/guest_view",

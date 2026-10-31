@@ -17,7 +17,6 @@ include_rules = [
   "+components/bookmarks/common",
   "+components/browser_ui/desktop_windowing/android",
   "+components/webui/chrome_urls",
-  "+components/captive_portal",
   "+components/collaboration",
   "+components/color",
   "+components/component_updater",

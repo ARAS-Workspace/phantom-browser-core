@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/captive_portal",
   "+components/content_settings/core/browser",
   "+components/content_settings/core/common",
   "+components/embedder_support",

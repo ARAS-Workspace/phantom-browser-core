@@ -205,7 +205,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_switches.h"
 #include "components/blocked_content/popup_blocker.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/content_settings/browser/ui/javascript_optimizer_setting.h"
 #include "components/content_settings/core/browser/content_settings_utils.h"
@@ -438,11 +437,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#include "components/captive_portal/content/captive_portal_url_loader_throttle.h"
-#endif
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 #include "chrome/browser/devtools/devtools_window.h"
@@ -4240,12 +4234,6 @@ ChromeContentBrowserClient::CreateURLLoaderThrottles(
   ChromeNavigationUIData* chrome_navigation_ui_data =
       static_cast<ChromeNavigationUIData*>(navigation_ui_data);
 
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  result.push_back(
-      std::make_unique<captive_portal::CaptivePortalURLLoaderThrottle>(
-          wc_getter.Run()));
-#endif
-
   if (chrome_navigation_ui_data &&
       chrome_navigation_ui_data->is_no_state_prefetching()) {
     result.push_back(
@@ -4732,17 +4720,6 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   signin::ProxyingURLLoaderFactory::MaybeProxyRequest(
       frame, type == URLLoaderFactoryType::kNavigation, request_initiator,
       isolation_info, factory_builder);
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  if (disable_secure_dns) {
-    WebContents* web_contents = WebContents::FromRenderFrameHost(frame);
-    *disable_secure_dns =
-        web_contents &&
-        captive_portal::CaptivePortalTabHelper::FromWebContents(web_contents) &&
-        captive_portal::CaptivePortalTabHelper::FromWebContents(web_contents)
-            ->is_captive_portal_window();
-  }
-#endif
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)

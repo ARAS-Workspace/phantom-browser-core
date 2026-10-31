@@ -401,7 +401,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "SubresourceFilterProfileContext",
     "ThemeSourceService",
     "WebRequestProxyingURLLoaderFactory",
-    "captive_portal::CaptivePortalService",
 
   };
   // clang-format on

@@ -57,9 +57,6 @@ class NetErrorTabHelperTest : public InProcessBrowserTest {
   void SetUp() override { InProcessBrowserTest::SetUp(); }
 
   void SetUpOnMainThread() override {
-    chrome_browser_net::NetErrorTabHelper::set_state_for_testing(
-        chrome_browser_net::NetErrorTabHelper::TESTING_DEFAULT);
-
     host_resolver()->AddRule("mock.http", "127.0.0.1");
     ASSERT_TRUE(embedded_test_server()->Start());
 

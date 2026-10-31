@@ -16,7 +16,6 @@ import("//chrome/browser/downgrade/buildflags.gni")
 import("//chrome/common/features.gni")
 import("//chrome/test/include_js_tests.gni")
 import("//components/allocation_recorder/testing/testing.gni")
-import("//components/captive_portal/core/features.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
@@ -1216,7 +1215,6 @@ test("browser_tests") {
     "//components/browsing_data/content",
     "//components/browsing_data/content:test_support",
     "//components/browsing_data/core",
-    "//components/captive_portal/content",
     "//components/cbor",
     "//components/cdm/common:buildflags",
     "//components/certificate_transparency",
@@ -1935,10 +1933,6 @@ test("browser_tests") {
     "//chrome/browser/ui/global_media_controls",
     "//components/global_media_controls:test_support",
   ]
-
-  if (enable_captive_portal_detection) {
-    deps += [ "//chrome/browser/captive_portal" ]
-  }
 
   deps += [
     "//chrome/browser/apps/link_capturing",
@@ -2816,7 +2810,6 @@ test("unit_tests") {
     "//components/browsing_data/content",
     "//components/browsing_data/content:test_support",
     "//components/browsing_data/core",
-    "//components/captive_portal/content",
     "//components/cbor",
     "//components/certificate_transparency",
     "//components/certificate_transparency:proto",
@@ -3084,10 +3077,6 @@ test("unit_tests") {
     "//chrome/browser/webapps:desktop",
     "//chrome/browser/webapps:desktop_impl",
   ]
-
-  if (enable_captive_portal_detection) {
-    deps += [ "//chrome/browser/captive_portal" ]
-  }
 
   if (chrome_root_store_cert_management_ui) {
     deps += [ "//chrome/browser/ui/webui/certificate_manager:unit_tests" ]
@@ -4151,8 +4140,6 @@ static_library("test_support_ui") {
     "//components/autofill/content/browser",
     "//components/autofill/content/browser:test_support",
     "//components/bookmarks/browser",
-    "//components/captive_portal/content",
-    "//components/captive_portal/core:buildflags",
     "//components/content_settings/core/browser",
     "//components/custom_handlers:test_support",
     "//components/embedder_support",

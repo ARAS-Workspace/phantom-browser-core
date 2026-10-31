@@ -10,7 +10,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/common/pref_names.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 
 #include "components/sync_preferences/pref_service_syncable.h"

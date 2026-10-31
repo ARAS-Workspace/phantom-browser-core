@@ -31,8 +31,6 @@
 #include "chrome/browser/ui/web_applications/navigation_capturing_redirection_throttle.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
-#include "components/captive_portal/content/captive_portal_service.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/custom_handlers/protocol_handler_navigation_throttle.h"
 #include "components/dom_distiller/content/browser/distiller_page_web_contents.h"
 #include "components/dom_distiller/content/browser/distiller_referrer_throttle.h"
@@ -94,10 +92,6 @@
 #include "components/pdf/browser/pdf_navigation_throttle.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
-#endif  // BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/mac/auth_session_request.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -130,12 +124,6 @@ void HandleSSLErrorWrapper(
   // Profile should always outlive a WebContents
   DCHECK(profile);
 
-  captive_portal::CaptivePortalService* captive_portal_service = nullptr;
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  captive_portal_service = CaptivePortalServiceFactory::GetForProfile(profile);
-#endif
-
   const bool is_ssl_error_override_allowed_for_origin =
       policy::IsOriginInAllowlist(request_url, profile->GetPrefs(),
                                   prefs::kSSLErrorOverrideAllowedForOrigins,
@@ -143,7 +131,7 @@ void HandleSSLErrorWrapper(
 
   SSLErrorHandler::HandleSSLError(
       web_contents, cert_error, ssl_info, request_url,
-      std::move(blocking_page_ready_callback), captive_portal_service,
+      std::move(blocking_page_ready_callback),
       std::make_unique<ChromeSecurityBlockingPageFactory>(),
       is_ssl_error_override_allowed_for_origin);
 }

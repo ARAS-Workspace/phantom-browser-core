@@ -49,11 +49,6 @@ bool IsShowingInterstitial(content::WebContents* tab) {
   return helper && helper->IsDisplayingInterstitial();
 }
 
-bool IsShowingCaptivePortalInterstitial(content::WebContents* tab) {
-  return IsShowingInterstitial(tab) &&
-         IsInterstitialDisplayingText(tab->GetPrimaryMainFrame(), "Connect to");
-}
-
 bool IsShowingSSLInterstitial(content::WebContents* tab) {
   return IsShowingInterstitial(tab) &&
          IsInterstitialDisplayingText(tab->GetPrimaryMainFrame(),

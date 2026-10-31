@@ -11,11 +11,10 @@ const SB_DISPLAY_CHECK_BOX = 'displaycheckbox';
 
 // This sets up the Extended Safe Browsing Reporting opt-in, either for
 // reporting malware or invalid certificate chains. Does nothing if the
-// interstitial type is not SAFEBROWSING or SSL or CAPTIVE_PORTAL.
+// interstitial type is not SAFEBROWSING or SSL.
 export function setupExtendedReportingCheckbox() {
   const interstitialType = loadTimeData.getString('type');
-  if (interstitialType !== 'SAFEBROWSING' && interstitialType !== 'SSL' &&
-      interstitialType !== 'CAPTIVE_PORTAL') {
+  if (interstitialType !== 'SAFEBROWSING' && interstitialType !== 'SSL') {
     return;
   }
 

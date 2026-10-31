@@ -66,7 +66,6 @@ function setupEvents() {
   const overridable = loadTimeData.getBoolean('overridable');
   const interstitialType = loadTimeData.getString('type');
   const ssl = interstitialType === 'SSL';
-  const captivePortal = interstitialType === 'CAPTIVE_PORTAL';
   const badClock = ssl && loadTimeData.getBoolean('bad_clock');
   const lookalike = interstitialType === 'LOOKALIKE';
   const billing =
@@ -95,8 +94,6 @@ function setupEvents() {
       errorCode.textContent = loadTimeData.getString('errorCode');
       errorCode.classList.remove(HIDDEN_CLASS);
     }
-  } else if (captivePortal) {
-    body.classList.add('captive-portal');
   } else if (billing) {
     body.classList.add('safe-browsing-billing');
   } else if (lookalike) {
@@ -134,7 +131,6 @@ function setupEvents() {
   } else {
     primaryButton.addEventListener('click', function() {
       switch (interstitialType) {
-        case 'CAPTIVE_PORTAL':
         case 'SUPERVISED_USER_VERIFY':
         case 'SUPERVISED_USER_VERIFY_SUBFRAME':
           sendCommand(SecurityInterstitialCommandId.CMD_OPEN_LOGIN);
@@ -194,7 +190,6 @@ function setupEvents() {
   if (overridable) {
     const overrideElement =
         document.querySelector(billing ? '#proceed-button' : '#proceed-link');
-    // Captive portal page isn't overridable.
     overrideElement.addEventListener('click', function(event) {
       if (!billing || clickjackingDelayHasPassed()) {
         sendCommand(SecurityInterstitialCommandId.CMD_PROCEED);
@@ -257,10 +252,10 @@ function setupEvents() {
   }
 
   const detailsButton = document.querySelector('#details-button');
-  if (captivePortal || billing || lookalike || insecureForm || httpsOnly ||
-      enterpriseWarn || enterpriseBlock || supervisedUserVerify ||
-      managedProfileRequired || supervisedUserVerifySubframe) {
-    // Captive portal, billing, lookalike pages, insecure form, enterprise warn,
+  if (billing || lookalike || insecureForm || httpsOnly || enterpriseWarn ||
+      enterpriseBlock || supervisedUserVerify || managedProfileRequired ||
+      supervisedUserVerifySubframe) {
+    // Billing, lookalike pages, insecure form, enterprise warn,
     // enterprise block, and HTTPS only mode interstitials don't
     // have details buttons.
     detailsButton.classList.add('hidden');

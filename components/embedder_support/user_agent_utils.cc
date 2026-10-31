@@ -26,7 +26,6 @@
 #include "base/version.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/embedder_support/switches.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"

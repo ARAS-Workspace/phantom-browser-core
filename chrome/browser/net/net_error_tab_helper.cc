@@ -4,15 +4,11 @@
 
 #include "chrome/browser/net/net_error_tab_helper.h"
 
-#include "base/functional/bind.h"
 #include "base/logging.h"
-#include "chrome/browser/net/dns_probe_service.h"
-#include "chrome/browser/net/dns_probe_service_factory.h"
 #include "chrome/browser/net/net_error_diagnostics_dialog.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/pref_names.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/error_page/common/net_error_info.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
@@ -37,16 +33,12 @@ using content::BrowserContext;
 using content::BrowserThread;
 using content::WebContents;
 using content::WebContentsObserver;
-using error_page::DnsProbeStatus;
 using error_page::DnsProbeStatusToString;
 using ui::PageTransition;
 
 namespace chrome_browser_net {
 
 namespace {
-
-static NetErrorTabHelper::TestingState testing_state_ =
-    NetErrorTabHelper::TESTING_DEFAULT;
 
 bool IsValidEasterEggTarget(content::RenderFrameHost& target_frame) {
   // Only the primary main-frame error document lives in the isolated
@@ -96,11 +88,6 @@ void NetErrorTabHelper::BindNetworkEasterEgg(
   if (!tab_helper)
     return;
   tab_helper->network_easter_egg_receivers_.Bind(rfh, std::move(receiver));
-}
-
-// static
-void NetErrorTabHelper::set_state_for_testing(TestingState state) {
-  testing_state_ = state;
 }
 
 void NetErrorTabHelper::RenderFrameCreated(
@@ -191,50 +178,12 @@ NetErrorTabHelper::NetErrorTabHelper(WebContents* contents)
 }
 
 void NetErrorTabHelper::OnMainFrameDnsError() {
-  if (ProbesAllowed()) {
-    // Don't start more than one probe at a time.
-    if (dns_probe_status_ != error_page::DNS_PROBE_STARTED) {
-      StartDnsProbe();
-      dns_probe_status_ = error_page::DNS_PROBE_STARTED;
-    }
-  } else {
-    dns_probe_status_ = error_page::DNS_PROBE_NOT_RUN;
-  }
-}
-
-void NetErrorTabHelper::StartDnsProbe() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DCHECK(dns_error_active_);
-  DCHECK_NE(error_page::DNS_PROBE_STARTED, dns_probe_status_);
-
-  DVLOG(1) << "Starting DNS probe.";
-
-  DnsProbeService* probe_service = DnsProbeServiceFactory::GetForContext(
-      web_contents()->GetBrowserContext());
-  probe_service->ProbeDns(base::BindOnce(&NetErrorTabHelper::OnDnsProbeFinished,
-                                         weak_factory_.GetWeakPtr()));
-}
-
-void NetErrorTabHelper::OnDnsProbeFinished(DnsProbeStatus result) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DCHECK_EQ(error_page::DNS_PROBE_STARTED, dns_probe_status_);
-  DCHECK(error_page::DnsProbeStatusIsFinished(result));
-
-  DVLOG(1) << "Finished DNS probe with result "
-           << DnsProbeStatusToString(result) << ".";
-
-  dns_probe_status_ = result;
-
-  if (dns_error_page_committed_)
-    SendInfo();
+  dns_probe_status_ = error_page::DNS_PROBE_NOT_RUN;
 }
 
 // static
 void NetErrorTabHelper::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* prefs) {
-  // embedder_support::kAlternateErrorPagesEnabled is registered by
-  // ProfileNetworkContextService.
-
   prefs->RegisterIntegerPref(prefs::kNetworkEasterEggHighScore, 0,
                              user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 }
@@ -244,18 +193,8 @@ void NetErrorTabHelper::InitializePref(WebContents* contents) {
 
   BrowserContext* browser_context = contents->GetBrowserContext();
   Profile* profile = Profile::FromBrowserContext(browser_context);
-  resolve_errors_with_web_service_.Init(
-      embedder_support::kAlternateErrorPagesEnabled, profile->GetPrefs());
   easter_egg_high_score_.Init(prefs::kNetworkEasterEggHighScore,
                               profile->GetPrefs());
-}
-
-bool NetErrorTabHelper::ProbesAllowed() const {
-  if (testing_state_ != TESTING_DEFAULT)
-    return testing_state_ == TESTING_FORCE_ENABLED;
-
-  // TODO(juliatuttle): Disable on mobile?
-  return *resolve_errors_with_web_service_;
 }
 
 void NetErrorTabHelper::SendInfo() {

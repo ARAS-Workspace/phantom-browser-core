@@ -31,7 +31,6 @@ class TestNetErrorTabHelper : public NetErrorTabHelper {
  public:
   explicit TestNetErrorTabHelper(content::WebContents* web_contents)
       : NetErrorTabHelper(web_contents),
-        mock_probe_running_(false),
         last_status_sent_(error_page::DNS_PROBE_MAX),
         mock_sent_count_(0),
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
@@ -40,13 +39,6 @@ class TestNetErrorTabHelper : public NetErrorTabHelper {
         times_diagnostics_dialog_invoked_(0) {
   }
 
-  void FinishProbe(DnsProbeStatus status) {
-    EXPECT_TRUE(mock_probe_running_);
-    OnDnsProbeFinished(status);
-    mock_probe_running_ = false;
-  }
-
-  bool mock_probe_running() const { return mock_probe_running_; }
   DnsProbeStatus last_status_sent() const { return last_status_sent_; }
   int mock_sent_count() const { return mock_sent_count_; }
 
@@ -90,11 +82,6 @@ class TestNetErrorTabHelper : public NetErrorTabHelper {
  private:
   // NetErrorTabHelper implementation:
 
-  void StartDnsProbe() override {
-    EXPECT_FALSE(mock_probe_running_);
-    mock_probe_running_ = true;
-  }
-
   void SendInfo() override {
     last_status_sent_ = dns_probe_status();
     mock_sent_count_++;
@@ -112,7 +99,6 @@ class TestNetErrorTabHelper : public NetErrorTabHelper {
   }
 #endif  // BUILDFLAG(ENABLE_OFFLINE_PAGES)
 
-  bool mock_probe_running_;
   DnsProbeStatus last_status_sent_;
   int mock_sent_count_;
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
@@ -141,8 +127,6 @@ class NetErrorTabHelperTest : public ChromeRenderViewHostTestHarness {
                     ->AppendChild("subframe");
 
     tab_helper_ = std::make_unique<TestNetErrorTabHelper>(web_contents());
-    NetErrorTabHelper::set_state_for_testing(
-        NetErrorTabHelper::TESTING_FORCE_ENABLED);
   }
 
   void TearDown() override {
@@ -167,8 +151,6 @@ class NetErrorTabHelperTest : public ChromeRenderViewHostTestHarness {
     tab_helper_->DidFinishNavigation(&navigation_handle);
   }
 
-  void FinishProbe(DnsProbeStatus status) { tab_helper_->FinishProbe(status); }
-
   void LoadURL(const GURL& url, bool succeeded) {
     if (succeeded) {
       content::NavigationSimulator::NavigateAndCommitFromBrowser(web_contents(),
@@ -190,7 +172,6 @@ class NetErrorTabHelperTest : public ChromeRenderViewHostTestHarness {
   }
 #endif  // BUILDFLAG(ENABLE_OFFLINE_PAGES)
 
-  bool probe_running() { return tab_helper_->mock_probe_running(); }
   DnsProbeStatus last_status_sent() { return tab_helper_->last_status_sent(); }
   int sent_count() { return tab_helper_->mock_sent_count(); }
 
@@ -202,45 +183,31 @@ class NetErrorTabHelperTest : public ChromeRenderViewHostTestHarness {
   GURL bogus_url_;
 };
 
-TEST_F(NetErrorTabHelperTest, Null) {
-  EXPECT_FALSE(probe_running());
-}
-
 TEST_F(NetErrorTabHelperTest, MainFrameNonDnsError) {
   DidFinishNavigation(MAIN_FRAME, OTHER_ERROR);
-  EXPECT_FALSE(probe_running());
   EXPECT_EQ(0, sent_count());
 }
 
 TEST_F(NetErrorTabHelperTest, NonMainFrameDnsError) {
   DidFinishNavigation(SUB_FRAME, DNS_ERROR);
-  EXPECT_FALSE(probe_running());
   EXPECT_EQ(0, sent_count());
 }
 
-// If multiple DNS errors occur in a row before a probe result, don't start
-// multiple probes.
+// If multiple DNS errors occur in a row, each committed error page is told
+// that no DNS probe was run.
 TEST_F(NetErrorTabHelperTest, CoalesceFailures) {
   DidFinishNavigation(MAIN_FRAME, DNS_ERROR);
   DidFinishNavigation(MAIN_FRAME, DNS_ERROR);
-  EXPECT_TRUE(probe_running());
   EXPECT_EQ(2, sent_count());
-  EXPECT_EQ(error_page::DNS_PROBE_STARTED, last_status_sent());
+  EXPECT_EQ(error_page::DNS_PROBE_NOT_RUN, last_status_sent());
 
   DidFinishNavigation(MAIN_FRAME, DNS_ERROR);
-  EXPECT_TRUE(probe_running());
   EXPECT_EQ(3, sent_count());
-  EXPECT_EQ(error_page::DNS_PROBE_STARTED, last_status_sent());
+  EXPECT_EQ(error_page::DNS_PROBE_NOT_RUN, last_status_sent());
 
   DidFinishNavigation(MAIN_FRAME, DNS_ERROR);
-  EXPECT_TRUE(probe_running());
   EXPECT_EQ(4, sent_count());
-  EXPECT_EQ(error_page::DNS_PROBE_STARTED, last_status_sent());
-
-  FinishProbe(error_page::DNS_PROBE_FINISHED_NXDOMAIN);
-  EXPECT_FALSE(probe_running());
-  EXPECT_EQ(5, sent_count());
-  EXPECT_EQ(error_page::DNS_PROBE_FINISHED_NXDOMAIN, last_status_sent());
+  EXPECT_EQ(error_page::DNS_PROBE_NOT_RUN, last_status_sent());
 }
 
 // Makes sure that URLs are sanitized before running the platform network

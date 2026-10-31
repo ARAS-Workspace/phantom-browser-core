@@ -110,7 +110,6 @@ missing_new_fields,chrome/browser/ui/webui/downloads/downloads_dom_handler.cc
 missing_new_fields,chrome/browser/ui/webui/sanitized_image/sanitized_image_source.cc
 missing_new_fields,chromeos/ash/components/device_activity/device_activity_client.cc
 missing_new_fields,components/autofill/core/browser/payments/payments_network_interface.cc
-missing_new_fields,components/captive_portal/content/captive_portal_service.cc
 missing_new_fields,components/dom_distiller/core/distiller_url_fetcher.cc
 missing_new_fields,components/domain_reliability/uploader.cc
 missing_new_fields,components/download/internal/common/download_item_impl.cc

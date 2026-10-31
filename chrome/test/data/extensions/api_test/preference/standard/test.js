@@ -34,7 +34,6 @@ const preferencesToTest = [
   {
     root: chrome.privacy.services,
     preferences: {
-      alternateErrorPagesEnabled: false,
       autofillEnabled: false,
       autofillAddressEnabled: false,
       autofillCreditCardEnabled: false,

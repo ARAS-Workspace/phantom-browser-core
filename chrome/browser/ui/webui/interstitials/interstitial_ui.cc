@@ -24,7 +24,6 @@
 #include "chrome/browser/ssl/insecure_form/insecure_form_controller_client.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/url_constants.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/grit/dev_ui_components_resources.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
@@ -52,10 +51,6 @@
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/webui/web_ui_util.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/security_interstitials/content/captive_portal_blocking_page.h"
-#endif
 
 InterstitialUIConfig::InterstitialUIConfig()
     : DefaultInternalWebUIConfig(chrome::kChromeUIInterstitialHost) {}
@@ -254,52 +249,6 @@ CreateHttpsOnlyModePage(content::WebContents* web_contents) {
       /*metrics_callback=*/base::DoNothing());
 }
 
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-std::unique_ptr<CaptivePortalBlockingPage> CreateCaptivePortalBlockingPage(
-    content::WebContents* web_contents) {
-  bool is_wifi_connection = false;
-  GURL landing_url("https://captive.portal/login");
-  GURL request_url("https://google.com");
-  // Not initialized to a default value, since non-empty wifi_ssid is
-  // considered a wifi connection, even if is_wifi_connection is false.
-  std::string wifi_ssid;
-
-  std::string request_url_param;
-  if (net::GetValueForKeyInQuery(web_contents->GetVisibleURL(), "url",
-                                 &request_url_param)) {
-    if (GURL(request_url_param).is_valid()) {
-      request_url = GURL(request_url_param);
-    }
-  }
-  std::string landing_url_param;
-  if (net::GetValueForKeyInQuery(web_contents->GetVisibleURL(), "landing_page",
-                                 &landing_url_param)) {
-    if (GURL(landing_url_param).is_valid()) {
-      landing_url = GURL(landing_url_param);
-    }
-  }
-  std::string wifi_connection_param;
-  if (net::GetValueForKeyInQuery(web_contents->GetVisibleURL(), "is_wifi",
-                                 &wifi_connection_param)) {
-    is_wifi_connection = wifi_connection_param == "1";
-  }
-  std::string wifi_ssid_param;
-  if (net::GetValueForKeyInQuery(web_contents->GetVisibleURL(), "wifi_name",
-                                 &wifi_ssid_param)) {
-    wifi_ssid = wifi_ssid_param;
-  }
-  net::SSLInfo ssl_info;
-  ssl_info.cert = ssl_info.unverified_cert = CreateFakeCert();
-  ChromeSecurityBlockingPageFactory blocking_page_factory;
-  std::unique_ptr<CaptivePortalBlockingPage> blocking_page =
-      blocking_page_factory.CreateCaptivePortalBlockingPage(
-          web_contents, request_url, landing_url, ssl_info,
-          net::ERR_CERT_COMMON_NAME_INVALID);
-  blocking_page->OverrideWifiInfoForTesting(is_wifi_connection, wifi_ssid);
-  return blocking_page;
-}
-#endif
-
 }  //  namespace
 
 InterstitialUI::InterstitialUI(content::WebUI* web_ui)
@@ -366,10 +315,6 @@ void InterstitialHTMLSource::StartDataRequest(
     interstitial_delegate = CreateBadClockBlockingPage(web_contents);
   } else if (path_without_query == "/lookalike") {
     interstitial_delegate = CreateLookalikeInterstitialPage(web_contents);
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  } else if (path_without_query == "/captiveportal") {
-    interstitial_delegate = CreateCaptivePortalBlockingPage(web_contents);
-#endif
   } else if (path_without_query == "/insecure_form") {
     interstitial_delegate = CreateInsecureFormPage(web_contents);
   } else if (path_without_query == "/https_only") {

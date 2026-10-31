@@ -9,8 +9,6 @@
 #include <string>
 
 #include "base/functional/bind.h"
-#include "base/memory/weak_ptr.h"
-#include "chrome/browser/net/dns_probe_service.h"
 #include "chrome/common/net/net_error_page_support.mojom.h"
 #include "chrome/common/network_diagnostics.mojom.h"
 #include "chrome/common/network_easter_egg.mojom.h"
@@ -29,8 +27,8 @@ class PrefRegistrySyncable;
 namespace chrome_browser_net {
 
 // A TabHelper that monitors loads for certain types of network errors and
-// does interesting things with them.  Currently, starts DNS probes using the
-// DnsProbeService whenever a page fails to load with a DNS-related error.
+// does interesting things with them.  Currently, tells the error page that no
+// DNS probe was run whenever a page fails to load with a DNS-related error.
 class NetErrorTabHelper
     : public content::WebContentsObserver,
       public content::WebContentsUserData<NetErrorTabHelper>,
@@ -38,12 +36,6 @@ class NetErrorTabHelper
       public chrome::mojom::NetworkDiagnostics,
       public chrome::mojom::NetworkEasterEgg {
  public:
-  enum TestingState {
-    TESTING_DEFAULT,
-    TESTING_FORCE_DISABLED,
-    TESTING_FORCE_ENABLED
-  };
-
   using DnsProbeStatusSnoopCallback =
       base::RepeatingCallback<void(error_page::DnsProbeStatus)>;
 
@@ -64,13 +56,11 @@ class NetErrorTabHelper
       mojo::PendingAssociatedReceiver<chrome::mojom::NetworkEasterEgg> receiver,
       content::RenderFrameHost* rfh);
 
-  static void set_state_for_testing(TestingState testing_state);
-
   static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* prefs);
 
   // Sets a callback that will be called immediately after the helper sends
-  // a NetErrorHelper IPC.  (Used by the DNS probe browser test to know when to
-  // check the error page for updates, instead of polling.)
+  // a NetErrorHelper IPC.  (Used by browser tests to know when the status
+  // reaches the error page, instead of polling.)
   void set_dns_probe_status_snoop_callback_for_testing(
       const DnsProbeStatusSnoopCallback& dns_probe_status_snoop_callback) {
     dns_probe_status_snoop_callback_ = dns_probe_status_snoop_callback;
@@ -98,9 +88,7 @@ class NetErrorTabHelper
   // |contents| is the WebContents of the tab this NetErrorTabHelper is
   // attached to.
   explicit NetErrorTabHelper(content::WebContents* contents);
-  virtual void StartDnsProbe();
   virtual void SendInfo();
-  void OnDnsProbeFinished(error_page::DnsProbeStatus result);
 
   error_page::DnsProbeStatus dns_probe_status() const {
     return dns_probe_status_;
@@ -127,7 +115,6 @@ class NetErrorTabHelper
   void OnMainFrameDnsError();
 
   void InitializePref(content::WebContents* contents);
-  bool ProbesAllowed() const;
 
   // chrome::mojom::NetworkDiagnostics:
   void RunNetworkDiagnostics(const GURL& url) override;
@@ -177,14 +164,8 @@ class NetErrorTabHelper
   // Optional callback for browser test to snoop on outgoing NetErrorInfo IPCs.
   DnsProbeStatusSnoopCallback dns_probe_status_snoop_callback_;
 
-  // "Use a web service to resolve navigation errors" preference is required
-  // to allow probes.
-  BooleanPrefMember resolve_errors_with_web_service_;
-
   // Preference storing the user's current easter egg game high score.
   IntegerPrefMember easter_egg_high_score_;
-
-  base::WeakPtrFactory<NetErrorTabHelper> weak_factory_{this};
 
   WEB_CONTENTS_USER_DATA_KEY_DECL();
 };

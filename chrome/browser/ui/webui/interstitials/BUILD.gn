@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/captive_portal/core/features.gni")
-
 source_set("interstitials") {
   sources = [
     "interstitial_ui.cc",
@@ -18,7 +16,6 @@ source_set("interstitials") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ssl",
     "//chrome/common",
-    "//components/captive_portal/core:buildflags",
     "//components/lookalikes/core",
     "//components/resources:dev_ui_components_resources",
     "//components/security_interstitials/content:security_interstitial_page",

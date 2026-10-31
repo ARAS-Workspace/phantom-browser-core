@@ -15,7 +15,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
 
@@ -34,9 +33,6 @@ namespace {
 constexpr char kOnPrefChangeFormat[] = "types.ChromeSetting.%s.onChange";
 
 const PrefMappingEntry kMappings[] = {
-    {"alternateErrorPagesEnabled",
-     embedder_support::kAlternateErrorPagesEnabled, APIPermissionID::kPrivacy,
-     APIPermissionID::kPrivacy},
     {"autofillEnabled", autofill::prefs::kAutofillEnabledDeprecated,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
     {"autofillAddressEnabled", autofill::prefs::kAutofillProfileEnabled,

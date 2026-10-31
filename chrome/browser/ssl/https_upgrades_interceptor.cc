@@ -20,7 +20,6 @@
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/content_settings/core/browser/content_settings_registry.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/prefs/pref_service.h"
@@ -50,10 +49,6 @@
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
 #include "url/url_constants.h"
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "components/guest_view/browser/guest_view_base.h"
@@ -209,10 +204,9 @@ HttpsUpgradesInterceptor::HttpsUpgradesInterceptor(
 HttpsUpgradesInterceptor::~HttpsUpgradesInterceptor() = default;
 
 bool ShouldExcludeNavigationFromUpgrades(
-    content::NavigationUIData* navigation_ui_data,
-    content::WebContents* contents) {
-  // If the URL was typed with an explicit http:// URL or is captive portal
-  // login URL, it is opted-out from upgrades.
+    content::NavigationUIData* navigation_ui_data) {
+  // If the URL was typed with an explicit http:// URL, it is opted-out from
+  // upgrades.
   ChromeNavigationUIData* chrome_navigation_ui_data =
       static_cast<ChromeNavigationUIData*>(navigation_ui_data);
   if (!chrome_navigation_ui_data) {
@@ -221,18 +215,8 @@ bool ShouldExcludeNavigationFromUpgrades(
   if (!chrome_navigation_ui_data->force_no_https_upgrade()) {
     return false;
   }
-  NavigationRequestSecurityLevel level =
-      NavigationRequestSecurityLevel::kExplicitHttpScheme;
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  captive_portal::CaptivePortalTabHelper* captive_portal_tab_helper =
-      captive_portal::CaptivePortalTabHelper::FromWebContents(contents);
-  if (captive_portal_tab_helper->is_captive_portal_tab() ||
-      captive_portal_tab_helper->is_captive_portal_window()) {
-    level = NavigationRequestSecurityLevel::kCaptivePortalLogin;
-  }
-#endif
-
-  RecordNavigationRequestSecurityLevel(level);
+  RecordNavigationRequestSecurityLevel(
+      NavigationRequestSecurityLevel::kExplicitHttpScheme);
   return true;
 }
 
@@ -352,13 +336,11 @@ void HttpsUpgradesInterceptor::MaybeCreateLoader(
     }
   }
 
-  // Captive portals and manually-entered http:// navigations are excluded from
-  // upgrades and we shouldn't warn on them when strict mode isn't enabled, so
-  // allowlist those http:// connections instead.
-  // TODO(crbug.com/363205521): Consider whether we want to allowlist captive
-  // portal hostnames.
+  // Manually-entered http:// navigations are excluded from upgrades and we
+  // shouldn't warn on them when strict mode isn't enabled, so allowlist those
+  // http:// connections instead.
   if (!IsStrictInterstitialEnabled(*interstitial_state_) &&
-      ShouldExcludeNavigationFromUpgrades(navigation_ui_data_, web_contents)) {
+      ShouldExcludeNavigationFromUpgrades(navigation_ui_data_)) {
     // Only allowlist the initial host of the navigation. Server-side redirect
     // targets are not chosen by the user and shouldn't be persistently
     // allowlisted.

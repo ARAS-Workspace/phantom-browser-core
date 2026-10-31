@@ -299,9 +299,6 @@ after discussions on the right group.
     <sender name="Brandcode Configuration">
       <annotation id="brandcode_config"/>
     </sender>
-    <sender name="Captive Portal">
-      <annotation id="captive_portal_service"/>
-    </sender>
     <sender name="DNS">
       <annotation id="dns_over_https"/>
       <annotation id="dns_transaction"/>

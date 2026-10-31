@@ -6,8 +6,8 @@
 #define CHROME_BROWSER_SSL_INSECURE_FORM_INSECURE_FORM_CONTROLLER_CLIENT_H_
 
 #include "base/memory/raw_ptr.h"
-#include "components/security_interstitials/content/content_metrics_helper.h"
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
+#include "components/security_interstitials/core/metrics_helper.h"
 
 namespace content {
 class WebContents;

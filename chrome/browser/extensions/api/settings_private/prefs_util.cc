@@ -32,7 +32,6 @@
 #include "components/component_updater/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/dom_distiller/core/pref_names.h"
-#include "components/embedder_support/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/live_caption/pref_names.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
@@ -105,8 +104,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   s_allowlist = new PrefsUtil::TypedPrefMap();
 
   // Miscellaneous
-  (*s_allowlist)[::embedder_support::kAlternateErrorPagesEnabled] =
-      settings_api::PrefType::kBoolean;
   (*s_allowlist)[autofill::prefs::kAutofillProfileEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[autofill::prefs::kAutofillCreditCardEnabled] =

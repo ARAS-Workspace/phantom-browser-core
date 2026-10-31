@@ -60,7 +60,6 @@
 #include "chrome/browser/resource_coordinator/tab_helper.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sessions/session_tab_helper_factory.h"
-#include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/connection_help_tab_helper.h"
 #include "chrome/browser/ssl/https_only_mode_tab_helper.h"
 #include "chrome/browser/storage_access_api/storage_access_api_service_factory.h"
@@ -91,7 +90,6 @@
 #include "components/blocked_content/popup_blocker_tab_helper.h"
 #include "components/blocked_content/popup_opener_tab_helper.h"
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
-#include "components/captive_portal/core/buildflags.h"
 #include "components/client_hints/browser/client_hints_web_contents_observer.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/dom_distiller/core/dom_distiller_features.h"
@@ -145,11 +143,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/blocked_content/framebust_block_tab_helper.h"
 #include "chrome/browser/ui/shared_highlighting/shared_highlighting_promo.h"
-#endif
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "chrome/browser/captive_portal/captive_portal_service_factory.h"
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -377,14 +370,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
 
   // --- Section 3: Feature tab helpers behind BUILDFLAGs ---
   // NOT for "if enabled"; put those in section 1.
-
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  captive_portal::CaptivePortalTabHelper::CreateForWebContents(
-      web_contents, CaptivePortalServiceFactory::GetForProfile(profile),
-      base::BindRepeating(
-          &ChromeSecurityBlockingPageFactory::OpenLoginTabForWebContents,
-          web_contents, false));
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // If the web contents already have a view type, don't overwrite it here. One

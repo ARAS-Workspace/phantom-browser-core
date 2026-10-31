@@ -11,7 +11,6 @@
 #include "build/build_config.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
 #include "components/security_interstitials/content/blocked_interception_blocking_page.h"
-#include "components/security_interstitials/content/captive_portal_blocking_page.h"
 #include "components/security_interstitials/content/https_only_mode_blocking_page.h"
 #include "components/security_interstitials/content/insecure_form_blocking_page.h"
 #include "components/security_interstitials/content/local_self_signed_blocking_page.h"
@@ -54,14 +53,6 @@ class SecurityBlockingPageFactory {
                                     int options_mask,
                                     const base::Time& time_triggered,
                                     const GURL& support_url) = 0;
-
-  // Creates a captive portal blocking page.
-  virtual std::unique_ptr<CaptivePortalBlockingPage>
-  CreateCaptivePortalBlockingPage(content::WebContents* web_contents,
-                                  const GURL& request_url,
-                                  const GURL& login_url,
-                                  const net::SSLInfo& ssl_info,
-                                  net::Error cert_error) = 0;
 
   // Creates a bad clock blocking page.
   virtual std::unique_ptr<BadClockBlockingPage> CreateBadClockBlockingPage(

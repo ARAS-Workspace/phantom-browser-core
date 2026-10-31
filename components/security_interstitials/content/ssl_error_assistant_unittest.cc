@@ -201,8 +201,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListMatch) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));
@@ -249,8 +249,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListComplexRegexMatch) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));
@@ -298,8 +298,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListMatchUnknownCertError) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));
@@ -344,8 +344,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListNoCommonName) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));
@@ -391,8 +391,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListNoOrganizationRegex) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));
@@ -438,8 +438,8 @@ TEST_F(SSLErrorAssistantTest, DynamicInterstitialListNoCertHashes) {
   // Add a dynamic interstitial that will mismatch.
   chrome_browser_ssl::DynamicInterstitial* filter =
       config_proto->add_dynamic_interstitial();
-  filter->set_interstitial_type(chrome_browser_ssl::DynamicInterstitial::
-                                    INTERSTITIAL_PAGE_CAPTIVE_PORTAL);
+  filter->set_interstitial_type(
+      chrome_browser_ssl::DynamicInterstitial::INTERSTITIAL_PAGE_MITM_SOFTWARE);
   filter->set_cert_error(
       chrome_browser_ssl::DynamicInterstitial::UNKNOWN_CERT_ERROR);
   filter->add_sha256_hash(MakeSha256String(1));

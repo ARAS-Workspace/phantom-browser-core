@@ -24,8 +24,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
 #include "components/security_interstitials/content/blocked_interception_blocking_page.h"
-#include "components/security_interstitials/content/captive_portal_blocking_page.h"
-#include "components/security_interstitials/content/captive_portal_helper.h"
 #include "components/security_interstitials/content/mitm_software_blocking_page.h"
 #include "components/security_interstitials/content/security_blocking_page_factory.h"
 #include "components/security_interstitials/content/security_interstitial_page.h"
@@ -46,10 +44,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
 
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#include "components/captive_portal/content/captive_portal_tab_helper.h"
-#endif
-
 BASE_FEATURE(kMITMSoftwareInterstitial, base::FEATURE_ENABLED_BY_DEFAULT);
 
 namespace {
@@ -60,8 +54,6 @@ BASE_FEATURE(kSSLCommonNameMismatchHandling, base::FEATURE_ENABLED_BY_DEFAULT);
 // This can be changed in tests.
 // - If there is a name mismatch and a suggested URL available result arrives
 //   during this time, the user is redirected to the suggester URL.
-// - If a "captive portal detected" result arrives during this time,
-//   a captive portal interstitial is displayed.
 // - Otherwise, an SSL interstitial is displayed.
 const int64_t kInterstitialDelayInMilliseconds = 3000;
 
@@ -155,8 +147,6 @@ class ConfigSingleton {
   SSLErrorHandler::TimerStartedCallback* timer_started_callback() const;
   base::Clock* clock() const;
 
-  bool IsKnownCaptivePortalCertificate(const net::SSLInfo& ssl_info);
-
   // Returns the name of a known MITM software provider that matches the
   // certificate passed in as the |cert| parameter. Returns empty string if
   // there is no match.
@@ -175,25 +165,12 @@ class ConfigSingleton {
   void SetTimerStartedCallbackForTesting(
       SSLErrorHandler::TimerStartedCallback* callback);
   void SetClockForTesting(base::Clock* clock);
-  void SetReportNetworkConnectivityCallbackForTesting(
-      base::OnceClosure callback);
 
   void SetErrorAssistantProto(
       std::unique_ptr<chrome_browser_ssl::SSLErrorAssistantConfig>
           error_assistant_proto);
 
   int GetErrorAssistantProtoVersionIdForTesting() const;
-
-  void SetOSReportsCaptivePortalForTesting(bool os_reports_captive_portal);
-  bool DoesOSReportCaptivePortalForTesting() const;
-
-  void SetIsMultiNetworkCCTWorkflowForTesting(  // IN-TEST
-      bool is_multi_network_cct_workflow);
-  bool IsMultiNetworkCCTWorkflowForTesting() const;  // IN-TEST
-
-  base::OnceClosure report_network_connectivity_callback() {
-    return std::move(report_network_connectivity_callback_);
-  }
 
  private:
   base::TimeDelta interstitial_delay_;
@@ -207,23 +184,11 @@ class ConfigSingleton {
   // testing.
   raw_ptr<base::Clock, DanglingUntriaged> testing_clock_ = nullptr;
 
-  base::OnceClosure report_network_connectivity_callback_;
-
-  enum OSCaptivePortalStatus {
-    OS_CAPTIVE_PORTAL_STATUS_NOT_SET,
-    OS_CAPTIVE_PORTAL_STATUS_BEHIND_PORTAL,
-    OS_CAPTIVE_PORTAL_STATUS_NOT_BEHIND_PORTAL,
-  };
-  OSCaptivePortalStatus os_captive_portal_status_for_testing_;
-
-  bool is_multi_network_cct_workflow_for_testing_ = false;
-
   std::unique_ptr<SSLErrorAssistant> ssl_error_assistant_;
 };
 
 ConfigSingleton::ConfigSingleton()
     : interstitial_delay_(base::Milliseconds(kInterstitialDelayInMilliseconds)),
-      os_captive_portal_status_for_testing_(OS_CAPTIVE_PORTAL_STATUS_NOT_SET),
       ssl_error_assistant_(std::make_unique<SSLErrorAssistant>()) {}
 
 base::TimeDelta ConfigSingleton::interstitial_delay() const {
@@ -244,8 +209,6 @@ void ConfigSingleton::ResetForTesting() {
   timer_started_callback_ = nullptr;
   testing_clock_ = nullptr;
   ssl_error_assistant_->ResetForTesting();
-  os_captive_portal_status_for_testing_ = OS_CAPTIVE_PORTAL_STATUS_NOT_SET;
-  is_multi_network_cct_workflow_for_testing_ = false;
 }
 
 void ConfigSingleton::SetInterstitialDelayForTesting(
@@ -263,44 +226,13 @@ void ConfigSingleton::SetClockForTesting(base::Clock* clock) {
   testing_clock_ = clock;
 }
 
-void ConfigSingleton::SetReportNetworkConnectivityCallbackForTesting(
-    base::OnceClosure closure) {
-  report_network_connectivity_callback_ = std::move(closure);
-}
-
 int ConfigSingleton::GetErrorAssistantProtoVersionIdForTesting() const {
   return ssl_error_assistant_->GetErrorAssistantProtoVersionIdForTesting();
-}
-
-void ConfigSingleton::SetOSReportsCaptivePortalForTesting(
-    bool os_reports_captive_portal) {
-  os_captive_portal_status_for_testing_ =
-      os_reports_captive_portal ? OS_CAPTIVE_PORTAL_STATUS_BEHIND_PORTAL
-                                : OS_CAPTIVE_PORTAL_STATUS_NOT_BEHIND_PORTAL;
-}
-
-bool ConfigSingleton::DoesOSReportCaptivePortalForTesting() const {
-  return os_captive_portal_status_for_testing_ ==
-         OS_CAPTIVE_PORTAL_STATUS_BEHIND_PORTAL;
-}
-
-void ConfigSingleton::SetIsMultiNetworkCCTWorkflowForTesting(
-    bool is_multi_network_cct_workflow) {
-  is_multi_network_cct_workflow_for_testing_ = is_multi_network_cct_workflow;
-}
-
-bool ConfigSingleton::IsMultiNetworkCCTWorkflowForTesting() const {
-  return is_multi_network_cct_workflow_for_testing_;
 }
 
 void ConfigSingleton::SetErrorAssistantProto(
     std::unique_ptr<chrome_browser_ssl::SSLErrorAssistantConfig> proto) {
   ssl_error_assistant_->SetErrorAssistantProto(std::move(proto));
-}
-
-bool ConfigSingleton::IsKnownCaptivePortalCertificate(
-    const net::SSLInfo& ssl_info) {
-  return ssl_error_assistant_->IsKnownCaptivePortalCertificate(ssl_info);
 }
 
 const std::string ConfigSingleton::MatchKnownMITMSoftware(
@@ -324,7 +256,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
       net::Error cert_error,
       int options_mask,
       const GURL& request_url,
-      captive_portal::CaptivePortalService* captive_portal_service,
       std::unique_ptr<SecurityBlockingPageFactory> blocking_page_factory,
       SSLErrorHandler::BlockingPageReadyCallback blocking_page_ready_callback)
       : web_contents_(web_contents),
@@ -333,9 +264,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
         cert_error_(cert_error),
         options_mask_(options_mask),
         request_url_(request_url),
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-        captive_portal_service_(captive_portal_service),
-#endif
         blocking_page_factory_(std::move(blocking_page_factory)),
         blocking_page_ready_callback_(std::move(blocking_page_ready_callback)) {
     DCHECK(!blocking_page_ready_callback_.is_null());
@@ -343,8 +271,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
   ~SSLErrorHandlerDelegateImpl() override;
 
   // SSLErrorHandler::Delegate methods:
-  void CheckForCaptivePortal() override;
-  bool DoesOSReportCaptivePortal() override;
   bool GetSuggestedUrl(const std::vector<std::string>& dns_names,
                        GURL* suggested_url) const override;
   void CheckSuggestedUrl(
@@ -352,7 +278,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
       CommonNameMismatchHandler::CheckUrlCallback callback) override;
   void NavigateToSuggestedURL(const GURL& suggested_url) override;
   bool IsErrorOverridable() const override;
-  void ShowCaptivePortalInterstitial(const GURL& landing_url) override;
   void ShowMITMSoftwareInterstitial(
       const std::string& mitm_software_name) override;
   void ShowSSLInterstitial(const GURL& support_url) override;
@@ -360,7 +285,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
                                 ssl_errors::ClockState clock_state) override;
   void ShowBlockedInterceptionInterstitial() override;
   void ShowLocalSelfSignedInterstitial() override;
-  void ReportNetworkConnectivity(base::OnceClosure callback) override;
   bool HasBlockedInterception() const override;
 
  private:
@@ -377,9 +301,6 @@ class SSLErrorHandlerDelegateImpl : public SSLErrorHandler::Delegate {
   const int options_mask_;
   const GURL request_url_;
   std::unique_ptr<CommonNameMismatchHandler> common_name_mismatch_handler_;
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  raw_ptr<captive_portal::CaptivePortalService> captive_portal_service_;
-#endif
   std::unique_ptr<SecurityBlockingPageFactory> blocking_page_factory_;
   SSLErrorHandler::BlockingPageReadyCallback blocking_page_ready_callback_;
 };
@@ -389,18 +310,6 @@ SSLErrorHandlerDelegateImpl::~SSLErrorHandlerDelegateImpl() {
     common_name_mismatch_handler_->Cancel();
     common_name_mismatch_handler_.reset();
   }
-}
-
-void SSLErrorHandlerDelegateImpl::CheckForCaptivePortal() {
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  captive_portal_service_->DetectCaptivePortal();
-#else
-  NOTREACHED();
-#endif
-}
-
-bool SSLErrorHandlerDelegateImpl::DoesOSReportCaptivePortal() {
-  return false;
 }
 
 bool SSLErrorHandlerDelegateImpl::GetSuggestedUrl(
@@ -432,13 +341,6 @@ void SSLErrorHandlerDelegateImpl::NavigateToSuggestedURL(
 
 bool SSLErrorHandlerDelegateImpl::IsErrorOverridable() const {
   return SSLBlockingPage::IsOverridable(options_mask_);
-}
-
-void SSLErrorHandlerDelegateImpl::ShowCaptivePortalInterstitial(
-    const GURL& landing_url) {
-  // Show captive portal blocking page. The interstitial owns the blocking page.
-  OnBlockingPageReady(blocking_page_factory_->CreateCaptivePortalBlockingPage(
-      web_contents_, request_url_, landing_url, ssl_info_, cert_error_));
 }
 
 void SSLErrorHandlerDelegateImpl::ShowMITMSoftwareInterstitial(
@@ -476,13 +378,6 @@ void SSLErrorHandlerDelegateImpl::ShowLocalSelfSignedInterstitial() {
       base::Time::NowFromSystemTime(), GURL()));
 }
 
-void SSLErrorHandlerDelegateImpl::ReportNetworkConnectivity(
-    base::OnceClosure callback) {
-  // Nothing to do on other platforms.
-  if (callback)
-    std::move(callback).Run();
-}
-
 bool SSLErrorHandlerDelegateImpl::HasBlockedInterception() const {
   return ssl_errors::ErrorInfo::NetErrorToErrorType(cert_error_) ==
          ssl_errors::ErrorInfo::CERT_KNOWN_INTERCEPTION_BLOCKED;
@@ -512,7 +407,6 @@ void SSLErrorHandler::HandleSSLError(
     base::OnceCallback<
         void(std::unique_ptr<security_interstitials::SecurityInterstitialPage>)>
         blocking_page_ready_callback,
-    captive_portal::CaptivePortalService* captive_portal_service,
     std::unique_ptr<SecurityBlockingPageFactory> blocking_page_factory,
     bool user_can_proceed_past_interstitial /*=true*/) {
   DCHECK(!FromWebContents(web_contents));
@@ -524,13 +418,11 @@ void SSLErrorHandler::HandleSSLError(
 
   auto delegate = std::make_unique<SSLErrorHandlerDelegateImpl>(
       web_contents, ssl_info, web_contents->GetBrowserContext(), cert_error,
-      options_mask, request_url, captive_portal_service,
-      std::move(blocking_page_factory),
+      options_mask, request_url, std::move(blocking_page_factory),
       std::move(blocking_page_ready_callback));
   // Protected ctor.
-  auto* error_handler =
-      new SSLErrorHandler(std::move(delegate), web_contents, cert_error,
-                          ssl_info, captive_portal_service, request_url);
+  auto* error_handler = new SSLErrorHandler(std::move(delegate), web_contents,
+                                            cert_error, ssl_info, request_url);
   web_contents->SetUserData(UserDataKey(), base::WrapUnique(error_handler));
   error_handler->StartHandlingError();
 }
@@ -558,13 +450,6 @@ void SSLErrorHandler::SetClockForTesting(base::Clock* testing_clock) {
 }
 
 // static
-void SSLErrorHandler::SetReportNetworkConnectivityCallbackForTesting(
-    base::OnceClosure closure) {
-  GetConfig().SetReportNetworkConnectivityCallbackForTesting(
-      std::move(closure));
-}
-
-// static
 std::string SSLErrorHandler::GetHistogramNameForTesting() {
   return kHistogram;
 }
@@ -572,19 +457,6 @@ std::string SSLErrorHandler::GetHistogramNameForTesting() {
 // static
 int SSLErrorHandler::GetErrorAssistantProtoVersionIdForTesting() {
   return GetConfig().GetErrorAssistantProtoVersionIdForTesting();
-}
-
-// static
-void SSLErrorHandler::SetOSReportsCaptivePortalForTesting(
-    bool os_reports_captive_portal) {
-  GetConfig().SetOSReportsCaptivePortalForTesting(os_reports_captive_portal);
-}
-
-// static
-void SSLErrorHandler::SetIsMultiNetworkCCTWorkflowForTesting(
-    bool is_multi_network_cct_workflow) {
-  GetConfig().SetIsMultiNetworkCCTWorkflowForTesting(  // IN-TEST
-      is_multi_network_cct_workflow);
 }
 
 bool SSLErrorHandler::IsTimerRunningForTesting() const {
@@ -597,25 +469,17 @@ void SSLErrorHandler::SetErrorAssistantProto(
   GetConfig().SetErrorAssistantProto(std::move(config_proto));
 }
 
-SSLErrorHandler::SSLErrorHandler(
-    std::unique_ptr<Delegate> delegate,
-    content::WebContents* web_contents,
-    net::Error cert_error,
-    const net::SSLInfo& ssl_info,
-    captive_portal::CaptivePortalService* captive_portal_service,
-    const GURL& request_url)
+SSLErrorHandler::SSLErrorHandler(std::unique_ptr<Delegate> delegate,
+                                 content::WebContents* web_contents,
+                                 net::Error cert_error,
+                                 const net::SSLInfo& ssl_info,
+                                 const GURL& request_url)
     : content::WebContentsUserData<SSLErrorHandler>(*web_contents),
       content::WebContentsObserver(web_contents),
       delegate_(std::move(delegate)),
       cert_error_(cert_error),
       ssl_info_(ssl_info),
-      request_url_(request_url)
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-      ,
-      captive_portal_service_(captive_portal_service)
-#endif
-{
-}
+      request_url_(request_url) {}
 
 SSLErrorHandler::~SSLErrorHandler() = default;
 
@@ -644,64 +508,8 @@ void SSLErrorHandler::StartHandlingError() {
     return;
   }
 
-  bool is_captive_portal_login_tab = false;
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  // Check whether this SSL Error is for a Captive Portal Login tab. If so, we
-  // must not show another Captive Portal interstitial because doing so will
-  // remove a user's ability to "ignore" the cert error to log onto the portal.
-  captive_portal::CaptivePortalTabHelper* captive_portal_tab_helper =
-      captive_portal::CaptivePortalTabHelper::FromWebContents(web_contents());
-  if (captive_portal_tab_helper && captive_portal_tab_helper->IsLoginTab())
-    is_captive_portal_login_tab = true;
-#endif
-
-  bool does_os_report_captive_portal = delegate_->DoesOSReportCaptivePortal();
-  // Ideally, a captive portal interstitial should only be displayed if the only
-  // SSL error is a name mismatch error. However, captive portal detector always
-  // opens a new tab if it detects a portal ignoring the types of SSL errors. To
-  // be consistent with captive portal detector, use the result of OS detection
-  // without checking only_error_is_name_mismatch.
-  if ((GetConfig().DoesOSReportCaptivePortalForTesting() ||  // IN-TEST
-       does_os_report_captive_portal)) {
-    delegate_->ReportNetworkConnectivity(
-        GetConfig().report_network_connectivity_callback());
-    RecordUMA(OS_REPORTS_CAPTIVE_PORTAL);
-    bool is_multi_network_cct_workflow =
-        GetConfig().IsMultiNetworkCCTWorkflowForTesting() ||  // IN-TEST
-        (web_contents()->GetTargetNetwork() !=
-         net::handles::kInvalidNetworkHandle);
-    // On Android the OS CaptivePortalLoginApp may open a CCT for captive portal
-    // login. If is_multi_network_cct_workflow is true, it is very likely that
-    // the OS has already detected a captive portal and launched a CCT. In that
-    // case, do not show Chromium's captive portal interstitial and display the
-    // SSL interstitial instead. Note that is_multi_network_cct_workflow can
-    // also be true if other apps use multi-networking APIs. In this case,
-    // showing the captive portal login page in that app is not ideal because
-    // those apps don't have the privilege to bypass VPN and private DNS
-    // restrictions, and therefore the in-browser captive portal login won't
-    // work well.
-    if (is_multi_network_cct_workflow) {
-      ShowSSLInterstitial();
-      return;
-    }
-
-    if (!is_captive_portal_login_tab) {
-      ShowCaptivePortalInterstitial(GURL());
-      return;
-    }
-  }
-
   const bool only_error_is_name_mismatch =
       IsOnlyCertError(net::CERT_STATUS_COMMON_NAME_INVALID);
-
-  // Check known captive portal certificate list if the only error is
-  // name-mismatch. If there are multiple errors, it indicates that the captive
-  // portal landing page itself will have SSL errors, and so it's not a very
-  // helpful place to direct the user to go.
-  if (only_error_is_name_mismatch) {
-    delegate_->ReportNetworkConnectivity(
-        GetConfig().report_network_connectivity_callback());
-  }
 
   // The MITM software interstitial is displayed if and only if:
   // - the error thrown is not overridable
@@ -729,10 +537,8 @@ void SSLErrorHandler::StartHandlingError() {
       RecordUMA(WWW_MISMATCH_FOUND_IN_SAN);
 
       // Show the SSL interstitial if |CERT_STATUS_COMMON_NAME_INVALID| is not
-      // the only error. Need not check for captive portal in this case (See
-      // the comment below). Also show the SSL interstitial if we're already
-      // on a login tab launched by the Captive Portal interstitial.
-      if (!only_error_is_name_mismatch || is_captive_portal_login_tab) {
+      // the only error.
+      if (!only_error_is_name_mismatch) {
         ShowSSLInterstitial();
         return;
       }
@@ -747,45 +553,12 @@ void SSLErrorHandler::StartHandlingError() {
         GetConfig().timer_started_callback()->Run(web_contents());
       }
 
-      // Do not check for a captive portal in this case, because a captive
-      // portal most likely cannot serve a valid certificate which passes the
-      // similarity check.
       return;
     }
   }
 
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  subscription_ = captive_portal_service_->RegisterCallback(
-      base::BindRepeating(&SSLErrorHandler::Observe, base::Unretained(this)));
-
-  if (captive_portal_tab_helper) {
-    captive_portal_tab_helper->OnSSLCertError(ssl_info_);
-  }
-
-  if (!is_captive_portal_login_tab) {
-    delegate_->CheckForCaptivePortal();
-    timer_.Start(FROM_HERE, GetConfig().interstitial_delay(), this,
-                 &SSLErrorHandler::ShowSSLInterstitial);
-    if (GetConfig().timer_started_callback()) {
-      GetConfig().timer_started_callback()->Run(web_contents());
-    }
-    return;
-  }
-#endif
   // Display an SSL interstitial.
   ShowSSLInterstitial();
-}
-
-void SSLErrorHandler::ShowCaptivePortalInterstitial(const GURL& landing_url) {
-  // Show captive portal blocking page. The interstitial owns the blocking page.
-  RecordUMA(delegate_->IsErrorOverridable()
-                ? SHOW_CAPTIVE_PORTAL_INTERSTITIAL_OVERRIDABLE
-                : SHOW_CAPTIVE_PORTAL_INTERSTITIAL_NONOVERRIDABLE);
-  delegate_->ShowCaptivePortalInterstitial(landing_url);
-
-  // Once an interstitial is displayed, no need to keep the handler around.
-  // This is the equivalent of "delete this". It also destroys the timer.
-  web_contents()->RemoveUserData(UserDataKey());
 }
 
 void SSLErrorHandler::ShowMITMSoftwareInterstitial(
@@ -828,10 +601,6 @@ void SSLErrorHandler::ShowDynamicInterstitial(
       delegate_->ShowSSLInterstitial(dynamic_interstitial.support_url);
       return;
     case chrome_browser_ssl::DynamicInterstitial::
-        INTERSTITIAL_PAGE_CAPTIVE_PORTAL:
-      delegate_->ShowCaptivePortalInterstitial(GURL());
-      return;
-    case chrome_browser_ssl::DynamicInterstitial::
         INTERSTITIAL_PAGE_MITM_SOFTWARE:
       DCHECK(!dynamic_interstitial.mitm_software_name.empty());
       delegate_->ShowMITMSoftwareInterstitial(
@@ -871,19 +640,6 @@ void SSLErrorHandler::CommonNameMismatchHandlerCallback(
     RecordUMA(WWW_MISMATCH_URL_NOT_AVAILABLE);
     ShowSSLInterstitial();
   }
-}
-
-void SSLErrorHandler::Observe(
-    const captive_portal::CaptivePortalService::Results& results) {
-#if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-  timer_.Stop();
-  if (results.result == captive_portal::RESULT_BEHIND_CAPTIVE_PORTAL)
-    ShowCaptivePortalInterstitial(results.landing_url);
-  else
-    ShowSSLInterstitial();
-#else
-  NOTREACHED();
-#endif
 }
 
 void SSLErrorHandler::DidStartNavigation(
