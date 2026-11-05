@@ -182,7 +182,7 @@ std::pair<gfx::Image, AvatarIconType> GetProfileAvatarImage(
   // so the icon type is determined by
   // ProfileAttributesEntry::GetAvatarIconWithType().
   return entry->GetAvatarIconWithType(
-      preferred_size, /*use_high_res_file=*/true,
+      preferred_size,
       GetPlaceholderAvatarIconParamsDependingOnTheme(
           ThemeServiceFactory::GetForProfile(&profile),
           /*background_color_id=*/kColorToolbar, color_provider));

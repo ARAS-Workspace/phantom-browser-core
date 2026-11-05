@@ -24,9 +24,7 @@ namespace downgrade {
 std::vector<SnapshotItemDetails> CollectUserDataItems() {
   std::vector<SnapshotItemDetails> user_data_items{
       SnapshotItemDetails(base::FilePath(chrome::kLocalStateFilename),
-                          SnapshotItemDetails::ItemType::kFile, 0),
-      SnapshotItemDetails(base::FilePath(profiles::kHighResAvatarFolderName),
-                          SnapshotItemDetails::ItemType::kDirectory, 0)};
+                          SnapshotItemDetails::ItemType::kFile, 0)};
   return user_data_items;
 }
 

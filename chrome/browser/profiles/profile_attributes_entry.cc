@@ -355,17 +355,13 @@ std::u16string ProfileAttributesEntry::GetUserName() const {
 
 gfx::Image ProfileAttributesEntry::GetAvatarIcon(
     int size_for_placeholder_avatar,
-    bool use_high_res_file,
     const PlaceholderAvatarIconParams& icon_params) const {
-  return GetAvatarIconWithType(size_for_placeholder_avatar, use_high_res_file,
-                               icon_params)
-      .first;
+  return GetAvatarIconWithType(size_for_placeholder_avatar, icon_params).first;
 }
 
 std::pair<gfx::Image, AvatarIconType>
 ProfileAttributesEntry::GetAvatarIconWithType(
     int size_for_placeholder_avatar,
-    bool use_high_res_file,
     const PlaceholderAvatarIconParams& icon_params) const {
   if (IsUsingGAIAPicture()) {
     // The picture may be null if it has not finished downloading yet; in that
@@ -376,18 +372,10 @@ ProfileAttributesEntry::GetAvatarIconWithType(
   }
 
   // TODO(crbug.com/40138086): After launch, remove the treatment of placeholder
-  // avatars from GetHighResAvatar() and from any other places.
+  // avatars.
   if (GetAvatarIconIndex() == profiles::GetPlaceholderAvatarIndex()) {
     return {GetPlaceholderAvatarIcon(size_for_placeholder_avatar, icon_params),
             AvatarIconType::kPlaceholder};
-  }
-
-  // Use the high resolution version of the avatar if it exists. Mobile doesn't
-  // need the high resolution version so no need to fetch it.
-  if (use_high_res_file) {
-    if (const gfx::Image* image = GetHighResAvatar()) {
-      return {*image, AvatarIconType::kNonPlaceholder};
-    }
   }
 
   const int icon_index = GetAvatarIconIndex();
@@ -770,11 +758,6 @@ void ProfileAttributesEntry::SetAvatarIconIndex(size_t icon_index) {
     // it is important to avoid firing |OnProfileAvatarChanged| in this case.
     // See http://crbug.com/41423540
     base::FilePath profile_path = GetPath();
-    if (!profile_attributes_storage_->GetDisableAvatarDownloadForTesting()) {
-      profile_attributes_storage_->DownloadHighResAvatarIfNeeded(icon_index,
-                                                                 profile_path);
-    }
-
     profile_attributes_storage_->NotifyOnProfileAvatarChanged(profile_path);
   }
 }
@@ -873,24 +856,6 @@ void ProfileAttributesEntry::SetAuthInfo(const GaiaId& gaia_id,
   }
 
   profile_attributes_storage_->NotifyProfileAuthInfoChanged(profile_path_);
-}
-
-const gfx::Image* ProfileAttributesEntry::GetHighResAvatar() const {
-  const size_t avatar_index = GetAvatarIconIndex();
-
-  // If this is the placeholder avatar, it is already included in the
-  // resources, so it doesn't need to be downloaded.
-  if (avatar_index == profiles::GetPlaceholderAvatarIndex()) {
-    return &ui::ResourceBundle::GetSharedInstance().GetImageNamed(
-        profiles::GetPlaceholderAvatarIconResourceID());
-  }
-
-  const std::string key =
-      profiles::GetDefaultAvatarIconFileNameAtIndex(avatar_index);
-  const base::FilePath image_path =
-      profiles::GetPathOfHighResAvatarAtIndex(avatar_index);
-  return profile_attributes_storage_->LoadAvatarPictureFromPath(GetPath(), key,
-                                                                image_path);
 }
 
 gfx::Image ProfileAttributesEntry::GetPlaceholderAvatarIcon(

@@ -481,7 +481,7 @@ ProfileSubMenuModel::ProfileSubMenuModel(
       auto [avatar_image, icon_type] =
           account_info.IsEmpty()
               ? profile_attributes->GetAvatarIconWithType(
-                    avatar_icon_size, /*use_high_res_file=*/true,
+                    avatar_icon_size,
                     GetPlaceholderAvatarIconParamsDependingOnTheme(
                         ThemeServiceFactory::GetForProfile(profile),
                         /*background_color_id=*/ui::kColorMenuBackground,
@@ -538,8 +538,7 @@ ProfileSubMenuModel::ProfileSubMenuModel(
 
       ui::ImageModel avatar_model =
           ui::ImageModel::FromImage(profiles::GetSizedAvatarIcon(
-              profile_entry->GetAvatarIcon(
-                  avatar_icon_size, /*use_high_res_file=*/true, icon_params),
+              profile_entry->GetAvatarIcon(avatar_icon_size, icon_params),
               avatar_icon_size, avatar_icon_size, profiles::SHAPE_CIRCLE));
 
       bool has_ai_ring = false;

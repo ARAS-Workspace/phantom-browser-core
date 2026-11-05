@@ -161,9 +161,8 @@ class TestingProfileManager : public ProfileObserver {
   base::FilePath profiles_path_;
 
   // The user data directory in the path service is overriden because some
-  // functions, e.g. GetPathOfHighResAvatarAtIndex, get the user data directory
-  // by the path service instead of the profile manager. The override is scoped
-  // with the help of this variable.
+  // functions get the user data directory by the path service instead of the
+  // profile manager. The override is scoped with the help of this variable.
   std::unique_ptr<base::ScopedPathOverride> user_data_dir_override_;
 
   // Weak reference to the browser process on which the ProfileManager is set.

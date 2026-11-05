@@ -124,9 +124,7 @@ class ProfileAttributesEntry {
   // address used to sign in and the empty string for profiles that aren't
   // signed in to chrome.
   std::u16string GetUserName() const;
-  // Gets the icon used as this profile's avatar. High res icon are downloaded
-  // only if `download_high_res` is true, otherwise a low-res fallback is
-  // returned.
+  // Gets the icon used as this profile's avatar.
   // TODO(crbug.com/40138086): Rename |size_for_placeholder_avatar| to |size|
   // and make this function resize all avatars appropriately. Remove the default
   // value of |size_for_placeholder_avatar| when all callsites pass some value.
@@ -134,13 +132,11 @@ class ProfileAttributesEntry {
   // profiles::GetSizedAvatarIcon().
   gfx::Image GetAvatarIcon(
       int size_for_placeholder_avatar = kDefaultSizeForPlaceholderAvatar,
-      bool use_high_res_file = true,
       const profiles::PlaceholderAvatarIconParams& icon_params = {}) const;
   // Same as GetAvatarIcon(), but also returns an AvatarIconType indicating
   // whether the returned image is a placeholder silhouette.
   std::pair<gfx::Image, AvatarIconType> GetAvatarIconWithType(
       int size_for_placeholder_avatar = kDefaultSizeForPlaceholderAvatar,
-      bool use_high_res_file = true,
       const profiles::PlaceholderAvatarIconParams& icon_params = {}) const;
   // Returns true if the profile is currently running any background apps. Note
   // that a return value of false could mean an error in collection or that
@@ -307,8 +303,6 @@ class ProfileAttributesEntry {
   FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest,
                            EntryInternalAccessors);
   FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest, ProfileActiveTime);
-  FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest,
-                           DownloadHighResAvatarTest);
 
   // Initializes the current entry instance. The callers must subsequently call
   // InitializeLastNameToDisplay() for this entry.
@@ -336,10 +330,6 @@ class ProfileAttributesEntry {
   // clear the current GAIA picture.
   bool ShouldUpdateGAIAPicture(const std::string& image_url_with_size,
                                bool image_is_empty) const;
-
-  // Loads or uses an already loaded high resolution image of the generic
-  // profile avatar.
-  const gfx::Image* GetHighResAvatar() const;
 
   // Generates the colored placeholder avatar icon for the given |size|.
   gfx::Image GetPlaceholderAvatarIcon(

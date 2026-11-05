@@ -64,7 +64,6 @@ struct PlaceholderAvatarIconParams {
 
 // Avatar access.
 extern const base::FilePath::CharType kGAIAPictureFileName[];
-extern const base::FilePath::CharType kHighResAvatarFolderName[];
 
 // Avatar formatting.
 extern const int kAvatarIconSize;
@@ -167,14 +166,8 @@ gfx::Image GetPlaceholderAvatarIconWithColors(
 // Gets the resource ID of the default avatar icon at |index|.
 int GetDefaultAvatarIconResourceIDAtIndex(size_t index);
 
-// Gets the resource filename of the default avatar icon at |index|.
-const char* GetDefaultAvatarIconFileNameAtIndex(size_t index);
-
 // Gets the resource ID of the default avatar label at |index|.
 int GetDefaultAvatarLabelResourceIDAtIndex(size_t index);
-
-// Gets the full path of the high res avatar icon at |index|.
-base::FilePath GetPathOfHighResAvatarAtIndex(size_t index);
 
 // Returns a URL for the default avatar icon with specified index.
 std::string GetDefaultAvatarIconUrl(size_t index);

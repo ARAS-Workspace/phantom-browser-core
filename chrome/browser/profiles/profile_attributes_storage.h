@@ -40,7 +40,6 @@ class PersistentRepeatingTimer;
 class AccountId;
 class PrefService;
 class ProfileAttributesEntry;
-class ProfileAvatarDownloader;
 class PrefRegistrySimple;
 
 class ProfileAttributesStorage {
@@ -139,8 +138,7 @@ class ProfileAttributesStorage {
   // set of default icons.
   size_t ChooseAvatarIconIndexForNewProfile() const;
 
-  // Returns the decoded image at |image_path|. Used both by the GAIA profile
-  // image and the high res avatars.
+  // Returns the decoded image at |image_path|. Used by the GAIA profile image.
   const gfx::Image* LoadAvatarPictureFromPath(
       const base::FilePath& profile_path,
       const std::string& key,
@@ -161,17 +159,8 @@ class ProfileAttributesStorage {
                              const std::string& key,
                              const base::FilePath& image_path);
 
-  // Checks whether the high res avatar at index |icon_index| exists, and if it
-  // does not, calls |DownloadHighResAvatar|.
-  void DownloadHighResAvatarIfNeeded(size_t icon_index,
-                                     const base::FilePath& profile_path);
-
   void AddObserver(Observer* observer);
   void RemoveObserver(Observer* observer);
-
-  bool GetDisableAvatarDownloadForTesting() {
-    return disable_avatar_download_for_testing_;
-  }
 
   void set_disable_avatar_download_for_testing(
       bool disable_avatar_download_for_testing) {
@@ -215,20 +204,10 @@ class ProfileAttributesStorage {
 
  private:
   FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest,
-                           DownloadHighResAvatarTest);
-  FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest,
-                           NothingToDownloadHighResAvatarTest);
-  FRIEND_TEST_ALL_PREFIXES(ProfileAttributesStorageTest,
                            MigrateLegacyProfileNamesAndRecomputeIfNeeded);
 
-  // Starts downloading the high res avatar at index |icon_index| for profile
-  // with path |profile_path|.
-  void DownloadHighResAvatar(size_t icon_index,
-                             const base::FilePath& profile_path);
-
-  // Saves the avatar |image| at |image_path|. This is used both for the GAIA
-  // profile pictures and the ProfileAvatarDownloader that is used to download
-  // the high res avatars.
+  // Saves the avatar |image| at |image_path|. This is used for the GAIA profile
+  // pictures.
   void SaveAvatarImageAtPath(const base::FilePath& profile_path,
                              gfx::Image image,
                              const std::string& key,
@@ -263,9 +242,6 @@ class ProfileAttributesStorage {
   ProfileAttributesEntry* InitEntryWithKey(const std::string& key,
                                            bool is_omitted);
 
-  // Download and high-res avatars used by the profiles.
-  void DownloadAvatars();
-
   // Loads GAIA pictures (if any) for all profiles registered in the storage and
   // puts them in memory cache.
   void LoadGAIAPictureIfNeeded();
@@ -284,7 +260,7 @@ class ProfileAttributesStorage {
                              gfx::Image image) const;
 
   // Called when the picture given by |file_name| has been saved to disk. Used
-  // both for the GAIA profile picture and the high res avatar files.
+  // for the GAIA profile picture.
   void OnAvatarPictureSaved(const std::string& file_name,
                             const base::FilePath& profile_path,
                             base::OnceClosure callback,
@@ -294,12 +270,6 @@ class ProfileAttributesStorage {
   // to disk.
   void OnGAIAPictureSaved(const std::string& image_url_with_size,
                           const base::FilePath& profile_path);
-
-  // Helper function that calls SaveAvatarImageAtPath without a callback.
-  void SaveAvatarImageAtPathNoCallback(const base::FilePath& profile_path,
-                                       gfx::Image image,
-                                       const std::string& key,
-                                       const base::FilePath& image_path);
 
   // Notifies observers.
   void NotifyOnProfileHighResAvatarLoaded(
@@ -316,24 +286,15 @@ class ProfileAttributesStorage {
       base::ObserverListReentrancyPolicy::kAllowReentrancyUntriaged>::
       UncheckedAndDanglingUntriaged observer_list_;
 
-  // A cache of gaia/high res avatar profile pictures. This cache is updated
-  // lazily so it needs to be mutable.
+  // A cache of gaia profile pictures. This cache is updated lazily so it needs
+  // to be mutable.
   mutable absl::flat_hash_map<std::string, gfx::Image> cached_avatar_images_;
 
   // Marks a profile picture as loading from disk. This prevents a picture from
   // loading multiple times.
   mutable absl::flat_hash_map<std::string, bool> cached_avatar_images_loading_;
 
-  // Hash table of profile pictures currently being downloaded from the remote
-  // location and the ProfileAvatarDownloader instances downloading them.
-  // This prevents a picture from being downloaded multiple times. The
-  // ProfileAvatarDownloader instances are deleted when the download completes
-  // or when the ProfileAttributesStorage is destroyed.
-  absl::flat_hash_map<std::string, std::unique_ptr<ProfileAvatarDownloader>>
-      avatar_images_downloads_in_progress_;
-
-  // Determines of the ProfileAvatarDownloader should be created and executed
-  // or not. Only set to true for tests.
+  // Skips reading avatar pictures from disk. Only set to true for tests.
   bool disable_avatar_download_for_testing_ = false;
 
   // Task runner used for file operation on avatar images.

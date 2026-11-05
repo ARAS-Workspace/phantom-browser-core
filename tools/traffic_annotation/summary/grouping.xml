@@ -351,7 +351,6 @@ after discussions on the right group.
       <annotation id="autofill_upload"/>
     </sender>
     <sender name="Personalization">
-      <annotation id="profile_avatar"/>
       <annotation id="signed_in_profile_avatar"/>
     </sender>
     <sender name="Favicon"/>

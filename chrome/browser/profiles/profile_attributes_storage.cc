@@ -30,7 +30,6 @@
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
-#include "chrome/browser/profiles/profile_avatar_downloader.h"
 #include "chrome/browser/profiles/profile_avatar_icon_util.h"
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/common/pref_names.h"
@@ -45,7 +44,6 @@
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_managed_status_finder.h"
-#include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
@@ -144,15 +142,6 @@ void DeleteBitmap(const base::FilePath& image_path) {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
   base::DeleteFile(image_path);
-}
-
-void RunCallbackIfFileMissing(const base::FilePath& file_path,
-                              base::OnceClosure callback) {
-  base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
-                                                base::BlockingType::MAY_BLOCK);
-  if (!base::PathExists(file_path))
-    content::GetUIThreadTaskRunner({})->PostTask(FROM_HERE,
-                                                 std::move(callback));
 }
 
 // Compares two ProfileAttributesEntry using locale-sensitive comparison of
@@ -305,13 +294,9 @@ ProfileAttributesStorage::ProfileAttributesStorage(
     entry->InitializeLastNameToDisplay();
   }
 
-  // If needed, start downloading the high-res avatars and migrate any legacy
-  // profile names.
-  if (!disable_avatar_download_for_testing_)
-    DownloadAvatars();
-
   LoadGAIAPictureIfNeeded();
 
+  // If needed, migrate any legacy profile names.
   bool migrate_legacy_profile_names =
       (!prefs_->GetBoolean(kLegacyProfileNameMigrated) ||
        g_migration_enabled_for_testing);
@@ -406,9 +391,6 @@ void ProfileAttributesStorage::AddProfile(ProfileAttributesInitParams params) {
   // after a new profile is added to the storage.
   for (auto& observer : observer_list_)
     observer.OnProfileAdded(params.profile_path);
-
-  if (!disable_avatar_download_for_testing_)
-    DownloadHighResAvatarIfNeeded(params.icon_index, params.profile_path);
 
   NotifyIfProfileNamesHaveChanged();
 }
@@ -727,7 +709,7 @@ const gfx::Image* ProfileAttributesStorage::LoadAvatarPictureFromPath(
     return &it->second;
   }
 
-  // Don't download the image if downloading is disabled for tests.
+  // Don't load the image if loading is disabled for tests.
   if (disable_avatar_download_for_testing_)
     return nullptr;
 
@@ -943,51 +925,6 @@ void ProfileAttributesStorage::DisableProfileMetricsForTesting() {
   repeating_timer_.reset();
 }
 
-void ProfileAttributesStorage::DownloadHighResAvatarIfNeeded(
-    size_t icon_index,
-    const base::FilePath& profile_path) {
-  DCHECK(!disable_avatar_download_for_testing_);
-
-  // If this is the placeholder avatar, it is already included in the
-  // resources, so it doesn't need to be downloaded (and it will never be
-  // requested from disk by `ProfileAttributesEntry::GetHighResAvatar()`).
-  if (icon_index == profiles::GetPlaceholderAvatarIndex())
-    return;
-
-  const base::FilePath& file_path =
-      profiles::GetPathOfHighResAvatarAtIndex(icon_index);
-  base::OnceClosure callback =
-      base::BindOnce(&ProfileAttributesStorage::DownloadHighResAvatar,
-                     weak_ptr_factory_.GetWeakPtr(), icon_index, profile_path);
-  file_task_runner_->PostTask(
-      FROM_HERE, base::BindOnce(&RunCallbackIfFileMissing, file_path,
-                                std::move(callback)));
-}
-
-void ProfileAttributesStorage::DownloadHighResAvatar(
-    size_t icon_index,
-    const base::FilePath& profile_path) {
-  const char* file_name =
-      profiles::GetDefaultAvatarIconFileNameAtIndex(icon_index);
-  DCHECK(file_name);
-  // If the file is already being downloaded, don't start another download.
-  if (avatar_images_downloads_in_progress_.contains(file_name)) {
-    return;
-  }
-
-  // Start the download for this file. The profile attributes storage takes
-  // ownership of the avatar downloader, which will be deleted when the download
-  // completes, or if that never happens, when the storage is destroyed.
-  std::unique_ptr<ProfileAvatarDownloader>& current_downloader =
-      avatar_images_downloads_in_progress_[file_name];
-  current_downloader = std::make_unique<ProfileAvatarDownloader>(
-      icon_index,
-      base::BindOnce(&ProfileAttributesStorage::SaveAvatarImageAtPathNoCallback,
-                     weak_ptr_factory_.GetWeakPtr(), profile_path));
-
-  current_downloader->Start();
-}
-
 void ProfileAttributesStorage::SaveAvatarImageAtPath(
     const base::FilePath& profile_path,
     gfx::Image image,
@@ -999,17 +936,6 @@ void ProfileAttributesStorage::SaveAvatarImageAtPath(
   scoped_refptr<base::RefCountedMemory> png_data = image.As1xPNGBytes();
   auto data = std::make_unique<ImageData>(png_data->size());
   base::span(*data).copy_from(*png_data);
-
-  // Remove the file from the list of downloads in progress. Note that this list
-  // only contains the high resolution avatars, and not the Gaia profile images.
-  auto downloader_iter = avatar_images_downloads_in_progress_.find(key);
-  if (downloader_iter != avatar_images_downloads_in_progress_.end()) {
-    // We mustn't delete the avatar downloader right here, since we're being
-    // called by it.
-    content::GetUIThreadTaskRunner({})->DeleteSoon(
-        FROM_HERE, downloader_iter->second.release());
-    avatar_images_downloads_in_progress_.erase(downloader_iter);
-  }
 
   if (data->empty()) {
     LOG(ERROR) << "Failed to PNG encode the image.";
@@ -1036,14 +962,6 @@ ProfileAttributesEntry* ProfileAttributesStorage::InitEntryWithKey(
   new_entry->Initialize(this, path, prefs_);
   new_entry->SetIsOmittedInternal(is_omitted);
   return new_entry;
-}
-
-void ProfileAttributesStorage::DownloadAvatars() {
-  std::vector<ProfileAttributesEntry*> entries = GetAllProfilesAttributes();
-  for (ProfileAttributesEntry* entry : entries) {
-    DownloadHighResAvatarIfNeeded(entry->GetAvatarIconIndex(),
-                                  entry->GetPath());
-  }
 }
 
 void ProfileAttributesStorage::LoadGAIAPictureIfNeeded() {
@@ -1141,15 +1059,6 @@ void ProfileAttributesStorage::OnGAIAPictureSaved(
   // Profile could have been destroyed while saving picture to disk.
   if (entry)
     entry->SetLastDownloadedGAIAPictureUrlWithSize(image_url_with_size);
-}
-
-void ProfileAttributesStorage::SaveAvatarImageAtPathNoCallback(
-    const base::FilePath& profile_path,
-    gfx::Image image,
-    const std::string& key,
-    const base::FilePath& image_path) {
-  SaveAvatarImageAtPath(profile_path, image, key, image_path,
-                        base::OnceClosure());
 }
 
 void ProfileAttributesStorage::

@@ -95,7 +95,6 @@ Refer to README.md for content description and update process.
  <item id="pdf_plugin_placeholder" added_in_milestone="63" content_hash_code="0101fbd5" os_list="linux,windows,chromeos" file_path="chrome/browser/plugins/plugin_observer.cc" />
  <item id="port_forwarding_controller_socket" added_in_milestone="65" content_hash_code="074810e4" os_list="linux,windows,chromeos" file_path="chrome/browser/devtools/device/port_forwarding_controller.cc" />
  <item id="predictive_prefetch" added_in_milestone="85" content_hash_code="00ebd1fd" os_list="linux,windows,chromeos,android" file_path="chrome/browser/predictors/prefetch_manager.cc" />
- <item id="profile_avatar" added_in_milestone="62" content_hash_code="06c4a5fd" os_list="linux,windows,chromeos,android" file_path="chrome/browser/profiles/profile_avatar_downloader.cc" />
  <item id="proxy_config_direct" added_in_milestone="67" content_hash_code="032a4682" os_list="linux,windows,chromeos,android" file_path="net/proxy_resolution/proxy_config_with_annotation.cc" />
  <item id="proxy_config_headless" added_in_milestone="67" content_hash_code="049def4d" os_list="linux,windows,chromeos" file_path="headless/lib/browser/headless_request_context_manager.cc" />
  <item id="proxy_config_settings" added_in_milestone="67" content_hash_code="05940645" os_list="linux,windows,chromeos,android" file_path="components/proxy_config/pref_proxy_config_tracker_impl.cc" />

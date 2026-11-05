@@ -490,8 +490,7 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
                                                        .has_background = false};
   params.profile_image = ui::ImageModel::FromImage(
       primary_extended_account_info.GetAvatarImage().value_or(
-          entry.GetAvatarIcon(kIdentityInfoImageSize,
-                              /*use_high_res_file=*/true, icon_params)));
+          entry.GetAvatarIcon(kIdentityInfoImageSize, icon_params)));
   if (ShouldShowAvatarGradientRing(&profile())) {
     params.avatar_ring = AvatarRingType::kGradient;
   }
@@ -622,7 +621,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
                 .GetProfileAttributesWithPath(profile().GetPath());
         account_image = profile_attributes->GetAvatarIcon(
             /*size_for_placeholder_avatar=*/kIdentityImageSizeForButton,
-            /*use_high_res_file=*/true,
             GetPlaceholderAvatarIconParamsVisibleAgainstColor(
                 ColorProviderBrowserHelper::From(&browser())
                     ->color_provider_source()
@@ -981,7 +979,6 @@ void ProfileMenuView::BuildOtherProfilesSection(
     ui::ImageModel avatar_image =
         ui::ImageModel::FromImage(profile_entry->GetAvatarIcon(
             kOtherProfileImageSize,
-            /*use_high_res_file=*/true,
             GetPlaceholderAvatarIconParamsVisibleAgainstColor(
                 ColorProviderBrowserHelper::From(&browser())
                     ->color_provider_source()

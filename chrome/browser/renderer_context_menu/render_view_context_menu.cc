@@ -1589,7 +1589,7 @@ void RenderViewContextMenu::AppendLinkItems() {
                                          entry->GetName()));
           AddAvatarToLastMenuItem(
               entry->GetAvatarIcon(kDefaultSizeForPlaceholderAvatar,
-                                   /*use_high_res_file=*/true, icon_params),
+                                   icon_params),
               &menu_model_);
         } else {
           for (ProfileAttributesEntry* entry : target_profiles_entries) {
@@ -1606,7 +1606,7 @@ void RenderViewContextMenu::AppendLinkItems() {
                 IDC_OPEN_LINK_IN_PROFILE_FIRST + menu_index, entry->GetName());
             AddAvatarToLastMenuItem(
                 entry->GetAvatarIcon(kDefaultSizeForPlaceholderAvatar,
-                                     /*use_high_res_file=*/true, icon_params),
+                                     icon_params),
                 &profile_link_submenu_model_);
           }
 
