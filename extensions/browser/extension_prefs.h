@@ -738,11 +738,6 @@ class ExtensionPrefs : public KeyedService {
       const ExtensionId& extension_id) const;
   void SetGeometryCache(const ExtensionId& extension_id, base::DictValue cache);
 
-  // Used for verification of installed extension ids. For the Set method, pass
-  // null to remove the preference.
-  const base::DictValue& GetInstallSignature() const;
-  void SetInstallSignature(base::DictValue* signature);
-
   // Whether the extension with the given `extension_id` needs to be synced.
   // This is set when the state (such as enabled/disabled or allowed in
   // incognito) is changed before Sync is ready.

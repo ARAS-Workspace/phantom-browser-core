@@ -8,7 +8,6 @@
 #include <string>
 #include <string_view>
 
-#include "base/auto_reset.h"
 #include "build/branding_buildflags.h"
 #include "extensions/common/extension_id.h"
 #include "url/gurl.h"
@@ -78,17 +77,6 @@ GURL GetWebstoreExtensionsCategoryURL();
 // will contain a trailing slash and should be concatenated with an item ID
 // to get the item detail URL.
 std::string GetWebstoreItemDetailURLPrefix();
-
-// Returns the URL used to get webstore data (ratings, manifest, icon URL,
-// etc.) about an extension from the webstore using the new itemSnippets API.
-GURL GetWebstoreItemSnippetURL(const extensions::ExtensionId& extension_id);
-
-// Returns the URL used to get the block status of queried extensions from the
-// webstore.
-GURL GetWebstoreBlockStatusURL();
-
-// Sets the itemSnippets API URL to `test_url`.
-base::AutoReset<const GURL*> SetItemSnippetURLForTesting(const GURL* test_url);
 
 // Returns the compile-time constant webstore update url specific to
 // Chrome. Usually you should prefer using GetWebstoreUpdateUrl.

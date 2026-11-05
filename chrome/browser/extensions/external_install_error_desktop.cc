@@ -16,7 +16,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/notreached.h"
-#include "base/numerics/safe_conversions.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/single_thread_task_runner.h"
@@ -25,7 +24,6 @@
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/extensions/extension_install_error_menu_item_id_provider.h"
 #include "chrome/browser/extensions/extension_install_prompt_show_params.h"
-#include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/external_install_manager.h"
 #include "chrome/browser/profiles/profile.h"
@@ -37,14 +35,12 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
-#include "content/public/browser/storage_partition.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/pref_names.h"
 #include "extensions/browser/ui_util.h"
 #include "extensions/browser/uninstall_reason.h"
-#include "extensions/browser/webstore_data_fetcher.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -325,20 +321,7 @@ ExternalInstallErrorDesktop::ExternalInstallErrorDesktop(
     }
   }
 
-  ExtensionManagement* extension_management =
-      ExtensionManagementFactory::GetForBrowserContext(browser_context_);
-
-  // Only make a call to fetch webstore data if the `extension` updates from the
-  // webstore. Otherwise, show a prompt without webstore data.
-  if (extension && extension_management->UpdatesFromWebstore(*extension)) {
-    webstore_data_fetcher_ =
-        std::make_unique<WebstoreDataFetcher>(this, GURL(), extension_id_);
-    webstore_data_fetcher_->Start(browser_context_->GetDefaultStoragePartition()
-                                      ->GetURLLoaderFactoryForBrowserProcess()
-                                      .get());
-  } else {
-    OnFetchComplete();
-  }
+  OnFetchComplete();
 }
 
 ExternalInstallErrorDesktop::~ExternalInstallErrorDesktop() {
@@ -428,28 +411,6 @@ ExternalInstallError::AlertType ExternalInstallErrorDesktop::alert_type()
 
 InstallPromptData* ExternalInstallErrorDesktop::GetPromptForTesting() const {
   return prompt_.get();
-}
-
-void ExternalInstallErrorDesktop::OnWebstoreRequestFailure(
-    const std::string& extension_id) {
-  OnFetchComplete();
-}
-
-void ExternalInstallErrorDesktop::OnFetchItemSnippetParseSuccess(
-    const std::string& extension_id,
-    FetchItemSnippetResponse item_snippet) {
-  prompt_->SetWebstoreData(item_snippet.user_count_string(),
-                           !item_snippet.user_count_string().empty(),
-                           item_snippet.average_rating(),
-                           base::checked_cast<int>(item_snippet.rating_count()),
-                           item_snippet.rating_count_string());
-  OnFetchComplete();
-}
-
-void ExternalInstallErrorDesktop::OnWebstoreResponseParseFailure(
-    const std::string& extension_id,
-    const std::string& error) {
-  OnFetchComplete();
 }
 
 void ExternalInstallErrorDesktop::OnFetchComplete() {

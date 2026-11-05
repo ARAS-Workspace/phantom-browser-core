@@ -34,7 +34,6 @@ using content::DownloadManager;
 using content::WebContents;
 using download::DownloadItem;
 using download::DownloadUrlParameters;
-using extensions::Extension;
 
 DownloadManager* DownloadManagerForBrowser(BrowserWindowInterface* browser) {
   return browser->GetProfile()->GetDownloadManager();

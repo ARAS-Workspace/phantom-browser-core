@@ -4,11 +4,13 @@
 
 #include "chrome/browser/extensions/external_install_error.h"
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "base/strings/utf_string_conversions.h"
+#include "base/test/bind.h"
 #include "base/values.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_install_prompt.h"
@@ -21,38 +23,17 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
+#include "content/public/test/url_loader_interceptor.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/mock_external_provider.h"
 #include "extensions/browser/pref_names.h"
 #include "extensions/browser/test_extension_registry_observer.h"
-#include "extensions/browser/webstore_data_fetcher.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "third_party/re2/src/re2/re2.h"
 #include "ui/base/l10n/l10n_util.h"
 
 namespace extensions {
-
-namespace {
-
-constexpr char kMockUserCountString[] = "1000";
-constexpr char kMockRatingCountString[] = "100";
-constexpr int kMockRatingCount = 100;
-constexpr double kMockAverageRating = 4.4;
-
-std::unique_ptr<FetchItemSnippetResponse> CreateMockResponse(
-    const ExtensionId& id) {
-  auto mock_response = std::make_unique<FetchItemSnippetResponse>();
-  mock_response->set_item_id(id);
-  mock_response->set_user_count_string(kMockUserCountString);
-  mock_response->set_rating_count_string(kMockRatingCountString);
-  mock_response->set_rating_count(kMockRatingCount);
-  mock_response->set_average_rating(kMockAverageRating);
-
-  return mock_response;
-}
-
-}  // namespace
 
 class ExternalInstallErrorTest : public ExtensionBrowserTest {
  public:
@@ -106,10 +87,19 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
   FeatureSwitch::ScopedOverride feature_override(
       FeatureSwitch::prompt_for_external_extensions(), true);
 
-  constexpr char kId[] = "akjooamlhcgeopfifcmlggaebeocgokj";
-  auto mock_response = CreateMockResponse(kId);
-  WebstoreDataFetcher::SetMockItemSnippetReponseForTesting(mock_response.get());
+  // The prompt is built locally: an extension that updates from the webstore
+  // must not trigger a request for store data.
+  std::atomic<int> store_requests = 0;
+  content::URLLoaderInterceptor interceptor(base::BindLambdaForTesting(
+      [&](content::URLLoaderInterceptor::RequestParams* params) {
+        if (params->url_request.url.GetHost() ==
+            "chromewebstore.googleapis.com") {
+          ++store_requests;
+        }
+        return false;
+      }));
 
+  constexpr char kId[] = "akjooamlhcgeopfifcmlggaebeocgokj";
   InstallExternalExtension(kId, "1", "update_from_webstore.crx");
 
   // Verify the external error.
@@ -120,17 +110,11 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
 
   InstallPromptData* alert_prompt = errors[0]->GetPromptForTesting();
   ASSERT_TRUE(alert_prompt);
-
-  // Validate that the alert prompt's data corresponds to what is returned from
-  // the item snippets API.
-  EXPECT_TRUE(alert_prompt->has_webstore_data());
-  EXPECT_EQ(kMockRatingCountString, alert_prompt->localized_rating_count());
-  EXPECT_EQ(kMockRatingCount, alert_prompt->rating_count());
-  EXPECT_EQ(kMockAverageRating, alert_prompt->average_rating());
+  EXPECT_EQ(0, store_requests.load());
 }
 
 // Same as the above test except the extension does not update from the
-// webstore, so the prompt should not display any webstore data.
+// webstore.
 IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
                        TestShutdownWithNonWebstoreExtension) {
   // This relies on prompting for external extensions.
@@ -138,9 +122,6 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
       FeatureSwitch::prompt_for_external_extensions(), true);
 
   constexpr char kId[] = "ldnnhddmnhbkjipkidpdiheffobcpfmf";
-  auto mock_response = CreateMockResponse(kId);
-  WebstoreDataFetcher::SetMockItemSnippetReponseForTesting(mock_response.get());
-
   InstallExternalExtension(kId, "1.0.0.0", "good.crx");
 
   // Verify the external error.
@@ -151,10 +132,6 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
 
   InstallPromptData* alert_prompt = errors[0]->GetPromptForTesting();
   ASSERT_TRUE(alert_prompt);
-
-  // Validate that the alert prompt's data corresponds to what is returned from
-  // the item snippets API.
-  EXPECT_FALSE(alert_prompt->has_webstore_data());
 }
 
 IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
@@ -172,9 +149,6 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
     prefs->SetList(pref_names::kInitialInstallList, std::move(ids));
     prefs->SetString(pref_names::kInitialInstallProviderName, kProvider);
   }
-
-  auto mock_response = CreateMockResponse(kId);
-  WebstoreDataFetcher::SetMockItemSnippetReponseForTesting(mock_response.get());
 
   InstallExternalExtension(kId, "1", "update_from_webstore.crx",
                            mojom::ManifestLocation::kExternalPrefDownload);
@@ -210,9 +184,6 @@ IN_PROC_BROWSER_TEST_F(ExternalInstallErrorTest,
     prefs->SetList(pref_names::kInitialInstallList, std::move(ids));
     prefs->SetString(pref_names::kInitialInstallProviderName, kProvider);
   }
-
-  auto mock_response = CreateMockResponse(kId);
-  WebstoreDataFetcher::SetMockItemSnippetReponseForTesting(mock_response.get());
 
   InstallExternalExtension(kId, "1.0.0.0", "good.crx",
                            mojom::ManifestLocation::kExternalPrefDownload);

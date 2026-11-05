@@ -465,7 +465,6 @@ declare global {
           Promise<void>;
       export function removeMultipleExtensions(extensionIds: string[]):
           Promise<void>;
-      export function repairExtension(extensionId: string): Promise<void>;
       export function requestFileSource(properties:
                                             RequestFileSourceProperties):
           Promise<RequestFileSourceResponse>;

@@ -5,9 +5,7 @@
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
-import("//rlz/buildflags/buildflags.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
-import("//third_party/protobuf/proto_library.gni")
 
 if (enable_desktop_android_extensions) {
   import("//build/config/android/rules.gni")
@@ -261,8 +259,6 @@ source_set("browser_sources") {
     "content_verifier/scoped_uma_recorder.h",
     "crx_file_info.cc",
     "crx_file_info.h",
-    "cws_info_service.cc",
-    "cws_info_service.h",
     "deferred_start_render_host.h",
     "delayed_install_manager.cc",
     "delayed_install_manager.h",
@@ -430,13 +426,9 @@ source_set("browser_sources") {
     "install_prompt_data.h",
     "install_prompt_permissions.cc",
     "install_prompt_permissions.h",
-    "install_signer.cc",
-    "install_signer.h",
     "install_stage.h",
     "install_tracker.cc",
     "install_tracker.h",
-    "install_verifier.cc",
-    "install_verifier.h",
     "json_file_sanitizer.cc",
     "json_file_sanitizer.h",
     "l10n_file_util.cc",
@@ -527,8 +519,6 @@ source_set("browser_sources") {
     "ruleset_parse_result.h",
     "sandboxed_unpacker.cc",
     "sandboxed_unpacker.h",
-    "scoped_active_install.cc",
-    "scoped_active_install.h",
     "screenshot_access.h",
     "script_executor.cc",
     "script_executor.h",
@@ -599,7 +589,6 @@ source_set("browser_sources") {
   ]
 
   deps = [
-    ":cws_item_service_proto",
     "//base",
     "//base:i18n",
     "//build:android_buildflags",
@@ -647,11 +636,9 @@ source_set("browser_sources") {
     "//extensions/common/api",
     "//extensions/strings",
     "//google_apis",
-    "//google_apis/common:request_util",
     "//net",
     "//pdf:buildflags",
     "//pdf:features",
-    "//rlz/buildflags",
     "//services/data_decoder/public/cpp",
     "//services/device/public/mojom",
     "//services/metrics/public/cpp:metrics_cpp",
@@ -671,10 +658,6 @@ source_set("browser_sources") {
     "//ui/menus",
     "//url",
   ]
-
-  if (enable_rlz) {
-    deps += [ "//rlz:rlz_lib" ]
-  }
 
   public_deps = [
     "//base",
@@ -825,39 +808,6 @@ source_set("crx_installer") {
     "//extensions/strings",
   ]
 }
-source_set("webstore_installer") {
-  sources = [
-    "webstore_data_fetcher.cc",
-    "webstore_data_fetcher.h",
-    "webstore_data_fetcher_delegate.cc",
-    "webstore_data_fetcher_delegate.h",
-    "webstore_install_helper.cc",
-    "webstore_install_helper.h",
-    "webstore_install_result.cc",
-    "webstore_install_result.h",
-    "webstore_installer.cc",
-    "webstore_installer.h",
-  ]
-  deps = [
-    ":browser_sources",
-    ":crx_installer",
-    ":cws_item_service_proto",
-    "//base",
-    "//components/download/public/common:public",
-    "//components/image_fetcher/core",
-    "//components/update_client",
-    "//content/public/browser",
-    "//extensions/buildflags",
-    "//extensions/common",
-    "//extensions/strings",
-    "//google_apis/common:request_util",
-    "//net/traffic_annotation",
-    "//services/data_decoder/public/cpp",
-    "//ui/base",
-    "//url",
-  ]
-}
-
 source_set("test_support") {
   testonly = true
   sources = [
@@ -1160,8 +1110,4 @@ if (enable_extensions) {
       "//url",
     ]
   }
-}
-
-proto_library("cws_item_service_proto") {
-  sources = [ "cws_item_service.proto" ]
 }

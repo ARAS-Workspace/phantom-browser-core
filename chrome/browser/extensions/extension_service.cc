@@ -41,7 +41,6 @@
 #include "chrome/browser/extensions/chrome_extension_registrar_delegate.h"
 #include "chrome/browser/extensions/component_loader.h"
 #include "chrome/browser/extensions/corrupted_extension_reinstaller.h"
-#include "chrome/browser/extensions/cws_info_service_factory.h"
 #include "chrome/browser/extensions/extension_action_storage_manager.h"
 #include "chrome/browser/extensions/extension_disabled_ui.h"
 #include "chrome/browser/extensions/extension_error_controller.h"
@@ -49,7 +48,6 @@
 #include "chrome/browser/extensions/external_install_manager.h"
 #include "chrome/browser/extensions/external_provider_impl.h"
 #include "chrome/browser/extensions/external_provider_manager.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/installed_loader.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
@@ -73,7 +71,6 @@
 #include "content/public/common/child_process_id.h"
 #include "extensions/browser/blocklist_extension_prefs.h"
 #include "extensions/browser/blocklist_state.h"
-#include "extensions/browser/cws_info_service.h"
 #include "extensions/browser/delayed_install_manager.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/event_router.h"
@@ -88,7 +85,6 @@
 #include "extensions/browser/external_install_info.h"
 #include "extensions/browser/forced_extensions/install_stage_tracker.h"
 #include "extensions/browser/install_flag.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/management_policy.h"
 #include "extensions/browser/manifest_v2_handler.h"
 #include "extensions/browser/pending_extension_manager.h"
@@ -141,9 +137,6 @@ const char* const kObsoleteComponentExtensionIds[] = {
     // continued test coverage.
     "jcgeabjmjgoblfofpppfkcoakmfobdko",  // Video Player
 };
-
-// ExtensionUnpublishedAvailability policy default value.
-constexpr int kAllowUnpublishedExtensions = 0;
 
 #if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const char kBlockLoadCommandline[] = "command_line";
@@ -229,9 +222,6 @@ ExtensionService::ExtensionService(
   // extensions on Android, which uses the Play Store for updates.
   UpgradeDetector::GetInstance()->AddObserver(this);
 
-  cws_info_service_observation_.Observe(
-      CWSInfoServiceFactory::GetForProfile(profile_));
-
   ExtensionManagementFactory::GetForBrowserContext(profile_)->AddObserver(this);
 
   if (auto* extension_install_policy_service =
@@ -285,7 +275,6 @@ ExtensionService::~ExtensionService() {
 
 void ExtensionService::Shutdown() {
   delayed_install_manager_ = nullptr;
-  cws_info_service_observation_.Reset();
   extension_install_policy_observation_.Reset();
   ExtensionManagementFactory::GetForBrowserContext(profile())->RemoveObserver(
       this);
@@ -495,15 +484,10 @@ void ExtensionService::CheckManagementPolicy() {
       to_remove.insert(disable_reason::DISABLE_UPDATE_REQUIRED_BY_POLICY);
     }
 
-    // Check published-in-store status against policy requirement and update
-    // the disable reasons accordingly.
-    if (management->IsAllowedByUnpublishedAvailabilityPolicy(extension.get())) {
-      to_remove.insert(
-          disable_reason::DISABLE_PUBLISHED_IN_STORE_REQUIRED_BY_POLICY);
-    } else {
-      to_add.insert(
-          disable_reason::DISABLE_PUBLISHED_IN_STORE_REQUIRED_BY_POLICY);
-    }
+    // The published-in-store requirement is gone; clear the reason a profile
+    // may still carry.
+    to_remove.insert(
+        disable_reason::DISABLE_PUBLISHED_IN_STORE_REQUIRED_BY_POLICY);
 
     if (management->IsAllowedByUnpackedDeveloperModePolicy(*extension)) {
       to_remove.insert(disable_reason::DISABLE_UNSUPPORTED_DEVELOPER_EXTENSION);
@@ -511,19 +495,12 @@ void ExtensionService::CheckManagementPolicy() {
       to_add.insert(disable_reason::DISABLE_UNSUPPORTED_DEVELOPER_EXTENSION);
     }
 
-    // Check if the `DISABLE_NOT_VERIFIED` reason is still applicable. This
-    // disable reason is used in multiple disabling flows (e.g., by
-    // InstallVerifier and StandardManagementPolicyProvider). Only clear the
-    // disable reason if none of these flows require the extension to be
-    // disabled.
+    // Check if the `DISABLE_NOT_VERIFIED` reason is still applicable. Only
+    // clear the disable reason if StandardManagementPolicyProvider does not
+    // require the extension to be disabled.
     // TODO(crbug.com/362756477): Refactor duplicated disable reason logic
     // between CheckManagementPolicy() and policy providers.
-    disable_reason::DisableReason install_verifier_disable_reason =
-        disable_reason::DISABLE_NONE;
-    InstallVerifierFactory::GetForBrowserContext(GetBrowserContext())
-        ->MustRemainDisabled(extension.get(), &install_verifier_disable_reason);
-    if (install_verifier_disable_reason == disable_reason::DISABLE_NONE &&
-        !management->ShouldBlockForceInstalledOffstoreExtension(*extension)) {
+    if (!management->ShouldBlockForceInstalledOffstoreExtension(*extension)) {
       to_remove.insert(disable_reason::DISABLE_NOT_VERIFIED);
     }
 
@@ -687,17 +664,6 @@ void ExtensionService::OnExtensionManagementSettingsChanged() {
   }
 
   CheckManagementPolicy();
-
-  // Request an out-of-cycle update of extension metadata information from CWS
-  // if the ExtensionUnpublishedAvailability policy setting is such that
-  // unpublished extensions should not be enabled. This update allows
-  // unpublished extensions to be disabled sooner rather than waiting till the
-  // next regularly scheduled fetch.
-  if (profile_->GetPrefs()->GetInteger(
-          pref_names::kExtensionUnpublishedAvailability) !=
-      kAllowUnpublishedExtensions) {
-    CWSInfoServiceFactory::GetForProfile(profile_)->CheckAndMaybeFetchInfo();
-  }
 }
 
 void ExtensionService::OnExtensionInstallPolicyUpdated() {
@@ -795,10 +761,6 @@ void ExtensionService::OnBlocklistUpdated() {
       registry_->GenerateInstalledExtensionsSet().GetIDs(),
       base::BindOnce(&ExtensionService::ManageBlocklist,
                      AsExtensionServiceWeakPtr()));
-}
-
-void ExtensionService::OnCWSInfoChanged() {
-  CheckManagementPolicy();
 }
 
 void ExtensionService::OnUpgradeRecommended() {

@@ -21,7 +21,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
 #include "content/public/test/browser_test.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/test/test_extension_dir.h"
 #include "ui/actions/actions.h"
 
@@ -116,7 +115,6 @@ class CustomizeChromeInteractiveTest
 
  protected:
   base::test::ScopedFeatureList scoped_feature_list_;
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass_;
 };
 }  // namespace
 

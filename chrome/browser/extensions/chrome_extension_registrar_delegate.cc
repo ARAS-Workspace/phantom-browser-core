@@ -20,7 +20,6 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_special_storage_policy.h"
 #include "chrome/browser/extensions/external_install_manager.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/installed_loader.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
@@ -36,7 +35,6 @@
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/install_flag.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/pending_extension_manager.h"
 #include "extensions/browser/permissions/permissions_updater.h"
 #include "extensions/browser/unpacked_installer.h"
@@ -122,14 +120,6 @@ void ChromeExtensionRegistrarDelegate::PreAddExtension(
   CheckPermissionsIncrease(extension, !!old_extension);
 }
 
-void ChromeExtensionRegistrarDelegate::OnAddNewOrUpdatedExtension(
-    const Extension* extension) {
-  if (InstallVerifier::NeedsVerification(*extension, profile_)) {
-    InstallVerifierFactory::GetForBrowserContext(profile_)->VerifyExtension(
-        extension->id());
-  }
-}
-
 void ChromeExtensionRegistrarDelegate::PostActivateExtension(
     scoped_refptr<const Extension> extension) {
   // Update policy permissions in case they were changed while extension was not
@@ -177,12 +167,6 @@ void ChromeExtensionRegistrarDelegate::PostDeactivateExtension(
   // ExtensionRegistryObserver::OnExtensionLoaded. See
   // http://crbug.com/41096321.
   UpdateActiveExtensionsInCrashReporter();
-}
-
-void ChromeExtensionRegistrarDelegate::PreUninstallExtension(
-    scoped_refptr<const Extension> extension) {
-  InstallVerifierFactory::GetForBrowserContext(profile_)->Remove(
-      extension->id());
 }
 
 void ChromeExtensionRegistrarDelegate::PostUninstallExtension(

@@ -44,11 +44,9 @@ class ChromeExtensionRegistrarDelegate : public ExtensionRegistrar::Delegate {
   // ExtensionRegistrar::Delegate:
   void PreAddExtension(const Extension* extension,
                        const Extension* old_extension) override;
-  void OnAddNewOrUpdatedExtension(const Extension* extension) override;
   void PostActivateExtension(scoped_refptr<const Extension> extension) override;
   void PostDeactivateExtension(
       scoped_refptr<const Extension> extension) override;
-  void PreUninstallExtension(scoped_refptr<const Extension> extension) override;
   void PostUninstallExtension(scoped_refptr<const Extension> extension,
                               base::OnceClosure done_callback) override;
   void LoadExtensionForReload(const ExtensionId& extension_id,

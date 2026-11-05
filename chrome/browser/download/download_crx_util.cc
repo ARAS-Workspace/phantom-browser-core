@@ -21,7 +21,6 @@
 #include "extensions/browser/crx_installer.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/install_prompt_data.h"
-#include "extensions/browser/webstore_installer.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_urls.h"
@@ -34,7 +33,6 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using content::BrowserThread;
 using download::DownloadItem;
-using extensions::WebstoreInstaller;
 
 namespace download_crx_util {
 
@@ -97,8 +95,7 @@ scoped_refptr<extensions::CrxInstaller> CreateCrxInstaller(
     const download::DownloadItem& download_item) {
   scoped_refptr<extensions::CrxInstaller> installer(
       extensions::CrxInstaller::Create(
-          profile, CreateExtensionInstallPrompt(profile, download_item),
-          WebstoreInstaller::GetAssociatedApproval(download_item)));
+          profile, CreateExtensionInstallPrompt(profile, download_item)));
 
   installer->set_error_on_unsupported_requirements(true);
   installer->set_delete_source(true);

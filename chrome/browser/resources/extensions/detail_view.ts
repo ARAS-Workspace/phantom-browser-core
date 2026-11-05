@@ -336,10 +336,6 @@ export class ExtensionsDetailViewElement extends
     this.delegate.deleteItem(this.data.id);
   }
 
-  protected onRepairClick_() {
-    this.delegate.repairItem(this.data.id);
-  }
-
   protected onLoadPathClick_() {
     this.delegate.showInFolder(this.data.id);
   }
@@ -544,16 +540,12 @@ export class ExtensionsDetailViewElement extends
         this.data.disableReasons.unsupportedDeveloperExtension;
   }
 
-  protected showRepairButton_(): boolean {
-    return getEnableControl(this.data) === EnableControl.REPAIR;
+  protected showCorruptedWarning_(): boolean {
+    return this.data.disableReasons.corruptInstall && this.data.userMayModify;
   }
 
   protected showEnableToggle_(): boolean {
-    const enableControl = getEnableControl(this.data);
-    // We still show the toggle even if we also show the repair button in the
-    // detail view, because the repair button appears just beneath it.
-    return enableControl === EnableControl.ENABLE_TOGGLE ||
-        enableControl === EnableControl.REPAIR;
+    return getEnableControl(this.data) === EnableControl.ENABLE_TOGGLE;
   }
 
   /** Opens the action menu for the extension. */

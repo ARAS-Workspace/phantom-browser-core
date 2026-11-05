@@ -16,7 +16,6 @@ class Profile;
 
 namespace extensions {
 
-class CWSInfoServiceInterface;
 class Extension;
 
 inline constexpr PrefMap kPrefAcknowledgeSafetyCheckWarning = {
@@ -28,16 +27,13 @@ namespace ExtensionSafetyCheckUtils {
 // Returns the Safety Hub warning reason for an extension.
 api::developer_private::SafetyCheckWarningReason GetSafetyCheckWarningReason(
     const Extension& extension,
-    Profile* profile,
-    bool unpublished_only = false);
+    Profile* profile);
 
 // A helper function to `GetSafetyCheckWarningReason` to simplify testing.
 api::developer_private::SafetyCheckWarningReason
-GetSafetyCheckWarningReasonHelper(CWSInfoServiceInterface* cws_info_service,
-                                  BitMapBlocklistState blocklist_state,
+GetSafetyCheckWarningReasonHelper(BitMapBlocklistState blocklist_state,
                                   Profile* profile,
-                                  const Extension& extension,
-                                  bool unpublished_only = false);
+                                  const Extension& extension);
 
 // Returns the display strings related to a Safety Hub Warning reason.
 api::developer_private::SafetyCheckStrings GetSafetyCheckWarningStrings(

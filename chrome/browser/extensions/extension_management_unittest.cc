@@ -29,7 +29,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/browser/blocklist_extension_prefs.h"
-#include "extensions/browser/cws_info_service.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/managed_installation_mode.h"
 #include "extensions/browser/pref_names.h"
@@ -367,10 +366,6 @@ class ExtensionManagementServiceTest : public testing::Test {
     return extension_management_->IsUpdateUrlOverridden(extension_id);
   }
 
-  void SetCWSInfoService(CWSInfoServiceInterface* cws_info_service) {
-    extension_management_->cws_info_service_ = cws_info_service;
-  }
-
   bool IsFileUrlNavigationAllowed(const ExtensionId& extension_id) {
     return extension_management_->IsFileUrlNavigationAllowed(extension_id);
   }
@@ -383,27 +378,6 @@ class ExtensionManagementServiceTest : public testing::Test {
   std::unique_ptr<TestingProfile> profile_;
   raw_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<ExtensionManagement> extension_management_;
-};
-
-class MockCWSInfoService : public CWSInfoServiceInterface {
- public:
-  MOCK_METHOD(std::optional<bool>,
-              IsLiveInCWS,
-              (const Extension&),
-              (const, override));
-  MOCK_METHOD(std::optional<CWSInfoServiceInterface::CWSInfo>,
-              GetCWSInfo,
-              (const Extension&),
-              (const, override));
-  MOCK_METHOD(void, CheckAndMaybeFetchInfo, (), (override));
-  MOCK_METHOD(void,
-              AddObserver,
-              (CWSInfoServiceInterface::Observer*),
-              (override));
-  MOCK_METHOD(void,
-              RemoveObserver,
-              (CWSInfoServiceInterface::Observer*),
-              (override));
 };
 
 class ExtensionAdminPolicyTest : public ExtensionManagementServiceTest {

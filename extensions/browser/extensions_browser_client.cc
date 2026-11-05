@@ -7,13 +7,11 @@
 #include <memory>
 #include <optional>
 
-#include "base/base_paths.h"
 #include "base/files/file_path.h"
 #include "base/functional/callback.h"
 #include "base/logging.h"
 #include "base/memory/ref_counted_memory.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/path_service.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/security_principal.h"
 #include "content/public/browser/site_instance.h"
@@ -254,9 +252,6 @@ ExtensionsBrowserClient::GetProtocolHandlerRegistry(
   return nullptr;
 }
 
-void ExtensionsBrowserClient::CheckManagementPolicy(
-    content::BrowserContext* context) {}
-
 void ExtensionsBrowserClient::OnActiveTabPermissionGranted(
     const Extension* extension,
     content::WebContents* web_contents) const {}
@@ -313,36 +308,13 @@ InstallTracker* ExtensionsBrowserClient::GetInstallTracker(
   return nullptr;
 }
 
-InstallVerifier* ExtensionsBrowserClient::GetInstallVerifier(
-    content::BrowserContext* context) {
-  return nullptr;
-}
-
 SharedModuleService* ExtensionsBrowserClient::GetSharedModuleService(
     content::BrowserContext* context) {
   return nullptr;
 }
 
-scoped_refptr<CrxInstaller>
-ExtensionsBrowserClient::CreateCrxInstallerFromDownloadItem(
-    content::BrowserContext* context,
-    const download::DownloadItem& download) {
-  return nullptr;
-}
-
 void ExtensionsBrowserClient::UpdateCheckIfEnabled(
     content::BrowserContext* context) {}
-
-base::FilePath ExtensionsBrowserClient::GetUserDataDir() {
-  base::FilePath temp_dir;
-  base::PathService::Get(base::DIR_TEMP, &temp_dir);
-  return temp_dir;
-}
-
-std::unique_ptr<image_fetcher::ImageDecoder>
-ExtensionsBrowserClient::CreateImageDecoder() {
-  return nullptr;
-}
 
 bool ExtensionsBrowserClient::CanUseNonComponentExtensions(
     content::BrowserContext* context) {

@@ -29,7 +29,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
 #include "extensions/browser/extension_action_manager.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/permissions/scripting_permissions_modifier.h"
 #include "extensions/browser/permissions/site_permissions_helper.h"
 #include "extensions/common/extension_features.h"
@@ -245,9 +244,6 @@ IN_PROC_BROWSER_TEST_F(ToolbarActionHoverCardBubbleViewUITest,
 // since such class computes the hover card state.
 IN_PROC_BROWSER_TEST_F(ToolbarActionHoverCardBubbleViewUITest,
                        WidgetUpdatedWhenHoveringBetweenActionViews) {
-  // Bypass install verification to allow testing the behavior of
-  // force-installed extensions.
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass;
   ASSERT_TRUE(embedded_test_server()->Start());
 
   // Install four extensions with different policy and site access permissions

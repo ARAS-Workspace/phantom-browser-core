@@ -13,7 +13,6 @@
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/blocklist_factory.h"
 #include "chrome/browser/extensions/chrome_extension_registrar_delegate.h"
-#include "chrome/browser/extensions/cws_info_service_factory.h"
 #include "chrome/browser/extensions/extension_error_controller.h"
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
@@ -27,7 +26,6 @@
 #include "components/value_store/testing_value_store.h"
 #include "content/public/browser/browser_thread.h"
 #include "extensions/browser/blocklist.h"
-#include "extensions/browser/cws_info_service.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
@@ -48,49 +46,6 @@
 using content::BrowserThread;
 
 namespace extensions {
-
-namespace {
-
-// A fake CWSInfoService for tests that utilize the test extension system and
-// service infrastructure but do not depend on the actual functionality of the
-// service.
-class FakeCWSInfoService : public CWSInfoService {
- public:
-  explicit FakeCWSInfoService(Profile* profile) {}
-
-  explicit FakeCWSInfoService(const CWSInfoService&) = delete;
-  FakeCWSInfoService& operator=(const CWSInfoService&) = delete;
-  ~FakeCWSInfoService() override = default;
-
-  // CWSInfoServiceInterface:
-  std::optional<bool> IsLiveInCWS(const Extension& extension) const override;
-  std::optional<CWSInfo> GetCWSInfo(const Extension& extension) const override;
-  void CheckAndMaybeFetchInfo() override {}
-  void AddObserver(Observer* observer) override {}
-  void RemoveObserver(Observer* observer) override {}
-
-  // KeyedService:
-  // Ensure that the keyed service shutdown is a no-op.
-  void Shutdown() override {}
-};
-
-std::optional<bool> FakeCWSInfoService::IsLiveInCWS(
-    const Extension& extension) const {
-  return true;
-}
-
-std::optional<CWSInfoServiceInterface::CWSInfo> FakeCWSInfoService::GetCWSInfo(
-    const Extension& extension) const {
-  return CWSInfoServiceInterface::CWSInfo();
-}
-
-std::unique_ptr<KeyedService> BuildFakeCWSService(
-    content::BrowserContext* context) {
-  return std::make_unique<FakeCWSInfoService>(
-      Profile::FromBrowserContext(context));
-}
-
-}  // namespace
 
 TestExtensionSystem::InitParams::InitParams() = default;
 
@@ -173,11 +128,6 @@ ExtensionService* TestExtensionSystem::CreateExtensionService(
     const base::FilePath& unpacked_install_directory,
     bool autoupdate_enabled,
     bool extensions_enabled) {
-  if (CWSInfoServiceFactory::GetForProfile(profile_) == nullptr) {
-    Profile* profile = profile_;
-    CWSInfoServiceFactory::GetInstance()->SetTestingFactory(
-        profile, base::BindRepeating(&BuildFakeCWSService));
-  }
   extension_service_ = std::make_unique<ExtensionService>(
       profile_, command_line, install_directory, unpacked_install_directory,
       ExtensionPrefs::Get(profile_),

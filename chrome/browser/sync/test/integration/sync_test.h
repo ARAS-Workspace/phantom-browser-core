@@ -34,8 +34,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "url/gurl.h"
 
-#include "extensions/browser/install_verifier.h"
-
 // The E2E tests are designed to run against real backend servers. To identify
 // those tests we use *E2ETest* test name filter and run disabled tests.
 //
@@ -407,9 +405,6 @@ class SyncTest : public PlatformBrowserTest,
   std::vector<std::unique_ptr<SyncServiceImplHarness>> clients_;
 
   syncer::DataTypeSet excluded_types_from_check_for_data_type_failures_;
-
-  // Disable extension install verification.
-  extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 
   std::unique_ptr<content::URLLoaderInterceptor> url_loader_interceptor_;
   content::NetworkConnectionChangeSimulator connection_change_simulator_;

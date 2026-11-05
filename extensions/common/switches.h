@@ -127,21 +127,9 @@ extern const char kZeroStatePromoCustomUiChipIphV3[];
 // each in a plain text link.
 extern const char kZeroStatePromoCustomUiPlainLinkIph[];
 
-// Turns on extension install verification if it would not otherwise have been
-// turned on.
-extern const char kExtensionsInstallVerification[];
-
-// Specifies a comma-separated list of extension ids that should be forced to
-// be treated as not from the webstore when doing install verification.
-extern const char kExtensionsNotWebstore[];
-
 // Overrides the url that the browser treats as the webstore, granting it the
 // webstore APIs and giving it some special protections.
 extern const char kAppsGalleryURL[];
-
-// Overrides the URL that the webstore APIs download extensions from.
-// Note: the URL must contain one '%s' for the extension ID.
-extern const char kAppsGalleryDownloadURL[];
 
 // Checks if extensions are allowed to run on chrome:// URLs.
 bool AreExtensionsOnChromeURLsAllowed();

@@ -108,10 +108,6 @@ BASE_DECLARE_FEATURE(kCheckingNoExtensionIdInExtensionIpcs);
 // URLs in worker scripts and subresources.
 BASE_DECLARE_FEATURE(kComponentExtensionAllowWorkerChromeResources);
 
-// Gates native UI affordances for leaving reviews on installed Chrome Web Store
-// extensions.
-BASE_DECLARE_FEATURE(kCWSReviewPromptingNativeUI);
-
 // If enabled, JS content scripts injected at document start will be compiled
 // in a background thread.
 BASE_DECLARE_FEATURE(kExtensionsBackgroundCompilation);
@@ -192,9 +188,6 @@ BASE_DECLARE_FEATURE(kDeclarativeNetRequestResponseHeaderMatching);
 // treated as "safe" but the rule limit's value will be the stricter "unsafe"
 // limit.
 BASE_DECLARE_FEATURE(kDeclarativeNetRequestSafeRuleLimits);
-
-// If enabled, use the new CWS itemSnippets API to fetch extension info.
-BASE_DECLARE_FEATURE(kUseItemSnippetsAPI);
 
 // If enabled, use the new simpler, more efficient service worker task queue.
 BASE_DECLARE_FEATURE(kUseNewServiceWorkerTaskQueue);

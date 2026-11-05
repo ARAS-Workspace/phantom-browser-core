@@ -30,14 +30,13 @@
 #include "chrome/browser/extensions/chrome_zipfile_installer.h"
 #include "chrome/browser/extensions/devtools_util.h"
 #include "chrome/browser/extensions/extension_commands_global_registry.h"
+#include "chrome/browser/extensions/extension_install_prompt.h"
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/extensions/extension_util.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/sync/account_extension_tracker.h"
 #include "chrome/browser/extensions/sync/extension_sync_util.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
-#include "chrome/browser/extensions/webstore_reinstaller.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/extensions/extensions_dialogs.h"
@@ -49,15 +48,13 @@
 #include "components/sync/base/features.h"
 #include "content/public/common/drop_data.h"
 #include "extensions/browser/crx_installer.h"
-#include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_file_task_runner.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/file_highlighter.h"
-#include "extensions/browser/install_verifier.h"
-#include "extensions/browser/management_policy.h"
+#include "extensions/browser/install_prompt_data.h"
 #include "extensions/browser/manifest_v2_handler.h"
 #include "extensions/browser/path_util.h"
 #include "extensions/browser/permissions/permissions_updater.h"
@@ -176,30 +173,6 @@ std::optional<URLPattern> ParseRuntimePermissionsPattern(
 GURL ConvertHostToUrl(const std::string& host) {
   return GURL(base::StrCat(
       {url::kHttpScheme, url::kStandardSchemeSeparator, host, "/"}));
-}
-
-// Runs the install verifier for all extensions that are enabled, disabled, or
-// terminated.
-void PerformVerificationCheck(content::BrowserContext* context) {
-  const ExtensionSet extensions =
-      ExtensionRegistry::Get(context)->GenerateInstalledExtensionsSet(
-          ExtensionRegistry::ENABLED | ExtensionRegistry::DISABLED |
-          ExtensionRegistry::TERMINATED);
-  ExtensionPrefs* prefs = ExtensionPrefs::Get(context);
-  bool should_do_verification_check = false;
-  for (const scoped_refptr<const Extension>& extension : extensions) {
-    if (ui_util::ShouldDisplayInExtensionSettings(*extension) &&
-        prefs->HasDisableReason(extension->id(),
-                                disable_reason::DISABLE_NOT_VERIFIED)) {
-      should_do_verification_check = true;
-      break;
-    }
-  }
-
-  if (should_do_verification_check) {
-    InstallVerifierFactory::GetForBrowserContext(context)
-        ->VerifyAllExtensions();
-  }
 }
 
 std::string GetETldPlusOne(const GURL& site) {
@@ -548,14 +521,6 @@ ExtensionFunction::ResponseAction
 DeveloperPrivateGetProfileConfigurationFunction::Run() {
   developer::ProfileInfo info =
       CreateProfileInfo(Profile::FromBrowserContext(browser_context()));
-
-  // If this is called from the chrome://extensions page, we use this as a
-  // heuristic that it's a good time to verify installs. We do this on startup,
-  // but there's a chance that it failed erroneously, so it's good to double-
-  // check.
-  if (source_context_type() == mojom::ContextType::kWebUi) {
-    PerformVerificationCheck(browser_context());
-  }
 
   return RespondNow(WithArguments(info.ToValue()));
 }
@@ -2067,63 +2032,6 @@ ExtensionFunction::ResponseAction DeveloperPrivateOpenDevToolsFunction::Run() {
       web_contents));  // Not through direct user gesture.
 #endif                 // BUILDFLAG(ENABLE_EXTENSIONS)
   return RespondNow(NoArguments());
-}
-
-DeveloperPrivateRepairExtensionFunction::
-    ~DeveloperPrivateRepairExtensionFunction() = default;
-
-ExtensionFunction::ResponseAction
-DeveloperPrivateRepairExtensionFunction::Run() {
-  std::optional<developer::RepairExtension::Params> params =
-      developer::RepairExtension::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-  const Extension* extension = GetExtensionById(params->extension_id);
-  if (!extension) {
-    return RespondNow(LogNoSuchExtensionFoundAndReturn());
-  }
-
-  if (!ExtensionPrefs::Get(browser_context())
-           ->HasDisableReason(extension->id(),
-                              disable_reason::DISABLE_CORRUPTED)) {
-    return RespondNow(Error(kCannotRepairHealthyExtension));
-  }
-
-  ManagementPolicy* management_policy =
-      ExtensionSystem::Get(browser_context())->management_policy();
-  // If content verifier would repair this extension independently, then don't
-  // allow repair from here. This applies to policy extensions.
-  // Also note that if we let |reinstaller| continue with the repair, this would
-  // have uninstalled the extension but then we would have failed to reinstall
-  // it for policy check (see PolicyCheck::Start()).
-  if (management_policy->ShouldRepairIfCorrupted(extension)) {
-    return RespondNow(Error(kCannotRepairPolicyExtension));
-  }
-
-  content::WebContents* web_contents = GetSenderWebContents();
-  if (!web_contents) {
-    return RespondNow(Error(kCouldNotFindWebContentsError));
-  }
-
-  ExtensionManagement* extension_management =
-      ExtensionManagementFactory::GetForBrowserContext(browser_context());
-  if (!extension_management->UpdatesFromWebstore(*extension)) {
-    return RespondNow(Error(kCannotRepairNonWebstoreExtension));
-  }
-
-  auto reinstaller = base::MakeRefCounted<WebstoreReinstaller>(
-      web_contents, params->extension_id,
-      base::BindOnce(
-          &DeveloperPrivateRepairExtensionFunction::OnReinstallComplete, this));
-  reinstaller->BeginReinstall();
-
-  return RespondLater();
-}
-
-void DeveloperPrivateRepairExtensionFunction::OnReinstallComplete(
-    bool success,
-    const std::string& error,
-    webstore_install::Result result) {
-  Respond(success ? NoArguments() : Error(error));
 }
 
 DeveloperPrivateUploadExtensionToAccountFunction::

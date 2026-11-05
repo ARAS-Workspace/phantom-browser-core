@@ -45,6 +45,7 @@
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
+#include "extensions/browser/blocklist_extension_prefs.h"
 #include "extensions/browser/blocklist_state.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_prefs.h"
@@ -139,11 +140,8 @@ class ExtensionInfoGeneratorUnitTest : public ExtensionServiceTestWithInstall {
     extension_action_test_util::CreateToolbarModelForProfile(profile());
     if (ShouldUseSafetyHubFeatures()) {
       feature_list_.emplace();
-      feature_list_->InitWithFeatures(
-          {features::kSafetyHubExtensionsUwSTrigger,
-           features::kSafetyHubExtensionsOffStoreTrigger,
-           features::kSafetyHubExtensionsNoPrivacyPracticesTrigger},
-          /*disabled_features=*/{});
+      feature_list_->InitAndEnableFeature(
+          features::kSafetyHubExtensionsUwSTrigger);
     }
   }
 
@@ -519,14 +517,22 @@ TEST_F(ExtensionInfoGeneratorUnitTest, ExtensionInfoGenerateSafetyHubData) {
   const scoped_refptr<const Extension> extension =
       CreateExtension("test", base::ListValue(), ManifestLocation::kInternal);
   {
-    // Test that an offstore extension returns the proper information.
+    // Test that an extension that does not come from the store is not flagged.
     std::unique_ptr<developer::ExtensionInfo> info =
         GenerateExtensionInfo(extension->id());
-    EXPECT_EQ(l10n_util::GetStringUTF8(IDS_EXTENSIONS_SAFETY_CHECK_OFFSTORE),
+    EXPECT_FALSE(info->safety_check_text.has_value());
+  }
+  {
+    // Test that a blocklisted extension returns the proper information.
+    blocklist_prefs::SetSafeBrowsingExtensionBlocklistState(
+        extension->id(), BitMapBlocklistState::BLOCKLISTED_MALWARE, prefs);
+    std::unique_ptr<developer::ExtensionInfo> info =
+        GenerateExtensionInfo(extension->id());
+    EXPECT_EQ(l10n_util::GetStringUTF8(IDS_SAFETY_CHECK_EXTENSIONS_MALWARE),
               info->safety_check_text->detail_string);
-    EXPECT_EQ(l10n_util::GetStringUTF8(IDS_EXTENSIONS_SAFETY_CHECK_OFFSTORE_ON),
+    EXPECT_EQ(l10n_util::GetStringUTF8(IDS_EXTENSIONS_SC_MALWARE),
               info->safety_check_text->panel_string);
-    EXPECT_EQ(developer::SafetyCheckWarningReason::kOffstore,
+    EXPECT_EQ(developer::SafetyCheckWarningReason::kMalware,
               info->safety_check_warning_reason);
   }
   {

@@ -219,13 +219,6 @@ bool StandardManagementPolicyProvider::MustRemainDisabled(
     return true;
   }
 
-  if (!settings_->IsAllowedByUnpublishedAvailabilityPolicy(extension)) {
-    if (reason) {
-      *reason = disable_reason::DISABLE_PUBLISHED_IN_STORE_REQUIRED_BY_POLICY;
-    }
-    return true;
-  }
-
   if (!settings_->IsAllowedByUnpackedDeveloperModePolicy(*extension)) {
     if (reason) {
       *reason = disable_reason::DISABLE_UNSUPPORTED_DEVELOPER_EXTENSION;

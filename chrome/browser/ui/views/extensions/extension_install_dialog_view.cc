@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "base/functional/bind.h"
-#include "base/i18n/message_formatter.h"
 #include "base/memory/raw_ptr.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/extension_install_prompt.h"
@@ -19,33 +18,25 @@
 #include "chrome/browser/ui/browser_web_contents_delegate/browser_web_contents_delegate.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
-#include "chrome/browser/ui/views/chrome_typography.h"
 #include "chrome/browser/ui/views/extensions/extension_permissions_view.h"
 #include "chrome/grit/generated_resources.h"
-#include "chrome/grit/theme_resources.h"
 #include "components/constrained_window/constrained_window_views.h"
 #include "content/public/browser/browser_thread.h"
-#include "content/public/browser/page_navigator.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_urls.h"
-#include "ui/accessibility/ax_enums.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_header_macros.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/mojom/dialog_button.mojom.h"
-#include "ui/base/resource/resource_bundle.h"
 #include "ui/gfx/geometry/insets.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/views/bubble/bubble_frame_view.h"
 #include "ui/views/controls/button/checkbox.h"
 #include "ui/views/controls/image_view.h"
 #include "ui/views/controls/label.h"
-#include "ui/views/controls/link.h"
 #include "ui/views/controls/scroll_view.h"
 #include "ui/views/controls/textarea/textarea.h"
 #include "ui/views/layout/box_layout.h"
@@ -58,27 +49,12 @@
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/window/dialog_delegate.h"
 
-using content::OpenURLParams;
-using content::Referrer;
 using extensions::InstallPromptData;
 
 namespace {
 
 // Time delay before the install button is enabled after initial display.
 int g_install_delay_in_ms = 500;
-
-// Returns the accessible name for the ratings view, which will convey the
-// information properly (i.e., "Rated 4.2 stars by 379 reviews" rather than
-// "image image...379").
-std::u16string GetRatingAccessibleName(double rating, int rating_count) {
-  if (rating_count == 0) {
-    return l10n_util::GetStringUTF16(
-        IDS_EXTENSION_PROMPT_NO_RATINGS_ACCESSIBLE_TEXT);
-  }
-  return base::i18n::MessageFormatter::FormatWithNumberedArgs(
-      l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_RATING_ACCESSIBLE_TEXT),
-      rating, rating_count);
-}
 
 void ShowExtensionInstallDialogImpl(
     std::unique_ptr<ExtensionInstallPromptShowParams> show_params,
@@ -283,13 +259,7 @@ ExtensionInstallDialogView::ExtensionInstallDialogView(
   SetCancelCallback(base::BindOnce(
       &ExtensionInstallDialogView::OnDialogCanceled, base::Unretained(this)));
   set_draggable(true);
-  if (prompt_->has_webstore_data()) {
-    auto store_link = std::make_unique<views::Link>(
-        l10n_util::GetStringUTF16(IDS_EXTENSION_PROMPT_STORE_LINK));
-    store_link->SetCallback(base::BindRepeating(
-        &ExtensionInstallDialogView::LinkClicked, base::Unretained(this)));
-    SetExtraView(std::move(store_link));
-  } else if (prompt_->ShouldWithheldPermissionsOnDialogAccept()) {
+  if (prompt_->ShouldWithheldPermissionsOnDialogAccept()) {
     grant_permissions_checkbox_ = SetExtraView(
         std::make_unique<views::Checkbox>(l10n_util::GetStringUTF16(
             IDS_EXTENSION_PROMPT_GRANT_PERMISSIONS_CHECKBOX)));
@@ -312,10 +282,6 @@ ExtensionInstallDialogView::~ExtensionInstallDialogView() {
 ExtensionInstallPromptShowParams*
 ExtensionInstallDialogView::GetShowParamsForTesting() {
   return show_params_.get();
-}
-
-void ExtensionInstallDialogView::ClickLinkForTesting() {
-  LinkClicked();
 }
 
 void ExtensionInstallDialogView::SetInstallButtonDelayForTesting(
@@ -479,25 +445,6 @@ void ExtensionInstallDialogView::OnShutdown(
   CloseDialog();
 }
 
-void ExtensionInstallDialogView::LinkClicked() {
-  GURL store_url(extension_urls::GetWebstoreItemDetailURLPrefix() +
-                 prompt_->extension()->id());
-  OpenURLParams params(store_url, Referrer(),
-                       WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                       ui::PAGE_TRANSITION_LINK, false);
-
-  DCHECK(show_params_);
-  if (show_params_->GetParentWebContents()) {
-    show_params_->GetParentWebContents()->OpenURL(
-        params, /*navigation_handle_callback=*/{});
-  } else {
-    chrome::ScopedTabbedBrowserDisplayer displayer(profile_);
-    displayer.browser_window_interface()->OpenURL(
-        params, /*navigation_handle_callback=*/{});
-  }
-  CloseDialog();
-}
-
 void ExtensionInstallDialogView::CreateContents() {
   SetLayoutManager(std::make_unique<views::FillLayout>());
 
@@ -610,95 +557,12 @@ ExtensionInstallDialogView::CreateTitleContainer() {
                                .SetImage(ui::ImageModel::FromImageSkia(*image))
                                .SetImageSize(size));
 
-  if (prompt_->has_webstore_data()) {
-    title_container.AddChild(CreateWebstoreDataBuilder());
-  } else {
-    title_container.AddChild(
-        views::Builder<TitleLabelWrapper>(std::make_unique<TitleLabelWrapper>(
-            views::BubbleFrameView::CreateDefaultTitleLabel(
-                prompt_->GetDialogTitle()))));
-  }
-
-  return std::move(title_container).Build();
-}
-
-views::Builder<views::BoxLayoutView>
-ExtensionInstallDialogView::CreateWebstoreDataBuilder() {
-  ChromeLayoutProvider* provider = ChromeLayoutProvider::Get();
-
-  // Title
-  auto title_label_builder =
+  title_container.AddChild(
       views::Builder<TitleLabelWrapper>(std::make_unique<TitleLabelWrapper>(
           views::BubbleFrameView::CreateDefaultTitleLabel(
-              prompt_->GetDialogTitle())));
+              prompt_->GetDialogTitle()))));
 
-  // Rating
-  auto rating_builder =
-      views::Builder<views::BoxLayoutView>()
-          .SetOrientation(views::BoxLayout::Orientation::kHorizontal)
-          .SetID(ExtensionInstallDialogView::kRatingsViewId)
-          .SetAccessibleRole(ax::mojom::Role::kStaticText)
-          .SetAccessibleName(GetRatingAccessibleName(prompt_->average_rating(),
-                                                     prompt_->rating_count()));
-
-  auto [full_stars, rating_fractional] = prompt_->GetRatingStars();
-
-  std::vector<const gfx::ImageSkia*> rating_stars;
-  ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
-  int i = 0;
-  while (i < full_stars) {
-    rating_stars.push_back(rb.GetImageSkiaNamed(IDR_EXTENSIONS_RATING_STAR_ON));
-    i++;
-  }
-  if (rating_fractional) {
-    rating_stars.push_back(
-        rb.GetImageSkiaNamed(IDR_EXTENSIONS_RATING_STAR_HALF_LEFT));
-    i++;
-  }
-  while (i < kMaxExtensionRating) {
-    rating_stars.push_back(
-        rb.GetImageSkiaNamed(IDR_EXTENSIONS_RATING_STAR_OFF));
-    i++;
-  }
-
-  for (auto star : rating_stars) {
-    rating_builder.AddChild(views::Builder<views::ImageView>()
-                                .SetImage(ui::ImageModel::FromImageSkia(*star))
-                                .SetAccessibleRole(ax::mojom::Role::kNone));
-  }
-
-  auto rating_count_builder =
-      views::Builder<views::Label>()
-          .SetText(prompt_->GetRatingCount())
-          .SetTextContext(views::style::CONTEXT_DIALOG_BODY_TEXT)
-          .SetTextStyle(views::style::STYLE_PRIMARY)
-          .SetAccessibleRole(ax::mojom::Role::kNone)
-          .SetAccessibleName(std::u16string(),
-                             ax::mojom::NameFrom::kAttributeExplicitlyEmpty)
-          .SetHorizontalAlignment(gfx::ALIGN_LEFT);
-
-  auto rating_container_builder =
-      views::Builder<views::BoxLayoutView>()
-          .SetOrientation(views::BoxLayout::Orientation::kHorizontal)
-          .SetBetweenChildSpacing(provider->GetDistanceMetric(
-              views::DISTANCE_RELATED_LABEL_HORIZONTAL))
-          .AddChildren(rating_builder, rating_count_builder);
-
-  // User count
-  auto user_count_builder = views::Builder<views::Label>()
-                                .SetText(prompt_->GetUserCount())
-                                .SetTextContext(CONTEXT_DIALOG_BODY_TEXT_SMALL)
-                                .SetTextStyle(views::style::STYLE_SECONDARY)
-                                .SetAutoColorReadabilityEnabled(false)
-                                .SetHorizontalAlignment(gfx::ALIGN_LEFT);
-
-  return views::Builder<views::BoxLayoutView>()
-      .SetOrientation(views::BoxLayout::Orientation::kVertical)
-      .SetInsideBorderInsets(gfx::Insets())
-      .SetBetweenChildSpacing(
-          provider->GetDistanceMetric(DISTANCE_RELATED_CONTROL_VERTICAL_SMALL))
-      .AddChildren(title_label_builder, rating_container_builder,
-                   user_count_builder);
+  return std::move(title_container).Build();
 }
 
 void ExtensionInstallDialogView::ContentsChanged(

@@ -710,10 +710,6 @@ interface DeveloperPrivate {
   static Promise<undefined> deleteExtensionErrors(
       DeleteExtensionErrorsProperties properties);
 
-  // Repairs the extension specified.
-  // |extensionId|: The id of the extension to repair.
-  static Promise<undefined> repairExtension(DOMString extensionId);
-
   // Shows the options page for the extension specified.
   // |extensionId|: The id of the extension to show the options page for.
   static Promise<undefined> showOptions(DOMString extensionId);

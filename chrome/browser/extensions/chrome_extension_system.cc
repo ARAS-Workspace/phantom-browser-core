@@ -26,7 +26,6 @@
 #include "chrome/browser/extensions/extension_garbage_collector.h"
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/shared_module_service_factory.h"
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
 #include "chrome/browser/notifications/notifier_state_tracker.h"
@@ -51,7 +50,6 @@
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_util.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/load_error_reporter.h"
 #include "extensions/browser/quota_service.h"
 #include "extensions/browser/service_worker_manager.h"
@@ -108,9 +106,6 @@ void ChromeExtensionSystem::Shared::RegisterManagementPolicyProviders() {
       ExtensionManagementFactory::GetForBrowserContext(profile_)
           ->GetProviders());
 
-  management_policy_->RegisterProvider(
-      InstallVerifierFactory::GetForBrowserContext(profile_));
-
   if (auto* extension_install_policy_service =
           policy::ExtensionInstallPolicyServiceFactory::GetForBrowserContext(
               profile_)) {
@@ -160,7 +155,6 @@ void ChromeExtensionSystem::Shared::Init(bool extensions_enabled) {
   // These services must be registered before the ExtensionService tries to
   // load any extensions.
   {
-    InstallVerifierFactory::GetForBrowserContext(profile_)->Init();
     ChromeContentVerifierDelegate::VerifyInfo::Mode mode =
         ChromeContentVerifierDelegate::GetDefaultMode();
     if (mode >= ChromeContentVerifierDelegate::VerifyInfo::Mode::BOOTSTRAP) {

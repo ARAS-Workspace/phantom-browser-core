@@ -16,7 +16,6 @@
 #include "content/public/test/slow_download_http_response.h"
 #include "content/public/test/test_download_http_response.h"
 #include "content/public/test/test_file_error_injector.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/scoped_ignore_content_verifier_for_test.h"
 #include "ui/base/window_open_disposition.h"
 
@@ -280,7 +279,6 @@ class DownloadTestBase : public InProcessBrowserTest {
   content::TestDownloadResponseHandler test_response_handler_;
   std::unique_ptr<DownloadTestFileActivityObserver> file_activity_observer_;
   extensions::ScopedIgnoreContentVerifierForTest ignore_content_verifier_;
-  extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 
   // By default, the embedded test server uses HTTP. Keep an HTTPS server
   // as well so that we can avoid unexpected insecure download warnings.

@@ -57,7 +57,6 @@ export class TestService extends TestBrowserProxy implements ServiceInterface {
       'reloadItem',
       'removeRuntimeHostPermission',
       'removeUserSpecifiedSites',
-      'repairItem',
       'requestFileSource',
       'retryLoadUnpacked',
       'setItemAllowedIncognito',
@@ -258,10 +257,6 @@ export class TestService extends TestBrowserProxy implements ServiceInterface {
       override_flags: 0,
       status: chrome.developerPrivate.PackStatus.ERROR,
     });
-  }
-
-  repairItem(id: string): void {
-    this.methodCalled('repairItem', id);
   }
 
   setProfileInDevMode(inDevMode: boolean) {

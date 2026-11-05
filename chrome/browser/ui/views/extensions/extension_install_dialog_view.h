@@ -38,11 +38,6 @@ class ExtensionInstallDialogView : public views::BubbleDialogDelegateView,
   METADATA_HEADER(ExtensionInstallDialogView, views::BubbleDialogDelegateView)
 
  public:
-  // The views::View::id of the ratings section in the dialog.
-  static const int kRatingsViewId = 1;
-  static const int kMinExtensionRating = 0;
-  static const int kMaxExtensionRating = 5;
-
   ExtensionInstallDialogView(
       std::unique_ptr<ExtensionInstallPromptShowParams> show_params,
       ExtensionInstallPrompt::DoneCallback done_callback,
@@ -72,7 +67,6 @@ class ExtensionInstallDialogView : public views::BubbleDialogDelegateView,
   bool ShouldAllowKeyEventsDuringInputProtection() const override;
 
   ExtensionInstallPromptShowParams* GetShowParamsForTesting();
-  void ClickLinkForTesting();
   bool IsJustificationFieldVisibleForTesting();
   void SetJustificationTextForTesting(const std::u16string& new_text);
   bool ShouldIgnoreButtonPressedEventHandlingForTesting(
@@ -89,7 +83,6 @@ class ExtensionInstallDialogView : public views::BubbleDialogDelegateView,
                               extensions::UninstallReason reason) override;
   void OnShutdown(extensions::ExtensionRegistry* registry) override;
 
-  void LinkClicked();
   void OnDialogCanceled();
   void OnDialogAccepted();
 
@@ -97,14 +90,8 @@ class ExtensionInstallDialogView : public views::BubbleDialogDelegateView,
   // info.
   void CreateContents();
 
-  // Returns the title container, which contains the title and (maybe) webstore
-  // data.
+  // Returns the title container, which contains the title.
   [[nodiscard]] std::unique_ptr<views::TableLayoutView> CreateTitleContainer();
-
-  // Returns the webstore data builder, which contains information about the
-  // extension on the webstore.
-  [[nodiscard]] views::Builder<views::BoxLayoutView>
-  CreateWebstoreDataBuilder();
 
   // Returns the extension info container, which contains extension permissions
   // and/or justification views.

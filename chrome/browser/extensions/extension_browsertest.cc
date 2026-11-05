@@ -168,10 +168,6 @@ bool ExtensionBrowserTest::ShouldEnableContentVerification() {
   return false;
 }
 
-bool ExtensionBrowserTest::ShouldEnableInstallVerification() {
-  return false;
-}
-
 bool ExtensionBrowserTest::ShouldAllowMV2Extensions() {
   return true;
 }
@@ -207,11 +203,6 @@ void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
   if (!ShouldEnableContentVerification()) {
     ignore_content_verification_ =
         std::make_unique<ScopedIgnoreContentVerifierForTest>();
-  }
-
-  if (!ShouldEnableInstallVerification()) {
-    ignore_install_verification_ =
-        std::make_unique<ScopedInstallVerifierBypassForTest>();
   }
 
   if (ShouldAllowMV2Extensions()) {

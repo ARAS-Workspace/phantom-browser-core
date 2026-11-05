@@ -265,7 +265,6 @@ GlobalSettings::~GlobalSettings() = default;
 void GlobalSettings::Reset() {
   install_sources.reset();
   allowed_types.reset();
-  unpublished_availability_setting = UnpublishedAvailability::kAllowUnpublished;
 }
 
 }  // namespace internal

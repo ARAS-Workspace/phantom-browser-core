@@ -9,7 +9,6 @@
 
 #include "base/files/file_path.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/scoped_ignore_content_verifier_for_test.h"
 #include "extensions/buildflags/buildflags.h"
 
@@ -65,9 +64,6 @@ class ExtensionSettingsTestBase : public WebUIMochaBrowserTest {
 
   // Disable extension content verification.
   extensions::ScopedIgnoreContentVerifierForTest ignore_content_verification_;
-
-  // Disable extension install verification.
-  extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 
   std::unique_ptr<extensions::ScopedTestDialogAutoConfirm>
       uninstall_auto_confirm_;

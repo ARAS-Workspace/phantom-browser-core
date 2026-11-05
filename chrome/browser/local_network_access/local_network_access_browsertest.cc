@@ -27,7 +27,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/content_browser_test_utils.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_builder.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -300,7 +299,6 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest, SpecialSchemeDevtools) {
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessBrowserTest,
                        SpecialSchemeChromeExtension) {
   base::ScopedAllowBlockingForTesting allow_blocking;
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass;
 
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());

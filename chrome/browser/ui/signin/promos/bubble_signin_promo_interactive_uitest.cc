@@ -51,7 +51,6 @@
 #include "components/sync/test/test_sync_service.h"
 #include "components/sync_bookmarks/switches.h"
 #include "content/public/test/browser_test.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/common/extension.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/views/interaction/element_tracker_views.h"
@@ -293,7 +292,6 @@ BubbleSignInPromoInteractiveUITest::SaveAndShowBookmarkBubble(
 
 scoped_refptr<const Extension>
 BubbleSignInPromoInteractiveUITest::InstallLocalExtension() {
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass;
   base::FilePath test_data_dir;
   base::PathService::Get(chrome::DIR_TEST_DATA, &test_data_dir);
   test_data_dir = test_data_dir.AppendASCII("extensions");

@@ -38,13 +38,6 @@ class Manifest;
 // extension downloaded in case there was a gap in time between when the install
 // was approved and the CRX was downloaded.
 struct InstallApproval : public base::SupportsUserData::Data {
-  static std::unique_ptr<InstallApproval> CreateWithInstallPrompt(
-      content::BrowserContext* browser_context);
-
-  // Creates an InstallApproval for installing a shared module.
-  static std::unique_ptr<InstallApproval> CreateForSharedModule(
-      content::BrowserContext* browser_context);
-
   // Creates an InstallApproval that will skip putting up an install
   // confirmation prompt if the actual manifest from the extension to be
   // installed matches `parsed_manifest`. The `strict_manifest_check` controls

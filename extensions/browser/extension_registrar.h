@@ -69,9 +69,6 @@ class ExtensionRegistrar : public KeyedService,
     virtual void PreAddExtension(const Extension* extension,
                                  const Extension* old_extension) = 0;
 
-    // Handles extension install tasks before AddExtension.
-    virtual void OnAddNewOrUpdatedExtension(const Extension* extension) = 0;
-
     // Handles updating the browser context when an extension is activated
     // (becomes enabled).
     virtual void PostActivateExtension(
@@ -80,11 +77,6 @@ class ExtensionRegistrar : public KeyedService,
     // Handles updating the browser context when an enabled extension is
     // deactivated (whether disabled or removed).
     virtual void PostDeactivateExtension(
-        scoped_refptr<const Extension> extension) = 0;
-
-    // Called before `extension` is uninstalled. Performs the operations
-    // necessary before `extension` is uninstalled.
-    virtual void PreUninstallExtension(
         scoped_refptr<const Extension> extension) = 0;
 
     // Called after `extension` is uninstalled. Performs the operations to

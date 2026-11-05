@@ -57,8 +57,7 @@ class InstallTracker : public KeyedService, public ExtensionRegistryObserver {
   // Registers an install initiated by the user to allow checking of duplicate
   // installs. Download of the extension has not necessarily started.
   // RemoveActiveInstall() must be called when install is complete regardless of
-  // success or failure. Consider using ScopedActiveInstall rather than calling
-  // this directly.
+  // success or failure.
   void AddActiveInstall(const ActiveInstallData& install_data);
 
   // Deregisters an active install.

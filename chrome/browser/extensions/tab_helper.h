@@ -19,7 +19,6 @@
 #include "extensions/browser/extension_registry_observer.h"
 #include "extensions/browser/permissions_manager.h"
 #include "extensions/browser/script_executor.h"
-#include "extensions/browser/webstore_install_result.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/stack_frame.h"

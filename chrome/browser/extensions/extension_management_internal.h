@@ -160,11 +160,6 @@ struct IndividualSettings {
 
 // Global extension management settings, applicable to all extensions.
 struct GlobalSettings {
-  enum class UnpublishedAvailability {
-    kAllowUnpublished = 0,
-    kDisableUnpublished = 1,
-  };
-
   GlobalSettings();
 
   GlobalSettings(const GlobalSettings&) = delete;
@@ -181,9 +176,6 @@ struct GlobalSettings {
   // Settings specifying all allowed app/extension types, will be enforced
   // only of `has_restricted_allowed_types` is set to true.
   std::optional<std::vector<Manifest::Type>> allowed_types;
-
-  UnpublishedAvailability unpublished_availability_setting =
-      UnpublishedAvailability::kAllowUnpublished;
 };
 
 }  // namespace internal

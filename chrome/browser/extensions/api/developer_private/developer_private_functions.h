@@ -17,7 +17,6 @@
 #include "extensions/browser/extension_function.h"
 #include "extensions/browser/extension_registry_observer.h"
 #include "extensions/browser/load_error_reporter.h"
-#include "extensions/browser/webstore_install_result.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension.h"
 #include "ui/base/clipboard/file_info.h"
@@ -62,10 +61,6 @@ class DeveloperPrivateAPIFunction : public ExtensionFunction {
       "Could not find a valid web contents.";
   static constexpr char kNoOptionsPageForExtensionError[] =
       "Extension does not have an options page.";
-  static constexpr char kCannotRepairHealthyExtension[] =
-      "Cannot repair a healthy extension.";
-  static constexpr char kCannotRepairPolicyExtension[] =
-      "Cannot repair a policy-installed extension.";
   static constexpr char kCannotChangeHostPermissions[] =
       "Cannot change host permissions for the given extension.";
   static constexpr char kCannotSetPinnedWithoutAction[] =
@@ -87,9 +82,6 @@ class DeveloperPrivateAPIFunction : public ExtensionFunction {
       "Extension with ID '*' doesn't exist.";
   static constexpr char kExtensionNotAffectedByMV2Deprecation[] =
       "Extension with ID '*' is not affected by the MV2 deprecation.";
-  static constexpr char kCannotRepairNonWebstoreExtension[] =
-      "Cannot repair an extension that is not installed from the Chrome Web "
-      "Store.";
   static constexpr char kUserNotSignedIn[] = "User is not signed in.";
   static constexpr char kCannotUploadExtensionToAccount[] =
       "Extension with ID '*' cannot be uploaded to the user's account.";
@@ -728,21 +720,6 @@ class DeveloperPrivateOpenDevToolsFunction
  protected:
   ~DeveloperPrivateOpenDevToolsFunction() override;
   ResponseAction Run() override;
-};
-
-class DeveloperPrivateRepairExtensionFunction
-    : public DeveloperPrivateAPIFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("developerPrivate.repairExtension",
-                             DEVELOPERPRIVATE_REPAIREXTENSION)
-
- protected:
-  ~DeveloperPrivateRepairExtensionFunction() override;
-  ResponseAction Run() override;
-
-  void OnReinstallComplete(bool success,
-                           const std::string& error,
-                           webstore_install::Result result);
 };
 
 class DeveloperPrivateUploadExtensionToAccountFunction

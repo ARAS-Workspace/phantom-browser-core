@@ -20,7 +20,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
 #include "chrome/browser/extensions/extension_management.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "components/metrics/metrics_log.h"
@@ -32,7 +31,6 @@
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/install_prefs_helper.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_set.h"
@@ -63,25 +61,17 @@ const size_t kExtensionListBuckets = 1024;
 // Possible states for extensions. The order of these enum values is important,
 // and is used when combining the state of multiple extensions and multiple
 // profiles. Combining two states should always result in the higher state.
-// Ex: One profile is in state kFromStoreVerified, and another is in
-// kFromStoreUnverified. The state of the two profiles together will be
-// kFromStoreUnverified.
+// Ex: One profile is in state kFromStoreUnverified, and another is in
+// kOffStore. The state of the two profiles together will be kOffStore.
 // This enum should be kept in sync with the corresponding enum in
 // third_party/metrics_proto/system_profile.proto
-enum class ExtensionState {
-  kNoExtensions,
-  kFromStoreVerified,
-  kFromStoreUnverified,
-  kOffStore
-};
+enum class ExtensionState { kNoExtensions, kFromStoreUnverified, kOffStore };
 
 metrics::SystemProfileProto::ExtensionsState ExtensionStateAsProto(
     ExtensionState value) {
   switch (value) {
     case ExtensionState::kNoExtensions:
       return metrics::SystemProfileProto::NO_EXTENSIONS;
-    case ExtensionState::kFromStoreVerified:
-      return metrics::SystemProfileProto::NO_OFFSTORE_VERIFIED;
     case ExtensionState::kFromStoreUnverified:
       return metrics::SystemProfileProto::NO_OFFSTORE_UNVERIFIED;
     case ExtensionState::kOffStore:
@@ -91,12 +81,8 @@ metrics::SystemProfileProto::ExtensionsState ExtensionStateAsProto(
 }
 
 // Determines if the |extension| is an extension (can use extension APIs) and is
-// not from the webstore. If local information claims the extension is from the
-// webstore, we attempt to verify with |verifier| by checking if it has been
-// explicitly deemed invalid. If |verifier| is inactive or if the extension is
-// unknown to |verifier|, the local information is trusted.
+// not from the webstore. Local information about the extension is trusted.
 ExtensionState IsOffStoreExtension(const extensions::Extension& extension,
-                                   const extensions::InstallVerifier& verifier,
                                    content::BrowserContext* context) {
   if (!extension.is_extension() && !extension.is_legacy_packaged_app())
     return ExtensionState::kNoExtensions;
@@ -105,35 +91,31 @@ ExtensionState IsOffStoreExtension(const extensions::Extension& extension,
   if (extensions::Manifest::IsComponentLocation(extension.location()))
     return ExtensionState::kNoExtensions;
 
-  if (verifier.AllowedByEnterprisePolicy(extension.id()))
+  extensions::ExtensionManagement* management =
+      extensions::ExtensionManagementFactory::GetForBrowserContext(context);
+  if (management->IsInstallationExplicitlyAllowed(extension.id())) {
     return ExtensionState::kNoExtensions;
+  }
 
-  if (!extensions::InstallVerifier::IsFromStore(extension, context))
+  if (!extension.from_webstore() &&
+      !management->UpdatesFromWebstore(extension)) {
     return ExtensionState::kOffStore;
+  }
 
-  // Local information about the extension implies it is from the store. We try
-  // to use the install verifier to verify this.
-  if (!verifier.IsKnownId(extension.id()))
-    return ExtensionState::kFromStoreUnverified;
-
-  if (verifier.IsInvalid(extension.id()))
-    return ExtensionState::kOffStore;
-
-  return ExtensionState::kFromStoreVerified;
+  return ExtensionState::kFromStoreUnverified;
 }
 
 // Finds the ExtensionState of |extensions|. The return value will be the
 // highest (as defined by the order of ExtensionState) value of each extension
 // in |extensions|.
 ExtensionState CheckForOffStore(const extensions::ExtensionSet& extensions,
-                                const extensions::InstallVerifier& verifier,
                                 content::BrowserContext* context) {
   ExtensionState state = ExtensionState::kNoExtensions;
   for (extensions::ExtensionSet::const_iterator it = extensions.begin();
        it != extensions.end() && state < ExtensionState::kOffStore; ++it) {
     // Combine the state of each extension, always favoring the higher state as
     // defined by the order of ExtensionState.
-    state = std::max(state, IsOffStoreExtension(**it, verifier, context));
+    state = std::max(state, IsOffStoreExtension(**it, context));
   }
   return state;
 }
@@ -483,14 +465,9 @@ void ExtensionsMetricsProvider::ProvideOffStoreMetric(
     if (!extensions)
       continue;
 
-    extensions::InstallVerifier* verifier =
-        extensions::InstallVerifierFactory::GetForBrowserContext(profiles[i]);
-    DCHECK(verifier);
-
     // Combine the state from each profile, always favoring the higher state as
     // defined by the order of ExtensionState.
-    state =
-        std::max(state, CheckForOffStore(*extensions, *verifier, profiles[i]));
+    state = std::max(state, CheckForOffStore(*extensions, profiles[i]));
   }
 
   system_profile->set_offstore_extensions_state(ExtensionStateAsProto(state));

@@ -199,9 +199,6 @@ constexpr const char kPrefGeometryCache[] = "geometry_cache";
 // A preference that indicates when an extension is last launched.
 constexpr const char kPrefLastLaunchTime[] = "last_launch_time";
 
-// A list of installed ids and a signature.
-constexpr const char kInstallSignature[] = "extensions.install_signature";
-
 // A list of IDs of external extensions that the user has chosen to uninstall;
 // saved as an indication to not re-install that extension.
 constexpr const char kExternalUninstalls[] = "extensions.external_uninstalls";
@@ -2091,20 +2088,6 @@ void ExtensionPrefs::SetGeometryCache(const ExtensionId& extension_id,
                       base::Value(std::move(cache)));
 }
 
-const base::DictValue& ExtensionPrefs::GetInstallSignature() const {
-  return prefs_->GetDict(kInstallSignature);
-}
-
-void ExtensionPrefs::SetInstallSignature(base::DictValue* signature) {
-  if (signature) {
-    prefs_->Set(kInstallSignature, base::Value(std::move(*signature)));
-    DVLOG(1) << "SetInstallSignature - saving";
-  } else {
-    DVLOG(1) << "SetInstallSignature - clearing";
-    prefs_->ClearPref(kInstallSignature);
-  }
-}
-
 bool ExtensionPrefs::NeedsSync(const ExtensionId& extension_id) const {
   return ReadPrefAsBooleanAndReturn(extension_id, kPrefNeedsSync);
 }
@@ -2194,7 +2177,6 @@ void ExtensionPrefs::RegisterProfilePrefs(
   registry->RegisterListPref(pref_names::kAllowedTypes);
   registry->RegisterListPref(pref_names::kAllowedInstallSites);
   registry->RegisterStringPref(pref_names::kLastChromeVersion, std::string());
-  registry->RegisterDictionaryPref(kInstallSignature);
   registry->RegisterListPref(kExternalUninstalls);
   registry->RegisterListPref(
       pref_names::kExtendedBackgroundLifetimeForPortConnectionsToUrls);
@@ -2212,8 +2194,6 @@ void ExtensionPrefs::RegisterProfilePrefs(
 #endif
 
   registry->RegisterBooleanPref(pref_names::kBlockExternalExtensions, false);
-  registry->RegisterIntegerPref(pref_names::kExtensionUnpublishedAvailability,
-                                0);
   registry->RegisterListPref(pref_names::kExtensionInstallTypeBlocklist);
   registry->RegisterBooleanPref(
       ManifestV2Handler::kMV2UnsupportedAcknowledgedGloballyPref.name, false);

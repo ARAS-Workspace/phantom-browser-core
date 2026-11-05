@@ -54,7 +54,6 @@ struct GlobalSettings;
 }  // namespace internal
 
 class APIPermissionSet;
-class CWSInfoServiceInterface;
 class Extension;
 class PermissionSet;
 
@@ -137,8 +136,6 @@ class ExtensionManagement : public KeyedService,
   // Returns true if an extension download should be allowed to proceed.
   bool IsOffstoreInstallAllowed(const GURL& url,
                                 const GURL& referrer_url) const;
-
-  bool IsAllowedByUnpublishedAvailabilityPolicy(const Extension* extension);
 
   // Returns false if the extension is loaded as unpacked and the developer mode
   // is OFF.
@@ -310,11 +307,6 @@ class ExtensionManagement : public KeyedService,
       observer_list_;
   PrefChangeRegistrar pref_change_registrar_;
   std::vector<std::unique_ptr<ManagementPolicy::Provider>> providers_;
-
-  // Unowned pointer to the CWSInfoService keyed-service instance for this
-  // profile. The service provides information about CWS publish status for
-  // extensions.
-  raw_ptr<CWSInfoServiceInterface> cws_info_service_ = nullptr;
 };
 
 class ExtensionManagementFactory : public ProfileKeyedServiceFactory {

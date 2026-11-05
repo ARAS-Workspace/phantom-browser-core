@@ -6,7 +6,6 @@
 
 #include <string_view>
 
-#include "base/auto_reset.h"
 #include "base/strings/escape.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
@@ -29,12 +28,6 @@ bool IsSourceFromAnExtension(const std::u16string& source) {
 }  // namespace extensions
 
 namespace extension_urls {
-
-namespace {
-
-const GURL* g_item_snippet_url_for_test_ = nullptr;
-
-}  // namespace
 
 const char kChromeWebstoreBaseURL[] = "https://chrome.google.com/webstore";
 const char kNewChromeWebstoreBaseURL[] = "https://chromewebstore.google.com/";
@@ -85,31 +78,6 @@ GURL GetWebstoreExtensionsCategoryURL() {
 
 std::string GetWebstoreItemDetailURLPrefix() {
   return GetNewWebstoreLaunchURL().spec() + "detail/";
-}
-
-GURL GetWebstoreItemSnippetURL(const extensions::ExtensionId& extension_id) {
-  if (g_item_snippet_url_for_test_) {
-    // Return `<base URL><extension_id>`. There is no suffix if the URL is
-    // overridden by a test.
-    return GURL(base::StringPrintf("%s%s",
-                                   g_item_snippet_url_for_test_->spec().c_str(),
-                                   extension_id.c_str()));
-  }
-
-  // Return `<base URL><extension_id><suffix>`.
-  return GURL(kChromeWebstoreApiURL)
-      .Resolve(base::StringPrintf("v2/items/%s:fetchItemSnippet",
-                                  extension_id.c_str()));
-}
-
-GURL GetWebstoreBlockStatusURL() {
-  return GURL(kChromeWebstoreApiURL)
-      .Resolve(base::StringPrintf(
-          "v2/items:batchFetchItemBlockStatusForEnterprise"));
-}
-
-base::AutoReset<const GURL*> SetItemSnippetURLForTesting(const GURL* test_url) {
-  return base::AutoReset<const GURL*>(&g_item_snippet_url_for_test_, test_url);
 }
 
 GURL GetDefaultWebstoreUpdateUrl() {

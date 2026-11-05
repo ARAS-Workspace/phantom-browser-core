@@ -45,7 +45,6 @@ export interface ItemDelegate {
       void;
   openUrl(url: string): void;
   reloadItem(id: string): Promise<void>;
-  repairItem(id: string): void;
   showItemOptionsPage(extension: chrome.developerPrivate.ExtensionInfo): void;
   showInFolder(id: string): void;
   getExtensionSize(id: string): Promise<string>;
@@ -95,7 +94,6 @@ export class DummyItemDelegate {
   reloadItem(_id: string) {
     return Promise.resolve();
   }
-  repairItem(_id: string) {}
   showItemOptionsPage(_extension: chrome.developerPrivate.ExtensionInfo) {}
   showInFolder(_id: string) {}
   getExtensionSize(_id: string) {
@@ -287,11 +285,6 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
         UPLOAD_EXTENSION_TO_ACCOUNT_ITEMS_LIST_PAGE_HISTOGRAM_NAME, uploaded);
   }
 
-  protected onRepairClick_() {
-    assert(this.delegate);
-    this.delegate.repairItem(this.data.id);
-  }
-
   protected isEnabled_(): boolean {
     return isEnabled(this.data.state);
   }
@@ -304,12 +297,6 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
   protected showReloadButton_(): boolean {
     return getEnableControl(this.data) === EnableControl.RELOAD;
   }
-
-  /** @return Whether the repair button should be shown. */
-  protected showRepairButton_(): boolean {
-    return getEnableControl(this.data) === EnableControl.REPAIR;
-  }
-
 
   /** @return Whether the enable toggle should be shown. */
   protected showEnableToggle_(): boolean {

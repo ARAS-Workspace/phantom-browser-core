@@ -120,7 +120,6 @@ export class MockItemDelegate extends ClickMock implements ItemDelegate {
     return Promise.resolve();
   }
 
-  repairItem(_id: string) {}
   showItemOptionsPage(_extension: chrome.developerPrivate.ExtensionInfo) {}
   showInFolder(_id: string) {}
 

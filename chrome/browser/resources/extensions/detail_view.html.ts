@@ -157,14 +157,10 @@ this text can be found by Ctrl + F because it isn't hidden. -->
             $i18n{itemSuspiciousInstall}
           </span>
         </div>
-        <div class="cr-row continuation warning control-line"
-            id="corrupted-warning" ?hidden="${!this.showRepairButton_()}">
+        <div class="cr-row continuation warning" id="corrupted-warning"
+            ?hidden="${!this.showCorruptedWarning_()}">
           <cr-icon class="warning-icon" icon="cr:warning-filled"></cr-icon>
           <span>$i18n{itemCorruptInstall}</span>
-          <cr-button id="repair-button" class="action-button"
-              @click="${this.onRepairClick_}">
-            $i18n{itemRepair}
-          </cr-button>
         </div>
         <div class="cr-row continuation warning" id="blocklisted-warning"
             ?hidden="${!this.shouldShowBlocklistText_()}">

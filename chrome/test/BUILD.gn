@@ -1969,7 +1969,6 @@ test("browser_tests") {
       "//chrome/browser/guest_view:browser_tests",
       "//chrome/browser/web_applications/extensions",
       "//chrome/browser/web_applications/isolated_web_apps/window_management",
-      "//extensions/browser:webstore_installer",
       "//extensions/components/native_app_window",
     ]
     if (toolkit_views) {

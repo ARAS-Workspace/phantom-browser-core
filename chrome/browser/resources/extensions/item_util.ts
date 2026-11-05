@@ -29,7 +29,6 @@ export enum SourceType {
 
 export enum EnableControl {
   RELOAD = 'RELOAD',
-  REPAIR = 'REPAIR',
   ENABLE_TOGGLE = 'ENABLE_TOGGLE',
 }
 
@@ -261,9 +260,6 @@ export function getEnableControl(data: chrome.developerPrivate.ExtensionInfo):
     EnableControl {
   if (isTerminated(data.state)) {
     return EnableControl.RELOAD;
-  }
-  if (data.disableReasons.corruptInstall && data.userMayModify) {
-    return EnableControl.REPAIR;
   }
   return EnableControl.ENABLE_TOGGLE;
 }

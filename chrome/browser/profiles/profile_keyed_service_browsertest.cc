@@ -480,7 +480,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "CorruptedExtensionReinstaller",
 #endif
-    "CWSInfoService",
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "DelayedInstallManager",
 #endif
@@ -533,7 +532,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "InMemoryURLIndex",
     "InstallStageTracker",
     "InstallTracker",
-    "InstallVerifier",
     "LazyBackgroundTaskQueue",
     "LocalOrSyncableBookmarkSyncServiceFactory",
     "LoginDetectionKeyedService",

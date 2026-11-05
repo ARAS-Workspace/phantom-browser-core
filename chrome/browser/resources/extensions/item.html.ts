@@ -159,12 +159,6 @@ export function getHtml(this: ItemElement) {
           aria-describedby="a11yAssociation" @click="${this.onReloadClick_}">
       </cr-icon-button>
     ` : ''}
-    ${this.showRepairButton_() ? html`
-      <cr-button id="repair-button" class="action-button"
-          aria-describedby="a11yAssociation" @click="${this.onRepairClick_}">
-        $i18n{itemRepair}
-      </cr-button>
-    ` : ''}
     ${this.showReloadButton_() ? html`
       <cr-button id="terminated-reload-button" @click="${this.onReloadClick_}"
           aria-describedby="a11yAssociation" class="action-button">

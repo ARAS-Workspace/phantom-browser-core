@@ -46,15 +46,6 @@ inline constexpr char kAppFullscreenAllowed[] = "apps.fullscreen.allowed";
 inline constexpr char kBlockExternalExtensions[] =
     "extensions.block_external_extensions";
 
-// Records the last time the CWS Info Service downloaded information about
-// currently installed extensions from the Chrome Web Store, successfully
-// compared it with the information stored in extension_prefs and updated the
-// latter if necessary. The timestamp therefore represents the "freshness" of
-// the CWS information saved.
-inline constexpr char kCWSInfoTimestamp[] = "extensions.cws_info_timestamp";
-inline constexpr char kCWSInfoFetchErrorTimestamp[] =
-    "extensions.cws_info_fetch_error_timestamp";
-
 // A preference for a list of Component extensions that have been
 // uninstalled/removed and should not be reloaded.
 inline constexpr char kDeletedComponentExtensions[] =
@@ -75,12 +66,6 @@ inline constexpr char kExtensions[] = "extensions.settings";
 // Values are expected to conform to the schema of the ExtensionManagement
 // policy.
 inline constexpr char kExtensionManagement[] = "extensions.management";
-
-// An integer that indicates the availability of extensions that are unpublished
-// on the Chrome Web Store. More details can be found at
-// ExtensionUnpublishedAvailability.yaml
-inline constexpr char kExtensionUnpublishedAvailability[] =
-    "extensions.unpublished_availability";
 
 // An allowlist of extension ids the user can install: exceptions from the
 // following denylist.

@@ -18,25 +18,6 @@ namespace extensions {
 
 InstallApproval::InstallApproval() = default;
 
-std::unique_ptr<InstallApproval> InstallApproval::CreateWithInstallPrompt(
-    content::BrowserContext* browser_context) {
-  // Use `new` due to private constructor.
-  std::unique_ptr<InstallApproval> result(new InstallApproval());
-  result->browser_context = browser_context;
-  return result;
-}
-
-std::unique_ptr<InstallApproval> InstallApproval::CreateForSharedModule(
-    content::BrowserContext* browser_context) {
-  // Use `new` due to private constructor.
-  std::unique_ptr<InstallApproval> result(new InstallApproval());
-  result->browser_context = browser_context;
-  result->skip_install_dialog = true;
-  result->skip_post_install_ui = true;
-  result->manifest_check_level = ManifestCheckLevel::kNone;
-  return result;
-}
-
 std::unique_ptr<InstallApproval> InstallApproval::CreateWithNoInstallPrompt(
     content::BrowserContext* browser_context,
     const ExtensionId& extension_id,

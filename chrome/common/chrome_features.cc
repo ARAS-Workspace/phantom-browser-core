@@ -261,14 +261,6 @@ BASE_FEATURE(kAbusiveNotificationPermissionRevocation,
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 BASE_FEATURE(kSafetyHubExtensionsUwSTrigger, base::FEATURE_ENABLED_BY_DEFAULT);
-// Enables extensions that do not display proper privacy practices in the
-// Safety Hub Extension Reivew Panel.
-BASE_FEATURE(kSafetyHubExtensionsNoPrivacyPracticesTrigger,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-// Enables offstore extensions to be shown in the Safety Hub Extension
-// review panel.
-BASE_FEATURE(kSafetyHubExtensionsOffStoreTrigger,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
 BASE_FEATURE(kSafetyHubThreeDotDetails, base::FEATURE_ENABLED_BY_DEFAULT);

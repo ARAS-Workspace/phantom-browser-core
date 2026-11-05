@@ -243,8 +243,9 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, HtmlInName) {
   RunTestCase("HtmlInName");
 }
 
-IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, RepairButton) {
-  RunTestCase("RepairButton");
+IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest,
+                       CorruptedExtensionHasNoRepairButton) {
+  RunTestCase("CorruptedExtensionHasNoRepairButton");
 }
 
 IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, InspectableViewSortOrder) {
@@ -401,10 +402,6 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, NoSearchResults) {
 
 IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, SectionsVisibility) {
   RunTestCase("SectionsVisibility");
-}
-
-IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, LoadTimeData) {
-  RunTestCase("LoadTimeData");
 }
 
 IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest,

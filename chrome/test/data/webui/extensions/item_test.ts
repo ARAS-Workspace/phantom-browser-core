@@ -225,10 +225,8 @@ suite('ExtensionItemTest', function() {
     data.disableReasons.corruptInstall = true;
     item.data = data;
     await microtasksFinished();
-    await mockDelegate.testClickingCalls(
-        item.shadowRoot.querySelector<HTMLElement>('#repair-button')!,
-        'repairItem', [item.data.id]);
-    testVisible(item, '#enableToggle', false);
+    testVisible(item, '#repair-button', false);
+    testVisible(item, '#enableToggle', true);
 
     data = createExtensionInfo(item.data);
     data.disableReasons.corruptInstall = false;
@@ -600,26 +598,10 @@ suite('ExtensionItemTest', function() {
         `Related to ${name}`, item.$.a11yAssociation.textContent.trim());
   });
 
-  test('RepairButton', async () => {
-    // For most extensions, the "repair" button should be displayed if the
-    // extension is detected as corrupted.
-    testVisible(item, '#repair-button', false);
-    let data = createExtensionInfo(item.data);
-    data.disableReasons.corruptInstall = true;
-    item.data = data;
-    await microtasksFinished();
-    testVisible(item, '#repair-button', true);
-
-    data = createExtensionInfo(item.data);
-    data.disableReasons.corruptInstall = false;
-    item.data = data;
-    await microtasksFinished();
-    testVisible(item, '#repair-button', false);
-
-    // However, the user isn't allowed to initiate a repair for extensions they
-    // aren't allowed to modify, so the button shouldn't be visible.
-    data = createExtensionInfo(item.data);
-    data.userMayModify = false;
+  test('CorruptedExtensionHasNoRepairButton', async () => {
+    // A corrupted extension is removed and installed again by the user, so
+    // there is no "repair" button.
+    const data = createExtensionInfo(item.data);
     data.disableReasons.corruptInstall = true;
     item.data = data;
     await microtasksFinished();

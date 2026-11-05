@@ -282,8 +282,6 @@ void ExtensionRegistrar::AddNewOrUpdatedExtension(
 
   delayed_install_manager_->Remove(extension->id());
 
-  delegate_->OnAddNewOrUpdatedExtension(extension);
-
   FinishInstallation(extension);
 }
 
@@ -741,9 +739,6 @@ bool ExtensionRegistrar::UninstallExtension(
     registry_->TriggerOnUninstallationDenied(extension.get());
     return false;
   }
-
-  // Prepare to uninstall the extension.
-  delegate_->PreUninstallExtension(extension.get());
 
   UMA_HISTOGRAM_ENUMERATION("Extensions.UninstallType", extension->GetType(),
                             100);

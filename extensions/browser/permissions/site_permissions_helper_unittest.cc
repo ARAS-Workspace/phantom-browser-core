@@ -56,12 +56,9 @@ class TestExtensionRegistrarDelegate : public ExtensionRegistrar::Delegate {
 
   void ShutDown() { browser_context_ = nullptr; }
 
-  MOCK_METHOD1(OnAddNewOrUpdatedExtension, void(const Extension* extension));
   MOCK_METHOD1(PostActivateExtension,
                void(scoped_refptr<const Extension> extension));
   MOCK_METHOD1(PostDeactivateExtension,
-               void(scoped_refptr<const Extension> extension));
-  MOCK_METHOD1(PreUninstallExtension,
                void(scoped_refptr<const Extension> extension));
   MOCK_METHOD2(PostUninstallExtension,
                void(scoped_refptr<const Extension> extension,

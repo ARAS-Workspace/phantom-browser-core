@@ -30,7 +30,6 @@
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_id.h"
@@ -69,9 +68,6 @@ class ExtensionManagementApiBrowserTest : public ExtensionBrowserTest {
     content::CrashTab(background_host->host_contents());
     return true;
   }
-
- private:
-  ScopedInstallVerifierBypassForTest install_verifier_bypass_;
 };
 
 class ExtensionManagementApiTestWithBackgroundType

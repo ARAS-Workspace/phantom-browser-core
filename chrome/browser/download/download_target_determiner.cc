@@ -47,7 +47,6 @@
 #include "url/origin.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "extensions/browser/webstore_installer.h"
 #include "extensions/common/feature_switch.h"
 #endif
 

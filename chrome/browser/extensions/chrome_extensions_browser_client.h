@@ -267,7 +267,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
       content::BrowserContext* context) override;
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-  void CheckManagementPolicy(content::BrowserContext* context) override;
   void OnActiveTabPermissionGranted(
       const Extension* extension,
       content::WebContents* web_contents) const override;
@@ -292,16 +291,9 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
   InstallStageTracker* GetInstallStageTracker(
       content::BrowserContext* context) override;
   InstallTracker* GetInstallTracker(content::BrowserContext* context) override;
-  InstallVerifier* GetInstallVerifier(
-      content::BrowserContext* context) override;
   SharedModuleService* GetSharedModuleService(
       content::BrowserContext* context) override;
   void UpdateCheckIfEnabled(content::BrowserContext* context) override;
-  base::FilePath GetUserDataDir() override;
-  scoped_refptr<CrxInstaller> CreateCrxInstallerFromDownloadItem(
-      content::BrowserContext* context,
-      const download::DownloadItem& download) override;
-  std::unique_ptr<image_fetcher::ImageDecoder> CreateImageDecoder() override;
   bool CanUseNonComponentExtensions(content::BrowserContext* context) override;
 
   void SetAPIClientForTest(std::unique_ptr<ExtensionsAPIClient> client);

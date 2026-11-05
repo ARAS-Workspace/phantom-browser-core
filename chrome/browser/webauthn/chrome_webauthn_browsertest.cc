@@ -53,7 +53,6 @@
 #include "device/fido/virtual_fido_device.h"
 #include "device/fido/virtual_fido_device_factory.h"
 #include "extensions/browser/extension_registrar.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/common/extension_builder.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -154,7 +153,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, ChromeExtensions) {
   // and it should get an assertion from a credential that's injected into the
   // virtual authenticator, scoped to the origin string.
   base::ScopedAllowBlockingForTesting allow_blocking;
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass;
 
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());

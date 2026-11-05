@@ -24,7 +24,6 @@
 #include "extensions/browser/extension_protocols.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_registry_observer.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/sandboxed_unpacker.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_id.h"
@@ -86,12 +85,6 @@ class ExtensionBrowserTest : public PlatformBrowserTest,
   // content verification; this should be overridden by derived tests which care
   // about content verification.
   virtual bool ShouldEnableContentVerification();
-
-  // Extensions used in tests are typically not from the web store and will fail
-  // install verification. The default implementation disables install
-  // verification; this should be overridden by derived tests which care
-  // about install verification.
-  virtual bool ShouldEnableInstallVerification();
 
   // Whether MV2 extensions should be allowed. Defaults to true for testing
   // (since many tests are parameterized to exercise both MV2 + MV3 logic).
@@ -452,10 +445,6 @@ class ExtensionBrowserTest : public PlatformBrowserTest,
   FeatureSwitch::ScopedOverride override_prompt_for_external_extensions_;
 
   std::unique_ptr<ExtensionCache> test_extension_cache_;
-
-  // Conditionally disable install verification.
-  std::unique_ptr<ScopedInstallVerifierBypassForTest>
-      ignore_install_verification_;
 
   // Conditionally disable content verification.
   std::unique_ptr<ScopedIgnoreContentVerifierForTest>

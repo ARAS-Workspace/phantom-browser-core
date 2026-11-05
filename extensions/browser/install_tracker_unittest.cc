@@ -13,7 +13,6 @@
 #include "extensions/browser/active_install_data.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extensions_test.h"
-#include "extensions/browser/scoped_active_install.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/manifest_constants.h"
@@ -55,8 +54,6 @@ class InstallTrackerTest : public ExtensionsTest {
   ~InstallTrackerTest() override = default;
 
  protected:
-  InstallTracker* tracker() { return tracker_.get(); }
-
   void VerifyInstallData(const ActiveInstallData& original,
                          const ActiveInstallData& retrieved) {
     EXPECT_EQ(original.extension_id, retrieved.extension_id);
@@ -93,57 +90,6 @@ TEST_F(InstallTrackerTest, AddAndRemoveActiveInstalls) {
   EXPECT_FALSE(tracker_->GetActiveInstall(kExtensionId1));
   EXPECT_TRUE(tracker_->GetActiveInstall(kExtensionId2));
   EXPECT_FALSE(tracker_->GetActiveInstall(kExtensionId3));
-}
-
-// Verifies that active installs are registered and deregistered correctly
-// using ScopedActiveInstall.
-TEST_F(InstallTrackerTest, ScopedActiveInstallDeregister) {
-  // Verify the constructor that registers the install.
-  ActiveInstallData install_data(kExtensionId1);
-  install_data.percent_downloaded = 6;
-  std::unique_ptr<ScopedActiveInstall> scoped_active_install(
-      new ScopedActiveInstall(tracker(), install_data));
-
-  const ActiveInstallData* retrieved_data =
-      tracker_->GetActiveInstall(kExtensionId1);
-  ASSERT_TRUE(retrieved_data);
-  VerifyInstallData(install_data, *retrieved_data);
-  retrieved_data = nullptr;
-
-  scoped_active_install.reset();
-  EXPECT_FALSE(tracker_->GetActiveInstall(kExtensionId1));
-
-  // Verify the constructor that doesn't register the install.
-  scoped_active_install =
-      std::make_unique<ScopedActiveInstall>(tracker(), kExtensionId1);
-  EXPECT_FALSE(tracker_->GetActiveInstall(kExtensionId1));
-
-  tracker_->AddActiveInstall(install_data);
-  EXPECT_TRUE(tracker_->GetActiveInstall(kExtensionId1));
-
-  scoped_active_install.reset();
-  EXPECT_FALSE(tracker_->GetActiveInstall(kExtensionId1));
-}
-
-// Verifies that ScopedActiveInstall can be cancelled.
-TEST_F(InstallTrackerTest, ScopedActiveInstallCancelled) {
-  ActiveInstallData install_data(kExtensionId1);
-  install_data.percent_downloaded = 87;
-  std::unique_ptr<ScopedActiveInstall> scoped_active_install(
-      new ScopedActiveInstall(tracker(), install_data));
-
-  const ActiveInstallData* retrieved_data =
-      tracker_->GetActiveInstall(kExtensionId1);
-  ASSERT_TRUE(retrieved_data);
-  VerifyInstallData(install_data, *retrieved_data);
-  retrieved_data = nullptr;
-
-  scoped_active_install->CancelDeregister();
-  scoped_active_install.reset();
-
-  retrieved_data = tracker_->GetActiveInstall(kExtensionId1);
-  ASSERT_TRUE(retrieved_data);
-  VerifyInstallData(install_data, *retrieved_data);
 }
 
 // Verifies that the download progress is updated correctly.

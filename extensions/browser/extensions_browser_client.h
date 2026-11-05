@@ -51,14 +51,6 @@ class StoragePartitionConfig;
 class WebContents;
 }  // namespace content
 
-namespace download {
-class DownloadItem;
-}  // namespace download
-
-namespace image_fetcher {
-class ImageDecoder;
-}  // namespace image_fetcher
-
 namespace mojo {
 template <typename>
 class BinderMapWithContext;
@@ -94,7 +86,6 @@ class ProtocolHandlerRegistry;
 namespace extensions {
 
 class Blocklist;
-class CrxInstaller;
 class ComponentExtensionResourceManager;
 class Extension;
 class ExtensionAssetsManager;
@@ -110,7 +101,6 @@ class ExtensionWebContentsObserver;
 class InstallPromptData;
 class InstallStageTracker;
 class InstallTracker;
-class InstallVerifier;
 class KioskDelegate;
 class PermissionSet;
 class ProcessManagerDelegate;
@@ -566,11 +556,6 @@ class ExtensionsBrowserClient {
   virtual custom_handlers::ProtocolHandlerRegistry* GetProtocolHandlerRegistry(
       content::BrowserContext* context);
 
-  // Go through each extension and unload those that are not allowed to run by
-  // management policy providers (ie. network admin and Google-managed
-  // blocklist).
-  virtual void CheckManagementPolicy(content::BrowserContext* context);
-
   // Notifies the ExtensionActionRunner that an extension has been granted
   // active tab permissions. This will run any pending injections for that
   // extension.
@@ -625,27 +610,12 @@ class ExtensionsBrowserClient {
   // Returns InstallTracker associated with `context`.
   virtual InstallTracker* GetInstallTracker(content::BrowserContext* context);
 
-  // Returns InstallVerifier associated with `context`.
-  virtual InstallVerifier* GetInstallVerifier(content::BrowserContext* context);
-
   // Returns SharedModuleService associated with `context`.
   virtual SharedModuleService* GetSharedModuleService(
       content::BrowserContext* context);
 
   // Run an update check if the updater is enabled.
   virtual void UpdateCheckIfEnabled(content::BrowserContext* context);
-
-  // Returns the path to the user's data directory.
-  virtual base::FilePath GetUserDataDir();
-
-  // Creates and pre-configures a CrxInstaller with an install prompt UI for a
-  // given |download_item|.
-  virtual scoped_refptr<CrxInstaller> CreateCrxInstallerFromDownloadItem(
-      content::BrowserContext* context,
-      const download::DownloadItem& download);
-
-  // Creates an implementation of image_fetcher::ImageDecoder.
-  virtual std::unique_ptr<image_fetcher::ImageDecoder> CreateImageDecoder();
 
   // Returns whether the given browser context is allowed to use non-component
   // extensions.

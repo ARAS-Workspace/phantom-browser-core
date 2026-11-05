@@ -65,11 +65,6 @@ class InstallPromptData {
 
   void AddPermissionSet(const PermissionSet& permissions);
   void AddPermissionMessages(const PermissionMessages& permissions);
-  void SetWebstoreData(const std::string& localized_user_count,
-                       bool show_user_count,
-                       double average_rating,
-                       int rating_count,
-                       const std::string& localized_rating_count);
   void SetInitialExtensionsProviderName(
       std::u16string initial_extensions_provider_name);
 
@@ -96,11 +91,6 @@ class InstallPromptData {
   // accepted.
   bool ShouldWithheldPermissionsOnDialogAccept() const;
 
-  // Getters for webstore metadata. Only populated when the type is
-  // INLINE_INSTALL_PROMPT, EXTERNAL_INSTALL_PROMPT, or REPAIR_PROMPT.
-  std::tuple<int, double> GetRatingStars() const;
-  std::u16string GetRatingCount() const;
-  std::u16string GetUserCount() const;
   size_t GetPermissionCount() const;
   InstallPromptPermissions GetPermissions() const;
   std::u16string GetPermission(size_t index) const;
@@ -110,14 +100,6 @@ class InstallPromptData {
 
   const gfx::Image& icon() const { return icon_; }
   void set_icon(const gfx::Image& icon) { icon_ = icon; }
-
-  double average_rating() const { return average_rating_; }
-  int rating_count() const { return rating_count_; }
-  const std::string& localized_rating_count() const {
-    return localized_rating_count_;
-  }
-
-  bool has_webstore_data() const { return has_webstore_data_; }
 
   void AddObserver(ExtensionInstallPromptClient::Observer* observer);
   void RemoveObserver(ExtensionInstallPromptClient::Observer* observer);
@@ -152,25 +134,6 @@ class InstallPromptData {
 
   // The icon to be displayed.
   gfx::Image icon_;
-
-  // These fields are populated only when the prompt type is
-  // INLINE_INSTALL_PROMPT
-  // Already formatted to be locale-specific.
-  std::string localized_user_count_;
-  // Range is kMinExtensionRating to kMaxExtensionRating
-  double average_rating_ = 0.0;
-  // The rating count for the extension, used for string pluralization.
-  int rating_count_ = 0;
-  // The localized rating count for the extension, used as-is for display.
-  std::string localized_rating_count_;
-
-  // Whether we should display the user count (we anticipate this will be
-  // false if localized_user_count_ represents the number zero).
-  bool show_user_count_ = false;
-
-  // Whether or not this prompt has been populated with data from the
-  // webstore.
-  bool has_webstore_data_ = false;
 
   base::ObserverList<ExtensionInstallPromptClient::Observer> observers_;
 };

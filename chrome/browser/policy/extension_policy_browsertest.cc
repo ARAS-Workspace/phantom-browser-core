@@ -68,7 +68,6 @@
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/forced_extensions/install_stage_tracker.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/pending_extension_manager.h"
 #include "extensions/browser/scoped_ignore_content_verifier_for_test.h"
 #include "extensions/browser/test_extension_registry_observer.h"
@@ -1682,7 +1681,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, ExtensionAllowedTypes) {
 IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, ExtensionInstallSources) {
   extensions::ScopedTestDialogAutoConfirm auto_confirm(
       extensions::ScopedTestDialogAutoConfirm::ACCEPT);
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass;
 
   ASSERT_TRUE(embedded_test_server()->Start());
 

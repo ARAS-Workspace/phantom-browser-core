@@ -15,7 +15,6 @@
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
-class CWSInfoServiceInterface;
 class Extension;
 }  // namespace extensions
 
@@ -42,7 +41,6 @@ class TestExtensionService : public extensions::ExtensionServiceInterface {
   base::WeakPtr<ExtensionServiceInterface> AsWeakPtr() override;
 
  private:
-  std::unique_ptr<extensions::CWSInfoServiceInterface> cws_info_service_;
   base::WeakPtrFactory<TestExtensionService> weak_ptr_factory_{this};
 };
 

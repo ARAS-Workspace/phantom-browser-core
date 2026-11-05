@@ -40,7 +40,6 @@
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/pending_extension_manager.h"
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/browser/updater/extension_downloader.h"
@@ -180,7 +179,6 @@ class ExtensionManagementTest : public extensions::ExtensionBrowserTest {
 
  private:
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
-  extensions::ScopedInstallVerifierBypassForTest install_verifier_bypass_;
 };
 
 // Tests that installing the same version overwrites.

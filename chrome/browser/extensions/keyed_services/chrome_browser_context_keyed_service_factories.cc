@@ -13,7 +13,6 @@
 #include "chrome/browser/extensions/chrome_extension_system_factory.h"
 #include "chrome/browser/extensions/component_loader_factory.h"
 #include "chrome/browser/extensions/corrupted_extension_reinstaller_factory.h"
-#include "chrome/browser/extensions/cws_info_service_factory.h"
 #include "chrome/browser/extensions/error_console/error_console_factory.h"
 #include "chrome/browser/extensions/extension_action_dispatcher.h"
 #include "chrome/browser/extensions/extension_allowlist_factory.h"
@@ -26,7 +25,6 @@
 #include "chrome/browser/extensions/external_provider_manager_factory.h"
 #include "chrome/browser/extensions/forced_extensions/install_stage_tracker_factory.h"
 #include "chrome/browser/extensions/install_tracker_factory.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/menu_manager_factory.h"
 #include "chrome/browser/extensions/shared_module_service_factory.h"
 #include "chrome/browser/extensions/sync/account_extension_tracker.h"
@@ -56,7 +54,6 @@ void EnsureChromeBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::ChromeExtensionSystemFactory::GetInstance();
   extensions::ComponentLoaderFactory::GetInstance();
   extensions::CorruptedExtensionReinstallerFactory::GetInstance();
-  extensions::CWSInfoServiceFactory::GetInstance();
   extensions::ErrorConsoleFactory::GetInstance();
   extensions::ExtensionActionDispatcher::GetFactoryInstance();
   extensions::ExtensionAllowlistFactory::GetInstance();
@@ -70,7 +67,6 @@ void EnsureChromeBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::ExternalProviderManagerFactory::GetInstance();
   extensions::InstallStageTrackerFactory::GetInstance();
   extensions::InstallTrackerFactory::GetInstance();
-  extensions::InstallVerifierFactory::GetInstance();
   extensions::ManifestV2Handler::GetFactory();
   extensions::MenuManagerFactory::GetInstance();
   extensions::PermissionsUpdater::EnsureAssociatedFactoryBuilt();

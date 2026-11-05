@@ -31,7 +31,6 @@
 #include "content/public/browser/render_process_host_creation_observer.h"
 #include "extensions/browser/blocklist.h"
 #include "extensions/browser/crx_file_info.h"
-#include "extensions/browser/cws_info_service.h"
 #include "extensions/browser/delayed_install_manager.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_host_registry.h"
@@ -114,7 +113,6 @@ class ExtensionService : public ExtensionServiceInterface,
                          public content::RenderProcessHostCreationObserver,
                          public content::RenderProcessHostObserver,
                          public Blocklist::Observer,
-                         public CWSInfoService::Observer,
                          public ExtensionManagement::Observer,
                          public policy::ExtensionInstallPolicyService::Observer,
                          public UpgradeObserver,
@@ -254,9 +252,6 @@ class ExtensionService : public ExtensionServiceInterface,
   // Blocklist::Observer implementation.
   void OnBlocklistUpdated() override;
 
-  // CWSInfoService::Observer implementation.
-  void OnCWSInfoChanged() override;
-
   // UpgradeObserver implementation.
   void OnUpgradeRecommended() override;
 
@@ -372,9 +367,6 @@ class ExtensionService : public ExtensionServiceInterface,
   base::ScopedObservation<ExtensionHostRegistry,
                           ExtensionHostRegistry::Observer>
       host_registry_observation_{this};
-
-  base::ScopedObservation<CWSInfoService, CWSInfoService::Observer>
-      cws_info_service_observation_{this};
 
   base::ScopedObservation<policy::ExtensionInstallPolicyService,
                           policy::ExtensionInstallPolicyService::Observer>

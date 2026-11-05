@@ -8,7 +8,6 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/forced_extensions/install_stage_tracker_factory.h"
 #include "chrome/browser/extensions/install_tracker_factory.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "extensions/browser/event_router_factory.h"
@@ -66,7 +65,6 @@ ChromeExtensionSystemSharedFactory::ChromeExtensionSystemSharedFactory()
   // GlobalErrorService is only used on Win/Mac/Linux.
   DependsOn(GlobalErrorServiceFactory::GetInstance());
 #endif
-  DependsOn(InstallVerifierFactory::GetInstance());
   DependsOn(ProcessManagerFactory::GetInstance());
   DependsOn(RendererStartupHelperFactory::GetInstance());
   DependsOn(BlocklistFactory::GetInstance());

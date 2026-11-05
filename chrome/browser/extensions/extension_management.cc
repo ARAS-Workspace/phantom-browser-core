@@ -27,7 +27,6 @@
 #include "base/version.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/extensions/cws_info_service_factory.h"
 #include "chrome/browser/extensions/extension_management_constants.h"
 #include "chrome/browser/extensions/extension_management_internal.h"
 #include "chrome/browser/extensions/external_policy_loader.h"
@@ -47,7 +46,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/common/content_switches.h"
 #include "extensions/browser/blocklist_extension_prefs.h"
-#include "extensions/browser/cws_info_service.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/forced_extensions/install_stage_tracker.h"
 #include "extensions/browser/managed_installation_mode.h"
@@ -105,8 +103,6 @@ ExtensionManagement::ExtensionManagement(Profile* profile)
                              pref_change_callback);
   pref_change_registrar_.Add(pref_names::kAllowedTypes, pref_change_callback);
   pref_change_registrar_.Add(pref_names::kExtensionManagement,
-                             pref_change_callback);
-  pref_change_registrar_.Add(pref_names::kExtensionUnpublishedAvailability,
                              pref_change_callback);
 
   // Note that both |global_settings_| and |default_settings_| will be null
@@ -319,36 +315,6 @@ bool ExtensionManagement::IsAllowedManifestType(
   const std::vector<Manifest::Type>& allowed_types =
       *global_settings_->allowed_types;
   return std::ranges::contains(allowed_types, manifest_type);
-}
-
-bool ExtensionManagement::IsAllowedByUnpublishedAvailabilityPolicy(
-    const Extension* extension) {
-  // This policy only applies to extensions that update from CWS.
-  if (!UpdatesFromWebstore(*extension)) {
-    return true;
-  }
-  if (global_settings_->unpublished_availability_setting ==
-      internal::GlobalSettings::UnpublishedAvailability::kAllowUnpublished) {
-    return true;
-  }
-  if (!cws_info_service_) {
-    cws_info_service_ = CWSInfoServiceFactory::GetForProfile(profile_);
-  }
-  // Return the current published status of the extension in CWS if available.
-  // Otherwise assume the extension is currently published and return true.
-  // Ignore extensions taken down for malware as they are blocklisted and
-  // unloaded independently of policy.
-  // Current publish status may not available if the policy setting just changed
-  // to |kDisableUnpublished|. The actual publish status will be retrieved
-  // by CWSInfoService separately and will trigger this same policy check.
-  std::optional<CWSInfoServiceInterface::CWSInfo> cws_info =
-      cws_info_service_->GetCWSInfo(*extension);
-  if (cws_info.has_value() && cws_info->is_present &&
-      cws_info->violation_type !=
-          CWSInfoServiceInterface::CWSViolationType::kMalware) {
-    return cws_info->is_live;
-  }
-  return true;
 }
 
 bool ExtensionManagement::IsAllowedByUnpackedDeveloperModePolicy(
@@ -597,10 +563,6 @@ void ExtensionManagement::Refresh() {
   const base::DictValue* dict_pref =
       LoadDictPreference(pref_names::kExtensionManagement, true);
 
-  const base::Value* unpublished_availability_pref =
-      LoadPreference(pref_names::kExtensionUnpublishedAvailability,
-                     /*force_managed=*/true, base::Value::Type::INTEGER);
-
   // Reset all settings.
   global_settings_ = std::make_unique<internal::GlobalSettings>();
   settings_by_id_.clear();
@@ -683,12 +645,6 @@ void ExtensionManagement::Refresh() {
         }
       }
     }
-  }
-
-  if (unpublished_availability_pref) {
-    global_settings_->unpublished_availability_setting =
-        static_cast<internal::GlobalSettings::UnpublishedAvailability>(
-            unpublished_availability_pref->GetInt());
   }
 
   if (dict_pref) {

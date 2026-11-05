@@ -69,12 +69,9 @@ class TestExtensionRegistrarDelegate : public ExtensionRegistrar::Delegate {
   MOCK_METHOD2(PreAddExtension,
                void(const Extension* extension,
                     const Extension* old_extension));
-  MOCK_METHOD1(OnAddNewOrUpdatedExtension, void(const Extension* extension));
   MOCK_METHOD1(PostActivateExtension,
                void(scoped_refptr<const Extension> extension));
   MOCK_METHOD1(PostDeactivateExtension,
-               void(scoped_refptr<const Extension> extension));
-  MOCK_METHOD1(PreUninstallExtension,
                void(scoped_refptr<const Extension> extension));
   MOCK_METHOD2(PostUninstallExtension,
                void(scoped_refptr<const Extension> extension,

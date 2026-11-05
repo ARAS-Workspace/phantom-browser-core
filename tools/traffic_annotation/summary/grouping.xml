@@ -123,7 +123,6 @@ after discussions on the right group.
       <annotation id="service_worker_race_network_request"/>
       <annotation id="bookmarks_image_fetcher"/>
       <annotation id="back_navigation_cache_query"/>
-      <annotation id="cws_info_service"/>
       <annotation id="iwa_update_discovery_update_manifest"/>
       <annotation id="iwa_update_discovery_web_bundle"/>
       <annotation id="blink_fetch_later_manager"/>
@@ -138,7 +137,6 @@ after discussions on the right group.
       <annotation id="controlled_frame_content_scripts_download"/>
       <annotation id="enterprise_logo_fetcher"/>
       <annotation id="private_metrics_encryption_key"/>
-      <annotation id="cws_fetch_item_snippet"/>
       <annotation id="lens_overlay"/>
       <annotation id="dbsc_registration"/>
       <annotation id="enterprise_companion_event_logging"/>
@@ -225,12 +223,9 @@ after discussions on the right group.
     <sender name="Extension and App Management">
       <annotation id="chrome_apps_socket_api"/>
       <annotation id="extension_blacklist"/>
-      <annotation id="extension_install_signer"/>
     </sender>
     <sender name="Webstore">
       <annotation id="content_hash_verification_job"/>
-      <annotation id="webstore_install_helper"/>
-      <annotation id="webstore_installer"/>
     </sender>
     <sender name="Google Cloud Messaging"/>
   </group>

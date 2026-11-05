@@ -196,7 +196,6 @@ source_set("impl") {
       "//chrome/browser/extensions",
       "//chrome/browser/tab_list",
       "//extensions/browser:crx_installer",
-      "//extensions/browser:webstore_installer",
     ]
   }
 

@@ -21,15 +21,6 @@
 
 namespace extensions {
 
-namespace {
-
-bool AllowWebstoreData(InstallPromptData::PromptType type) {
-  return type == InstallPromptData::EXTERNAL_INSTALL_PROMPT ||
-         type == InstallPromptData::REPAIR_PROMPT;
-}
-
-}  // namespace
-
 InstallPromptData::InstallPromptData(PromptType type) : type_(type) {
   DCHECK_NE(type_, NUM_PROMPT_TYPES);
 }
@@ -48,21 +39,6 @@ void InstallPromptData::AddPermissionSet(const PermissionSet& permissions) {
 void InstallPromptData::AddPermissionMessages(
     const PermissionMessages& permissions) {
   prompt_permissions_.AddPermissionMessages(permissions);
-}
-
-void InstallPromptData::SetWebstoreData(
-    const std::string& localized_user_count,
-    bool show_user_count,
-    double average_rating,
-    int rating_count,
-    const std::string& localized_rating_count) {
-  CHECK(AllowWebstoreData(type_));
-  localized_user_count_ = localized_user_count;
-  show_user_count_ = show_user_count;
-  average_rating_ = average_rating;
-  rating_count_ = rating_count;
-  localized_rating_count_ = localized_rating_count;
-  has_webstore_data_ = true;
 }
 
 void InstallPromptData::SetInitialExtensionsProviderName(
@@ -251,48 +227,6 @@ std::u16string InstallPromptData::GetPermissionsHeading() const {
       NOTREACHED();
   }
   return l10n_util::GetStringUTF16(id);
-}
-
-std::tuple<int, double> InstallPromptData::GetRatingStars() const {
-  CHECK(AllowWebstoreData(type_));
-
-  // The star display logic replicates the one used by the webstore (from
-  // components.ratingutils.setFractionalYellowStars).
-  int full_stars = floor(average_rating_);
-  double rating_fractional = average_rating_ - full_stars;
-
-  if (rating_fractional > 0.66) {
-    // Show one more full star (e.g. 3.67 stars is shown as 4 full stars)
-    full_stars += 1;
-  }
-
-  if (rating_fractional < 0.33 || rating_fractional > 0.66) {
-    // Do not show a half star.
-    // E.g.:
-    //   - 3.32 stars is shown as 3 full stars
-    //   - 3.33 stars is shown as 3.5 full stars
-    //   - 3.66 stars is shown as 3.5 full stars
-    //   - 3.67 stars is shown as 4 full stars
-    rating_fractional = 0;
-  }
-
-  return {full_stars, rating_fractional};
-}
-
-std::u16string InstallPromptData::GetRatingCount() const {
-  CHECK(AllowWebstoreData(type_));
-  return l10n_util::GetStringFUTF16(IDS_EXTENSION_RATING_COUNT,
-                                    base::UTF8ToUTF16(localized_rating_count_));
-}
-
-std::u16string InstallPromptData::GetUserCount() const {
-  CHECK(AllowWebstoreData(type_));
-
-  if (show_user_count_) {
-    return l10n_util::GetStringFUTF16(IDS_EXTENSION_USER_COUNT,
-                                      base::UTF8ToUTF16(localized_user_count_));
-  }
-  return std::u16string();
 }
 
 size_t InstallPromptData::GetPermissionCount() const {

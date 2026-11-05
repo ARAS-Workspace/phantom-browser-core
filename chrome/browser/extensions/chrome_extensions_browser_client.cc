@@ -11,7 +11,6 @@
 #include "base/logging.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/path_service.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
@@ -23,7 +22,6 @@
 #include "chrome/browser/app_mode/app_mode_utils.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/download/download_crx_util.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/extensions/activity_log/activity_action_constants.h"
 #include "chrome/browser/extensions/activity_log/activity_actions.h"
@@ -55,7 +53,6 @@
 #include "chrome/browser/extensions/favicon/favicon_util.h"
 #include "chrome/browser/extensions/forced_extensions/install_stage_tracker_factory.h"
 #include "chrome/browser/extensions/install_tracker_factory.h"
-#include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/pref_mapping.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/shared_module_service_factory.h"
@@ -63,7 +60,6 @@
 #include "chrome/browser/extensions/updater/extension_updater.h"
 #include "chrome/browser/extensions/user_script_listener.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
-#include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/prefetch/pref_names.h"
@@ -80,7 +76,6 @@
 #include "chrome/browser/ui/simple_message_box.h"
 #include "chrome/browser/ui/webui/chrome_web_ui_controller_factory.h"
 #include "chrome/common/channel_info.h"
-#include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
@@ -105,7 +100,6 @@
 #include "extensions/browser/api/extensions_api_client.h"
 #include "extensions/browser/api/proxy/proxy_pref_transformer.h"
 #include "extensions/browser/component_extension_resource_manager.h"
-#include "extensions/browser/crx_installer.h"
 #include "extensions/browser/extension_management_client.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registrar.h"
@@ -877,11 +871,6 @@ bool ChromeExtensionsBrowserClient::HasControlledFrameCapability(
                                      CONTROLLED_FRAME) == CONTENT_SETTING_ALLOW;
 }
 
-void ChromeExtensionsBrowserClient::CheckManagementPolicy(
-    content::BrowserContext* context) {
-  ExtensionSystem::Get(context)->extension_service()->CheckManagementPolicy();
-}
-
 void ChromeExtensionsBrowserClient::OnActiveTabPermissionGranted(
     const Extension* extension,
     content::WebContents* web_contents) const {
@@ -1070,11 +1059,6 @@ InstallTracker* ChromeExtensionsBrowserClient::GetInstallTracker(
   return InstallTrackerFactory::GetForBrowserContext(context);
 }
 
-InstallVerifier* ChromeExtensionsBrowserClient::GetInstallVerifier(
-    content::BrowserContext* context) {
-  return InstallVerifierFactory::GetForBrowserContext(context);
-}
-
 SharedModuleService* ChromeExtensionsBrowserClient::GetSharedModuleService(
     content::BrowserContext* context) {
   return SharedModuleServiceFactory::GetForBrowserContext(context);
@@ -1086,25 +1070,6 @@ void ChromeExtensionsBrowserClient::UpdateCheckIfEnabled(
   if (extension_updater->enabled()) {
     extension_updater->CheckSoon();
   }
-}
-
-base::FilePath ChromeExtensionsBrowserClient::GetUserDataDir() {
-  base::FilePath user_data_dir;
-  base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
-  return user_data_dir;
-}
-
-scoped_refptr<CrxInstaller>
-ChromeExtensionsBrowserClient::CreateCrxInstallerFromDownloadItem(
-    content::BrowserContext* context,
-    const download::DownloadItem& download) {
-  return download_crx_util::CreateCrxInstaller(
-      Profile::FromBrowserContext(context), download);
-}
-
-std::unique_ptr<image_fetcher::ImageDecoder>
-ChromeExtensionsBrowserClient::CreateImageDecoder() {
-  return std::make_unique<ImageDecoderImpl>();
 }
 
 bool ChromeExtensionsBrowserClient::CanUseNonComponentExtensions(

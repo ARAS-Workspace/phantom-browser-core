@@ -49,7 +49,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_features.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/permissions/permission_message_provider.h"
 #include "extensions/common/permissions/permissions_data.h"
 #include "ui/base/mojom/dialog_button.mojom.h"
@@ -389,40 +388,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionInstallDialogViewTest,
     tab_destroyed_watcher.Wait();
   }
 
-  class TabAddedObserver : public TabStripModelObserver {
-   public:
-    explicit TabAddedObserver(TabStripModel* tab_strip_model) {
-      tab_strip_model->AddObserver(this);
-    }
-
-    void WaitForWebstoreTabAdded() { run_loop_.Run(); }
-
-    // TabStripModelObserver:
-    void OnTabStripModelChanged(
-        TabStripModel* tab_strip_model,
-        const TabStripModelChange& change,
-        const TabStripSelectionChange& selection) override {
-      if (change.type() != TabStripModelChange::kInserted) {
-        return;
-      }
-
-      for (const auto& contents : change.GetInsert()->contents) {
-        // Note: GetVisibleURL() is used instead of GetLastCommittedURL() for
-        // simplicity's sake as this test doesn't serve webstore url and
-        // the url doesn't commit.
-        const GURL& url = contents.contents->GetVisibleURL();
-        if (url.GetHost() ==
-            extension_urls::GetNewWebstoreLaunchURL().GetHost()) {
-          run_loop_.Quit();
-          return;
-        }
-      }
-    }
-
-   private:
-    base::RunLoop run_loop_;
-  };
-
   // The dialog remains visible even though |originator_contents| is gone. Note
   // that this doesn't seem quite intuitive, but this is how things are at the
   // moment. See crbug.com/40055612 for details.
@@ -430,13 +395,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionInstallDialogViewTest,
 
   EXPECT_EQ(nullptr,
             delegate_view->GetShowParamsForTesting()->GetParentWebContents());
-
-  // Click webstore link.
-  {
-    TabAddedObserver observer(tab_strip_model);
-    delegate_view->ClickLinkForTesting();
-    observer.WaitForWebstoreTabAdded();
-  }
 
   CloseAndWait(delegate_view->GetWidget());
 }
@@ -477,10 +435,6 @@ class ExtensionInstallDialogViewInteractiveBrowserTest
       prompt->AddPermissionMessages(permission_messages_);
     }
 
-    if (from_webstore_) {
-      prompt->SetWebstoreData("69,420", true, 2.5, 37, "37");
-    }
-
     ExtensionInstallDialogView::SetInstallButtonDelayForTesting(0);
     auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
     auto install_prompt = std::make_unique<ExtensionInstallPrompt>(
@@ -489,8 +443,6 @@ class ExtensionInstallDialogViewInteractiveBrowserTest
                                ExtensionInstallPrompt::ShowDialogCallback());
     base::RunLoop().RunUntilIdle();
   }
-
-  void set_from_webstore() { from_webstore_ = true; }
 
   void set_type(InstallPromptData::PromptType type) { type_ = type; }
 
@@ -513,7 +465,6 @@ class ExtensionInstallDialogViewInteractiveBrowserTest
 
  private:
   InstallPromptData::PromptType type_ = InstallPromptData::INSTALL_PROMPT;
-  bool from_webstore_ = false;
   std::unique_ptr<PermissionSet> permission_set_;
   PermissionMessages permission_messages_;
 

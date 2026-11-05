@@ -70,7 +70,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/account_id/account_id.h"
 #include "extensions/browser/extension_registrar.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/features/simple_feature.h"
 
@@ -730,8 +729,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionPolicyUITest,
   // Bypass "signin_screen" feature only enabled for allowlisted extensions.
   extensions::SimpleFeature::ScopedThreadUnsafeAllowlistForTest allowlist(
       extension->id());
-  // Disable extension install verification.
-  extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 
   extensions::ExtensionRegistrar::Get(extension_profile())
       ->OnExtensionInstalled(extension.get(), syncer::StringOrdinal(), 0);

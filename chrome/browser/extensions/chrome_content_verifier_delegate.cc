@@ -30,7 +30,6 @@
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
-#include "extensions/browser/install_verifier.h"
 #include "extensions/browser/management_policy.h"
 #include "extensions/browser/pref_types.h"
 #include "extensions/buildflags/buildflags.h"
@@ -297,17 +296,17 @@ void ChromeContentVerifierDelegate::Shutdown() {}
 
 bool ChromeContentVerifierDelegate::IsFromWebstore(
     const Extension& extension) const {
-  // Use the InstallVerifier's |IsFromStore| method to avoid discrepancies
-  // between which extensions are considered in-store.
-  // See https://crbug.com/40540778 for details.
-  if (!InstallVerifier::IsFromStore(extension, context_)) {
+  ExtensionManagement* extension_management =
+      ExtensionManagementFactory::GetForBrowserContext(context_);
+  // An extension is in-store if it claims to be from the webstore or updates
+  // from it. See https://crbug.com/40540778 for details.
+  if (!extension.from_webstore() &&
+      !extension_management->UpdatesFromWebstore(extension)) {
     // It's possible that the webstore update url was overridden for testing
     // so also consider extensions with the default (production) update url
     // to be from the store as well. Therefore update URL is compared with
     // |GetDefaultWebstoreUpdateUrl|, not the |GetWebstoreUpdateUrl| used by
     // |IsWebstoreUpdateUrl|.
-    ExtensionManagement* extension_management =
-        ExtensionManagementFactory::GetForBrowserContext(context_);
     if (extension_management->GetEffectiveUpdateURL(extension) !=
         extension_urls::GetDefaultWebstoreUpdateUrl()) {
       return false;
