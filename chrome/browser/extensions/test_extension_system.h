@@ -62,7 +62,6 @@ class TestExtensionSystem : public ExtensionSystem {
     bool enable_extensions = true;
   };
 
-  using InstallUpdateCallback = ExtensionSystem::InstallUpdateCallback;
   explicit TestExtensionSystem(Profile* profile);
   ~TestExtensionSystem() override;
 
@@ -111,14 +110,6 @@ class TestExtensionSystem : public ExtensionSystem {
   const base::OneShotEvent& ready() const override;
   bool is_ready() const override;
   ContentVerifier* content_verifier() override;
-  void InstallUpdate(const std::string& extension_id,
-                     const std::string& public_key,
-                     const base::FilePath& temp_dir,
-                     bool install_immediately,
-                     InstallUpdateCallback install_update_callback) override;
-  void PerformActionBasedOnOmahaAttributes(
-      const std::string& extension_id,
-      const base::DictValue& attributes) override;
 
   // Note that you probably want to use base::RunLoop().RunUntilIdle() right
   // after this to run all the accumulated tasks.

@@ -10,7 +10,6 @@
 #include "chrome/browser/extensions/install_tracker_factory.h"
 #include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "extensions/browser/event_router_factory.h"
 #include "extensions/browser/extension_host_registry.h"
@@ -72,9 +71,6 @@ ChromeExtensionSystemSharedFactory::ChromeExtensionSystemSharedFactory()
   DependsOn(RendererStartupHelperFactory::GetInstance());
   DependsOn(BlocklistFactory::GetInstance());
   DependsOn(EventRouterFactory::GetInstance());
-  // This depends on ExtensionDownloader, which depends on
-  // IdentityManager for webstore authentication.
-  DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(InstallStageTrackerFactory::GetInstance());
   DependsOn(InstallTrackerFactory::GetInstance());
   // ExtensionService (owned by the ExtensionSystem) depends on

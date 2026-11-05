@@ -75,17 +75,4 @@ ContentVerifier* MockExtensionSystem::content_verifier() {
   return nullptr;
 }
 
-void MockExtensionSystem::InstallUpdate(
-    const ExtensionId& extension_id,
-    const std::string& public_key,
-    const base::FilePath& temp_dir,
-    bool install_immediately,
-    InstallUpdateCallback install_update_callback) {
-  NOTREACHED();
-}
-
-void MockExtensionSystem::PerformActionBasedOnOmahaAttributes(
-    const ExtensionId& extension_id,
-    const base::DictValue& attributes) {}
-
 }  // namespace extensions

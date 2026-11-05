@@ -44,7 +44,6 @@
 #include "content/public/browser/url_data_source.h"
 #include "extensions/browser/app_sorting.h"
 #include "extensions/browser/content_verifier/content_verifier.h"
-#include "extensions/browser/crx_installer.h"
 #include "extensions/browser/delayed_install_manager.h"
 #include "extensions/browser/extension_pref_store.h"
 #include "extensions/browser/extension_pref_value_map.h"
@@ -60,7 +59,6 @@
 #include "extensions/browser/state_store.h"
 #include "extensions/browser/unpacked_installer.h"
 #include "extensions/browser/update_install_gate.h"
-#include "extensions/browser/updater/uninstall_ping_sender.h"
 #include "extensions/browser/user_script_manager.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
@@ -78,24 +76,6 @@
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
-
-namespace {
-
-// Helper to serve as an UninstallPingSender::Filter callback.
-UninstallPingSender::FilterResult ShouldSendUninstallPing(
-    Profile* profile,
-    const Extension* extension,
-    UninstallReason reason) {
-  ExtensionManagement* extension_management =
-      ExtensionManagementFactory::GetForBrowserContext(profile);
-  if (extension && (extension->from_webstore() ||
-                    extension_management->UpdatesFromWebstore(*extension))) {
-    return UninstallPingSender::SEND_PING;
-  }
-  return UninstallPingSender::DO_NOT_SEND_PING;
-}
-
-}  // namespace
 
 //
 // ChromeExtensionSystem::Shared
@@ -176,10 +156,6 @@ void ChromeExtensionSystem::Shared::Init(bool extensions_enabled) {
       BlocklistFactory::GetForBrowserContext(profile_),
       ExtensionErrorController::Get(profile_), autoupdate_enabled,
       extensions_enabled, &ready_);
-
-  uninstall_ping_sender_ = std::make_unique<UninstallPingSender>(
-      ExtensionRegistry::Get(profile_),
-      base::BindRepeating(&ShouldSendUninstallPing, profile_));
 
   // These services must be registered before the ExtensionService tries to
   // load any extensions.
@@ -357,30 +333,6 @@ AppSorting* ChromeExtensionSystem::app_sorting() {
 
 ContentVerifier* ChromeExtensionSystem::content_verifier() {
   return shared_->content_verifier();
-}
-
-void ChromeExtensionSystem::InstallUpdate(
-    const std::string& extension_id,
-    const std::string& public_key,
-    const base::FilePath& unpacked_dir,
-    bool install_immediately,
-    InstallUpdateCallback install_update_callback) {
-  DCHECK(!install_update_callback.is_null());
-
-  scoped_refptr<CrxInstaller> installer =
-      CrxInstaller::CreateSilent(profile_->GetOriginalProfile());
-  installer->set_delete_source(true);
-  installer->AddInstallerCallback(std::move(install_update_callback));
-  installer->set_install_immediately(install_immediately);
-  installer->UpdateExtensionFromUnpackedCrx(extension_id, public_key,
-                                            unpacked_dir);
-}
-
-void ChromeExtensionSystem::PerformActionBasedOnOmahaAttributes(
-    const std::string& extension_id,
-    const base::DictValue& attributes) {
-  extension_service()->PerformActionBasedOnOmahaAttributes(extension_id,
-                                                           attributes);
 }
 
 }  // namespace extensions

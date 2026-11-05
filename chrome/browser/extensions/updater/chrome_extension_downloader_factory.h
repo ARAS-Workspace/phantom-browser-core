@@ -50,9 +50,7 @@ class ChromeExtensionDownloaderFactory {
       crx_file::VerifierFormat required_verifier_format,
       const base::FilePath& profile_path = base::FilePath());
 
-  // Creates a downloader for a given Profile. This downloader will be able
-  // to authenticate as the signed-in user in the event that it's asked to
-  // fetch a protected download.
+  // Creates a downloader for a given Profile.
   static std::unique_ptr<extensions::ExtensionDownloader> CreateForProfile(
       Profile* profile,
       extensions::ExtensionDownloaderDelegate* delegate);

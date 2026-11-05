@@ -49,7 +49,7 @@ enum class UnloadedExtensionReason;
 // their own right.
 class ExtensionSystem : public KeyedService {
  public:
-  // A callback to be executed when InstallUpdate finishes.
+  // A callback to be executed when a crx install finishes.
   using InstallUpdateCallback =
       base::OnceCallback<void(const std::optional<CrxInstallError>& result)>;
 
@@ -109,22 +109,6 @@ class ExtensionSystem : public KeyedService {
 
   // Returns the content verifier, if any.
   virtual ContentVerifier* content_verifier() = 0;
-
-  // Install an updated version of `extension_id` with the version given in
-  // `unpacked_dir`. If `install_immediately` is true, the system will install
-  // the given extension immediately instead of waiting until idle. Ownership
-  // of `unpacked_dir` in the filesystem is transferred and implementors of
-  // this function are responsible for cleaning it up on errors, etc.
-  virtual void InstallUpdate(const ExtensionId& extension_id,
-                             const std::string& public_key,
-                             const base::FilePath& unpacked_dir,
-                             bool install_immediately,
-                             InstallUpdateCallback install_update_callback) = 0;
-
-  // Perform various actions depending on the Omaga attributes on the extension.
-  virtual void PerformActionBasedOnOmahaAttributes(
-      const ExtensionId& extension_id,
-      const base::DictValue& attributes) = 0;
 };
 
 }  // namespace extensions

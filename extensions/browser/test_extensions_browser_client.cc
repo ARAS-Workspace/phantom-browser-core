@@ -8,8 +8,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "components/update_client/configurator.h"
-#include "components/update_client/test_configurator.h"
 #include "content/public/browser/browser_context.h"
 #include "extensions/browser/extension_host_delegate.h"
 #include "extensions/browser/kiosk/kiosk_delegate.h"
@@ -19,6 +17,7 @@
 #include "extensions/common/extension_id.h"
 #include "extensions/common/switches.h"
 #include "extensions/common/url_pattern_set.h"
+#include "net/http/http_response_headers.h"
 #include "services/network/public/mojom/url_loader.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -120,11 +119,6 @@ TestExtensionsBrowserClient::TestExtensionsBrowserClient()
     : TestExtensionsBrowserClient(nullptr) {}
 
 TestExtensionsBrowserClient::~TestExtensionsBrowserClient() = default;
-
-void TestExtensionsBrowserClient::SetUpdateClientFactory(
-    base::RepeatingCallback<update_client::UpdateClient*(void)> factory) {
-  update_client_factory_ = std::move(factory);
-}
 
 void TestExtensionsBrowserClient::SetMainContext(
     content::BrowserContext* main_context) {
@@ -370,20 +364,6 @@ KioskDelegate* TestExtensionsBrowserClient::GetKioskDelegate() {
 
 UserScriptListener* TestExtensionsBrowserClient::GetUserScriptListener() {
   return user_script_listener_;
-}
-
-scoped_refptr<update_client::UpdateClient>
-TestExtensionsBrowserClient::CreateUpdateClient(
-    scoped_refptr<update_client::Configurator> /*configurator*/) {
-  return update_client_factory_.is_null()
-             ? nullptr
-             : base::WrapRefCounted(update_client_factory_.Run());
-}
-
-scoped_refptr<update_client::Configurator>
-TestExtensionsBrowserClient::CreateUpdateClientConfigurator(
-    content::BrowserContext* context) {
-  return base::MakeRefCounted<update_client::TestConfigurator>(nullptr);
 }
 
 std::string TestExtensionsBrowserClient::GetApplicationLocale() {

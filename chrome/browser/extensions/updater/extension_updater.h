@@ -12,7 +12,6 @@
 #include <set>
 #include <string>
 
-#include "base/auto_reset.h"
 #include "base/callback_list.h"
 #include "base/files/file_path.h"
 #include "base/functional/callback.h"
@@ -28,8 +27,6 @@
 #include "extensions/browser/updater/extension_downloader.h"
 #include "extensions/browser/updater/extension_downloader_delegate.h"
 #include "extensions/browser/updater/extension_downloader_types.h"
-#include "extensions/browser/updater/extension_update_data.h"
-#include "extensions/browser/updater/update_service.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_id.h"
 #include "url/gurl.h"
@@ -70,6 +67,10 @@ class ExtensionUpdater : public KeyedService,
                          public ExtensionDownloaderDelegate {
  public:
   using FinishedCallback = base::OnceClosure;
+
+  // Called with the extension id and version of the update that was found.
+  using UpdateFoundCallback =
+      base::RepeatingCallback<void(const std::string&, const base::Version&)>;
 
   struct CheckParams {
     // Creates a default CheckParams instance that checks for all extensions.
@@ -203,9 +204,6 @@ class ExtensionUpdater : public KeyedService,
   void SetBackoffPolicyForTesting(
       const net::BackoffEntry::Policy& backoff_policy);
 
-  // Always fetch updates via update service, not the extension downloader.
-  static base::AutoReset<bool> GetScopedUseUpdateServiceForTesting();
-
   // Set a callback to invoke when updating has started.
   void SetUpdatingStartedCallbackForTesting(base::RepeatingClosure callback);
 
@@ -259,13 +257,10 @@ class ExtensionUpdater : public KeyedService,
 
     bool is_full_check = false;
     bool install_immediately = false;
-    bool awaiting_update_service = false;
     UpdateFoundCallback update_found_callback;
     FinishedCallback callback;
     // Prevents the destruction of the Profile* while an update check is in
     // progress.
-    // TODO(crbug.com/40174537): Find a way to pass the keepalive to
-    // UpdateClient instead of holding it here.
     std::unique_ptr<ScopedProfileKeepAlive> profile_keep_alive;
     // The ids of extensions that have in-progress update checks.
     std::set<ExtensionId> in_progress_ids;
@@ -328,10 +323,6 @@ class ExtensionUpdater : public KeyedService,
   bool GetExtensionExistingVersion(const ExtensionId& id,
                                    std::string* version) override;
 
-  // Returns an `ExtensionUpdateData` prepopulated with the `pending_version`
-  // if there is a pending extension update.
-  ExtensionUpdateData GetExtensionUpdateData(const ExtensionId& id);
-
   void UpdatePingData(const ExtensionId& id, const PingResult& ping_result);
 
   // Starts installing a crx file that has been fetched but not installed yet.
@@ -342,9 +333,6 @@ class ExtensionUpdater : public KeyedService,
 
   // Send a notification if we're finished updating.
   void NotifyIfFinished(int request_id);
-
-  // |udpate_service_| will execute this function on finish.
-  void OnUpdateServiceFinished(int request_id);
 
   void ExtensionCheckFinished(const ExtensionId& extension_id,
                               FinishedCallback callback);
@@ -360,12 +348,6 @@ class ExtensionUpdater : public KeyedService,
 
   void OnInstallerDone(const base::UnguessableToken& token,
                        const std::optional<CrxInstallError>& error);
-
-  // Returns whether UpdateService can update an extension. The extension may be
-  // represented by either an Extension or PendingExtensionInfo) depending on
-  // whether it is installed or pending.
-  bool CanUseUpdateService(const Extension* extension_id,
-                           const PendingExtensionInfo* info) const;
 
   // Called when the browser is terminating.
   void OnAppTerminating();
@@ -392,13 +374,6 @@ class ExtensionUpdater : public KeyedService,
 
   base::ObserverList<UpdateObserver, /*check_empty=*/true>::Unchecked
       update_observers_;
-
-  // Update service is responsible for updating Webstore extensions.
-  // Note that |UpdateService| is a KeyedService class, which can only be
-  // created through a |KeyedServiceFactory| singleton, thus |update_service_|
-  // will be freed by the same factory singleton before the browser is
-  // shutdown.
-  raw_ptr<UpdateService> update_service_ = nullptr;
 
   base::TimeDelta frequency_;
   bool will_check_soon_ = false;

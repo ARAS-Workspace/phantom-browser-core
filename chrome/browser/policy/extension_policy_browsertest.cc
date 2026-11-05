@@ -13,7 +13,6 @@
 #include "base/path_service.h"
 #include "base/run_loop.h"
 #include "base/strings/strcat.h"
-#include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/gtest_tags.h"
@@ -33,7 +32,6 @@
 #include "chrome/browser/extensions/extension_service_test_with_install.h"
 #include "chrome/browser/extensions/forced_extensions/install_stage_tracker_factory.h"
 #include "chrome/browser/extensions/load_error_waiter.h"
-#include "chrome/browser/extensions/shared_module_service_factory.h"
 #include "chrome/browser/extensions/sync/extension_sync_data.h"
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
@@ -43,7 +41,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_test_util.h"
-#include "chrome/common/extensions/extension_test_util.h"
 #include "chrome/common/extensions/manifest_handlers/app_launch_info.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
@@ -51,7 +48,6 @@
 #include "components/sync/model/sync_change.h"
 #include "components/sync/test/fake_sync_change_processor.h"
 #include "components/sync/test/sync_change_processor_wrapper_for_test.h"
-#include "components/version_info/channel.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_process_host_creation_observer.h"
 #include "content/public/browser/render_view_host.h"
@@ -75,23 +71,18 @@
 #include "extensions/browser/install_verifier.h"
 #include "extensions/browser/pending_extension_manager.h"
 #include "extensions/browser/scoped_ignore_content_verifier_for_test.h"
-#include "extensions/browser/shared_module_service.h"
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/browser/unpacked_installer.h"
 #include "extensions/browser/updater/extension_cache_fake.h"
 #include "extensions/browser/updater/extension_downloader_test_helper.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/feature_switch.h"
-#include "extensions/common/features/feature_channel.h"
 #include "extensions/common/file_util.h"
 #include "extensions/common/manifest.h"
-#include "extensions/common/manifest_handlers/shared_module_info.h"
 #include "extensions/common/mojom/view_type.mojom.h"
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/verifier_formats.h"
 #include "extensions/test/test_extension_dir.h"
-#include "net/test/embedded_test_server/http_request.h"
-#include "net/test/embedded_test_server/http_response.h"
 #include "third_party/blink/public/common/switches.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -162,38 +153,6 @@ constexpr net::BackoffEntry::Policy kDefaultBackOffPolicyForTesting = {
     // Don't use initial delay unless the last request was an error.
     false,
 };
-
-// Registers a handler to respond to requests whose path matches |match_path|.
-// The response contents are generated from |template_file|, by replacing all
-// "${URL_PLACEHOLDER}" substrings in the file with the request URL excluding
-// filename, query values and fragment.
-void RegisterURLReplacingHandler(net::EmbeddedTestServer* test_server,
-                                 const std::string& match_path,
-                                 const base::FilePath& template_file) {
-  test_server->RegisterRequestHandler(base::BindRepeating(
-      [](net::EmbeddedTestServer* test_server, const std::string& match_path,
-         const base::FilePath& template_file,
-         const net::test_server::HttpRequest& request)
-          -> std::unique_ptr<net::test_server::HttpResponse> {
-        GURL url = test_server->GetURL(request.relative_url);
-        if (url.GetPath() != match_path) {
-          return nullptr;
-        }
-
-        std::string contents;
-        CHECK(base::ReadFileToString(template_file, &contents));
-
-        GURL url_base = url.GetWithoutFilename();
-        base::ReplaceSubstringsAfterOffset(&contents, 0, "${URL_PLACEHOLDER}",
-                                           url_base.spec());
-
-        auto response = std::make_unique<net::test_server::BasicHttpResponse>();
-        response->set_content(contents);
-        response->set_content_type("text/plain");
-        return response;
-      },
-      base::Unretained(test_server), match_path, template_file));
-}
 
 // Sends a mouse click at the given coordinates to the current renderer.
 void PerformClick(content::WebContents* contents, int x, int y) {
@@ -299,11 +258,6 @@ class ExtensionPolicyTest : public ExtensionPolicyTestBase {
 
   extensions::ExtensionUpdater* extension_updater() {
     return extensions::ExtensionUpdater::Get(profile());
-  }
-
-  extensions::SharedModuleService* shared_module_service() {
-    return extensions::SharedModuleServiceFactory::GetForBrowserContext(
-        profile());
   }
 
   const extensions::Extension* InstallExtension(
@@ -493,86 +447,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, ExtensionInstallBlocklistWildcard) {
   EXPECT_FALSE(InstallExtension(kGoodCrxName));
   EXPECT_FALSE(registry->GetExtensionById(
       kGoodCrxId, extensions::ExtensionRegistry::EVERYTHING));
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
-                       ExtensionInstallBlocklistSharedModules) {
-  // Verifies that shared_modules are not affected by the blocklist.
-
-  base::FilePath base_path;
-  GetTestDataDirectory(&base_path);
-  base::FilePath update_xml_template_path =
-      base_path.Append(kTestExtensionsDir)
-          .AppendASCII("policy_shared_module")
-          .AppendASCII("update_template.xml");
-
-  std::string update_xml_path =
-      "/" + base::FilePath(kTestExtensionsDir).MaybeAsASCII() +
-      "/policy_shared_module/gen_update.xml";
-  RegisterURLReplacingHandler(embedded_test_server(), update_xml_path,
-                              update_xml_template_path);
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  const char kImporterId[] = "pchakhniekfaeoddkifplhnfbffomabh";
-  const char kSharedModuleId[] = "nfgclafboonjbiafbllihiailjlhelpm";
-
-  // Make sure that "import" and "export" are available to these extension IDs
-  // by mocking the release channel.
-  extensions::ScopedCurrentChannel channel(version_info::Channel::DEV);
-
-  // Verify that the extensions are not installed initially.
-  extensions::ExtensionRegistry* registry = extension_registry();
-  ASSERT_FALSE(registry->GetExtensionById(
-      kImporterId, extensions::ExtensionRegistry::EVERYTHING));
-  ASSERT_FALSE(registry->GetExtensionById(
-      kSharedModuleId, extensions::ExtensionRegistry::EVERYTHING));
-
-  // Mock the webstore update URL. This is where the shared module extension
-  // will be installed from.
-  GURL update_xml_url = embedded_test_server()->GetURL(update_xml_path);
-  extension_test_util::SetGalleryUpdateURL(update_xml_url);
-  NavigateToURL(update_xml_url);
-
-  // Blocklist "*" but force-install the importer extension. The shared module
-  // should be automatically installed too.
-  base::ListValue blocklist;
-  blocklist.Append("*");
-  PolicyMap policies;
-  AddExtensionToForceList(&policies, kImporterId, update_xml_url);
-  policies.Set(key::kExtensionInstallBlocklist, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value(std::move(blocklist)), nullptr);
-
-  extensions::TestExtensionRegistryObserver observe_importer(registry,
-                                                             kImporterId);
-  extensions::TestExtensionRegistryObserver observe_shared_module(
-      registry, kSharedModuleId);
-  UpdateProviderPolicy(policies);
-  observe_importer.WaitForExtensionLoaded();
-  observe_shared_module.WaitForExtensionLoaded();
-
-  // Verify that both extensions got installed.
-  const extensions::Extension* importer =
-      registry->enabled_extensions().GetByID(kImporterId);
-  ASSERT_TRUE(importer);
-  EXPECT_EQ(kImporterId, importer->id());
-  const extensions::Extension* shared_module =
-      registry->enabled_extensions().GetByID(kSharedModuleId);
-  ASSERT_TRUE(shared_module);
-  EXPECT_EQ(kSharedModuleId, shared_module->id());
-  EXPECT_TRUE(shared_module->is_shared_module());
-
-  // Verify the dependency.
-  std::unique_ptr<extensions::ExtensionSet> set =
-      shared_module_service()->GetDependentExtensions(shared_module);
-  ASSERT_TRUE(set);
-  EXPECT_EQ(1u, set->size());
-  EXPECT_TRUE(set->Contains(importer->id()));
-
-  std::vector<extensions::SharedModuleInfo::ImportInfo> imports =
-      extensions::SharedModuleInfo::GetImports(importer);
-  ASSERT_EQ(1u, imports.size());
-  EXPECT_EQ(kSharedModuleId, imports[0].extension_id);
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, ExtensionInstallAllowlist) {
@@ -1691,26 +1565,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, ExtensionInstallForcelistOffline) {
       extensions::ExtensionDownloaderDelegate::CacheStatus::
           CACHE_HIT_ON_MANIFEST_FETCH_FAILURE,
       1);
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
-                       ExtensionInstallForcelist_DefaultedUpdateUrl) {
-  // Verifies the ExtensionInstallForcelist policy with an empty (defaulted)
-  // "update" URL.
-
-  ExtensionRequestInterceptor interceptor;
-
-  extensions::ExtensionRegistry* registry = extension_registry();
-  ASSERT_FALSE(registry->GetExtensionById(
-      kGoodCrxId, extensions::ExtensionRegistry::EVERYTHING));
-
-  PolicyMap policies;
-  AddExtensionToForceList(&policies, kGoodCrxId, GURL());
-  extensions::TestExtensionRegistryObserver observer(registry);
-  UpdateProviderPolicy(policies);
-  observer.WaitForExtensionWillBeInstalled();
-
-  EXPECT_TRUE(registry->enabled_extensions().GetByID(kGoodCrxId));
 }
 
 // Verifies that the browser doesn't crash on shutdown. If the extensions are

@@ -251,19 +251,6 @@ ContentVerifier* TestExtensionSystem::content_verifier() {
   return content_verifier_.get();
 }
 
-void TestExtensionSystem::InstallUpdate(
-    const std::string& extension_id,
-    const std::string& public_key,
-    const base::FilePath& temp_dir,
-    bool install_immediately,
-    InstallUpdateCallback install_update_callback) {
-  NOTREACHED();
-}
-
-void TestExtensionSystem::PerformActionBasedOnOmahaAttributes(
-    const std::string& extension_id,
-    const base::DictValue& attributes) {}
-
 value_store::TestingValueStore* TestExtensionSystem::value_store() {
   // These tests use TestingValueStore in a way that ensures it only ever mints
   // instances of TestingValueStore.

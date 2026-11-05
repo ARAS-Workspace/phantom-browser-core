@@ -5,7 +5,6 @@
 #include "chrome/browser/extensions/chrome_extensions_browser_client.h"
 
 #include <memory>
-#include <optional>
 #include <utility>
 
 #include "base/command_line.h"
@@ -61,7 +60,6 @@
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/shared_module_service_factory.h"
 #include "chrome/browser/extensions/tab_helper.h"
-#include "chrome/browser/extensions/updater/chrome_update_client_config.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
 #include "chrome/browser/extensions/user_script_listener.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
@@ -95,8 +93,6 @@
 #include "components/proxy_config/proxy_config_pref_names.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/sessions/content/session_tab_helper.h"
-#include "components/update_client/configurator.h"
-#include "components/update_client/update_client.h"
 #include "components/version_info/version_info.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -124,7 +120,6 @@
 #include "extensions/browser/unpacked_installer.h"
 #include "extensions/browser/url_request_util.h"
 #include "extensions/common/extension_id.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/features/feature_channel.h"
 #include "extensions/common/features/feature_developer_mode_only.h"
 #include "extensions/common/manifest_handlers/chrome_url_overrides_handler.h"
@@ -142,9 +137,6 @@
 namespace extensions {
 
 namespace {
-
-constexpr std::string_view kCrxUrlPath = "/service/update2/crx";
-constexpr std::string_view kJsonUrlPath = "/service/update2/json";
 
 // If true, the extensions client will behave as though there is always a
 // new chrome update.
@@ -614,27 +606,6 @@ void ChromeExtensionsBrowserClient::AttachExtensionTaskManagerTag(
     case mojom::ViewType::kInvalid:
       NOTREACHED();
   }
-}
-
-scoped_refptr<update_client::UpdateClient>
-ChromeExtensionsBrowserClient::CreateUpdateClient(
-    scoped_refptr<update_client::Configurator> configurator) {
-  return update_client::UpdateClientFactory(configurator);
-}
-
-scoped_refptr<update_client::Configurator>
-ChromeExtensionsBrowserClient::CreateUpdateClientConfigurator(
-    content::BrowserContext* context) {
-  std::optional<GURL> override_url;
-  GURL update_url = extension_urls::GetWebstoreUpdateUrl();
-  if (update_url != extension_urls::GetDefaultWebstoreUpdateUrl()) {
-    if (update_url.GetPath() == kCrxUrlPath) {
-      override_url = update_url.GetWithEmptyPath().Resolve(kJsonUrlPath);
-    } else {
-      override_url = update_url;
-    }
-  }
-  return ChromeUpdateClientConfig::Create(context, override_url);
 }
 
 std::unique_ptr<ScopedBrowserContextKeepAlive>

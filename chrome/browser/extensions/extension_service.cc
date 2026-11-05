@@ -43,7 +43,6 @@
 #include "chrome/browser/extensions/corrupted_extension_reinstaller.h"
 #include "chrome/browser/extensions/cws_info_service_factory.h"
 #include "chrome/browser/extensions/extension_action_storage_manager.h"
-#include "chrome/browser/extensions/extension_allowlist_factory.h"
 #include "chrome/browser/extensions/extension_disabled_ui.h"
 #include "chrome/browser/extensions/extension_error_controller.h"
 #include "chrome/browser/extensions/extension_special_storage_policy.h"
@@ -52,7 +51,6 @@
 #include "chrome/browser/extensions/external_provider_manager.h"
 #include "chrome/browser/extensions/install_verifier_factory.h"
 #include "chrome/browser/extensions/installed_loader.h"
-#include "chrome/browser/extensions/omaha_attributes_handler.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
 #include "chrome/browser/extensions/updater/chrome_extension_downloader_factory.h"
@@ -196,7 +194,6 @@ ExtensionService::ExtensionService(
       system_(ExtensionSystem::Get(profile)),
       extension_prefs_(extension_prefs),
       blocklist_(blocklist),
-      allowlist_(ExtensionAllowlistFactory::GetForBrowserContext(profile)),
       registry_(ExtensionRegistry::Get(profile)),
       pending_extension_manager_(PendingExtensionManager::Get(profile)),
       external_provider_manager_(ExternalProviderManager::Get(profile)),
@@ -208,9 +205,6 @@ ExtensionService::ExtensionService(
       extension_registrar_delegate_(
           std::make_unique<ChromeExtensionRegistrarDelegate>(profile_)),
       extension_registrar_(ExtensionRegistrar::Get(profile)),
-      omaha_attributes_handler_(extension_prefs,
-                                registry_,
-                                extension_registrar_),
       force_installed_tracker_(registry_, profile_),
       force_installed_metrics_(registry_, profile_, &force_installed_tracker_),
       corrupted_extension_reinstaller_(
@@ -311,7 +305,6 @@ void ExtensionService::Shutdown() {
   pending_extension_manager_ = nullptr;
   external_provider_manager_ = nullptr;
   error_controller_ = nullptr;
-  allowlist_ = nullptr;
   external_install_manager_ = nullptr;
   updater_ = nullptr;
   component_loader_ = nullptr;
@@ -421,17 +414,6 @@ void ExtensionService::LoadExtensionsFromCommandLineFlag(
       switch_name == switches::kLoadExtension
           ? ExtensionService::LoadExtensionFlag::kLoadExtension
           : ExtensionService::LoadExtensionFlag::kDisableExtensionsExcept);
-}
-
-void ExtensionService::PerformActionBasedOnOmahaAttributes(
-    const std::string& extension_id,
-    const base::DictValue& attributes) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  omaha_attributes_handler_.PerformActionBasedOnOmahaAttributes(extension_id,
-                                                                attributes);
-  allowlist_->PerformActionBasedOnOmahaAttributes(extension_id, attributes);
-  // Show an error for the newly blocklisted extension.
-  error_controller_->ShowErrorIfNeeded();
 }
 
 void ExtensionService::DisableUserExtensionsExcept(

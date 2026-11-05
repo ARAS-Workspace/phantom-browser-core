@@ -22,8 +22,6 @@ namespace extensions {
 // with the MockExtensionSystemFactory below.
 class MockExtensionSystem : public ExtensionSystem {
  public:
-  using InstallUpdateCallback = ExtensionSystem::InstallUpdateCallback;
-
   explicit MockExtensionSystem(content::BrowserContext* context);
 
   MockExtensionSystem(const MockExtensionSystem&) = delete;
@@ -50,14 +48,6 @@ class MockExtensionSystem : public ExtensionSystem {
   const base::OneShotEvent& ready() const override;
   bool is_ready() const override;
   ContentVerifier* content_verifier() override;
-  void InstallUpdate(const ExtensionId& extension_id,
-                     const std::string& public_key,
-                     const base::FilePath& temp_dir,
-                     bool install_immediately,
-                     InstallUpdateCallback install_update_callback) override;
-  void PerformActionBasedOnOmahaAttributes(
-      const ExtensionId& extension_id,
-      const base::DictValue& attributes) override;
 
  private:
   raw_ptr<content::BrowserContext> browser_context_;

@@ -26,7 +26,6 @@
 #include "extensions/browser/updater/safe_manifest_parser.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/mojom/manifest.mojom-shared.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "net/http/http_request_headers.h"
 #include "services/network/public/mojom/url_loader_factory.mojom.h"
@@ -35,12 +34,6 @@
 namespace crx_file {
 enum class VerifierFormat;
 }
-
-namespace signin {
-class PrimaryAccountAccessTokenFetcher;
-class IdentityManager;
-struct AccessTokenInfo;
-}  // namespace signin
 
 namespace network {
 class SharedURLLoaderFactory;
@@ -99,21 +92,8 @@ class ExtensionDownloader {
   // AddExtension() and AddPendingExtension().
   void StartAllPending(ExtensionCache* cache);
 
-  // Sets the IdentityManager instance to be used for OAuth2 authentication on
-  // protected Webstore downloads. The IdentityManager instance must be valid to
-  // use for the lifetime of this object.
-  void SetIdentityManager(signin::IdentityManager* identity_manager);
-
-  void set_brand_code(const std::string& brand_code) {
-    brand_code_ = brand_code;
-  }
-
   void set_manifest_query_params(const std::string& params) {
     manifest_query_params_ = params;
-  }
-
-  void set_ping_enabled_domain(const std::string& domain) {
-    ping_enabled_domain_ = domain;
   }
 
   // Set backoff policy for manifest and extension queue. Set `std::nullopt` to
@@ -156,16 +136,6 @@ class ExtensionDownloader {
   static const int kExtensionFetcherId = 2;
 
   static const int kMaxRetries = 10;
-
-  // Names of the header fields used for traffic management for extension
-  // updater.
-  static const char kUpdateInteractivityHeader[];
-  static const char kUpdateAppIdHeader[];
-  static const char kUpdateUpdaterHeader[];
-
-  // Header values for foreground/background update requests.
-  static const char kUpdateInteractivityForeground[];
-  static const char kUpdateInteractivityBackground[];
 
  private:
   friend class ExtensionDownloaderTest;
@@ -212,16 +182,11 @@ class ExtensionDownloader {
 
     enum CredentialsMode {
       CREDENTIALS_NONE = 0,
-      CREDENTIALS_OAUTH2_TOKEN,
       CREDENTIALS_COOKIES,
     };
 
     // Indicates the type of credentials to include with this fetch.
     CredentialsMode credentials;
-
-    // Counts the number of times OAuth2 authentication has been attempted for
-    // this fetch.
-    int oauth2_attempt_count;
   };
 
   // We limit the number of extensions grouped together in one batch to avoid
@@ -402,9 +367,6 @@ class ExtensionDownloader {
   bool IterateFetchCredentialsAfterFailure(ExtensionFetch* fetch,
                                            int response_code);
 
-  void OnAccessTokenFetchComplete(GoogleServiceAuthError error,
-                                  signin::AccessTokenInfo token_info);
-
   ManifestFetchData* CreateManifestFetchData(
       const GURL& update_url,
       int request_id,
@@ -452,27 +414,8 @@ class ExtensionDownloader {
   // Cache for .crx files.
   raw_ptr<ExtensionCache, DanglingUntriaged> extension_cache_;
 
-  // May be used to fetch access tokens for protected download requests. May be
-  // null. If non-null, guaranteed to outlive this object.
-  raw_ptr<signin::IdentityManager> identity_manager_;
-
-  // A Webstore download-scoped access token for the |identity_provider_|'s
-  // active account, if any.
-  std::string access_token_;
-
-  // A pending access token fetcher.
-  std::unique_ptr<signin::PrimaryAccountAccessTokenFetcher>
-      access_token_fetcher_;
-
-  // Brand code to include with manifest fetch queries if sending ping data.
-  std::string brand_code_;
-
   // Baseline parameters to include with manifest fetch queries.
   std::string manifest_query_params_;
-
-  // Domain to enable ping data. Ping data will be sent with manifest fetches
-  // to update URLs which match this domain. Defaults to empty (no domain).
-  std::string ping_enabled_domain_;
 
   net::HttpRequestHeaders
       last_extension_loader_resource_request_headers_for_testing_;

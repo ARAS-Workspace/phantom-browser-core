@@ -16,7 +16,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "components/update_client/update_client.h"
 #include "extensions/browser/extension_management_client.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/updater/extension_cache.h"
@@ -24,10 +23,6 @@
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "services/network/public/mojom/fetch_api.mojom.h"
-
-namespace update_client {
-class Configurator;
-}
 
 namespace extensions {
 class KioskDelegate;
@@ -62,10 +57,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
       std::unique_ptr<ExtensionManagementClient> client) {
     extension_management_client_ = std::move(client);
   }
-
-  // Sets a factory to respond to calls of the CreateUpdateClient method.
-  void SetUpdateClientFactory(
-      base::RepeatingCallback<update_client::UpdateClient*(void)> factory);
 
   // Sets the main browser context. Only call if a BrowserContext was not
   // already provided. `main_context` must not be an incognito context.
@@ -169,10 +160,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
       content::WebContents* web_contents) override;
   KioskDelegate* GetKioskDelegate() override;
   UserScriptListener* GetUserScriptListener() override;
-  scoped_refptr<update_client::UpdateClient> CreateUpdateClient(
-      scoped_refptr<update_client::Configurator> configurator) override;
-  scoped_refptr<update_client::Configurator> CreateUpdateClientConfigurator(
-      content::BrowserContext* context) override;
   std::string GetApplicationLocale() override;
   ExtensionManagementClient* GetExtensionManagementClient(
       content::BrowserContext* context) override;
@@ -189,9 +176,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
   raw_ptr<ExtensionSystemProvider> extension_system_factory_ = nullptr;
 
   std::unique_ptr<ExtensionCache> extension_cache_;
-
-  base::RepeatingCallback<update_client::UpdateClient*(void)>
-      update_client_factory_;
 
   std::unique_ptr<ExtensionManagementClient> extension_management_client_;
   std::unique_ptr<KioskDelegate> kiosk_delegate_;

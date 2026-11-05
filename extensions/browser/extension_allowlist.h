@@ -39,10 +39,6 @@ class ExtensionAllowlist : public KeyedService {
   void SetExtensionAllowlistState(const ExtensionId& extension_id,
                                   AllowlistState state);
 
-  // Performs action based on Omaha attributes for the extension.
-  void PerformActionBasedOnOmahaAttributes(const ExtensionId& extension_id,
-                                           const base::DictValue& attributes);
-
  private:
   friend class ExtensionAllowlistFactory;
 

@@ -24,7 +24,6 @@
 #include "components/sync/model/string_ordinal.h"
 #include "components/sync_preferences/pref_service_mock_factory.h"
 #include "components/sync_preferences/pref_service_syncable.h"
-#include "components/update_client/update_client.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
 #include "extensions/browser/extension_pref_store.h"
@@ -109,7 +108,6 @@ void TestExtensionPrefs::ResetPrefRegistry() {
   // Prefs should be registered before the PrefService is created.
   ExtensionPrefs::RegisterProfilePrefs(pref_registry_.get());
   PermissionsManager::RegisterProfilePrefs(pref_registry_.get());
-  update_client::RegisterProfilePrefs(pref_registry_.get());
 }
 
 void TestExtensionPrefs::RecreateExtensionPrefs() {

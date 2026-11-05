@@ -75,11 +75,6 @@ class NetworkContext;
 }
 }  // namespace network
 
-namespace update_client {
-class Configurator;
-class UpdateClient;
-}  // namespace update_client
-
 namespace url {
 class Origin;
 }  // namespace url
@@ -407,14 +402,6 @@ class ExtensionsBrowserClient {
   // manager.
   virtual void AttachExtensionTaskManagerTag(content::WebContents* web_contents,
                                              mojom::ViewType view_type) {}
-
-  // Returns a new UpdateClient.
-  virtual scoped_refptr<update_client::UpdateClient> CreateUpdateClient(
-      scoped_refptr<update_client::Configurator> configurator);
-
-  // Returns a new update_client::Configurator.
-  virtual scoped_refptr<update_client::Configurator>
-  CreateUpdateClientConfigurator(content::BrowserContext* context);
 
   // Returns a new ScopedBrowserContextKeepAlive, or nullptr if the embedder
   // does not support keeping the context alive while the updater is running.

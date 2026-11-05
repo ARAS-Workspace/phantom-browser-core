@@ -19,16 +19,10 @@
 #include "base/metrics/histogram.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
-#include "base/strings/stringprintf.h"
 #include "base/time/time.h"
 #include "base/version.h"
 #include "components/crx_file/crx_verifier.h"
-#include "components/signin/public/identity_manager/access_token_info.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
-#include "components/update_client/update_query_params.h"
 #include "content/public/browser/file_url_loader.h"
 #include "content/public/browser/shared_cors_origin_access_list.h"
 #include "extensions/browser/extension_file_task_runner.h"
@@ -50,9 +44,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
-
-using base::Time;
-using update_client::UpdateQueryParams;
 
 namespace extensions {
 
@@ -84,34 +75,15 @@ const net::BackoffEntry::Policy kDefaultBackoffPolicy = {
     false,
 };
 
-const char kAuthUserQueryKey[] = "authuser";
-
-const int kMaxAuthUserValue = 10;
-const int kMaxOAuth2Attempts = 3;
-
 const char kNotFromWebstoreInstallSource[] = "notfromwebstore";
-const char kDefaultInstallSource[] = "";
 const char kReinstallInstallSource[] = "reinstall";
-
-const char kGoogleDotCom[] = "google.com";
 
 ExtensionDownloader::TestObserver* g_test_observer = nullptr;
 ExtensionDownloaderTestDelegate* g_test_delegate = nullptr;
 
-#define RETRY_HISTOGRAM(name, retry_count, url)                           \
-  if ((url).DomainIs(kGoogleDotCom)) {                                    \
-    UMA_HISTOGRAM_CUSTOM_COUNTS("Extensions." name "RetryCountGoogleUrl", \
-                                retry_count,                              \
-                                1,                                        \
-                                kMaxRetries,                              \
-                                kMaxRetries + 1);                         \
-  } else {                                                                \
-    UMA_HISTOGRAM_CUSTOM_COUNTS("Extensions." name "RetryCountOtherUrl",  \
-                                retry_count,                              \
-                                1,                                        \
-                                kMaxRetries,                              \
-                                kMaxRetries + 1);                         \
-  }
+#define RETRY_HISTOGRAM(name, retry_count)                             \
+  UMA_HISTOGRAM_CUSTOM_COUNTS("Extensions." name "RetryCountOtherUrl", \
+                              retry_count, 1, kMaxRetries, kMaxRetries + 1)
 
 bool ShouldRetryRequest(const network::SimpleURLLoader* loader) {
   DCHECK(loader);
@@ -130,44 +102,12 @@ bool ShouldRetryRequest(const network::SimpleURLLoader* loader) {
   return response_code >= 500 && response_code < 600;
 }
 
-// This parses and updates a URL query such that the value of the |authuser|
-// query parameter is incremented by 1. If parameter was not present in the URL,
-// it will be added with a value of 1. All other query keys and values are
-// preserved as-is. Returns |false| if the user index exceeds a hard-coded
-// maximum.
-bool IncrementAuthUserIndex(GURL* url) {
-  int user_index = 0;
-  std::string old_query = url->GetQuery();
-  std::vector<std::string> new_query_parts;
-  url::Component query(0, old_query.length());
-  url::Component key, value;
-  while (url::ExtractQueryKeyValue(old_query, &query, &key, &value)) {
-    std::string key_string = old_query.substr(key.begin, key.len);
-    std::string value_string = old_query.substr(value.begin, value.len);
-    if (key_string == kAuthUserQueryKey) {
-      base::StringToInt(value_string, &user_index);
-    } else {
-      new_query_parts.push_back(base::StringPrintf(
-          "%s=%s", key_string.c_str(), value_string.c_str()));
-    }
-  }
-  if (user_index >= kMaxAuthUserValue)
-    return false;
-  new_query_parts.push_back(
-      base::StringPrintf("%s=%d", kAuthUserQueryKey, user_index + 1));
-  std::string new_query = base::JoinString(new_query_parts, "&");
-  GURL::Replacements replacements;
-  replacements.SetQueryStr(new_query);
-  *url = url->ReplaceComponents(replacements);
-  return true;
-}
-
 // This sanitizes update urls used to fetch update manifests for extensions.
 std::optional<GURL> SanitizeUpdateURL(const ExtensionId& extension_id,
                                       const GURL& update_url) {
+  // An extension without an update URL has no update server to ask.
   if (update_url.is_empty()) {
-    // Fill in default update URL.
-    return extension_urls::GetWebstoreUpdateUrl();
+    return std::nullopt;
   }
 
   // Skip extensions with non-empty invalid update URLs.
@@ -185,25 +125,10 @@ std::optional<GURL> SanitizeUpdateURL(const ExtensionId& extension_id,
     return std::nullopt;
   }
 
-  // Make sure we use SSL for store-hosted extensions.
-  if (extension_urls::IsWebstoreUpdateUrl(update_url) &&
-      !update_url.SchemeIsCryptographic()) {
-    return extension_urls::GetWebstoreUpdateUrl();
-  }
-
   return update_url;
 }
 
 }  // namespace
-
-const char ExtensionDownloader::kUpdateInteractivityHeader[] =
-    "X-Goog-Update-Interactivity";
-const char ExtensionDownloader::kUpdateAppIdHeader[] = "X-Goog-Update-AppId";
-const char ExtensionDownloader::kUpdateUpdaterHeader[] =
-    "X-Goog-Update-Updater";
-
-const char ExtensionDownloader::kUpdateInteractivityForeground[] = "fg";
-const char ExtensionDownloader::kUpdateInteractivityBackground[] = "bg";
 
 DownloadFailure::DownloadFailure(
     ExtensionDownloaderDelegate::Error error,
@@ -223,8 +148,7 @@ ExtensionDownloader::ExtensionFetch::ExtensionFetch(
       package_hash(package_hash),
       version(version),
       fetch_priority(fetch_priority),
-      credentials(CREDENTIALS_NONE),
-      oauth2_attempt_count(0) {
+      credentials(CREDENTIALS_NONE) {
   associated_tasks.emplace_back(std::move(task));
 }
 
@@ -269,7 +193,6 @@ ExtensionDownloader::ExtensionDownloader(
           base::BindRepeating(&ExtensionDownloader::CreateExtensionLoader,
                               base::Unretained(this))),
       extension_cache_(nullptr),
-      identity_manager_(nullptr),
       crx_format_requirement_(crx_format_requirement) {
   DCHECK(delegate_);
   DCHECK(url_loader_factory_);
@@ -299,12 +222,9 @@ void ExtensionDownloader::AddToFetches(
              std::vector<std::unique_ptr<ManifestFetchData>>>&
         fetches_preparing,
     ExtensionDownloaderTask task) {
-  std::string install_source =
-      extension_urls::IsWebstoreUpdateUrl(task.update_url)
-          ? kDefaultInstallSource
-          : kNotFromWebstoreInstallSource;
-  if (task.is_corrupt_reinstall)
-    install_source = kReinstallInstallSource;
+  const std::string install_source = task.is_corrupt_reinstall
+                                         ? kReinstallInstallSource
+                                         : kNotFromWebstoreInstallSource;
 
   DownloadPingData ping_data;
   DownloadPingData* optional_ping_data = nullptr;
@@ -365,11 +285,6 @@ void ExtensionDownloader::DoStartAllPending() {
     for (auto& fetch : fetch_list.second)
       StartUpdateCheck(std::move(fetch));
   }
-}
-
-void ExtensionDownloader::SetIdentityManager(
-    signin::IdentityManager* identity_manager) {
-  identity_manager_ = identity_manager;
 }
 
 ExtensionDownloader::TestObserver::TestObserver() = default;
@@ -487,10 +402,6 @@ void ExtensionDownloader::CreateManifestLoader() {
                                           extension_ids.end());
   std::string id_list = base::JoinString(id_vector, ",");
   VLOG(2) << "Fetching " << active_request->full_url() << " for " << id_list;
-  VLOG(2) << "Update interactivity: "
-          << (active_request->foreground_check()
-                  ? kUpdateInteractivityForeground
-                  : kUpdateInteractivityBackground);
 
   net::NetworkTrafficAnnotationTag traffic_annotation =
       net::DefineNetworkTrafficAnnotation("extension_manifest_fetcher", R"(
@@ -498,8 +409,7 @@ void ExtensionDownloader::CreateManifestLoader() {
           sender: "Extension Downloader"
           description:
             "Fetches information about an extension manifest (using its "
-            "update_url, which is usually Chrome Web Store) in order to update "
-            "the extension."
+            "update_url) in order to update the extension."
           trigger:
             "An update timer indicates that it's time to update extensions, or "
             "a user triggers an extension update flow."
@@ -507,8 +417,8 @@ void ExtensionDownloader::CreateManifestLoader() {
             "The extension id, version and install source (the cause of the "
             "update flow). The client's OS, architecture, language, Chromium "
             "version, channel and a flag stating whether the request "
-            "originated in the foreground or the background. Authentication is "
-            "used only for non-Chrome-Web-Store update_urls."
+            "originated in the foreground or the background. Authentication "
+            "may be used."
           destination: WEBSITE
         }
         policy {
@@ -534,27 +444,11 @@ void ExtensionDownloader::CreateManifestLoader() {
     resource_request->priority = net::MEDIUM;
   }
 
-  // Send traffic-management headers to the webstore, and omit credentials.
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=647516
-  if (extension_urls::IsWebstoreUpdateUrl(active_request->full_url())) {
-    resource_request->headers.SetHeader(kUpdateInteractivityHeader,
-                                        active_request->foreground_check()
-                                            ? kUpdateInteractivityForeground
-                                            : kUpdateInteractivityBackground);
-    resource_request->headers.SetHeader(kUpdateAppIdHeader, id_list);
-    resource_request->headers.SetHeader(
-        kUpdateUpdaterHeader,
-        base::StringPrintf(
-            "%s-%s", UpdateQueryParams::GetProdIdString(UpdateQueryParams::CRX),
-            UpdateQueryParams::GetProdVersion().c_str()));
-    resource_request->credentials_mode = network::mojom::CredentialsMode::kOmit;
-  } else {
-    // Non-webstore sources may require HTTP auth.
-    resource_request->credentials_mode =
-        network::mojom::CredentialsMode::kInclude;
-    resource_request->site_for_cookies =
-        net::SiteForCookies::FromUrl(active_request->full_url());
-  }
+  // Update servers may require HTTP auth.
+  resource_request->credentials_mode =
+      network::mojom::CredentialsMode::kInclude;
+  resource_request->site_for_cookies =
+      net::SiteForCookies::FromUrl(active_request->full_url());
 
   std::unique_ptr<network::SimpleURLLoader> loader =
       network::SimpleURLLoader::Create(std::move(resource_request),
@@ -678,8 +572,7 @@ void ExtensionDownloader::RetryRequestOrHandleFailureOnManifestFetchFailure(
                               response_code);
     return;
   }
-  const GURL url = loader.GetFinalURL();
-  RETRY_HISTOGRAM("ManifestFetchFailure", request_failure_count, url);
+  RETRY_HISTOGRAM("ManifestFetchFailure", request_failure_count);
   if (all_force_installed_extensions) {
     if (TryFetchingExtensionsFromCache(request.fetch.get()))
       return;
@@ -736,7 +629,7 @@ void ExtensionDownloader::OnManifestLoadComplete(
   // We want to try parsing the manifest, and if it indicates updates are
   // available, we want to fire off requests to fetch those updates.
   if (response_body && !response_body->empty()) {
-    RETRY_HISTOGRAM("ManifestFetchSuccess", request_failure_count, url);
+    RETRY_HISTOGRAM("ManifestFetchSuccess", request_failure_count);
     VLOG(2) << "beginning manifest parse for " << url;
     NotifyExtensionsDownloadStageChanged(
         request.fetch->GetExtensionIds(),
@@ -823,20 +716,6 @@ void ExtensionDownloader::HandleManifestResults(
             std::move(update.first), crx_url, update.second->package_hash,
             update.second->version, fetch_data->fetch_priority()),
         update.second->info);
-  }
-
-  // If the manifest response included a <daystart> element, we want to save
-  // that value for any extensions which had sent a ping in the request.
-  if (fetch_data->base_url().DomainIs(kGoogleDotCom) &&
-      results->daystart_elapsed_seconds >= 0) {
-    Time day_start =
-        Time::Now() - base::Seconds(results->daystart_elapsed_seconds);
-
-    for (const ExtensionId& id : extension_ids) {
-      ExtensionDownloaderDelegate::PingResult& result = ping_results_[id];
-      result.did_ping = fetch_data->DidPing(id, ManifestFetchData::ROLLCALL);
-      result.day_start = day_start;
-    }
   }
 
   ExtensionIdSet extension_ids_with_errors;
@@ -1183,29 +1062,6 @@ void ExtensionDownloader::CreateExtensionLoader() {
         net::SiteForCookies::FromUrl(fetch->url);
   }
 
-  if (fetch->credentials == ExtensionFetch::CREDENTIALS_OAUTH2_TOKEN &&
-      is_secure) {
-    if (access_token_.empty()) {
-      // We should try OAuth2, but we have no token cached. This
-      // ExtensionLoader will be started once the token fetch is complete,
-      // in either OnTokenFetchSuccess or OnTokenFetchFailure.
-      DCHECK(identity_manager_);
-      // It is safe to use Unretained(this) here given that the callback
-      // will not be invoked if this object is deleted.
-      access_token_fetcher_ =
-          std::make_unique<signin::PrimaryAccountAccessTokenFetcher>(
-              signin::OAuthConsumerId::kExtensionDownloader, identity_manager_,
-              base::BindOnce(&ExtensionDownloader::OnAccessTokenFetchComplete,
-                             base::Unretained(this)),
-              signin::PrimaryAccountAccessTokenFetcher::Mode::kImmediate,
-              signin::ConsentLevel::kSignin);
-      return;
-    }
-    extension_loader_resource_request_->headers.SetHeader(
-        net::HttpRequestHeaders::kAuthorization,
-        base::StringPrintf("Bearer %s", access_token_.c_str()));
-  }
-
   VLOG(2) << "Starting load of " << fetch->url << " for " << fetch->id;
 
   StartExtensionLoader();
@@ -1218,13 +1074,11 @@ void ExtensionDownloader::StartExtensionLoader() {
           sender: "Extension Downloader"
           description:
             "Downloads an extension's crx file in order to update the "
-            "extension, using update_url from the extension's manifest which "
-            "is usually Chrome WebStore."
+            "extension, using update_url from the extension's manifest."
           trigger:
             "An update check indicates an extension update is available."
           data:
-            "URL and required data to specify the extension to download. "
-            "OAuth2 token is also sent if connection is secure and to Google."
+            "URL and required data to specify the extension to download."
           destination: WEBSITE
         }
         policy {
@@ -1257,16 +1111,6 @@ void ExtensionDownloader::StartExtensionLoader() {
       GetURLLoaderFactoryToUse(extension_loader_resource_request_->url);
   extension_loader_ = network::SimpleURLLoader::Create(
       std::move(extension_loader_resource_request_), traffic_annotation);
-
-  // Remove Authorization headers on redirect to avoid open redirect attacks.
-  extension_loader_->SetOnRedirectCallback(
-      base::BindRepeating([](const GURL& url, const net::RedirectInfo& redirect,
-                             const network::mojom::URLResponseHead& head,
-                             std::vector<std::string>* to_be_removed_headers) {
-        CHECK(to_be_removed_headers);
-        to_be_removed_headers->emplace_back(
-            net::HttpRequestHeaders::kAuthorization);
-      }));
 
   // Retry up to 3 times.
   extension_loader_->SetRetryOptions(
@@ -1308,8 +1152,7 @@ void ExtensionDownloader::OnExtensionLoadComplete(base::FilePath crx_path) {
   const ExtensionId& id = active_request.id;
   if (!crx_path.empty()) {
     RETRY_HISTOGRAM("CrxFetchSuccess",
-                    extensions_queue_.active_request_failure_count(),
-                    url);
+                    extensions_queue_.active_request_failure_count());
     std::unique_ptr<ExtensionFetch> fetch_data =
         std::move(extensions_queue_.reset_active_request().fetch);
     delegate_->OnExtensionDownloadStageChanged(
@@ -1345,8 +1188,7 @@ void ExtensionDownloader::OnExtensionLoadComplete(base::FilePath crx_path) {
       delegate_->OnExtensionDownloadRetryForTests();
     } else {
       RETRY_HISTOGRAM("CrxFetchFailure",
-                      extensions_queue_.active_request_failure_count(),
-                      url);
+                      extensions_queue_.active_request_failure_count());
       delegate_->OnExtensionDownloadStageChanged(
           id, ExtensionDownloaderDelegate::Stage::FINISHED);
       const ExtensionDownloaderDelegate::FailureData failure_data =
@@ -1429,82 +1271,21 @@ bool ExtensionDownloader::IterateFetchCredentialsAfterFailure(
   if (!auth_failure) {
     return false;
   }
-  // Here we decide what to do next if the server refused to authorize this
-  // fetch.
-  switch (fetch->credentials) {
-    case ExtensionFetch::CREDENTIALS_NONE:
-      if (fetch->url.DomainIs(kGoogleDotCom) && identity_manager_) {
-        fetch->credentials = ExtensionFetch::CREDENTIALS_OAUTH2_TOKEN;
-      } else {
-        fetch->credentials = ExtensionFetch::CREDENTIALS_COOKIES;
-      }
-      return true;
-    case ExtensionFetch::CREDENTIALS_OAUTH2_TOKEN:
-      fetch->oauth2_attempt_count++;
-      // OAuth2 may fail due to an expired access token, in which case we
-      // should invalidate the token and try again.
-      if (response_code == net::HTTP_UNAUTHORIZED &&
-          fetch->oauth2_attempt_count <= kMaxOAuth2Attempts) {
-        DCHECK(identity_manager_);
-        if (!access_token_.empty()) {
-          identity_manager_->RemoveAccessTokenFromCache(
-              identity_manager_->GetPrimaryAccountId(
-                  signin::ConsentLevel::kSignin),
-              signin::OAuthConsumerId::kExtensionDownloader, access_token_);
-          access_token_.clear();
-        }
-        return true;
-      }
-      // Either there is no Gaia identity available, the active identity
-      // doesn't have access to this resource, or the server keeps returning
-      // 401s and we've retried too many times. Fall back on cookies.
-      if (access_token_.empty() || response_code == net::HTTP_FORBIDDEN ||
-          fetch->oauth2_attempt_count > kMaxOAuth2Attempts) {
-        fetch->credentials = ExtensionFetch::CREDENTIALS_COOKIES;
-        return true;
-      }
-      // Something else is wrong. Time to give up.
-      return false;
-    case ExtensionFetch::CREDENTIALS_COOKIES:
-      if (response_code == net::HTTP_FORBIDDEN) {
-        // Try the next session identity, up to some maximum.
-        return IncrementAuthUserIndex(&fetch->url);
-      }
-      return false;
-    default:
-      NOTREACHED();
+  // The server refused to authorize this fetch, retry it once with cookies.
+  if (fetch->credentials == ExtensionFetch::CREDENTIALS_NONE) {
+    fetch->credentials = ExtensionFetch::CREDENTIALS_COOKIES;
+    return true;
   }
-}
-
-void ExtensionDownloader::OnAccessTokenFetchComplete(
-    GoogleServiceAuthError error,
-    signin::AccessTokenInfo token_info) {
-  access_token_fetcher_.reset();
-
-  if (error.state() != GoogleServiceAuthError::NONE) {
-    // If we fail to get an access token, kick the pending fetch and let it fall
-    // back on cookies.
-    StartExtensionLoader();
-    return;
-  }
-
-  access_token_ = token_info.token;
-  extension_loader_resource_request_->headers.SetHeader(
-      net::HttpRequestHeaders::kAuthorization,
-      base::StringPrintf("Bearer %s", access_token_.c_str()));
-  StartExtensionLoader();
+  return false;
 }
 
 ManifestFetchData* ExtensionDownloader::CreateManifestFetchData(
     const GURL& update_url,
     int request_id,
     DownloadFetchPriority fetch_priority) {
-  ManifestFetchData::PingMode ping_mode = ManifestFetchData::NO_PING;
-  if (update_url.DomainIs(ping_enabled_domain_.c_str()))
-    ping_mode = ManifestFetchData::PING_WITH_ENABLED_STATE;
-  return new ManifestFetchData(update_url, request_id, brand_code_,
-                               manifest_query_params_, ping_mode,
-                               fetch_priority);
+  return new ManifestFetchData(update_url, request_id, /*brand_code=*/"",
+                               manifest_query_params_,
+                               ManifestFetchData::NO_PING, fetch_priority);
 }
 
 }  // namespace extensions

@@ -6,29 +6,16 @@
 
 #include "base/command_line.h"
 #include "base/functional/callback_helpers.h"
-#include "base/run_loop.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/test/bind.h"
-#include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "content/public/browser/browser_context.h"
-#include "content/public/browser/storage_partition.h"
 #include "content/public/common/content_switches.h"
-#include "content/public/test/browser_task_environment.h"
 #include "content/public/test/test_utils.h"
 #include "extensions/browser/extensions_test.h"
 #include "extensions/browser/updater/extension_cache_fake.h"
 #include "extensions/browser/updater/extension_downloader_test_helper.h"
 #include "extensions/browser/updater/extension_downloader_types.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/verifier_formats.h"
-#include "net/dns/mock_host_resolver.h"
-#include "net/http/http_request_headers.h"
-#include "net/test/cert_test_util.h"
-#include "net/test/embedded_test_server/embedded_test_server.h"
-#include "net/test/embedded_test_server/http_request.h"
-#include "net/test/embedded_test_server/http_response.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "services/network/test/test_utils.h"
 
 using testing::_;
@@ -44,6 +31,7 @@ namespace {
 
 const char kTestExtensionId[] = "test_app";
 const char kTestExtensionId2[] = "test_app2";
+const char kTestUpdateUrl[] = "https://localhost/update";
 
 }  // namespace
 
@@ -452,16 +440,6 @@ TEST_F(ExtensionDownloaderTest, TestUpdateURLHandle) {
 
   // Clear pending queue to check it.
   helper.downloader().StartAllPending(nullptr);
-  // HTTP Webstore URL, should be replaced with HTTPS.
-  helper.downloader().AddPendingExtension(CreateDownloaderTask(
-      kTestExtensionId,
-      GURL("http://clients2.google.com/service/update2/crx")));
-  ASSERT_EQ(1u, tasks.size());
-  EXPECT_EQ(GURL("https://clients2.google.com/service/update2/crx"),
-            tasks.rbegin()->update_url);
-
-  // Clear pending queue to check it.
-  helper.downloader().StartAllPending(nullptr);
   // Just a custom URL, should be kept as is.
   helper.downloader().AddPendingExtension(
       CreateDownloaderTask(kTestExtensionId, GURL("https://example.com")));
@@ -470,12 +448,10 @@ TEST_F(ExtensionDownloaderTest, TestUpdateURLHandle) {
 
   // Clear pending queue to check it.
   helper.downloader().StartAllPending(nullptr);
-  // Empty URL, should be replaced with Webstore one.
+  // Empty URL, shouldn't be added at all.
   helper.downloader().AddPendingExtension(
       CreateDownloaderTask(kTestExtensionId, GURL("")));
-  ASSERT_EQ(1u, tasks.size());
-  EXPECT_EQ(GURL("https://clients2.google.com/service/update2/crx"),
-            tasks.rbegin()->update_url);
+  EXPECT_EQ(0u, tasks.size());
 }
 
 // Tests that multiple updates are combined in single requests.
@@ -519,8 +495,8 @@ TEST_F(ExtensionDownloaderTest, TestNoNetworkRetryAfterCacheMiss) {
 
   helper.downloader().SetBackoffPolicy(kZeroBackoffPolicy);
 
-  ExtensionDownloaderTask task = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task.install_location = mojom::ManifestLocation::kExternalPolicyDownload,
   helper.downloader().AddPendingExtension(std::move(task));
   auto test_extension_cache = std::make_unique<ExtensionCacheFake>();
@@ -546,8 +522,8 @@ TEST_F(ExtensionDownloaderTest, TestManifestFetchFailureAfterCacheMiss) {
 
   helper.downloader().SetBackoffPolicy(kZeroBackoffPolicy);
 
-  ExtensionDownloaderTask task = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task.install_location = mojom::ManifestLocation::kExternalPolicyDownload;
   helper.downloader().AddPendingExtension(std::move(task));
 
@@ -575,11 +551,11 @@ TEST_F(ExtensionDownloaderTest, TestManifestFetchFailureAfterCacheMiss) {
 TEST_F(ExtensionDownloaderTest, TestMultipleRequests) {
   ExtensionDownloaderTestHelper helper;
 
-  ExtensionDownloaderTask task1 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task1 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task1.request_id = 0;
-  ExtensionDownloaderTask task2 = CreateDownloaderTask(
-      kTestExtensionId2, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task2 =
+      CreateDownloaderTask(kTestExtensionId2, GURL(kTestUpdateUrl));
   task2.request_id = 1;
 
   helper.test_url_loader_factory().SetInterceptor(
@@ -635,11 +611,11 @@ TEST_F(ExtensionDownloaderTest, TestMultipleRequests) {
 TEST_F(ExtensionDownloaderTest, TestMultipleRequestsSameExtension) {
   ExtensionDownloaderTestHelper helper;
 
-  ExtensionDownloaderTask task1 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task1 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task1.request_id = 0;
-  ExtensionDownloaderTask task2 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task2 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task2.request_id = 1;
 
   helper.test_url_loader_factory().SetInterceptor(
@@ -691,11 +667,11 @@ TEST_F(ExtensionDownloaderTest, TestMultipleRequestsSameExtension) {
 TEST_F(ExtensionDownloaderTest, TestUpdateManifestURLMerged) {
   ExtensionDownloaderTestHelper helper;
 
-  ExtensionDownloaderTask task1 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task1 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task1.request_id = 1;
-  ExtensionDownloaderTask task2 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task2 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task2.request_id = 2;
 
   int number_of_fetches = 0;
@@ -781,12 +757,12 @@ TEST_F(ExtensionDownloaderTest, TestMultipleCacheAccess) {
   // completely identical manifest fetches in the downloader, so when we'll ask
   // the cache about the extension after network fetch failure, they should be
   // merged into one fetch and cache should be queried only once.
-  ExtensionDownloaderTask task1 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task1 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task1.install_location = mojom::ManifestLocation::kExternalPolicyDownload;
   task1.request_id = 1;
-  ExtensionDownloaderTask task2 = CreateDownloaderTask(
-      kTestExtensionId, extension_urls::GetWebstoreUpdateUrl());
+  ExtensionDownloaderTask task2 =
+      CreateDownloaderTask(kTestExtensionId, GURL(kTestUpdateUrl));
   task2.install_location = mojom::ManifestLocation::kExternalPolicyDownload;
   task2.request_id = 2;
 
@@ -810,126 +786,6 @@ TEST_F(ExtensionDownloaderTest, TestMultipleCacheAccess) {
   content::RunAllTasksUntilIdle();
 
   testing::Mock::VerifyAndClearExpectations(&mock_cache);
-}
-
-class ExtensionDownloaderRedirectTest : public ExtensionsTest {
- public:
-  ExtensionDownloaderRedirectTest()
-      : ExtensionsTest(content::BrowserTaskEnvironment::IO_MAINLOOP) {}
-};
-
-TEST_F(ExtensionDownloaderRedirectTest, AuthorizationHeaderRemovedOnRedirect) {
-  // Use HTTPS server because Authorization header is only added for secure
-  // URLs.
-  net::EmbeddedTestServer test_server(net::EmbeddedTestServer::TYPE_HTTPS);
-  test_server.SetCertHostnames(
-      {"google.com", "other.com", "localhost", "127.0.0.1"});
-
-  int crx_request_count = 0;
-  bool redirect_had_auth = false;
-  bool final_had_auth = false;
-
-  test_server.RegisterRequestHandler(base::BindLambdaForTesting(
-      [&](const net::test_server::HttpRequest& request)
-          -> std::unique_ptr<net::test_server::HttpResponse> {
-        GURL url = request.GetURL();
-        if (url.path() == "/manifest") {
-          auto response =
-              std::make_unique<net::test_server::BasicHttpResponse>();
-          response->set_code(net::HTTP_OK);
-          // Point to google.com so that ExtensionDownloader is willing to use
-          // OAuth2 tokens.
-          response->set_content(CreateUpdateManifest(
-              {UpdateManifestItem(kTestExtensionId)
-                   .version("1.1")
-                   .codebase(
-                       test_server.GetURL("google.com", "/crx").spec())}));
-          response->set_content_type("text/xml");
-          return response;
-        } else if (url.path() == "/crx") {
-          crx_request_count++;
-          if (crx_request_count == 1) {
-            // First request fails with 401 to trigger OAuth2 retry.
-            auto response =
-                std::make_unique<net::test_server::BasicHttpResponse>();
-            response->set_code(net::HTTP_UNAUTHORIZED);
-            return response;
-          }
-          // Second request (retry) should have the Authorization header.
-          redirect_had_auth =
-              request.headers.contains(net::HttpRequestHeaders::kAuthorization);
-          auto response =
-              std::make_unique<net::test_server::BasicHttpResponse>();
-          response->set_code(net::HTTP_FOUND);
-          response->AddCustomHeader(
-              "Location", test_server.GetURL("other.com", "/final").spec());
-          return response;
-        } else if (url.path() == "/final") {
-          // Third request (after redirect) should NOT have the Authorization
-          // header.
-          final_had_auth =
-              request.headers.contains(net::HttpRequestHeaders::kAuthorization);
-          auto response =
-              std::make_unique<net::test_server::BasicHttpResponse>();
-          response->set_code(net::HTTP_OK);
-          response->set_content("crx_content");
-          return response;
-        }
-        return nullptr;
-      }));
-
-  ASSERT_TRUE(test_server.Start());
-
-  net::ScopedTestRoot scoped_test_root(test_server.GetRoot());
-
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder;
-
-  auto host_resolver_proc =
-      base::MakeRefCounted<net::RuleBasedHostResolverProc>(nullptr);
-  host_resolver_proc->AddRule("*", "127.0.0.1");
-  net::ScopedDefaultHostResolverProc scoped_host_resolver_proc(
-      host_resolver_proc.get());
-
-  signin::IdentityTestEnvironment identity_test_env;
-  identity_test_env.MakePrimaryAccountAvailable("test@example.com",
-                                                signin::ConsentLevel::kSignin);
-  identity_test_env.SetAutomaticIssueOfAccessTokens(true);
-
-  MockExtensionDownloaderDelegate delegate;
-  ExtensionDownloader downloader(&delegate,
-                                 browser_context()
-                                     ->GetDefaultStoragePartition()
-                                     ->GetURLLoaderFactoryForBrowserProcess(),
-                                 GetTestVerifierFormat());
-  downloader.SetIdentityManager(identity_test_env.identity_manager());
-  downloader.SetBackoffPolicy(kZeroBackoffPolicy);
-
-  base::RunLoop run_loop;
-
-  ExtensionDownloaderTask task(kTestExtensionId,
-                               test_server.GetURL("/manifest"),
-                               mojom::ManifestLocation::kInternal, false, 0,
-                               DownloadFetchPriority::kBackground);
-  downloader.AddPendingExtension(std::move(task));
-
-  EXPECT_CALL(delegate, IsExtensionPending(kTestExtensionId))
-      .WillRepeatedly(testing::Return(true));
-  EXPECT_CALL(delegate,
-              OnExtensionDownloadFinished_(testing::_, testing::_, testing::_,
-                                           testing::_, testing::_, testing::_))
-      .WillOnce(testing::InvokeWithoutArgs(&run_loop, &base::RunLoop::Quit));
-  EXPECT_CALL(delegate,
-              OnExtensionDownloadFailed(testing::_, testing::_, testing::_,
-                                        testing::_, testing::_))
-      .WillRepeatedly(
-          testing::InvokeWithoutArgs(&run_loop, &base::RunLoop::Quit));
-
-  downloader.StartAllPending(nullptr);
-  run_loop.Run();
-
-  EXPECT_EQ(crx_request_count, 2);
-  EXPECT_TRUE(redirect_had_auth);
-  EXPECT_FALSE(final_had_auth);
 }
 
 }  // namespace extensions

@@ -1174,7 +1174,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   extensions::util::RegisterProfilePrefs(registry);
   extensions_ui_prefs::RegisterProfilePrefs(registry);
   ExtensionUrlOverrides::RegisterProfilePrefs(registry);
-  update_client::RegisterProfilePrefs(registry);
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 

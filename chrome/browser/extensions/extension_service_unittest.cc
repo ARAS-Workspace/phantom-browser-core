@@ -139,7 +139,6 @@
 #include "extensions/common/extension_features.h"
 #include "extensions/common/extension_l10n_util.h"
 #include "extensions/common/extension_resource.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/file_util.h"
 #include "extensions/common/manifest_constants.h"
 #include "extensions/common/manifest_handlers/background_info.h"
@@ -4665,52 +4664,6 @@ TEST_F(ExtensionServiceTest, DisableExtension) {
   EXPECT_EQ(0u, registry()->blocklisted_extensions().size());
 }
 
-// Tests the malware Omaha attributes to remotely disable an extension for
-// malware.
-TEST_F(ExtensionServiceTest, DisableRemotelyForMalware) {
-  InitializeEmptyExtensionService();
-
-  InstallCRX(data_dir().AppendASCII("good.crx"), INSTALL_NEW);
-  EXPECT_TRUE(registry()->enabled_extensions().GetByID(kGoodCrx));
-
-  auto attributes = base::DictValue().Set("_malware", true);
-  EXPECT_EQ(1u, registry()->enabled_extensions().size());
-
-  service()->PerformActionBasedOnOmahaAttributes(kGoodCrx, attributes);
-  EXPECT_TRUE(blocklist_prefs::HasOmahaBlocklistState(
-      kGoodCrx, BitMapBlocklistState::BLOCKLISTED_MALWARE, prefs()));
-  EXPECT_TRUE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-
-  attributes.Set("_malware", false);
-  service()->PerformActionBasedOnOmahaAttributes(kGoodCrx, attributes);
-  EXPECT_EQ(1u, registry()->enabled_extensions().size());
-  EXPECT_TRUE(prefs()->GetDisableReasons(kGoodCrx).empty());
-  EXPECT_FALSE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-}
-
-// Tests not re-enabling previously remotely disabled extension if it's not the
-// only reason but the disable reasons should be gone.
-TEST_F(ExtensionServiceTest, NoEnableRemotelyDisabledExtension) {
-  InitializeEmptyExtensionService();
-
-  InstallCRX(data_dir().AppendASCII("good.crx"), INSTALL_NEW);
-  EXPECT_TRUE(registry()->enabled_extensions().GetByID(kGoodCrx));
-
-  auto attributes = base::DictValue().Set("_malware", true);
-  registrar()->DisableExtension(kGoodCrx,
-                                {disable_reason::DISABLE_USER_ACTION});
-  EXPECT_TRUE(registry()->disabled_extensions().GetByID(kGoodCrx));
-  service()->PerformActionBasedOnOmahaAttributes(kGoodCrx, attributes);
-  EXPECT_TRUE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-
-  attributes.Set("_malware", false);
-  service()->PerformActionBasedOnOmahaAttributes(kGoodCrx, attributes);
-  EXPECT_TRUE(registry()->disabled_extensions().GetByID(kGoodCrx));
-  EXPECT_FALSE(blocklist_prefs::HasOmahaBlocklistState(
-      kGoodCrx, BitMapBlocklistState::BLOCKLISTED_MALWARE, prefs()));
-  EXPECT_FALSE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-}
-
 TEST_F(ExtensionServiceTest,
        DisableAndReenableUnpackedExtensionBasedOnDeveloperMode) {
   base::test::ScopedFeatureList feature_list(
@@ -8178,7 +8131,7 @@ TEST_F(ExtensionServiceTest,
   AddMockExternalProvider(ManifestLocation::kExternalPrefDownload);
   const ExtensionId kExternalExtensionId =
       crx_file::id_util::GenerateId("external");
-  GURL update_url(extension_urls::kChromeWebstoreUpdateURL);
+  GURL update_url("https://localhost/test/updates.xml");
   external_provider_manager()->OnExternalExtensionUpdateUrlFound(
       ExternalInstallInfoUpdateUrl(
           kExternalExtensionId, /*install_parameter=*/"", update_url,
@@ -8243,7 +8196,7 @@ TEST_P(ExternalExtensionPriorityTest, PolicyForegroundFetch) {
   updater->SetExtensionCacheForTesting(&extension_cache);
   updater->Start();
 
-  GURL update_url(extension_urls::kChromeWebstoreUpdateURL);
+  GURL update_url("https://localhost/test/updates.xml");
   external_provider_manager()->OnExternalExtensionUpdateUrlFound(
       ExternalInstallInfoUpdateUrl(kAllZero /* extension_id */,
                                    "" /* install_parameter */, update_url,
@@ -8264,9 +8217,8 @@ TEST_P(ExternalExtensionPriorityTest, PolicyForegroundFetch) {
   bool is_high_priority =
       GetParam() == ManifestLocation::kExternalPolicyDownload ||
       GetParam() == ManifestLocation::kExternalComponent;
-  std::string expected_header = is_high_priority ? "fg" : "bg";
-  EXPECT_EQ(expected_header, pending_request->request.headers.GetHeader(
-                                 "X-Goog-Update-Interactivity"));
+  EXPECT_EQ(is_high_priority ? net::MEDIUM : net::IDLE,
+            pending_request->request.priority);
 
   // Destroy updater's downloader as it uses |helper|.
   updater->SetExtensionDownloaderForTesting(nullptr);

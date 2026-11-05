@@ -196,7 +196,6 @@ class ExtensionPrefs : public KeyedService {
     friend class ExtensionPrefs;
     friend class ExtensionRegistrar;
     friend class ExtensionService;
-    friend class UpdateDataProviderTest;
     FRIEND_TEST_ALL_PREFIXES(ExtensionPrefsSimpleTest,
                              DisableReasonsRawManipulation);
   };

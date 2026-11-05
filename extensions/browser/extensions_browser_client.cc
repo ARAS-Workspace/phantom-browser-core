@@ -14,8 +14,6 @@
 #include "base/memory/ref_counted_memory.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/path_service.h"
-#include "components/update_client/configurator.h"
-#include "components/update_client/update_client.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/security_principal.h"
 #include "content/public/browser/site_instance.h"
@@ -61,18 +59,6 @@ void ExtensionsBrowserClient::AddAPIProvider(
 }
 
 void ExtensionsBrowserClient::StartTearDown() {}
-
-scoped_refptr<update_client::UpdateClient>
-ExtensionsBrowserClient::CreateUpdateClient(
-    scoped_refptr<update_client::Configurator> configurator) {
-  return scoped_refptr<update_client::UpdateClient>(nullptr);
-}
-
-scoped_refptr<update_client::Configurator>
-ExtensionsBrowserClient::CreateUpdateClientConfigurator(
-    content::BrowserContext* context) {
-  return scoped_refptr<update_client::Configurator>(nullptr);
-}
 
 std::unique_ptr<ScopedBrowserContextKeepAlive>
 ExtensionsBrowserClient::CreateUpdaterKeepAlive(

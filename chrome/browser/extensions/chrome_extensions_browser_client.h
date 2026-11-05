@@ -38,10 +38,6 @@ namespace url {
 class Origin;
 }  // namespace url
 
-namespace update_client {
-class Configurator;
-}
-
 namespace extensions {
 class ChromeProcessManagerDelegate;
 class ComponentExtensionResourceManager;
@@ -186,10 +182,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
   void ClearBackForwardCache() override;
   void AttachExtensionTaskManagerTag(content::WebContents* web_contents,
                                      mojom::ViewType view_type) override;
-  scoped_refptr<update_client::UpdateClient> CreateUpdateClient(
-      scoped_refptr<update_client::Configurator>) override;
-  scoped_refptr<update_client::Configurator> CreateUpdateClientConfigurator(
-      content::BrowserContext* context) override;
   std::unique_ptr<ScopedBrowserContextKeepAlive> CreateUpdaterKeepAlive(
       content::BrowserContext* context) override;
   std::unique_ptr<ScopedBrowserContextKeepAlive> CreateCrxInstallerKeepAlive(

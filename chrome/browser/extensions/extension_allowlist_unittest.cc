@@ -4,7 +4,6 @@
 
 #include "extensions/browser/extension_allowlist.h"
 
-#include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/extensions/extension_allowlist_factory.h"
 #include "chrome/browser/extensions/extension_management_test_util.h"
 #include "chrome/browser/extensions/extension_service.h"
@@ -33,7 +32,7 @@ using ManagementPrefUpdater = ExtensionManagementPrefUpdater<
 
 }  // namespace
 
-// Test suite for the Safe Browsing allowlist state set from Omaha attributes.
+// Test suite for the Safe Browsing allowlist state.
 class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
  protected:
   // Creates a test extension service with 3 installed extensions.
@@ -48,15 +47,10 @@ class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
     InitializeExtensionService(ExtensionServiceInitParams());
   }
 
-  void PerformActionBasedOnOmahaAttributes(const ExtensionId& extension_id,
-                                           bool is_malware,
-                                           bool is_allowlisted) {
-    auto attributes = base::DictValue().Set("_esbAllowlist", is_allowlisted);
-    if (is_malware) {
-      attributes.Set("_malware", true);
-    }
-
-    service()->PerformActionBasedOnOmahaAttributes(extension_id, attributes);
+  void SetAllowlisted(const ExtensionId& extension_id, bool is_allowlisted) {
+    allowlist()->SetExtensionAllowlistState(
+        extension_id,
+        is_allowlisted ? ALLOWLIST_ALLOWLISTED : ALLOWLIST_NOT_ALLOWLISTED);
   }
 
   bool IsEnabled(const ExtensionId& extension_id) {
@@ -86,18 +80,13 @@ TEST_F(ExtensionAllowlistUnitTestBase, ReenabledExtensionsAreNotReenforced) {
   EXPECT_TRUE(IsEnabled(kExtensionId2));
 
   // If `kExtensionId2` becomes not allowlisted, it should stay enabled.
-  PerformActionBasedOnOmahaAttributes(kExtensionId2,
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/false);
+  SetAllowlisted(kExtensionId2, /*is_allowlisted=*/false);
   EXPECT_TRUE(IsEnabled(kExtensionId2));
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(kExtensionId2));
 
-  // If `kExtensionId2` becomes allowlisted again, the state follows the Omaha
-  // attribute.
-  PerformActionBasedOnOmahaAttributes(kExtensionId2,
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/true);
+  // If `kExtensionId2` becomes allowlisted again, the state follows.
+  SetAllowlisted(kExtensionId2, /*is_allowlisted=*/true);
   EXPECT_EQ(ALLOWLIST_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(kExtensionId2));
 }
@@ -111,9 +100,7 @@ TEST_F(ExtensionAllowlistUnitTestBase, NoEnforcementWhenFeatureDisabled) {
   service()->Init();
   EXPECT_TRUE(IsEnabled(kExtensionId1));
 
-  PerformActionBasedOnOmahaAttributes(kExtensionId2,
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/false);
+  SetAllowlisted(kExtensionId2, /*is_allowlisted=*/false);
   EXPECT_TRUE(IsEnabled(kExtensionId1));
   EXPECT_TRUE(IsEnabled(kExtensionId2));
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
@@ -141,18 +128,11 @@ TEST_F(ExtensionAllowlistUnitTestBase,
 
   EXPECT_TRUE(IsEnabled(extension->id()));
 
-  base::HistogramTester histogram_tester;
-  // On next update check, the extension is now marked as not allowlisted.
-  PerformActionBasedOnOmahaAttributes(extension->id(),
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/false);
+  // The extension is now marked as not allowlisted.
+  SetAllowlisted(extension->id(), /*is_allowlisted=*/false);
 
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(extension->id()));
-  // 2 == ExtensionAllowlistOmahaAttributeValue::kNotAllowlisted.
-  histogram_tester.ExpectUniqueSample("Extensions.EsbAllowlistOmahaAttribute",
-                                      /*sample=*/2,
-                                      /*expected_bucket_count=*/1);
   // A policy installed extension is not disabled by allowlist enforcement.
   EXPECT_TRUE(IsEnabled(extension->id()));
 }
@@ -176,10 +156,8 @@ TEST_F(ExtensionAllowlistUnitTestBase, NoEnforcementOnPolicyAllowedInstall) {
 
   EXPECT_TRUE(IsEnabled(extension->id()));
 
-  // On next update check, the extension is now marked as not allowlisted.
-  PerformActionBasedOnOmahaAttributes(extension->id(),
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/false);
+  // The extension is now marked as not allowlisted.
+  SetAllowlisted(extension->id(), /*is_allowlisted=*/false);
 
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(extension->id()));

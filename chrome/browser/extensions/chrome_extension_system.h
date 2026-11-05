@@ -27,7 +27,6 @@ class ValueStoreFactoryImpl;
 namespace extensions {
 
 class ChromeExtensionSystemSharedFactory;
-class UninstallPingSender;
 class InstallGate;
 
 // The ExtensionSystem for ProfileImpl and OffTheRecordProfileImpl.
@@ -37,8 +36,6 @@ class InstallGate;
 // but with a shared instance for incognito) keeps the common services.
 class ChromeExtensionSystem : public ExtensionSystem {
  public:
-  using InstallUpdateCallback = ExtensionSystem::InstallUpdateCallback;
-
   explicit ChromeExtensionSystem(Profile* profile);
 
   ChromeExtensionSystem(const ChromeExtensionSystem&) = delete;
@@ -65,14 +62,6 @@ class ChromeExtensionSystem : public ExtensionSystem {
   const base::OneShotEvent& ready() const override;
   bool is_ready() const override;
   ContentVerifier* content_verifier() override;  // shared
-  void InstallUpdate(const std::string& extension_id,
-                     const std::string& public_key,
-                     const base::FilePath& unpacked_dir,
-                     bool install_immediately,
-                     InstallUpdateCallback install_update_callback) override;
-  void PerformActionBasedOnOmahaAttributes(
-      const std::string& extension_id,
-      const base::DictValue& attributes) override;
 
  private:
   friend class ChromeExtensionSystemSharedFactory;
@@ -130,8 +119,6 @@ class ChromeExtensionSystem : public ExtensionSystem {
 
     // For verifying the contents of extensions read from disk.
     scoped_refptr<ContentVerifier> content_verifier_;
-
-    std::unique_ptr<UninstallPingSender> uninstall_ping_sender_;
 
     base::OneShotEvent ready_;
   };

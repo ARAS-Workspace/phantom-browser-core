@@ -23,7 +23,6 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/forced_extensions/force_installed_metrics.h"
 #include "chrome/browser/extensions/forced_extensions/force_installed_tracker.h"
-#include "chrome/browser/extensions/omaha_attributes_handler.h"
 #include "chrome/browser/policy/cloud/extension_install_policy_service.h"
 #include "chrome/browser/profiles/profile_manager_observer.h"
 #include "chrome/browser/upgrade_detector/upgrade_observer.h"
@@ -62,7 +61,6 @@ class ComponentLoader;
 class CorruptedExtensionReinstaller;
 class DelayedInstallManager;
 class ExtensionActionStorageManager;
-class ExtensionAllowlist;
 class ExtensionErrorController;
 class ExtensionRegistry;
 class ExtensionSystem;
@@ -163,10 +161,6 @@ class ExtensionService : public ExtensionServiceInterface,
   // Called when the associated Profile is going to be destroyed, as part of
   // KeyedService two-phase shutdown.
   void Shutdown();
-
-  // Performs action based on Omaha attributes for the extension.
-  void PerformActionBasedOnOmahaAttributes(const std::string& extension_id,
-                                           const base::DictValue& attributes);
 
   // Disable non-default and non-managed extensions with ids not in
   // `except_ids`. Default extensions are those from the Web Store with
@@ -315,8 +309,6 @@ class ExtensionService : public ExtensionServiceInterface,
   // Blocklist for the owning profile.
   raw_ptr<Blocklist> blocklist_ = nullptr;
 
-  raw_ptr<ExtensionAllowlist> allowlist_ = nullptr;
-
   // Sets of enabled/disabled/terminated/blocklisted extensions. Not owned.
   raw_ptr<ExtensionRegistry> registry_ = nullptr;
 
@@ -364,9 +356,6 @@ class ExtensionService : public ExtensionServiceInterface,
 
   // Helper to register and unregister extensions.
   raw_ptr<ExtensionRegistrar> extension_registrar_ = nullptr;
-
-  // Needs `extension_registrar_` during construction.
-  OmahaAttributesHandler omaha_attributes_handler_;
 
   // Tracker of enterprise policy forced installation.
   ForceInstalledTracker force_installed_tracker_;
