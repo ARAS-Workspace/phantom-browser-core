@@ -55,15 +55,3 @@ source_set("updater") {
     "//services/data_decoder/public/cpp",
   ]
 }
-
-source_set("test_support") {
-  sources = [
-    "extension_update_found_test_observer.cc",
-    "extension_update_found_test_observer.h",
-  ]
-
-  deps = [
-    ":updater",
-    "//base",
-  ]
-}

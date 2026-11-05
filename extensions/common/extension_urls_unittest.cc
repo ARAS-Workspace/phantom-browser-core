@@ -23,13 +23,4 @@ TEST(ExtensionWebstoreURLsTest, GetWebstoreExtensionsCategoryURL) {
             GetWebstoreExtensionsCategoryURL().spec());
 }
 
-// Tests that the URL to get the block status of extensions in the webstore is
-// what we expect.
-TEST(ExtensionWebstoreURLsTest, GetWebstoreBlockStatusURL) {
-  EXPECT_EQ(
-      "https://chromewebstore.googleapis.com/v2/items:"
-      "batchFetchItemBlockStatusForEnterprise",
-      GetWebstoreBlockStatusURL().spec());
-}
-
 }  // namespace extension_urls

@@ -7,9 +7,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/strings/strcat.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/gtest_util.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
@@ -207,45 +205,6 @@ TEST_F(ExtensionUtilUnittest, FixupLongExtensionName) {
   std::u16string fixup_extension_name =
       ui_util::GetFixupExtensionNameForUIDisplay(long_extension_name);
   EXPECT_EQ(fixup_extension_name, expected_fixup_extension_name);
-}
-
-using ExtensionUtilDeathTest = testing::Test;
-
-TEST_F(ExtensionUtilDeathTest, GetCWSWritingReviewUrl_InvalidId) {
-  const ExtensionId kInvalidId = "invalid_id_format";
-
-  for (const char* invalid_id : {kInvalidId.c_str(), "", "../../etc/passwd"}) {
-    EXPECT_CHECK_DEATH(util::GetCWSWritingReviewUrl(
-        invalid_id, util::CWSReviewSource::kExtensionsMenu));
-  }
-}
-
-TEST_F(ExtensionUtilUnittest, GetCWSWritingReviewUrl) {
-  const ExtensionId kValidId = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-
-  EXPECT_EQ(
-      util::GetCWSWritingReviewUrl(
-          kValidId, util::CWSReviewSource::kExtensionsMenu)
-          .spec(),
-      base::StringPrintf("https://chromewebstore.google.com/detail/"
-                         "%s/reviews?action=write&source=extensions_menu",
-                         kValidId.c_str()));
-
-  EXPECT_EQ(
-      util::GetCWSWritingReviewUrl(
-          kValidId, util::CWSReviewSource::kExtensionsPage)
-          .spec(),
-      base::StringPrintf("https://chromewebstore.google.com/detail/"
-                         "%s/reviews?action=write&source=extensions_page",
-                         kValidId.c_str()));
-
-  EXPECT_EQ(
-      util::GetCWSWritingReviewUrl(
-          kValidId, util::CWSReviewSource::kContextMenu)
-          .spec(),
-      base::StringPrintf("https://chromewebstore.google.com/detail/"
-                         "%s/reviews?action=write&source=context_menu",
-                         kValidId.c_str()));
 }
 
 }  // namespace extensions

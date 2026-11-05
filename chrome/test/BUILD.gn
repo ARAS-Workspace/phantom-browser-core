@@ -1149,7 +1149,6 @@ test("browser_tests") {
     "//chrome/browser/ui/webui/content_settings:browser_tests",
     "//chrome/browser/ui/webui/cr_components/theme_color_picker",
     "//chrome/browser/ui/webui/customize_buttons:browser_tests",
-    "//chrome/browser/ui/webui/extensions_zero_state_promo:browser_tests",
     "//chrome/browser/ui/webui/image:browser_tests",
     "//chrome/browser/ui/webui/new_tab_footer:browser_tests",
     "//chrome/browser/ui/webui/new_tab_page_third_party:browser_tests",

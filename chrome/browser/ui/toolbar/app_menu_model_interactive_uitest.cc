@@ -46,7 +46,6 @@
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/browser/unpacked_installer.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/test/test_extension_dir.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -313,38 +312,4 @@ IN_PROC_BROWSER_TEST_P(AppMenuModelExtensionsInteractiveTest,
                                 MENU_ACTION_VISIT_CHROME_WEB_STORE, 0);
   histograms_.ExpectBucketCount("WrenchMenu.MenuAction",
                                 MENU_ACTION_FIND_EXTENSIONS, 0);
-}
-
-// Test to confirm that the visit Chrome Web Store menu item navigates to the
-// correct chrome webstore URL when selected and emits histograms that it did
-// so.
-IN_PROC_BROWSER_TEST_P(AppMenuModelExtensionsInteractiveTest,
-                       VisitChromeWebStore) {
-  const bool collapse = MenuShouldCollapse();
-  const GURL expected_webstore_launch_url =
-      extension_urls::GetNewWebstoreLaunchURL();
-  RunTestSequence(
-      InstrumentTab(kPrimaryTabPageElementId),
-      PressButton(kToolbarAppMenuButtonElementId),
-      // If not collapsed, then the web store item is in the extensions submenu.
-      If([collapse]() { return !collapse; },
-         Then(SelectMenuItem(AppMenuModel::kExtensionsMenuItem))),
-      SelectMenuItem(ExtensionsMenuModel::kVisitChromeWebStoreMenuItem),
-      WaitForWebContentsNavigation(
-          kPrimaryTabPageElementId,
-          extension_urls::AppendUtmSource(expected_webstore_launch_url,
-                                          extension_urls::kAppMenuUtmSource)));
-
-  histograms_.ExpectTotalCount("WrenchMenu.TimeToAction.VisitChromeWebStore",
-                               collapse ? 0 : 1);
-  histograms_.ExpectTotalCount("WrenchMenu.TimeToAction.FindExtensions",
-                               collapse ? 1 : 0);
-  histograms_.ExpectTotalCount("WrenchMenu.TimeToAction.ManageExtensions", 0);
-  histograms_.ExpectBucketCount("WrenchMenu.MenuAction",
-                                MENU_ACTION_VISIT_CHROME_WEB_STORE,
-                                collapse ? 0 : 1);
-  histograms_.ExpectBucketCount("WrenchMenu.MenuAction",
-                                MENU_ACTION_FIND_EXTENSIONS, collapse ? 1 : 0);
-  histograms_.ExpectBucketCount("WrenchMenu.MenuAction",
-                                MENU_ACTION_MANAGE_EXTENSIONS, 0);
 }
