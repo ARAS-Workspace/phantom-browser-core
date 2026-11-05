@@ -16,7 +16,6 @@ enum SaveRequestType {
   kAnnotation = 0,
   kOriginal = 1,
   kEdited = 2,
-  kSearchified = 3,
 };
 
 // Renderer-side interface used by the browser.
@@ -55,9 +54,8 @@ interface PdfListener {
 
   // Returns `true` if the document has meaningful text. A document is
   // considered to have meaningful text if the total character count is at
-  // least 100 characters. If Searchify is enabled, pages that require
-  // Searchify are treated as having 0 characters. Returns `false` if called
-  // before the document is loaded.
+  // least 100 characters. Returns `false` if called before the document is
+  // loaded.
   HasMeaningfulText() => (bool has_meaningful_text);
 
   // Returns `true` if the PDF contains JavaScript actions. Returns `false` if
@@ -142,9 +140,4 @@ interface PdfHost {
 
   // Notifies the embedder know the plugin can handle save commands internally.
   SetPluginCanSave(bool can_save);
-
-  // Notifies that PDF searchifier has started processing pages. This should be
-  // called at most once.
-  [EnableIf=enable_screen_ai_service]
-  OnSearchifyStarted();
 };

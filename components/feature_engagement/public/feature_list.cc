@@ -46,7 +46,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHMemorySaverModeFeature,
     &kIPHMultistepFilterPromoFeature,
     &kIPHPdfInkSignaturesFeature,
-    &kIPHPdfSearchifyFeature,
     &kIPHPdfTextAnnotationsFeature,
     &kIPHPdfTranslateBubbleFeature,
     &kIPHPerformanceInterventionDialogFeature,

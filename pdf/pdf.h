@@ -13,7 +13,6 @@
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "pdf/document_metadata.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 
 namespace gfx {
 class Rect;

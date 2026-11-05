@@ -6,10 +6,7 @@ import("//extensions/buildflags/buildflags.gni")
 import("//services/screen_ai/buildflags/features.gni")
 
 source_set("accessibility") {
-  public = [
-    "pdf_ocr_metrics.h",
-    "prefers_default_scrollbar_styles_prefs.h",
-  ]
+  public = [ "prefers_default_scrollbar_styles_prefs.h" ]
 
   public += [
     "ax_main_node_annotator_controller.h",
@@ -45,10 +42,7 @@ source_set("accessibility") {
 }
 
 source_set("impl") {
-  sources = [
-    "pdf_ocr_metrics.cc",
-    "prefers_default_scrollbar_styles_prefs.cc",
-  ]
+  sources = [ "prefers_default_scrollbar_styles_prefs.cc" ]
 
   deps = [ "//chrome/browser/language" ]
 

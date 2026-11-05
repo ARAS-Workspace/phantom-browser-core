@@ -120,7 +120,6 @@ base::DictValue GetPdfViewerStrings() {
       {"rotationStateLabel90", IDS_PDF_ROTATION_STATE_LABEL_90},
       {"rotationStateLabel180", IDS_PDF_ROTATION_STATE_LABEL_180},
       {"rotationStateLabel270", IDS_PDF_ROTATION_STATE_LABEL_270},
-      {"searchifyInProgress", IDS_PDF_SEARCHIFY_IN_PROGRESS},
       {"sidebarLabel", IDS_PDF_SIDEBAR_LABEL},
       {"thumbnailPageAriaLabel", IDS_PDF_THUMBNAIL_PAGE_ARIA_LABEL},
       {"tooltipAttachments", IDS_PDF_TOOLTIP_ATTACHMENTS},
@@ -281,9 +280,6 @@ base::DictValue GetAdditionalData(content::WebContents* web_contents) {
   dict.Set("pdfGetSaveDataInBlocks",
            base::FeatureList::IsEnabled(
                chrome_pdf::features::kPdfGetSaveDataInBlocks));
-  dict.Set(
-      "pdfSearchifySaveEnabled",
-      base::FeatureList::IsEnabled(chrome_pdf::features::kPdfSearchifySave));
   dict.Set("pdfUseShowSaveFilePicker",
            base::FeatureList::IsEnabled(
                chrome_pdf::features::kPdfUseShowSaveFilePicker));

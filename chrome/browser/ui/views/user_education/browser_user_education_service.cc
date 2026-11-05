@@ -48,7 +48,6 @@
 #include "chrome/browser/ui/views/autofill/popup/popup_view_views.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bar_view.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/page_action/page_action_view.h"
 #include "chrome/browser/ui/views/tabs/tab/tab_icon.h"
@@ -77,7 +76,6 @@
 #include "components/data_sharing/public/features.h"
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/pdf/browser/pdf_document_helper.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/send_tab_to_self/features.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -712,41 +710,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(151, "thestig@chromium.org",
                        "Triggered when the PDF Viewer opens.")));
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
-
-  // kIPHPdfSearchifyFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHPdfSearchifyFeature,
-          kBrowserDialogAnchorElementId, IDS_PDF_SEARCHIFY_IPH_BODY,
-          IDS_PDF_SEARCHIFY_IPH_BODY_SCREEN_READER,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetBubbleArrow(HelpBubbleArrow::kNone)
-          .SetBubbleTitleText(IDS_PDF_SEARCHIFY_IPH_TITLE)
-          .SetMetadata(132, "rhalavati@chromium.org",
-                       "Triggered once when user opens a PDF which gets OCRed.")
-          .SetAnchorElementFilter(base::BindRepeating(
-              [](const ui::ElementTracker::ElementList& elements)
-                  -> ui::TrackedElement* {
-                if (elements.empty()) {
-                  return nullptr;
-                }
-                // Ensure a searchified PDF is visible before showing the IPH.
-                auto* const browser_view =
-                    views::ElementTrackerViews::GetInstance()
-                        ->GetFirstMatchingViewAs<BrowserView>(
-                            kBrowserViewElementId, elements[0]->context());
-                std::vector<ContentsWebView*> contents_web_views =
-                    browser_view->GetAllVisibleContentsWebViews();
-                for (auto* contents_web_view : contents_web_views) {
-                  auto* pdf_doc_helper =
-                      pdf::PDFDocumentHelper::MaybeGetForWebContents(
-                          *contents_web_view->GetWebContents());
-                  if (pdf_doc_helper && pdf_doc_helper->SearchifyStarted()) {
-                    return elements[0];
-                  }
-                }
-                return nullptr;
-              }))));
 
   // kIPHLensOverlayFeature:
   registry.RegisterFeature(std::move(

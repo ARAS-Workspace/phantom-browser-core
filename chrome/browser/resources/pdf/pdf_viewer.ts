@@ -6,7 +6,6 @@
 // <if expr="enable_pdf_ink2">
 import 'chrome://resources/cr_elements/cr_page_selector/cr_page_selector.js';
 // </if>
-import 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 import './elements/viewer_error_dialog.js';
 import './elements/viewer_password_dialog.js';
 // <if expr="enable_pdf_ink2">
@@ -21,7 +20,6 @@ import './elements/viewer_properties_dialog.js';
 import './elements/viewer_toolbar.js';
 
 import {PdfHelpBubbleProxyImpl} from 'chrome://resources/cr_components/help_bubble/pdf_help_bubble_proxy.js';
-import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
 import {assert, assertNotReached, assertNotReachedCase} from 'chrome://resources/js/assert.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import type {LoadTimeDataRaw} from 'chrome://resources/js/load_time_data.js';
@@ -160,7 +158,6 @@ export interface PdfViewerElement {
     scroller: HTMLElement,
     sizer: HTMLElement,
     toolbar: ViewerToolbarElement,
-    searchifyProgress: CrToastElement,
   };
 }
 
@@ -289,7 +286,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
   protected accessor pdfInk2Enabled_: boolean = false;
   protected accessor pdfTextAnnotationsEnabled_: boolean = false;
   // </if>
-  private pdfSearchifySaveEnabled_: boolean = false;
   private pdfUseShowSaveFilePicker_: boolean = false;
   private pluginController_: PluginController = PluginController.getInstance();
   // <if expr="enable_pdf_ink2">
@@ -313,7 +309,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
   // </if>
   protected accessor viewportZoom_: number = 1;
   protected accessor zoomBounds_: ZoomBounds = {min: 0, max: 0};
-  private hasSearchifyText_: boolean = false;
 
   constructor() {
     PdfHelpBubbleProxyImpl.createConnectedInstance();
@@ -859,8 +854,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
     this.pdfTextAnnotationsEnabled_ =
         loadTimeData.getBoolean('pdfTextAnnotationsEnabled');
     // </if>
-    this.pdfSearchifySaveEnabled_ =
-        loadTimeData.getBoolean('pdfSearchifySaveEnabled');
     this.pdfUseShowSaveFilePicker_ =
         loadTimeData.getBoolean('pdfUseShowSaveFilePicker');
     const presetZoomFactors = this.viewport.presetZoomFactors;
@@ -964,9 +957,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
             return;
           case 'Copy':
             record(UserAction.COPY);
-            if (this.hasSearchifyText_) {
-              record(UserAction.COPY_SEARCHIFIED);
-            }
             return;
           case 'Paste':
             record(UserAction.PASTE);
@@ -1034,18 +1024,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         // Editing mode can only be entered once, and cannot be exited.
         this.hasEdits_ = true;
         return;
-      case 'setHasSearchifyText':
-        this.hasSearchifyText_ = true;
-        return;
-      case 'showSearchifyInProgress':
-        if ((data as unknown as {
-              show: boolean,
-            }).show) {
-          this.$.searchifyProgress.show();
-        } else {
-          this.$.searchifyProgress.hide();
-        }
-        return;
       // <if expr="enable_pdf_ink2">
       case 'startInkStroke':
         this.handleStartInkStroke_();
@@ -1053,9 +1031,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
       // </if>
       case 'startedFindInPage':
         record(UserAction.FIND_IN_PAGE);
-        if (this.hasSearchifyText_) {
-          record(UserAction.FIND_IN_PAGE_SEARCHIFIED);
-        }
         return;
       case 'touchSelectionOccurred':
         this.sendScriptingMessage({
@@ -1276,8 +1251,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
       saveMode = SaveRequestType.ANNOTATION;
     } else if (this.hasEdits_) {
       saveMode = SaveRequestType.EDITED;
-    } else if (this.hasSearchifyText_ && this.pdfSearchifySaveEnabled_) {
-      saveMode = SaveRequestType.SEARCHIFIED;
     } else {
       saveMode = SaveRequestType.ORIGINAL;
     }
@@ -1518,10 +1491,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
    * called by `save_`.
    */
   private async saveInBlocks_(requestType: SaveRequestType) {
-    // TODO(crbug.com/382610226): Update for `SaveRequestType.SEARCHIFIED` to
-    // allow users to select saving original PDF or text extracted one.
-    // To do so, the save type should be asked first, and then content would be
-    // fetched based on the selected type.
     assert(this.pluginController_.isActive);
 
     // Request type is only passed for testing purposes.
@@ -1656,12 +1625,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         break;
       case SaveRequestType.EDITED:
         record(UserAction.SAVE_EDITED);
-        break;
-      case SaveRequestType.SEARCHIFIED:
-        // TODO(crbug.com/382610226): Update metric after the code is updated to
-        // give users the option to save searchified or original PDF, and add
-        // test.
-        record(UserAction.SAVE_SEARCHIFIED);
         break;
       default:
         assertNotReachedCase(requestType);

@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "base/check_op.h"
-#include "chrome/browser/accessibility/pdf_ocr_metrics.h"
 #include "chrome/browser/ui/tab_contents/chrome_web_contents_menu_helper.h"
 #include "components/pdf/common/constants.h"
 #include "components/pdf/common/pdf_util.h"
@@ -51,8 +50,6 @@ void ChromeMimeHandlerViewGuestDelegate::RecordLoadMetric(
   ReportPDFLoadStatus(is_full_page
                           ? PDFLoadStatus::kLoadedFullPagePdfWithPdfium
                           : PDFLoadStatus::kLoadedEmbeddedPdfWithPdfium);
-
-  accessibility::RecordPDFOpenedWithA11yFeatureWithPdfOcr();
 }
 
 }  // namespace extensions

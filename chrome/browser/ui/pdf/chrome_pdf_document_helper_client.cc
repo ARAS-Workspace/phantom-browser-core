@@ -10,7 +10,6 @@
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/pdf/pdf_extension_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/screen_ai/screen_ai_install_state.h"
 #include "chrome/browser/ui/tab_contents/core_tab_helper.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/common/chrome_content_client.h"
@@ -19,7 +18,6 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/pdf/browser/pdf_document_helper.h"
 #include "components/pdf/browser/pdf_frame_util.h"
-#include "components/tabs/public/tab_interface.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
@@ -51,15 +49,6 @@ bool MaybeShowFeaturePromo(const base::Feature& feature,
   user_education_interface->MaybeShowFeaturePromo(
       user_education::FeaturePromoParams(feature));
   return true;
-}
-
-void MaybeHideSearchifyFeaturePromo(tabs::TabInterface* tab_interface) {
-  auto* user_education_interface = BrowserUserEducationInterface::From(
-      tab_interface->GetBrowserWindowInterface());
-  if (user_education_interface) {
-    user_education_interface->AbortFeaturePromo(
-        feature_engagement::kIPHPdfSearchifyFeature);
-  }
 }
 
 }  // namespace
@@ -151,24 +140,4 @@ void ChromePDFDocumentHelperClient::SetPluginCanSave(
   if (guest_view) {
     guest_view->SetPluginCanSave(can_save);
   }
-}
-
-void ChromePDFDocumentHelperClient::OnSearchifyStarted(
-    content::RenderFrameHost& render_frame_host) {
-  // Show the promo only when ScreenAI component is available and OCR can be
-  // done.
-  if (!screen_ai::ScreenAIInstallState::GetInstance()->IsComponentAvailable()) {
-    return;
-  }
-  content::WebContents* web_contents = GetWebContentsToUse(render_frame_host);
-  if (!MaybeShowFeaturePromo(feature_engagement::kIPHPdfSearchifyFeature,
-                             web_contents)) {
-    return;
-  }
-  auto* const tab = tabs::TabInterface::MaybeGetFromContents(web_contents);
-  if (!tab) {
-    return;
-  }
-  tab_subscriptions_.push_back(tab->RegisterWillDeactivate(
-      base::BindRepeating(&MaybeHideSearchifyFeaturePromo)));
 }

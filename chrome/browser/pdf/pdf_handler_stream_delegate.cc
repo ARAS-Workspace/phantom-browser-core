@@ -35,8 +35,6 @@ void PdfHandlerStreamDelegate::OnPostMessageSetUp(
 
   // Now that postMessage is set up, the PDF viewer has finished loading, so
   // update metrics.
-  // TODO(b:289010799): Call RecordPDFOpenedWithA11yFeatureWithPdfOcr in
-  // pdf_ocr_util.cc after figuring out how to fix the build dependency issue.
   ReportPDFLoadStatus(embedder_host->IsInPrimaryMainFrame()
                           ? PDFLoadStatus::kLoadedFullPagePdfWithPdfium
                           : PDFLoadStatus::kLoadedEmbeddedPdfWithPdfium);

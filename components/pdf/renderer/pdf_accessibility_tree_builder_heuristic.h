@@ -14,7 +14,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/raw_span.h"
 #include "pdf/accessibility_structs.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 
 namespace chrome_pdf {
 struct AccessibilityButtonInfo;
@@ -158,12 +157,7 @@ class PdfAccessibilityTreeBuilderHeuristic {
       ui::AXNodeData* para_node,
       size_t* text_run_index);
 
-  void AddRemainingAnnotations(ui::AXNodeData* para_node
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-                               ,
-                               bool ocr_applied
-#endif
-  );
+  void AddRemainingAnnotations(ui::AXNodeData* para_node);
 
   raw_ref<PdfAccessibilityTreeBuilder> builder_;
 

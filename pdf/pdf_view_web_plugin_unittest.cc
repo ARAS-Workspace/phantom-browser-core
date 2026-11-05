@@ -54,7 +54,6 @@
 #include "pdf/test/test_pdfium_engine.h"
 #include "printing/metafile_skia.h"
 #include "printing/units.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/input/web_coalesced_input_event.h"
@@ -241,9 +240,6 @@ class MockPdfAccessibilityDataHandler : public PdfAccessibilityDataHandler {
                std::vector<AccessibilityCharInfo>,
                AccessibilityPageObjects),
               (override));
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-  MOCK_METHOD(void, OnHasSearchifyText, (), (override));
-#endif
 };
 
 class FakePdfViewWebPluginClient : public PdfViewWebPlugin::Client {
@@ -363,24 +359,6 @@ class FakePdfViewWebPluginClient : public PdfViewWebPlugin::Client {
               CreateAccessibilityDataHandler,
               (PdfAccessibilityActionHandler*, blink::WebPluginContainer*),
               (override));
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-  MOCK_METHOD(void,
-              GetOcrMaxImageDimension,
-              (base::OnceCallback<void(uint32_t)> callback),
-              (override));
-
-  MOCK_METHOD(void,
-              PerformOcr,
-              (const SkBitmap& image,
-               base::OnceCallback<void(screen_ai::mojom::VisualAnnotationPtr)>
-                   callback),
-              (override));
-
-  MOCK_METHOD(void,
-              SetOcrDisconnectedCallback,
-              (base::RepeatingClosure callback),
-              (override));
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
 };
 
 class FakePdfHost : public pdf::mojom::PdfHost {
@@ -397,9 +375,6 @@ class FakePdfHost : public pdf::mojom::PdfHost {
               (const gfx::PointF&, int32_t, const gfx::PointF&, int32_t),
               (override));
   MOCK_METHOD(void, SetPluginCanSave, (bool), (override));
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-  MOCK_METHOD(void, OnSearchifyStarted, (), (override));
-#endif
 };
 
 }  // namespace
@@ -2287,9 +2262,6 @@ class PdfViewWebPluginSaveInBlocksTest : public PdfViewWebPluginTest {
         break;
       case pdf::mojom::SaveRequestType::kEdited:
         request_type_string = "EDITED";
-        break;
-      case pdf::mojom::SaveRequestType::kSearchified:
-        request_type_string = "SEARCHIFIED";
         break;
     }
     return base::DictValue()

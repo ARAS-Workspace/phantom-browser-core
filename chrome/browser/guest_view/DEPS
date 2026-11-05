@@ -4,7 +4,6 @@
 
 include_rules = [
   "-chrome/browser",
-  "+chrome/browser/accessibility/pdf_ocr_metrics.h",
   "+chrome/browser/ash/app_mode/kiosk_chrome_app_manager.h",
   "+chrome/browser/ash/app_mode/kiosk_controller.h",
   "+chrome/browser/ash/app_mode/kiosk_system_session.h",

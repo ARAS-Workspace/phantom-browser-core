@@ -4,7 +4,6 @@
 
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 
 assert(enable_pdf)
 

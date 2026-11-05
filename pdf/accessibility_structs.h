@@ -86,12 +86,6 @@ struct AccessibilityTextRunInfo {
                            const gfx::RectF& bounds,
                            AccessibilityTextDirection direction,
                            const AccessibilityTextStyleInfo& style);
-  AccessibilityTextRunInfo(uint32_t start_index,
-                           uint32_t len,
-                           const gfx::RectF& bounds,
-                           AccessibilityTextDirection direction,
-                           const AccessibilityTextStyleInfo& style,
-                           bool is_searchified);
   AccessibilityTextRunInfo(const AccessibilityTextRunInfo& other);
   ~AccessibilityTextRunInfo();
 
@@ -100,7 +94,6 @@ struct AccessibilityTextRunInfo {
   gfx::RectF bounds;
   AccessibilityTextDirection direction = AccessibilityTextDirection::kNone;
   AccessibilityTextStyleInfo style;
-  bool is_searchified = false;
 };
 
 struct AccessibilityImageInfo {
@@ -182,7 +175,6 @@ struct AccessibilityPageInfo {
   gfx::Rect bounds;
   uint32_t text_run_count = 0;
   uint32_t char_count = 0;
-  bool is_searchified = false;
 };
 
 struct AccessibilityCharInfo {

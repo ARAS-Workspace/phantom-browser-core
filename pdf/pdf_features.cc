@@ -41,8 +41,6 @@ BASE_FEATURE(kPdfPortfolio, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables PDF WebUI save to get PDF content from renderer in blocks.
 BASE_FEATURE(kPdfGetSaveDataInBlocks, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kPdfSearchifySave, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enables accessibility tags in PDFs to be parsed and integrated into the
 // accessibility tree by Chrome's PDF Viewer. Accessibility tags provide
 // structure and semantics to the text found in a PDF, e.g. they could mark a

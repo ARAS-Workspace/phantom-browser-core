@@ -5,7 +5,6 @@
 import("//build/buildflag_header.gni")
 import("//content/public/common/features.gni")
 import("//pdf/features.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//testing/test.gni")
 import("//third_party/pdfium/pdfium.gni")
@@ -61,7 +60,6 @@ if (enable_pdf) {
       ":internal",
       "//base",
       "//build:chromeos_buildflags",
-      "//services/screen_ai/buildflags",
       "//ui/gfx/geometry",
     ]
   }
@@ -159,8 +157,6 @@ if (enable_pdf) {
       "pdfium/pdfium_form_filler.h",
       "pdfium/pdfium_mem_buffer_file_write.cc",
       "pdfium/pdfium_mem_buffer_file_write.h",
-      "pdfium/pdfium_ocr.cc",
-      "pdfium/pdfium_ocr.h",
       "pdfium/pdfium_page.cc",
       "pdfium/pdfium_page.h",
       "pdfium/pdfium_permissions.cc",
@@ -213,7 +209,6 @@ if (enable_pdf) {
       "//gin",
       "//pdf/loader",
       "//printing",
-      "//services/screen_ai/buildflags",
       "//third_party/blink/public:blink_headers",
       "//third_party/blink/public/common:headers",
       "//third_party/highway:libhwy",
@@ -274,20 +269,6 @@ if (enable_pdf) {
       public_deps += [ "//third_party/ink" ]
       deps += [ "//pdf/mojom" ]
     }
-
-    if (enable_screen_ai_service) {
-      sources += [
-        "pdfium/pdfium_on_demand_searchifier.cc",
-        "pdfium/pdfium_on_demand_searchifier.h",
-        "pdfium/pdfium_searchify.cc",
-        "pdfium/pdfium_searchify.h",
-        "pdfium/pdfium_searchify_font.cc",
-        "pdfium/pdfium_searchify_font.h",
-      ]
-
-      public_deps += [ "//services/screen_ai/public/mojom" ]
-      deps += [ "//services/screen_ai/public/cpp:utilities" ]
-    }
   }
 
   source_set("assert_enums") {
@@ -340,7 +321,6 @@ if (enable_pdf) {
 
     deps = [
       ":pdf_accessibility_constants_helper",
-      "//services/screen_ai/buildflags",
       "//skia",
       "//ui/gfx/geometry",
     ]
@@ -386,7 +366,6 @@ if (enable_pdf) {
       "//pdf/loader",
       "//printing",
       "//services/network/public/mojom:url_loader_base",
-      "//services/screen_ai/buildflags",
       "//skia",
       "//third_party/blink/public:blink_headers",
       "//third_party/blink/public/common:headers",
@@ -433,7 +412,6 @@ if (enable_pdf) {
       "//cc:test_support",
       "//pdf/loader",
       "//printing",
-      "//services/screen_ai/buildflags",
       "//testing/gmock",
       "//testing/gtest",
       "//third_party/blink/public:blink",
@@ -506,7 +484,6 @@ if (enable_pdf) {
       "//pdf/loader",
       "//pdf/loader:unit_tests",
       "//printing",
-      "//services/screen_ai/buildflags",
       "//skia",
       "//testing/gmock",
       "//testing/gtest",

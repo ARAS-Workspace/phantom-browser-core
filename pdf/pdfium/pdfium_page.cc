@@ -34,7 +34,6 @@
 #include "pdf/pdfium/pdfium_api_string_buffer_adapter.h"
 #include "pdf/pdfium/pdfium_api_wrappers.h"
 #include "pdf/pdfium/pdfium_engine.h"
-#include "pdf/pdfium/pdfium_ocr.h"
 #include "pdf/pdfium/pdfium_rotation.h"
 #include "pdf/pdfium/pdfium_unsupported_features.h"
 #include "pdf/ui/thumbnail.h"
@@ -53,10 +52,6 @@
 #include "ui/gfx/geometry/vector2d.h"
 #include "ui/gfx/geometry/vector2d_f.h"
 #include "ui/gfx/range/range.h"
-
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-#include "third_party/skia/include/core/SkBitmap.h"
-#endif
 
 using printing::ConvertUnitFloat;
 using printing::kPixelsPerInch;
@@ -212,16 +207,6 @@ bool FloatEquals(float f1, float f2) {
          kEpsilonScale * fmaxf(fmaxf(fabsf(f1), fabsf(f2)), kEpsilonScale);
 }
 
-// Check if the smaller number is at least half the larger one. This function is
-// only called on objects added by searchify.
-bool FloatAtLeastHalf(float f1, float f2) {
-  CHECK_GT(f1, 0);
-  CHECK_GT(f2, 0);
-
-  float ratio = f1 < f2 ? f1 / f2 : f2 / f1;
-  return ratio >= 0.5f;
-}
-
 bool IsRadioButtonOrCheckBox(int button_type) {
   return button_type == FPDF_FORMFIELD_CHECKBOX ||
          button_type == FPDF_FORMFIELD_RADIOBUTTON;
@@ -308,27 +293,14 @@ AccessibilityTextStyleInfo CalculateTextRunStyleInfo(FPDF_TEXTPAGE text_page,
 }
 
 // Returns true if the text_object on the given `text_page` at the given
-// `char_index` has the same text style as the text run. `is_searchified`
-// indicates that the text and style are from searchify.
+// `char_index` has the same text style as the text run.
 bool AreTextStyleEqual(FPDF_TEXTPAGE text_page,
                        int char_index,
-                       const AccessibilityTextStyleInfo& style,
-                       bool is_searchified) {
+                       const AccessibilityTextStyleInfo& style) {
   AccessibilityTextStyleInfo char_style =
       CalculateTextRunStyleInfo(text_page, char_index);
-
-  // Font size of the searchify text is set based on the height of the bounding
-  // box around each word. Therefore the font size depends on whether that word
-  // has upper case or tall letters or not.
-  // Comparing the font size is done heuristically, as the smaller value should
-  // not be less than half the larger one.
-  // TODO(crbug.com/398064843): Add unittests with OCRed PDF data.
-  // TODO(crbug.com/398064843): Add block information from OCR results to
-  // objects and create text runs based on them.
-  bool font_size_match =
-      is_searchified ? FloatAtLeastHalf(char_style.font_size, style.font_size)
-                     : FloatEquals(char_style.font_size, style.font_size);
-  return font_size_match && char_style.font_name == style.font_name &&
+  return FloatEquals(char_style.font_size, style.font_size) &&
+         char_style.font_name == style.font_name &&
          char_style.font_weight == style.font_weight &&
          char_style.render_mode == style.render_mode &&
          char_style.fill_color == style.fill_color &&
@@ -477,9 +449,6 @@ FPDF_PAGE PDFiumPage::GetPage() {
     ScopedPageUnloadPreventer scoped_unload_preventer(this);
     page_.reset(FPDF_LoadPage(engine_->doc(), index_));
     if (page_) {
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-      engine_->ScheduleSearchifyIfNeeded(this);
-#endif
       if (engine_->form()) {
         FORM_OnAfterLoadPage(page(), engine_->form());
       }
@@ -943,37 +912,6 @@ std::vector<int> PDFiumPage::GetImageObjectIndices() {
       images_, [](const Image& image) { return image.page_object_index; });
 }
 
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-bool PDFiumPage::HasImages() {
-  CalculateImages();
-  return images_.size();
-}
-
-SkBitmap PDFiumPage::GetImageForOcr(int page_object_index,
-                                    int max_image_dimension) {
-  FPDF_PAGE page = GetPage();
-  FPDF_PAGEOBJECT page_object = FPDFPage_GetObject(page, page_object_index);
-  return ::chrome_pdf::GetImageForOcr(engine_->doc(), page, page_object,
-                                      max_image_dimension);
-}
-
-void PDFiumPage::OnSearchifyGotOcrResult(bool added_text) {
-  CHECK(!has_searchify_added_text_.has_value());
-  has_searchify_added_text_ = added_text;
-  if (added_text) {
-    engine_->OnHasSearchifyText();
-  }
-}
-
-bool PDFiumPage::IsPageSearchified() const {
-  return has_searchify_added_text_.has_value();
-}
-
-bool PDFiumPage::CanReloadTextPage() const {
-  return preventing_text_page_unload_count_ == 0;
-}
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-
 std::vector<AccessibilityHighlightInfo> PDFiumPage::GetHighlightInfo() {
   std::vector<AccessibilityHighlightInfo> highlight_info;
   if (!available_)
@@ -1298,11 +1236,6 @@ AccessibilityTextRunInfo PDFiumPage::CalculateTextRunInfoAt(
     uint32_t chars_count) {
   AccessibilityTextRunInfo info;
   info.start_index = start_char_index;
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-  // This assumes all text on the page are either from the PDF itself, or from
-  // Searchify.
-  info.is_searchified = has_searchify_added_text_.value_or(false);
-#endif
 
   FPDF_TEXTPAGE text_page = GetTextPage();
   uint32_t actual_start_char_index = GetFirstNonUnicodeWhiteSpaceCharIndex(
@@ -1369,11 +1302,7 @@ AccessibilityTextRunInfo PDFiumPage::CalculateTextRunInfoAt(
                              ? *breakpoint_iter
                              : -1;
 
-  // Searchify text uses a fixed width font with sizes selected based on the
-  // height of each word block. Therefore the values are not as reliable as the
-  // non-Searchify text and bigger threshold is used.
-  float character_distance_break_threshold_ratio =
-      info.is_searchified ? 5.0f : 2.5f;
+  constexpr float kCharacterDistanceBreakThresholdRatio = 2.5f;
 
   FPDF_PAGEOBJECT text_object =
       FPDFText_GetTextObject(text_page, actual_start_char_index);
@@ -1399,8 +1328,7 @@ AccessibilityTextRunInfo PDFiumPage::CalculateTextRunInfoAt(
       FPDF_PAGEOBJECT current_text_object =
           FPDFText_GetTextObject(text_page, char_index);
       if (current_text_object != text_object &&
-          !AreTextStyleEqual(text_page, char_index, info.style,
-                             info.is_searchified)) {
+          !AreTextStyleEqual(text_page, char_index, info.style)) {
         break;
       }
 
@@ -1427,8 +1355,7 @@ AccessibilityTextRunInfo PDFiumPage::CalculateTextRunInfoAt(
 
       // Heuristic: End the text run if the center-point distance to the
       // previous character is less than
-      // `character_distance_break_threshold_ratio` x the average character
-      // size.
+      // `kCharacterDistanceBreakThresholdRatio` x the average character size.
       AddCharSizeToAverageCharSize(char_rect.size(), &avg_char_size,
                                    &non_whitespace_chars_count);
 
@@ -1439,8 +1366,7 @@ AccessibilityTextRunInfo PDFiumPage::CalculateTextRunInfoAt(
           GetRotatedCharWidth(current_angle, char_rect.size()) / 2 -
           GetRotatedCharWidth(current_angle, prev_char_rect.size()) / 2;
 
-      if (distance >
-          character_distance_break_threshold_ratio * avg_char_width) {
+      if (distance > kCharacterDistanceBreakThresholdRatio * avg_char_width) {
         break;
       }
 

@@ -11,8 +11,7 @@ namespace pdfViewerPrivate {
   enum SaveRequestType {
     ANNOTATION,
     ORIGINAL,
-    EDITED,
-    SEARCHIFIED
+    EDITED
   };
 
   // Nearly identical to mimeHandlerPrivate.StreamInfo, but without a mime type

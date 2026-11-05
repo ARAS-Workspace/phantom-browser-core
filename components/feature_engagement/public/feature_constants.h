@@ -91,7 +91,6 @@ extern const base::FeatureParam<base::TimeDelta> kIPHLensOverlayDelayTime;
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHLensOverlayTranslateButtonFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHTabAudioMutingFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPdfInkSignaturesFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPdfSearchifyFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPdfTextAnnotationsFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPdfTranslateBubbleFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPerformanceInterventionDialogFeature);

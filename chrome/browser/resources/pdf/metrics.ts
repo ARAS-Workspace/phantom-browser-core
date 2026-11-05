@@ -229,12 +229,6 @@ export enum UserAction {
   FIND_IN_PAGE_FIRST = 73,
   FIND_IN_PAGE = 74,
 
-  // Recorded copy/find commands for searchified PDFs.
-  COPY_SEARCHIFIED_FIRST = 75,
-  COPY_SEARCHIFIED = 76,
-  FIND_IN_PAGE_SEARCHIFIED_FIRST = 77,
-  FIND_IN_PAGE_SEARCHIFIED = 78,
-
   // Recorded when the user enters Ink2 annotation mode.
   ENTER_INK2_ANNOTATION_MODE_FIRST = 79,
   ENTER_INK2_ANNOTATION_MODE = 80,
@@ -275,10 +269,6 @@ export enum UserAction {
   // Recorded when the user opens the Ink2 bottom toolbar.
   OPEN_INK2_BOTTOM_TOOLBAR_FIRST = 97,
   OPEN_INK2_BOTTOM_TOOLBAR = 98,
-
-  // Recorded when the user triggers a save of the searchified document.
-  SAVE_SEARCHIFIED_FIRST = 99,
-  SAVE_SEARCHIFIED = 100,
 
   // Recorded when the user enters Ink2 text annotation mode.
   ENTER_INK2_TEXT_ANNOTATION_MODE_FIRST = 101,

@@ -4,7 +4,6 @@
 
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//pdf/features.gni")
-import("//services/screen_ai/buildflags/features.gni")
 
 mojom("mojom") {
   sources = [ "pdf.mojom" ]
@@ -21,9 +20,5 @@ mojom("mojom") {
 
   if (enable_pdf_ink2) {
     enabled_features += [ "enable_pdf_ink2" ]
-  }
-
-  if (enable_screen_ai_service) {
-    enabled_features += [ "enable_screen_ai_service" ]
   }
 }

@@ -23,7 +23,6 @@
 #include "pdf/pdfium/pdfium_print.h"
 #include "pdf/pdfium/pdfium_unsupported_features.h"
 #include "printing/nup_parameters.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "third_party/pdfium/public/cpp/fpdf_scopers.h"
 #include "third_party/pdfium/public/fpdf_attachment.h"

@@ -121,9 +121,6 @@ BASE_FEATURE(kIPHTabAudioMutingFeature,
 BASE_FEATURE(kIPHPdfInkSignaturesFeature,
              "IPH_PdfInkSignatures",
              base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPdfSearchifyFeature,
-             "IPH_PdfSearchifyFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHPdfTextAnnotationsFeature,
              "IPH_PdfTextAnnotations",
              base::FEATURE_ENABLED_BY_DEFAULT);

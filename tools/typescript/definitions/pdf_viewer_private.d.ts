@@ -17,7 +17,6 @@ declare global {
         ANNOTATION = 'ANNOTATION',
         ORIGINAL = 'ORIGINAL',
         EDITED = 'EDITED',
-        SEARCHIFIED = 'SEARCHIFIED',
       }
 
       // `mimeType` and `responseHeaders` are unused fields, but they are

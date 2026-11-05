@@ -16,7 +16,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "pdf/accessibility_structs.h"
 #include "pdf/page_character_index.h"
-#include "services/strings/grit/services_strings.h"
 #include "third_party/blink/public/web/web_ax_object.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/accessibility/ax_enums.mojom-shared.h"
@@ -564,23 +563,5 @@ ui::AXNodeData* PdfAccessibilityTreeBuilder::CreateChoiceFieldNode(
       return CreateComboboxNode(choice_field);
   }
 }
-
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-ui::AXNodeData* PdfAccessibilityTreeBuilder::CreateOcrWrapperNode(
-    const gfx::PointF& position,
-    bool start) {
-  ui::AXNodeData* wrapper_node = CreateAndAppendNode(
-      start ? ax::mojom::Role::kBanner : ax::mojom::Role::kContentInfo,
-      ax::mojom::Restriction::kReadOnly);
-  wrapper_node->relative_bounds.bounds = gfx::RectF(position, gfx::SizeF(1, 1));
-
-  ui::AXNodeData* text_node = CreateStaticTextNode();
-  text_node->SetNameChecked(l10n_util::GetStringUTF8(
-      start ? IDS_PDF_OCR_RESULT_BEGIN : IDS_PDF_OCR_RESULT_END));
-  text_node->relative_bounds.bounds = wrapper_node->relative_bounds.bounds;
-  wrapper_node->child_ids.push_back(text_node->id);
-  return wrapper_node;
-}
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
 
 }  // namespace pdf
