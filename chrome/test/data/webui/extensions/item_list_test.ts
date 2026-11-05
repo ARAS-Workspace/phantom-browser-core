@@ -100,37 +100,23 @@ suite('ExtensionItemListTest', function() {
         itemList.shadowRoot.querySelector('extensions-item')!.data.name);
   });
 
-  test('NoItems', async () => {
-    boundTestVisible('#no-items', false);
-    boundTestVisible('#no-search-results', false);
-
-    itemList.extensions = [];
-    itemList.apps = [];
-    await microtasksFinished();
-    boundTestVisible('#no-items', true);
-    boundTestVisible('#no-search-results', false);
-  });
-
   test('NoSearchResults', async () => {
-    boundTestVisible('#no-items', false);
     boundTestVisible('#no-search-results', false);
 
     itemList.filter = 'non-existent name';
     await microtasksFinished();
-    boundTestVisible('#no-items', false);
     boundTestVisible('#no-search-results', true);
   });
 
   // Tests that the extensions section and the chrome apps section, along with
   // their headers, are only visible when extensions or chrome apps are
-  // existent, respectively. Otherwise, no items section is shown.
+  // existent, respectively.
   test('SectionsVisibility', async () => {
     // Extensions and chrome apps were added during setup.
     boundTestVisible('#extensions-section', true);
     boundTestVisible('#extensions-section h2.section-header', true);
     boundTestVisible('#chrome-apps-section', true);
     boundTestVisible('#chrome-apps-section h2.section-header', true);
-    boundTestVisible('#no-items', false);
 
     itemList.apps = [];
     await microtasksFinished();
@@ -140,19 +126,15 @@ suite('ExtensionItemListTest', function() {
     boundTestVisible('#extensions-section h2.section-header', true);
     boundTestVisible('#chrome-apps-section', false);
     boundTestVisible('#chrome-apps-section h2.section-header', false);
-    boundTestVisible('#no-items', false);
 
     itemList.extensions = [];
     await microtasksFinished();
 
     // Verify extensions section is not visible when there are no extensions.
-    // Since there are no extensions or chrome apps, no items section is
-    // displayed.
     boundTestVisible('#extensions-section', false);
     boundTestVisible('#extensions-section h2.section-header', false);
     boundTestVisible('#chrome-apps-section', false);
     boundTestVisible('#chrome-apps-section h2.section-header', false);
-    boundTestVisible('#no-items', true);
   });
 
   test('SafetyCheckPanel_EnabledSafetyCheck', async () => {

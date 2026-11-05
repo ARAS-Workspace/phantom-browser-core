@@ -56,7 +56,6 @@
 #include "extensions/common/command.h"
 #include "extensions/common/extension_features.h"
 #include "extensions/common/extension_set.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/install_warning.h"
 #include "extensions/common/manifest.h"
 #include "extensions/common/manifest_handlers/background_info.h"
@@ -687,12 +686,11 @@ void ExtensionInfoGenerator::FillExtensionInfo(const Extension& extension,
   info.home_page.url = ManifestURL::GetHomepageURL(&extension).spec();
   info.home_page.specified = ManifestURL::SpecifiedHomepageURL(&extension);
 
-  // Developer and web store URLs.
+  // Developer URL.
   // TODO(dschuyler) after MD extensions releases (expected in m64), look into
   // removing the `home_page.url` and `home_page.specified` above.
   info.manifest_home_page_url =
       ManifestURL::GetManifestHomePageURL(&extension).spec();
-  info.web_store_url = ManifestURL::GetWebStoreURL(&extension).spec();
 
   info.id = extension.id();
 
@@ -855,11 +853,6 @@ void ExtensionInfoGenerator::FillExtensionInfo(const Extension& extension,
   CHECK(mv2_handler);
   info.is_affected_by_mv2_deprecation =
       mv2_handler->IsExtensionAffected(extension);
-  if (info.web_store_url.length() > 0) {
-    info.recommendations_url =
-        extension_urls::GetNewWebstoreItemRecommendationsUrl(extension.id())
-            .spec();
-  }
 
   info.can_upload_as_account_extension =
       AccountExtensionTracker::Get(profile)->CanUploadAsAccountExtension(

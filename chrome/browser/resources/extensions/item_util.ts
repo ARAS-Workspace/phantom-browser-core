@@ -308,7 +308,6 @@ export function createDummyExtensionInfo():
     userMayModify: false,
     version: '2.0',
     views: [],
-    webStoreUrl: '',
     showAccessRequestsInToolbar: false,
     safetyCheckWarningReason:
         chrome.developerPrivate.SafetyCheckWarningReason.UNPUBLISHED,

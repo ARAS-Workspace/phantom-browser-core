@@ -154,7 +154,6 @@ class ToolsMenuModel : public ui::SimpleMenuModel {
 class ExtensionsMenuModel : public ui::SimpleMenuModel {
  public:
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kManageExtensionsMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kVisitChromeWebStoreMenuItem);
 
   ExtensionsMenuModel(ui::SimpleMenuModel::Delegate* delegate,
                       BrowserWindowInterface* browser);

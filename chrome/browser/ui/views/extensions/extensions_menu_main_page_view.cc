@@ -53,10 +53,6 @@
 #include "ui/views/view_class_properties.h"
 #include "ui/views/view_utils.h"
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "extensions/common/extension_urls.h"
-#endif
-
 namespace {
 
 // Radius for the containers in the extensions menu.
@@ -208,9 +204,6 @@ ExtensionsMenuMainPageView::ExtensionsMenuMainPageView(
               gfx::Insets::TLBR(control_vertical_spacing, 0, 0, 0),
               /*menu_entries_margins=*/
               gfx::Insets::TLBR(control_vertical_spacing, 0, 0, 0)),
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-          CreateWebstoreButtonBuilder(),
-#endif
           CreateManageButtonBuilder())
       .BuildChildren();
 
@@ -615,18 +608,6 @@ ExtensionsMenuMainPageView::CreateContentsBuilder(
                       .CopyAddressTo(&menu_entries_)
                       .SetProperty(views::kMarginsKey, menu_entries_margins)));
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-views::Builder<HoverButton>
-ExtensionsMenuMainPageView::CreateWebstoreButtonBuilder() {
-  return views::Builder<HoverButton>(std::make_unique<HoverButton>(
-      base::BindRepeating(&chrome::ShowWebStore, browser_,
-                          extension_urls::kExtensionsMenuUtmSource),
-      ui::ImageModel::FromVectorIcon(vector_icons::kGoogleChromeWebstoreIcon),
-      l10n_util::GetStringUTF16(
-          IDS_EXTENSIONS_MENU_MAIN_PAGE_DISCOVER_EXTENSIONS)));
-}
-#endif
 
 views::Builder<HoverButton>
 ExtensionsMenuMainPageView::CreateManageButtonBuilder() {

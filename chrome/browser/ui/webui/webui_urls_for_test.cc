@@ -50,7 +50,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://downloads",
       "chrome://extensions",
       "chrome://extensions-internals",
-      "chrome://extensions-zero-state",
       "chrome://flags",
       "chrome://gpu",
       "chrome://histograms",

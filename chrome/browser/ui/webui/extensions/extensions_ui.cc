@@ -98,7 +98,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
 
       // Multi-use strings defined in extensions_strings.grdp.
       {"remove", IDS_EXTENSIONS_REMOVE},
-      {"moreOptions", IDS_EXTENSIONS_MORE_OPTIONS},
 
       // Add extension-specific strings.
       {"title", IDS_MANAGE_EXTENSIONS_SETTING_WINDOWS_TITLE},
@@ -108,9 +107,7 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"clearSearch", IDS_CLEAR_SEARCH},
       {"sidebarExtensions", IDS_EXTENSIONS_SIDEBAR_EXTENSIONS},
       {"appsTitle", IDS_EXTENSIONS_APPS_TITLE},
-      {"noExtensionsOrApps", IDS_EXTENSIONS_NO_INSTALLED_ITEMS},
       {"noDescription", IDS_EXTENSIONS_NO_DESCRIPTION},
-      {"viewInStore", IDS_EXTENSIONS_ITEM_CHROME_WEB_STORE},
       {"extensionWebsite", IDS_EXTENSIONS_ITEM_EXTENSION_WEBSITE},
       {"dropToInstall", IDS_EXTENSIONS_INSTALL_DROP_TARGET},
       {"editSitePermissionsAllowAllExtensions",
@@ -133,7 +130,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
        IDS_EXTENSIONS_SAFETY_CHECK_PRIMARY_LABEL},
       {"safetyCheckExtensionsKeep", IDS_CONFIRM_DOWNLOAD},
       {"stackTrace", IDS_EXTENSIONS_ERROR_STACK_TRACE},
-      {"sidebarDiscoverMore", IDS_EXTENSIONS_SIDEBAR_DISCOVER_MORE},
       {"sidebarDocsPromo", IDS_EXTENSIONS_MODERN_WEB_GUIDANCE_PROMO},
       {"keyboardShortcuts", IDS_EXTENSIONS_SIDEBAR_KEYBOARD_SHORTCUTS},
       {"incognitoInfoWarning", IDS_EXTENSIONS_INCOGNITO_WARNING},
@@ -332,12 +328,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"mv2DeprecationPanelTitle", IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_TITLE},
       {"mv2DeprecationPanelDismissButton",
        IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_DISMISS_BUTTON},
-      {"mv2DeprecationPanelExtensionActionMenuLabel",
-       IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_ACTION_MENU_BUTTON_LABEL},
-      {"mv2DeprecationPanelFindAlternativeButton",
-       IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_FIND_ALTERNATIVE_BUTTON},
-      {"mv2DeprecationPanelFindAlternativeButtonAccLabel",
-       IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_FIND_ALTERNATIVE_BUTTON_ACC_LABEL},
       {"mv2DeprecationPanelRemoveButtonAccLabel",
        IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_REMOVE_BUTTON_ACC_LABEL},
       {"mv2DeprecationMessageDisabledHeader",
@@ -411,15 +401,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       l10n_util::GetStringFUTF16(
           IDS_EXTENSIONS_ADDED_WITHOUT_KNOWLEDGE,
           l10n_util::GetStringUTF16(IDS_EXTENSION_WEB_STORE_TITLE)));
-  source->AddString(
-      "getMoreExtensionsUrl",
-      base::ASCIIToUTF16(
-          google_util::AppendGoogleLocaleParam(
-              extension_urls::AppendUtmSource(
-                  extension_urls::GetWebstoreExtensionsCategoryURL(),
-                  extension_urls::kExtensionsSidebarUtmSource),
-              g_browser_process->GetApplicationLocale())
-              .spec()));
   source->AddString(
       "modernWebGuidanceURL",
       base::ASCIIToUTF16(google_util::AppendGoogleLocaleParam(

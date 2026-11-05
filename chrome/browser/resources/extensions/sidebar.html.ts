@@ -53,16 +53,6 @@ ${this.inDevMode ? html`
     </span>
   </div>
 `: ''}
-<div class="separator"></div>
-<div class="cr-nav-menu-item" id="moreExtensions">
-  <cr-icon id="web-store-icon" icon="extensions-icons:web_store-custom">
-  </cr-icon>
-  <span id="discover-more-text" class="cr-secondary-text"
-      @click="${this.onMoreExtensionsClick_}"
-      .innerHTML="${this.computeDiscoverMoreText_()}">
-  </span>
-  <cr-ripple></cr-ripple>
-</div>
 <!--_html_template_end_-->`;
   // clang-format on
 }

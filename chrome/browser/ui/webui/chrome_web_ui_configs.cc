@@ -89,10 +89,6 @@
 #include "chrome/browser/ui/webui/extensions/extensions_ui.h"
 #endif  // !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/ui/webui/extensions_zero_state_promo/zero_state_promo_ui.h"
-#endif  // ENABLE_EXTENSIONS
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui.h"
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -216,11 +212,6 @@ void RegisterChromeWebUIConfigs() {
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   map.AddWebUIConfig(std::make_unique<extensions::ExtensionsUIConfig>());
 #endif  // !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  map.AddWebUIConfig(
-      std::make_unique<extensions::ZeroStatePromoControllerConfig>());
-#endif  // !BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   map.AddWebUIConfig(std::make_unique<printing::PrintPreviewUIConfig>());

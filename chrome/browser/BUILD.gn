@@ -883,7 +883,6 @@ source_set("core") {
     deps += [
       "//chrome/browser/apps/platform_apps",
       "//chrome/browser/controlled_frame",
-      "//chrome/browser/ui/webui/extensions_zero_state_promo",
       "//extensions/components/javascript_dialog_extensions_client",
     ]
   }

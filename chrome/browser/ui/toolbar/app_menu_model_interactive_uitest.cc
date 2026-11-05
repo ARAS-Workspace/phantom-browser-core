@@ -2,20 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <optional>
 #include <string>
 
 #include "base/feature_list.h"
-#include "base/files/file_util.h"
 #include "base/logging.h"
 #include "base/test/bind.h"
 #include "base/test/gtest_util.h"
 #include "base/test/metrics/histogram_tester.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
 #include "build/build_config.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/browser/ui/accelerator_utils.h"
@@ -26,9 +22,7 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
-#include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/chrome_features.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/interactive_test_utils.h"
@@ -37,16 +31,10 @@
 #include "chrome/test/interaction/tracked_element_webcontents.h"
 #include "chrome/test/interaction/webcontents_interaction_test_util.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/crx_file/id_util.h"
 #include "components/performance_manager/public/features.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/test/browser_test.h"
-#include "extensions/browser/extension_registry.h"
-#include "extensions/browser/extension_system.h"
-#include "extensions/browser/test_extension_registry_observer.h"
-#include "extensions/browser/unpacked_installer.h"
-#include "extensions/test/test_extension_dir.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/accelerators/menu_label_accelerator_util.h"
@@ -187,113 +175,20 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest,
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-namespace {
-
-enum ExtensionsTestMode {
-  kDoNotCollapse,
-  kCollapseNoExtensions,
-  kCollapseWithExtensions
-};
-
-}  // namespace
-
 class AppMenuModelExtensionsInteractiveTest
-    : public AppMenuModelInteractiveTest,
-      public testing::WithParamInterface<ExtensionsTestMode> {
+    : public AppMenuModelInteractiveTest {
  public:
   AppMenuModelExtensionsInteractiveTest() = default;
   ~AppMenuModelExtensionsInteractiveTest() override = default;
 
-  bool MenuShouldCollapse() const {
-    return GetParam() == ExtensionsTestMode::kCollapseNoExtensions;
-  }
-
-  void SetUp() override {
-    scoped_feature_list_.InitWithFeatureState(
-        features::kExtensionsCollapseMainMenu,
-        GetParam() != ExtensionsTestMode::kDoNotCollapse);
-    set_open_about_blank_on_browser_launch(true);
-    ASSERT_TRUE(embedded_test_server()->InitializeAndListen());
-    InteractiveBrowserTest::SetUp();
-  }
-
-  void SetUpOnMainThread() override {
-    if (GetParam() != ExtensionsTestMode::kDoNotCollapse) {
-      // Enable promotions.
-      promotions_enabled_value_to_restore_opt_ =
-          g_browser_process->local_state()->GetBoolean(
-              prefs::kPromotionsEnabled);
-      g_browser_process->local_state()->SetBoolean(prefs::kPromotionsEnabled,
-                                                   true);
-    }
-    if (GetParam() == ExtensionsTestMode::kCollapseWithExtensions) {
-      // Create and load a dummy extension.
-      constexpr char kExtensionManifest[] = R"(
-        {
-          "name": "an extension",
-          "version": "1.0",
-          "manifest_version": 3,
-          "action": {}
-        }
-      )";
-      extensions::TestExtensionDir dir;
-      dir.WriteManifest(kExtensionManifest);
-      const auto id = crx_file::id_util::GenerateIdForPath(
-          base::MakeAbsoluteFilePath(dir.UnpackedPath()));
-      auto* const registry =
-          extensions::ExtensionRegistry::Get(browser()->GetProfile());
-      CHECK(registry);
-      extensions::TestExtensionRegistryObserver observer(registry, id);
-      extensions::UnpackedInstaller::Create(browser()->GetProfile())
-          ->Load(dir.UnpackedPath());
-      observer.WaitForExtensionLoaded();
-    }
-    AppMenuModelInteractiveTest::SetUpOnMainThread();
-  }
-
-  void TearDownOnMainThread() override {
-    InteractiveBrowserTest::TearDownOnMainThread();
-    if (promotions_enabled_value_to_restore_opt_.has_value()) {
-      g_browser_process->local_state()->SetBoolean(
-          prefs::kPromotionsEnabled,
-          promotions_enabled_value_to_restore_opt_.value());
-    }
-  }
-
  protected:
   base::HistogramTester histograms_;
-  base::test::ScopedFeatureList scoped_feature_list_;
-
- private:
-  std::optional<bool> promotions_enabled_value_to_restore_opt_;
 };
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    AppMenuModelExtensionsInteractiveTest,
-    testing::Values(ExtensionsTestMode::kDoNotCollapse,
-                    ExtensionsTestMode::kCollapseNoExtensions,
-                    ExtensionsTestMode::kCollapseWithExtensions),
-    [](const testing::TestParamInfo<ExtensionsTestMode>& param) {
-      switch (param.param) {
-        case ExtensionsTestMode::kDoNotCollapse:
-          return "DoNotCollapse";
-        case ExtensionsTestMode::kCollapseNoExtensions:
-          return "CollapseNoExtensions";
-        case ExtensionsTestMode::kCollapseWithExtensions:
-          return "CollapseWithExtensions";
-      }
-    });
 
 // Test to confirm that the manage extensions menu item navigates when selected
 // and emit histograms that it did so.
-IN_PROC_BROWSER_TEST_P(AppMenuModelExtensionsInteractiveTest,
+IN_PROC_BROWSER_TEST_F(AppMenuModelExtensionsInteractiveTest,
                        ManageExtensions) {
-  if (MenuShouldCollapse()) {
-    GTEST_SKIP()
-        << "Manage extensions cannot be accessed through collapsed menu.";
-  }
-
   RunTestSequence(
       InstrumentTab(kPrimaryTabPageElementId),
       PressButton(kToolbarAppMenuButtonElementId),

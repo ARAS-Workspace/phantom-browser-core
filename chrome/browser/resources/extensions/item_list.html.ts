@@ -31,12 +31,6 @@ export function getHtml(this: ExtensionsItemListElement) {
       </div>
     ` : ''}
 
-    <div id="no-items" class="empty-list-message"
-        ?hidden="${!this.shouldShowEmptyItemsMessage_()}">
-      <span @click="${this.onNoExtensionsClick_}">
-        $i18nRaw{noExtensionsOrApps}
-      </span>
-    </div>
     <div id="no-search-results" class="empty-list-message"
         ?hidden="${!this.shouldShowEmptySearchMessage_()}">
       <span>$i18n{noSearchResults}</span>

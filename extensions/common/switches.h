@@ -96,37 +96,6 @@ extern const char kExtensionTestApiOnWebPages[];
 // `browser.test` proposal.
 extern const char kExtensionTestApiStandardizedBehavior[];
 
-// The feature parameter name that controls the variant of IPH shown when the
-// user has no extensions installed.
-extern const char kZeroStatePromoIphVariantParamName[];
-
-// When the user has no extensions installed, display a custom action IPH
-// that upon triggering, opens a new tab to the Chrome Web Store.
-extern const char kZeroStatePromoCustomActionIph[];
-
-// When the user has no extensions installed, display a custom UI IPH that
-// presents the user with different collections of extensions to explore,
-// each in a cr-chip button.
-extern const char kZeroStatePromoCustomUiChipIphV1[];
-
-// When the user has no extensions installed, display a custom UI IPH that
-// presents the user with different collections of extensions to explore,
-// each in a cr-chip button. This variation has a different color scheme
-// to highlight the chips.
-extern const char kZeroStatePromoCustomUiChipIphV2[];
-
-// When the user has no extensions installed, display a custom UI IPH that
-// presents the user with different collections of extensions to explore,
-// each in a cr-chip button. This variation has a different color scheme
-// to highlight the chips. The ordering and selection of the chips are
-// slightly different than variation 2.
-extern const char kZeroStatePromoCustomUiChipIphV3[];
-
-// When the user has no extensions installed, display a custom UI IPH that
-// presents the user with different collections of extensions to explore,
-// each in a plain text link.
-extern const char kZeroStatePromoCustomUiPlainLinkIph[];
-
 // Overrides the url that the browser treats as the webstore, granting it the
 // webstore APIs and giving it some special protections.
 extern const char kAppsGalleryURL[];

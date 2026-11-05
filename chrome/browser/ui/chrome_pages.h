@@ -95,8 +95,6 @@ void ShowClearBrowsingDataDialog(BrowserWindowInterface* browser);
 void ShowImportDialog(BrowserWindowInterface* browser);
 void ShowAboutChrome(BrowserWindowInterface* browser);
 void ShowSearchEngineSettings(BrowserWindowInterface* browser);
-void ShowWebStore(BrowserWindowInterface* browser,
-                  std::string_view utm_source_value);
 void ShowPrivacySandboxSettings(BrowserWindowInterface* browser);
 void ShowPrivacySandboxAdMeasurementSettings(BrowserWindowInterface* browser);
 void ShowAddresses(BrowserWindowInterface* bwi);

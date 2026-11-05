@@ -704,7 +704,6 @@ source_set("platform_browser_tests") {
       "//chrome/browser/ui/extensions",
       "//chrome/browser/ui/tabs/alert:tab_alert",
       "//chrome/browser/ui/tabs/saved_tab_groups:test_support",
-      "//chrome/browser/ui/webui/extensions_zero_state_promo",
       "//extensions/browser/mime_handler:mime_handler_registry",
     ]
   }

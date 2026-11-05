@@ -197,11 +197,6 @@ suite('ExtensionDetailViewTest', function() {
     await updateItemData({manifestHomePageUrl: ''});
     assertFalse(testIsVisible('#extensionWebsite'));
 
-    await updateItemData({webStoreUrl: 'http://example.com'});
-    assertTrue(testIsVisible('#viewInStore'));
-    await updateItemData({webStoreUrl: ''});
-    assertFalse(testIsVisible('#viewInStore'));
-
     assertFalse(testIsVisible('#id-section'));
     assertFalse(testIsVisible('#inspectable-views'));
     assertFalse(testIsVisible('#dev-reload-button'));
@@ -799,38 +794,6 @@ suite('ExtensionDetailViewTest', function() {
     // call.
     await mockDelegate.testClickingCalls(
         removeButton, 'deleteItem', [extensionData.id]);
-
-    // Action menu is hidden when the extension doesn't have a recommendations
-    // url.
-    const actionMenu =
-        item.shadowRoot.querySelector<HTMLElement>('#mv2DeprecationMessage')!
-            .querySelector<HTMLButtonElement>('#actionMenuButton');
-    assertTrue(!!actionMenu);
-    assertFalse(isVisible(actionMenu));
-
-    // Add a recommendations url to the extension.
-    const id = 'a'.repeat(32);
-    const recommendationsUrl =
-        `https://chromewebstore.google.com/detail/${id}` +
-        `/related-recommendations`;
-    await updateItemData({recommendationsUrl: recommendationsUrl});
-
-    // Action menu is visible when the extension has a recommendations url.
-    assertTrue(isVisible(actionMenu));
-
-    // Open the action menu to verify its items.
-    actionMenu.click();
-
-    // Find alternative action is visible.
-    const findAlternativeAction =
-        item.shadowRoot.querySelector<HTMLElement>('#findAlternativeAction');
-    assertTrue(!!findAlternativeAction);
-    assertTrue(isVisible(findAlternativeAction));
-
-    // Click on the find alternative action, and verify it triggered the
-    // correct delegate call.
-    await mockDelegate.testClickingCalls(
-        findAlternativeAction, 'openUrl', [recommendationsUrl]);
   });
 
   test('PinnedToToolbar', async function() {

@@ -398,7 +398,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionsMenuMainPageViewInteractiveUITest,
   ShowUi("");
 
   EXPECT_EQ(main_page()->GetSiteSettingLabelForTesting(),
-            u"Extensions are not allowed on chrome://extensions");
+            u"Extensions are not allowed on phantom://extensions");
 
   // Update the title of the unfocused tab.
   BrowserUiController::From(browser())->set_update_ui_immediately_for_testing();
@@ -418,7 +418,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionsMenuMainPageViewInteractiveUITest,
   // displayed on the menu's subtitle.
   ASSERT_EQ(browser()->tab_strip_model()->active_index(), 1);
   EXPECT_EQ(main_page()->GetSiteSettingLabelForTesting(),
-            u"Extensions are not allowed on chrome://extensions");
+            u"Extensions are not allowed on phantom://extensions");
 }
 
 // Verifies extensions can add site access requests on active and inactive tabs,

@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/strings/string_util.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/manifest_constants.h"
 #include "extensions/common/manifest_handlers/manifest_url_handlers.h"
 #include "extensions/common/manifest_test.h"
@@ -33,13 +31,9 @@ TEST_F(HomepageURLManifestTest, GetHomepageURL) {
   EXPECT_EQ(GURL("http://foo.com#bar"),
             ManifestURL::GetHomepageURL(extension.get()));
 
-  // The Google Gallery URL ends with the id, which depends on the path, which
-  // can be different in testing, so we just check the part before id.
+  // An extension updating from the web store has no web store homepage.
   extension = LoadAndExpectSuccess("homepage_url_google_hosted.json");
-  EXPECT_TRUE(
-      base::StartsWith(ManifestURL::GetHomepageURL(extension.get()).spec(),
-                       extension_urls::GetWebstoreItemDetailURLPrefix(),
-                       base::CompareCase::INSENSITIVE_ASCII));
+  EXPECT_EQ(GURL(), ManifestURL::GetHomepageURL(extension.get()));
 
   extension = LoadAndExpectSuccess("homepage_url_externally_hosted.json");
   EXPECT_EQ(GURL(), ManifestURL::GetHomepageURL(extension.get()));

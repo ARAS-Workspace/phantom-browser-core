@@ -4,9 +4,6 @@
 
 #include "chrome/browser/history/top_sites_factory.h"
 
-#include <stddef.h>
-
-#include <array>
 #include <memory>
 
 #include "base/command_line.h"
@@ -18,19 +15,10 @@
 #include "chrome/browser/history/history_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/grit/generated_resources.h"
-#include "chrome/grit/locale_settings.h"
-#include "chrome/grit/theme_resources.h"
-#include "components/grit/components_scaled_resources.h"
 #include "components/history/core/browser/history_constants.h"
 #include "components/history/core/browser/top_sites_impl.h"
-#include "components/policy/core/common/policy_pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
-#include "components/prefs/pref_service.h"
 #include "components/search_engines/template_url_service.h"
-#include "components/strings/grit/components_strings.h"
-#include "ui/base/l10n/l10n_util.h"
-#include "url/gurl.h"
 
 namespace {
 
@@ -38,44 +26,6 @@ const char kDisableTopSites[] = "disable-top-sites";
 
 bool IsTopSitesDisabled() {
   return base::CommandLine::ForCurrentProcess()->HasSwitch(kDisableTopSites);
-}
-
-struct RawPrepopulatedPage {
-  int url_id;            // The resource for the page URL.
-  int title_id;          // The resource for the page title.
-  int favicon_id;        // The raw data resource for the favicon.
-  SkColor color;         // The best color to highlight the page (should
-                         // roughly match favicon).
-};
-
-// Android does not use prepopulated pages.
-constexpr auto kRawPrepopulatedPages = std::to_array<RawPrepopulatedPage>({
-    {
-        IDS_WEBSTORE_URL,
-        IDS_EXTENSION_WEB_STORE_TITLE_SHORT,
-        IDR_WEBSTORE_ICON_32,
-        SkColorSetRGB(63, 132, 197),
-    },
-});
-
-void InitializePrepopulatedPageList(
-    Profile* profile,
-    history::PrepopulatedPageList* prepopulated_pages) {
-  DCHECK(prepopulated_pages);
-  PrefService* pref_service = profile->GetPrefs();
-  bool hide_web_store_icon =
-      pref_service->GetBoolean(policy::policy_prefs::kHideWebStoreIcon);
-
-  prepopulated_pages->reserve(std::size(kRawPrepopulatedPages));
-  for (size_t i = 0; i < std::size(kRawPrepopulatedPages); ++i) {
-    const RawPrepopulatedPage& page = kRawPrepopulatedPages[i];
-    if (hide_web_store_icon && page.url_id == IDS_WEBSTORE_URL)
-      continue;
-
-    prepopulated_pages->push_back(history::PrepopulatedPage(
-        GURL(l10n_util::GetStringUTF8(page.url_id)),
-        l10n_util::GetStringUTF16(page.title_id), page.favicon_id, page.color));
-  }
 }
 
 }  // namespace
@@ -135,10 +85,7 @@ TopSitesFactory::~TopSitesFactory() = default;
 
 scoped_refptr<RefcountedKeyedService> TopSitesFactory::BuildServiceInstanceFor(
     content::BrowserContext* context) const {
-  history::PrepopulatedPageList prepopulated_pages;
-  InitializePrepopulatedPageList(Profile::FromBrowserContext(context),
-                                 &prepopulated_pages);
-  return BuildTopSites(context, prepopulated_pages);
+  return BuildTopSites(context, history::PrepopulatedPageList());
 }
 
 void TopSitesFactory::RegisterProfilePrefs(

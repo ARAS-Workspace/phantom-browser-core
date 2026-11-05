@@ -238,7 +238,6 @@ declare global {
         path?: string;
         permissions: Permissions;
         prettifiedPath?: string;
-        recommendationsUrl?: string;
         runtimeErrors: RuntimeError[];
         runtimeWarnings: string[];
         state: ExtensionState;
@@ -247,7 +246,6 @@ declare global {
         userMayModify: boolean;
         version: string;
         views: ExtensionView[];
-        webStoreUrl: string;
         showAccessRequestsInToolbar: boolean;
         safetyCheckWarningReason: SafetyCheckWarningReason;
         pinnedToToolbar?: boolean;

@@ -56,7 +56,6 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/common/constants.h"
-#include "extensions/common/extension_urls.h"
 #include "net/base/url_util.h"
 #include "ui/base/window_open_disposition.h"
 #include "url/url_util.h"
@@ -415,13 +414,6 @@ void ShowSearchEngineSettings(BrowserWindowInterface* browser) {
       browser, base::FeatureList::IsEnabled(switches::kSearchSettingsUpdate)
                    ? kSearchSubPage
                    : kSearchEnginesSubPage);
-}
-
-void ShowWebStore(BrowserWindowInterface* browser,
-                  std::string_view utm_source_value) {
-  GURL webstore_url = extension_urls::GetNewWebstoreLaunchURL();
-  ShowSingletonTabIgnorePathOverwriteNTP(
-      browser, extension_urls::AppendUtmSource(webstore_url, utm_source_value));
 }
 
 void ShowPrivacySandboxSettings(BrowserWindowInterface* browser) {

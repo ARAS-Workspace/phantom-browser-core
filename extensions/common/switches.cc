@@ -45,14 +45,6 @@ const char kExtensionTestApiOnWebPages[] = "extension-test-api-on-web-pages";
 const char kExtensionTestApiStandardizedBehavior[] =
     "extension-test-api-standardized-behavior";
 
-const char kZeroStatePromoIphVariantParamName[] =
-    "extension-zero-state-iph-variant";
-const char kZeroStatePromoCustomActionIph[] = "custom-action-iph";
-const char kZeroStatePromoCustomUiChipIphV1[] = "custom-ui-chip-iph";
-const char kZeroStatePromoCustomUiChipIphV2[] = "custom-ui-chip-iph-v2";
-const char kZeroStatePromoCustomUiChipIphV3[] = "custom-ui-chip-iph-v3";
-const char kZeroStatePromoCustomUiPlainLinkIph[] = "custom-ui-plain-link-iph";
-
 const char kAppsGalleryURL[] = "apps-gallery-url";
 
 bool AreExtensionsOnChromeURLsAllowed() {

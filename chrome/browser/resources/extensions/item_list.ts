@@ -291,12 +291,6 @@ export class ExtensionsItemListElement extends ExtensionsItemListElementBase {
         this.shownExtensionsCount_ === 0;
   }
 
-  protected onNoExtensionsClick_(e: Event) {
-    if ((e.target as HTMLElement).tagName === 'A') {
-      chrome.metricsPrivate.recordUserAction('Options_GetMoreExtensions');
-    }
-  }
-
   private announceSearchResults_() {
     if (this.computedFilter_) {
       setTimeout(() => {  // Async to allow list to update.

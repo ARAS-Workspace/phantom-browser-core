@@ -48,7 +48,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_api.h"
 #include "extensions/common/extension_id.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/features/feature.h"
 #include "extensions/common/features/feature_provider.h"
 #include "extensions/common/manifest_handlers/background_info.h"
@@ -1378,9 +1377,6 @@ void EventRouter::DispatchEventToProcess(const ExtensionId& extension_id,
   if (target_context == mojom::ContextType::kWebPage) {
     // |url| can only be null for service workers, so should never be null here.
     CHECK(url);
-    bool is_new_webstore_origin =
-        url::Origin::Create(extension_urls::GetNewWebstoreLaunchURL())
-            .IsSameOriginWith(*url);
     const Feature* feature =
         ExtensionAPI::GetSharedInstance()->GetFeatureDependency(
             event->event_name);
@@ -1388,7 +1384,6 @@ void EventRouter::DispatchEventToProcess(const ExtensionId& extension_id,
                                               base::CompareCase::SENSITIVE);
     CHECK(
         feature->RequiresDelegatedAvailabilityCheck() ||
-        is_new_webstore_origin ||
         // The `chrome.test` API can send events to web pages during tests.
         (is_test_api_event && base::CommandLine::ForCurrentProcess()->HasSwitch(
                                   switches::kExtensionTestApiOnWebPages)))

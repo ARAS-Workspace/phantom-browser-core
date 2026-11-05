@@ -41,7 +41,6 @@
 #include "extensions/common/error_utils.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_id.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/icons/extension_icon_set.h"
 #include "extensions/common/manifest.h"
 #include "extensions/common/manifest_handlers/description_info.h"
@@ -630,10 +629,8 @@ ExtensionFunction::ResponseAction ManagementUninstallFunctionBase::Uninstall(
     return RespondNow(Error(keys::kUserCantModifyError, target_extension_id_));
   }
 
-  // A null extension() should only happen if the call is coming from WebUI or
-  // the new Webstore which is a webpage the management API is exposed on.
-  DCHECK(extension() || source_context_type() == mojom::ContextType::kWebUi ||
-         extension_urls::IsWebstoreDomain(source_url()));
+  // A null extension() should only happen if the call is coming from WebUI.
+  DCHECK(extension() || source_context_type() == mojom::ContextType::kWebUi);
 
   bool self_uninstall = extension() && extension_id() == target_extension_id_;
   // We need to show a dialog for any extension uninstalling another extension.

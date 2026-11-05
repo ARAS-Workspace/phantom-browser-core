@@ -23,7 +23,6 @@ export interface ExtensionsSidebarElement {
     sectionsExtensions: HTMLElement,
     sectionsShortcuts: HTMLElement,
     sectionsSitePermissions: HTMLElement,
-    moreExtensions: HTMLElement,
   };
 }
 
@@ -109,20 +108,6 @@ export class ExtensionsSidebarElement extends ExtensionsSidebarElementBase {
     navigation.navigateTo(
         {page: ((e.currentTarget as HTMLElement).dataset['path'] as Page)});
     this.fire('close-drawer');
-  }
-
-  protected onMoreExtensionsClick_(e: Event) {
-    if ((e.target as HTMLElement).tagName === 'A') {
-      chrome.metricsPrivate.recordUserAction('Options_GetMoreExtensions');
-    }
-  }
-
-  protected computeDiscoverMoreText_(): TrustedHTML {
-    return this.i18nAdvanced('sidebarDiscoverMore', {
-      tags: ['a'],
-      attrs: ['target'],
-      substitutions: [loadTimeData.getString('getMoreExtensionsUrl')],
-    });
   }
 
   protected computeModernWebGuidancePromoText_(): TrustedHTML {

@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/config/chrome_build.gni")
 import("//build/config/ui.gni")
-import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 
 assert(toolkit_views)
@@ -123,10 +123,6 @@ source_set("impl") {
   if (is_mac) {
     sources += [ "browser_help_bubble_event_relay_mac.mm" ]
     deps += [ "//components/remote_cocoa/app_shim" ]
-  }
-
-  if (enable_extensions) {
-    deps += [ "//chrome/browser/ui/webui/extensions_zero_state_promo" ]
   }
 
   if (enable_pdf_ink2) {

@@ -88,4 +88,9 @@ IN_PROC_BROWSER_TEST_F(TopSitesExtensionTest, GetTopSites) {
   EXPECT_GE(result->GetList().size(), top_sites_prepopulated_pages_size());
 }
 
+// The default page list is empty: a clean profile has no prepopulated tile.
+IN_PROC_BROWSER_TEST_F(TopSitesExtensionTest, NoPrepopulatedPages) {
+  EXPECT_EQ(0u, top_sites_prepopulated_pages_size());
+}
+
 }  // namespace extensions

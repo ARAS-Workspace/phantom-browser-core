@@ -24,7 +24,6 @@ const base::Feature* const kAllFeatures[] = {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     &kIPHExtensionsMenuFeature,
     &kIPHExtensionsRequestAccessButtonFeature,
-    &kIPHExtensionsZeroStatePromoFeature,
 #endif
     // keep-sorted start case=no
     &kIPHBackNavigationMenuFeature,

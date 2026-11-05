@@ -8,7 +8,6 @@
 #include <string_view>
 
 #include "base/memory/raw_ptr.h"
-#include "build/branding_buildflags.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_model.h"
 #include "chrome/browser/ui/views/extensions/extensions_menu_entry_view.h"
 #include "ui/base/metadata/metadata_header_macros.h"
@@ -113,11 +112,6 @@ class ExtensionsMenuMainPageView : public views::View {
       gfx::Insets contents_margins,
       gfx::Insets reload_button_margins,
       gfx::Insets menu_entries_margins);
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // Returns the webstore button builder.
-  [[nodiscard]] views::Builder<HoverButton> CreateWebstoreButtonBuilder();
-#endif
 
   // Returns the manage extensions button builder.
   [[nodiscard]] views::Builder<HoverButton> CreateManageButtonBuilder();

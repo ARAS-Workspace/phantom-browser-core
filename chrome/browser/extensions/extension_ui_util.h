@@ -23,23 +23,9 @@ class Extension;
 
 namespace ui_util {
 
-// Returns true if the extension should be displayed in the app launcher.
-// Checks whether the extension is an ephemeral app or should be hidden due to
-// policy.
-bool ShouldDisplayInAppLauncher(const Extension* extension,
-                                content::BrowserContext* context);
-
 // Returns true if the extension can be displayed in the app launcher.
-// Checks whether the extension should be hidden due to policy, but does not
-// exclude ephemeral apps.
 bool CanDisplayInAppLauncher(const Extension* extension,
                              content::BrowserContext* context);
-
-// Returns true if the extension should be displayed in the browser NTP.
-// Checks whether the extension is an ephemeral app or should be hidden due to
-// policy.
-bool ShouldDisplayInNewTabPage(const Extension* extension,
-                               content::BrowserContext* context);
 
 // Returns the name of the extension associated with `url`, with whitespace
 // collapsed, or empty string if no such extension is present. For top-level
@@ -47,11 +33,6 @@ bool ShouldDisplayInNewTabPage(const Extension* extension,
 std::u16string GetEnabledExtensionNameForUrl(
     const GURL& url,
     content::WebContents& web_contents);
-
-// Returns whether `browser_context` contains any extensions that are manageable
-// - i.e. visible to the user on the extensions settings page,
-// chrome://extensions.
-bool HasManageableExtensions(content::BrowserContext* browser_context);
 
 // Returns a human-readable string representing the host of the last committed
 // URL in the given `web_contents`, formatted for display. This formatting

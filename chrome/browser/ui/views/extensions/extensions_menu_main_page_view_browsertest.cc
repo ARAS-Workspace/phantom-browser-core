@@ -1280,7 +1280,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionsMenuMainPageViewBrowserTest, RestrictedSite) {
   // Verify site settings tooltip and toggle are hidden, since no extension can
   // customize a restricted site.
   EXPECT_EQ(main_page()->GetSiteSettingLabelForTesting(),
-            u"Extensions are not allowed on chrome://extensions");
+            u"Extensions are not allowed on phantom://extensions");
   EXPECT_FALSE(main_page()->site_settings_tooltip()->GetVisible());
   EXPECT_FALSE(main_page()->GetSiteSettingsToggleForTesting()->GetVisible());
 

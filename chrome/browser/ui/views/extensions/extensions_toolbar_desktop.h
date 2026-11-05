@@ -72,13 +72,6 @@ class ExtensionsToolbarDesktop : public ToolbarIconContainerView,
 
   static void SetOnVisibleCallbackForTesting(base::OnceClosure callback);
 
-  // In a live environment, the Extensions Zero State Promo IPH will only open
-  // after at least 10 minutes into the browsing session.
-  //
-  // This function sets the Zero State Promo show timer so that the IPH can
-  // show immediately.
-  static void WakeZeroStatePromoForTesting();
-
   ExtensionsMenuCoordinator* GetExtensionsMenuCoordinatorForTesting() {
     return extensions_menu_coordinator_.get();
   }

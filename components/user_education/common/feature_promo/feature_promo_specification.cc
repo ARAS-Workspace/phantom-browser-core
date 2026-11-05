@@ -82,8 +82,7 @@ bool IsAllowedCustomUiPromo(const base::Feature& promo_feature) {
   //
   // Add the text names of allowlisted rotating promos here:
   static constexpr auto kAllowedPromoNames =
-      base::MakeFixedFlatSet<std::string_view>(
-          {"IPH_AutofillAtMemory", "IPH_ExtensionsZeroStatePromo"});
+      base::MakeFixedFlatSet<std::string_view>({"IPH_AutofillAtMemory"});
   return kAllowedPromoNames.contains(promo_feature.name);
 }
 

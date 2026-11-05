@@ -49,7 +49,6 @@
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/extension_set.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/mojom/context_type.mojom.h"
 #include "extensions/common/permissions/permission_set.h"
 
@@ -487,39 +486,6 @@ TEST_F(ManagementApiUnitTest, ManagementUninstallWebstoreHostedApp) {
     // Reset the callback.
     extensions::ExtensionUninstallDialog::SetOnShownCallbackForTesting(nullptr);
   }
-}
-
-// Tests management.uninstall from the new Webstore domain.
-TEST_F(ManagementApiUnitTest, ManagementUninstallNewWebstore) {
-  scoped_refptr<const Extension> extension = ExtensionBuilder("Test").Build();
-  registrar()->AddExtension(extension.get());
-  const ExtensionId& extension_id = extension->id();
-  base::ListValue uninstall_args;
-  uninstall_args.Append(extension->id());
-  base::HistogramTester tester;
-
-  // Note: no triggering extension is set on the ExtensionFunction, but the
-  // associated URL should be from the webstore domain.
-  auto function = base::MakeRefCounted<ManagementUninstallFunction>();
-  function->set_source_url(GURL(extension_urls::GetNewWebstoreLaunchURL()));
-
-  bool did_show = false;
-  auto callback =
-      base::BindRepeating([](bool* did_show) { *did_show = true; }, &did_show);
-  extensions::ExtensionUninstallDialog::SetOnShownCallbackForTesting(&callback);
-
-  ScopedTestDialogAutoConfirm auto_confirm(ScopedTestDialogAutoConfirm::ACCEPT);
-  ExtensionFunction::ScopedUserGestureForTests scoped_user_gesture;
-
-  EXPECT_TRUE(RunFunction(function, uninstall_args)) << function->GetError();
-  // The extension should be uninstalled.
-  EXPECT_EQ(nullptr, registry()->GetInstalledExtension(extension_id));
-  EXPECT_TRUE(did_show);
-  tester.ExpectBucketCount(kUninstallSourceHistogramName,
-                           extensions::UNINSTALL_SOURCE_CHROME_WEBSTORE, 1);
-
-  // Reset the callback.
-  extensions::ExtensionUninstallDialog::SetOnShownCallbackForTesting(nullptr);
 }
 
 // Tests management.uninstall from a normal extension, which will create a

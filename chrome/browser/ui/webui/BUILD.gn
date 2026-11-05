@@ -143,10 +143,6 @@ source_set("configs") {
     ]
   }
 
-  if (enable_extensions) {
-    deps += [ "//chrome/browser/ui/webui/extensions_zero_state_promo" ]
-  }
-
   if (enable_webui_certificate_viewer) {
     deps += [ "//chrome/browser/ui/webui/certificate_viewer" ]
   }

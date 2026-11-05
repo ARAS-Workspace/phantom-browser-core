@@ -154,7 +154,6 @@
   E(kActionAbout, IDC_ABOUT) \
   E(kActionShowAppMenu, IDC_SHOW_APP_MENU) \
   E(kActionManageExtensions, IDC_MANAGE_EXTENSIONS) \
-  E(kActionFindExtensions, IDC_FIND_EXTENSIONS) \
   E(kActionChromeEnterpriseReleaseNotes, \
     IDC_CHROME_ENTERPRISE_RELEASE_NOTES) \
   E(kActionDevToolsInspect, IDC_DEV_TOOLS_INSPECT) \
@@ -181,8 +180,6 @@
   E(kActionPerformance, IDC_PERFORMANCE) \
   E(kActionExtensionsSubmenuManageExtensions, \
     IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS) \
-  E(kActionExtensionsSubmenuVisitChromeWebStore, \
-    IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE) \
   E(kActionReadingListMenuAddTab) \
   E(kActionRecentTabsLoginForDeviceTabs, \
     IDC_RECENT_TABS_LOGIN_FOR_DEVICE_TABS) \

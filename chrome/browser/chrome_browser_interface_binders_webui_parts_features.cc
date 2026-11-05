@@ -23,10 +23,6 @@
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/ui/webui/extensions_zero_state_promo/zero_state_promo_ui.h"
-#endif
-
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "components/guest_view/browser/slim_web_view/slim_web_view.mojom.h"  // nogncheck
 #endif
@@ -56,15 +52,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
       signout_confirmation::mojom::PageHandlerFactory, SignoutConfirmationUI>(
       map);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  RegisterWebUIControllerInterfaceBinder<
-      zero_state_promo::mojom::PageHandlerFactory,
-      extensions::ZeroStatePromoController>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      custom_help_bubble::mojom::CustomHelpBubbleHandlerFactory,
-      extensions::ZeroStatePromoController>(map);
-#endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   RegisterWebUIControllerInterfaceBinder<

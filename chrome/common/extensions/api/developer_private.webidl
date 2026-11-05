@@ -238,7 +238,6 @@ dictionary ExtensionInfo {
   DOMString path;
   required Permissions permissions;
   DOMString prettifiedPath;
-  DOMString recommendationsUrl;
   required sequence<RuntimeError> runtimeErrors;
   required sequence<DOMString> runtimeWarnings;
   required ExtensionState state;
@@ -247,7 +246,6 @@ dictionary ExtensionInfo {
   required boolean userMayModify;
   required DOMString version;
   required sequence<ExtensionView> views;
-  required DOMString webStoreUrl;
   SafetyCheckWarningReason safetyCheckWarningReason;
   required boolean showAccessRequestsInToolbar;
   boolean pinnedToToolbar;

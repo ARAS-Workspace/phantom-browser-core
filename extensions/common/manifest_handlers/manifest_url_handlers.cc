@@ -16,7 +16,6 @@
 #include "extensions/common/file_util.h"
 #include "extensions/common/manifest.h"
 #include "extensions/common/manifest_constants.h"
-#include "extensions/common/manifest_handlers/shared_module_info.h"
 #include "extensions/strings/grit/extensions_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -34,8 +33,7 @@ const GURL& ManifestURL::Get(const Extension* extension,
 
 // static
 GURL ManifestURL::GetHomepageURL(const Extension* extension) {
-  const GURL& homepage_url = Get(extension, keys::kHomepageURL);
-  return homepage_url.is_valid() ? homepage_url : GetWebStoreURL(extension);
+  return GetManifestHomePageURL(extension);
 }
 
 // static
@@ -47,16 +45,6 @@ bool ManifestURL::SpecifiedHomepageURL(const Extension* extension) {
 const GURL& ManifestURL::GetManifestHomePageURL(const Extension* extension) {
   const GURL& homepage_url = Get(extension, keys::kHomepageURL);
   return homepage_url.is_valid() ? homepage_url : GURL::EmptyGURL();
-}
-
-// static
-GURL ManifestURL::GetWebStoreURL(const Extension* extension) {
-  bool use_webstore_url = UpdatesFromGallery(extension) &&
-                          !SharedModuleInfo::IsSharedModule(extension);
-  return use_webstore_url
-             ? GURL(extension_urls::GetWebstoreItemDetailURLPrefix() +
-                    extension->id())
-             : GURL();
 }
 
 // static

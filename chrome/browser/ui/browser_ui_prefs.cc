@@ -16,7 +16,6 @@
 #include "chrome/common/buildflags.h"
 #include "chrome/common/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/policy/core/common/policy_pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -129,10 +128,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterListPref(
       prefs::kWebRTCDiagnosticLogCollectionAllowedForOrigins,
       base::ListValue());
-
-  // We need to register the type of these preferences in order to query
-  // them even though they're only typically controlled via policy.
-  registry->RegisterBooleanPref(policy::policy_prefs::kHideWebStoreIcon, false);
 
 #if BUILDFLAG(IS_MAC)
   // This really belongs in platform code, but there's no good place to

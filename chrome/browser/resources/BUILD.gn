@@ -66,10 +66,6 @@ group("resources") {
     public_deps += [ ":preinstalled_web_apps_resources" ]
   }
 
-  if (enable_extensions) {
-    public_deps += [ "extensions_zero_state_promo:resources" ]
-  }
-
   if (is_mac) {
     public_deps += [ "unexportable_keys_internals:resources" ]
   }

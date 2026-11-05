@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_icon_button/cr_icon_button.js';
 import 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
@@ -18,8 +17,6 @@ import './runtime_host_permissions.js';
 import '/strings.m.js';
 import './toggle_row.js';
 
-import {AnchorAlignment} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
-import type {CrActionMenuElement} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
 import type {CrLinkRowElement} from 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
 import type {CrToggleElement} from 'chrome://resources/cr_elements/cr_toggle/cr_toggle.js';
 import {I18nMixinLit} from 'chrome://resources/cr_elements/i18n_mixin_lit.js';
@@ -47,7 +44,6 @@ class DummyDetailViewDelegate extends DummyItemDelegate {
 
 export interface ExtensionsDetailViewElement {
   $: {
-    actionMenu: CrActionMenuElement,
     closeButton: HTMLElement,
     description: HTMLElement,
     enableToggle: CrToggleElement,
@@ -413,10 +409,6 @@ export class ExtensionsDetailViewElement extends
     // </if>
   }
 
-  protected onViewInStoreClick_() {
-    this.delegate.openUrl(this.data.webStoreUrl);
-  }
-
   protected computeDependentEntry_(
       item: chrome.developerPrivate.DependentExtension): string {
     return loadTimeData.getStringF('itemDependentEntry', item.name, item.id);
@@ -511,22 +503,6 @@ export class ExtensionsDetailViewElement extends
     return !this.data.mustRemainInstalled;
   }
 
-  /**
-   * Returns whether the action menu button in the mv2 deprecation message
-   * should be displayed.
-   */
-  protected shouldShowMv2DeprecationActionMenu_(): boolean {
-    return !!this.data.recommendationsUrl;
-  }
-
-  /**
-   * Returns whether the find alternative button in mv2 deprecation message
-   * action menu should be displayed.
-   */
-  protected shouldShowMv2DeprecationFindAlternativeAction_(): boolean {
-    return !!this.data.recommendationsUrl;
-  }
-
   protected shouldShowBlocklistText_(): boolean {
     return !this.showSafetyCheck_ && !!this.data.blocklistText;
   }
@@ -546,28 +522,6 @@ export class ExtensionsDetailViewElement extends
 
   protected showEnableToggle_(): boolean {
     return getEnableControl(this.data) === EnableControl.ENABLE_TOGGLE;
-  }
-
-  /** Opens the action menu for the extension. */
-  protected onActionMenuButtonClick_(event: MouseEvent): void {
-    this.$.actionMenu.showAt(
-        event.target as HTMLElement,
-        {anchorAlignmentY: AnchorAlignment.AFTER_END});
-  }
-
-  /**
-   * Opens a URL in the Web Store with extensions recommendations for the
-   * extension.
-   */
-  protected onFindAlternativeActionClick_(): void {
-    chrome.metricsPrivate.recordUserAction(
-        'Extensions.Mv2Deprecation.Unsupported.FindAlternativeForExtension.DetailPage');
-
-    this.$.actionMenu.close();
-
-    const recommendationsUrl: string|undefined = this.data.recommendationsUrl;
-    assert(!!recommendationsUrl);
-    this.delegate.openUrl(recommendationsUrl);
   }
 
   /**
@@ -601,12 +555,6 @@ export class ExtensionsDetailViewElement extends
         loadTimeData.getBoolean('webuiRoundedIconsEnabled') ?
             'extensions-icons:chrome-extension-off' :
             'extensions-icons:extension_off-old');
-  }
-
-  /** Returns the accessible label for the action menu button */
-  protected getActionMenuButtonLabel_(): string {
-    return this.i18n(
-        'mv2DeprecationPanelExtensionActionMenuLabel', this.data.name);
   }
 }
 

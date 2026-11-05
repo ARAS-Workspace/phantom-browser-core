@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 #include "chrome/browser/extensions/extension_apitest.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/common/chrome_switches.h"
 #include "components/network_session_configurator/common/network_switches.h"
@@ -11,10 +10,7 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/test_navigation_observer.h"
-#include "extensions/browser/event_router.h"
-#include "extensions/browser/extension_event_histogram_value.h"
 #include "extensions/buildflags/buildflags.h"
-#include "extensions/common/api/management.h"
 #include "extensions/common/switches.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -75,12 +71,8 @@ class WebstoreDomainBrowserTest : public ExtensionApiTest,
   }
 };
 
-// Tests that management and runtime are exposed to the webstore domain, but not
-// to a non-webstore domain.
-// Note: Although we don't explicitly provide runtime to the webstore domain in
-// the case of it being a "web page" context, it is granted implicitly by the
-// NativeExtensionBindingsSystem due to another extension API (management)
-// being exposed to the web page.
+// Tests that management and runtime are exposed neither to the webstore domain
+// nor to a non-webstore domain.
 IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, ExpectedAvailability) {
   const GURL webstore_url = GetParam().Resolve("/webstore/mock_store.html");
   const GURL not_webstore_url = GURL(kNonWebstoreURL1).Resolve("/empty.html");
@@ -97,22 +89,10 @@ IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, ExpectedAvailability) {
   EXPECT_EQ(web_contents->GetPrimaryMainFrame()->GetLastCommittedURL(),
             webstore_url);
 
-  // The management API is only available on the new webstore domain. The old
-  // site gained access to it via the hosted app, which is no longer allowed to
-  // access management (since the hosted app isn't used).
-  // The runtime API is still available since it's always available to all
-  // items, but it doesn't really have any capabilities (and the hosted app is
-  // still safe; just unused).
-  bool expect_fun_apis = GetParam() == GURL(kNewWebstoreURL) ||
-                         GetParam() == GURL(kWebstoreOverrideURL);
-
-  EXPECT_EQ(expect_fun_apis, is_api_available("management"));
-
-  // Even runtime shouldn't be available for the old hosted app URL since the
-  // hosted app isn't installed.
-  bool expect_runtime = GetParam() == GURL(kNewWebstoreURL) ||
-                        GetParam() == GURL(kWebstoreOverrideURL);
-  EXPECT_EQ(expect_runtime, is_api_available("runtime"));
+  // No webstore page has these APIs, neither on the old or new domain nor on
+  // the command line override.
+  EXPECT_FALSE(is_api_available("management"));
+  EXPECT_FALSE(is_api_available("runtime"));
 
   ASSERT_TRUE(NavigateToURL(web_contents, not_webstore_url));
   EXPECT_EQ(web_contents->GetPrimaryMainFrame()->GetLastCommittedURL(),
@@ -121,12 +101,9 @@ IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, ExpectedAvailability) {
   EXPECT_FALSE(is_api_available("runtime"));
 }
 
-// Test that the webstore can register and receive management events. Normally
-// we have a check that the receiver of an extension event can never be a
-// webpage context. The old webstore got around this by appearing as a hosted
-// app extension context, but the new webstore has the APIs exposed directly to
-// the webpage context it uses. Regression test for crbug.com/40064270.
-IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, CanReceiveEvents) {
+// Tests that the webstore can not register management events: the management
+// API is not exposed to the page, so adding a listener throws.
+IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, CannotRegisterEvents) {
   const GURL webstore_url = GetParam().Resolve("/webstore/mock_store.html");
 
   content::WebContents* web_contents = GetActiveWebContents();
@@ -145,33 +122,8 @@ IN_PROC_BROWSER_TEST_P(WebstoreDomainBrowserTest, CanReceiveEvents) {
     }
   )";
 
-  // The webstore hosted app no longer has access to the management API.
-  bool expect_management = GetParam() == GURL(kNewWebstoreURL) ||
-                           GetParam() == GURL(kWebstoreOverrideURL);
-
-  std::string js_result =
-      content::EvalJs(web_contents, kAddListener).ExtractString();
-
-  if (expect_management) {
-    ASSERT_EQ("listener added", js_result);
-
-    content::DOMMessageQueue message_queue(web_contents);
-    // Directly broadcast the management.onInstalled event from the EventRouter
-    // and verify it arrived to the page without causing a crash.
-    EventRouter* event_router = EventRouter::Get(profile());
-    api::management::ExtensionInfo info;
-    info.install_type = api::management::ExtensionInstallType::kNormal;
-    info.type = api::management::ExtensionType::kExtension;
-    event_router->BroadcastEvent(std::make_unique<Event>(
-        events::FOR_TEST, api::management::OnInstalled::kEventName,
-        api::management::OnInstalled::Create(info)));
-
-    std::string message;
-    EXPECT_TRUE(message_queue.WaitForMessage(&message));
-    EXPECT_EQ("\"received event\"", message);
-  } else {
-    ASSERT_EQ("Error registering", js_result);
-  }
+  EXPECT_EQ("Error registering",
+            content::EvalJs(web_contents, kAddListener).ExtractString());
 }
 
 // Tests that a webstore page with misconfigured or missing X-Frame-Options

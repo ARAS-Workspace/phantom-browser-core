@@ -24,9 +24,7 @@
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/defaults.h"
-#include "chrome/browser/extensions/extension_ui_util.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -86,7 +84,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/theme_resources.h"
@@ -172,8 +169,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kHelpMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kPerformanceMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kManageExtensionsMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
-                                      kVisitChromeWebStoreMenuItem);
 
 namespace {
 
@@ -956,11 +951,6 @@ SaveAndShareSubMenuModel::SaveAndShareSubMenuModel(
   }
 }
 
-bool ArePromotionsEnabled() {
-  PrefService* local_state = g_browser_process->local_state();
-  return local_state && local_state->GetBoolean(prefs::kPromotionsEnabled);
-}
-
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1111,9 +1101,8 @@ ExtensionsMenuModel::ExtensionsMenuModel(
 ExtensionsMenuModel::~ExtensionsMenuModel() = default;
 
 // Extensions (sub)menu is constructed as follows:
-// - An overflow with two items:
+// - An overflow with one item:
 //   - An item to manage extensions at chrome://extensions
-//   - An item to visit the Chrome Web Store
 void ExtensionsMenuModel::Build(BrowserWindowInterface* browser) {
   AddItemWithStringIdAndVectorIcon(
       this, IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
@@ -1124,16 +1113,6 @@ void ExtensionsMenuModel::Build(BrowserWindowInterface* browser) {
   SetElementIdentifierAt(
       GetIndexOfCommandId(IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS).value(),
       kManageExtensionsMenuItem);
-  AddItemWithStringId(IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE,
-                      IDS_EXTENSIONS_SUBMENU_CHROME_WEBSTORE_ITEM);
-  SetElementIdentifierAt(
-      GetIndexOfCommandId(IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE)
-          .value(),
-      kVisitChromeWebStoreMenuItem);
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  SetCommandIcon(this, IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE,
-                 vector_icons::kGoogleChromeWebstoreIcon);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1281,20 +1260,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
             "WrenchMenu.TimeToAction.ManageExtensions", delta);
       }
       LogMenuAction(MENU_ACTION_MANAGE_EXTENSIONS);
-      break;
-    case IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.VisitChromeWebStore", delta);
-      }
-      LogMenuAction(MENU_ACTION_VISIT_CHROME_WEB_STORE);
-      break;
-    case IDC_FIND_EXTENSIONS:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.FindExtensions",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_FIND_EXTENSIONS);
       break;
     // Recent tabs menu.
     case IDC_RESTORE_TAB:
@@ -1905,28 +1870,16 @@ void AppMenuModel::Build() {
   }
 
   // Extensions sub menu.
-  if (ArePromotionsEnabled() &&
-      base::FeatureList::IsEnabled(features::kExtensionsCollapseMainMenu) &&
-      !extensions::ui_util::HasManageableExtensions(browser_->GetProfile())) {
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_FIND_EXTENSIONS, IDS_FIND_EXTENSIONS,
-        features::IsRoundedIconsEnabled()
-            ? vector_icons::kChromeExtensionIcon
-            : vector_icons::kExtensionChromeRefreshOldIcon);
-    SetElementIdentifierAt(GetIndexOfCommandId(IDC_FIND_EXTENSIONS).value(),
-                           ExtensionsMenuModel::kVisitChromeWebStoreMenuItem);
-  } else {
-    sub_menus_.push_back(std::make_unique<ExtensionsMenuModel>(this, browser_));
-    AddSubMenuWithStringIdAndVectorIcon(
-        this, kExtensionsSubmenuPlaceholder, IDS_EXTENSIONS_SUBMENU,
-        sub_menus_.back().get(),
-        features::IsRoundedIconsEnabled()
-            ? vector_icons::kChromeExtensionIcon
-            : vector_icons::kExtensionChromeRefreshOldIcon);
-    SetElementIdentifierAt(
-        GetIndexOfCommandId(kExtensionsSubmenuPlaceholder).value(),
-        kExtensionsMenuItem);
-  }
+  sub_menus_.push_back(std::make_unique<ExtensionsMenuModel>(this, browser_));
+  AddSubMenuWithStringIdAndVectorIcon(
+      this, kExtensionsSubmenuPlaceholder, IDS_EXTENSIONS_SUBMENU,
+      sub_menus_.back().get(),
+      features::IsRoundedIconsEnabled()
+          ? vector_icons::kChromeExtensionIcon
+          : vector_icons::kExtensionChromeRefreshOldIcon);
+  SetElementIdentifierAt(
+      GetIndexOfCommandId(kExtensionsSubmenuPlaceholder).value(),
+      kExtensionsMenuItem);
 
   AddItemWithStringIdAndVectorIcon(
       this, IDC_CLEAR_BROWSING_DATA, IDS_CLEAR_BROWSING_DATA,

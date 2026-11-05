@@ -164,7 +164,6 @@
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/page_navigator.h"
 #include "content/public/common/profiling.h"
-#include "extensions/common/extension_urls.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
 #include "printing/buildflags/buildflags.h"
@@ -1141,17 +1140,6 @@ void BrowserActions::InitializeChromeMenuActions() {
               },
               bwi))
           .SetActionId(kActionExtensionsSubmenuManageExtensions)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowWebStore(bwi, extension_urls::kAppMenuUtmSource);
-              },
-              bwi))
-          .SetActionId(kActionExtensionsSubmenuVisitChromeWebStore)
           .Build());
 }
 
@@ -3021,20 +3009,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetAccelerator(GetAcceleratorForCommandId(IDC_MANAGE_EXTENSIONS))
           .Build());
 
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowWebStore(bwi, extension_urls::kAppMenuUtmSource);
-              },
-              bwi),
-          kActionFindExtensions, IDS_FIND_EXTENSIONS, IDS_FIND_EXTENSIONS,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kChromeExtensionIcon
-              : vector_icons::kExtensionChromeRefreshOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
   if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
     root_action_item_->AddChild(
         ChromeMenuAction(

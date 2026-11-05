@@ -107,8 +107,6 @@ BASE_FEATURE(kLegacySearchIntegrityCheck, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-BASE_FEATURE(kExtensionsCollapseMainMenu, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // When enabled, newly installed extensions are pinned to the toolbar by
 // default.
 BASE_FEATURE(kExtensionsPinnedByDefault, base::FEATURE_DISABLED_BY_DEFAULT);

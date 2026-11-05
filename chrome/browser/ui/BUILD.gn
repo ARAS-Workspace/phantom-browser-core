@@ -2576,7 +2576,6 @@ static_library("ui") {
       "//chrome/browser/apps:icon_standardizer",
       "//chrome/browser/apps/platform_apps",
       "//chrome/browser/profiles",
-      "//chrome/browser/ui/webui/extensions_zero_state_promo",
       "//chrome/browser/web_applications",
       "//chrome/browser/web_applications/app_service",
       "//chrome/common/extensions/api",
@@ -2586,14 +2585,7 @@ static_library("ui") {
 
     # Any circular includes must depend on the target
     # "//chrome/browser:browser_public_dependencies".
-    allow_circular_includes_from += [
-      "//chrome/browser/apps/platform_apps",
-
-      # TODO(crbug.com/353332589): zero_state_promo_ui.h and page_handler.cc
-      # include browser.h and custom_webui_help_bubble_controller.h from
-      # //chrome/browser/ui:ui.
-      "//chrome/browser/ui/webui/extensions_zero_state_promo",
-    ]
+    allow_circular_includes_from += [ "//chrome/browser/apps/platform_apps" ]
 
     sources += [
       "views/chrome_javascript_app_modal_view_factory_views.cc",

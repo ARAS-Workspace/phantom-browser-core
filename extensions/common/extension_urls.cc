@@ -38,14 +38,7 @@ const char kChromeWebstoreUpdateURL[] =
     "https://clients2.google.com/service/update2/crx";
 const char kChromeWebstoreApiURL[] = "https://chromewebstore.googleapis.com/";
 
-const char kAppMenuUtmSource[] = "ext_app_menu";
-const char kExtensionsMenuUtmSource[] = "ext_extensions_menu";
 const char kExtensionsSidebarUtmSource[] = "ext_sidebar";
-const char kCustomActionIphUtmSource[] = "ext_zero_state_promo_generic_iph";
-const char kCustomUiChipIphV1UtmSource[] = "ext_zero_state_promo_chips_iph";
-const char kCustomUiChipIphV2UtmSource[] = "ext_zero_state_promo_chips_iph_v2";
-const char kCustomUiChipIphV3UtmSource[] = "ext_zero_state_promo_chips_iph_v3";
-const char kCustomUiPlainLinkIphUtmSource[] = "ext_zero_state_promo_links_iph";
 
 GURL GetWebstoreLaunchURL() {
   extensions::ExtensionsClient* client = extensions::ExtensionsClient::Get();
@@ -69,13 +62,6 @@ GURL AppendUtmSource(const GURL& url, std::string_view utm_source_value) {
   return net::AppendQueryParameter(url, "utm_source", utm_source_value);
 }
 
-GURL GetWebstoreExtensionsCategoryURL() {
-  GURL base_url = GetNewWebstoreLaunchURL();
-  CHECK_EQ(base_url.path(), "/")
-      << "GURL::Resolve() won't work with a URL with a path.";
-  return base_url.Resolve("category/extensions");
-}
-
 std::string GetWebstoreItemDetailURLPrefix() {
   return GetNewWebstoreLaunchURL().spec() + "detail/";
 }
@@ -96,13 +82,6 @@ GURL GetWebstoreReportAbuseUrl(const extensions::ExtensionId& extension_id,
   return GURL(base::StringPrintf("%sdetail/%s/report?utm_source=%s",
                                  GetNewWebstoreLaunchURL().spec().c_str(),
                                  extension_id.c_str(), referrer_id.c_str()));
-}
-
-GURL GetNewWebstoreItemRecommendationsUrl(
-    const extensions::ExtensionId& extension_id) {
-  return GURL(base::StringPrintf("%sdetail/%s/related-recommendations",
-                                 GetNewWebstoreLaunchURL().spec().c_str(),
-                                 extension_id.c_str()));
 }
 
 bool IsWebstoreDomain(const GURL& url) {

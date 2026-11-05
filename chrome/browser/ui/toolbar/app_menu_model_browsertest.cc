@@ -352,7 +352,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, ModelHasIcons) {
       kRecentTabsNoDeviceTabsId,
       IDC_ABOUT,
       RecentTabsSubMenuModel::GetDisabledRecentlyClosedHeaderCommandId(),
-      IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE,
       IDC_TAKE_SCREENSHOT,
       IDC_BOOKMARK_BAR_SUBMENU_ALWAYS_SHOW,
       IDC_BOOKMARK_BAR_SUBMENU_ALWAYS_HIDE,
@@ -394,54 +393,23 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, ModelHasIcons) {
   check_for_icons(u"<Root Menu>", &model);
 }
 
-class ExtensionsMenuModelTest : public AppMenuModelTest,
-                                public testing::WithParamInterface<bool> {
- public:
-  ExtensionsMenuModelTest() {
-    if (GetParam()) {
-      scoped_feature_list_.InitAndEnableFeature(
-          features::kExtensionsCollapseMainMenu);
-    } else {
-      scoped_feature_list_.InitAndDisableFeature(
-          features::kExtensionsCollapseMainMenu);
-    }
-  }
-  ~ExtensionsMenuModelTest() override = default;
+using ExtensionsMenuModelTest = AppMenuModelTest;
 
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(,
-                         ExtensionsMenuModelTest,
-                         testing::Bool(),
-                         [](const testing::TestParamInfo<bool>& param) {
-                           return param.param ? "Collapse" : "DoNotCollapse";
-                         });
-
-// Tests that extensions sub menu (when enabled) generates the correct elements
-// or does not generate its elements when disabled.
-IN_PROC_BROWSER_TEST_P(ExtensionsMenuModelTest, ExtensionsMenu) {
+// Tests that the extensions sub menu only has the manage extensions item: it
+// has no web store item.
+IN_PROC_BROWSER_TEST_F(ExtensionsMenuModelTest, ExtensionsMenu) {
   AppMenuModel model(this, browser());
   model.Init();
 
-  if (GetParam()) {
-    const auto index = model.GetIndexOfCommandId(IDC_FIND_EXTENSIONS);
-    ASSERT_TRUE(index.has_value());
-    EXPECT_EQ(nullptr, model.GetSubmenuModelAt(*index));
-  } else {
-    ASSERT_TRUE(
-        model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder));
-    ui::MenuModel* extensions_submenu = model.GetSubmenuModelAt(
-        model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder)
-            .value());
-    ASSERT_NE(extensions_submenu, nullptr);
-    ASSERT_EQ(2ul, extensions_submenu->GetItemCount());
-    EXPECT_EQ(IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
-              extensions_submenu->GetCommandIdAt(0));
-    EXPECT_EQ(IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE,
-              extensions_submenu->GetCommandIdAt(1));
-  }
+  ASSERT_TRUE(
+      model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder));
+  ui::MenuModel* extensions_submenu = model.GetSubmenuModelAt(
+      model.GetIndexOfCommandId(AppMenuModel::kExtensionsSubmenuPlaceholder)
+          .value());
+  ASSERT_NE(extensions_submenu, nullptr);
+  ASSERT_EQ(1ul, extensions_submenu->GetItemCount());
+  EXPECT_EQ(IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
+            extensions_submenu->GetCommandIdAt(0));
 }
 
 class TestAppMenuModelMetricsTest : public AppMenuModelTest,

@@ -405,7 +405,6 @@ bool CanWebpageContextConnectExternally(ScriptContext* context) {
 // in UpdateBindingsForContext.
 const std::string_view kWebAvailableFeatures[] = {
     "app",
-    "management",
 };
 
 // A custom accessor for the `browser.devtools` property.

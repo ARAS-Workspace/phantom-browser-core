@@ -60,8 +60,6 @@ DEFINE_VARIATION_PARAM(kIPHExplicitBrowserSigninPreferenceRememberedFeature,
 DEFINE_VARIATION_PARAM(kIPHExtensionsMenuFeature, "IPH_ExtensionsMenu");
 DEFINE_VARIATION_PARAM(kIPHExtensionsRequestAccessButtonFeature,
                        "IPH_ExtensionsRequestAccessButton");
-DEFINE_VARIATION_PARAM(kIPHExtensionsZeroStatePromoFeature,
-                       "IPH_ExtensionsZeroStatePromo");
 #endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 DEFINE_VARIATION_PARAM(kIPHExtensionsPinnedByDefaultFeature,

@@ -54,7 +54,6 @@
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button.h"
 #include "chrome/browser/ui/views/user_education/autofill_help_bubble_factory.h"
 #include "chrome/browser/ui/views/user_education/browser_help_bubble.h"
-#include "chrome/browser/ui/views/user_education/custom_webui_help_bubble.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_feature_promo_controller.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_feature_promo_preconditions.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_user_education_context.h"
@@ -101,7 +100,6 @@
 #include "components/user_education/webui/help_bubble_handler.h"
 #include "components/user_education/webui/help_bubble_webui.h"
 #include "components/vector_icons/vector_icons.h"
-#include "extensions/common/extension_urls.h"
 #include "pdf/buildflags.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/base/interaction/element_identifier.h"
@@ -116,10 +114,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "components/user_education/views/help_bubble_factory_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/ui/webui/extensions_zero_state_promo/zero_state_promo_ui.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_PDF_INK2)
 #include "chrome/browser/pdf/pdf_help_bubble_handler_factory.h"
@@ -632,51 +626,6 @@ void MaybeRegisterChromeFeaturePromos(
               155, "evasu@google.com",
               "Triggered when the user installs a new extension and it is "
               "pinned by default to the toolbar.")));
-
-  // kIPHExtensionsZeroStatePromoFeature
-  Metadata iph_extensions_zero_state_promo_feature_metaData(
-      140, "uwyiming@google.com",
-      "Triggered when a user has no "
-      "extensions installed.");
-  switch (feature_engagement::kIPHExtensionsZeroStatePromoVariantParam.Get()) {
-    case feature_engagement::kCustomActionIph:
-      registry.RegisterFeature(std::move(
-          FeaturePromoSpecification::CreateForCustomAction(
-              feature_engagement::kIPHExtensionsZeroStatePromoFeature,
-              kToolbarAppMenuButtonElementId,
-              IDS_EXTENSIONS_ZERO_STATE_PROMO_CUSTOM_ACTION_IPH_DESCRIPTION,
-              IDS_EXTENSIONS_ZERO_STATE_PROMO_CUSTOM_ACTION_IPH_ACCEPT,
-              CreateNavigationAction(extension_urls::AppendUtmSource(
-                  extension_urls::GetNewWebstoreLaunchURL(),
-                  extension_urls::kCustomActionIphUtmSource)))
-              .SetCustomActionIsDefault(true)
-              .SetBubbleTitleText(IDS_EXTENSIONS_ZERO_STATE_PROMO_IPH_TITLE)
-              .SetMetadata(
-                  std::move(iph_extensions_zero_state_promo_feature_metaData))
-              .SetHighlightedMenuItem(
-                  ExtensionsMenuModel::kVisitChromeWebStoreMenuItem)));
-      break;
-    case feature_engagement::kCustomUiChipIphV1:
-    case feature_engagement::kCustomUiChipIphV2:
-    case feature_engagement::kCustomUiChipIphV3:
-    case feature_engagement::kCustomUIPlainLinkIph:
-      registry.RegisterFeature(std::move(
-          FeaturePromoSpecification::CreateForCustomUi(
-              feature_engagement::kIPHExtensionsZeroStatePromoFeature,
-              kToolbarAppMenuButtonElementId,
-              MakeCustomWebUIHelpBubbleFactoryCallback<
-                  extensions::ZeroStatePromoController>(
-                  GURL(chrome::kChromeUIExtensionsZeroStatePromoURL)),
-              // No op. The individual buttons on the custom UI will perform the
-              // actual actions.
-              base::DoNothing())
-              .SetMetadata(
-                  std::move(iph_extensions_zero_state_promo_feature_metaData))
-              .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-              .SetHighlightedMenuItem(
-                  ExtensionsMenuModel::kVisitChromeWebStoreMenuItem)));
-      break;
-  }
 #endif
 
   // kIPHTabAudioMutingFeature:

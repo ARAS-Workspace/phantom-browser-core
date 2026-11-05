@@ -392,10 +392,6 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, Filtering) {
   RunTestCase("Filtering");
 }
 
-IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, NoItems) {
-  RunTestCase("NoItems");
-}
-
 IN_PROC_BROWSER_TEST_F(CrExtensionsItemListTest, NoSearchResults) {
   RunTestCase("NoSearchResults");
 }

@@ -45,25 +45,16 @@
   margin-bottom: 8px;
 }
 
-#web-store-icon {
-  --iron-icon-height: 24px;
-  --iron-icon-width: 24px;
-  margin-inline-end: 18px;
-  margin-inline-start: -2px;
-}
-
 .cr-secondary-text {
   line-height: 19px;
   margin-inline-end: 10px;
 }
 
-#discover-more-text a,
 #promo-message-text a {
   color: var(--cr-link-color);
 }
 
 :host-context([webui-refresh-2026]) {
-  #discover-more-text a:focus,
   #promo-message-text a:focus {
     border-radius: 2px;
     outline: solid 2px var(--cr-focus-outline-color);

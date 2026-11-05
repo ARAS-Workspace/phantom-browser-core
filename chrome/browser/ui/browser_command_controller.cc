@@ -116,7 +116,6 @@
 #include "content/public/common/url_constants.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
-#include "extensions/common/extension_urls.h"
 #include "printing/buildflags/buildflags.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/actions/actions.h"
@@ -1087,10 +1086,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS:
       ShowExtensions(webui::GetBrowserForOpeningWebUi(browser_));
       break;
-    case IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE:
-    case IDC_FIND_EXTENSIONS:
-      ShowWebStore(browser_, extension_urls::kAppMenuUtmSource);
-      break;
     case IDC_PERFORMANCE:
       ShowSettingsSubPage(webui::GetBrowserForOpeningWebUi(browser_),
                           chrome::kPerformanceSubPage);
@@ -1725,10 +1720,6 @@ void BrowserCommandController::UpdateCommandsForExtensionsMenu() {
   command_updater_->UpdateCommandEnabled(
       IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
       /*state=*/true);
-  command_updater_->UpdateCommandEnabled(
-      IDC_EXTENSIONS_SUBMENU_VISIT_CHROME_WEB_STORE, /*state=*/true);
-  command_updater_->UpdateCommandEnabled(IDC_FIND_EXTENSIONS,
-                                         /*state=*/true);
 }
 
 void BrowserCommandController::UpdateCommandsForTabState() {

@@ -105,10 +105,6 @@ inline constexpr char kForceGoogleSafeSearch[] =
 inline constexpr char kForceYouTubeRestrict[] =
     "settings.force_youtube_restrict";
 
-// A boolean pref set to true if the Chrome Web Store icons should be hidden
-// from the New Tab Page and app launcher.
-inline constexpr char kHideWebStoreIcon[] = "hide_web_store_icon";
-
 // Enum that specifies whether Incognito mode is:
 // 0 - Enabled. Default behaviour. Default mode is available on demand.
 // 1 - Disabled. User cannot browse pages in Incognito mode.

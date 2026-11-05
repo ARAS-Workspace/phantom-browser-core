@@ -12,10 +12,8 @@
 #include "base/functional/callback_helpers.h"
 #include "base/no_destructor.h"
 #include "base/scoped_observation.h"
-#include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
@@ -50,7 +48,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "content/public/browser/web_contents.h"
-#include "extensions/browser/extension_util.h"
 #include "extensions/common/extension_features.h"
 #include "extensions/common/extension_id.h"
 #include "ui/base/dragdrop/drag_drop_types.h"
@@ -99,32 +96,11 @@ base::OnceClosure& GetOnVisibleCallbackForTesting() {
   return *callback;
 }
 
-// Only attempt to launch the Extensions Zero State Promo IPH after this
-// timestamp, in order to reduce the cadence with which the this IPH calls
-// the User Educations system.
-std::optional<base::TimeTicks> g_zero_state_promo_next_show_time_opt =
-    std::nullopt;
-
-// The interval of time to wait for between attempting to launch the Zero
-// State Promo.
-constexpr base::TimeDelta kZeroStatePromoIntervalBetweenLaunchAttempt =
-    base::Minutes(2);
-
-bool ArePromotionsEnabled() {
-  PrefService* local_state = g_browser_process->local_state();
-  return local_state && local_state->GetBoolean(prefs::kPromotionsEnabled);
-}
-
 }  // namespace
 
 void ExtensionsToolbarDesktop::SetOnVisibleCallbackForTesting(
     base::OnceClosure callback) {
   GetOnVisibleCallbackForTesting() = std::move(callback);
-}
-
-// static
-void ExtensionsToolbarDesktop::WakeZeroStatePromoForTesting() {
-  g_zero_state_promo_next_show_time_opt = base::TimeTicks::Now();
 }
 
 struct ExtensionsToolbarDesktop::DropInfo {
@@ -1315,24 +1291,6 @@ void ExtensionsToolbarDesktop::MaybeShowIPH() {
             kAnyExtensionHasAccess) {
       BrowserUserEducationInterface::From(browser_)->MaybeShowFeaturePromo(
           feature_engagement::kIPHExtensionsMenuFeature);
-    }
-  }
-
-  // The Extensions Zero State promo prompts users without extensions to
-  // explore the Chrome Web Store. Only triggered for normal browser types.
-  if (browser_->GetType() == BrowserWindowInterface::TYPE_NORMAL) {
-    if (!g_zero_state_promo_next_show_time_opt.has_value()) {
-      g_zero_state_promo_next_show_time_opt =
-          base::TimeTicks::Now() + kZeroStatePromoIntervalBetweenLaunchAttempt;
-    } else if (base::TimeTicks::Now() >=
-                   g_zero_state_promo_next_show_time_opt.value() &&
-               ArePromotionsEnabled() &&
-               !extensions::util::AnyCurrentlyInstalledExtensionIsFromWebstore(
-                   browser_->GetProfile())) {
-      g_zero_state_promo_next_show_time_opt =
-          base::TimeTicks::Now() + kZeroStatePromoIntervalBetweenLaunchAttempt;
-      BrowserUserEducationInterface::From(browser_)->MaybeShowFeaturePromo(
-          feature_engagement::kIPHExtensionsZeroStatePromoFeature);
     }
   }
 }

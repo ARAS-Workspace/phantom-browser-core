@@ -32,7 +32,7 @@ export function getHtml(this: ExtensionsMv2DeprecationPanelElement) {
   </div>
 
   <div class="panel-extensions">
-    ${this.extensions.map((item, index) => html`
+    ${this.extensions.map(item => html`
       <div class="panel-extension-row cr-row">
         <img class="panel-extension-icon" src="${item.iconUrl}"
             role="presentation">
@@ -44,24 +44,9 @@ export function getHtml(this: ExtensionsMv2DeprecationPanelElement) {
               aria-label="${this.getRemoveButtonLabelFor_(item.name)}"
               ?hidden="${!this.showExtensionRemoveButton_(item)}">
           </cr-icon-button>
-          <cr-icon-button id="actionMenuButton" data-index="${index}"
-              class="icon-more-vert header-aligned-button"
-              @click="${this.onExtensionActionMenuClick_}"
-              title="$i18n{moreOptions}"
-              aria-label="${this.getActionMenuButtonLabelFor_(item.name)}"
-              ?hidden="${!this.showActionMenu_(item)}">
-          </cr-icon-button>
         </div>
       </div>
     `)}
-
-    <cr-action-menu id="actionMenu">
-      <button class="dropdown-item" id="findAlternativeAction"
-          @click="${this.onFindAlternativeExtensionActionClick_}"
-          ?hidden="${!this.showExtensionFindAlternativeAction_()}">
-        Find alternatives
-      </button>
-    </cr-action-menu>
   </div>
 </div>
 <!--_html_template_end_-->`;

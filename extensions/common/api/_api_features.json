@@ -275,17 +275,6 @@
       "chrome://extensions/*",
       "chrome://settings/*"
     ]
-  }, {
-    "channel": "stable",
-    "contexts": ["web_page"],
-    "matches": ["https://chromewebstore.google.com/*"]
-  }, {
-    // Used for webstore testing. See comment in
-    // chrome/common/extensions/webstore_override.cc
-    "channel": "stable",
-    "contexts": ["web_page"],
-    "requires_delegated_availability_check": true,
-    "matches": ["<all_urls>"]
   }],
   "management.getPermissionWarningsByManifest": {
     "dependencies": [],
@@ -328,7 +317,6 @@
       "chrome://customize-chrome-side-panel.top-chrome/*",
       "chrome://eche-app/*",
       "chrome://extensions/*",
-      "chrome://extensions-zero-state/*",
       "chrome://file-manager/*",
       "chrome://help-app/*",
       "chrome://history/*",

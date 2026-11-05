@@ -87,20 +87,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
             ?hidden="${!this.shouldShowMv2DeprecationRemoveButton_()}">
           $i18n{mv2DeprecationMessageRemoveButton}
         </cr-button>
-        <cr-icon-button class="icon-more-vert header-aligned-button"
-            id="actionMenuButton" @click="${this.onActionMenuButtonClick_}"
-            title="$i18n{moreOptions}"
-            aria-label="${this.getActionMenuButtonLabel_()}"
-            ?hidden="${!this.shouldShowMv2DeprecationActionMenu_()}">
-        </cr-icon-button>
-        <cr-action-menu id="actionMenu">
-          <button class="dropdown-item" id="findAlternativeAction"
-              ?hidden="${
-                  !this.shouldShowMv2DeprecationFindAlternativeAction_()}"
-              @click="${this.onFindAlternativeActionClick_}">
-            $i18n{mv2DeprecationPanelFindAlternativeButton}
-          </button>
-        </cr-action-menu>
       </div>
     ` : ''}
     <div class="cr-row first control-line" id="enable-section">
@@ -394,10 +380,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
     <cr-link-row class="hr" ?hidden="${!this.data.manifestHomePageUrl.length}"
         id="extensionWebsite" label="$i18n{extensionWebsite}"
         @click="${this.onExtensionWebSiteClick_}" external>
-    </cr-link-row>
-    <cr-link-row class="hr" ?hidden="${!this.data.webStoreUrl.length}"
-        id="viewInStore" label="$i18n{viewInStore}"
-        @click="${this.onViewInStoreClick_}" external>
     </cr-link-row>
     <div class="section hr">
       <div class="section-title" role="heading" aria-level="2">

@@ -54,28 +54,6 @@ BASE_FEATURE(kIPHExtensionsMenuFeature,
 BASE_FEATURE(kIPHExtensionsRequestAccessButtonFeature,
              "IPH_ExtensionsRequestAccessButton",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHExtensionsZeroStatePromoFeature,
-             "IPH_ExtensionsZeroStatePromo",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<IPHExtensionsZeroStatePromoVariant>::Option
-    kIPHExtensionsZeroStatePromoVariantOptions[] = {
-        {IPHExtensionsZeroStatePromoVariant::kCustomActionIph,
-         "custom-action-iph"},
-        {IPHExtensionsZeroStatePromoVariant::kCustomUiChipIphV1,
-         "custom-ui-chip-iph"},
-        {IPHExtensionsZeroStatePromoVariant::kCustomUiChipIphV2,
-         "custom-ui-chip-iph-v2"},
-        {IPHExtensionsZeroStatePromoVariant::kCustomUiChipIphV3,
-         "custom-ui-chip-iph-v3"},
-        {IPHExtensionsZeroStatePromoVariant::kCustomUIPlainLinkIph,
-         "custom-ui-plain-link-iph"}};
-BASE_FEATURE_ENUM_PARAM(
-    IPHExtensionsZeroStatePromoVariant,
-    kIPHExtensionsZeroStatePromoVariantParam,
-    &feature_engagement::kIPHExtensionsZeroStatePromoFeature,
-    "x_iph-variant",
-    IPHExtensionsZeroStatePromoVariant::kCustomUiChipIphV2,
-    &kIPHExtensionsZeroStatePromoVariantOptions);
 #endif
 BASE_FEATURE(kIPHFocusHelpBubbleScreenReaderPromoFeature,
              "IPH_FocusHelpBubbleScreenReaderPromo",

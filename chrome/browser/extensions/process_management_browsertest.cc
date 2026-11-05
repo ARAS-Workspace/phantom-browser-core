@@ -586,22 +586,13 @@ IN_PROC_BROWSER_TEST_P(ChromeWebStoreInIsolatedOriginTest,
   ASSERT_TRUE(NavigateToURL(web_contents, cws_web_url));
   EXPECT_EQ(cws_web_url, web_contents->GetLastCommittedURL());
 
-  // Double-check that the page has access to the restricted APIs we expect to
-  // be available to the Webstore.
-
-  // We only expect the API to be available to the new (or overridden) URLs.
-  // The old URL was granted access via the component hosted app, which is no
-  // longer supported.
-  bool expect_management_api =
-      GetParam() == kNewWebstoreURL || GetParam() == kWebstoreURLOverride;
-
-  EXPECT_EQ(expect_management_api,
+  // The management API is not exposed to the Webstore, neither on the old URL
+  // nor on the new or overridden URLs.
+  EXPECT_EQ(false,
             content::EvalJs(web_contents, "!!chrome && !!chrome.management"));
 
   // Verify that we have the Webstore hosted app loaded into the Web Contents if
-  // this is for the old Webstore URL. Note: The new Webstore and the Webstore
-  // URL override are granted their powers without use of the hosted app, so we
-  // don't do this check for them.
+  // this is for the old Webstore URL.
   if (GetParam() == kWebstoreURL) {
     content::RenderProcessHost* render_process_host =
         web_contents->GetPrimaryMainFrame()->GetProcess();
