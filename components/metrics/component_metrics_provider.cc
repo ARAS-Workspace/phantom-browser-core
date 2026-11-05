@@ -144,8 +144,6 @@ SystemProfileProto_ComponentId ComponentMetricsProvider::CrxIdToComponentId(
        SystemProfileProto_ComponentId_ORIGIN_TRIALS},  // Alternate ID
       {"lmelglejhemejginpboagddgdfbepgmp",
        SystemProfileProto_ComponentId_OPTIMIZATION_HINTS},
-      {"mfhmdacoffpmifoibamicehhklffanao",
-       SystemProfileProto_ComponentId_SCREEN_AI},
       {"mimojjlkmoijpicakmndhoigimigcmbb",
        SystemProfileProto_ComponentId_PEPPER_FLASH},
       {"mjdmdobabdmfcbaakcaadileafkmifen",

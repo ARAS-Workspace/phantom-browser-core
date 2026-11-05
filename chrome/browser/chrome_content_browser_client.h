@@ -839,12 +839,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   void OnFetchKeepAliveRequestDestroyed(
       content::BrowserContext& browser_context) override;
 
-#if BUILDFLAG(IS_MAC)
-  bool SetupEmbedderSandboxParameters(
-      sandbox::mojom::Sandbox sandbox_type,
-      sandbox::SandboxSerializer* serializer) override;
-#endif  // BUILDFLAG(IS_MAC)
-
   bool HasErrorPage(int http_status_code) override;
 
   StartupData* startup_data() { return &startup_data_; }

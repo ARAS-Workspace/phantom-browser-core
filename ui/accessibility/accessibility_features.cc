@@ -7,18 +7,8 @@
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
 #include "build/build_config.h"
-#include "ui/accessibility/ax_features.mojom-features.h"
 
 namespace features {
-
-BASE_FEATURE(kAccessibilityPdfOcrForSelectToSpeak,
-             "kAccessibilityPdfOcrForSelectToSpeak",
-             base::FEATURE_DISABLED_BY_DEFAULT
-);
-bool IsAccessibilityPdfOcrForSelectToSpeakEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kAccessibilityPdfOcrForSelectToSpeak);
-}
 
 BASE_FEATURE(kAccessibilityExposeSummaryAsHeading,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -173,42 +163,12 @@ bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled() {
       ::features::kEnableCollectAccessibilityHeuristicInCanvasUkm);
 }
 
-BASE_FEATURE(kAXTreeFixing, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsAXTreeFixingEnabled() {
-  return base::FeatureList::IsEnabled(::features::kAXTreeFixing);
-}
-
-bool IsScreenAIMainContentExtractionEnabled() {
-  return base::FeatureList::IsEnabled(
-      ax::mojom::features::kScreenAIMainContentExtractionEnabled);
-}
-
-bool IsScreenAIOCREnabled() {
-  return base::FeatureList::IsEnabled(ax::mojom::features::kScreenAIOCREnabled);
-}
-
-BASE_FEATURE(kMainNodeAnnotations, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsMainNodeAnnotationsEnabled() {
-  return base::FeatureList::IsEnabled(::features::kMainNodeAnnotations);
-}
-
 BASE_FEATURE(kPdfAccessibilityHeuristicEnhancements,
              base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsPdfAccessibilityHeuristicEnhancementsEnabled() {
   return base::FeatureList::IsEnabled(
       ::features::kPdfAccessibilityHeuristicEnhancements);
 }
-
-// This feature is only used in tests and must not be enabled by default.
-BASE_FEATURE(kScreenAITestMode, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsScreenAITestModeEnabled() {
-  return base::FeatureList::IsEnabled(::features::kScreenAITestMode);
-}
-
-#if BUILDFLAG(IS_LINUX)
-BASE_FEATURE(kScreenAIPartitionAllocAdvancedChecksEnabled,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_MAC)
 // Enables the switchover to the newer NSAccessibility property-based API.

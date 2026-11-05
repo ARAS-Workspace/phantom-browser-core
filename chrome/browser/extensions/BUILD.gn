@@ -15,7 +15,6 @@ import("//mojo/public/tools/bindings/mojom.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/protobuf/proto_library.gni")
 
@@ -795,7 +794,6 @@ source_set("extensions") {
       "//chrome/app/vector_icons",
       "//chrome/browser:font_pref",
       "//chrome/browser:primitives",
-      "//chrome/browser/accessibility/tree_fixing:prefs",
       "//chrome/browser/apps:user_type_filter",
       "//chrome/browser/importer",
       "//chrome/browser/language",

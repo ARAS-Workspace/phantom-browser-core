@@ -10,7 +10,6 @@ assert(is_mac || is_linux)
 
 source_set("settings") {
   sources = [
-    "accessibility_main_handler.h",
     "appearance_handler.h",
     "browser_lifetime_handler.h",
     "custom_home_pages_table_model.h",
@@ -52,7 +51,6 @@ source_set("settings") {
     "//chrome/browser/permissions/system",
     "//chrome/browser/profile_resetter",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/screen_ai:screen_ai_install_state",
     "//chrome/browser/themes",
     "//chrome/browser/ui/search_engines",
     "//chrome/browser/ui/webui/signin:login_ui_service",
@@ -106,7 +104,6 @@ source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
   sources = [
-    "accessibility_main_handler.cc",
     "appearance_handler.cc",
     "browser_lifetime_handler.cc",
     "custom_home_pages_table_model.cc",

@@ -23,7 +23,6 @@
 #include "sandbox/policy/mac/print_compositor.sb.h"
 #include "sandbox/policy/mac/proxy_resolver.sb.h"
 #include "sandbox/policy/mac/renderer.sb.h"
-#include "sandbox/policy/mac/screen_ai.sb.h"
 #include "sandbox/policy/mac/speech_recognition.sb.h"
 #include "sandbox/policy/mac/utility.sb.h"
 #include "sandbox/policy/mac/webnn_model_compilation.sb.h"
@@ -62,8 +61,6 @@ std::string GetSandboxProfile(sandbox::mojom::Sandbox sandbox_type) {
         return kSeatbeltPolicyString_print_backend;
       case sandbox::mojom::Sandbox::kPrintCompositor:
         return kSeatbeltPolicyString_print_compositor;
-      case sandbox::mojom::Sandbox::kScreenAI:
-        return kSeatbeltPolicyString_screen_ai;
       case sandbox::mojom::Sandbox::kSpeechRecognition:
         return kSeatbeltPolicyString_speech_recognition;
       case sandbox::mojom::Sandbox::kOnDeviceModelExecution:

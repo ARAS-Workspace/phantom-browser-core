@@ -17,7 +17,6 @@
 #include "base/timer/elapsed_timer.h"
 #include "build/build_config.h"
 #include "content/public/renderer/render_thread.h"
-#include "content/renderer/accessibility/annotations/ax_annotators_manager.h"
 #include "content/renderer/accessibility/ax_action_target_factory.h"
 #include "content/renderer/accessibility/blink_ax_action_target.h"
 #include "content/renderer/accessibility/render_accessibility_manager.h"
@@ -87,8 +86,6 @@ RenderAccessibilityImpl::RenderAccessibilityImpl(
   // aria-modal currently prunes the accessibility tree on Mac and Android only.
   render_frame_->GetWebView()->GetSettings()->SetAriaModalPrunesAXTree(true);
 #endif  // BUILDFLAG(IS_MAC)
-
-  ax_annotators_manager_ = std::make_unique<AXAnnotatorsManager>(this);
 }
 
 RenderAccessibilityImpl::~RenderAccessibilityImpl() {
@@ -122,9 +119,6 @@ void RenderAccessibilityImpl::DidCommitProvisionalLoad(
   slowest_serialization_time_ = base::TimeDelta();
   ukm_timer_ = std::make_unique<base::ElapsedTimer>();
 
-  ax_annotators_manager_->CancelAnnotations();
-  ax_annotators_manager_->AccessibilityModeChanged(ui::AXMode(),
-                                                   accessibility_mode_);
   page_language_.clear();
 
   // New document has started. Do not expect to receive the ACK for a
@@ -174,9 +168,6 @@ void RenderAccessibilityImpl::NotifyAccessibilityModeChange(
   if (was_on) {
     ax_context_->MarkDocumentDirty();
   }
-
-  // Update AXAnnotators based on a changed accessibility mode.
-  ax_annotators_manager_->AccessibilityModeChanged(old_mode, mode);
 
   // Fire a load complete event so that any ATs present can treat the page as
   // fresh and newly loaded.
@@ -327,8 +318,6 @@ void RenderAccessibilityImpl::PerformAction(const ui::AXActionData& data) {
       AXActionTargetFactory::CreateFromNodeIdOrRole(
           document, plugin_action_target_adapter_, data.focus_node_id);
 
-  ax_annotators_manager_->PerformAction(data.action);
-
   // Important: keep this reconciled with AXObject::PerformAction().
   // Actions shouldn't be handled in both places.
   switch (data.action) {
@@ -381,9 +370,7 @@ void RenderAccessibilityImpl::PerformAction(const ui::AXActionData& data) {
     case ax::mojom::Action::kNone:
       NOTREACHED();
     case ax::mojom::Action::kGetTextLocation:
-      break;
     case ax::mojom::Action::kAnnotatePageImages:
-      // Handle this in AXAnnotatorsManager.
       break;
     case ax::mojom::Action::kSignalEndOfTest:
       HandleAXEvent(
@@ -526,13 +513,6 @@ bool RenderAccessibilityImpl::SendAccessibilitySerialization(
   ui::AXUpdatesAndEvents updates_and_events;
   updates_and_events.updates = std::move(updates);
   updates_and_events.events = std::move(events);
-
-  for (auto& update : updates_and_events.updates) {
-    ax_annotators_manager_->Annotate(document, &update,
-                                     had_load_complete_messages);
-  }
-
-  ax_annotators_manager_->AddDebuggingAttributes(updates_and_events.updates);
 
   CHECK(!weak_factory_for_pending_events_.HasWeakPtrs());
   CHECK(reset_token_);

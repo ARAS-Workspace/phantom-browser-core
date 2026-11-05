@@ -28,7 +28,6 @@ include_rules = [
   "+components/sampling_profiler",
   "+components/startup_metric_utils/common",
   "+components/webui/about",
-  "+services/screen_ai/buildflags",
   "+services/tracing/public/cpp/stack_sampling/tracing_sampler_profiler.h",
   "+components/upload_list",
   "+components/version_info",

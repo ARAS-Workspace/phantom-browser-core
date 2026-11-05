@@ -55,7 +55,6 @@
 #include "sandbox/policy/linux/sandbox_linux.h"
 #include "services/audio/audio_sandbox_hook_linux.h"
 #include "services/network/network_sandbox_hook_linux.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 #include "services/shape_detection/shape_detection_sandbox_hook.h"
 
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
@@ -78,11 +77,6 @@
 
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "printing/sandbox/print_backend_sandbox_hook_linux.h"
-#endif
-
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-#include "services/screen_ai/public/cpp/utilities.h"  // nogncheck
-#include "services/screen_ai/sandbox/screen_ai_sandbox_hook_linux.h"  // nogncheck
 #endif
 
 #endif  // BUILDFLAG(IS_LINUX)
@@ -256,16 +250,6 @@ int UtilityMain(MainFunctionParams parameters) {
       on_device_model::AddSandboxLinuxOptions(sandbox_options);
       pre_sandbox_hook = base::BindOnce(&on_device_model::PreSandboxHook);
       break;
-    case sandbox::mojom::Sandbox::kScreenAI:
-#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-      pre_sandbox_hook =
-          base::BindOnce(&screen_ai::ScreenAIPreSandboxHook,
-                         parameters.command_line->GetSwitchValuePath(
-                             screen_ai::GetBinaryPathSwitch()));
-      break;
-#else
-      NOTREACHED();
-#endif
 #if BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kShapeDetection:
       pre_sandbox_hook =

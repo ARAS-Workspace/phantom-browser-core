@@ -41,11 +41,6 @@
 
 namespace features {
 
-// Enable PDF OCR for Select-to-Speak. It will be disabled by default on
-// platforms other than ChromeOS as STS is available only on ChromeOS.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityPdfOcrForSelectToSpeak);
-AX_BASE_EXPORT bool IsAccessibilityPdfOcrForSelectToSpeakEnabled();
-
 // A replacement algorithm for AbstractInlineTextBox + InlineCursor for
 // AXInlineTextBox creation.
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityBlockFlowIterator);
@@ -151,39 +146,9 @@ AX_BASE_EXPORT BASE_DECLARE_FEATURE(
     kEnableCollectAccessibilityHeuristicInCanvasUkm);
 AX_BASE_EXPORT bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled();
 
-
-
-// Use the AXTree fixing code, which may be an assortment of different
-// tools/methods to fix the AXTree. This is not available on Android.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAXTreeFixing);
-AX_BASE_EXPORT bool IsAXTreeFixingEnabled();
-
-// Identify and annotate the main node of the AXTree where one was not already
-// provided.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kMainNodeAnnotations);
-AX_BASE_EXPORT bool IsMainNodeAnnotationsEnabled();
-
 // Enable heuristic enhancements for PDF accessibility.
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kPdfAccessibilityHeuristicEnhancements);
 AX_BASE_EXPORT bool IsPdfAccessibilityHeuristicEnhancementsEnabled();
-
-// ScreenAI library's Main Content Extraction service is enabled.
-AX_BASE_EXPORT bool IsScreenAIMainContentExtractionEnabled();
-
-// ScreenAI library's OCR service is enabled.
-AX_BASE_EXPORT bool IsScreenAIOCREnabled();
-
-// Enables to use the Screen AI component available for testing.
-// If enabled, ScreenAI library will be loaded from //third_party/screen-ai.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kScreenAITestMode);
-AX_BASE_EXPORT bool IsScreenAITestModeEnabled();
-
-#if BUILDFLAG(IS_LINUX)
-// Enables advanced partition allocation checks in ScreenAI service.
-// TODO(crbug.com/418199684): Remove when the bug is fixed.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(
-    kScreenAIPartitionAllocAdvancedChecksEnabled);
-#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kMacAccessibilityAPIMigration);

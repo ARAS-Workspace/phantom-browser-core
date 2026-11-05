@@ -17,7 +17,6 @@ import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//third_party/protobuf/proto_library.gni")
 import("//tools/metrics/generate_allowlist_from_histograms_file.gni")
 import("//ui/base/ui_features.gni")
@@ -1124,7 +1123,6 @@ static_library("ui") {
     "//chrome/browser/download:impl",
     "//chrome/browser/metrics/desktop_session_duration",
     "//chrome/browser/regional_capabilities",
-    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/tab_group_sync:utils",
     "//chrome/browser/themes",
     "//chrome/browser/ui/apps",

@@ -29,10 +29,7 @@ if (is_posix) {
 # This target is for dependency tracking for the command ID header.
 source_set("command_ids") {
   sources = [ "chrome_command_ids.h" ]
-  public_deps = [
-    "//build:branding_buildflags",
-    "//services/screen_ai/buildflags",
-  ]
+  public_deps = [ "//build:branding_buildflags" ]
   deps = [ "//ui/base:constants" ]
 }
 

@@ -739,11 +739,6 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
       ui::AXApiType::Type api_type,
       std::vector<ui::AXPropertyFilter> property_filters) = 0;
 
-  // Applies a fix to an AXTree from an AXTreeFixing service.
-  virtual void ApplyAXTreeFixingResult(ui::AXTreeID tree_id,
-                                       ui::AXNodeID node_id,
-                                       ax::mojom::Role role) = 0;
-
   // A callback that takes a string which contains accessibility event
   // information.
   using AccessibilityEventCallback =

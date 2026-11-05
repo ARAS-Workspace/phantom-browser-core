@@ -141,7 +141,6 @@ source_set("misc") {
   ]
 
   deps += [
-    "//chrome/browser/accessibility/tree_fixing:prefs",
     "//chrome/browser/themes",
     "//chrome/browser/ui/dialogs:browser_dialogs",
     "//chrome/browser/ui/signin",
@@ -696,7 +695,6 @@ source_set("profiles_extra_parts_impl") {
   ]
 
   deps += [
-    "//chrome/browser/accessibility/tree_fixing:service",
     "//chrome/browser/apps/app_service",
     "//chrome/browser/autofill",
     "//chrome/browser/badging",
@@ -708,7 +706,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/profile_resetter",
     "//chrome/browser/record_replay",
     "//chrome/browser/record_replay:impl",
-    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/sharing_hub",
     "//chrome/browser/themes",

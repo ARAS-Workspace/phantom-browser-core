@@ -341,7 +341,6 @@
 #include "pdf/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 #include "sandbox/policy/features.h"
-#include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/switches.h"
 #include "services/cert_verifier/public/mojom/cert_verifier_service_factory.mojom.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
@@ -388,9 +387,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/browser_process_platform_part_mac.h"
 #include "chrome/common/chrome_version.h"
-#include "sandbox/mac/sandbox_serializer.h"
-#include "sandbox/policy/mac/params.h"
-#include "sandbox/policy/mac/sandbox_mac.h"
 #endif
 
 #include "chrome/browser/devtools/chrome_devtools_manager_delegate.h"
@@ -399,7 +395,6 @@
 #include "chrome/browser/loader/fetch_keepalive_process_manager.h"
 #include "chrome/browser/metrics/usage_scenario/chrome_responsiveness_calculator_delegate.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
-#include "chrome/browser/screen_ai/screen_ai_install_state.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -5912,30 +5907,6 @@ void ChromeContentBrowserClient::OnFetchKeepAliveRequestDestroyed(
   fetch_keepalive_process_manager_->OnRequestDestroyed(
       *Profile::FromBrowserContext(&browser_context));
 }
-
-#if BUILDFLAG(IS_MAC)
-bool ChromeContentBrowserClient::SetupEmbedderSandboxParameters(
-    sandbox::mojom::Sandbox sandbox_type,
-    sandbox::SandboxSerializer* serializer) {
-  if (sandbox_type == sandbox::mojom::Sandbox::kScreenAI) {
-    // ScreenAI service needs read access to ScreenAI component binary path to
-    // load it.
-    base::FilePath screen_ai_binary_path =
-        screen_ai::ScreenAIInstallState::GetInstance()
-            ->get_component_binary_path();
-    if (screen_ai_binary_path.empty()) {
-      VLOG(1) << "Screen AI component not found.";
-      return false;
-    }
-    return serializer->SetParameter(
-        sandbox::policy::kParamScreenAiComponentPath,
-        screen_ai_binary_path.value());
-  }
-
-  return false;
-}
-
-#endif  // BUILDFLAG(IS_MAC)
 
 bool ChromeContentBrowserClient::HasErrorPage(int http_status_code) {
   // Use an internal error page, if we have one for the status code.

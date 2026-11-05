@@ -47,7 +47,6 @@
 #include "sandbox/policy/linux/bpf_print_backend_policy_linux.h"
 #include "sandbox/policy/linux/bpf_print_compositor_policy_linux.h"
 #include "sandbox/policy/linux/bpf_renderer_policy_linux.h"
-#include "sandbox/policy/linux/bpf_screen_ai_policy_linux.h"
 #include "sandbox/policy/linux/bpf_service_policy_linux.h"
 #include "sandbox/policy/linux/bpf_speech_recognition_policy_linux.h"
 #include "sandbox/policy/linux/bpf_utility_policy_linux.h"
@@ -184,8 +183,6 @@ std::unique_ptr<BPFBasePolicy> SandboxSeccompBPF::PolicyForSandboxType(
     case sandbox::mojom::Sandbox::kSpeechRecognition:
       return std::make_unique<SpeechRecognitionProcessPolicy>();
 #if BUILDFLAG(IS_LINUX)
-    case sandbox::mojom::Sandbox::kScreenAI:
-      return std::make_unique<ScreenAIProcessPolicy>();
     case sandbox::mojom::Sandbox::kShapeDetection:
       return std::make_unique<UtilityProcessPolicy>();
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
@@ -254,7 +251,6 @@ void SandboxSeccompBPF::RunSandboxSanityChecks(
 #endif  // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 #if BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kShapeDetection:
-    case sandbox::mojom::Sandbox::kScreenAI:
 #endif  // BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kAudio:
     case sandbox::mojom::Sandbox::kService:

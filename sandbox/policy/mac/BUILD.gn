@@ -15,7 +15,6 @@ sb_files = [
   "print_compositor.sb",
   "proxy_resolver.sb",
   "renderer.sb",
-  "screen_ai.sb",
   "speech_recognition.sb",
   "utility.sb",
   "webnn_model_compilation.sb",

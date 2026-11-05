@@ -239,8 +239,6 @@
 #include "ui/events/base_event_utils.h"
 #include "ui/gfx/animation/animation.h"
 
-#include "ui/accessibility/accessibility_features.h"
-
 #if BUILDFLAG(ENABLE_VR)
 #include "content/browser/xr/service/xr_runtime_manager_impl.h"
 #endif
@@ -9848,37 +9846,6 @@ void WebContentsImpl::RecursivelyConstructAXTree(
   for (ui::AXNode* child : node->GetAllChildren()) {
     RecursivelyConstructAXTree(child, nodes);
   }
-}
-
-void WebContentsImpl::ApplyAXTreeFixingResult(ui::AXTreeID tree_id,
-                                              ui::AXNodeID node_id,
-                                              ax::mojom::Role role) {
-  CHECK(features::IsAXTreeFixingEnabled());
-
-  GetPrimaryMainFrame()->ForEachRenderFrameHostImplWithAction(
-      [tree_id, node_id, role](RenderFrameHostImpl* rfhi) {
-        ui::BrowserAccessibilityManager* manager =
-            rfhi->browser_accessibility_manager();
-        if (!manager) {
-          return RenderFrameHost::FrameIterationAction::kContinue;
-        }
-
-        ui::AXTree* tree = manager->ax_tree();
-        if (!tree || !tree->root()) {
-          return RenderFrameHost::FrameIterationAction::kContinue;
-        }
-
-        ui::AXNode* node = manager->ax_tree()->GetFromId(node_id);
-        if (!node) {
-          return RenderFrameHost::FrameIterationAction::kContinue;
-        }
-
-        // Update the node's role and stop iterating.
-        ui::AXNodeData new_data = node->data();
-        new_data.role = role;
-        node->SetData(new_data);
-        return RenderFrameHost::FrameIterationAction::kStop;
-      });
 }
 
 void WebContentsImpl::DidChangeLoadProgressForMainFrame(

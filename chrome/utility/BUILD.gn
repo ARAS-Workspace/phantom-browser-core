@@ -9,7 +9,6 @@ import("//extensions/buildflags/buildflags.gni")
 import("//media/media_options.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 
 static_library("utility") {
   sources = [
@@ -59,7 +58,6 @@ static_library("utility") {
     "//services/network:network_service",
     "//services/passage_embeddings",
     "//services/passage_embeddings/public/mojom",
-    "//services/screen_ai/buildflags",
     "//services/service_manager/public/cpp",
     "//skia",
     "//sql",
@@ -105,7 +103,6 @@ static_library("utility") {
     "//components/user_data_importer/content",
     "//components/user_data_importer/utility:bookmarks",
     "//services/proxy_resolver:lib",
-    "//services/screen_ai",
   ]
 
   if (enable_extensions) {

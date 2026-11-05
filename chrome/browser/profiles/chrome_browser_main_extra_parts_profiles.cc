@@ -221,8 +221,6 @@
 
 // Per-platform #include blocks, in alphabetical order.
 
-#include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
-#include "chrome/browser/accessibility/tree_fixing/ax_tree_fixing_services_router_factory.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/badging/badge_manager_factory.h"
 #include "chrome/browser/device_api/managed_configuration_api_factory.h"
@@ -236,7 +234,6 @@
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
 #include "chrome/browser/record_replay/task_service_factory.h"
 #include "chrome/browser/record_replay/task_store_factory.h"
-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/storage/storage_notification_service_factory.h"
 #include "chrome/browser/ui/browser_manager_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
@@ -249,7 +246,6 @@
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service_factory.h"
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
-#include "ui/accessibility/accessibility_features.h"
 
 #include "chrome/browser/download/bubble/download_bubble_update_service_factory.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
@@ -620,10 +616,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_LINUX)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
 #endif
-  if (features::IsMainNodeAnnotationsEnabled()) {
-    screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
-  }
-  screen_ai::ScreenAIServiceRouterFactory::EnsureFactoryBuilt();
   SCTReportingServiceFactory::GetInstance();
   search_engines::SearchEngineChoiceServiceFactory::GetInstance();
   SearchPrefetchServiceFactory::GetInstance();
@@ -673,7 +665,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ToolbarActionsModelFactory::GetInstance();
 #endif
   TopSitesFactory::GetInstance();
-  tree_fixing::AXTreeFixingServicesRouterFactory::GetInstance();
   TriggeredProfileResetterFactory::GetInstance();
   TurnSyncOnHelper::EnsureFactoryBuilt();
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)

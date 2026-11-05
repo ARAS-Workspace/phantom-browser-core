@@ -1760,9 +1760,6 @@
                   '|chrome/browser/ui/pdf/'\
                   '|pdf/'
     },
-    'pdf_ocr': {
-      'filepath': 'pdf_ocr'
-    },
     'permissions': {
       'filepath': 'content/(child,browser)/permissions/'\
                   '|content/common/permission_'\
@@ -1889,9 +1886,6 @@
                   '|build/android/gyp/extract_unwind_tables*'\
                   '|chrome/android/features/stack_unwinder/'\
                   '|chrome/android/modules/stack_unwinder/',
-    },
-    'screen_ai': {
-      'filepath': 'screen_ai',
     },
     'search_engine_choice_screen': {
       'filepath': 'chrome/browser/search_engine_choice/'\
@@ -2998,8 +2992,6 @@
                         'bartekn+watch@chromium.org'],
     'password_manager': ['gcasto+watchlist@chromium.org'],
     'pdf': ['pdf-reviews@chromium.org'],
-    'pdf_ocr': ['kyungjunlee+watch@google.com',
-                'rhalavati+watch@chromium.org'],
     'permissions': ['permissions-reviews@chromium.org'],
     'permissions_policy': ['loonybear@chromium.org',
                            'iclelland+watch@chromium.org',
@@ -3039,7 +3031,6 @@
                'robertshield+watch@chromium.org'],
     'runtime_enabled_features': ['jmedley+watch@chromium.org'],
     'sampling_profiler': ['thiabaud@google.com', 'spvm@chromium.org'],
-    'screen_ai': ['rhalavati+watch@chromium.org'],
     'search_engine_choice_screen': ['chrome-regionalcapabilities+watch@google.com'],
     'search_prefetch': ['lingqi+watch@chromium.org'],
     'security': ['security-watchlist@chromium.org'],

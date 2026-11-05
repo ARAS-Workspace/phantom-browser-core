@@ -214,7 +214,6 @@
 #endif  // BUILDFLAG(ENABLE_PDF)
 
 #include "chrome/browser/intranet_redirect_detector.h"
-#include "chrome/browser/screen_ai/pref_names.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/task_manager/task_manager_interface.h"
 #include "chrome/browser/themes/theme_syncable_service.h"
@@ -1021,8 +1020,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 
   RegisterDefaultBrowserPromptPrefs(registry);
 
-  screen_ai::RegisterLocalStatePrefs(registry);
-
   // Platform-specific and compile-time conditional individual preferences.
   // If you have multiple preferences that should clearly be grouped together,
   // please group them together into a helper function called above. Please
@@ -1284,9 +1281,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterIntegerPref(prefs::kMemorySaverChipExpandedCount, 0);
   registry->RegisterTimePref(prefs::kLastMemorySaverChipExpandedTimestamp,
                              base::Time());
-  registry->RegisterBooleanPref(
-      prefs::kAccessibilityMainNodeAnnotationsEnabled, false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 
   registry->RegisterBooleanPref(
       prefs::kManagedLocalNetworkAccessRestrictionsTemporaryOptOut, false);

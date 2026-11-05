@@ -66,8 +66,6 @@
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/screen_ai/screen_ai_service_router.h"
-#include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/web_applications/sub_apps/sub_apps_service_impl.h"
 #endif
 
@@ -191,27 +189,6 @@ void BindNetworkHintsHandler(
   predictors::NetworkHintsHandlerImpl::Create(frame_host, std::move(receiver));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-void BindScreenAIAnnotator(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<screen_ai::mojom::ScreenAIAnnotator> receiver) {
-  content::BrowserContext* browser_context =
-      frame_host->GetProcess()->GetBrowserContext();
-
-  screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(browser_context)
-      ->BindScreenAIAnnotator(std::move(receiver));
-}
-
-void BindScreen2xMainContentExtractor(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<screen_ai::mojom::Screen2xMainContentExtractor>
-        receiver) {
-  screen_ai::ScreenAIServiceRouterFactory::GetForBrowserContext(
-      frame_host->GetProcess()->GetBrowserContext())
-      ->BindMainContentExtractor(std::move(receiver));
-}
-#endif
-
 void BindModelBroker(
     content::RenderFrameHost* frame_host,
     mojo::PendingReceiver<optimization_guide::mojom::ModelBroker> receiver) {
@@ -290,11 +267,6 @@ void PopulateChromeFrameBinders(
     map->Add<blink::mojom::SubAppsService>(
         &web_app::SubAppsServiceImpl::CreateIfAllowed);
   }
-
-  map->Add<screen_ai::mojom::ScreenAIAnnotator>(&BindScreenAIAnnotator);
-
-  map->Add<screen_ai::mojom::Screen2xMainContentExtractor>(
-      &BindScreen2xMainContentExtractor);
 #endif
 
 #if BUILDFLAG(ENABLE_PDF)

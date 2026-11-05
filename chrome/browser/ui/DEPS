@@ -28,7 +28,6 @@ include_rules = [
   "+components/web_package",
   "+extensions/strings/grit/extensions_strings.h",
   "+services/device/public/mojom",
-  "+services/screen_ai",
   "+services/webnn/public/mojom/features.mojom.h",
   "+services/webnn/webnn_switches.h",
   "+services/preferences/tracked",

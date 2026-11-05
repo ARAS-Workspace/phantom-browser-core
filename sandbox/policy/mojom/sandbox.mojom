@@ -92,9 +92,6 @@ enum Sandbox {
   // Interfaces with operating system print drivers.
   [EnableIf=is_chromeos|is_linux|is_mac|is_win] kPrintBackend,
 
-  // Like kUtility but allows loading of screen AI library.
-  [EnableIf=is_chromeos|is_linux|is_mac|is_win] kScreenAI,
-
   // |kXrCompositing| hosts XR Device Service on Windows.
   [EnableIf=is_win] kXrCompositing,
 

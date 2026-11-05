@@ -36,8 +36,6 @@
 #include "chrome/utility/importer/profile_import_impl.h"
 #include "services/proxy_resolver/proxy_resolver_factory_impl.h"  // nogncheck
 #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
-#include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
-#include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
 
 #if BUILDFLAG(ENABLE_EXTRACTORS)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
@@ -128,11 +126,6 @@ auto RunPassageEmbeddingsService(
       std::move(receiver));
 }
 
-auto RunScreenAIServiceFactory(
-    mojo::PendingReceiver<screen_ai::mojom::ScreenAIServiceFactory> receiver) {
-  return std::make_unique<screen_ai::ScreenAIService>(std::move(receiver));
-}
-
 #if BUILDFLAG(ENABLE_EXTRACTORS)
 auto RunFileUtil(
     mojo::PendingReceiver<chrome::mojom::FileUtilService> receiver) {
@@ -209,7 +202,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunPassageEmbeddingsService);
 
   services.Add(RunProfileImporter);
-  services.Add(RunScreenAIServiceFactory);
 
 #if BUILDFLAG(IS_MAC)
   services.Add(RunMacNotificationService);

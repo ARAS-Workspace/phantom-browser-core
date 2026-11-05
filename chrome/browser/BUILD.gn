@@ -27,7 +27,6 @@ import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
 import("//sandbox/features.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//third_party/webrtc/webrtc.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
@@ -1070,14 +1069,6 @@ source_set("core") {
     ]
   }
 
-  if (enable_screen_ai_service) {
-    deps += [
-      "//chrome/browser/screen_ai:screen_ai_downloader",
-      "//chrome/browser/screen_ai:screen_ai_install_state",
-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-    ]
-  }
-
   if (enable_session_service) {
     deps += [ "//chrome/browser/ui/webui/tab_strip_internals" ]
   }
@@ -1809,9 +1800,6 @@ source_set("browser") {
     "//chrome/browser/profile_resetter:impl",
     "//chrome/browser/record_replay",
     "//chrome/browser/record_replay:impl",
-    "//chrome/browser/screen_ai:screen_ai_install_state",
-    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-    "//chrome/browser/screen_ai/public:optical_character_recognizer",
     "//chrome/browser/sharing_hub",
     "//chrome/browser/sharing_hub:impl",
     "//chrome/browser/themes",
@@ -2295,7 +2283,6 @@ group("browser_public_dependencies") {
     "//pdf:buildflags",
     "//services/data_decoder/public/mojom",
     "//services/network/public/mojom",
-    "//services/screen_ai/buildflags",
     "//sql",
     "//ui/lottie",
   ]

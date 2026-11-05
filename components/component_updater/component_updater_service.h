@@ -32,10 +32,6 @@ namespace policy {
 class ComponentUpdaterPolicyTest;
 }
 
-namespace screen_ai {
-class ScreenAIDownloaderNonChromeOS;
-}
-
 namespace speech {
 }
 
@@ -207,7 +203,6 @@ class ComponentUpdateService {
   virtual void Stop() = 0;
 
  private:
-  friend class screen_ai::ScreenAIDownloaderNonChromeOS;
   friend class ::ComponentsHandler;
   FRIEND_TEST_ALL_PREFIXES(ComponentInstallerTest, RegisterComponent);
   FRIEND_TEST_ALL_PREFIXES(ComponentUpdaterTest, UpdatesDisabled);

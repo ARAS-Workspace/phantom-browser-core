@@ -75,11 +75,6 @@ namespace webrtc_event_logging {
 class WebRtcEventLogManager;
 }  // namespace webrtc_event_logging
 
-
-namespace screen_ai {
-class ScreenAIInstallState;
-}  // namespace screen_ai
-
 // Real implementation of BrowserProcess that creates and returns the services.
 class BrowserProcessImpl : public BrowserProcess,
                            public KeepAliveStateObserver {
@@ -365,10 +360,6 @@ class BrowserProcessImpl : public BrowserProcess,
   // to concerns over integrity of data shared between profiles,
   // but some users of component updater only install per-user.
   std::unique_ptr<component_updater::ComponentUpdateService> component_updater_;
-
-  // Used to download Screen AI on demand and keep track of the library
-  // availability.
-  std::unique_ptr<screen_ai::ScreenAIInstallState> screen_ai_download_;
 
   std::unique_ptr<BrowserProcessPlatformPart> platform_part_;
 

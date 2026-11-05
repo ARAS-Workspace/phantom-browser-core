@@ -158,7 +158,6 @@ source_set("sync") {
     "//chrome/browser/ui/tabs:tab_strip_model_observer",
   ]
   deps += [
-    "//chrome/browser/accessibility/tree_fixing:prefs",
     "//chrome/browser/themes",
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/tabs/saved_tab_groups",

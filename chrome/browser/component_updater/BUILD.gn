@@ -38,8 +38,6 @@ source_set("component_updater") {
   ]
   public_deps += []
 
-  public += [ "screen_ai_component_installer.h" ]
-
   if (chrome_root_store_supported) {
     public += [ "pki_metadata_fastpush_component_installer_policy.h" ]
   }
@@ -95,12 +93,6 @@ source_set("impl") {
   deps += [
     "//chrome/browser/dictation",
     "//components/webapps/isolated_web_apps",
-  ]
-
-  sources += [ "screen_ai_component_installer.cc" ]
-  deps += [
-    "//chrome/browser/screen_ai:screen_ai_install_state",
-    "//services/screen_ai/public/cpp:utilities",
   ]
 
   if (chrome_root_store_supported) {

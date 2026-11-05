@@ -128,7 +128,6 @@ class UtilityProcessSandboxBrowserTest
 #endif  // BUILDFLAG(IS_LINUX)
       case Sandbox::kNetwork:
       case Sandbox::kPrintBackend:
-      case Sandbox::kScreenAI:
       case Sandbox::kSpeechRecognition: {
         constexpr int kExpectedPartialSandboxFlags =
             SandboxLinux::kSeccompBPF | SandboxLinux::kYama |

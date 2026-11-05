@@ -28,7 +28,6 @@ import("//net/features.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//testing/test.gni")
 import("//third_party/blink/public/public_features.gni")
@@ -975,8 +974,6 @@ test("browser_tests") {
     "//chrome/browser/renderer_host",
     "//chrome/browser/renderer_host:browser_tests",
     "//chrome/browser/resource_coordinator:mojo_bindings",
-    "//chrome/browser/screen_ai:screen_ai_install_state",
-    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/search",
     "//chrome/browser/search:browser_tests",
     "//chrome/browser/search_engines",
@@ -1406,8 +1403,6 @@ test("browser_tests") {
     "//services/preferences/public/cpp",
     "//services/preferences/public/cpp/tracked",
     "//services/preferences/tracked:features",
-    "//services/screen_ai/public/cpp:utilities",
-    "//services/screen_ai/public/mojom",
     "//services/service_manager/public/cpp",
     "//services/strings",
     "//services/test/echo/public/mojom",
@@ -2555,7 +2550,6 @@ test("unit_tests") {
     "//chrome/browser:process_singleton",
     "//chrome/browser:renderer_preferences_util",
     "//chrome/browser:resources_util",
-    "//chrome/browser/accessibility:unit_tests",
     "//chrome/browser/ai",
     "//chrome/browser/ai:test_support",
     "//chrome/browser/apps:unit_tests",
@@ -3371,7 +3365,6 @@ test("unit_tests") {
   # TODO(crbug.com/417513088): Maybe merge with the non-android `deps`
   # declaration above?
   deps += [
-    "../browser/screen_ai:screen_ai_install_state",
     "//chrome:packed_resources",
     "//chrome/browser/apps:icon_standardizer",
     "//chrome/browser/apps/app_service",

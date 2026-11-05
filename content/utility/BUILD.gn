@@ -8,7 +8,6 @@ import("//media/media_options.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//services/accessibility/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 
 source_set("utility") {
   # Only the public target should depend on this. All other targets (even
@@ -64,7 +63,6 @@ source_set("utility") {
     "//services/on_device_model:on_device_model_service",
     "//services/on_device_model/public/cpp",
     "//services/on_device_model/public/mojom",
-    "//services/screen_ai/buildflags",
     "//services/service_manager/public/cpp",
     "//services/service_manager/public/mojom",
     "//services/shape_detection:lib",
@@ -113,10 +111,6 @@ source_set("utility") {
   }
 
   deps += [ "//services/proxy_resolver:lib" ]
-
-  if (enable_screen_ai_service && is_linux) {
-    deps += [ "//services/screen_ai:screen_ai_sandbox_hook" ]
-  }
 
   if (enable_accessibility_service) {
     deps += [ "//services/accessibility:lib" ]

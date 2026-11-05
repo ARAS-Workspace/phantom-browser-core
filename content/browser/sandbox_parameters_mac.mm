@@ -278,7 +278,6 @@ bool SetupSandboxParameters(sandbox::mojom::Sandbox sandbox_type,
       NOTREACHED() << "Unhandled parameters for sandbox_type "
                    << static_cast<int>(sandbox_type);
     // Setup parameters for sandbox types handled by embedders below.
-    case sandbox::mojom::Sandbox::kScreenAI:
     case sandbox::mojom::Sandbox::kSpeechRecognition:
       CHECK(GetContentClient()->browser()->SetupEmbedderSandboxParameters(
           sandbox_type, serializer));

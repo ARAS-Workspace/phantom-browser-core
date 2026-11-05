@@ -14,7 +14,6 @@ import("//media/media_options.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//testing/test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/repack.gni")
@@ -676,14 +675,6 @@ if (use_blink) {
         "//pdf:accessibility",
         "//pdf:features",
         "//ui/strings:auto_image_annotation_strings",
-      ]
-    }
-
-    if (enable_screen_ai_service) {
-      deps += [
-        "//services/screen_ai",
-        "//services/screen_ai/public/mojom",
-        "//skia",
       ]
     }
 

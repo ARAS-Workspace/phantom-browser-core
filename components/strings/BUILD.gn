@@ -9,7 +9,6 @@ import("//content/public/common/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//tools/grit/grit_rule.gni")
 
 group("strings") {
@@ -92,7 +91,7 @@ grit_strings("components_strings") {
     "enable_pdf_ink2=$enable_pdf_ink2",
     "enable_plugins=$enable_plugins",
     "enable_print_preview=$enable_print_preview",
-    "enable_screen_ai_service=$enable_screen_ai_service",
+    "enable_screen_ai_service=false",
     "enable_vr=$enable_vr",
     "use_blink=$use_blink",
   ]

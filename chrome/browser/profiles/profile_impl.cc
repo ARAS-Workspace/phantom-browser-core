@@ -182,11 +182,9 @@
 #include "services/service_manager/public/cpp/service.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
 #include "chrome/browser/first_run/first_run.h"
 #include "chrome/browser/ui/startup/features.h"
 #include "content/public/common/page_zoom.h"
-#include "ui/accessibility/accessibility_features.h"
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 #include "chrome/browser/background/extensions/background_mode_manager.h"  // nogncheck crbug.com/40147906
@@ -682,10 +680,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   // The Privacy Sandbox service must be created with the profile to ensure that
   // preference reconciliation occurs.
   PrivacySandboxServiceFactory::GetForProfile(this);
-
-  if (features::IsMainNodeAnnotationsEnabled()) {
-    screen_ai::AXMainNodeAnnotatorControllerFactory::GetForProfile(this);
-  }
 
   // The announcement notification  service might not be available for some
   // irregular profiles, like the System Profile.

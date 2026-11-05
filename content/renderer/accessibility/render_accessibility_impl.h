@@ -43,7 +43,6 @@ class MojoUkmRecorder;
 
 namespace content {
 
-class AXAnnotatorsManager;
 class RenderFrameImpl;
 class RenderAccessibilityManager;
 
@@ -153,10 +152,6 @@ class CONTENT_EXPORT RenderAccessibilityImpl : public RenderAccessibility,
   // for debugging.
   bool image_annotation_debugging_ = false;
 
-  AXAnnotatorsManager* ax_annotators_manager_for_testing() {
-    return ax_annotators_manager_.get();
-  }
-
  private:
   // Called whenever the "ack" message is received for a serialization message
   // sent to the browser process, indicating it was received.
@@ -209,9 +204,6 @@ class CONTENT_EXPORT RenderAccessibilityImpl : public RenderAccessibility,
 
   // This keeps accessibility enabled as long as it lives.
   std::unique_ptr<blink::WebAXContext> ax_context_;
-
-  // Manages generated annotations of the AXTree.
-  std::unique_ptr<AXAnnotatorsManager> ax_annotators_manager_;
 
   raw_ptr<PluginAXTreeActionTargetAdapter> plugin_action_target_adapter_;
 

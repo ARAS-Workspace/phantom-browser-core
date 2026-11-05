@@ -289,13 +289,6 @@ vars = {
   # reclient CIPD package version
   'reclient_version': 're_client_version:0.185.0.db415f21-gomaip',
 
-  # screen-ai CIPD packages
-  'screen_ai_linux': 'version:153.01',
-  'screen_ai_macos_amd64': 'version:153.01',
-  'screen_ai_macos_arm64': 'version:153.01',
-  'screen_ai_windows_amd64': 'version:153.01',
-  'screen_ai_windows_386': 'version:153.01',
-
   # download libaom test data
   'download_libaom_testdata': False,
 
@@ -3739,61 +3732,6 @@ deps = {
       'url': Var('chrome_git') + '/chrome/tools/clusterfuzz-data.git' + '@' +
         Var('clusterfuzz_data_revision'),
       'condition': 'checkout_clusterfuzz_data and checkout_src_internal',
-  },
-
-  'src/third_party/screen-ai/linux': {
-      'packages': [
-          {
-              'package': 'chromium/third_party/screen-ai/linux',
-              'version': Var('screen_ai_linux'),
-          },
-      ],
-      'condition': 'checkout_linux and non_git_source',
-      'dep_type': 'cipd',
-  },
-
-  'src/third_party/screen-ai/macos_amd64': {
-      'packages': [
-          {
-              'package': 'chromium/third_party/screen-ai/mac-amd64',
-              'version': Var('screen_ai_macos_amd64'),
-          },
-      ],
-      'condition': 'checkout_mac',
-      'dep_type': 'cipd',
-  },
-
-  'src/third_party/screen-ai/macos_arm64': {
-      'packages': [
-          {
-              'package': 'chromium/third_party/screen-ai/mac-arm64',
-              'version': Var('screen_ai_macos_arm64'),
-          },
-      ],
-      'condition': 'checkout_mac',
-      'dep_type': 'cipd',
-  },
-
-  'src/third_party/screen-ai/windows_amd64': {
-      'packages': [
-          {
-              'package': 'chromium/third_party/screen-ai/windows-amd64',
-              'version': Var('screen_ai_windows_amd64'),
-          },
-      ],
-      'condition': 'checkout_win',
-      'dep_type': 'cipd',
-  },
-
-  'src/third_party/screen-ai/windows_386': {
-      'packages': [
-          {
-              'package': 'chromium/third_party/screen-ai/windows-386',
-              'version': Var('screen_ai_windows_386'),
-          },
-      ],
-      'condition': 'checkout_win',
-      'dep_type': 'cipd',
   },
 
   'src/third_party/soda': {

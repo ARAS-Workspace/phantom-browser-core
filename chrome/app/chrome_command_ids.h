@@ -7,7 +7,6 @@
 
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "services/screen_ai/buildflags/buildflags.h"
 #include "ui/base/command_id_constants.h"
 
 // This file lists all the command IDs understood by e.g. the browser.

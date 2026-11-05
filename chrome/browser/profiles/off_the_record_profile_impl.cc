@@ -90,8 +90,6 @@
 #include "media/mojo/services/video_decode_perf_history.h"
 #include "net/http/transport_security_state.h"
 
-#include "chrome/browser/accessibility/tree_fixing/pref_names.h"
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/extension_special_storage_policy.h"
 #include "chrome/browser/ui/webui/extensions/extension_icon_source.h"
@@ -206,10 +204,6 @@ void OffTheRecordProfileImpl::Init() {
   // Image labels default to off in incognito.
   GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsEnabled, false);
   GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsOptInAccepted, false);
-
-  // To avoid using any server-side tree fixing service, it is disabled in
-  // Incognito profiles.
-  tree_fixing::InitOffTheRecordPrefs(this);
 
   // The ad service might not be available for some irregular profiles, like the
   // System Profile.

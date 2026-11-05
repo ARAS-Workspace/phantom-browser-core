@@ -225,7 +225,6 @@ static_library("mock_test_support") {
     "//chrome/test:test_support",
     "//components/prefs",
     "//content/public/browser",
-    "//services/screen_ai/buildflags",
     "//testing/gtest",
   ]
 }

@@ -36,7 +36,6 @@ constexpr char kSpeechRecognitionSandbox[] = "speech_recognition";
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 constexpr char kPrintBackendSandbox[] = "print_backend";
-constexpr char kScreenAISandbox[] = "screen_ai";
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -111,7 +110,6 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
 #endif  // BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     case Sandbox::kPrintBackend:
-    case Sandbox::kScreenAI:
 #endif
     case Sandbox::kSpeechRecognition:
       DCHECK(command_line->GetSwitchValueASCII(switches::kProcessType) ==
@@ -199,8 +197,6 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     case Sandbox::kPrintBackend:
       return kPrintBackendSandbox;
-    case Sandbox::kScreenAI:
-      return kScreenAISandbox;
 #endif
 #if BUILDFLAG(IS_MAC)
     case Sandbox::kProxyResolver:
@@ -279,9 +275,6 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (sandbox_string == kPrintBackendSandbox) {
     return Sandbox::kPrintBackend;
-  }
-  if (sandbox_string == kScreenAISandbox) {
-    return Sandbox::kScreenAI;
   }
 #endif
 #if BUILDFLAG(IS_LINUX)

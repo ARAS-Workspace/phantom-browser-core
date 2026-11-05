@@ -204,8 +204,6 @@
 #include "chrome/browser/notifications/notification_ui_manager.h"
 #endif
 
-#include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
-
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
 #include "chrome/browser/browser_features.h"
 #include "components/os_crypt/async/browser/freedesktop_secret_key_provider.h"
@@ -1200,8 +1198,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
   platform_part_->PreMainMessageLoopRun();
 
   CreateNetworkQualityObserver();
-
-  screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();
 
   base::FilePath user_data_dir;
   bool result = base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);

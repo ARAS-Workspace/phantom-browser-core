@@ -15,7 +15,6 @@ import("//media/media_options.gni")
 import("//net/features.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//services/screen_ai/buildflags/features.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/webui/webui_features.gni")
 

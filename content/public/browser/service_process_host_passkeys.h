@@ -12,10 +12,6 @@ namespace shape_detection::mojom {
 class ShapeDetectionService;
 }
 
-namespace screen_ai {
-class ScreenAIServiceHandlerBase;
-}  // namespace screen_ai
-
 namespace content {
 class VideoCaptureServiceLauncher;
 class WebNNCompilerProcessHost;
@@ -30,7 +26,6 @@ class ServiceProcessHostPreloadLibraries {
 
   // Service launchers using `ServiceProcessHost::Options::WithPreloadLibraries`
   // should be added here and must be reviewed by the security team.
-  friend class screen_ai::ScreenAIServiceHandlerBase;
   friend class content::WebNNCompilerProcessHost;
   friend shape_detection::mojom::ShapeDetectionService*
   content::GetShapeDetectionService();

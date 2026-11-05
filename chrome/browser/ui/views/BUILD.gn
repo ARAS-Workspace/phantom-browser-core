@@ -60,7 +60,6 @@ component("views") {
     "//components/vector_icons",
     "//content/public/browser",
     "//printing/buildflags",
-    "//services/screen_ai/buildflags",
     "//skia",
     "//ui/base",
     "//ui/events",
