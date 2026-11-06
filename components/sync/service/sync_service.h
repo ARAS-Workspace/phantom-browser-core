@@ -527,7 +527,7 @@ class SyncService : public KeyedService {
     kUnknown = 0,
     kBrowserTabsModelProvider = 1,
     kAndroidSyncServiceBridge = 2,
-    kSyncInvalidationsService = 3,
+    // kSyncInvalidationsService = 3, // Removed due to deprecation.
     kLocalSync = 4,
     kSyncInternals = 5,
     kForeignSessionHelper = 6,

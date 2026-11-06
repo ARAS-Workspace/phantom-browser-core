@@ -370,13 +370,6 @@ bool PathProvider(int key, base::FilePath* result) {
       break;
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && (BUILDFLAG(IS_LINUX) ||
         // BUILDFLAG(IS_MAC))
-    case chrome::DIR_GLOBAL_GCM_STORE:
-      if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
-        return false;
-      }
-      cur = cur.Append(kGCMStoreDirname);
-      break;
-
     case chrome::DIR_OPTIMIZATION_GUIDE_PREDICTION_MODELS:
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
         return false;

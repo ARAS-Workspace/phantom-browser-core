@@ -36,14 +36,12 @@
 #include "components/sync/service/data_type_controller.h"
 #include "components/sync/service/data_type_manager.h"
 #include "components/sync/service/data_type_manager_observer.h"
-#include "components/sync/service/device_statistics_scheduler.h"
 #include "components/sync/service/local_data_migration_item_queue.h"
 #include "components/sync/service/sync_auth_manager.h"
 #include "components/sync/service/sync_client.h"
 #include "components/sync/service/sync_prefs.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_service_crypto.h"
-#include "components/sync/service/sync_stopped_reporter.h"
 #include "components/sync/service/sync_user_settings_impl.h"
 #include "components/version_info/channel.h"
 #include "google_apis/gaia/gaia_auth_util.h"
@@ -74,8 +72,7 @@ class SyncServiceImpl : public SyncService,
                         public SyncAuthManager::Delegate,
                         public SyncServiceCrypto::Delegate,
                         public SyncUserSettingsImpl::Delegate,
-                        public signin::IdentityManager::Observer,
-                        public DeviceStatisticsScheduler::Delegate {
+                        public signin::IdentityManager::Observer {
  public:
   // Bundles the arguments for SyncServiceImpl construction. This is a
   // movable struct. Because of the non-POD data members, it needs out-of-line
@@ -227,14 +224,6 @@ class SyncServiceImpl : public SyncService,
   void OnIdentityManagerShutdown(
       signin::IdentityManager* identity_manager) override;
 
-  // DeviceStatisticsScheduler::Delegate implementation.
-  bool IsDeviceStatisticsMetricReportingEnabled() override;
-  std::unique_ptr<DeviceStatisticsRequest> CreateDeviceStatisticsRequest(
-      const CoreAccountInfo&,
-      const GURL&) override;
-  base::flat_set<std::string> GetCurrentDeviceCacheGuidsForDeviceStatistics()
-      override;
-
   // Similar to OnAccountsInCookieUpdated() but with a callback that will be
   // invoked on completion.
   void OnAccountsInCookieUpdatedWithCallback(
@@ -369,9 +358,6 @@ class SyncServiceImpl : public SyncService,
 
   // Whether sync has been authenticated with an account ID.
   bool IsSignedIn() const;
-
-  // Tell the sync server that this client has disabled sync.
-  void RemoveClientFromServer() const;
 
   // Records histograms about the history opt-in state.
   void RecordHistoryOptInStateOnSigninHistograms(
@@ -515,8 +501,6 @@ class SyncServiceImpl : public SyncService,
   // an action set on it.
   SyncProtocolError last_actionable_error_;
 
-  std::unique_ptr<SyncStoppedReporter> sync_stopped_reporter_;
-
   // Used for UMA to determine whether TrustedVaultErrorShownOnStartup
   // histogram needs to recorded. Set to false iff histogram was already
   // recorded or trusted vault passphrase type wasn't used on startup.
@@ -537,8 +521,6 @@ class SyncServiceImpl : public SyncService,
 
   // Tasks that should run after the engine is initialized.
   std::vector<base::OnceClosure> tasks_waiting_for_engine_initialization_;
-
-  std::unique_ptr<DeviceStatisticsScheduler> device_statistics_scheduler_;
 
   base::WeakPtrFactory<SyncServiceImpl> weak_factory_{this};
 };

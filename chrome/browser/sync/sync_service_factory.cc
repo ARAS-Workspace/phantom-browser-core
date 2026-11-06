@@ -42,7 +42,6 @@
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/session_sync_service_factory.h"
-#include "chrome/browser/sync/tab_context_sync_service_factory.h"
 #include "chrome/browser/sync/user_event_service_factory.h"
 #include "chrome/browser/tab_group_sync/feature_utils.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
@@ -184,8 +183,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
       SendTabToSelfSyncServiceFactory::GetForProfile(profile));
   builder.SetSessionSyncService(
       SessionSyncServiceFactory::GetForProfile(profile));
-  builder.SetTabContextSyncService(
-      TabContextSyncServiceFactory::GetForProfile(profile));
   builder.SetUserEventService(
       browser_sync::UserEventServiceFactory::GetForProfile(profile));
 
@@ -377,7 +374,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());
-  DependsOn(TabContextSyncServiceFactory::GetInstance());
   DependsOn(TemplateURLServiceFactory::GetInstance());
   DependsOn(ThemeServiceFactory::GetInstance());
   DependsOn(TrustedVaultServiceFactory::GetInstance());

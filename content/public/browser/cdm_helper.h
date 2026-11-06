@@ -14,8 +14,7 @@
 namespace content {
 
 /**
- * A helper class to interact with CDM. Used by GapisService component to
- * fetch app tokens.
+ * A helper class to interact with CDM.
  */
 class CONTENT_EXPORT CdmHelper {
  public:

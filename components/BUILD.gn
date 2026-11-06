@@ -238,7 +238,6 @@ test("components_unittests") {
     "//components/sync_preferences:unit_tests",
     "//components/sync_preferences/cross_device_pref_tracker:unit_tests",
     "//components/sync_preferences/synced_set_up:unit_tests",
-    "//components/sync_tab_context:unit_tests",
     "//components/sync_user_events:unit_tests",
     "//components/system_cpu:unit_tests",
     "//components/system_media_controls:unit_tests",
@@ -270,10 +269,6 @@ test("components_unittests") {
     "//components/webdata_services:unit_tests",
     "//components/webui/flags:unit_tests",
   ]
-
-  if (is_linux || is_mac) {
-    deps += [ "//components/gapis:unit_tests" ]
-  }
 
   if (build_allocation_stack_trace_recorder) {
     deps += [

@@ -166,7 +166,6 @@ after discussions on the right group.
       <annotation id="amount_extraction_model_execution"/>
       <annotation id="metrics_report_private_metrics"/>
       <annotation id="scam_detection_model_execution"/>
-      <annotation id="sync_device_statistics_metrics"/>
       <annotation id="isolated_web_app_throttle"/>
       <annotation id="gemini_antiscam_protection_model_execution"/>
       <annotation id="skills_service_loader"/>
@@ -193,7 +192,6 @@ after discussions on the right group.
       <annotation id="doodle_impression_android"/>
       <annotation id="read_aloud_generate_text"/>
       <annotation id="read_aloud_synthesize"/>
-      <annotation id="tab_context_ephemeral_key_fetch"/>
       <annotation id="enterprise_skills_fetcher"/>
       <annotation id="iwa_dev_ui_update_manifest"/>
       <annotation id="fetch_user_data_processing_consent"/>
@@ -359,7 +357,6 @@ after discussions on the right group.
     </sender>
     <sender name="Chrome Sync">
       <annotation id="sync_http_bridge"/>
-      <annotation id="sync_stop_reporter"/>
       <annotation id="trusted_vault_request"/>
     </sender>
     <sender name="Assist Rank">

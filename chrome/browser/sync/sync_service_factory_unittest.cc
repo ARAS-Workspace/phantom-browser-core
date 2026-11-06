@@ -165,12 +165,6 @@ class SyncServiceFactoryTest : public testing::Test {
       datatypes.Put(syncer::GEMINI_THREAD);
     }
 
-    if (base::FeatureList::IsEnabled(
-            syncer::kSyncEncryptedTabContextContainer)) {
-      datatypes.Put(syncer::ENCRYPTED_TAB_CONTEXT_CONTAINER);
-      datatypes.Put(syncer::ENCRYPTED_TAB_CONTEXT_ITEM);
-    }
-
     if (base::FeatureList::IsEnabled(syncer::kSyncJourney)) {
       datatypes.Put(syncer::JOURNEY);
     }

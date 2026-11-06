@@ -65,8 +65,6 @@ inline constexpr base::FilePath::CharType
         FILE_PATH_LITERAL("Feature Engagement Tracker");
 inline constexpr base::FilePath::CharType kFirstRunSentinel[] =
     FILE_PATH_LITERAL("First Run");
-inline constexpr base::FilePath::CharType kGCMStoreDirname[] =
-    FILE_PATH_LITERAL("GCM Store");
 inline constexpr base::FilePath::CharType kLocalStateFilename[] =
     FILE_PATH_LITERAL("Local State");
 inline constexpr base::FilePath::CharType kMediaCacheDirname[] =

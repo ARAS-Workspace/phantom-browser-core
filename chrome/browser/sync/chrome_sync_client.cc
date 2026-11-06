@@ -148,8 +148,4 @@ void ChromeSyncClient::RegisterTrustedVaultAutoUpgradeSyntheticFieldTrial(
       variations::SyntheticTrialAnnotationMode::kCurrentLog);
 }
 
-bool ChromeSyncClient::IsMetricsAndCrashReportingEnabled() {
-  return ChromeMetricsServiceAccessor::IsMetricsAndCrashReportingEnabled();
-}
-
 }  // namespace browser_sync

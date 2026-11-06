@@ -34,10 +34,6 @@ missing,net/proxy_resolution/proxy_config_service_android.cc
 missing,components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc
 missing,components/personal_context/core/network/personal_context_fetcher.cc
 
-# For prototyping and will be removed (either by adding a proper traffic
-# annotation or by removing the code). b/485217840
-missing,components/gapis/token_downloader.cc
-
 # TODO(crbug.com/494582740): Remove this once the traffic annotation is added.
 missing,components/accessibility_annotator/core/annotation_reducer/one_p_resolver_impl.cc
 
@@ -134,7 +130,6 @@ missing_new_fields,components/security_interstitials/content/common_name_mismatc
 missing_new_fields,components/signin/internal/identity_manager/account_fetcher_service.cc
 missing_new_fields,components/signin/internal/identity_manager/gaia_cookie_manager_service.cc
 missing_new_fields,components/spellcheck/browser/spelling_service_client.cc
-missing_new_fields,components/sync/service/sync_stopped_reporter.cc
 missing_new_fields,components/sync/engine/net/http_bridge.cc
 missing_new_fields,components/trusted_vault/trusted_vault_request.cc
 missing_new_fields,components/ui_devtools/devtools_server.cc

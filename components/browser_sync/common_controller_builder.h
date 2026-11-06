@@ -82,10 +82,6 @@ namespace sync_sessions {
 class SessionSyncService;
 }  // namespace sync_sessions
 
-namespace sync_tab_context {
-class TabContextSyncService;
-}  // namespace sync_tab_context
-
 namespace syncer {
 class DeviceInfoSyncService;
 class DataTypeController;
@@ -162,8 +158,6 @@ class CommonControllerBuilder {
                                        send_tab_to_self_sync_service);
   void SetSessionSyncService(
       sync_sessions::SessionSyncService* session_sync_service);
-  void SetTabContextSyncService(
-      sync_tab_context::TabContextSyncService* tab_context_sync_service);
 
   void SetTabGroupSyncService(
       tab_groups::TabGroupSyncService* tab_group_sync_service);
@@ -218,12 +212,6 @@ class CommonControllerBuilder {
   CreateSavedTabGroupDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateSharedTabGroupDataTypeController(syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateEncryptedTabContextContainerDataTypeController(
-      syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateEncryptedTabContextItemDataTypeController(
-      syncer::SyncService* sync_service);
   std::unique_ptr<syncer::DataTypeController>
   CreateSearchEnginesDataTypeController(version_info::Channel channel);
   std::unique_ptr<syncer::DataTypeController>
@@ -330,8 +318,6 @@ class CommonControllerBuilder {
   SafeOptional<raw_ptr<data_sharing::DataSharingService>> data_sharing_service_;
   SafeOptional<raw_ptr<tab_groups::TabGroupSyncService>>
       tab_group_sync_service_;
-  SafeOptional<raw_ptr<sync_tab_context::TabContextSyncService>>
-      tab_context_sync_service_;
   SafeOptional<raw_ptr<TemplateURLService>> template_url_service_;
 };
 

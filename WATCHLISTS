@@ -1206,11 +1206,6 @@
                   'build/config/sanitizers/|' \
                   'third_party/libprotobuf-mutator/(?!src)',
     },
-    'gcm': {
-      'filepath': 'chrome/browser/gcm/|'\
-                  'components/gcm_driver/|'\
-                  'google_apis/gcm/',
-    },
     'gemini_app': {
       'filepath': 'chrome/browser/chromeos/gemini_app/|'\
                   'chrome/browser/ui/ash/gemini_app/|'\
@@ -2805,7 +2800,6 @@
                 'titouan+watch@chromium.org'],
     'fuzzing_core': ['aakallam+watch@chromium.org',
                      'ortuno+watch-core@chromium.org'],
-    'gcm': ['peter@chromium.org', 'dibyapal+watch-webapps@chromium.org'],
     'gemini_app': ['dmblack+watch@google.com',
                    'xiaohuic+watch@chromium.org'],
     'generic_sensor': ['kubo@igalia.com',

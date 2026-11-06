@@ -303,14 +303,11 @@ constexpr char kAshDriveIntegrationName[] = "ash_drive_integration";
 constexpr char kAshClassroomPageHandlerName[] = "ash_classroom_page_handler";
 constexpr char kAshScannerKeyedServiceName[] = "ash_scanner_keyed_service";
 constexpr char kAshAutotestPrivateApiName[] = "ash_autotest_private_api";
-constexpr char kSyncDeviceStatisticsMetricsName[] =
-    "sync_device_statistics_metrics";
 constexpr char kPrivateAiServiceName[] = "private_ai_service";
 constexpr char kWalletPassesName[] = "wallet_passes";
 constexpr char kAccessibilityAnnotatorName[] = "accessibility_annotator";
 constexpr char kActorLoginPermissionServiceName[] =
     "actor_login_permission_service";
-constexpr char kGapisServiceName[] = "gapis_service";
 constexpr char kOneTimeTokenServiceName[] = "one_time_token_service";
 constexpr char kMultistepFilterName[] = "multistep_filter";
 constexpr char kContextMemoryServiceName[] = "context_memory_service";
@@ -692,10 +689,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       // This consumer id should be converted using
       // GetOAuthConsumerForDynamicScopes().
       NOTREACHED();
-    case OAuthConsumerId::kSyncDeviceStatisticsMetrics:
-      return OAuthConsumer(
-          /*name=*/kSyncDeviceStatisticsMetricsName,
-          /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
     case OAuthConsumerId::kPrivateAiService:
       return OAuthConsumer(
           /*name=*/kPrivateAiServiceName,
@@ -717,10 +710,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kActorLoginPermissionServiceName,
           /*scopes=*/{kAgenticPermissionOAuth2Scope});
-    case OAuthConsumerId::kGapisService:
-      return OAuthConsumer(
-          /*name=*/kGapisServiceName,
-          /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
     case OAuthConsumerId::kOneTimeTokenService:
       return OAuthConsumer(
           /*name=*/kOneTimeTokenServiceName,
@@ -759,10 +748,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
           /*scopes=*/{GaiaConstants::kGoogleUserInfoEmail});
     case OAuthConsumerId::kBrowserActuator:
       return GetOAuthConsumerForBrowserActuator();
-    case OAuthConsumerId::kTabContextContainersService:
-      return OAuthConsumer(
-          /*name=*/oauth_consumer_name::kTabContextContainersServiceName,
-          /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
     case OAuthConsumerId::kSiteTokenProvider:
       return GetOAuthConsumerForSiteTokenProvider();
     case OAuthConsumerId::kDeviceAuthorizationRequest:

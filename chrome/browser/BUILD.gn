@@ -2167,10 +2167,6 @@ source_set("browser") {
     ]
   }
 
-  if (is_linux || is_mac) {
-    deps += [ "//chrome/browser/gapis" ]
-  }
-
   if (enable_vr) {
     deps += [ "//device/vr" ]
   }

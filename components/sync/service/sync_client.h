@@ -61,10 +61,6 @@ class SyncClient {
   // most once.
   virtual void RegisterTrustedVaultAutoUpgradeSyntheticFieldTrial(
       const TrustedVaultAutoUpgradeSyntheticFieldTrialGroup& group) = 0;
-
-  // Returns whether metrics reporting is enabled; see
-  // `ChromeMetricsServiceAccessor` for details.
-  virtual bool IsMetricsAndCrashReportingEnabled() = 0;
 };
 
 }  // namespace syncer

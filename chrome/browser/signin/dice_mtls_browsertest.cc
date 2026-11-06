@@ -321,7 +321,7 @@ IN_PROC_BROWSER_TEST_F(DiceMtlsBrowserTest, DiceSigninWithMtlsTokenBinding) {
   // Trigger an access token fetch to verify that the fetch uses mTLS.
   std::unique_ptr<signin::AccessTokenFetcher> fetcher =
       identity_manager->CreateAccessTokenFetcherForAccount(
-          account_id, signin::OAuthConsumerId::kSyncDeviceStatisticsMetrics,
+          account_id, signin::OAuthConsumerId::kNotebooksService,
           future.GetCallback(), signin::AccessTokenFetcher::Mode::kImmediate);
 
   ASSERT_TRUE(future.Wait());

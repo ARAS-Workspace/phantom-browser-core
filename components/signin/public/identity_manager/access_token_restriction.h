@@ -29,11 +29,6 @@ OAuth2ScopeRestriction GetOAuth2ScopeRestriction(const std::string& scope);
 // level.
 bool IsPrivilegedOAuth2Consumer(OAuthConsumerId oauth_consumer_id);
 
-// Returns true if the specific combination of consumer and scope is allowlisted
-// to bypass any default restrictions (e.g. required sign-in level).
-bool IsConsumerAllowlistedForScope(OAuthConsumerId oauth_consumer_id,
-                                   const std::string& scope);
-
 }  // namespace signin
 
 #endif  // COMPONENTS_SIGNIN_PUBLIC_IDENTITY_MANAGER_ACCESS_TOKEN_RESTRICTION_H_

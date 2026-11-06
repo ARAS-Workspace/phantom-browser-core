@@ -36,9 +36,6 @@ BASE_DECLARE_FEATURE(kSyncContextualTask);
 // Enables syncing of Gemini threads across devices.
 BASE_DECLARE_FEATURE(kSyncGeminiThread);
 
-// Enables syncing of Encrypted Tab Context Containers across devices.
-BASE_DECLARE_FEATURE(kSyncEncryptedTabContextContainer);
-
 // Enables syncing of themes across iOS devices.
 BASE_DECLARE_FEATURE(kSyncThemesIos);
 
@@ -160,19 +157,6 @@ BASE_DECLARE_FEATURE(kSyncPreferencesUseSelectedTypes);
 // If enabled, the new sync dashboard URL will be opened when the user clicks
 // on the "Review your synced data" (or equivalent) entrypoint in settings.
 BASE_DECLARE_FEATURE(kSyncEnableNewSyncDashboardUrl);
-
-// If enabled, Sync will fetch device statistics for all accounts on the device,
-// and record summary metrics about them.
-BASE_DECLARE_FEATURE(kSyncRecordDeviceStatisticsMetrics);
-// Delay before downloading device statistics and recording related metrics. The
-// exact number is somewhat arbitrary, chosen to ensure that refresh tokens are
-// loaded, the local cache GUID is up to date, and to avoid interfering with
-// general (sync or browser) startup.
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
-                           kSyncRecordDeviceStatisticsMetricsDelay);
-// Controls how often device statistics are collected and recorded in metrics,
-// as the minimum number of days between recordings.
-BASE_DECLARE_FEATURE_PARAM(int, kSyncRecordDeviceStatisticsMetricsPeriodDays);
 
 // If enabled, validate the access token before sending the request to the
 // server.

@@ -26,12 +26,10 @@
 #include "base/values.h"
 #include "components/sync/base/client_tag_hash.h"
 #include "components/sync/base/data_type.h"
-#include "components/sync/engine/loopback_server/persistent_tombstone_entity.h"
 #include "components/sync/protocol/data_type_progress_marker.pb.h"
 #include "components/sync/protocol/proto_value_conversions.h"
 #include "components/sync/protocol/sync_entity.pb.h"
 #include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync_device_info/device_info_util.h"
 #include "net/http/http_status_code.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -154,20 +152,6 @@ std::string PrettyPrintValue(base::Value value) {
 }
 
 }  // namespace
-
-void FakeServer::HandleEvent(const sync_pb::EventRequest& request) {
-  DCHECK(thread_checker_.CalledOnValidThread());
-
-  if (request.has_sync_disabled()) {
-    sync_pb::DeviceInfoSpecifics specifics;
-    specifics.set_cache_guid(request.sync_disabled().cache_guid());
-
-    InjectEntity(
-        syncer::PersistentTombstoneEntity::CreateNewForTest(  // IN-TEST
-            syncer::DEVICE_INFO,
-            syncer::DeviceInfoUtil::SpecificsToTag(specifics)));
-  }
-}
 
 net::HttpStatusCode FakeServer::HandleCommand(const std::string& request,
                                               std::string* response) {

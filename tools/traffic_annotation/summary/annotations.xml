@@ -127,7 +127,6 @@ Refer to README.md for content description and update process.
  <item id="spellcheck_lookup" added_in_milestone="62" content_hash_code="072d1525" os_list="linux,windows,chromeos" file_path="components/spellcheck/browser/spelling_service_client.cc" />
  <item id="ssl_name_mismatch_lookup" added_in_milestone="62" content_hash_code="05d18c86" os_list="linux,windows,chromeos,android" file_path="components/security_interstitials/content/common_name_mismatch_handler.cc" />
  <item id="sync_http_bridge" added_in_milestone="62" content_hash_code="01f587fa" os_list="linux,windows,chromeos,android" file_path="components/sync/engine/net/http_bridge.cc" />
- <item id="sync_stop_reporter" added_in_milestone="62" content_hash_code="036444c2" os_list="linux,windows,chromeos,android" file_path="components/sync/service/sync_stopped_reporter.cc" />
  <item id="test" added_in_milestone="62" reserved="1" os_list="linux,windows" file_path="" />
  <item id="test_partial" added_in_milestone="62" reserved="1" os_list="linux,windows" file_path="" />
  <item id="tethering_handler_socket" added_in_milestone="65" content_hash_code="000f0cb8" os_list="linux,windows,chromeos,android" file_path="content/browser/devtools/protocol/tethering_handler.cc" />
@@ -234,7 +233,6 @@ Refer to README.md for content description and update process.
  <item id="amount_extraction_model_execution" added_in_milestone="144" content_hash_code="05d4d2fd" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="metrics_report_private_metrics" added_in_milestone="144" content_hash_code="0811746a" os_list="linux,windows,android,chromeos" file_path="components/metrics/net/net_metrics_log_uploader.cc" />
  <item id="scam_detection_model_execution" added_in_milestone="145" content_hash_code="01f2a65e" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
- <item id="sync_device_statistics_metrics" added_in_milestone="145" content_hash_code="06d02833" os_list="linux,windows,android,chromeos" file_path="components/sync/service/device_statistics_request_impl.cc" />
  <item id="isolated_web_app_throttle" added_in_milestone="145" content_hash_code="02d57891" os_list="linux,windows,chromeos" file_path="chrome/browser/web_applications/isolated_web_apps/iwa_permissions_policy_cache.cc" />
  <item id="gemini_antiscam_protection_model_execution" added_in_milestone="146" content_hash_code="07503f35" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="skills_model_execution" added_in_milestone="146" content_hash_code="02f1c115" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
@@ -262,7 +260,6 @@ Refer to README.md for content description and update process.
  <item id="read_aloud_generate_text" added_in_milestone="152" content_hash_code="004d1146" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="read_aloud_synthesize" added_in_milestone="152" content_hash_code="01f5f507" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="safe_browsing_v5_get_hash" added_in_milestone="152" content_hash_code="042aa735" os_list="linux,windows,android,chromeos" file_path="components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.cc" />
- <item id="tab_context_ephemeral_key_fetch" added_in_milestone="152" content_hash_code="01f989a9" os_list="linux,windows,chromeos,android" file_path="components/sync_tab_context/http_rpc_based_ephemeral_key_fetcher.cc" />
  <item id="iwa_dev_ui_update_manifest" added_in_milestone="153" type="partial" second_id="iwa_update_manifest_fetcher" content_hash_code="03008323" os_list="linux,windows,chromeos" semantics_fields="1,2,3,6" policy_fields="3,5" file_path="chrome/browser/ui/webui/iwa_dev/iwa_dev_page_handler.cc" />
  <item id="fetch_user_data_processing_consent" added_in_milestone="153" content_hash_code="036ac1e5" os_list="linux,windows,android,chromeos" file_path="components/one_time_tokens/core/browser/user_data_processing_consent_fetcher.cc" />
 </annotations>

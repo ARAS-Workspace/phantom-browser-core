@@ -14,8 +14,6 @@ inline extern const char kGlicInvokeApiName[] = "glic_invoke_api";
 inline extern const char kSkillsServiceName[] = "skills_service";
 inline extern const char kContextualTasksName[] = "contextual_tasks";
 inline extern const char kBrowserActuatorName[] = "browser_actuator";
-inline extern const char kTabContextContainersServiceName[] =
-    "tab_context_containers_service";
 inline extern const char kSiteTokenProviderName[] = "site_token_provider";
 }  // namespace oauth_consumer_name
 
@@ -110,14 +108,14 @@ enum class OAuthConsumerId {
   kAshBocaClassroomPageHandler = 83,
   kAshScannerKeyedService = 84,
   kAshAutotestPrivateApi = 85,
-  kSyncDeviceStatisticsMetrics = 86,
+  // kSyncDeviceStatisticsMetrics = 86, // Removed due to deprecation.
   kPrivateAiService = 87,
   kWalletPasses = 88,
   kAimEligibilityService = 89,
   // kDevtoolsAiCode = 90, // Removed due to deprecation.
   kAccessibilityAnnotator = 91,
   kActorLoginPermissionService = 92,
-  kGapisService = 93,
+  // kGapisService = 93, // Removed due to deprecation.
   kOneTimeTokenService = 94,
   kMultistepFilter = 95,
   kIndigo = 96,
@@ -131,7 +129,7 @@ enum class OAuthConsumerId {
   kNotebooksService = 104,
   // kRemoteActorLoginCredentialsService = 105, // Removed due to deprecation.
   kBrowserActuator = 106,
-  kTabContextContainersService = 107,
+  // kTabContextContainersService = 107, // Removed due to deprecation.
   kSiteTokenProvider = 108,
   kDeviceAuthorizationRequest = 109,
   kMaxValue = kDeviceAuthorizationRequest,

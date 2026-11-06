@@ -158,7 +158,6 @@
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/sync/base/account_pref_utils.h"
 #include "components/sync/base/pref_names.h"
-#include "components/sync/service/device_statistics_scheduler.h"
 #include "components/sync/service/glue/sync_transport_data_prefs.h"
 #include "components/sync/service/sync_prefs.h"
 #include "components/sync_device_info/device_info_prefs.h"
@@ -1148,7 +1147,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   subscription_eligibility::prefs::RegisterProfilePrefs(registry);
   sync_sessions::SessionSyncPrefs::RegisterProfilePrefs(registry);
   syncer::DeviceInfoPrefs::RegisterProfilePrefs(registry);
-  syncer::DeviceStatisticsScheduler::RegisterProfilePrefs(registry);
   syncer::SyncPrefs::RegisterProfilePrefs(registry);
   syncer::SyncTransportDataPrefs::RegisterProfilePrefs(registry);
   TemplateURLPrepopulateData::RegisterProfilePrefs(registry);

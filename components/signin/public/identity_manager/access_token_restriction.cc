@@ -64,17 +64,4 @@ bool IsPrivilegedOAuth2Consumer(OAuthConsumerId oauth_consumer_id) {
   return oauth_consumer_id == OAuthConsumerId::kExtensionsIdentityAPI;
 }
 
-bool IsConsumerAllowlistedForScope(OAuthConsumerId oauth_consumer_id,
-                                   const std::string& scope) {
-  static constexpr auto kAllowlist =
-      base::MakeFixedFlatSet<std::pair<OAuthConsumerId, std::string_view>>({
-          {OAuthConsumerId::kTabContextContainersService,
-           GaiaConstants::kChromeSyncOAuth2Scope},
-          {OAuthConsumerId::kSyncDeviceStatisticsMetrics,
-           GaiaConstants::kChromeSyncOAuth2Scope},
-      });
-
-  return kAllowlist.contains({oauth_consumer_id, scope});
-}
-
 }  // namespace signin

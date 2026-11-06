@@ -44,10 +44,6 @@ namespace extensions {
 class ExtensionsBrowserClient;
 }
 
-namespace gcm {
-class GCMDriver;
-}
-
 namespace metrics {
 class MetricsService;
 }

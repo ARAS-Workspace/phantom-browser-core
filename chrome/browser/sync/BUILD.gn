@@ -47,8 +47,6 @@ source_set("sync") {
     "sync_startup_tracker.h",
     "sync_ui_util.cc",
     "sync_ui_util.h",
-    "tab_context_sync_service_factory.cc",
-    "tab_context_sync_service_factory.h",
     "user_event_service_factory.cc",
     "user_event_service_factory.h",
   ]
@@ -70,7 +68,6 @@ source_set("sync") {
     "//components/sync_preferences",
     "//components/sync_preferences:common_syncable_prefs_database",
     "//components/sync_sessions",
-    "//components/sync_tab_context",
     "//content/public/browser",
 
     # TODO: Use //chrome/browser/ui instead after fixing cyclic dependency.

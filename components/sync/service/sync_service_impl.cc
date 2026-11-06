@@ -55,7 +55,6 @@
 #include "components/sync/service/configure_context.h"
 #include "components/sync/service/data_type_manager_impl.h"
 #include "components/sync/service/data_type_status_table.h"
-#include "components/sync/service/device_statistics_request_impl.h"
 #include "components/sync/service/glue/sync_transport_data_prefs.h"
 #include "components/sync/service/local_data_description.h"
 #include "components/sync/service/local_data_migration_item_queue.h"
@@ -223,9 +222,6 @@ SyncServiceImpl::SyncServiceImpl(InitParams init_params)
   // shouldn't be instantiated.
   DCHECK(IsSyncAllowedByFlag());
 
-  sync_stopped_reporter_ = std::make_unique<SyncStoppedReporter>(
-      sync_service_url_, MakeUserAgentForSync(channel_), url_loader_factory_);
-
   if (identity_manager_) {
     identity_manager_observation_.Observe(identity_manager_);
   }
@@ -356,10 +352,6 @@ void SyncServiceImpl::Initialize(DataTypeController::TypeVector controllers) {
   local_data_migration_item_queue_ =
       std::make_unique<LocalDataMigrationItemQueue>(this,
                                                     data_type_manager_.get());
-
-  device_statistics_scheduler_ = std::make_unique<DeviceStatisticsScheduler>(
-      /*delegate=*/this, sync_client_->GetPrefService(),
-      sync_client_->GetIdentityManager(), sync_service_url_);
 }
 
 void SyncServiceImpl::StartSyncingWithServer() {
@@ -594,8 +586,6 @@ void SyncServiceImpl::Shutdown() {
 
   NotifyShutdown();
 
-  device_statistics_scheduler_.reset();
-
   // Ensure the LocalDataMigrationItemQueue, the DataTypeManager and the
   // engine are destroyed in order since they hold consecutive pointers to each
   // other.
@@ -654,16 +644,6 @@ std::unique_ptr<SyncEngine> SyncServiceImpl::ResetEngine(
   }
 
   base::UmaHistogramEnumeration("Sync.ResetEngineReason", reset_reason);
-  switch (shutdown_reason) {
-    case ShutdownReason::STOP_SYNC_AND_KEEP_DATA:
-      RemoveClientFromServer();
-      break;
-    case ShutdownReason::DISABLE_SYNC_AND_CLEAR_DATA:
-      RemoveClientFromServer();
-      break;
-    case ShutdownReason::BROWSER_SHUTDOWN_AND_KEEP_DATA:
-      break;
-  }
 
   // First, we spin down the engine to stop change processing as soon as
   // possible.
@@ -1755,27 +1735,10 @@ void SyncServiceImpl::OnIdentityManagerShutdown(
   NOTREACHED(base::NotFatalUntil::M142);
 }
 
-bool SyncServiceImpl::IsDeviceStatisticsMetricReportingEnabled() {
-  return sync_client_->IsMetricsAndCrashReportingEnabled();
-}
-
-std::unique_ptr<DeviceStatisticsRequest>
-SyncServiceImpl::CreateDeviceStatisticsRequest(const CoreAccountInfo& account,
-                                               const GURL& url) {
-  return std::make_unique<DeviceStatisticsRequestImpl>(
-      sync_client_->GetIdentityManager(), url_loader_factory_,
-      MakeUserAgentForSync(channel_), account, url);
-}
-
 base::flat_set<std::string>
 SyncServiceImpl::GetCurrentDeviceCacheGuidsForAllGaiaIds() const {
   return SyncTransportDataPrefs::GetCurrentDeviceCacheGuidsForAllGaiaIds(
       sync_client_->GetPrefService());
-}
-
-base::flat_set<std::string>
-SyncServiceImpl::GetCurrentDeviceCacheGuidsForDeviceStatistics() {
-  return GetCurrentDeviceCacheGuidsForAllGaiaIds();
 }
 
 void SyncServiceImpl::OnAccountsInCookieUpdatedWithCallback(
@@ -1994,22 +1957,6 @@ SyncEncryptionHandler::Observer*
 SyncServiceImpl::GetEncryptionObserverForTest() {
   CHECK_IS_TEST();
   return &crypto_;
-}
-
-void SyncServiceImpl::RemoveClientFromServer() const {
-  if (!engine_ || !engine_->IsInitialized()) {
-    return;
-  }
-  const std::string cache_guid = engine_->GetCacheGuid();
-  const std::string birthday = engine_->GetBirthday();
-  DCHECK(!cache_guid.empty());
-  const std::string& access_token =
-      auth_manager_->GetCredentials().access_token_info.token;
-  const bool report_sync_stopped = !access_token.empty() && !birthday.empty();
-  if (report_sync_stopped) {
-    sync_stopped_reporter_->ReportSyncStopped(access_token, cache_guid,
-                                              birthday);
-  }
 }
 
 void SyncServiceImpl::RecordHistoryOptInStateOnSigninHistograms(

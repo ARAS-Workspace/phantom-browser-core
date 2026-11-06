@@ -742,11 +742,6 @@ inline constexpr char kMessageCenterDisabledExtensionIds[] =
 // platforms.
 inline constexpr char kFullscreenAllowed[] = "fullscreen.allowed";
 
-// A string like "com.chrome.macosx" that should be used as the GCM category
-// when an app_id is sent as a subtype instead of as a category.
-inline constexpr char kGCMProductCategoryForSubtypes[] =
-    "gcm.product_category_for_subtypes";
-
 // Whether a user is allowed to use Easy Unlock.
 inline constexpr char kEasyUnlockAllowed[] = "easy_unlock.allowed";
 

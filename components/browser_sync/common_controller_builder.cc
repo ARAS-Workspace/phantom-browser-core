@@ -60,8 +60,6 @@
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "components/sync_sessions/session_data_type_controller.h"
 #include "components/sync_sessions/session_sync_service.h"
-#include "components/sync_tab_context/tab_context_data_type_controller.h"
-#include "components/sync_tab_context/tab_context_sync_service.h"
 #include "components/sync_user_events/user_event_data_type_controller.h"
 #include "components/sync_user_events/user_event_service.h"
 #include "components/variations/service/google_groups_manager.h"
@@ -293,11 +291,6 @@ void CommonControllerBuilder::SetSessionSyncService(
   session_sync_service_.Set(session_sync_service);
 }
 
-void CommonControllerBuilder::SetTabContextSyncService(
-    sync_tab_context::TabContextSyncService* tab_context_sync_service) {
-  tab_context_sync_service_.Set(tab_context_sync_service);
-}
-
 void CommonControllerBuilder::SetTabGroupSyncService(
     tab_groups::TabGroupSyncService* tab_group_sync_service) {
   tab_group_sync_service_.Set(tab_group_sync_service);
@@ -392,16 +385,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::SAVED_TAB_GROUP)) {
     add_controller(CreateSavedTabGroupDataTypeController());
-  }
-
-  if (!disabled_types.Has(syncer::ENCRYPTED_TAB_CONTEXT_CONTAINER)) {
-    add_controller(
-        CreateEncryptedTabContextContainerDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::ENCRYPTED_TAB_CONTEXT_ITEM)) {
-    add_controller(
-        CreateEncryptedTabContextItemDataTypeController(sync_service));
   }
 
   if (!disabled_types.Has(syncer::SHARED_TAB_GROUP_DATA)) {
@@ -698,48 +681,6 @@ CommonControllerBuilder::CreateSavedTabGroupDataTypeController() {
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
       /*delegate_for_transport_mode=*/
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateEncryptedTabContextContainerDataTypeController(
-    syncer::SyncService* sync_service) {
-  if (!base::FeatureList::IsEnabled(
-          syncer::kSyncEncryptedTabContextContainer) ||
-      !tab_context_sync_service_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* delegate =
-      tab_context_sync_service_.value()
-          ->GetSyncControllerDelegateForContainer()
-          .get();
-  return std::make_unique<sync_tab_context::TabContextDataTypeController>(
-      syncer::ENCRYPTED_TAB_CONTEXT_CONTAINER,
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      sync_service);
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateEncryptedTabContextItemDataTypeController(
-    syncer::SyncService* sync_service) {
-  if (!base::FeatureList::IsEnabled(
-          syncer::kSyncEncryptedTabContextContainer) ||
-      !tab_context_sync_service_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* delegate =
-      tab_context_sync_service_.value()
-          ->GetSyncControllerDelegateForItem()
-          .get();
-  return std::make_unique<sync_tab_context::TabContextDataTypeController>(
-      syncer::ENCRYPTED_TAB_CONTEXT_ITEM,
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      sync_service);
 }
 
 std::unique_ptr<syncer::DataTypeController>

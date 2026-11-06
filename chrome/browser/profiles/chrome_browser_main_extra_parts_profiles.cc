@@ -322,11 +322,6 @@
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/gapis/gapis_service_factory.h"
-#include "components/gapis/features.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/bookmarks/bookmark_expanded_state_tracker_factory.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
@@ -505,11 +500,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   FirstRunServiceFactory::GetInstance();
   FontPrefChangeNotifierFactory::GetInstance();
   GAIAInfoUpdateServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  if (base::FeatureList::IsEnabled(gapis::kEnableGapis)) {
-    GapisServiceFactory::GetInstance();
-  }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   GlobalErrorServiceFactory::GetInstance();
   GoogleGroupsManagerFactory::GetInstance();
   HeavyAdServiceFactory::GetInstance();

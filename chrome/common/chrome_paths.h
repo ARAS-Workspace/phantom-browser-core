@@ -93,8 +93,6 @@ enum {
   DIR_USER_NATIVE_MESSAGING,  // Directory with Native Messaging Hosts
                               // installed per-user.
 #endif
-  DIR_GLOBAL_GCM_STORE,  // Directory where the global GCM instance
-                         // stores its data.
 
   // Valid only in development environment; TODO(darin): move these
   DIR_GEN_TEST_DATA,  // Directory where generated test data resides.

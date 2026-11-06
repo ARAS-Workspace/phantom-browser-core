@@ -21,9 +21,6 @@ BASE_FEATURE(kSyncContextualTask, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncGeminiThread, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kSyncEncryptedTabContextContainer,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kSyncThemesIos, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kNewTabPageCustomizationThemeSync,
@@ -110,19 +107,6 @@ BASE_FEATURE(kSyncPreferencesUseSelectedTypes,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncEnableNewSyncDashboardUrl, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kSyncRecordDeviceStatisticsMetrics,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE_PARAM(base::TimeDelta,
-                   kSyncRecordDeviceStatisticsMetricsDelay,
-                   &kSyncRecordDeviceStatisticsMetrics,
-                   "SyncRecordDeviceStatisticsMetricsDelay",
-                   base::Seconds(30));
-BASE_FEATURE_PARAM(int,
-                   kSyncRecordDeviceStatisticsMetricsPeriodDays,
-                   &kSyncRecordDeviceStatisticsMetrics,
-                   "SyncRecordDeviceStatisticsMetricsPeriodDays",
-                   1);
 
 BASE_FEATURE(kSyncValidateAccessToken, base::FEATURE_ENABLED_BY_DEFAULT);
 

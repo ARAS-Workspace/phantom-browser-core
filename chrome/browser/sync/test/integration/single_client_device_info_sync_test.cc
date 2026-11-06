@@ -6,13 +6,9 @@
 
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
-#include "base/test/metrics/histogram_tester.h"
-#include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
-#include "chrome/browser/metrics/testing/metrics_consent_override.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/committed_all_nudged_changes_checker.h"
@@ -20,9 +16,7 @@
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "components/browser_sync/browser_sync_switches.h"
-#include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/time.h"
@@ -31,7 +25,6 @@
 #include "components/sync/protocol/sync.pb.h"
 #include "components/sync/protocol/sync_entity.pb.h"
 #include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync/service/device_statistics_tracker.h"
 #include "components/sync/test/fake_server.h"
 #include "components/sync_device_info/device_info.h"
 #include "components/sync_device_info/device_info_sync_service.h"
@@ -39,7 +32,6 @@
 #include "components/sync_device_info/device_info_util.h"
 #include "components/sync_device_info/device_name_util.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/test_launcher.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
@@ -179,17 +171,9 @@ class SingleClientDeviceInfoSyncTest
     : public SyncTest,
       public testing::WithParamInterface<SyncTest::SetupSyncMode> {
  public:
-  explicit SingleClientDeviceInfoSyncTest(
-      bool enable_device_statistics_metrics = false)
-      : SyncTest(SINGLE_CLIENT) {
+  SingleClientDeviceInfoSyncTest() : SyncTest(SINGLE_CLIENT) {
     std::vector<base::test::FeatureRefAndParams> enabled_features;
     std::vector<base::test::FeatureRef> disabled_features;
-    if (enable_device_statistics_metrics) {
-      enabled_features.emplace_back(
-          syncer::kSyncRecordDeviceStatisticsMetrics,
-          base::FieldTrialParams{
-              {syncer::kSyncRecordDeviceStatisticsMetricsDelay.name, "0"}});
-    }
     if (GetSetupSyncMode() == SetupSyncMode::kSyncTransportOnly) {
       enabled_features.emplace_back(syncer::kReplaceSyncPromosWithSignInPromos,
                                     base::FieldTrialParams{});
@@ -280,23 +264,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, CommitLocalDevice) {
   EXPECT_TRUE(ServerDeviceInfoMatchChecker(
                   ElementsAre(HasCacheGuid(GetLocalCacheGuid())))
                   .Wait());
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
-                       ShouldDeleteDeviceInfoOnServerWhenSignedOut) {
-  ASSERT_TRUE(SetupSync());
-
-  // The local device should eventually be committed to the server.
-  ASSERT_TRUE(ServerDeviceInfoMatchChecker(
-                  ElementsAre(HasCacheGuid(GetLocalCacheGuid())))
-                  .Wait());
-
-  // Sign out. This should trigger a SyncDisabledEvent to the server.
-  GetClient(0)->SignOutPrimaryAccount();
-
-  // The FakeServer should receive a SyncDisabledEvent and generate a tombstone,
-  // leaving 0 normal DeviceInfo entities. Wait for it.
-  EXPECT_TRUE(ServerDeviceInfoMatchChecker(IsEmpty()).Wait());
 }
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, DownloadRemoteDevices) {
@@ -729,202 +696,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
   ASSERT_EQ(1U, entities_before.size());
   ASSERT_EQ(1U, entities_after.size());
   EXPECT_EQ(entities_before.front().mtime(), entities_after.front().mtime());
-}
-
-class SingleClientDeviceInfoWithDeviceStatisticsSyncTest
-    : public SingleClientDeviceInfoSyncTest {
- public:
-  explicit SingleClientDeviceInfoWithDeviceStatisticsSyncTest(
-      bool metrics_consent_value = true)
-      : SingleClientDeviceInfoSyncTest(
-            /*enable_device_statistics_metrics=*/true),
-        metrics_consent_value_(metrics_consent_value) {}
-
-  void SetUpInProcessBrowserTestFixture() override {
-    create_services_subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(base::BindRepeating(
-                &SingleClientDeviceInfoWithDeviceStatisticsSyncTest::
-                    OnWillCreateBrowserContextServices,
-                base::Unretained(this)));
-  }
-
- protected:
-  // Note: The HistogramTester must be created before the test body, since
-  // otherwise it's a race condition whether the default test profile manages to
-  // record the metrics first or not.
-  base::HistogramTester histograms_;
-
- private:
-  void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    // Note: The `MetricsConsentOverride` must be set *after*
-    // `g_browser_process` has been initialized, but *before* the KeyedServices
-    // have been created (since SyncService creation kicks off the metrics
-    // recording).
-    // In PRE_ tests, do *not* set metrics consent, otherwise the following
-    // proper test wouldn't record the metrics due to the once-per-day limit.
-    metrics_consent_.emplace(metrics_consent_value_ && !content::IsPreTest());
-  }
-
-  const bool metrics_consent_value_;
-  base::CallbackListSubscription create_services_subscription_;
-  std::optional<metrics::test::MetricsConsentOverride> metrics_consent_;
-};
-
-INSTANTIATE_TEST_SUITE_P(,
-                         SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
-                         GetSyncTestModes(),
-                         testing::PrintToStringParamName());
-
-class SingleClientDeviceInfoWithDeviceStatisticsWithoutConsentSyncTest
-    : public SingleClientDeviceInfoWithDeviceStatisticsSyncTest {
- public:
-  SingleClientDeviceInfoWithDeviceStatisticsWithoutConsentSyncTest()
-      : SingleClientDeviceInfoWithDeviceStatisticsSyncTest(false) {}
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    SingleClientDeviceInfoWithDeviceStatisticsWithoutConsentSyncTest,
-    GetSyncTestModes(),
-    testing::PrintToStringParamName());
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientDeviceInfoWithDeviceStatisticsWithoutConsentSyncTest,
-    ShouldNotRecordDeviceStatisticsMetrics) {
-  // Simulate that the primary account has two other devices.
-  InjectDeviceInfoEntityToServer(1);
-  InjectDeviceInfoEntityToServer(2);
-
-  ASSERT_TRUE(SetupSync());
-
-  // Wait long enough so that the DeviceStatisticsTracker would've started, if
-  // it were going to.
-  const base::Time wait_start = base::Time::Now();
-  const base::TimeDelta wait_time = std::max(
-      base::Seconds(1), syncer::kSyncRecordDeviceStatisticsMetricsDelay.Get());
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return base::Time::Now() - wait_start > wait_time; }));
-
-  histograms_.ExpectTotalCount("Sync.DeviceStatistics.RequestsStartedCount", 0,
-                               FROM_HERE);
-  histograms_.ExpectTotalCount("Sync.DeviceStatistics.Outcome.Overall2", 0,
-                               FROM_HERE);
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
-    PRE_ShouldRecordDeviceStatisticsMetricsWithPrimaryAccount) {
-  // Simulate that the primary account has two other devices.
-  InjectDeviceInfoEntityToServer(1);
-  InjectDeviceInfoEntityToServer(2);
-
-  // Sign in, to ensure that during startup of the following test, there is
-  // already a primary account.
-  ASSERT_TRUE(SetupSync());
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
-                       ShouldRecordDeviceStatisticsMetricsWithPrimaryAccount) {
-  ASSERT_TRUE(SetupClients());
-
-  // Wait for the test profile's statistics request to complete. Only check
-  // the specific bucket rather than total sample count, since the default
-  // profile may also record a sample but with unreliable timing.
-  EXPECT_TRUE(base::test::RunUntil([&]() {
-    return histograms_.GetBucketCount(
-               "Sync.DeviceStatistics.Outcome.Overall2",
-               syncer::DeviceStatisticsTracker::
-                   AccountsHaveOtherDevicesSummary::kPrimaryYesNonPrimaryNA) >=
-           1;
-  }));
-
-  // Note: Since the default profile doesn't have any signed-in accounts, it
-  // shouldn't have started any requests, so there should be only one request.
-  histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
-                                 /*sample=*/1, /*expected_bucket_count=*/1,
-                                 FROM_HERE);
-
-  histograms_.ExpectUniqueSample(
-      "Sync.DeviceStatistics.RequestsCompletedSuccess",
-      syncer::DeviceStatisticsTracker::RequestsCompletedSuccess::kAllSucceeded,
-      /*expected_bucket_count=*/1, FROM_HERE);
-
-  histograms_.ExpectBucketCount(
-      "Sync.DeviceStatistics.Outcome.Overall2",
-      syncer::DeviceStatisticsTracker::AccountsHaveOtherDevicesSummary::
-          kPrimaryYesNonPrimaryNA,
-      /*expected_count=*/1, FROM_HERE);
-
-  histograms_.ExpectUniqueSample(
-      "Sync.DeviceStatistics.Outcome.PrimaryAccount.NumberOfAdditionalClients2",
-      /*sample=*/2,
-      /*expected_bucket_count=*/1, FROM_HERE);
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
-    PRE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {
-  // Simulate that the account has two other devices. (Note that the FakeServer
-  // doesn't actually know anything about accounts, so it'll return those
-  // devices also for the non-primary account that's set up below.)
-  InjectDeviceInfoEntityToServer(1);
-  InjectDeviceInfoEntityToServer(2);
-
-  // Sign in, to ensure that during startup of the following test, there is
-  // already a signed-in (but non-primary) account.
-  ASSERT_TRUE(SetupClients());
-
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(GetProfile(0));
-  signin::AccountAvailabilityOptionsBuilder options =
-      signin::AccountAvailabilityOptionsBuilder().WithGaiaId(
-          GetClient(0)->GetGaiaIdForAccount(SyncTestAccount::kDefaultAccount));
-  signin::MakeAccountAvailable(identity_manager,
-                               options.Build(GetClient(0)->GetEmailForAccount(
-                                   SyncTestAccount::kDefaultAccount)));
-}
-
-#define MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount \
-  ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount
-IN_PROC_BROWSER_TEST_P(
-    SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
-    MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {
-  ASSERT_TRUE(SetupClients());
-
-  // Wait for the test profile's statistics request to complete. Only check
-  // the specific bucket rather than total sample count, since the default
-  // profile may also record a sample but with unreliable timing.
-  EXPECT_TRUE(base::test::RunUntil([&]() {
-    return histograms_.GetBucketCount(
-               "Sync.DeviceStatistics.Outcome.Overall2",
-               syncer::DeviceStatisticsTracker::
-                   AccountsHaveOtherDevicesSummary::kPrimaryNANonPrimaryYes) >=
-           1;
-  }));
-
-  // Note: Since the default profile doesn't have any signed-in accounts, it
-  // shouldn't have started any requests, so there should be only one request.
-  histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
-                                 /*sample=*/1, /*expected_bucket_count=*/1,
-                                 FROM_HERE);
-
-  histograms_.ExpectUniqueSample(
-      "Sync.DeviceStatistics.RequestsCompletedSuccess",
-      syncer::DeviceStatisticsTracker::RequestsCompletedSuccess::kAllSucceeded,
-      /*expected_bucket_count=*/1, FROM_HERE);
-
-  histograms_.ExpectBucketCount(
-      "Sync.DeviceStatistics.Outcome.Overall2",
-      syncer::DeviceStatisticsTracker::AccountsHaveOtherDevicesSummary::
-          kPrimaryNANonPrimaryYes,
-      /*expected_count=*/1, FROM_HERE);
-
-  histograms_.ExpectUniqueSample(
-      "Sync.DeviceStatistics.Outcome.NonPrimaryAccount."
-      "NumberOfAdditionalClients2",
-      /*sample=*/2,
-      /*expected_bucket_count=*/1, FROM_HERE);
 }
 
 }  // namespace
