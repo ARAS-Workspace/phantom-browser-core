@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <memory>
 
+#include "base/functional/callback.h"
 #include "base/memory/ptr_util.h"
 #include "base/time/clock.h"
 #include "base/time/default_clock.h"

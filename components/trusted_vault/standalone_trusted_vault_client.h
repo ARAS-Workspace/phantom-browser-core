@@ -17,14 +17,9 @@
 #include "base/sequence_checker.h"
 #include "base/task/sequenced_task_runner.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/trusted_vault/trusted_vault_access_token_fetcher_frontend.h"
 #include "components/trusted_vault/trusted_vault_client.h"
 
 struct CoreAccountInfo;
-
-namespace network {
-class SharedURLLoaderFactory;
-}  // namespace network
 
 namespace trusted_vault {
 
@@ -40,15 +35,13 @@ class StandaloneTrustedVaultClient : public TrustedVaultClient {
  public:
   // |base_dir| is the directory in which to create snapshot
   // files. |identity_manager| must not be null and must outlive this object.
-  // |url_loader_factory| must not be null.
   StandaloneTrustedVaultClient(
 #if BUILDFLAG(IS_MAC)
       const std::string& icloud_keychain_access_group_prefix,
 #endif
       SecurityDomainId security_domain,
       const base::FilePath& base_dir,
-      signin::IdentityManager* identity_manager,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
+      signin::IdentityManager* identity_manager);
 
   StandaloneTrustedVaultClient(const StandaloneTrustedVaultClient& other) =
       delete;
@@ -80,16 +73,6 @@ class StandaloneTrustedVaultClient : public TrustedVaultClient {
 
   // Runs |cb| when the backend becomes idle.
   void WaitForIdleForTesting(base::OnceClosure cb) const;
-  void FetchBackendPrimaryAccountForTesting(
-      base::OnceCallback<void(const std::optional<CoreAccountInfo>&)> callback)
-      const;
-  void FetchIsDeviceRegisteredForTesting(
-      const GaiaId& gaia_id,
-      base::OnceCallback<void(bool)> callback);
-  // TODO(crbug.com/40178774): This this API and rely exclusively on
-  // FakeSecurityDomainsServer.
-  void GetLastAddedRecoveryMethodPublicKeyForTesting(
-      base::OnceCallback<void(const std::vector<uint8_t>&)> callback);
   void GetLastKeyVersionForTesting(
       const GaiaId& gaia_id,
       base::OnceCallback<void(int last_key_version)> callback);
@@ -104,10 +87,6 @@ class StandaloneTrustedVaultClient : public TrustedVaultClient {
   SEQUENCE_CHECKER(sequence_checker_);
 
   base::ObserverList<Observer> observer_list_;
-
-  // Allows access token fetching for primary account on the ui thread. Passed
-  // as WeakPtr to TrustedVaultAccessTokenFetcherImpl.
-  TrustedVaultAccessTokenFetcherFrontend access_token_fetcher_frontend_;
 
   // |backend_| constructed in the UI thread, used and destroyed in
   // |backend_task_runner_|.

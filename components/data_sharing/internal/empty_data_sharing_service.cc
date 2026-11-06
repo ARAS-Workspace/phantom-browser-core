@@ -5,8 +5,6 @@
 #include "components/data_sharing/internal/empty_data_sharing_service.h"
 
 #include "base/functional/callback.h"
-#include "components/data_sharing/internal/preview_server_proxy.h"
-#include "components/data_sharing/public/data_sharing_sdk_delegate.h"
 
 namespace data_sharing {
 
@@ -16,11 +14,6 @@ EmptyDataSharingService::~EmptyDataSharingService() = default;
 
 bool EmptyDataSharingService::IsEmptyService() {
   return true;
-}
-
-DataSharingNetworkLoader*
-EmptyDataSharingService::GetDataSharingNetworkLoader() {
-  return nullptr;
 }
 
 base::WeakPtr<syncer::DataTypeControllerDelegate>
@@ -125,28 +118,7 @@ void EmptyDataSharingService::GetAvatarImageForURL(
     base::OnceCallback<void(const gfx::Image&)> callback,
     image_fetcher::ImageFetcher* image_fetcher) {}
 
-void EmptyDataSharingService::SetSDKDelegate(
-    std::unique_ptr<DataSharingSDKDelegate> sdk_delegate) {}
-
-DataSharingSDKDelegate* EmptyDataSharingService::GetSDKDelegate() {
-  return nullptr;
-}
-
-void EmptyDataSharingService::SetUIDelegate(
-    std::unique_ptr<DataSharingUIDelegate> ui_delegate) {}
-
-DataSharingUIDelegate* EmptyDataSharingService::GetUiDelegate() {
-  return nullptr;
-}
-
 Logger* EmptyDataSharingService::GetLogger() {
-  return nullptr;
-}
-
-void EmptyDataSharingService::AddGroupDataForTesting(GroupData group_data) {}
-void EmptyDataSharingService::SetPreviewServerProxyForTesting(
-    std::unique_ptr<PreviewServerProxy> preview_server_proxy) {}
-PreviewServerProxy* EmptyDataSharingService::GetPreviewServerProxyForTesting() {
   return nullptr;
 }
 

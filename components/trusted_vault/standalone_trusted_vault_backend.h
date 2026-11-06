@@ -244,9 +244,6 @@ class StandaloneTrustedVaultBackend
   // recovery factor registration, keys downloading, etc.) will be disabled.
   // Note: |connection_| depends on |storage_|, so it needs to be destroyed
   // first. Thus, the field order matters.
-  // TODO(crbug.com/40143544): |connection_| can be null if URL passed as
-  // kTrustedVaultServiceURLSwitch is not valid, consider making it non-nullable
-  // even in this case and clean up related logic.
   const std::unique_ptr<TrustedVaultThrottlingConnection> connection_;
 
   // Only current |primary_account_| can be used for communication with trusted

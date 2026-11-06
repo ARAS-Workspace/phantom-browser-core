@@ -106,10 +106,6 @@
 -ProfileManagementDisclaimerServiceBrowserFocusBrowserTest.Test/Managed_EnforcedByPolicy_Cancel
 
 # Flaky on most bots: crbug.com/483092903
--RecentActivityBubbleDialogViewActionBrowserTest.HandlesActionFocusTab
--RecentActivityBubbleDialogViewActionBrowserTest.HandlesActionManageSharing
--RecentActivityBubbleDialogViewActionBrowserTest.HandlesActionOpenTabGroupEditDialog
--RecentActivityBubbleDialogViewActionBrowserTest.HandlesActionReopenTab
 
 # Flaky on multiple bots: crbug.com/474642229
 -SBNavigationObserverBrowserTest.VerifyIdentifyReferrerChainByEventURL

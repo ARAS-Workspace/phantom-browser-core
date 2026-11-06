@@ -131,7 +131,6 @@ missing_new_fields,components/signin/internal/identity_manager/account_fetcher_s
 missing_new_fields,components/signin/internal/identity_manager/gaia_cookie_manager_service.cc
 missing_new_fields,components/spellcheck/browser/spelling_service_client.cc
 missing_new_fields,components/sync/engine/net/http_bridge.cc
-missing_new_fields,components/trusted_vault/trusted_vault_request.cc
 missing_new_fields,components/ui_devtools/devtools_server.cc
 missing_new_fields,components/update_client/net/network_impl.cc
 missing_new_fields,components/variations/service/variations_service.cc
@@ -207,4 +206,3 @@ missing_new_fields,extensions/browser/guest_view/web_view/controlled_frame_embed
 
 # Header files with traffic annotations that existed before the new check was introduced.
 all,chrome/browser/predictors/predictors_traffic_annotations.h
-all,components/data_sharing/public/data_sharing_network_utils.h

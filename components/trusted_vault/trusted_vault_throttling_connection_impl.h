@@ -11,7 +11,6 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/trusted_vault/proto/vault.pb.h"
 #include "components/trusted_vault/standalone_trusted_vault_storage.h"
-#include "components/trusted_vault/trusted_vault_access_token_fetcher.h"
 #include "components/trusted_vault/trusted_vault_connection.h"
 #include "components/trusted_vault/trusted_vault_throttling_connection.h"
 

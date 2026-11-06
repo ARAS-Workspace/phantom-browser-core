@@ -7,12 +7,7 @@ import("//mojo/public/tools/bindings/mojom.gni")
 source_set("public") {
   sources = [
     "client_version_info.h",
-    "data_sharing_network_loader.cc",
-    "data_sharing_network_loader.h",
-    "data_sharing_network_utils.h",
-    "data_sharing_sdk_delegate.h",
     "data_sharing_service.h",
-    "data_sharing_ui_delegate.h",
     "share_url_interception_context.cc",
     "share_url_interception_context.h",
   ]
@@ -26,7 +21,6 @@ source_set("public") {
     "//components/data_sharing/public/protocol",
     "//components/keyed_service/core",
     "//components/sync/model",
-    "//net/traffic_annotation",
     "//url",
   ]
 }
@@ -61,8 +55,6 @@ static_library("features") {
   sources = [
     "features.cc",
     "features.h",
-    "server_environment.h",
-    "switches.h",
   ]
 
   public_deps = [ "//base" ]

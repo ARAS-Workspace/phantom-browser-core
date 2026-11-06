@@ -255,7 +255,6 @@ constexpr char kSafeBrowsingName[] = "safe_browsing_service";
 constexpr char kTailoredSecurityServiceName[] = "tailored_security_service";
 constexpr char kLensOverlayQueryControllerName[] =
     "lens_overlay_query_controller";
-constexpr char kTrustedVaultFrontendName[] = "trusted_vault_frontend";
 constexpr char kFeedNetworkName[] = "feed_network";
 constexpr char kAutofillPaymentsName[] = "autofill_payments";
 constexpr char kPaymentsAccessTokenFetcherName[] =
@@ -282,7 +281,6 @@ constexpr char kNearbyPresenceServerClientName[] =
 constexpr char kCryptAuthClientName[] = "crypt_auth_client";
 constexpr char kAmbientModeName[] = "ambient_mode";
 constexpr char kProfileDownloaderName[] = "profile_downloader";
-constexpr char kDataSharingAndroidName[] = "data_sharing_android";
 constexpr char kExtensionsIdentityAPIName[] = "extensions_identity_api";
 constexpr char kMantaName[] = "manta";
 constexpr char kChromeMemexName[] = "chrome_memex";
@@ -290,7 +288,6 @@ constexpr char kAimEligibilityServiceName[] = "aim_eligibility_service";
 constexpr char kChromeOsBabelOrcaName[] = "chromeos_babel_orca";
 constexpr char kChromeOsBocaSchoolToolsAuthName[] =
     "chromeos_boca_school_tools_auth";
-constexpr char kSharedDataPreviewName[] = "shared_data_preview";
 constexpr char kAccessCodeCastDiscoveryName[] = "access_code_cast_discovery";
 constexpr char kAuthServiceDriveApiName[] = "auth_service_drive_api";
 constexpr char kAuthServiceCalendarName[] = "auth_service_calendar";
@@ -516,10 +513,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kLensOverlayQueryControllerName,
           /*scopes=*/{GaiaConstants::kLensOAuth2Scope});
-    case OAuthConsumerId::kTrustedVaultFrontend:
-      return OAuthConsumer(
-          /*name=*/kTrustedVaultFrontendName,
-          /*scopes=*/{kCryptAuthOAuth2Scope});
     case OAuthConsumerId::kFeedNetwork:
       return OAuthConsumer(
           /*name=*/kFeedNetworkName,
@@ -606,11 +599,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
           /*name=*/kProfileDownloaderName,
           /*scopes=*/{GaiaConstants::kGoogleUserInfoProfile,
                       GaiaConstants::kGoogleUserInfoEmail});
-    case OAuthConsumerId::kDataSharingAndroid:
-      return OAuthConsumer(
-          /*name=*/kDataSharingAndroidName,
-          /*scopes=*/{kPeopleApiReadWriteOAuth2Scope,
-                      kPeopleApiReadOnlyOAuth2Scope});
     case OAuthConsumerId::kExtensionsIdentityAPI:
       return OAuthConsumer(
           /*name=*/kExtensionsIdentityAPIName,
@@ -631,10 +619,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kChromeOsBocaSchoolToolsAuthName,
           /*scopes=*/{kSchoolToolsAuthScope});
-    case OAuthConsumerId::kSharedDataPreview:
-      return OAuthConsumer(
-          /*name=*/kSharedDataPreviewName,
-          /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
     case OAuthConsumerId::kAccessCodeCastDiscovery:
       return OAuthConsumer(
           /*name=*/kAccessCodeCastDiscoveryName,

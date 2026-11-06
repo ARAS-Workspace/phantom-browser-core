@@ -9,8 +9,6 @@
 
 #include "base/functional/callback.h"
 #include "base/types/expected.h"
-#include "components/data_sharing/internal/preview_server_proxy.h"
-#include "components/data_sharing/public/data_sharing_sdk_delegate.h"
 #include "components/data_sharing/public/data_sharing_service.h"
 #include "components/data_sharing/public/group_data.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -31,7 +29,6 @@ class MockDataSharingService : public DataSharingService {
   MOCK_METHOD0(IsEmptyService, bool());
   MOCK_METHOD1(AddObserver, void(Observer*));
   MOCK_METHOD1(RemoveObserver, void(Observer*));
-  MOCK_METHOD0(GetDataSharingNetworkLoader, DataSharingNetworkLoader*());
   MOCK_METHOD0(GetCollaborationGroupControllerDelegate,
                base::WeakPtr<syncer::DataTypeControllerDelegate>());
   MOCK_METHOD0(IsGroupDataModelLoaded, bool());
@@ -91,15 +88,7 @@ class MockDataSharingService : public DataSharingService {
                int,
                base::OnceCallback<void(const gfx::Image&)>,
                image_fetcher::ImageFetcher*));
-  MOCK_METHOD1(SetSDKDelegate, void(std::unique_ptr<DataSharingSDKDelegate>));
-  MOCK_METHOD0(GetSDKDelegate, DataSharingSDKDelegate*());
-  MOCK_METHOD1(SetUIDelegate, void(std::unique_ptr<DataSharingUIDelegate>));
-  MOCK_METHOD0(GetUiDelegate, DataSharingUIDelegate*());
   MOCK_METHOD0(GetLogger, Logger*());
-  MOCK_METHOD1(AddGroupDataForTesting, void(GroupData));
-  MOCK_METHOD1(SetPreviewServerProxyForTesting,
-               void(std::unique_ptr<PreviewServerProxy>));
-  MOCK_METHOD0(GetPreviewServerProxyForTesting, PreviewServerProxy*());
   MOCK_METHOD1(OnCollaborationGroupRemoved, void(const GroupId&));
   MOCK_METHOD1(IsContextIdShared, bool(const ContextId&));
 };

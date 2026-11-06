@@ -100,4 +100,16 @@ DownloadAuthenticationFactorsRegistrationStateResult::operator=(
 DownloadAuthenticationFactorsRegistrationStateResult::
     ~DownloadAuthenticationFactorsRegistrationStateResult() = default;
 
+std::vector<TrustedVaultKeyAndVersion> GetTrustedVaultKeysWithVersions(
+    const std::vector<std::vector<uint8_t>>& trusted_vault_keys,
+    int last_key_version) {
+  const int first_key_version =
+      last_key_version - static_cast<int>(trusted_vault_keys.size()) + 1;
+  std::vector<TrustedVaultKeyAndVersion> result;
+  for (size_t i = 0; i < trusted_vault_keys.size(); ++i) {
+    result.emplace_back(trusted_vault_keys[i], first_key_version + i);
+  }
+  return result;
+}
+
 }  // namespace trusted_vault

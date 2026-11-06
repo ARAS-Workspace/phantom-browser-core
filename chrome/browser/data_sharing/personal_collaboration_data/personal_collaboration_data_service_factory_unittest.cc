@@ -24,7 +24,7 @@ class PersonalCollaborationDataServiceFactoryTest : public testing::Test {
 };
 
 TEST_F(PersonalCollaborationDataServiceFactoryTest,
-       FeatureEnabledUsesRealService) {
+       FeatureEnabledReturnNullService) {
   scoped_feature_list_.InitWithFeatures(
       {features::kDataSharingAccountDataMigration,
        data_sharing::features::kDataSharingFeature},
@@ -33,7 +33,7 @@ TEST_F(PersonalCollaborationDataServiceFactoryTest,
 
   PersonalCollaborationDataService* service =
       PersonalCollaborationDataServiceFactory::GetForProfile(profile_.get());
-  EXPECT_TRUE(service);
+  EXPECT_FALSE(service);
 }
 
 TEST_F(PersonalCollaborationDataServiceFactoryTest,

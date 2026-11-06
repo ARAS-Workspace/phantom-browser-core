@@ -12,42 +12,13 @@ static_library("internal") {
   ]
 
   sources = [
-    "avatar_fetcher.cc",
-    "avatar_fetcher.h",
-    "collaboration_group_sync_bridge.cc",
-    "collaboration_group_sync_bridge.h",
-    "data_sharing_network_loader_impl.cc",
-    "data_sharing_network_loader_impl.h",
-    "data_sharing_service_impl.cc",
-    "data_sharing_service_impl.h",
     "empty_data_sharing_service.cc",
     "empty_data_sharing_service.h",
-    "group_data_model.cc",
-    "group_data_model.h",
-    "group_data_proto_utils.cc",
-    "group_data_proto_utils.h",
-    "group_data_store.cc",
-    "group_data_store.h",
-    "logger_impl.cc",
-    "logger_impl.h",
-    "preview_server_proxy.cc",
-    "preview_server_proxy.h",
   ]
 
   deps = [
-    "//components/data_sharing/internal/protocol",
     "//components/data_sharing/public:logger",
-    "//components/endpoint_fetcher",
-    "//components/image_fetcher/core",
-    "//components/signin/public/identity_manager",
-    "//components/sqlite_proto",
-    "//components/sync/base",
     "//components/sync/model",
-    "//components/sync/protocol",
-    "//google_apis/common",
-    "//services/data_decoder/public/cpp",
-    "//services/network/public/cpp",
-    "//sql",
   ]
 
   public_deps = [
@@ -58,62 +29,17 @@ static_library("internal") {
   ]
 }
 
-static_library("personal_collaboration_data_internal") {
-  sources = [
-    "personal_collaboration_data/personal_collaboration_data_service_impl.cc",
-    "personal_collaboration_data/personal_collaboration_data_service_impl.h",
-    "personal_collaboration_data/personal_collaboration_data_sync_bridge.cc",
-    "personal_collaboration_data/personal_collaboration_data_sync_bridge.h",
-  ]
-
-  deps = [
-    "//base",
-    "//components/data_sharing/public:personal_collaboration_data",
-    "//components/keyed_service/core",
-  ]
-}
-
 source_set("unit_tests") {
   testonly = true
 
   visibility = [ "//components/data_sharing:unit_tests" ]
 
-  sources = [
-    "avatar_fetcher_unittest.cc",
-    "collaboration_group_sync_bridge_unittest.cc",
-    "data_sharing_network_loader_impl_unittest.cc",
-    "data_sharing_service_impl_unittest.cc",
-    "empty_data_sharing_service_unittest.cc",
-    "group_data_model_unittest.cc",
-    "group_data_proto_utils_unittest.cc",
-    "group_data_store_unittest.cc",
-    "logger_impl_unittest.cc",
-    "personal_collaboration_data/personal_collaboration_data_service_impl_unittest.cc",
-    "personal_collaboration_data/personal_collaboration_data_sync_bridge_unittest.cc",
-    "preview_server_proxy_unittest.cc",
-  ]
+  sources = [ "empty_data_sharing_service_unittest.cc" ]
 
   deps = [
     ":internal",
-    ":personal_collaboration_data_internal",
     "//base",
-    "//base/test:test_support",
-    "//components/data_sharing:personal_collaboration_data_test_support_proto",
-    "//components/data_sharing:test_support",
-    "//components/data_sharing/public:logger",
-    "//components/endpoint_fetcher",
-    "//components/endpoint_fetcher:test_support",
-    "//components/image_fetcher/core",
-    "//components/image_fetcher/core:test_support",
-    "//components/signin/public/identity_manager:test_support",
-    "//components/sync:test_support",
-    "//net/traffic_annotation:test_support",
-    "//services/data_decoder/public/cpp:test_support",
-    "//services/network:test_support",
-    "//services/network/public/cpp",
     "//testing/gtest",
-    "//ui/base",
-    "//ui/gfx:test_support",
   ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

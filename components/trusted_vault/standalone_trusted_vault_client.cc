@@ -20,15 +20,10 @@
 #include "base/task/thread_pool.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
-#include "components/trusted_vault/command_line_switches.h"
-#include "components/trusted_vault/proto/local_trusted_vault.pb.h"
 #include "components/trusted_vault/standalone_trusted_vault_backend.h"
 #include "components/trusted_vault/standalone_trusted_vault_storage.h"
-#include "components/trusted_vault/trusted_vault_access_token_fetcher_impl.h"
-#include "components/trusted_vault/trusted_vault_connection_impl.h"
 #include "components/trusted_vault/trusted_vault_server_constants.h"
 #include "google_apis/gaia/google_service_auth_error.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
 
 namespace trusted_vault {
 
@@ -37,14 +32,6 @@ namespace {
 constexpr base::TaskTraits kBackendTaskTraits = {
     base::MayBlock(), base::TaskPriority::USER_VISIBLE,
     base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN};
-
-void ReplyToIsDeviceRegisteredForTesting(  // IN-TEST
-    base::OnceCallback<void(bool)> is_device_registered_callback,
-    const trusted_vault_pb::LocalDeviceRegistrationInfo&
-        device_registration_info) {
-  std::move(is_device_registered_callback)
-      .Run(device_registration_info.device_registered());
-}
 
 class IdentityManagerObserver : public signin::IdentityManager::Observer {
  public:
@@ -255,22 +242,9 @@ StandaloneTrustedVaultClient::StandaloneTrustedVaultClient(
 #endif
     SecurityDomainId security_domain,
     const base::FilePath& base_dir,
-    signin::IdentityManager* identity_manager,
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
+    signin::IdentityManager* identity_manager)
     : backend_task_runner_(
-          base::ThreadPool::CreateSequencedTaskRunner(kBackendTaskTraits)),
-      access_token_fetcher_frontend_(identity_manager) {
-  std::unique_ptr<TrustedVaultConnection> connection;
-  GURL trusted_vault_service_gurl =
-      ExtractTrustedVaultServiceURLFromCommandLine();
-  if (trusted_vault_service_gurl.is_valid()) {
-    connection = std::make_unique<TrustedVaultConnectionImpl>(
-        security_domain, trusted_vault_service_gurl,
-        url_loader_factory->Clone(),
-        std::make_unique<TrustedVaultAccessTokenFetcherImpl>(
-            access_token_fetcher_frontend_.GetWeakPtr()));
-  }
-
+          base::ThreadPool::CreateSequencedTaskRunner(kBackendTaskTraits)) {
   backend_ = base::MakeRefCounted<StandaloneTrustedVaultBackend>(
 #if BUILDFLAG(IS_MAC)
       icloud_keychain_access_group_prefix,
@@ -282,7 +256,7 @@ StandaloneTrustedVaultClient::StandaloneTrustedVaultClient(
           base::BindRepeating(&StandaloneTrustedVaultClient::
                                   NotifyRecoverabilityDegradedChanged,
                               weak_ptr_factory_.GetWeakPtr()))),
-      std::move(connection));
+      /*connection=*/nullptr);
   backend_task_runner_->PostTask(
       FROM_HERE,
       base::BindOnce(&StandaloneTrustedVaultBackend::ReadDataFromDisk,
@@ -399,45 +373,6 @@ void StandaloneTrustedVaultClient::WaitForIdleForTesting(
       base::BindOnce(&StandaloneTrustedVaultBackend::WaitForIdleForTesting,
                      backend_,
                      base::BindPostTaskToCurrentDefault(std::move(cb))));
-}
-
-void StandaloneTrustedVaultClient::FetchBackendPrimaryAccountForTesting(
-    base::OnceCallback<void(const std::optional<CoreAccountInfo>&)> cb) const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(backend_);
-  backend_task_runner_->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(
-          &StandaloneTrustedVaultBackend::GetPrimaryAccountForTesting,
-          backend_),
-      std::move(cb));
-}
-
-void StandaloneTrustedVaultClient::FetchIsDeviceRegisteredForTesting(
-    const GaiaId& gaia_id,
-    base::OnceCallback<void(bool)> callback) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(backend_);
-  backend_task_runner_->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(
-          &StandaloneTrustedVaultBackend::GetDeviceRegistrationInfoForTesting,
-          backend_, gaia_id),
-      base::BindOnce(&ReplyToIsDeviceRegisteredForTesting,
-                     std::move(callback)));
-}
-
-void StandaloneTrustedVaultClient::
-    GetLastAddedRecoveryMethodPublicKeyForTesting(
-        base::OnceCallback<void(const std::vector<uint8_t>&)> callback) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(backend_);
-  backend_task_runner_->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(&StandaloneTrustedVaultBackend::
-                         GetLastAddedRecoveryMethodPublicKeyForTesting,
-                     backend_),
-      std::move(callback));
 }
 
 void StandaloneTrustedVaultClient::GetLastKeyVersionForTesting(

@@ -9,21 +9,9 @@
 #include "base/functional/callback.h"
 #include "base/no_destructor.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/sync/data_type_store_service_factory.h"
-#include "chrome/common/channel_info.h"
-#include "components/data_sharing/internal/data_sharing_service_impl.h"
 #include "components/data_sharing/internal/empty_data_sharing_service.h"
-#include "components/data_sharing/public/data_sharing_sdk_delegate.h"
 #include "components/data_sharing/public/data_sharing_service.h"
-#include "components/data_sharing/public/data_sharing_ui_delegate.h"
-#include "components/data_sharing/public/features.h"
-#include "components/sync/model/data_type_store_service.h"
 #include "content/public/browser/browser_context.h"
-#include "content/public/browser/storage_partition.h"
-
-#include "chrome/browser/data_sharing/desktop/data_sharing_sdk_delegate_desktop.h"
-#include "chrome/browser/data_sharing/desktop/data_sharing_ui_delegate_desktop.h"
 
 namespace data_sharing {
 // static
@@ -46,35 +34,14 @@ DataSharingServiceFactory::DataSharingServiceFactory()
               // TODO(crbug.com/41488885): Check if this service is needed for
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOwnInstance)
-              .Build()) {
-  DependsOn(DataTypeStoreServiceFactory::GetInstance());
-  DependsOn(IdentityManagerFactory::GetInstance());
-}
+              .Build()) {}
 
 DataSharingServiceFactory::~DataSharingServiceFactory() = default;
 
 std::unique_ptr<KeyedService>
 DataSharingServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  if (!features::IsDataSharingFunctionalityEnabled() ||
-      context->IsOffTheRecord()) {
-    return std::make_unique<EmptyDataSharingService>();
-  }
-
-  Profile* profile = Profile::FromBrowserContext(context);
-  std::unique_ptr<DataSharingUIDelegate> ui_delegate;
-  std::unique_ptr<DataSharingSDKDelegate> sdk_delegate;
-
-  ui_delegate = std::make_unique<DataSharingUIDelegateDesktop>(profile);
-  sdk_delegate = std::make_unique<DataSharingSDKDelegateDesktop>(context);
-
-  return std::make_unique<DataSharingServiceImpl>(
-      profile->GetPath(),
-      profile->GetDefaultStoragePartition()
-          ->GetURLLoaderFactoryForBrowserProcess(),
-      IdentityManagerFactory::GetForProfile(profile),
-      DataTypeStoreServiceFactory::GetForProfile(profile)->GetStoreFactory(),
-      chrome::GetChannel(), std::move(sdk_delegate), std::move(ui_delegate));
+  return std::make_unique<EmptyDataSharingService>();
 }
 
 }  // namespace data_sharing

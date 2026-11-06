@@ -5,6 +5,7 @@
 #ifndef COMPONENTS_DATA_SHARING_PUBLIC_DATA_SHARING_SERVICE_H_
 #define COMPONENTS_DATA_SHARING_PUBLIC_DATA_SHARING_SERVICE_H_
 
+#include <memory>
 #include <set>
 #include <string>
 
@@ -14,7 +15,6 @@
 #include "base/types/expected.h"
 #include "build/build_config.h"
 #include "components/data_sharing/migration/public/context_id.h"
-#include "components/data_sharing/public/data_sharing_ui_delegate.h"
 #include "components/data_sharing/public/group_data.h"
 #include "components/data_sharing/public/share_url_interception_context.h"
 #include "components/keyed_service/core/keyed_service.h"
@@ -32,10 +32,7 @@ class DataTypeControllerDelegate;
 }  // namespace syncer
 
 namespace data_sharing {
-class DataSharingNetworkLoader;
-class DataSharingSDKDelegate;
 class Logger;
-class PreviewServerProxy;
 
 // The core class for managing data sharing.
 class DataSharingService : public KeyedService, public base::SupportsUserData {
@@ -131,9 +128,6 @@ class DataSharingService : public KeyedService, public base::SupportsUserData {
 
   virtual void AddObserver(Observer* observer) = 0;
   virtual void RemoveObserver(Observer* observer) = 0;
-
-  // Returns the network loader for fetching data.
-  virtual DataSharingNetworkLoader* GetDataSharingNetworkLoader() = 0;
 
   // Returns DataTypeControllerDelegate for the collaboration group datatype.
   virtual base::WeakPtr<syncer::DataTypeControllerDelegate>
@@ -261,32 +255,7 @@ class DataSharingService : public KeyedService, public base::SupportsUserData {
       base::OnceCallback<void(const gfx::Image&)> callback,
       image_fetcher::ImageFetcher* image_fetcher) = 0;
 
-  // Sets the current DataSharingSDKDelegate instance.
-  virtual void SetSDKDelegate(
-      std::unique_ptr<DataSharingSDKDelegate> sdk_delegate) = 0;
-
-  // Get the current SDK Delegate instance.
-  virtual DataSharingSDKDelegate* GetSDKDelegate() = 0;
-
-  // Sets the current DataSharingUIDelegate instance.
-  virtual void SetUIDelegate(
-      std::unique_ptr<DataSharingUIDelegate> ui_delegate) = 0;
-
-  // Get the current DataSharingUIDelegate instance.
-  virtual DataSharingUIDelegate* GetUiDelegate() = 0;
-
   virtual Logger* GetLogger() = 0;
-
-  // Sets a group for testing. When ReadGroup is called, the GroupData that
-  // matches GroupId will be returned. This function does not notify observers
-  // of the group being added. Settings 2 groups with the same GroupId will
-  // replace the existing GroupData.
-  virtual void AddGroupDataForTesting(GroupData group_data) = 0;
-
-  // Getter/setter for the preview proxy to allow override in tests.
-  virtual void SetPreviewServerProxyForTesting(
-      std::unique_ptr<PreviewServerProxy> preview_server_proxy) = 0;
-  virtual PreviewServerProxy* GetPreviewServerProxyForTesting() = 0;
 
   // Called when a collaboration group is removed by the user locally. This
   // happens when user leaves or deletes a group.

@@ -7,9 +7,5 @@ include_rules = [
   "+components/signin/public",
   "+crypto",
   "+google_apis",
-  "+net",
-  "+services/network/public",
-  "+services/network/test",
   "+third_party/boringssl",
-  "+third_party/libxml/chromium",
 ]

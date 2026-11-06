@@ -57,38 +57,6 @@ enum class TrustedVaultRecoveryFactorRegistrationOutcomeForUMA {
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/trusted_vault/enums.xml:TrustedVaultRecoveryFactorRegistrationOutcome)
 
-// Used to provide UMA metric breakdowns.
-enum class TrustedVaultURLFetchReasonForUMA {
-  kUnspecified,
-  kRegisterDevice,
-  kRegisterLockScreenKnowledgeFactor,
-  kRegisterUnspecifiedAuthenticationFactor,
-  kDownloadKeys,
-  kDownloadIsRecoverabilityDegraded,
-  kDownloadAuthenticationFactorsRegistrationState,
-  kRegisterGpmPin,
-  kRegisterICloudKeychain,
-  kDownloadGaiaPasswordPublicKey,
-  kRotateSharedKey,
-};
-
-// Used to provide UMA metric breakdowns.
-enum class RecoveryKeyStoreURLFetchReasonForUMA {
-  kUpdateRecoveryKeyStore,
-  kListRecoveryKeyStores,
-};
-
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-// LINT.IfChange(RecoveryKeyStoreCertificatesFetchStatus)
-enum class RecoveryKeyStoreCertificatesFetchStatusForUMA {
-  kSuccess = 0,
-  kNetworkError = 1,
-  kParseError = 2,
-  kMaxValue = kParseError,
-};
-// LINT.ThenChange(/tools/metrics/histograms/metadata/trusted_vault/enums.xml:RecoveryKeyStoreCertificatesFetchStatus)
-
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
 // LINT.IfChange(TrustedVaultDownloadKeysStatus)
@@ -145,17 +113,6 @@ enum class TrustedVaultFileReadStatusForUMA {
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
-// LINT.IfChange(TrustedVaultListSecurityDomainMembersPinStatus)
-enum class TrustedVaultListSecurityDomainMembersPinStatus {
-  kPinPresentAndUsableForRecovery = 0,
-  kPinPresentButUnusableForRecovery = 1,
-  kNoPinPresent = 2,
-  kMaxValue = kNoPinPresent
-};
-// LINT.ThenChange(/tools/metrics/histograms/metadata/trusted_vault/enums.xml:TrustedVaultListSecurityDomainMembersPinStatus)
-
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
 // LINT.IfChange(TrustedVaultRecoveryFlowEndpoint)
 enum class TrustedVaultRecoveryFlowEndpoint {
   kDesktop = 0,
@@ -181,28 +138,6 @@ void RecordTrustedVaultRecoveryFactorRegistrationOutcome(
     SecurityDomainId security_domain_id,
     TrustedVaultRecoveryFactorRegistrationOutcomeForUMA registration_outcome);
 
-// Records url fetch response status (combined http and net error code) for
-// requests to security domain service. If |http_response_code| is non-zero, it
-// will be recorded, otherwise |net_error| will be recorded. Either
-// |http_status| or |net_error| must be non zero.
-void RecordTrustedVaultURLFetchResponse(SecurityDomainId security_domain_id,
-                                        TrustedVaultURLFetchReasonForUMA reason,
-                                        int http_response_code,
-                                        int net_error);
-
-// Records url fetch response status (combined http and net error code) for
-// requests to vault service. If |http_response_code| is non-zero, it
-// will be recorded, otherwise |net_error| will be recorded. Either
-// |http_status| or |net_error| must be non zero.
-void RecordRecoveryKeyStoreURLFetchResponse(
-    RecoveryKeyStoreURLFetchReasonForUMA reason,
-    int http_response_code,
-    int net_error);
-
-// Records the result of fetching recovery key store certificates.
-void RecordRecoveryKeyStoreFetchCertificatesStatus(
-    RecoveryKeyStoreCertificatesFetchStatusForUMA status);
-
 // Records the outcome of trying to download keys from the server.
 void RecordTrustedVaultDownloadKeysStatus(
     LocalRecoveryFactorType local_recovery_factor_type,
@@ -220,26 +155,6 @@ void RecordTrustedVaultRecoverKeysOutcome(
 
 void RecordTrustedVaultFileReadStatus(SecurityDomainId security_domain_id,
                                       TrustedVaultFileReadStatusForUMA status);
-
-enum class IsOffTheRecord { kNo, kYes };
-
-// Records a call to set security domain encryption keys in the browser.
-// `std::nullopt` indicates the caller attempted to set keys for a security
-// domain with a name that was not understood by this client.
-void RecordTrustedVaultSetEncryptionKeysForSecurityDomain(
-    std::optional<SecurityDomainId> security_domain,
-    IsOffTheRecord is_off_the_record);
-
-// Records a call to chrome.setClientEncryptionKeys() for the given security
-// domain in the renderer. `std::nullopt` indicates the caller attempted to set
-// keys for a security domain with a name that was not understood by this
-// client.
-void RecordCallToJsSetClientEncryptionKeysWithSecurityDomainToUma(
-    std::optional<SecurityDomainId> security_domain);
-
-void RecordTrustedVaultListSecurityDomainMembersPinStatus(
-    SecurityDomainId security_domain_id,
-    TrustedVaultListSecurityDomainMembersPinStatus status);
 
 // Returns a recovery factor name suitable for using in histograms. When
 // including this in a histogram, its name in the XML should have

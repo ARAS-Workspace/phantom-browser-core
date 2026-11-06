@@ -139,7 +139,6 @@ after discussions on the right group.
       <annotation id="dbsc_registration"/>
       <annotation id="enterprise_companion_event_logging"/>
       <annotation id="contextual_search_resolve_debug"/>
-      <annotation id="chrome_data_sharing_preview"/>
       <annotation id="lens_overlay_save"/>
       <annotation id="iwa_web_app_internals_update_manifest"/>
       <annotation id="iwa_web_app_internals_web_bundle"/>
@@ -154,7 +153,6 @@ after discussions on the right group.
       <annotation id="gemini_user_status"/>
       <annotation id="zero_state_suggestions_model_execution"/>
       <annotation id="certificate_verifier_2qwac_loader"/>
-      <annotation id="trusted_vault_cert_request"/>
       <annotation id="keepalive_fetch_retry"/>
       <annotation id="ntp_composebox_query_controller"/>
       <annotation id="password_change_submission_model_execution"/>
@@ -357,7 +355,6 @@ after discussions on the right group.
     </sender>
     <sender name="Chrome Sync">
       <annotation id="sync_http_bridge"/>
-      <annotation id="trusted_vault_request"/>
     </sender>
     <sender name="Assist Rank">
       <annotation id="ranker_url_fetcher"/>

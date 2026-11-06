@@ -8,8 +8,6 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/data_sharing/internal/data_sharing_service_impl.h"
-#include "components/data_sharing/internal/empty_data_sharing_service.h"
 #include "components/data_sharing/public/data_sharing_service.h"
 #include "components/data_sharing/public/features.h"
 #include "content/public/test/browser_task_environment.h"
@@ -40,11 +38,11 @@ class DataSharingServiceFactoryTest : public testing::Test {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-TEST_F(DataSharingServiceFactoryTest, FeatureEnabledUsesRealService) {
+TEST_F(DataSharingServiceFactoryTest, FeatureEnabledUsesEmptyService) {
   InitService(/*enable_feature=*/true);
   DataSharingService* service =
       DataSharingServiceFactory::GetForProfile(profile_.get());
-  EXPECT_FALSE(service->IsEmptyService());
+  EXPECT_TRUE(service->IsEmptyService());
 }
 
 TEST_F(DataSharingServiceFactoryTest, FeatureDisabledUsesEmptyService) {

@@ -91,13 +91,6 @@ class DataSharingPageHandlerUnitTest : public ChromeRenderViewHostTestHarness {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-TEST_F(DataSharingPageHandlerUnitTest, GetShareLink) {
-  data_sharing::mojom::PageHandler::GetShareLinkCallback callback =
-      base::BindLambdaForTesting(
-          [&](const GURL& url) { ASSERT_TRUE(url.is_valid()); });
-  handler()->GetShareLink("GROUP_ID", "ACCESS_TOKEN", std::move(callback));
-}
-
 TEST_F(DataSharingPageHandlerUnitTest, GetTabGroupPreview) {
   data_sharing::mojom::PageHandler::GetTabGroupPreviewCallback callback =
       base::BindLambdaForTesting(

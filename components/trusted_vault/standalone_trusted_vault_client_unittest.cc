@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/files/scoped_temp_dir.h"
@@ -27,33 +26,21 @@
 #include "build/build_config.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "components/trusted_vault/command_line_switches.h"
 #include "components/trusted_vault/securebox.h"
-#include "components/trusted_vault/standalone_trusted_vault_server_constants.h"
-#include "components/trusted_vault/test/fake_security_domains_server.h"
 #include "components/trusted_vault/trusted_vault_client.h"
 #include "components/trusted_vault/trusted_vault_server_constants.h"
-#include "components/trusted_vault/trusted_vault_throttling_connection_impl.h"
 #if BUILDFLAG(IS_MAC)
 #include "crypto/apple/scoped_fake_keychain_v2.h"
 #endif
 #include "google_apis/gaia/gaia_id.h"
-#include "net/test/embedded_test_server/embedded_test_server.h"
-#include "net/test/embedded_test_server/http_request.h"
-#include "net/test/embedded_test_server/http_response.h"
-#include "services/network/test/test_shared_url_loader_factory.h"
-#include "services/network/test/test_utils.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace trusted_vault {
 namespace {
 
-using testing::_;
 using testing::ElementsAre;
-using testing::Eq;
 using testing::IsEmpty;
-using testing::SizeIs;
 
 constexpr char kTestEmail[] = "test@gmail.com";
 
@@ -61,11 +48,6 @@ constexpr char kTestEmail[] = "test@gmail.com";
 constexpr char kKeychainAccessGroupPrefix[] = "test-access-group-prefix";
 const std::string kKeychainAccessGroup(
     base::StrCat({kKeychainAccessGroupPrefix, ".com.google.common.folsom"}));
-// On Mac, both the physical device recovery factor and the iCloud Keychain
-// recovery factor are registered by default.
-constexpr int kDefaultExpectedMemberCount = 2;
-#else
-constexpr int kDefaultExpectedMemberCount = 1;
 #endif
 
 class MockTrustedVaultClientObserver : public TrustedVaultClient::Observer {
@@ -89,53 +71,30 @@ class MockTrustedVaultClientObserver : public TrustedVaultClient::Observer {
 //    - StandaloneTrustedVaultClient (public client API)
 //    - StandaloneTrustedVaultBackend (core engine, running in a sequence)
 //    - Persistent disk storage layer
-//    - Recovery factor registration / retrieval logic
 //
 // 2. Testing Boundaries:
 //    - All test interactions occur through the public TrustedVaultClient
 //      interface.
-//    - RPC calls to SecurityDomainsService are intercepted and faked at the
-//      TrustedVaultConnection boundary using FakeSecurityDomainsServer.
+//    - The client is built without a TrustedVaultConnection.
 //    - Persistent protobuf serialization (trusted_vault.pb) is exercised
 //      against a real disk directory using base::ScopedTempDir.
 //
 // Note: These tests do not aim to cover all possible edge cases - there are
 // more suitable places to do that, e.g. in
 // standalone_trusted_vault_backend_unittest.cc. The goal here is to test the
-// interaction of the various components (connection, storage, recovery
-// factors, helpers, etc.) for relevant user scenarios.
+// interaction of the various components (storage, helpers, etc.) for relevant
+// user scenarios.
 class StandaloneTrustedVaultClientTest : public testing::Test {
  public:
   StandaloneTrustedVaultClientTest()
       : task_environment_(base::test::TaskEnvironment::MainThreadType::IO,
-                          base::test::TaskEnvironment::TimeSource::MOCK_TIME),
-        test_server_(net::EmbeddedTestServer::TYPE_HTTP) {}
+                          base::test::TaskEnvironment::TimeSource::MOCK_TIME) {}
 
   ~StandaloneTrustedVaultClientTest() override = default;
 
-  void SetUp() override {
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    ASSERT_TRUE(test_server_.InitializeAndListen());
-
-    fake_security_domains_server_ =
-        std::make_unique<FakeSecurityDomainsServer>(test_server_.base_url());
-    test_server_.RegisterRequestHandler(base::BindRepeating(
-        &FakeSecurityDomainsServer::HandleRequest,
-        base::Unretained(fake_security_domains_server_.get())));
-    test_server_.StartAcceptingConnections();
-
-    base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-        kTrustedVaultServiceURLSwitch,
-        FakeSecurityDomainsServer::GetServerURL(test_server_.base_url())
-            .spec());
-
-    identity_test_env_.SetAutomaticIssueOfAccessTokens(true);
-  }
+  void SetUp() override { ASSERT_TRUE(temp_dir_.CreateUniqueTempDir()); }
 
   void TearDown() override {
-    ASSERT_TRUE(test_server_.ShutdownAndWaitUntilComplete());
-    base::CommandLine::ForCurrentProcess()->RemoveSwitch(
-        kTrustedVaultServiceURLSwitch);
     // Make sure to run all pending deletions.
     task_environment_.RunUntilIdle();
   }
@@ -146,8 +105,8 @@ class StandaloneTrustedVaultClientTest : public testing::Test {
         kKeychainAccessGroupPrefix,
 #endif
         SecurityDomainId::kChromeSync,
-        /*base_dir=*/temp_dir_.GetPath(), identity_test_env_.identity_manager(),
-        base::MakeRefCounted<network::TestSharedURLLoaderFactory>());
+        /*base_dir=*/temp_dir_.GetPath(),
+        identity_test_env_.identity_manager());
   }
 
   CoreAccountInfo MakeAccountAvailable(const std::string& email) {
@@ -206,156 +165,38 @@ class StandaloneTrustedVaultClientTest : public testing::Test {
   crypto::apple::ScopedFakeKeychainV2 fake_keychain_{kKeychainAccessGroup};
 #endif
   base::test::TaskEnvironment task_environment_;
-  net::EmbeddedTestServer test_server_;
   base::ScopedTempDir temp_dir_;
-  std::unique_ptr<FakeSecurityDomainsServer> fake_security_domains_server_;
   signin::IdentityTestEnvironment identity_test_env_;
 };
 
-TEST_F(StandaloneTrustedVaultClientTest, ShouldPreEnrollOnStartup) {
-  std::unique_ptr<StandaloneTrustedVaultClient> client = CreateClient();
-  CoreAccountInfo account_info = MakeAccountAvailable(kTestEmail);
-  // During pre-enrollment (when only constant keys exist), iCloud Keychain
-  // recovery factor registration is not supported, so only physical device
-  // recovery factor is registered.
-  WaitForIdle(client.get());
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(), 1);
-  EXPECT_TRUE(fake_security_domains_server_->AllMembersHaveKey(
-      GetConstantTrustedVaultKey()));
-
-  EXPECT_THAT(FetchKeys(client.get(), account_info), IsEmpty());
-  EXPECT_GT(fake_security_domains_server_->GetCurrentEpoch(), 0);
-  EXPECT_THAT(fake_security_domains_server_->GetAllTrustedVaultKeys(),
-              ElementsAre(GetConstantTrustedVaultKey()));
-}
-
 TEST_F(StandaloneTrustedVaultClientTest,
-       ShouldFallbackToKeyRetrievalWhenPreEnrollmentRejected) {
-  const std::vector<uint8_t> kServerKey = {1, 2, 3, 4};
-  const int kServerEpoch = 10;
-  fake_security_domains_server_->ResetDataToState({kServerKey}, kServerEpoch);
+       ShouldKeepKeysLocallyWithoutConnection) {
+  const std::vector<uint8_t> kKey = {1, 2, 3, 4};
 
   std::unique_ptr<StandaloneTrustedVaultClient> client = CreateClient();
   CoreAccountInfo account_info = MakeAccountAvailable(kTestEmail);
   WaitForIdle(client.get());
-
-  // Background pre-enrollment registration was rejected with
-  // kLocalDataObsolete.
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(), 0);
   EXPECT_THAT(FetchKeys(client.get(), account_info), IsEmpty());
 
-  // Fallback key retrieval via StoreKeys resolves error and registers factors.
   MockTrustedVaultClientObserver observer;
   client->AddObserver(&observer);
 
   EXPECT_CALL(observer, OnTrustedVaultKeysChanged);
-  StoreKeys(client.get(), account_info.gaia, {kServerKey}, kServerEpoch);
+  StoreKeys(client.get(), account_info.gaia, {kKey}, /*last_key_version=*/1);
   WaitForIdle(client.get());
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(),
-            kDefaultExpectedMemberCount);
-  EXPECT_TRUE(fake_security_domains_server_->AllMembersHaveKey(kServerKey));
+  EXPECT_THAT(FetchKeys(client.get(), account_info), ElementsAre(kKey));
 
-  EXPECT_THAT(FetchKeys(client.get(), account_info), ElementsAre(kServerKey));
-}
-
-// TODO(crbug.com/543720939): Flaky on Mac.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_ShouldFollowKeyRotationOnUserEnrolment \
-  DISABLED_ShouldFollowKeyRotationOnUserEnrolment
-#else
-#define MAYBE_ShouldFollowKeyRotationOnUserEnrolment \
-  ShouldFollowKeyRotationOnUserEnrolment
-#endif
-TEST_F(StandaloneTrustedVaultClientTest,
-       MAYBE_ShouldFollowKeyRotationOnUserEnrolment) {
-  std::unique_ptr<StandaloneTrustedVaultClient> client = CreateClient();
-  CoreAccountInfo account_info = MakeAccountAvailable(kTestEmail);
-  WaitForIdle(client.get());
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(), 1);
-  EXPECT_TRUE(fake_security_domains_server_->AllMembersHaveKey(
-      GetConstantTrustedVaultKey()));
-
-  // FetchKeys() returns empty when no non-constant keys exist on the server.
-  // Because the server responds with kNoNewKeys, the connection records a
-  // failed request and throttles subsequent requests for kThrottlingDuration.
-  // We advance time past the throttling interval so post-rotation requests
-  // are not blocked.
-  ASSERT_THAT(FetchKeys(client.get(), account_info), IsEmpty());
-  task_environment_.FastForwardBy(
-      TrustedVaultThrottlingConnectionImpl::kThrottlingDuration +
-      base::Seconds(1));
-
-  // Mimic user enrolment by rotating the server side key and marking local keys
-  // as stale.
-  std::vector<uint8_t> new_epoch_key =
-      fake_security_domains_server_->RotateTrustedVaultKey(
-          GetConstantTrustedVaultKey());
+  // Stale keys are still returned from local storage.
   EXPECT_TRUE(MarkLocalKeysAsStale(client.get(), account_info));
+  EXPECT_THAT(FetchKeys(client.get(), account_info), ElementsAre(kKey));
 
-  // TODO(crbug.com/541108964): consider notifying observers when FetchKeys()
-  // downloads new keys from the server so that observer expectations can be
-  // tested here.
-  // FetchKeys() should follow the server side key rotation and register local
-  // factors if applicable.
-  EXPECT_THAT(FetchKeys(client.get(), account_info),
-              ElementsAre(new_epoch_key));
-  WaitForIdle(client.get());
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(),
-            kDefaultExpectedMemberCount);
-  EXPECT_TRUE(fake_security_domains_server_->AllMembersHaveKey(new_epoch_key));
-}
-
-// TODO(crbug.com/544711435): Flaky on Mac.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_ShouldResolveErrorAndRegisterFactorsAfterFollowingKeyRotation \
-  DISABLED_ShouldResolveErrorAndRegisterFactorsAfterFollowingKeyRotation
-#else
-#define MAYBE_ShouldResolveErrorAndRegisterFactorsAfterFollowingKeyRotation \
-  ShouldResolveErrorAndRegisterFactorsAfterFollowingKeyRotation
-#endif
-TEST_F(StandaloneTrustedVaultClientTest,
-       MAYBE_ShouldResolveErrorAndRegisterFactorsAfterFollowingKeyRotation) {
-  const std::vector<uint8_t> kLocalKeyV1 = {1, 1, 1, 1};
-  const std::vector<uint8_t> kRemoteKeyV2 = {2, 2, 2, 2};
-  const int kLocalEpochV1 = 1;
-  const int kRemoteEpochV2 = 2;
-
-  fake_security_domains_server_->ResetDataToState({kLocalKeyV1, kRemoteKeyV2},
-                                                  kRemoteEpochV2);
-
-  std::unique_ptr<StandaloneTrustedVaultClient> client = CreateClient();
-  CoreAccountInfo account_info = MakeAccountAvailable(kTestEmail);
-  WaitForIdle(client.get());
-
-  MockTrustedVaultClientObserver observer;
-  client->AddObserver(&observer);
-
-  EXPECT_CALL(observer, OnTrustedVaultKeysChanged);
-  StoreKeys(client.get(), account_info.gaia, {kLocalKeyV1}, kLocalEpochV1);
-  WaitForIdle(client.get());
-  ASSERT_THAT(FetchKeys(client.get(), account_info), ElementsAre(kLocalKeyV1));
-
-  // Attempting to add a recovery method with stale local key fails with
-  // kLocalDataObsolete.
   std::unique_ptr<SecureBoxKeyPair> key_pair =
       SecureBoxKeyPair::GenerateRandom();
   AddTrustedRecoveryMethod(client.get(), account_info.gaia,
                            key_pair->public_key().ExportToBytes(),
                            /*method_type_hint=*/3);
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(), 0);
 
-  // Storing retrieved remote keys resolves kLocalDataObsolete and
-  // auto-registers the default recovery factors.
-  EXPECT_CALL(observer, OnTrustedVaultKeysChanged);
-  StoreKeys(client.get(), account_info.gaia, {kLocalKeyV1, kRemoteKeyV2},
-            kRemoteEpochV2);
-  WaitForIdle(client.get());
-  EXPECT_EQ(fake_security_domains_server_->GetMemberCount(),
-            kDefaultExpectedMemberCount);
-  EXPECT_TRUE(fake_security_domains_server_->AllMembersHaveKey(kRemoteKeyV2));
-
-  EXPECT_THAT(FetchKeys(client.get(), account_info),
-              ElementsAre(kLocalKeyV1, kRemoteKeyV2));
+  client->RemoveObserver(&observer);
 }
 
 TEST_F(StandaloneTrustedVaultClientTest,

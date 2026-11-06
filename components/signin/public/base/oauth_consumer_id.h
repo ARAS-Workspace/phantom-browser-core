@@ -64,7 +64,7 @@ enum class OAuthConsumerId {
   kSafeBrowsing = 39,
   kTailoredSecurityService = 40,
   kLensOverlayQueryController = 41,
-  kTrustedVaultFrontend = 42,
+  // kTrustedVaultFrontend = 42, // Removed due to deprecation.
   kFeedNetwork = 43,
   kAutofillPayments = 44,
   kPaymentsAccessTokenFetcher = 45,
@@ -86,14 +86,14 @@ enum class OAuthConsumerId {
   kCryptAuthClient = 61,
   kAmbientMode = 62,
   kProfileDownloader = 63,
-  kDataSharingAndroid = 64,
+  // kDataSharingAndroid = 64, // Removed due to deprecation.
   kExtensionsIdentityAPI = 65,
   kManta = 66,
   kChromeMemex = 67,
   // kDevtoolsAida = 68, // Removed due to deprecation.
   kChromeOsBabelOrca = 69,
   kChromeOsBocaSchoolToolsAuth = 70,
-  kSharedDataPreview = 71,
+  // kSharedDataPreview = 71, // Removed due to deprecation.
   kAccessCodeCastDiscovery = 72,
   kAuthServiceDriveApi = 73,
   kAuthServiceCalendar = 74,

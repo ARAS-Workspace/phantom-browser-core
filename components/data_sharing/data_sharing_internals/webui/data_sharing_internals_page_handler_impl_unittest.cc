@@ -9,7 +9,6 @@
 #include "base/run_loop.h"
 #include "base/test/task_environment.h"
 #include "base/types/expected.h"
-#include "components/data_sharing/public/data_sharing_network_loader.h"
 #include "components/data_sharing/public/data_sharing_service.h"
 #include "components/data_sharing/public/group_data.h"
 #include "components/data_sharing/public/logger_common.mojom.h"

@@ -25,7 +25,7 @@ class DataSharingService;
 class DataSharingServiceFactory : public ProfileKeyedServiceFactory {
  public:
   // Gets the DataSharingService for the profile. Returns a non-null, but empty
-  // implementation if the feature isn't enabled.
+  // implementation.
   static DataSharingService* GetForProfile(Profile* profile);
 
   // Gets the lazy singleton instance of DataSharingServiceFactory.

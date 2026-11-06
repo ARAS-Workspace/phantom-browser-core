@@ -111,10 +111,7 @@ source_set("interactive_ui_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-  sources = [
-    "saved_tab_group_interactive_uitest.cc",
-    "shared_tab_group_interactive_uitest.cc",
-  ]
+  sources = [ "saved_tab_group_interactive_uitest.cc" ]
 
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 

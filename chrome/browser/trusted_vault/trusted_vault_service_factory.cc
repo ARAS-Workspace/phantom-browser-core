@@ -6,17 +6,15 @@
 
 #include <memory>
 
+#include "base/files/file_path.h"
 #include "base/functional/callback.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
+#include "components/trusted_vault/standalone_trusted_vault_client.h"
 #include "components/trusted_vault/trusted_vault_server_constants.h"
 #include "components/trusted_vault/trusted_vault_service.h"
 #include "device/fido/public/features.h"
-
-#include "base/files/file_path.h"
-#include "components/trusted_vault/standalone_trusted_vault_client.h"
-#include "content/public/browser/storage_partition.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/common/chrome_version.h"
@@ -36,9 +34,7 @@ CreateChromeSyncStandaloneTrustedVaultClient(Profile* profile) {
 #endif
       trusted_vault::SecurityDomainId::kChromeSync,
       /*base_dir=*/profile->GetPath(),
-      IdentityManagerFactory::GetForProfile(profile),
-      profile->GetDefaultStoragePartition()
-          ->GetURLLoaderFactoryForBrowserProcess());
+      IdentityManagerFactory::GetForProfile(profile));
 }
 
 std::unique_ptr<trusted_vault::TrustedVaultClient>

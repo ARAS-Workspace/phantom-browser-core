@@ -25,7 +25,6 @@ class EmptyDataSharingService : public DataSharingService {
   bool IsEmptyService() override;
   void AddObserver(Observer* observer) override;
   void RemoveObserver(Observer* observer) override;
-  DataSharingNetworkLoader* GetDataSharingNetworkLoader() override;
   base::WeakPtr<syncer::DataTypeControllerDelegate>
   GetCollaborationGroupControllerDelegate() override;
   bool IsGroupDataModelLoaded() override;
@@ -83,17 +82,7 @@ class EmptyDataSharingService : public DataSharingService {
       int size,
       base::OnceCallback<void(const gfx::Image&)> callback,
       image_fetcher::ImageFetcher* image_fetcher) override;
-  void SetSDKDelegate(
-      std::unique_ptr<DataSharingSDKDelegate> sdk_delegate) override;
-  DataSharingSDKDelegate* GetSDKDelegate() override;
-  void SetUIDelegate(
-      std::unique_ptr<DataSharingUIDelegate> ui_delegate) override;
-  DataSharingUIDelegate* GetUiDelegate() override;
   Logger* GetLogger() override;
-  void AddGroupDataForTesting(GroupData group_data) override;
-  void SetPreviewServerProxyForTesting(
-      std::unique_ptr<PreviewServerProxy> preview_server_proxy) override;
-  PreviewServerProxy* GetPreviewServerProxyForTesting() override;
   void OnCollaborationGroupRemoved(const GroupId& group_id) override;
   bool IsContextIdShared(const ContextId& context_id) override;
 };
