@@ -13,7 +13,6 @@
 #include "base/functional/bind.h"
 #include "base/json/json_reader.h"
 #include "base/memory/raw_ptr.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/time/tick_clock.h"
@@ -135,29 +134,6 @@ class ResponseInjector {
   std::string results_;
 };
 
-const std::string kTestAccessToken = "1/fFAGRNJru1FTz70BzhT3Zg";
-const std::string kTestAccessTokenHandle = "1/kjhH87dfgkj87Hhj5KJkjZ";
-const std::string kTestRefreshToken =
-    "1/6BMfW9j53gdGImsixUH6kU5RsR4zwI9lUVX-tqf8JXQ";
-const std::string kTestUserEmail = "a_user@gmail.com";
-const std::string kTestUserId = "8675309";
-const int kTestExpiresIn = 3920;
-
-const std::string kDummyGetTokensResult =
-    "{\"access_token\":\"" + kTestAccessToken + "\","
-    "\"expires_in\":" + base::NumberToString(kTestExpiresIn) + ","
-    "\"refresh_token\":\"" + kTestRefreshToken + "\"}";
-
-const std::string kDummyRefreshTokenResult =
-    "{\"access_token\":\"" + kTestAccessToken + "\","
-    "\"expires_in\":" + base::NumberToString(kTestExpiresIn) + "}";
-
-const std::string kDummyUserInfoResult =
-    "{\"email\":\"" + kTestUserEmail + "\"}";
-
-const std::string kDummyUserIdResult =
-    "{\"id\":\"" + kTestUserId + "\"}";
-
 const std::string kDummyFullUserInfoResult =
     "{"
       "\"family_name\": \"Bar\", "
@@ -169,16 +145,6 @@ const std::string kDummyFullUserInfoResult =
       "\"given_name\": \"Foo\", "
       "\"id\": \"12345678901234567890\""
     "}";
-
-const std::string kDummyTokenInfoResult =
-    "{\"issued_to\": \"1234567890.apps.googleusercontent.com\","
-    "\"audience\": \"1234567890.apps.googleusercontent.com\","
-    "\"scope\": \"https://googleapis.com/oauth2/v2/tokeninfo\","
-    "\"expires_in\":" + base::NumberToString(kTestExpiresIn) + "}";
-
-const std::string kDummyTokenHandleInfoResult =
-    "{\"audience\": \"1234567890.apps.googleusercontent.com\","
-    "\"expires_in\":" + base::NumberToString(kTestExpiresIn) + "}";
 
 const std::string kDummyAccountCapabilitiesResult =
     "{\"accountCapabilities\": ["
@@ -198,16 +164,7 @@ class MockGaiaOAuthClientDelegate : public gaia::GaiaOAuthClient::Delegate {
   MockGaiaOAuthClientDelegate& operator=(const MockGaiaOAuthClientDelegate&) =
       delete;
 
-  MOCK_METHOD3(OnGetTokensResponse,
-               void(const std::string& refresh_token,
-                    const std::string& access_token,
-                    int expires_in_seconds));
-  MOCK_METHOD2(OnRefreshTokenResponse,
-               void(const std::string& access_token, int expires_in_seconds));
-  MOCK_METHOD1(OnGetUserEmailResponse, void(const std::string& user_email));
-  MOCK_METHOD1(OnGetUserIdResponse, void(const std::string& user_id));
   MOCK_METHOD1(OnGetUserInfoResponse, void(const base::DictValue& user_info));
-  MOCK_METHOD1(OnGetTokenInfoResponse, void(const base::DictValue& token_info));
   MOCK_METHOD1(OnGetAccountCapabilitiesResponse,
                void(const base::DictValue& account_capabilities));
   MOCK_METHOD0(OnOAuthError, void());
@@ -218,12 +175,6 @@ class GaiaOAuthClientTest : public testing::Test {
  protected:
   GaiaOAuthClientTest()
       : task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME) {}
-
-  void SetUp() override {
-    client_info_.client_id = "test_client_id";
-    client_info_.client_secret = "test_client_secret";
-    client_info_.redirect_uri = "test_redirect_uri";
-  }
 
   scoped_refptr<network::SharedURLLoaderFactory> GetSharedURLLoaderFactory() {
     return base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
@@ -240,8 +191,6 @@ class GaiaOAuthClientTest : public testing::Test {
 
   base::test::TaskEnvironment task_environment_;
   network::TestURLLoaderFactory url_loader_factory_;
-
-  OAuthClientInfo client_info_;
 };
 
 class GaiaOAuthClientGetAccountCapabilitiesTest
@@ -286,7 +235,7 @@ TEST_F(GaiaOAuthClientTest, NetworkFailure) {
   injector.set_max_failure_count(4);
 
   GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", 2, &delegate);
+  auth.GetUserInfo("access_token", 2, &delegate);
   FlushNetwork();
 }
 
@@ -294,16 +243,15 @@ TEST_F(GaiaOAuthClientTest, NetworkFailureRecover) {
   int response_code = net::HTTP_INTERNAL_SERVER_ERROR;
 
   MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetTokensResponse(kTestRefreshToken, kTestAccessToken,
-      kTestExpiresIn)).Times(1);
+  EXPECT_CALL(delegate, OnGetUserInfoResponse(_)).Times(1);
 
   ResponseInjector injector(&url_loader_factory_);
   injector.set_response_code(response_code);
   injector.set_max_failure_count(4);
-  injector.set_results(kDummyGetTokensResult);
+  injector.set_results(kDummyFullUserInfoResult);
 
   GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", -1, &delegate);
+  auth.GetUserInfo("access_token", -1, &delegate);
   FlushNetwork();
 }
 
@@ -312,19 +260,17 @@ TEST_F(GaiaOAuthClientTest, NetworkFailureRecoverBackoff) {
   int response_code = net::HTTP_INTERNAL_SERVER_ERROR;
 
   MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetTokensResponse(kTestRefreshToken, kTestAccessToken,
-                                            kTestExpiresIn))
-      .Times(1);
+  EXPECT_CALL(delegate, OnGetUserInfoResponse(_)).Times(1);
 
   ResponseInjector injector(&url_loader_factory_);
   injector.set_response_code(response_code);
   injector.set_max_failure_count(21);
-  injector.set_results(kDummyGetTokensResult);
+  injector.set_results(kDummyFullUserInfoResult);
 
   base::TimeTicks start = task_environment_.GetMockTickClock()->NowTicks();
 
   GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", -1, &delegate);
+  auth.GetUserInfo("access_token", -1, &delegate);
   FlushNetwork();
 
   // Default params are:
@@ -348,104 +294,10 @@ TEST_F(GaiaOAuthClientTest, OAuthFailure) {
   ResponseInjector injector(&url_loader_factory_);
   injector.set_response_code(response_code);
   injector.set_max_failure_count(-1);
-  injector.set_results(kDummyGetTokensResult);
+  injector.set_results(kDummyFullUserInfoResult);
 
   GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", -1, &delegate);
-  FlushNetwork();
-}
-
-
-TEST_F(GaiaOAuthClientTest, GetTokensSuccess) {
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetTokensResponse(kTestRefreshToken, kTestAccessToken,
-      kTestExpiresIn)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyGetTokensResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", -1, &delegate);
-  FlushNetwork();
-}
-
-TEST_F(GaiaOAuthClientTest, GetTokensAfterNetworkFailure) {
-  int response_code = net::HTTP_INTERNAL_SERVER_ERROR;
-
-  MockGaiaOAuthClientDelegate failure_delegate;
-  EXPECT_CALL(failure_delegate, OnNetworkError(response_code)).Times(1);
-
-  MockGaiaOAuthClientDelegate success_delegate;
-  EXPECT_CALL(success_delegate, OnGetTokensResponse(kTestRefreshToken,
-      kTestAccessToken, kTestExpiresIn)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_response_code(response_code);
-  injector.set_max_failure_count(4);
-  injector.set_results(kDummyGetTokensResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", 2, &failure_delegate);
-  FlushNetwork();
-  auth.GetTokensFromAuthCode(client_info_, "auth_code", -1, &success_delegate);
-  FlushNetwork();
-}
-
-TEST_F(GaiaOAuthClientTest, RefreshTokenSuccess) {
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnRefreshTokenResponse(kTestAccessToken,
-      kTestExpiresIn)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyRefreshTokenResult);
-  injector.set_complete_immediately(false);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.RefreshToken(client_info_, "refresh_token", std::vector<std::string>(),
-                    -1, &delegate);
-  EXPECT_THAT(injector.GetUploadData(), Not(HasSubstr("scope")));
-  injector.Finish();
-  FlushNetwork();
-}
-
-TEST_F(GaiaOAuthClientTest, RefreshTokenDownscopingSuccess) {
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnRefreshTokenResponse(kTestAccessToken,
-      kTestExpiresIn)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyRefreshTokenResult);
-  injector.set_complete_immediately(false);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.RefreshToken(client_info_, "refresh_token",
-                    std::vector<std::string>(1, "scope4test"), -1, &delegate);
-  EXPECT_THAT(injector.GetUploadData(), HasSubstr("&scope=scope4test"));
-  injector.Finish();
-  FlushNetwork();
-}
-
-TEST_F(GaiaOAuthClientTest, GetUserEmail) {
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetUserEmailResponse(kTestUserEmail)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyUserInfoResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetUserEmail("access_token", 1, &delegate);
-  FlushNetwork();
-}
-
-TEST_F(GaiaOAuthClientTest, GetUserId) {
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetUserIdResponse(kTestUserId)).Times(1);
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyUserIdResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetUserId("access_token", 1, &delegate);
+  auth.GetUserInfo("access_token", -1, &delegate);
   FlushNetwork();
 }
 
@@ -470,48 +322,6 @@ TEST_F(GaiaOAuthClientTest, GetUserInfo) {
   DCHECK(expected_value);
   ASSERT_TRUE(expected_value->is_dict());
   EXPECT_EQ(expected_value->GetDict(), captured_result);
-}
-
-TEST_F(GaiaOAuthClientTest, GetTokenInfo) {
-  base::DictValue captured_result;
-
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetTokenInfoResponse(_))
-      .WillOnce([&](const base::DictValue& result) {
-        captured_result = result.Clone();
-      });
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyTokenInfoResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokenInfo("some_token", 1, &delegate);
-  FlushNetwork();
-
-  std::string* issued_to = captured_result.FindString("issued_to");
-  ASSERT_NE(issued_to, nullptr);
-  ASSERT_EQ("1234567890.apps.googleusercontent.com", *issued_to);
-}
-
-TEST_F(GaiaOAuthClientTest, GetTokenHandleInfo) {
-  base::DictValue captured_result;
-
-  MockGaiaOAuthClientDelegate delegate;
-  EXPECT_CALL(delegate, OnGetTokenInfoResponse(_))
-      .WillOnce([&](const base::DictValue& result) {
-        captured_result = result.Clone();
-      });
-
-  ResponseInjector injector(&url_loader_factory_);
-  injector.set_results(kDummyTokenHandleInfoResult);
-
-  GaiaOAuthClient auth(GetSharedURLLoaderFactory());
-  auth.GetTokenHandleInfo("some_handle", 1, &delegate);
-  FlushNetwork();
-
-  std::string* audience = captured_result.FindString("audience");
-  ASSERT_NE(audience, nullptr);
-  ASSERT_EQ("1234567890.apps.googleusercontent.com", *audience);
 }
 
 TEST_P(GaiaOAuthClientGetAccountCapabilitiesTest, GetAccountCapabilities) {

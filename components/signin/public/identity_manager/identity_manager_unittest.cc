@@ -2170,6 +2170,30 @@ TEST_F(IdentityManagerTest, OnNetworkInitialized) {
   run_loop.Run();
 }
 
+TEST_F(IdentityManagerTest, OnNetworkInitializedAvoidsCookieListener) {
+  set_avoid_list_accounts_requests(true);
+  RecreateIdentityManager();
+
+  auto test_cookie_manager = std::make_unique<network::TestCookieManager>();
+  network::TestCookieManager* test_cookie_manager_ptr =
+      test_cookie_manager.get();
+  signin_client()->set_cookie_manager(std::move(test_cookie_manager));
+
+  identity_manager()->OnNetworkInitialized();
+  base::RunLoop().RunUntilIdle();
+
+  auto cookie = net::CanonicalCookie::CreateUnsafeCookieForTesting(
+      "SAPISID", std::string(), ".google.com", "/", base::Time(), base::Time(),
+      base::Time(), base::Time(), /*secure=*/true, false,
+      net::CookieSameSite::NO_RESTRICTION, net::COOKIE_PRIORITY_DEFAULT,
+      net::CookieSourceType::kOther);
+  test_cookie_manager_ptr->DispatchCookieChange(net::CookieChangeInfo(
+      *cookie, net::CookieAccessResult(), net::CookieChangeCause::INSERTED));
+  base::RunLoop().RunUntilIdle();
+
+  EXPECT_EQ(0, test_url_loader_factory()->NumPending());
+}
+
 TEST_F(IdentityManagerTest,
        BatchChangeObserversAreNotifiedOnCredentialsUpdate) {
   identity_manager()->GetAccountTrackerService()->SeedAccountInfo(kTestGaiaId,

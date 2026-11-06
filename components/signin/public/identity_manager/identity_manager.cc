@@ -410,7 +410,9 @@ void IdentityManager::RemoveDiagnosticsObserver(DiagnosticsObserver* observer) {
 }
 
 void IdentityManager::OnNetworkInitialized() {
-  gaia_cookie_manager_service_->InitCookieListener();
+  if (!avoid_list_accounts_requests_) {
+    gaia_cookie_manager_service_->InitCookieListener();
+  }
   account_fetcher_service_->OnNetworkInitialized();
   // Trigger ListAccounts once the network is initialized to ensure the accounts
   // in cookie jar are up to date.

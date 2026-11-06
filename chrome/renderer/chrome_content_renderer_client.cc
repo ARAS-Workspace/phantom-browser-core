@@ -65,7 +65,6 @@
 #include "chrome/renderer/net/net_error_helper.h"
 #include "chrome/renderer/plugins/non_loadable_plugin_placeholder.h"
 #include "chrome/renderer/plugins/pdf_plugin_placeholder.h"
-#include "chrome/renderer/trusted_vault_encryption_keys_extension.h"
 #include "chrome/renderer/url_loader_throttle_provider_impl.h"
 #include "chrome/renderer/v8_unwinder.h"
 #include "chrome/renderer/websocket_handshake_throttle_provider_impl.h"
@@ -523,7 +522,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
   new paint_preview::PaintPreviewRecorderImpl(render_frame);
 #endif
 
-  TrustedVaultEncryptionKeysExtension::Create(render_frame);
   GoogleAccountsPrivateApiExtension::Create(render_frame);
 
   if (render_frame->IsMainFrame())

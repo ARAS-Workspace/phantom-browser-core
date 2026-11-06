@@ -582,10 +582,6 @@ void FakeGaia::Initialize() {
       gaia_urls->GetCheckConnectionInfoURLWithSource(std::string()),
       HandleGetCheckConnectionInfo);
 
-  // Handles ReAuth API token fetch call.
-  REGISTER_RESPONSE_HANDLER(gaia_urls->reauth_api_url(),
-                            HandleGetReAuthProofToken);
-
   // Handles API for browser tests to manually remove local accounts.
   REGISTER_RESPONSE_HANDLER(
       gaia_urls->gaia_url().Resolve(kFakeRemoveLocalAccountPath),
@@ -1078,52 +1074,6 @@ void FakeGaia::HandleSAMLRedirect(const HttpRequest& request,
 void FakeGaia::HandleGetCheckConnectionInfo(const HttpRequest& request,
                                             BasicHttpResponse* http_response) {
   FormatOkJSONResponse(base::ListValue(), http_response);
-}
-
-void FakeGaia::HandleGetReAuthProofToken(const HttpRequest& request,
-                                         BasicHttpResponse* http_response) {
-  base::DictValue response_dict;
-  base::DictValue error;
-
-  switch (next_reauth_status_) {
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kSuccess:
-      response_dict.Set("encodedRapt", "abc123");
-      FormatOkJSONResponse(response_dict, http_response);
-      break;
-
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kInvalidGrant:
-      error.Set("message", "INVALID_GRANT");
-      response_dict.Set("error", std::move(error));
-      FormatJSONResponse(response_dict, net::HTTP_BAD_REQUEST, http_response);
-      break;
-
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kInvalidRequest:
-      error.Set("message", "INVALID_REQUEST");
-      response_dict.Set("error", std::move(error));
-      FormatJSONResponse(response_dict, net::HTTP_BAD_REQUEST, http_response);
-      break;
-
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kUnauthorizedClient:
-      error.Set("message", "UNAUTHORIZED_CLIENT");
-      response_dict.Set("error", std::move(error));
-      FormatJSONResponse(response_dict, net::HTTP_FORBIDDEN, http_response);
-      break;
-
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kInsufficientScope:
-      error.Set("message", "INSUFFICIENT_SCOPE");
-      response_dict.Set("error", std::move(error));
-      FormatJSONResponse(response_dict, net::HTTP_FORBIDDEN, http_response);
-      break;
-
-    case GaiaAuthConsumer::ReAuthProofTokenStatus::kCredentialNotSet:
-      response_dict.Set("error", std::move(error));
-      FormatJSONResponse(response_dict, net::HTTP_FORBIDDEN, http_response);
-      break;
-
-    default:
-      LOG(FATAL) << "Unsupported ReAuthProofTokenStatus: "
-                 << static_cast<int>(next_reauth_status_);
-  }
 }
 
 void FakeGaia::HandleMultilogin(const HttpRequest& request,

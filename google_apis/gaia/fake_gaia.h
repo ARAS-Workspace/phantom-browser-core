@@ -247,11 +247,6 @@ class FakeGaia {
   // Returns an email that is filled into the the Email field (if any).
   const std::string& prefilled_email() { return prefilled_email_; }
 
-  void SetNextReAuthStatus(
-      GaiaAuthConsumer::ReAuthProofTokenStatus next_status) {
-    next_reauth_status_ = next_status;
-  }
-
   // If set, HandleEmbeddedSetupChromeos will serve a hidden iframe that points
   // to |frame_src_url|.
   void SetIframeOnEmbeddedSetupChromeosUrl(const GURL& frame_src_url) {
@@ -373,9 +368,6 @@ class FakeGaia {
   void HandleGetCheckConnectionInfo(
       const net::test_server::HttpRequest& request,
       net::test_server::BasicHttpResponse* http_response);
-  void HandleGetReAuthProofToken(
-      const net::test_server::HttpRequest& request,
-      net::test_server::BasicHttpResponse* http_response);
   // HTTP handler for /OAuth/Multilogin.
   void HandleMultilogin(const net::test_server::HttpRequest& request,
                         net::test_server::BasicHttpResponse* http_response);
@@ -428,8 +420,6 @@ class FakeGaia {
   std::string is_device_owner_;
   std::string reauth_request_token_;
   std::string passwordless_support_level_;
-  GaiaAuthConsumer::ReAuthProofTokenStatus next_reauth_status_ =
-      GaiaAuthConsumer::ReAuthProofTokenStatus::kSuccess;
   GURL embedded_setup_chromeos_iframe_url_;
   base::queue<MultiloginCall> multilogin_calls_;
 };

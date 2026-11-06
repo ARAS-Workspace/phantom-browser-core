@@ -13,7 +13,6 @@
 #include "base/base64url.h"
 #include "base/functional/bind.h"
 #include "base/json/json_reader.h"
-#include "base/json/json_writer.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/metrics/user_metrics.h"
@@ -48,7 +47,6 @@
 namespace {
 
 constexpr char kFormEncodedContentType[] = "application/x-www-form-urlencoded";
-constexpr char kJsonContentType[] = "application/json;charset=UTF-8";
 
 std::unique_ptr<const GaiaAuthConsumer::ClientOAuthResult>
 ExtractOAuth2TokenPairResponse(const std::string& data) {
@@ -120,32 +118,6 @@ GetTokenRevocationStatusFromResponseData(const std::string& data,
   return GaiaAuthConsumer::TokenRevocationStatus::kUnknownError;
 }
 
-base::DictValue ParseJSONDict(const std::string& data) {
-  return base::JSONReader::ReadDict(data, base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-      .value_or(base::DictValue());
-}
-
-GaiaAuthConsumer::ReAuthProofTokenStatus ErrorMessageToReAuthProofTokenStatus(
-    const std::string& message) {
-  if (message == "INVALID_REQUEST") {
-    return GaiaAuthConsumer::ReAuthProofTokenStatus::kInvalidRequest;
-  }
-  if (message == "INVALID_GRANT") {
-    return GaiaAuthConsumer::ReAuthProofTokenStatus::kInvalidGrant;
-  }
-  if (message == "UNAUTHORIZED_CLIENT") {
-    return GaiaAuthConsumer::ReAuthProofTokenStatus::kUnauthorizedClient;
-  }
-  if (message == "INSUFFICIENT_SCOPE") {
-    return GaiaAuthConsumer::ReAuthProofTokenStatus::kInsufficientScope;
-  }
-  if (message == "CREDENTIAL_NOT_SET") {
-    return GaiaAuthConsumer::ReAuthProofTokenStatus::kCredentialNotSet;
-  }
-  DLOG(ERROR) << "Unrecognized ReauthAPI error message: " + message;
-  return GaiaAuthConsumer::ReAuthProofTokenStatus::kUnknownError;
-}
-
 }  // namespace
 
 namespace gaia {
@@ -207,8 +179,7 @@ GaiaAuthFetcher::GaiaAuthFetcher(
       logout_gurl_(GaiaUrls::GetInstance()->LogOutURLWithSource(source_)),
       get_check_connection_info_url_(
           GaiaUrls::GetInstance()->GetCheckConnectionInfoURLWithSource(
-              source_)),
-      reauth_api_url_(GaiaUrls::GetInstance()->reauth_api_url()) {}
+              source_)) {}
 
 GaiaAuthFetcher::~GaiaAuthFetcher() = default;
 
@@ -226,11 +197,6 @@ void GaiaAuthFetcher::SetPendingFetch(bool pending_fetch) {
 }
 bool GaiaAuthFetcher::IsMultiloginUrl(const GURL& url) {
   return base::StartsWith(url.spec(), oauth_multilogin_gurl_.spec(),
-                          base::CompareCase::SENSITIVE);
-}
-
-bool GaiaAuthFetcher::IsReAuthApiUrl(const GURL& url) {
-  return base::StartsWith(url.spec(), reauth_api_url_.spec(),
                           base::CompareCase::SENSITIVE);
 }
 
@@ -638,68 +604,6 @@ void GaiaAuthFetcher::StartLogOut() {
       network::mojom::CredentialsMode::kInclude, traffic_annotation);
 }
 
-void GaiaAuthFetcher::StartCreateReAuthProofTokenForParent(
-    const std::string& child_oauth_access_token,
-    const GaiaId& parent_obfuscated_gaia_id,
-    const std::string& parent_credential) {
-  // Create the post body.
-  base::DictValue post_body_value;
-  post_body_value.Set("credentialType", "password");
-  post_body_value.Set("credential", parent_credential);
-  std::string post_body;
-  bool write_success = base::JSONWriter::Write(post_body_value, &post_body);
-  DCHECK(write_success);
-
-  // Create the Authorization header.
-  net::HttpRequestHeaders headers;
-  headers.SetHeader("Authorization", "Bearer " + child_oauth_access_token);
-  headers.SetHeader("Content-Type", kJsonContentType);
-
-  // Create the traffic annotation.
-  net::NetworkTrafficAnnotationTag traffic_annotation(
-      net::DefineNetworkTrafficAnnotation(
-          "gaia_create_reauth_proof_token_for_parent", R"(
-        semantics {
-          sender: "Chrome - Google authentication API"
-          description:
-            "This request exchanges a set of credentials for a parent-type "
-            "Google Family Link user for a ReAuth Proof Token (RAPT), "
-            "the successful receipt of which re-authorizes (but explicitly "
-            "does not authenticate) the parent user."
-          trigger:
-            "This request is triggered when a Chrome service needs to "
-            "re-authorize a parent-type Google Family Link user given the "
-            "parent's login credential."
-          data:
-            "The obfuscated GAIA id of the parent, the Google OAuth access "
-            "token of the child account, and the credential to be used to "
-            "reauthorize the user."
-          destination: GOOGLE_OWNED_SERVICE
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be disabled in settings, but if the user "
-            "signs out of Chrome, this request would not be made."
-          chrome_policy {
-            BrowserSignin {
-              BrowserSignin: 0
-            }
-          }
-        })"));
-
-  // Create the ReAuth URL.
-  GURL reauth_url = GaiaUrls::GetInstance()->reauth_api_url().Resolve(
-      parent_obfuscated_gaia_id.ToString() +
-      "/reauthProofTokens?delegationType=unicorn");
-  DCHECK(reauth_url.is_valid());
-
-  // Start the request.
-  CreateAndStartGaiaFetcher(
-      post_body, kJsonContentType, headers, reauth_url,
-      google_apis::GetOmitCredentialsModeForGaiaRequests(), traffic_annotation);
-}
-
 void GaiaAuthFetcher::StartGetCheckConnectionInfo() {
   DCHECK(!fetch_pending_) << "Tried to fetch two things at once!";
 
@@ -829,37 +733,6 @@ void GaiaAuthFetcher::OnLogOutFetched(const std::string& data,
   }
 }
 
-void GaiaAuthFetcher::OnReAuthApiInfoFetched(const std::string& data,
-                                             net::Error net_error,
-                                             int response_code) {
-  if (net_error == net::OK) {
-    base::DictValue response_dict = ParseJSONDict(data);
-
-    if (response_code == net::HTTP_OK) {
-      std::string* rapt_token = response_dict.FindString("encodedRapt");
-      if (!rapt_token) {
-        // This should not happen unless there is a bug on the server,
-        // since if we get HTTP_OK response, we should get a RAPT token.
-        DLOG(ERROR) << "Got HTTP-OK ReauthAPI response with empty RAPT token";
-        consumer_->OnReAuthProofTokenFailure(
-            GaiaAuthConsumer::ReAuthProofTokenStatus::kUnknownError);
-        return;
-      }
-      consumer_->OnReAuthProofTokenSuccess(*rapt_token);
-    } else {
-      const std::string* error_message =
-          response_dict.FindStringByDottedPath("error.message");
-      CHECK(error_message);
-
-      consumer_->OnReAuthProofTokenFailure(
-          ErrorMessageToReAuthProofTokenStatus(*error_message));
-    }
-  } else {
-    consumer_->OnReAuthProofTokenFailure(
-        GaiaAuthConsumer::ReAuthProofTokenStatus::kNetworkError);
-  }
-}
-
 void GaiaAuthFetcher::OnGetCheckConnectionInfoFetched(const std::string& data,
                                                       net::Error net_error,
                                                       int response_code) {
@@ -927,8 +800,6 @@ void GaiaAuthFetcher::DispatchFetchedRequest(const GURL& url,
     OnLogOutFetched(data, net_error, response_code);
   } else if (url == get_check_connection_info_url_) {
     OnGetCheckConnectionInfoFetched(data, net_error, response_code);
-  } else if (IsReAuthApiUrl(url)) {
-    OnReAuthApiInfoFetched(data, net_error, response_code);
   } else {
     NOTREACHED() << "Unknown url: '" << url << "'";
   }

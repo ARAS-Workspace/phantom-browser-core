@@ -136,8 +136,6 @@ TEST_F(GaiaUrlsTest, InitializeDefault_AllUrls) {
             "https://www.googleapis.com/oauth2/v2/tokeninfo");
   EXPECT_EQ(gaia_urls()->oauth2_revoke_url().spec(),
             "https://accounts.google.com/o/oauth2/revoke");
-  EXPECT_EQ(gaia_urls()->reauth_api_url().spec(),
-            "https://www.googleapis.com/reauth/v1beta/users/");
 }
 
 TEST_F(GaiaUrlsTest, InitializeDefault_URLSwitches) {
@@ -211,8 +209,6 @@ TEST_F(GaiaUrlsTest, InitializeDefault_URLSwitches) {
             "https://test-googleapis.com/oauth2/v2/tokeninfo");
   EXPECT_EQ(gaia_urls()->oauth2_revoke_url().spec(),
             "https://test-lso.com/o/oauth2/revoke");
-  EXPECT_EQ(gaia_urls()->reauth_api_url().spec(),
-            "https://test-googleapis.com/reauth/v1beta/users/");
 }
 
 TEST_F(GaiaUrlsTest, InitializeFromConfig_OneUrl) {
@@ -340,8 +336,6 @@ TEST_F(GaiaUrlsTest, InitializeFromConfig_AllUrls) {
             "https://www.exampleapis.com/oauth2/v2/tokeninfo");
   EXPECT_EQ(gaia_urls()->oauth2_revoke_url().spec(),
             "https://accounts.example.com/o/oauth2/revoke");
-  EXPECT_EQ(gaia_urls()->reauth_api_url().spec(),
-            "https://www.exampleapis.com/reauth/v1beta/users/");
 }
 
 TEST_F(GaiaUrlsTest, InitializeFromConfig_AllBaseUrls) {
@@ -418,8 +412,6 @@ TEST_F(GaiaUrlsTest, InitializeFromConfig_AllBaseUrls) {
             "https://www.exampleapis.com/oauth2/v2/tokeninfo");
   EXPECT_EQ(gaia_urls()->oauth2_revoke_url().spec(),
             "https://lso.example.com/o/oauth2/revoke");
-  EXPECT_EQ(gaia_urls()->reauth_api_url().spec(),
-            "https://www.exampleapis.com/reauth/v1beta/users/");
 }
 
 TEST_F(GaiaUrlsTest, InitializeDefault_ListAccountsFormat) {

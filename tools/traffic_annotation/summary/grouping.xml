@@ -261,12 +261,8 @@ after discussions on the right group.
       <annotation id="gaia_auth_rotate_bound_cookies"/>
       <annotation id="gaia_auth_multilogin"/>
       <annotation id="gaia_cookie_manager_external_cc_result"/>
-      <annotation id="gaia_create_reauth_proof_token_for_parent"/>
-      <annotation id="gaia_oauth_client_get_token_info"/>
       <annotation id="gaia_oauth_client_get_account_capabilities"/>
-      <annotation id="gaia_oauth_client_get_tokens"/>
       <annotation id="gaia_oauth_client_get_user_info"/>
-      <annotation id="gaia_oauth_client_refresh_token"/>
       <annotation id="oauth2_access_token_fetcher"/>
       <annotation id="oauth2_mint_token_flow"/>
       <annotation id="oauth2_upgrade_token_flow"/>

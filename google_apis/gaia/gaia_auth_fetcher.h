@@ -170,22 +170,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaAuthFetcher {
   // web, the Gaia logout page should be loaded as a navigation.
   void StartLogOut();
 
-  // Given a child account's OAuth2 refresh token, the parent account's
-  // obfuscated GAIA ID, and their |credential| create the reauth proof token
-  // for the parent.
-  //
-  // |max_retries| specifies the maximum number of times we should retry on a
-  // network error.  This could help to fetch the token in the case of a flaky
-  // network connection. This does not apply in the case of an ReAuth error
-  // (i.e. there was something wrong with the ReAuth input arguments).  Setting
-  // |max_retries| to -1 implies infinite retries.
-  //
-  // Virtual so it can be overridden by fake implementations.
-  virtual void StartCreateReAuthProofTokenForParent(
-      const std::string& child_oauth_access_token,
-      const GaiaId& parent_obfuscated_gaia_id,
-      const std::string& parent_credential);
-
   // Starts a request to get the list of URLs to check for connection info.
   // Returns token/URL pairs to check, and the resulting status can be given to
   // OAuth multilogin requests.
@@ -233,8 +217,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaAuthFetcher {
   // NSUrlSession in iOS.
   bool IsMultiloginUrl(const GURL& url);
 
-  bool IsReAuthApiUrl(const GURL& url);
-
   bool IsListAccountsUrl(const GURL& url);
 
  private:
@@ -264,10 +246,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaAuthFetcher {
                                        net::Error net_error,
                                        int response_code);
 
-  void OnReAuthApiInfoFetched(const std::string& data,
-                              net::Error net_error,
-                              int response_code);
-
   static void ParseFailureResponse(const std::string& data,
                                    std::string* error,
                                    std::string* error_url);
@@ -296,7 +274,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaAuthFetcher {
   const GURL list_accounts_gurl_;
   const GURL logout_gurl_;
   const GURL get_check_connection_info_url_;
-  const GURL reauth_api_url_;
 
   // While a fetch is going on:
   std::unique_ptr<network::SimpleURLLoader> url_loader_;

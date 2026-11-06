@@ -113,9 +113,6 @@
     },
     "oauth2_revoke_url": {
       "url": "https://accounts.example.com/o/oauth2/revoke"
-    },
-    "reauth_api_url": {
-      "url": "https://www.exampleapis.com/reauth/v1beta/users/"
     }
   }
 }

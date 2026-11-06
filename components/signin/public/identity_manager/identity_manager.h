@@ -440,8 +440,9 @@ class IdentityManager : public KeyedService,
     std::unique_ptr<DeviceAccountsSynchronizer> device_accounts_synchronizer;
     std::unique_ptr<DiagnosticsProvider> diagnostics_provider;
     raw_ptr<SigninClient> signin_client = nullptr;
-    // When true, GetAccountsInCookieJar() returns the cached accounts and
-    // OnNetworkInitialized() does not request /ListAccounts.
+    // When true, GetAccountsInCookieJar() returns the cached accounts, and
+    // OnNetworkInitialized() does not request /ListAccounts or install the
+    // Gaia cookie listener.
     bool avoid_list_accounts_requests = false;
 
     InitParameters();

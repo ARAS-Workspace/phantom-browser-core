@@ -21,6 +21,7 @@
 #include "components/signin/internal/identity_manager/profile_oauth2_token_service.h"
 #include "components/signin/internal/identity_manager/profile_oauth2_token_service_builder.h"
 #include "components/signin/public/base/signin_client.h"
+#include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/accounts_mutator.h"
 #include "components/signin/public/identity_manager/device_accounts_synchronizer.h"
 
@@ -90,6 +91,11 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
         params->unexportable_key_service,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
         params->signin_client);
+  }
+
+  if (params->avoid_list_accounts_requests) {
+    params->signin_client->GetPrefs()->ClearPref(
+        prefs::kGaiaCookieLastListAccountsBinaryData);
   }
 
   auto gaia_cookie_manager_service = std::make_unique<GaiaCookieManagerService>(

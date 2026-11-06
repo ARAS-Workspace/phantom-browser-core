@@ -15,6 +15,7 @@
 #include "components/signin/internal/identity_manager/account_fetcher_factory.h"
 #include "components/signin/internal/identity_manager/account_fetcher_service.h"
 #include "components/signin/internal/identity_manager/account_info_fetcher.h"
+#include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/test_signin_client.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
@@ -113,6 +114,34 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
   EXPECT_NE(init_params.diagnostics_provider, nullptr);
   EXPECT_EQ(init_params.device_accounts_synchronizer, nullptr);
   EXPECT_NE(init_params.accounts_mutator, nullptr);
+}
+
+// Test that the stored /ListAccounts response is cleared when /ListAccounts
+// requests are avoided.
+TEST_F(IdentityManagerBuilderTest, AvoidListAccountsRequestsClearsStoredList) {
+  base::ScopedTempDir temp_dir;
+  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
+
+  GetPrefService()->SetString(prefs::kGaiaCookieLastListAccountsBinaryData,
+                              "stored");
+
+  IdentityManagerBuildParams params;
+  params.image_decoder = std::make_unique<image_fetcher::FakeImageDecoder>();
+  params.local_state = GetPrefService();
+  params.network_connection_tracker =
+      network::TestNetworkConnectionTracker::GetInstance();
+  params.pref_service = GetPrefService();
+  params.profile_path = temp_dir.GetPath();
+  params.signin_client = GetSigninClient();
+  params.profile_metrics_service = GetProfileMetricsService();
+  params.avoid_list_accounts_requests = true;
+
+  const IdentityManager::InitParameters init_params =
+      signin::BuildIdentityManagerInitParameters(&params);
+
+  EXPECT_TRUE(GetPrefService()
+                  ->GetString(prefs::kGaiaCookieLastListAccountsBinaryData)
+                  .empty());
 }
 
 }  // namespace signin

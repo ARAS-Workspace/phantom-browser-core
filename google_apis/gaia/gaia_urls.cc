@@ -103,7 +103,6 @@ const char kOAuth2RevokeUrlSuffix[] = "o/oauth2/revoke";
 const char kOAuth2TokenUrlSuffix[] = "oauth2/v4/token";
 const char kOAuth2TokenInfoUrlSuffix[] = "oauth2/v2/tokeninfo";
 const char kOAuthUserInfoUrlSuffix[] = "oauth2/v1/userinfo";
-const char kReAuthApiUrlSuffix[] = "reauth/v1beta/users/";
 
 // API calls from oauth2.mtls.googleapis.com
 const char kMtlsOAuth2TokenUrlSuffix[] = "token";
@@ -373,10 +372,6 @@ const GURL& GaiaUrls::oauth2_revoke_url() const {
   return oauth2_revoke_url_;
 }
 
-const GURL& GaiaUrls::reauth_api_url() const {
-  return reauth_api_url_;
-}
-
 const GURL& GaiaUrls::rotate_bound_cookies_url() const {
   return rotate_bound_cookies_url_;
 }
@@ -529,8 +524,6 @@ void GaiaUrls::InitializeDefault() {
                       kOAuth2TokenInfoUrlSuffix);
   ResolveURLIfInvalid(&oauth_user_info_url_, google_apis_origin_url_,
                       kOAuthUserInfoUrlSuffix);
-  ResolveURLIfInvalid(&reauth_api_url_, google_apis_origin_url_,
-                      kReAuthApiUrlSuffix);
 
   // URLs from |oauth_account_manager_origin_url_|.
   ResolveURLIfInvalid(&oauth2_issue_token_url_,
@@ -617,6 +610,5 @@ void GaiaUrls::InitializeFromConfig() {
   config->GetURLIfExists(URL_KEY_AND_PTR(oauth2_upgrade_token_url));
   config->GetURLIfExists(URL_KEY_AND_PTR(oauth2_token_info_url));
   config->GetURLIfExists(URL_KEY_AND_PTR(oauth2_revoke_url));
-  config->GetURLIfExists(URL_KEY_AND_PTR(reauth_api_url));
   config->GetURLIfExists(URL_KEY_AND_PTR(rotate_bound_cookies_url));
 }

@@ -20,7 +20,6 @@
 #include "base/notreached.h"
 #include "base/strings/escape.h"
 #include "base/strings/strcat.h"
-#include "base/strings/string_util.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/values.h"
 #include "google_apis/credentials_mode.h"
@@ -37,12 +36,6 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "url/gurl.h"
-
-namespace {
-const char kAccessTokenValue[] = "access_token";
-const char kRefreshTokenValue[] = "refresh_token";
-const char kExpiresInValue[] = "expires_in";
-}  // namespace
 
 namespace gaia {
 
@@ -65,21 +58,6 @@ class GaiaOAuthClient::Core
     backoff_policy_.always_use_initial_delay = false;
   }
 
-  void GetTokensFromAuthCode(const OAuthClientInfo& oauth_client_info,
-                             const std::string& auth_code,
-                             int max_retries,
-                             GaiaOAuthClient::Delegate* delegate);
-  void RefreshToken(const OAuthClientInfo& oauth_client_info,
-                    const std::string& refresh_token,
-                    const std::vector<std::string>& scopes,
-                    int max_retries,
-                    GaiaOAuthClient::Delegate* delegate);
-  void GetUserEmail(const std::string& oauth_access_token,
-                    int max_retries,
-                    Delegate* delegate);
-  void GetUserId(const std::string& oauth_access_token,
-                 int max_retries,
-                 Delegate* delegate);
   void GetUserInfo(const std::string& oauth_access_token,
                    int max_retries,
                    Delegate* delegate);
@@ -88,11 +66,6 @@ class GaiaOAuthClient::Core
       base::span<const std::string_view> capabilities_names,
       int max_retries,
       Delegate* delegate);
-  void GetTokenInfo(const std::string& qualifier,
-                    const std::string& query,
-                    int max_retries,
-                    Delegate* delegate);
-
   // Called as a SimpleURLLoader callback
   void OnURLLoadComplete(std::optional<std::string> body);
 
@@ -101,21 +74,11 @@ class GaiaOAuthClient::Core
 
   enum RequestType {
     NO_PENDING_REQUEST,
-    TOKENS_FROM_AUTH_CODE,
-    REFRESH_TOKEN,
-    TOKEN_INFO,
-    USER_EMAIL,
-    USER_ID,
     USER_INFO,
     ACCOUNT_CAPABILITIES,
   };
 
   ~Core() {}
-
-  void GetUserInfoImpl(RequestType type,
-                       const std::string& oauth_access_token,
-                       int max_retries,
-                       Delegate* delegate);
 
   // Stores request settings into |this| and calls SendRequest().
   void MakeRequest(
@@ -158,131 +121,9 @@ class GaiaOAuthClient::Core
   base::WeakPtrFactory<Core> weak_ptr_factory_{this};
 };
 
-void GaiaOAuthClient::Core::GetTokensFromAuthCode(
-    const OAuthClientInfo& oauth_client_info,
-    const std::string& auth_code,
-    int max_retries,
-    GaiaOAuthClient::Delegate* delegate) {
-  std::string post_body =
-      "code=" + base::EscapeUrlEncodedData(auth_code, true) + "&client_id=" +
-      base::EscapeUrlEncodedData(oauth_client_info.client_id, true) +
-      "&client_secret=" +
-      base::EscapeUrlEncodedData(oauth_client_info.client_secret, true) +
-      "&redirect_uri=" +
-      base::EscapeUrlEncodedData(oauth_client_info.redirect_uri, true) +
-      "&grant_type=authorization_code";
-  net::MutableNetworkTrafficAnnotationTag traffic_annotation(
-      net::DefineNetworkTrafficAnnotation("gaia_oauth_client_get_tokens", R"(
-        semantics {
-          sender: "OAuth 2.0 calls"
-          description:
-            "This request exchanges an authorization code for an OAuth 2.0 "
-            "refresh token and an OAuth 2.0 access token."
-          trigger:
-            "This request is triggered when a Chrome service requires an "
-            "access token and a refresh token (e.g. Cloud Print, Chrome Remote "
-            "Desktop etc.) See https://developers.google.com/identity/protocols"
-            "/OAuth2 for more information about the Google implementation of "
-            "the OAuth 2.0 protocol."
-          data:
-            "The Google console client ID and client secret of the caller, the "
-            "OAuth authorization code and the redirect URI."
-          destination: GOOGLE_OWNED_SERVICE
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be disabled in settings, but if the user "
-            "signs out of Chrome, this request would not be made."
-          chrome_policy {
-            BrowserSignin {
-              BrowserSignin: 0
-            }
-          }
-        })"));
-  MakeRequest(TOKENS_FROM_AUTH_CODE,
-              GURL(GaiaUrls::GetInstance()->oauth2_token_url()), post_body,
-              /* authorization_header = */ std::string(),
-              /* http_method_override_header = */ std::string(), max_retries,
-              delegate, traffic_annotation);
-}
-
-void GaiaOAuthClient::Core::RefreshToken(
-    const OAuthClientInfo& oauth_client_info,
-    const std::string& refresh_token,
-    const std::vector<std::string>& scopes,
-    int max_retries,
-    GaiaOAuthClient::Delegate* delegate) {
-  std::string post_body =
-      "refresh_token=" + base::EscapeUrlEncodedData(refresh_token, true) +
-      "&client_id=" +
-      base::EscapeUrlEncodedData(oauth_client_info.client_id, true) +
-      "&client_secret=" +
-      base::EscapeUrlEncodedData(oauth_client_info.client_secret, true) +
-      "&grant_type=refresh_token";
-
-  if (!scopes.empty()) {
-    std::string scopes_string = base::JoinString(scopes, " ");
-    post_body += "&scope=" + base::EscapeUrlEncodedData(scopes_string, true);
-  }
-
-  net::MutableNetworkTrafficAnnotationTag traffic_annotation(
-      net::DefineNetworkTrafficAnnotation("gaia_oauth_client_refresh_token", R"(
-        semantics {
-          sender: "OAuth 2.0 calls"
-          description:
-            "This request fetches a fresh access token that can be used to "
-            "authenticate an API call to a Google web endpoint."
-          trigger:
-            "This is called whenever the caller needs a fresh OAuth 2.0 access "
-            "token."
-          data:
-            "The OAuth 2.0 refresh token, the Google console client ID and "
-            "client secret of the caller, and optionally the scopes of the API "
-            "for which the access token should be authorized."
-          destination: GOOGLE_OWNED_SERVICE
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be disabled in settings, but if the user "
-            "signs out of Chrome, this request would not be made."
-          chrome_policy {
-            BrowserSignin {
-              BrowserSignin: 0
-            }
-          }
-        })"));
-  MakeRequest(REFRESH_TOKEN, GURL(GaiaUrls::GetInstance()->oauth2_token_url()),
-              post_body,
-              /* authorization_header = */ std::string(),
-              /* http_method_override_header = */ std::string(), max_retries,
-              delegate, traffic_annotation);
-}
-
-void GaiaOAuthClient::Core::GetUserEmail(const std::string& oauth_access_token,
-                                         int max_retries,
-                                         Delegate* delegate) {
-  GetUserInfoImpl(USER_EMAIL, oauth_access_token, max_retries, delegate);
-}
-
-void GaiaOAuthClient::Core::GetUserId(const std::string& oauth_access_token,
-                                      int max_retries,
-                                      Delegate* delegate) {
-  GetUserInfoImpl(USER_ID, oauth_access_token, max_retries, delegate);
-}
-
 void GaiaOAuthClient::Core::GetUserInfo(const std::string& oauth_access_token,
                                         int max_retries,
                                         Delegate* delegate) {
-  GetUserInfoImpl(USER_INFO, oauth_access_token, max_retries, delegate);
-}
-
-void GaiaOAuthClient::Core::GetUserInfoImpl(
-    RequestType type,
-    const std::string& oauth_access_token,
-    int max_retries,
-    Delegate* delegate) {
   net::MutableNetworkTrafficAnnotationTag traffic_annotation(
       net::DefineNetworkTrafficAnnotation("gaia_oauth_client_get_user_info", R"(
         semantics {
@@ -310,53 +151,8 @@ void GaiaOAuthClient::Core::GetUserInfoImpl(
           }
         })"));
   std::string auth = "OAuth " + oauth_access_token;
-  MakeRequest(type, GaiaUrls::GetInstance()->oauth_user_info_url(),
+  MakeRequest(USER_INFO, GaiaUrls::GetInstance()->oauth_user_info_url(),
               /* post_body = */ std::string(), auth,
-              /* http_method_override_header = */ std::string(), max_retries,
-              delegate, traffic_annotation);
-}
-
-void GaiaOAuthClient::Core::GetTokenInfo(const std::string& qualifier,
-                                         const std::string& query,
-                                         int max_retries,
-                                         Delegate* delegate) {
-  std::string post_body =
-      qualifier + "=" + base::EscapeUrlEncodedData(query, true);
-  net::MutableNetworkTrafficAnnotationTag traffic_annotation(
-      net::DefineNetworkTrafficAnnotation("gaia_oauth_client_get_token_info",
-                                          R"(
-        semantics {
-          sender: "OAuth 2.0 calls"
-          description:
-            "This request fetches information about an OAuth 2.0 access token. "
-            "The response is a dictionary of response values. The provided "
-            "access token may have any scope, and basic results will be "
-            "returned: issued_to, audience, scope, expires_in, access_type. In "
-            "addition, if the https://www.googleapis.com/auth/userinfo.email "
-            "scope is present, the email and verified_email fields will be "
-            "returned. If the https://www.googleapis.com/auth/userinfo.profile "
-            "scope is present, the user_id field will be returned."
-          trigger:
-            "This is triggered after a Google account is added to the browser. "
-            "It it also triggered after each successful fetch of an OAuth 2.0 "
-            "access token."
-          data: "The OAuth 2.0 access token."
-          destination: GOOGLE_OWNED_SERVICE
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be disabled in settings, but if the user "
-            "signs out of Chrome, this request would not be made."
-          chrome_policy {
-            BrowserSignin {
-              BrowserSignin: 0
-            }
-          }
-        })"));
-  MakeRequest(TOKEN_INFO,
-              GURL(GaiaUrls::GetInstance()->oauth2_token_info_url()), post_body,
-              /* authorization_header = */ std::string(),
               /* http_method_override_header = */ std::string(), max_retries,
               delegate, traffic_annotation);
 }
@@ -556,63 +352,8 @@ void GaiaOAuthClient::Core::HandleResponse(std::optional<std::string> body,
   request_type_ = NO_PENDING_REQUEST;
 
   switch (type) {
-    case USER_EMAIL: {
-      std::string email;
-      if (const std::string* dict_value = response_dict->FindString("email")) {
-        email = *dict_value;
-      }
-      delegate_->OnGetUserEmailResponse(email);
-      break;
-    }
-
-    case USER_ID: {
-      std::string id;
-      if (const std::string* dict_value = response_dict->FindString("id")) {
-        id = *dict_value;
-      }
-      delegate_->OnGetUserIdResponse(id);
-      break;
-    }
-
     case USER_INFO: {
       delegate_->OnGetUserInfoResponse(*response_dict);
-      break;
-    }
-
-    case TOKEN_INFO: {
-      delegate_->OnGetTokenInfoResponse(*response_dict);
-      break;
-    }
-
-    case TOKENS_FROM_AUTH_CODE:
-    case REFRESH_TOKEN: {
-      std::string access_token;
-      if (const std::string* dict_value =
-              response_dict->FindString(kAccessTokenValue)) {
-        access_token = *dict_value;
-      }
-      std::string refresh_token;
-      if (const std::string* dict_value =
-              response_dict->FindString(kRefreshTokenValue)) {
-        refresh_token = *dict_value;
-      }
-      int expires_in_seconds = 0;
-      if (const std::optional<int> dict_value =
-              response_dict->FindInt(kExpiresInValue)) {
-        expires_in_seconds = *dict_value;
-      }
-
-      if (access_token.empty()) {
-        delegate_->OnOAuthError();
-        return;
-      }
-
-      if (type == REFRESH_TOKEN) {
-        delegate_->OnRefreshTokenResponse(access_token, expires_in_seconds);
-      } else {
-        delegate_->OnGetTokensResponse(refresh_token, access_token,
-                                       expires_in_seconds);
-      }
       break;
     }
 
@@ -633,54 +374,10 @@ GaiaOAuthClient::GaiaOAuthClient(
 
 GaiaOAuthClient::~GaiaOAuthClient() {}
 
-void GaiaOAuthClient::GetTokensFromAuthCode(
-    const OAuthClientInfo& oauth_client_info,
-    const std::string& auth_code,
-    int max_retries,
-    Delegate* delegate) {
-  return core_->GetTokensFromAuthCode(oauth_client_info, auth_code, max_retries,
-                                      delegate);
-}
-
-void GaiaOAuthClient::RefreshToken(const OAuthClientInfo& oauth_client_info,
-                                   const std::string& refresh_token,
-                                   const std::vector<std::string>& scopes,
-                                   int max_retries,
-                                   Delegate* delegate) {
-  return core_->RefreshToken(oauth_client_info, refresh_token, scopes,
-                             max_retries, delegate);
-}
-
-void GaiaOAuthClient::GetUserEmail(const std::string& access_token,
-                                   int max_retries,
-                                   Delegate* delegate) {
-  return core_->GetUserEmail(access_token, max_retries, delegate);
-}
-
-void GaiaOAuthClient::GetUserId(const std::string& access_token,
-                                int max_retries,
-                                Delegate* delegate) {
-  return core_->GetUserId(access_token, max_retries, delegate);
-}
-
 void GaiaOAuthClient::GetUserInfo(const std::string& access_token,
                                   int max_retries,
                                   Delegate* delegate) {
   return core_->GetUserInfo(access_token, max_retries, delegate);
-}
-
-void GaiaOAuthClient::GetTokenInfo(const std::string& access_token,
-                                   int max_retries,
-                                   Delegate* delegate) {
-  return core_->GetTokenInfo("access_token", access_token, max_retries,
-                             delegate);
-}
-
-void GaiaOAuthClient::GetTokenHandleInfo(const std::string& token_handle,
-                                         int max_retries,
-                                         Delegate* delegate) {
-  return core_->GetTokenInfo("token_handle", token_handle, max_retries,
-                             delegate);
 }
 
 void GaiaOAuthClient::GetAccountCapabilities(

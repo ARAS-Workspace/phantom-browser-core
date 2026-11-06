@@ -71,7 +71,6 @@
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/themes/theme_syncable_service.h"
-#include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_active_state_manager/browser_active_state_manager.h"
 #include "chrome/browser/ui/browser_commands.h"
