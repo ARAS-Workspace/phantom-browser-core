@@ -9,7 +9,6 @@ source_set("infobars") {
   ]
 
   public = [
-    "alternate_nav_infobar_view.h",
     "confirm_infobar.h",
     "infobar_container_view.h",
     "infobar_view.h",
@@ -29,7 +28,6 @@ source_set("infobars") {
 
 source_set("impl") {
   sources = [
-    "alternate_nav_infobar_view.cc",
     "confirm_infobar.cc",
     "confirm_infobar_with_normal_label.cc",
     "confirm_infobar_with_styled_label.cc",

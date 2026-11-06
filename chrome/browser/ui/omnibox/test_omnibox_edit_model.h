@@ -28,8 +28,7 @@ class TestOmniboxEditModel : public OmniboxEditModel {
   TestOmniboxEditModel& operator=(const TestOmniboxEditModel&) = delete;
 
   // OmniboxEditModel:
-  AutocompleteMatch CurrentMatchAndAlternateNavUrl(
-      GURL* alternate_nav_url) const override;
+  AutocompleteMatch CurrentMatch() const override;
   void OnPopupDataChanged(const std::u16string& temporary_text,
                           bool is_temporary_text,
                           const std::u16string& inline_autocompletion,
@@ -45,7 +44,6 @@ class TestOmniboxEditModel : public OmniboxEditModel {
   void OpenMatchForTesting(
       AutocompleteMatch match,
       WindowOpenDisposition disposition,
-      const GURL& alternate_nav_url,
       const std::u16string& pasted_text,
       size_t index,
       base::TimeTicks match_selection_timestamp = base::TimeTicks());

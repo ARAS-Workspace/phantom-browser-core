@@ -53,17 +53,13 @@ class AutocompleteClassifier : public KeyedService {
   // be useful in deciding how the input should be interpreted.
   // `match` should be a non-NULL out param that will be set to the default
   // match for this input, if any (for invalid input, there will be no default
-  // match, and `match` will be left unchanged).  `alternate_nav_url` is a
-  // possibly-NULL outparam that, if non-NULL, will be set to the navigational
-  // URL (if any) in case of an accidental search; see comments on
-  // AutocompleteResult::alternate_nav_url_ in autocomplete.h.
+  // match, and `match` will be left unchanged).
   void Classify(
       const std::u16string& text,
       bool in_keyword_mode,
       bool allow_exact_keyword_match,
       metrics::OmniboxEventProto::PageClassification page_classification,
-      AutocompleteMatch* match,
-      GURL* alternate_nav_url);
+      AutocompleteMatch* match);
 
   AutocompleteController* autocomplete_controller() {
     return controller_.get();

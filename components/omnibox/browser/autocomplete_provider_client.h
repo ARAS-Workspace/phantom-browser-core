@@ -177,8 +177,7 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
       bool in_keyword_mode,
       bool allow_exact_keyword_match,
       metrics::OmniboxEventProto::PageClassification page_classification,
-      AutocompleteMatch* match,
-      GURL* alternate_nav_url) = 0;
+      AutocompleteMatch* match) = 0;
 
   // Deletes all URL and search term entries matching the given |term| and
   // |keyword_id| from history.

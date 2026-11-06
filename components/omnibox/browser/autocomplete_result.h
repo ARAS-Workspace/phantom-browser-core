@@ -328,13 +328,6 @@ class AutocompleteResult {
   void Validate() const;
 #endif  // DCHECK_IS_ON()
 
-  // Returns a URL to offer the user as an alternative navigation when they
-  // open |match| after typing in |input|.
-  static GURL ComputeAlternateNavUrl(
-      const AutocompleteInput& input,
-      const AutocompleteMatch& match,
-      AutocompleteProviderClient* provider_client);
-
   // Gets common prefix from SEARCH_SUGGEST_TAIL matches
   std::u16string GetCommonPrefix();
 

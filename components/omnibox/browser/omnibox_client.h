@@ -344,8 +344,7 @@ class OmniboxClient {
       bool destination_url_entered_without_scheme,
       bool destination_url_entered_with_http_scheme,
       const std::u16string& text,
-      const AutocompleteMatch& match,
-      const AutocompleteMatch& alternative_nav_match) = 0;
+      const AutocompleteMatch& match) = 0;
 
   // Executes the given `action`.
   void ExecuteAction(OmniboxAction* action,

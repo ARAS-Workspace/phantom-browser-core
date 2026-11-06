@@ -1513,19 +1513,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   net::NetModule::SetResourceProvider(ChromeNetResourceProvider);
   media::SetLocalizedStringProvider(ChromeMediaLocalizedStringProvider);
 
-  // In unittest mode, this will do nothing.  In normal mode, this will create
-  // the global IntranetRedirectDetector instance, which will promptly go to
-  // sleep for seven seconds (to avoid slowing startup), and wake up afterwards
-  // to see if it should do anything else.
-  //
-  // A simpler way of doing all this would be to have some function which could
-  // give the time elapsed since startup, and simply have this object check that
-  // when asked to initialize itself, but this doesn't seem to exist.
-  //
-  // This can't be created in the BrowserProcessImpl constructor because it
-  // needs to read prefs that get set after that runs.
-  browser_process_->intranet_redirect_detector();
-
 #if BUILDFLAG(ENABLE_PDF)
   chrome_pdf::features::SetIsOopifPdfPolicyEnabled(
       g_browser_process->local_state()->GetBoolean(

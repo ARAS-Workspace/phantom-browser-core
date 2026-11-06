@@ -104,8 +104,7 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
       bool in_keyword_mode,
       bool allow_exact_keyword_match,
       metrics::OmniboxEventProto::PageClassification page_classification,
-      AutocompleteMatch* match,
-      GURL* alternate_nav_url) override;
+      AutocompleteMatch* match) override;
   void DeleteMatchingURLsForKeywordFromHistory(
       history::KeywordID keyword_id,
       const std::u16string& term) override;

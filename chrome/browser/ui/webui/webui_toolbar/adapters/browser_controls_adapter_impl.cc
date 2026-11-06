@@ -109,7 +109,7 @@ void BrowserControlsAdapterImpl::NavigateText(const std::string& text) {
   AutocompleteMatch match;
   AutocompleteClassifierFactory::GetForProfile(browser_.get().GetProfile())
       ->Classify(sanitized_text, false, false,
-                 metrics::OmniboxEventProto::INVALID_SPEC, &match, nullptr);
+                 metrics::OmniboxEventProto::INVALID_SPEC, &match);
 
   if (!match.destination_url.is_valid()) {
     return;

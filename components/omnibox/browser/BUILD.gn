@@ -230,8 +230,6 @@ static_library("browser") {
     "in_memory_url_index_types.h",
     "inline_autocompletion_util.cc",
     "inline_autocompletion_util.h",
-    "intranet_redirector_state.cc",
-    "intranet_redirector_state.h",
     "keyword_extensions_delegate.cc",
     "keyword_extensions_delegate.h",
     "keyword_provider.cc",

@@ -43,7 +43,6 @@
 #include "components/omnibox/browser/autocomplete_provider.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/omnibox/browser/base_search_provider.h"
-#include "components/omnibox/browser/intranet_redirector_state.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/omnibox/browser/page_classification_functions.h"
@@ -1104,35 +1103,6 @@ void AutocompleteResult::Validate() const {
     i.Validate();
 }
 #endif  // DCHECK_IS_ON()
-
-// static
-GURL AutocompleteResult::ComputeAlternateNavUrl(
-    const AutocompleteInput& input,
-    const AutocompleteMatch& match,
-    AutocompleteProviderClient* provider_client) {
-  auto redirector_policy =
-      omnibox::GetInterceptionChecksBehavior(provider_client->GetLocalState());
-
-  bool policy_allows_alternate_navs =
-      (redirector_policy == omnibox::IntranetRedirectorBehavior::
-                                DISABLE_INTERCEPTION_CHECKS_ENABLE_INFOBARS ||
-       redirector_policy == omnibox::IntranetRedirectorBehavior::
-                                ENABLE_INTERCEPTION_CHECKS_AND_INFOBARS);
-  TRACE_EVENT_INSTANT("omnibox", "AutocompleteResult::ComputeAlternateNavURL",
-                      "input", input, "match", match,
-                      "policy_allows_alternate_navs",
-                      policy_allows_alternate_navs);
-  if (!policy_allows_alternate_navs)
-    return GURL();
-
-  return ((input.type() == metrics::OmniboxInputType::UNKNOWN) &&
-          (AutocompleteMatch::IsSearchType(match.type)) &&
-          !ui::PageTransitionCoreTypeIs(match.transition,
-                                        ui::PAGE_TRANSITION_KEYWORD) &&
-          (input.canonicalized_url() != match.destination_url))
-             ? input.canonicalized_url()
-             : GURL();
-}
 
 // static
 void AutocompleteResult::DeduplicateMatches(

@@ -791,7 +791,7 @@ TEST_F(WebuiOmniboxHandlerTest, OpenAutocompleteMatch_KeyboardModifiers) {
       static_cast<TestOmniboxClient*>(omnibox_controller_->client());
   EXPECT_CALL(*client,
               OnAutocompleteAccept(_, _, WindowOpenDisposition::NEW_WINDOW, _,
-                                   _, _, _, _, _, _, _))
+                                   _, _, _, _, _, _))
       .Times(1);
 
   auto modifiers = searchbox::mojom::ActionModifiers::New();
@@ -827,7 +827,7 @@ TEST_F(WebuiOmniboxHandlerTest, OpenMatchResumesNavigationWhenNoDialogShown) {
   EXPECT_CALL(*client, OnAutocompleteAccept(match.destination_url, testing::_,
                                             testing::_, testing::_, testing::_,
                                             testing::_, testing::_, testing::_,
-                                            testing::_, testing::_, testing::_))
+                                            testing::_, testing::_))
       .Times(1);
   handler_->OpenMatch(OmniboxPopupSelection(0), match,
                       WindowOpenDisposition::CURRENT_TAB,
@@ -855,7 +855,7 @@ TEST_F(WebuiOmniboxHandlerTest, OpenMatchDropsNavigationWhenDialogCancelled) {
   EXPECT_CALL(*client, OnAutocompleteAccept(testing::_, testing::_, testing::_,
                                             testing::_, testing::_, testing::_,
                                             testing::_, testing::_, testing::_,
-                                            testing::_, testing::_))
+                                            testing::_))
       .Times(0);
 
   handler_->OpenMatch(OmniboxPopupSelection(0), match,
@@ -1040,5 +1040,5 @@ TEST_F(SearchboxOmniboxClientNavigationTest,
       base::TimeTicks::Now(),
       /*destination_url_entered_without_scheme=*/false,
       /*destination_url_entered_with_http_scheme=*/false,
-      /*text=*/u"google", match, /*alternative_nav_match=*/AutocompleteMatch());
+      /*text=*/u"google", match);
 }

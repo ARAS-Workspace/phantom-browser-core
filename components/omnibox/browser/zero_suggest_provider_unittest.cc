@@ -103,8 +103,7 @@ class FakeAutocompleteProviderClient : public MockAutocompleteProviderClient {
       bool in_keyword_mode,
       bool allow_exact_keyword_match,
       metrics::OmniboxEventProto::PageClassification page_classification,
-      AutocompleteMatch* match,
-      GURL* alternate_nav_url) override {
+      AutocompleteMatch* match) override {
     // Populate enough of |match| to keep the ZeroSuggestProvider happy.
     match->type = AutocompleteMatchType::URL_WHAT_YOU_TYPED;
     match->destination_url = GURL(text);

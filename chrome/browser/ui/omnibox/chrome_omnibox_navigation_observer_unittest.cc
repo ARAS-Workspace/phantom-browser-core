@@ -4,20 +4,15 @@
 
 #include "chrome/browser/ui/omnibox/chrome_omnibox_navigation_observer.h"
 
-#include <array>
-#include <unordered_map>
 #include <vector>
 
-#include "base/run_loop.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/bind.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory_test_util.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/infobars/content/content_infobar_manager.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"
 #include "components/search_engines/template_url_service.h"
@@ -27,12 +22,8 @@
 #include "content/public/test/navigation_simulator.h"
 #include "net/http/http_response_headers.h"
 #include "net/http/http_status_code.h"
-#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
-#include "services/network/test/test_url_loader_factory.h"
 #include "services/network/test/test_utils.h"
-
-using network::TestURLLoaderFactory;
 
 class ChromeOmniboxNavigationObserverTest
     : public ChromeRenderViewHostTestHarness {
@@ -82,7 +73,6 @@ class ChromeOmniboxNavigationObserverTest
 
 void ChromeOmniboxNavigationObserverTest::SetUp() {
   ChromeRenderViewHostTestHarness::SetUp();
-  infobars::ContentInfoBarManager::CreateForWebContents(web_contents());
 
   // Set up a series of search engines for later testing.
   TemplateURLServiceFactoryTestUtil factory_util(profile());
@@ -184,142 +174,13 @@ TEST_F(ChromeOmniboxNavigationObserverTest, DeleteBrokenCustomSearchEngines) {
     WriteMojoMessage(producer_handle, "data");
 
     navigation->Start();
-    ChromeOmniboxNavigationObserver::CreateForTesting(
-        navigation->GetNavigationHandle(), profile(), cases[i].keyword + query,
-        match, AutocompleteMatch(), nullptr, base::DoNothing());
+    ChromeOmniboxNavigationObserver::Create(navigation->GetNavigationHandle(),
+                                            profile(), cases[i].keyword + query,
+                                            match);
 
     navigation->Commit();
 
     EXPECT_EQ(cases[i].expect_exists,
               model()->GetTemplateURLForKeyword(cases[i].keyword) != nullptr);
-  }
-}
-
-TEST_F(ChromeOmniboxNavigationObserverTest, AlternateNavInfoBar) {
-  TestURLLoaderFactory test_url_loader_factory;
-  scoped_refptr<network::SharedURLLoaderFactory> shared_factory =
-      base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
-          &test_url_loader_factory);
-
-  const int kNetError = net::ERR_FAILED;
-  const int kNoResponse = -1;
-  struct Response {
-    const std::vector<std::string> urls;  // If more than one, 301 between them.
-    // The final status code to return after all the redirects, or one of
-    // kNetError or kNoResponse.
-    const int http_response_code;
-    std::string content;
-  };
-
-  // All of these test cases assume the alternate nav URL is http://example/.
-  struct Case {
-    const Response response;
-    const bool expected_alternate_nav_bar_shown;
-  };
-  auto cases = std::to_array<Case>({
-      // The only response provided is a net error.
-      {{{"http://example/"}, kNetError}, false},
-      // The response connected to a valid page.
-      {{{"http://example/"}, 200}, true},
-      // A non-empty page, despite the HEAD.
-      {{{"http://example/"}, 200, "Content"}, true},
-      // The response connected to an error page.
-      {{{"http://example/"}, 404}, false},
-
-      // The response redirected to same host, just http->https, with a path
-      // change as well.  In this case the second URL should not fetched; Chrome
-      // will optimistically assume the destination will return a valid page and
-      // display the infobar.
-      {{{"http://example/", "https://example/path"}, kNoResponse}, true},
-      // Ditto, making sure it still holds when the final destination URL
-      // returns a valid status code.
-      {{{"http://example/", "https://example/path"}, 200}, true},
-
-      // The response redirected to an entirely different host.  In these cases,
-      // no URL should be fetched against this second host; again Chrome will
-      // optimistically assume the destination will return a valid page and
-      // display the infobar.
-      {{{"http://example/", "http://new-destination/"}, kNoResponse}, true},
-      // Ditto, making sure it still holds when the final destination URL
-      // returns a valid status code.
-      {{{"http://example/", "http://new-destination/"}, 200}, true},
-
-      // The response redirected to same host, just http->https, with no other
-      // changes.  In these cases, Chrome will fetch the second URL.
-      // The second URL response returned a valid page.
-      {{{"http://example/", "https://example/"}, 200}, true},
-      // The second URL response returned an error page.
-      {{{"http://example/", "https://example/"}, 404}, false},
-      // The second URL response returned a net error.
-      {{{"http://example/", "https://example/"}, kNetError}, false},
-      // The second URL response redirected again.
-      {{{"http://example/", "https://example/", "https://example/root"},
-        kNoResponse},
-       true},
-  });
-  for (size_t i = 0; i < std::size(cases); ++i) {
-    SCOPED_TRACE("case #" + base::NumberToString(i));
-    const Case& test_case = cases[i];
-    const Response& response = test_case.response;
-
-    // Set the URL request responses.
-    test_url_loader_factory.ClearResponses();
-
-    // Compute URL redirect chain.
-    TestURLLoaderFactory::Redirects redirects;
-    for (size_t dest = 1; dest < response.urls.size(); ++dest) {
-      net::RedirectInfo redir_info;
-      redir_info.new_url = GURL(response.urls[dest]);
-      redir_info.status_code = net::HTTP_MOVED_PERMANENTLY;
-      auto redir_head =
-          network::CreateURLResponseHead(net::HTTP_MOVED_PERMANENTLY);
-      redirects.emplace_back(redir_info, std::move(redir_head));
-    }
-
-    // Fill in final response.
-    network::mojom::URLResponseHeadPtr http_head =
-        network::mojom::URLResponseHead::New();
-    network::URLLoaderCompletionStatus net_status;
-    if (response.http_response_code == kNetError) {
-      net_status = network::URLLoaderCompletionStatus(net::ERR_FAILED);
-    } else if (response.http_response_code != kNoResponse) {
-      net_status = network::URLLoaderCompletionStatus(net::OK);
-      http_head = network::CreateURLResponseHead(
-          static_cast<net::HttpStatusCode>(response.http_response_code));
-    }
-
-    test_url_loader_factory.AddResponse(GURL(response.urls[0]),
-                                        std::move(http_head), response.content,
-                                        net_status, std::move(redirects));
-
-    // Create the alternate nav match and the observer.
-    // |observer| gets deleted automatically after all fetchers complete.
-    AutocompleteMatch alternate_nav_match;
-    alternate_nav_match.destination_url = GURL("http://example/");
-    auto navigation = content::NavigationSimulator::CreateBrowserInitiated(
-        GURL(base::StringPrintf("https://foo.com/%zu", i)), web_contents());
-    bool displayed_infobar = false;
-
-    navigation->Start();
-    ChromeOmniboxNavigationObserver::CreateForTesting(
-        navigation->GetNavigationHandle(), profile(), u"example",
-        AutocompleteMatch(), alternate_nav_match, shared_factory.get(),
-        base::BindLambdaForTesting(
-            [&](ChromeOmniboxNavigationObserver* observer) {
-              displayed_infobar = true;
-            }));
-
-    // Make sure the fetcher(s) have finished.
-    base::RunLoop().RunUntilIdle();
-
-    if (test_case.response.http_response_code != kNetError) {
-      navigation->Commit();
-    } else {
-      navigation->Fail(kNetError);
-      navigation->CommitErrorPage();
-    }
-
-    // See if AlternateNavInfoBarDelegate::Create() was called.
-    EXPECT_EQ(test_case.expected_alternate_nav_bar_shown, displayed_infobar);
   }
 }

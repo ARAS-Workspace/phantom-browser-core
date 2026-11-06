@@ -426,10 +426,6 @@ TestingBrowserProcess::notification_platform_bridge() {
   return notification_platform_bridge_.get();
 }
 
-IntranetRedirectDetector* TestingBrowserProcess::intranet_redirect_detector() {
-  return nullptr;
-}
-
 void TestingBrowserProcess::CreateDevToolsProtocolHandler() {}
 
 void TestingBrowserProcess::CreateDevToolsAutoOpener() {}

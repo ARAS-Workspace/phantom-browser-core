@@ -26,7 +26,6 @@ source_set("omnibox") {
     "//components/search_engines",
   ]
   public += [
-    "alternate_nav_infobar_delegate.h",
     "chrome_omnibox_client.h",
     "chrome_omnibox_navigation_observer.h",
     "clipboard_utils.h",
@@ -115,7 +114,6 @@ source_set("impl") {
     "//components/vector_icons",
   ]
   sources += [
-    "alternate_nav_infobar_delegate.cc",
     "chrome_omnibox_client.cc",
     "chrome_omnibox_navigation_observer.cc",
     "clipboard_utils.cc",
@@ -129,7 +127,6 @@ source_set("impl") {
     "//chrome/app/vector_icons",
     "//chrome/browser:browser_process",
     "//chrome/browser:global_features",
-    "//chrome/browser:intranet_redirect_detector",
     "//chrome/browser:primitives",
     "//chrome/browser/extensions/api/omnibox",
     "//chrome/browser/omnibox",
@@ -218,7 +215,6 @@ source_set("test_support") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "alternate_nav_infobar_delegate_unittest.cc",
     "chrome_omnibox_navigation_observer_unittest.cc",
     "clipboard_utils_unittest.cc",
     "omnibox_controller_unittest.cc",
@@ -275,10 +271,7 @@ source_set("unit_tests") {
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [
-    "alternate_nav_infobar_delegate_browsertest.cc",
-    "omnibox_metrics_browsertest.cc",
-  ]
+  sources = [ "omnibox_metrics_browsertest.cc" ]
   deps = [
     ":omnibox",
     "//base/test:test_support",

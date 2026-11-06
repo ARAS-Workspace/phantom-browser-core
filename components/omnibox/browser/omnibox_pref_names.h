@@ -47,12 +47,6 @@ inline constexpr char kDismissedHistoryScopePromo[] =
 inline constexpr char kIsOmniboxInBottomPosition[] =
     "omnibox.is_in_bottom_position";
 
-// Enum specifying the active behavior for the intranet redirect detector.
-// The browser pref kDNSInterceptionChecksEnabled also impacts the redirector.
-// Values are defined in omnibox::IntranetRedirectorBehavior.
-inline constexpr char kIntranetRedirectBehavior[] =
-    "browser.intranet_redirect_behavior";
-
 // Boolean that controls whether scoped search mode can be triggered by <space>.
 inline constexpr char kKeywordSpaceTriggeringEnabled[] =
     "omnibox.keyword_space_triggering_enabled";

@@ -124,7 +124,6 @@ class OmniboxAction : public base::RefCountedThreadSafe<OmniboxAction> {
                                 bool destination_url_entered_without_scheme,
                                 bool destination_url_entered_with_http_scheme,
                                 const std::u16string&,
-                                const AutocompleteMatch&,
                                 const AutocompleteMatch&)>;
 
     ExecutionContext(Client& client,

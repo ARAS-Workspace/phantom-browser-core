@@ -760,11 +760,9 @@ void ChromeOmniboxClient::OnAutocompleteAccept(
     bool destination_url_entered_without_scheme,
     bool destination_url_entered_with_http_scheme,
     const std::u16string& text,
-    const AutocompleteMatch& match,
-    const AutocompleteMatch& alternative_nav_match) {
+    const AutocompleteMatch& match) {
   TRACE_EVENT("omnibox", "ChromeOmniboxClient::OnAutocompleteAccept", "text",
-              text, "match", match, "alternative_nav_match",
-              alternative_nav_match);
+              text, "match", match);
 
   std::string extra_headers;
   for (const auto& header : match.extra_headers) {
@@ -789,7 +787,7 @@ void ChromeOmniboxClient::OnAutocompleteAccept(
       }
     }
     ChromeOmniboxNavigationObserver::Create(navigation.get(), profile_, text,
-                                            match, alternative_nav_match);
+                                            match);
     search_engines::MaybeShowSearchEngineResetNotification(browser_,
                                                            match_type);
   }

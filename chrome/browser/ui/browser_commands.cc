@@ -1301,8 +1301,7 @@ void NewTabFromClipboardURL(BrowserWindowInterface* browser) {
               AutocompleteClassifierFactory::GetForProfile(
                   browser_weak->GetProfile())
                   ->Classify(text, false, false,
-                             metrics::OmniboxEventProto::BLANK, &match,
-                             nullptr);
+                             metrics::OmniboxEventProto::BLANK, &match);
               if (match.destination_url.is_valid() &&
                   content::ChildProcessSecurityPolicy::GetInstance()
                       ->IsWebSafeScheme(

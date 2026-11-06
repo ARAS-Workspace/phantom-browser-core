@@ -68,7 +68,7 @@ TEST_F(SearchboxUtilsTest, OpenMatchNormal) {
 
   EXPECT_CALL(client_, OnAutocompleteAccept(GURL("https://example.com"), _,
                                             WindowOpenDisposition::CURRENT_TAB,
-                                            _, _, _, _, _, _, _, _))
+                                            _, _, _, _, _, _, _))
       .Times(1);
 
   OpenMatch(&autocomplete_controller_, &client_,
@@ -97,7 +97,7 @@ TEST_F(SearchboxUtilsTest, OpenMatchWithAction) {
   metrics_tracker.set_time_user_first_modified_omnibox(now - base::Seconds(2));
   metrics_tracker.set_match_selection_timestamp(now);
 
-  EXPECT_CALL(client_, OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
+  EXPECT_CALL(client_, OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _))
       .Times(0);
   EXPECT_CALL(*action, Execute(_)).Times(1);
 
@@ -151,10 +151,8 @@ TEST_F(SearchboxUtilsTest, ComputeOpenDispositionFromModifiers) {
 
 TEST_F(SearchboxUtilsTest, ClassifyStringUrl) {
   AutocompleteMatch match;
-  GURL alternate_nav_url;
   ClassifyString(&client_, u"https://example.com", /*in_keyword_mode=*/false,
-                 /*allow_exact_keyword_match=*/true, &match,
-                 &alternate_nav_url);
+                 /*allow_exact_keyword_match=*/true, &match);
   EXPECT_TRUE(match.destination_url.is_valid());
   EXPECT_EQ(AutocompleteMatchType::URL_WHAT_YOU_TYPED, match.type);
   EXPECT_EQ(GURL("https://example.com/"), match.destination_url);
@@ -162,10 +160,8 @@ TEST_F(SearchboxUtilsTest, ClassifyStringUrl) {
 
 TEST_F(SearchboxUtilsTest, ClassifyStringSearchQuery) {
   AutocompleteMatch match;
-  GURL alternate_nav_url;
   ClassifyString(&client_, u"test search query", /*in_keyword_mode=*/false,
-                 /*allow_exact_keyword_match=*/true, &match,
-                 &alternate_nav_url);
+                 /*allow_exact_keyword_match=*/true, &match);
   EXPECT_TRUE(match.destination_url.is_valid());
   EXPECT_TRUE(AutocompleteMatch::IsSearchType(match.type));
   EXPECT_EQ(AutocompleteMatchType::SEARCH_WHAT_YOU_TYPED, match.type);

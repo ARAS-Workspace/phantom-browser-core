@@ -1332,7 +1332,7 @@ SearchProvider::ScoreHistoryResultsHelper(
       scored_results.front().relevance() >= 1200) {
     AutocompleteMatch match;
     client()->Classify(scored_results.front().suggestion(), false, false,
-                       input_.current_page_classification(), &match, nullptr);
+                       input_.current_page_classification(), &match);
     // Demote this match that would normally be interpreted as a URL to have
     // the highest score a previously-issued search query could have when
     // scoring with the non-aggressive method.  A consequence of demoting

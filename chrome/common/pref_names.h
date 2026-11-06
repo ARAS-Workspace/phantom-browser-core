@@ -1074,18 +1074,6 @@ inline constexpr char kDownloadAllowedURLsForOpenByPolicy[] =
 inline constexpr char kProtocolHandlerPerOriginAllowedProtocols[] =
     "protocol_handler.allowed_origin_protocol_pairs";
 
-// String containing the last known intranet redirect URL, if any.  See
-// intranet_redirect_detector.h for more information.
-inline constexpr char kLastKnownIntranetRedirectOrigin[] =
-    "browser.last_redirect_origin";
-
-// Boolean specifying that the intranet redirect detector should be enabled.
-// Defaults to true.
-// See also kIntranetRedirectBehavior in the omnibox component's prefs, which
-// also impacts the redirect detector.
-inline constexpr char kDNSInterceptionChecksEnabled[] =
-    "browser.dns_interception_checks_enabled";
-
 // Whether to restart the current Chrome session automatically as the last thing
 // before shutting everything down.
 inline constexpr char kRestartLastSessionOnShutdown[] =

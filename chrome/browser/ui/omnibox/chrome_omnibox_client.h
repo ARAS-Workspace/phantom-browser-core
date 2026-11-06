@@ -122,18 +122,16 @@ class ChromeOmniboxClient final : public OmniboxClient {
       size_t index,
       const AutocompleteMatch& match,
       omnibox::mojom::NavigationPredictor navigation_predictor) override;
-  void OnAutocompleteAccept(
-      const GURL& destination_url,
-      TemplateURLRef::PostContent* post_content,
-      WindowOpenDisposition disposition,
-      ui::PageTransition transition,
-      AutocompleteMatchType::Type match_type,
-      base::TimeTicks match_selection_timestamp,
-      bool destination_url_entered_without_scheme,
-      bool destination_url_entered_with_http_scheme,
-      const std::u16string& text,
-      const AutocompleteMatch& match,
-      const AutocompleteMatch& alternative_nav_match) override;
+  void OnAutocompleteAccept(const GURL& destination_url,
+                            TemplateURLRef::PostContent* post_content,
+                            WindowOpenDisposition disposition,
+                            ui::PageTransition transition,
+                            AutocompleteMatchType::Type match_type,
+                            base::TimeTicks match_selection_timestamp,
+                            bool destination_url_entered_without_scheme,
+                            bool destination_url_entered_with_http_scheme,
+                            const std::u16string& text,
+                            const AutocompleteMatch& match) override;
   void OnInputInProgress(bool in_progress) override;
   void OnPopupVisibilityChanged(bool popup_is_open) override;
   void OpenUrl(GURL gurl, WindowOpenDisposition disposition) override;

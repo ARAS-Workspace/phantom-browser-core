@@ -77,8 +77,9 @@ void ZeroSuggestVerbatimMatchProviderTest::SetUp() {
           [](const std::u16string& text, bool in_keyword_mode,
              bool allow_exact_keyword_match,
              metrics::OmniboxEventProto::PageClassification page_classification,
-             AutocompleteMatch* match,
-             GURL* alternate_nav_url) { match->destination_url = GURL(text); });
+             AutocompleteMatch* match) {
+            match->destination_url = GURL(text);
+          });
 }
 
 TEST_P(ZeroSuggestVerbatimMatchProviderTest,

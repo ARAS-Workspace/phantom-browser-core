@@ -213,7 +213,6 @@
 #include "chrome/browser/pdf/pdf_pref_names.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/task_manager/task_manager_interface.h"
 #include "chrome/browser/themes/theme_syncable_service.h"
@@ -984,7 +983,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 #endif
 
   headless::RegisterPrefs(registry);
-  IntranetRedirectDetector::RegisterPrefs(registry);
   performance_manager::user_tuning::prefs::RegisterLocalStatePrefs(registry);
   PerformanceInterventionMetricsReporter::RegisterLocalStatePrefs(registry);
   RegisterBrowserPrefs(registry);

@@ -1012,8 +1012,7 @@ bool OmniboxViewViews::UnapplySteadyStateElisions(UnelisionGesture gesture) {
 
   if (offset != std::u16string::npos) {
     AutocompleteMatch match;
-    controller()->edit_model()->ClassifyString(original_selected_text, &match,
-                                               nullptr);
+    controller()->edit_model()->ClassifyString(original_selected_text, &match);
     const bool selection_classifes_as_search =
         AutocompleteMatch::IsSearchType(match.type);
     if (!selection.is_empty() && gesture == UnelisionGesture::kMouseRelease &&

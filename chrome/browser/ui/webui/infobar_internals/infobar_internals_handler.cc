@@ -31,16 +31,13 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/collected_cookies_infobar_delegate.h"
-#include "chrome/browser/ui/omnibox/alternate_nav_infobar_delegate.h"
 #include "chrome/browser/ui/page_info/page_info_infobar_delegate.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/site_data/page_specific_site_data_dialog_controller.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/simple_alert_infobar_delegate.h"
-#include "components/omnibox/browser/autocomplete_match.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
@@ -99,13 +96,6 @@ void InfoBarInternalsHandler::TriggerInfoBar(InfoBarType type,
 void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
   // Please keep the entries in alphabetized order base on the type.
   std::vector<InfoBarEntryPtr> infobar_list;
-  if (base::FeatureList::IsEnabled(features::kInfoBarInlineLinks)) {
-    infobar_list.emplace_back(InfoBarEntry::New(
-        /*type=*/InfoBarType::kAlternateNav, /*name=*/"Alternate Nav",
-        /*description=*/
-        "The Alternate Nav infobar is shown when a user searches for a term "
-        "they may have meant to navigate to."));
-  }
 #if BUILDFLAG(CHROME_FOR_TESTING)
   infobar_list.emplace_back(InfoBarEntry::New(
       /*type=*/InfoBarType::kChromeForTesting, /*name=*/"Chrome for Testing",
@@ -208,21 +198,6 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
 
   // Please keep the entries in alphabetized order base on the type.
   switch (type) {
-    case InfoBarType::kAlternateNav: {
-      if (!bwi || !bwi->GetActiveTabInterface()) {
-        return false;
-      }
-
-      content::WebContents* web_contents =
-          bwi->GetActiveTabInterface()->GetContents();
-
-      AutocompleteMatch match;
-      match.destination_url = GURL("https://google.com/");
-
-      AlternateNavInfoBarDelegate::CreateForOmniboxNavigation(
-          web_contents, u"test", match, GURL("https://youtube.com/"));
-      return true;
-    }
 #if BUILDFLAG(CHROME_FOR_TESTING)
     case InfoBarType::kChromeForTesting: {
       if (infobars::IsInfoBarMigrated(

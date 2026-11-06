@@ -108,8 +108,7 @@ void ClassifyString(OmniboxClient* client,
                     const std::u16string& text,
                     bool in_keyword_mode,
                     bool allow_exact_keyword_match,
-                    AutocompleteMatch* match,
-                    GURL* alternate_nav_url = nullptr);
+                    AutocompleteMatch* match);
 
 // Determines whether the user can "paste and go", given the specified text.
 bool CanPasteAndGo(OmniboxClient* client, const std::u16string& text);

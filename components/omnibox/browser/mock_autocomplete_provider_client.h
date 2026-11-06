@@ -154,14 +154,13 @@ class MockAutocompleteProviderClient
               (const std::string&),
               (const));
 
-  MOCK_METHOD6(
+  MOCK_METHOD5(
       Classify,
       void(const std::u16string& text,
            bool in_keyword_mode,
            bool allow_exact_keyword_match,
            metrics::OmniboxEventProto::PageClassification page_classification,
-           AutocompleteMatch* match,
-           GURL* alternate_nav_url));
+           AutocompleteMatch* match));
   MOCK_METHOD2(DeleteMatchingURLsForKeywordFromHistory,
                void(history::KeywordID keyword_id, const std::u16string& term));
   MOCK_METHOD1(PrefetchImage, void(const GURL& url));

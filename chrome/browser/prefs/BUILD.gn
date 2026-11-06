@@ -186,7 +186,6 @@ source_set("impl") {
   }
 
   deps += [
-    "//chrome/browser:intranet_redirect_detector",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/search_engines",

@@ -1514,12 +1514,11 @@ void SearchboxHandler::OnDefaultSearchExtensionDialogDone(
              OmniboxClient::ExtensionControlledDialogResult::kReject) {
     std::u16string input_text = autocomplete_controller()->input().text();
     AutocompleteMatch new_match;
-    GURL new_alternate_nav_url;
 
     searchbox::ClassifyString(
         client(), input_text,
         autocomplete_controller()->input().in_keyword_mode(),
-        /*allow_exact_keyword_match=*/true, &new_match, &new_alternate_nav_url);
+        /*allow_exact_keyword_match=*/true, &new_match);
 
     OpenMatch(selection, new_match, disposition, match_selection_timestamp);
     client()->FocusWebContents();

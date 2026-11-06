@@ -163,7 +163,6 @@ class BrowserProcessImpl : public BrowserProcess,
   printing::PrintPreviewDialogController* print_preview_dialog_controller()
       override;
   printing::BackgroundPrintingManager* background_printing_manager() override;
-  IntranetRedirectDetector* intranet_redirect_detector() override;
   const std::string& GetApplicationLocale() override;
   void SetApplicationLocale(const std::string& actual_locale) override;
   DownloadStatusUpdater* download_status_updater() override;
@@ -297,8 +296,6 @@ class BrowserProcessImpl : public BrowserProcess,
   bool created_notification_ui_manager_ = false;
   std::unique_ptr<NotificationUIManager> notification_ui_manager_;
 #endif
-
-  std::unique_ptr<IntranetRedirectDetector> intranet_redirect_detector_;
 
   std::unique_ptr<StatusTray> status_tray_;
 

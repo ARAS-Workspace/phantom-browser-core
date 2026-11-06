@@ -2070,7 +2070,7 @@ void RenderViewContextMenu::AppendSearchProvider() {
   AutocompleteMatch match;
   AutocompleteClassifierFactory::GetForProfile(GetProfile())
       ->Classify(params_.selection_text, false, false,
-                 metrics::OmniboxEventProto::INVALID_SPEC, &match, nullptr);
+                 metrics::OmniboxEventProto::INVALID_SPEC, &match);
   selection_navigation_url_ = match.destination_url;
   if (!selection_navigation_url_.is_valid()) {
     return;

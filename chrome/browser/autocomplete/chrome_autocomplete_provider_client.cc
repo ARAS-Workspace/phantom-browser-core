@@ -410,12 +410,11 @@ void ChromeAutocompleteProviderClient::Classify(
     bool in_keyword_mode,
     bool allow_exact_keyword_match,
     metrics::OmniboxEventProto::PageClassification page_classification,
-    AutocompleteMatch* match,
-    GURL* alternate_nav_url) {
+    AutocompleteMatch* match) {
   AutocompleteClassifier* classifier = GetAutocompleteClassifier();
   DCHECK(classifier);
   classifier->Classify(text, in_keyword_mode, allow_exact_keyword_match,
-                       page_classification, match, alternate_nav_url);
+                       page_classification, match);
 }
 
 void ChromeAutocompleteProviderClient::DeleteMatchingURLsForKeywordFromHistory(

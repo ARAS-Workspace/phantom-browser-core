@@ -94,8 +94,7 @@ void AutocompleteClassifier::Classify(
     bool in_keyword_mode,
     bool allow_exact_keyword_match,
     metrics::OmniboxEventProto::PageClassification page_classification,
-    AutocompleteMatch* match,
-    GURL* alternate_nav_url) {
+    AutocompleteMatch* match) {
   TRACE_EVENT1("omnibox", "AutocompleteClassifier::Classify", "text",
                base::UTF16ToUTF8(text));
   DCHECK(!inside_classify_);
@@ -110,14 +109,8 @@ void AutocompleteClassifier::Classify(
 
   auto* default_match = controller_->result().default_match();
   if (!default_match) {
-    if (alternate_nav_url)
-      *alternate_nav_url = GURL();
     return;
   }
 
   *match = *default_match;
-  if (alternate_nav_url) {
-    *alternate_nav_url = AutocompleteResult::ComputeAlternateNavUrl(
-        input, *match, controller_->autocomplete_provider_client());
-  }
 }

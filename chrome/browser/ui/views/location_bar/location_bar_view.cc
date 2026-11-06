@@ -1788,8 +1788,7 @@ void LocationBarView::OnMiddleClickPaste(base::TimeTicks event_timestamp,
 
   AutocompleteMatch match;
   AutocompleteClassifierFactory::GetForProfile(GetProfile())
-      ->Classify(text, false, false, metrics::OmniboxEventProto::BLANK, &match,
-                 nullptr);
+      ->Classify(text, false, false, metrics::OmniboxEventProto::BLANK, &match);
   if (!content::ChildProcessSecurityPolicy::GetInstance()->IsWebSafeScheme(
           std::string(match.destination_url.scheme()))) {
     return;

@@ -320,20 +320,6 @@ void OpenMatch(
     client->OnBookmarkLaunched();
   }
 
-  GURL alternate_nav_url = AutocompleteResult::ComputeAlternateNavUrl(
-      input, match, autocomplete_controller->autocomplete_provider_client());
-
-  AutocompleteInput alternate_input(
-      input.text(), page_classification, client->GetSchemeClassifier(),
-      client->ShouldDefaultTypedNavigationsToHttps(), 0, false);
-  alternate_input.set_current_url(client->GetURL());
-  alternate_input.set_current_title(client->GetTitle());
-
-  AutocompleteMatch alternative_nav_match = VerbatimMatchForInput(
-      autocomplete_controller->history_url_provider(),
-      autocomplete_controller->autocomplete_provider_client(), alternate_input,
-      alternate_nav_url, false);
-
   client->OnAutocompleteAccept(
       destination_url, match.post_content.get(), disposition,
       ui::PageTransitionFromInt(match.transition |
@@ -342,21 +328,20 @@ void OpenMatch(
       input.added_default_scheme_to_typed_url(),
       input.typed_url_had_http_scheme() &&
           match.type == AutocompleteMatchType::URL_WHAT_YOU_TYPED,
-      input.text(), match, alternative_nav_match);
+      input.text(), match);
 }
 
 void ClassifyString(OmniboxClient* client,
                     const std::u16string& text,
                     bool in_keyword_mode,
                     bool allow_exact_keyword_match,
-                    AutocompleteMatch* match,
-                    GURL* alternate_nav_url) {
+                    AutocompleteMatch* match) {
   DCHECK(match);
   AutocompleteClassifier* classifier = client->GetAutocompleteClassifier();
   if (classifier) {
     classifier->Classify(text, in_keyword_mode, allow_exact_keyword_match,
                          client->GetPageClassification(/*is_prefetch=*/false),
-                         match, alternate_nav_url);
+                         match);
   }
 }
 
@@ -367,7 +352,7 @@ bool CanPasteAndGo(OmniboxClient* client, const std::u16string& text) {
 
   AutocompleteMatch match;
   ClassifyString(client, text, /*in_keyword_mode=*/false,
-                 /*allow_exact_keyword_match=*/false, &match, nullptr);
+                 /*allow_exact_keyword_match=*/false, &match);
   return match.destination_url.is_valid();
 }
 
@@ -381,10 +366,8 @@ void PasteAndGo(AutocompleteController* autocomplete_controller,
 
   AutocompleteInput input = autocomplete_controller->input();
   AutocompleteMatch match;
-  GURL alternate_nav_url;
   ClassifyString(client, text, /*in_keyword_mode=*/false,
-                 /*allow_exact_keyword_match=*/false, &match,
-                 &alternate_nav_url);
+                 /*allow_exact_keyword_match=*/false, &match);
 
   GURL upgraded_url;
   if (match.type == AutocompleteMatchType::URL_WHAT_YOU_TYPED &&

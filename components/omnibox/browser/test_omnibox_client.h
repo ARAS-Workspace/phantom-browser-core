@@ -86,8 +86,7 @@ class TestOmniboxClient final : public testing::NiceMock<OmniboxClient> {
                bool destination_url_entered_without_scheme,
                bool destination_url_entered_with_http_scheme,
                const std::u16string& text,
-               const AutocompleteMatch& match,
-               const AutocompleteMatch& alternative_nav_match));
+               const AutocompleteMatch& match));
   MOCK_METHOD(bookmarks::BookmarkModel*, GetBookmarkModel, ());
   MOCK_METHOD(PrefService*, GetPrefs, (), (override));
   MOCK_METHOD(const PrefService*, GetPrefs, (), (const, override));

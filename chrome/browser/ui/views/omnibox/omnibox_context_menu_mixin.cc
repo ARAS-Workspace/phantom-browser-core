@@ -166,8 +166,7 @@ std::u16string OmniboxContextMenuMixinBase::HandleGetLabelForCommandId(
       clipboard_text_for_menu_, kMaxSelectionTextLength, gfx::WORD_BREAK);
 
   AutocompleteMatch match;
-  controller_->edit_model()->ClassifyString(clipboard_text_for_menu_, &match,
-                                            nullptr);
+  controller_->edit_model()->ClassifyString(clipboard_text_for_menu_, &match);
   if (AutocompleteMatch::IsSearchType(match.type)) {
     return l10n_util::GetStringFUTF16(IDS_PASTE_AND_SEARCH, selection_text);
   }

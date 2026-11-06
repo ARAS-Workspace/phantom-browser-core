@@ -26,24 +26,22 @@ TestOmniboxEditModel::TestOmniboxEditModel(
 
 TestOmniboxEditModel::~TestOmniboxEditModel() = default;
 
-AutocompleteMatch TestOmniboxEditModel::CurrentMatchAndAlternateNavUrl(
-    GURL* alternate_nav_url) const {
+AutocompleteMatch TestOmniboxEditModel::CurrentMatch() const {
   if (override_current_match_) {
     return *override_current_match_;
   }
 
-  return OmniboxEditModel::CurrentMatchAndAlternateNavUrl(alternate_nav_url);
+  return OmniboxEditModel::CurrentMatch();
 }
 
 void TestOmniboxEditModel::OpenMatchForTesting(
     AutocompleteMatch match,
     WindowOpenDisposition disposition,
-    const GURL& alternate_nav_url,
     const std::u16string& pasted_text,
     size_t index,
     base::TimeTicks match_selection_timestamp) {
-  OpenMatch(OmniboxPopupSelection(index), match, disposition, alternate_nav_url,
-            pasted_text, match_selection_timestamp);
+  OpenMatch(OmniboxPopupSelection(index), match, disposition, pasted_text,
+            match_selection_timestamp);
 }
 
 const SkBitmap* TestOmniboxEditModel::GetPopupRichSuggestionBitmapForKeyword(

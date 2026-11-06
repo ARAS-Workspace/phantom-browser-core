@@ -45,7 +45,7 @@ AutocompleteMatch VerbatimMatchForURL(
       match.description_class.push_back({0, ACMatchClassification::NONE});
   } else {
     client->Classify(input.text(), false, true,
-                     input.current_page_classification(), &match, nullptr);
+                     input.current_page_classification(), &match);
   }
   match.allowed_to_be_default_match = true;
   // The default relevance to use for relevance match. Should be greater than

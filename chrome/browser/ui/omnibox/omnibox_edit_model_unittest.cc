@@ -95,7 +95,7 @@ void OpenUrlFromEditBox(OmniboxController* controller,
     model->SetUserText(url_text);
   }
   model->OnSetFocus(false);
-  model->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB, GURL(),
+  model->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
                              std::u16string(), 0);
 }
 
@@ -244,41 +244,6 @@ TEST_F(OmniboxEditModelTest, RevertZeroSuggestTemporaryText) {
   EXPECT_EQ(u"https://www.example.com/", view()->GetText());
   EXPECT_FALSE(model()->user_input_in_progress());
   EXPECT_TRUE(view()->IsSelectAll());
-}
-
-// This verifies the fix for a bug where calling OpenMatch() with a valid
-// alternate nav URL would fail a DCHECK if the input began with "http://".
-// The failure was due to erroneously trying to strip the scheme from the
-// resulting fill_into_edit.  Alternate nav matches are never shown, so there's
-// no need to ever try and strip this scheme.
-TEST_F(OmniboxEditModelTest, AlternateNavHasHTTP) {
-  AutocompleteMatch match(
-      controller()->autocomplete_controller()->search_provider(), 0, false,
-      AutocompleteMatchType::SEARCH_WHAT_YOU_TYPED);
-  // |match.destination_url| has to be set to ensure that OnAutocompleteAccept
-  // is called and |alternate_nav_match| is populated.
-  match.destination_url = GURL("https://foo/");
-  const GURL alternate_nav_url("http://abcd/");
-
-  AutocompleteMatch alternate_nav_match;
-  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
-      .WillOnce(SaveArg<10>(&alternate_nav_match));
-
-  model()->OnSetFocus(false);  // Avoids DCHECK in OpenMatch().
-  model()->SetUserText(u"http://abcd");
-  model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               alternate_nav_url, std::u16string(), 0);
-  EXPECT_TRUE(
-      AutocompleteInput::HasHTTPScheme(alternate_nav_match.fill_into_edit));
-
-  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
-      .WillOnce(SaveArg<10>(&alternate_nav_match));
-
-  model()->SetUserText(u"abcd");
-  model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               alternate_nav_url, std::u16string(), 0);
-  EXPECT_TRUE(
-      AutocompleteInput::HasHTTPScheme(alternate_nav_match.fill_into_edit));
 }
 
 TEST_F(OmniboxEditModelTest, CurrentMatch) {
@@ -1613,33 +1578,33 @@ TEST_F(OmniboxEditModelTest, OpenTabMatch) {
   match.from_keyword = true;
 
   WindowOpenDisposition disposition;
-  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
+  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _))
       .WillOnce(SaveArg<2>(&disposition));
 
   model()->OnSetFocus(false);  // Avoids DCHECK in OpenMatch().
   model()->SetUserText(u"http://abcd");
   model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               GURL(), std::u16string(), 0);
+                               std::u16string(), 0);
   EXPECT_EQ(disposition, WindowOpenDisposition::SWITCH_TO_TAB);
 
-  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
+  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _))
       .WillOnce(SaveArg<2>(&disposition));
 
   // Suggestions not from the Open Tab Provider or not from keyword mode should
   // not change the disposition.
   match.from_keyword = false;
   model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               GURL(), std::u16string(), 0);
+                               std::u16string(), 0);
   EXPECT_EQ(disposition, WindowOpenDisposition::CURRENT_TAB);
 
-  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _, _))
+  EXPECT_CALL(*client(), OnAutocompleteAccept(_, _, _, _, _, _, _, _, _, _))
       .WillOnce(SaveArg<2>(&disposition));
 
   match.provider = controller()->autocomplete_controller()->search_provider();
   match.type = AutocompleteMatchType::SEARCH_WHAT_YOU_TYPED;
   match.from_keyword = true;
   model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               GURL(), std::u16string(), 0);
+                               std::u16string(), 0);
   EXPECT_EQ(disposition, WindowOpenDisposition::CURRENT_TAB);
 }
 
@@ -1651,7 +1616,7 @@ TEST_F(OmniboxEditModelTest, LogAnswerUsed) {
   match.answer_type = omnibox::ANSWER_TYPE_WEATHER;
   match.destination_url = GURL("https://foo");
   model()->OpenMatchForTesting(match, WindowOpenDisposition::CURRENT_TAB,
-                               GURL(), std::u16string(), 0);
+                               std::u16string(), 0);
   histogram_tester.ExpectUniqueSample("Omnibox.SuggestionUsed.AnswerInSuggest",
                                       8, 1);
 }

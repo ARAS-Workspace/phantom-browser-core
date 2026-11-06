@@ -139,7 +139,6 @@ class TestingBrowserProcess
 
   NotificationUIManager* notification_ui_manager() override;
   NotificationPlatformBridge* notification_platform_bridge() override;
-  IntranetRedirectDetector* intranet_redirect_detector() override;
   void CreateDevToolsProtocolHandler() override;
   void CreateDevToolsAutoOpener() override;
   bool IsShuttingDown() override;

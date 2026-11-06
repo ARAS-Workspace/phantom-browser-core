@@ -384,18 +384,6 @@ source_set("certificate_viewer") {
   ]
 }
 
-source_set("intranet_redirect_detector") {
-  public = [ "intranet_redirect_detector.h" ]
-  deps = [
-    "//base",
-    "//components/pref_registry",
-    "//mojo/public/cpp/bindings",
-    "//services/network/public/cpp",
-    "//services/network/public/mojom",
-    "//url",
-  ]
-}
-
 source_set("repost_form_warning_controller") {
   public = [ "repost_form_warning_controller.h" ]
   deps = [ "//chrome/browser/ui:tab_modal_confirm_dialog_delegate" ]
@@ -841,13 +829,11 @@ source_set("core") {
 
   sources += [
     "chrome_process_singleton.cc",
-    "intranet_redirect_detector.cc",
     "process_singleton_startup_lock.cc",
     "repost_form_warning_controller.cc",
   ]
   deps += [
     ":chrome_process_singleton",
-    ":intranet_redirect_detector",
     ":repost_form_warning_controller",
     "//chrome/browser/apps/app_service",
     "//chrome/browser/apps/app_service/publishers",

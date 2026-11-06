@@ -123,17 +123,8 @@ class OmniboxEditModel {
   void RestoreState(const State* state);
 
   // Returns the match for the current text. If the user has not edited the text
-  // this is the match corresponding to the permanent text. Returns the
-  // alternate nav URL, if |alternate_nav_url| is non-NULL and there is such a
-  // URL. Virtual for testing.
-  virtual AutocompleteMatch CurrentMatchAndAlternateNavUrl(
-      GURL* alternate_nav_url) const;
-
-  // Provided for convenience, since most CurrentMatchAndAlternateNavUrl()
-  // callers do not need the alternate navigation URL.
-  AutocompleteMatch CurrentMatch() const {
-    return CurrentMatchAndAlternateNavUrl(nullptr);
-  }
+  // this is the match corresponding to the permanent text. Virtual for testing.
+  virtual AutocompleteMatch CurrentMatch() const;
 
   // Called when the user wants to export the entire current text as a URL.
   // Sets the url, and if known, the title and favicon.
@@ -246,11 +237,9 @@ class OmniboxEditModel {
       const std::u16string& text,
       base::TimeTicks match_selection_timestamp = base::TimeTicks());
 
-  // Sets |match| and |alternate_nav_url| based on classifying |text|.
-  // |alternate_nav_url| may be nullptr.
+  // Sets |match| based on classifying |text|.
   void ClassifyString(const std::u16string& text,
-                      AutocompleteMatch* match,
-                      GURL* alternate_nav_url) const;
+                      AutocompleteMatch* match) const;
 
   // Opens given selection. Most kinds of selection invoke an action or
   // otherwise call `OpenMatch`, but some may `AcceptInput` which is not
@@ -636,7 +625,6 @@ class OmniboxEditModel {
   void OpenMatch(OmniboxPopupSelection selection,
                  AutocompleteMatch match,
                  WindowOpenDisposition disposition,
-                 const GURL& alternate_nav_url,
                  const std::u16string& pasted_text,
                  base::TimeTicks match_selection_timestamp = base::TimeTicks());
 
@@ -644,7 +632,6 @@ class OmniboxEditModel {
       OmniboxPopupSelection selection,
       AutocompleteMatch match,
       WindowOpenDisposition disposition,
-      const GURL& alternate_nav_url,
       const std::u16string& pasted_text,
       base::TimeTicks match_selection_timestamp,
       OmniboxClient::ExtensionControlledDialogResult proceed);
@@ -664,11 +651,9 @@ class OmniboxEditModel {
   std::u16string MaybeStripKeyword(const std::u16string& text) const;
   std::u16string MaybePrependKeyword(const std::u16string& text) const;
 
-  // Copies a match corresponding to the current text into |match|, and
-  // populates |alternate_nav_url| as well if it's not nullptr. If the popup
+  // Copies a match corresponding to the current text into |match|. If the popup
   // is closed, the match is generated from the autocomplete classifier.
-  void GetInfoForCurrentText(AutocompleteMatch* match,
-                             GURL* alternate_nav_url) const;
+  void GetInfoForCurrentText(AutocompleteMatch* match) const;
 
   // Checks whether keyword mode space-triggering has been disabled either by
   // a pref or relevant feature flags. If the setting isn't available on the

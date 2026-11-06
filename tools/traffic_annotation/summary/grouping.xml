@@ -49,13 +49,11 @@ after discussions on the right group.
       <annotation id="devtools_network_resource"/>
       <annotation id="devtools_cdp_network_resource"/>
       <annotation id="downloads_api_run_async"/>
-      <annotation id="intranet_redirect_detector"/>
       <annotation id="browser_switcher_ieem_sitelist"/>
       <annotation id="enterprise_safe_browsing_realtime_url_lookup"/>
       <annotation id="port_forwarding_controller_socket"/>
       <annotation id="pdf_plugin_placeholder"/>
       <annotation id="render_view_context_menu"/>
-      <annotation id="omnibox_navigation_observer"/>
       <annotation id="devtools_free_data_source"/>
       <annotation id="download_internals_webui_source"/>
       <annotation id="downloads_dom_handler"/>

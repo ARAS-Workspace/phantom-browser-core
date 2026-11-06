@@ -76,7 +76,6 @@
 #include "components/omnibox/browser/searchbox_utils.h"
 #include "components/omnibox/browser/suggestion_answer.h"
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
-#include "components/omnibox/browser/verbatim_match.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/omnibox/common/omnibox_focus_state.h"
@@ -324,17 +323,11 @@ void OmniboxEditModel::RestoreState(const State* state) {
   }
 }
 
-AutocompleteMatch OmniboxEditModel::CurrentMatchAndAlternateNavUrl(
-    GURL* alternate_nav_url) const {
+AutocompleteMatch OmniboxEditModel::CurrentMatch() const {
   // If we have a valid match use it. Otherwise get one for the current text.
   AutocompleteMatch match = current_match_;
   if (!match.destination_url.is_valid()) {
-    GetInfoForCurrentText(&match, alternate_nav_url);
-  } else if (alternate_nav_url) {
-    AutocompleteProviderClient* provider_client =
-        autocomplete_controller()->autocomplete_provider_client();
-    *alternate_nav_url = AutocompleteResult::ComputeAlternateNavUrl(
-        input_, match, provider_client);
+    GetInfoForCurrentText(&match);
   }
   return match;
 }
@@ -378,7 +371,7 @@ void OmniboxEditModel::SetUserText(const std::u16string& text) {
     view_->OnKeywordPlaceholderTextChange();
   }
   InternalSetUserText(text);
-  GetInfoForCurrentText(&current_match_, nullptr);
+  GetInfoForCurrentText(&current_match_);
   paste_state_ = PasteState::kNone;
   has_temporary_text_ = false;
 }
@@ -767,8 +760,7 @@ void OmniboxEditModel::OpenSelection(OmniboxPopupSelection selection,
         controller_->client(), autocomplete_controller(), input_, text_for_tld,
         nullptr);
     if (url_match.destination_url.is_valid()) {
-      OpenMatch(selection, url_match, disposition, GURL(), std::u16string(),
-                timestamp);
+      OpenMatch(selection, url_match, disposition, std::u16string(), timestamp);
       return;
     }
   }
@@ -796,11 +788,7 @@ void OmniboxEditModel::OpenSelection(OmniboxPopupSelection selection,
     controller_->client()->OpenIphLink(match.iph_link_url);
   } else {
     // Open the match.
-    GURL alternate_nav_url = AutocompleteResult::ComputeAlternateNavUrl(
-        input_, match,
-        autocomplete_controller()->autocomplete_provider_client());
-    OpenMatch(selection, match, disposition, alternate_nav_url,
-              std::u16string(), timestamp);
+    OpenMatch(selection, match, disposition, std::u16string(), timestamp);
   }
 }
 
@@ -1587,8 +1575,7 @@ std::u16string OmniboxEditModel::MaybePrependKeyword(
   return is_keyword_selected() ? keyword_ + u' ' + text : text;
 }
 
-void OmniboxEditModel::GetInfoForCurrentText(AutocompleteMatch* match,
-                                             GURL* alternate_nav_url) const {
+void OmniboxEditModel::GetInfoForCurrentText(AutocompleteMatch* match) const {
   DCHECK(match);
 
   // If there's a query in progress or the popup is open, pick out the default
@@ -1607,13 +1594,6 @@ void OmniboxEditModel::GetInfoForCurrentText(AutocompleteMatch* match,
       *match = autocomplete_controller()->result().match_at(selection.line);
       found_match_for_text = true;
     }
-    if (found_match_for_text && alternate_nav_url &&
-        (!popup_view_ || IsPopupSelectionOnInitialLine())) {
-      AutocompleteProviderClient* provider_client =
-          autocomplete_controller()->autocomplete_provider_client();
-      *alternate_nav_url = AutocompleteResult::ComputeAlternateNavUrl(
-          input_, *match, provider_client);
-    }
   }
 
   if (!found_match_for_text) {
@@ -1624,7 +1604,7 @@ void OmniboxEditModel::GetInfoForCurrentText(AutocompleteMatch* match,
 
     controller_->client()->GetAutocompleteClassifier()->Classify(
         MaybePrependKeyword(text_for_match_generation), is_keyword_selected(),
-        true, GetPageClassification(), match, alternate_nav_url);
+        true, GetPageClassification(), match);
   }
 }
 
@@ -2289,8 +2269,7 @@ void OmniboxEditModel::StepPopupSelection(
 void OmniboxEditModel::AcceptInput(WindowOpenDisposition disposition,
                                    base::TimeTicks match_selection_timestamp) {
   // Get the URL and transition type for the selected entry.
-  GURL alternate_nav_url;
-  AutocompleteMatch match = CurrentMatchAndAlternateNavUrl(&alternate_nav_url);
+  AutocompleteMatch match = CurrentMatch();
 
   // If CTRL is down it means the user wants to append ".com" to the text they
   // typed. If we can successfully generate a URL_WHAT_YOU_TYPED match doing
@@ -2325,7 +2304,6 @@ void OmniboxEditModel::AcceptInput(WindowOpenDisposition disposition,
     if (url_match.destination_url.is_valid()) {
       // We have a valid URL, we use this newly generated AutocompleteMatch.
       match = url_match;
-      alternate_nav_url = GURL();
     }
   }
 
@@ -2343,8 +2321,7 @@ void OmniboxEditModel::AcceptInput(WindowOpenDisposition disposition,
 
   if (popup_view_) {
     OpenMatch(OmniboxPopupSelection(OmniboxPopupSelection::kNoMatch), match,
-              disposition, alternate_nav_url, std::u16string(),
-              match_selection_timestamp);
+              disposition, std::u16string(), match_selection_timestamp);
   }
 }
 
@@ -2352,7 +2329,6 @@ void OmniboxEditModel::OnDefaultSearchExtensionDialogDone(
     OmniboxPopupSelection selection,
     AutocompleteMatch match,
     WindowOpenDisposition disposition,
-    const GURL& alternate_nav_url,
     const std::u16string& pasted_text,
     base::TimeTicks match_selection_timestamp,
     OmniboxClient::ExtensionControlledDialogResult proceed) {
@@ -2375,7 +2351,7 @@ void OmniboxEditModel::OnDefaultSearchExtensionDialogDone(
   if (proceed == OmniboxClient::ExtensionControlledDialogResult::kAccept ||
       proceed ==
           OmniboxClient::ExtensionControlledDialogResult::kNoDialogShown) {
-    OpenMatch(selection, match, disposition, alternate_nav_url, pasted_text,
+    OpenMatch(selection, match, disposition, pasted_text,
               match_selection_timestamp);
   } else if (proceed ==
              OmniboxClient::ExtensionControlledDialogResult::kReject) {
@@ -2385,13 +2361,12 @@ void OmniboxEditModel::OnDefaultSearchExtensionDialogDone(
             : pasted_text;
 
     AutocompleteMatch new_match;
-    GURL new_alternate_nav_url;
 
     // Re-classify using the current (restored) settings.
-    ClassifyString(input_text, &new_match, &new_alternate_nav_url);
+    ClassifyString(input_text, &new_match);
 
-    OpenMatch(selection, new_match, disposition, new_alternate_nav_url,
-              pasted_text, match_selection_timestamp);
+    OpenMatch(selection, new_match, disposition, pasted_text,
+              match_selection_timestamp);
 
     // The omnibox is focused during the string classification, so we need to
     // focus the web contents after the string classification.
@@ -2404,7 +2379,6 @@ void OmniboxEditModel::OnDefaultSearchExtensionDialogDone(
 void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
                                  AutocompleteMatch match,
                                  WindowOpenDisposition disposition,
-                                 const GURL& alternate_nav_url,
                                  const std::u16string& pasted_text,
                                  base::TimeTicks match_selection_timestamp) {
   // When `ShowConfirmationDialogIfDefaultSearchExtensionControlled` is called
@@ -2424,7 +2398,7 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
               base::BindOnce(
                   &OmniboxEditModel::OnDefaultSearchExtensionDialogDone,
                   weak_factory_.GetWeakPtr(), selection, match, disposition,
-                  alternate_nav_url, pasted_text, match_selection_timestamp))) {
+                  pasted_text, match_selection_timestamp))) {
     return;
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
@@ -2472,8 +2446,7 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
   }
 
   TRACE_EVENT("omnibox", "OmniboxEditModel::OpenMatch", "match", match,
-              "disposition", disposition, "altenate_nav_url", alternate_nav_url,
-              "pasted_text", pasted_text);
+              "disposition", disposition, "pasted_text", pasted_text);
   const base::TimeTicks& now(base::TimeTicks::Now());
   base::TimeDelta elapsed_time_since_user_first_modified_omnibox(
       now - metrics_tracker_.time_user_first_modified_omnibox());
@@ -2495,16 +2468,6 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
   if (input_text.empty()) {
     input_text = user_input_in_progress_ ? user_text_ : url_for_editing_;
   }
-  // Create a dummy AutocompleteInput for use in calling VerbatimMatchForInput()
-  // to create an alternate navigational match.
-  AutocompleteInput alternate_input(
-      input_text, GetPageClassification(),
-      controller_->client()->GetSchemeClassifier(),
-      controller_->client()->ShouldDefaultTypedNavigationsToHttps(), 0, false);
-  // Somehow we can occasionally get here with no active tab.  It's not
-  // clear why this happens.
-  alternate_input.set_current_url(controller_->client()->GetURL());
-  alternate_input.set_current_title(controller_->client()->GetTitle());
 
   base::TimeDelta elapsed_time_since_last_change_to_default_match(
       now - autocomplete_controller()->last_time_default_match_changed());
@@ -2698,11 +2661,7 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
           input_.added_default_scheme_to_typed_url(),
           input_.typed_url_had_http_scheme() &&
               match.type == AutocompleteMatchType::URL_WHAT_YOU_TYPED,
-          input_text, match,
-          VerbatimMatchForInput(
-              autocomplete_controller()->history_url_provider(),
-              autocomplete_controller()->autocomplete_provider_client(),
-              alternate_input, alternate_nav_url, false));
+          input_text, match);
     }
   }
 }
@@ -2849,11 +2808,10 @@ bool OmniboxEditModel::IsSpaceCharForAcceptingKeyword(wchar_t c) {
 }
 
 void OmniboxEditModel::ClassifyString(const std::u16string& text,
-                                      AutocompleteMatch* match,
-                                      GURL* alternate_nav_url) const {
+                                      AutocompleteMatch* match) const {
   DCHECK(match);
   controller_->client()->GetAutocompleteClassifier()->Classify(
-      text, false, false, GetPageClassification(), match, alternate_nav_url);
+      text, false, false, GetPageClassification(), match);
 }
 
 bool OmniboxEditModel::SetInputInProgressNoNotify(bool in_progress) {

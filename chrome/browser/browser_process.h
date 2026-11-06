@@ -49,8 +49,6 @@ class StatusTray;
 class SystemNetworkContextManager;
 class WebRtcLogUploader;
 
-class IntranetRedirectDetector;
-
 namespace embedder_support {
 class OriginTrialsSettingsStorage;
 }
@@ -195,8 +193,6 @@ class BrowserProcess {
   print_preview_dialog_controller() = 0;
   virtual printing::BackgroundPrintingManager*
   background_printing_manager() = 0;
-
-  virtual IntranetRedirectDetector* intranet_redirect_detector() = 0;
 
   // Sets or gets the locale used by the application. It is the IETF language
   // tag, defined in BCP 47. The region subtag is not included when it adds no

@@ -569,7 +569,7 @@ std::optional<GURL> BrowserRootView::GetPasteAndGoURL(
   AutocompleteClassifierFactory::GetForProfile(
       browser_view_->browser()->GetProfile())
       ->Classify(text, false, false, metrics::OmniboxEventProto::INVALID_SPEC,
-                 &match, nullptr);
+                 &match);
   if (!match.destination_url.is_valid()) {
     return std::nullopt;
   }

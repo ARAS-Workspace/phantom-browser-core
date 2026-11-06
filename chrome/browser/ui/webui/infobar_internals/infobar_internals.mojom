@@ -7,9 +7,6 @@ module infobar_internals.mojom;
 // Types for every infobar that can be triggered from the internals page.
 // Keep these sorted alphabetically.
 enum InfoBarType {
-  // Alternate nav infobar.
-  kAlternateNav,
-
   // Chrome for Testing infobar.
   [EnableIf=is_chrome_for_testing]
   kChromeForTesting,

@@ -184,8 +184,7 @@ void AdjustTextForCopy(
   // screw up our calculation of the desired_tld.
   AutocompleteMatch match_from_text;
   autocomplete_classifier->Classify(*text, is_keyword_selected, true,
-                                    page_classification, &match_from_text,
-                                    nullptr);
+                                    page_classification, &match_from_text);
   if (AutocompleteMatch::IsSearchType(match_from_text.type)) {
     return;
   }

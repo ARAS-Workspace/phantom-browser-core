@@ -160,7 +160,6 @@
 #include "ui/message_center/message_center.h"
 
 #include "chrome/browser/devtools/devtools_auto_opener.h"
-#include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/resource_coordinator/tab_manager.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
@@ -408,7 +407,6 @@ void BrowserProcessImpl::StartTearDown() {
   features_->PostMainMessageLoopRun();
   metrics_services_manager_client_ = nullptr;
   metrics_services_manager_.reset();
-  intranet_redirect_detector_.reset();
 
   system_notification_helper_.reset();
 
@@ -854,15 +852,6 @@ BrowserProcessImpl::background_printing_manager() {
   NOTIMPLEMENTED();
   return NULL;
 #endif
-}
-
-IntranetRedirectDetector* BrowserProcessImpl::intranet_redirect_detector() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!intranet_redirect_detector_) {
-    intranet_redirect_detector_ = std::make_unique<IntranetRedirectDetector>();
-  }
-
-  return intranet_redirect_detector_.get();
 }
 
 const std::string& BrowserProcessImpl::GetApplicationLocale() {
