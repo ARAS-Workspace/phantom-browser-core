@@ -1227,11 +1227,6 @@ inline constexpr char kDevToolsSyncedPreferencesSyncEnabled[] =
 inline constexpr char kDevToolsSyncedPreferencesSyncDisabled[] =
     "devtools.synced_preferences_sync_disabled";
 
-inline constexpr char kDevToolsGenAiSettings[] = "devtools.gen_ai_settings";
-
-inline constexpr char kDevToolsGoogleDeveloperProgramProfileAvailability[] =
-    "devtools.google_developer_program_profile_availability";
-
 // Tracks the number of times the dice signin promo has been shown in the user
 // menu.
 inline constexpr char kDiceSigninUserMenuPromoCount[] =

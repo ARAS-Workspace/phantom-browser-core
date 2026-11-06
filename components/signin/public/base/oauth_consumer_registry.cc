@@ -18,10 +18,6 @@ constexpr char kAccountsReauthOAuth2Scope[] =
     "https://www.googleapis.com/auth/accounts.reauth";
 constexpr char kAgenticPermissionOAuth2Scope[] =
     "https://www.googleapis.com/auth/agenticpermission";
-// OAuth2 scope for DevTools GenAI features.
-constexpr char kAiCodeOAuth2Scope[] = "https://www.googleapis.com/auth/aicode";
-// OAuth2 scope for DevTools GenAI features.
-constexpr char kAidaOAuth2Scope[] = "https://www.googleapis.com/auth/aida";
 // OAuth2 scope for access to audit recording (ARI).
 constexpr char kAuditRecordingOAuth2Scope[] =
     "https://www.googleapis.com/auth/auditrecording-pa";
@@ -102,9 +98,6 @@ constexpr char kGCMCheckinServerOAuth2Scope[] =
     "https://www.googleapis.com/auth/android_checkin";
 constexpr char kGCMGroupServerOAuth2Scope[] =
     "https://www.googleapis.com/auth/gcm";
-// OAuth2 scope for DevTools Google Developer Program features.
-constexpr char kGdpOAuth2Scope[] =
-    "https://www.googleapis.com/auth/devprofiles.full_control";
 // OAuth2 scope for readonly access to Gmail metadata.
 constexpr char kGmailMetadataOAuth2Scope[] =
     "https://www.googleapis.com/auth/gmail.metadata";
@@ -293,9 +286,7 @@ constexpr char kDataSharingAndroidName[] = "data_sharing_android";
 constexpr char kExtensionsIdentityAPIName[] = "extensions_identity_api";
 constexpr char kMantaName[] = "manta";
 constexpr char kChromeMemexName[] = "chrome_memex";
-constexpr char kDevtoolsAidaName[] = "devtools_aida_client";
 constexpr char kAimEligibilityServiceName[] = "aim_eligibility_service";
-constexpr char kDevtoolsAiCodeName[] = "devtools_aicode_client";
 constexpr char kChromeOsBabelOrcaName[] = "chromeos_babel_orca";
 constexpr char kChromeOsBocaSchoolToolsAuthName[] =
     "chromeos_boca_school_tools_auth";
@@ -308,7 +299,6 @@ constexpr char kAuthServiceGlanceablesClassroomName[] =
 constexpr char kAuthServiceTasksClientName[] = "auth_service_tasks_client";
 constexpr char kYouTubeMusicName[] = "youtube_music";
 
-constexpr char kDevtoolsGdpName[] = "devtools_gdp_client";
 constexpr char kAshDriveIntegrationName[] = "ash_drive_integration";
 constexpr char kAshClassroomPageHandlerName[] = "ash_classroom_page_handler";
 constexpr char kAshScannerKeyedServiceName[] = "ash_scanner_keyed_service";
@@ -636,10 +626,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kChromeMemexName,
           /*scopes=*/{kChromeMemexOAuth2Scope});
-    case OAuthConsumerId::kDevtoolsAida:
-      return OAuthConsumer(
-          /*name=*/kDevtoolsAidaName,
-          /*scopes=*/{kAidaOAuth2Scope});
     case OAuthConsumerId::kChromeOsBabelOrca:
       return OAuthConsumer(
           /*name=*/kChromeOsBabelOrcaName,
@@ -685,10 +671,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return GetOAuthConsumerForGlicUserStatus();
     case OAuthConsumerId::kIndigo:
       NOTREACHED();
-    case OAuthConsumerId::kDevtoolsGdp:
-      return OAuthConsumer(
-          /*name=*/kDevtoolsGdpName,
-          /*scopes=*/{kGdpOAuth2Scope});
     case OAuthConsumerId::kAshDriveIntegration:
       return OAuthConsumer(
           /*name=*/kAshDriveIntegrationName,
@@ -726,10 +708,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kAimEligibilityServiceName,
           /*scopes=*/{GaiaConstants::kSearchResultsOAuth2Scope});
-    case OAuthConsumerId::kDevtoolsAiCode:
-      return OAuthConsumer(
-          /*name=*/kDevtoolsAiCodeName,
-          /*scopes=*/{kAiCodeOAuth2Scope});
     case OAuthConsumerId::kAccessibilityAnnotator:
       // TODO(b/493530228): Use narrow scope for the accessibility annotator.
       return OAuthConsumer(

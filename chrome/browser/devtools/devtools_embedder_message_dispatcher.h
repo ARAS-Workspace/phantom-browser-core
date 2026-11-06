@@ -10,7 +10,6 @@
 
 #include "base/functional/callback.h"
 #include "base/values.h"
-#include "chrome/browser/devtools/devtools_dispatch_http_request_params.h"
 #include "ui/gfx/geometry/insets.h"
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/geometry/size.h"
@@ -140,17 +139,7 @@ class DevToolsEmbedderMessageDispatcher {
                             const std::string& trigger) = 0;
     virtual void CanShowSurvey(DispatchCallback callback,
                                const std::string& trigger) = 0;
-    virtual void DoAidaConversation(DispatchCallback callback,
-                                    const std::string& request,
-                                    int stream_id) = 0;
-    virtual void AidaCodeComplete(DispatchCallback callback,
-                                    const std::string& request) = 0;
-    virtual void RegisterAidaClientEvent(DispatchCallback callback,
-                                         const std::string& request) = 0;
     virtual void SetChromeFlag(const std::string& flag_name, bool value) = 0;
-    virtual void DispatchHttpRequest(
-        DispatchCallback callback,
-        const DevToolsDispatchHttpRequestParams& body) = 0;
     virtual void RequestRestart() = 0;
   };
 

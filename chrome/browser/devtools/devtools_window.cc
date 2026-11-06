@@ -27,7 +27,6 @@
 #include "base/values.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/certificate_viewer.h"
-#include "chrome/browser/devtools/aida_client.h"
 #include "chrome/browser/devtools/devtools_availability_checker.h"
 #include "chrome/browser/devtools/devtools_eye_dropper.h"
 #include "chrome/browser/devtools/features.h"
@@ -52,7 +51,6 @@
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/tabs/tab_group_deletion_dialog_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_user_gesture_details.h"
-#include "chrome/browser/ui/webui/devtools/devtools_ui.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
@@ -564,12 +562,6 @@ void DevToolsWindow::RegisterProfilePrefs(
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterDictionaryPref(
       prefs::kDevToolsSyncedPreferencesSyncDisabled);
-  registry->RegisterIntegerPref(
-      prefs::kDevToolsGenAiSettings,
-      static_cast<int>(DevToolsGenAiEnterprisePolicyValue::kAllow));
-  registry->RegisterIntegerPref(
-      prefs::kDevToolsGoogleDeveloperProgramProfileAvailability,
-      /* enabled */ 0);
 }
 
 // static
@@ -675,26 +667,6 @@ void DevToolsWindow::OpenDevToolsWindow(
     Profile* profile,
     DevToolsOpenedByAction opened_by,
     const content::DevToolsManagerDelegate::DevToolsOptions& devtools_options) {
-  OpenDevToolsWindow(agent_host, profile, false /* use_bundled_frontend */,
-                     opened_by, devtools_options);
-}
-
-// static
-void DevToolsWindow::OpenDevToolsWindowWithBundledFrontend(
-    scoped_refptr<content::DevToolsAgentHost> agent_host,
-    Profile* profile,
-    DevToolsOpenedByAction opened_by) {
-  OpenDevToolsWindow(agent_host, profile, true /* use_bundled_frontend */,
-                     opened_by);
-}
-
-// static
-void DevToolsWindow::OpenDevToolsWindow(
-    scoped_refptr<content::DevToolsAgentHost> agent_host,
-    Profile* profile,
-    bool use_bundled_frontend,
-    DevToolsOpenedByAction opened_by,
-    const content::DevToolsManagerDelegate::DevToolsOptions& devtools_options) {
   if (!profile) {
     profile = Profile::FromBrowserContext(agent_host->GetBrowserContext());
   }
@@ -709,9 +681,7 @@ void DevToolsWindow::OpenDevToolsWindow(
                    type == DevToolsAgentHost::kTypeSharedWorker;
 
   if (!agent_host->GetFrontendURL().empty()) {
-    DevToolsWindow::OpenExternalFrontend(profile, agent_host->GetFrontendURL(),
-                                         agent_host, use_bundled_frontend,
-                                         opened_by);
+    DevToolsWindow::OpenExternalFrontend(profile, agent_host, opened_by);
     return;
   }
 
@@ -762,9 +732,7 @@ void DevToolsWindow::OpenDevToolsWindowForFrame(
 // static
 void DevToolsWindow::OpenExternalFrontend(
     Profile* profile,
-    const std::string& frontend_url,
     const scoped_refptr<content::DevToolsAgentHost>& agent_host,
-    bool use_bundled_frontend,
     DevToolsOpenedByAction opened_by) {
   DevToolsWindow* window = FindDevToolsWindow(agent_host.get());
   if (window) {
@@ -785,11 +753,8 @@ void DevToolsWindow::OpenExternalFrontend(
     FrontendType frontend_type =
         is_worker ? kFrontendRemoteWorker
                   : (type == "tab" ? kFrontendRemoteTab : kFrontendRemote);
-    std::string effective_frontend_url =
-        use_bundled_frontend ? kFallbackFrontendURL
-                             : DevToolsUI::GetProxyURL(frontend_url).spec();
     window =
-        Create(profile, nullptr, frontend_type, effective_frontend_url, false,
+        Create(profile, nullptr, frontend_type, kFallbackFrontendURL, false,
                std::string(), std::string(), agent_host->IsAttached(),
                /* browser_connection */ false, opened_by);
   }
@@ -1390,8 +1355,7 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
                                     bool browser_connection) {
   std::string url;
 
-  std::string remote_base =
-      "?remoteBase=" + DevToolsUI::GetRemoteBaseURL().spec();
+  const std::string query_start = "?";
 
   const std::string valid_frontend =
       frontend_url.empty() ? chrome::kChromeUIDevToolsURL : frontend_url;
@@ -1404,7 +1368,7 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
   std::string tab_target = "&targetType=tab";
   switch (frontend_type) {
     case kFrontendDefault:
-      url = kDefaultFrontendURL + remote_base + tab_target;
+      url = kDefaultFrontendURL + query_start + tab_target;
       if (can_dock) {
         url += "&can_dock=true";
       }
@@ -1413,13 +1377,13 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
       }
       break;
     case kFrontendWorker:
-      url = kWorkerFrontendURL + remote_base;
+      url = kWorkerFrontendURL + query_start;
       break;
     case kFrontendV8:
-      url = kJSFrontendURL + remote_base;
+      url = kJSFrontendURL + query_start;
       break;
     case kFrontendNode:
-      url = kNodeFrontendURL + remote_base;
+      url = kNodeFrontendURL + query_start;
       break;
     case kFrontendRemote:
       url = remote_frontend;

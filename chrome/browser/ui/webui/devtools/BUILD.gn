@@ -16,7 +16,6 @@ if (enable_devtools_frontend) {
     ]
     deps = [
       "//base",
-      "//build/util:chromium_git_revision",
       "//chrome/browser/devtools",
       "//chrome/browser/profiles:profile",
       "//chrome/common",

@@ -25,7 +25,8 @@ struct NetworkTrafficAnnotationTag;
 // requests. Three types of requests could be handled based on the URL path:
 // 1. /bundled/: bundled DevTools frontend is served. The path can be provided
 //    via --custom-devtools-frontend as file:// URL.
-// 2. /remote/: remote DevTools frontend is served from App Engine.
+// 2. /remote/: custom DevTools frontend is served as specified via
+//    --custom-devtools-frontend.
 // 3. /custom/: custom DevTools frontend is served from the server as specified
 //    via --custom-devtools-frontend as http:// URL.
 class DevToolsDataSource : public content::URLDataSource {
@@ -65,9 +66,6 @@ class DevToolsDataSource : public content::URLDataSource {
   // Serves bundled DevTools frontend from ResourceBundle.
   void StartBundledDataRequest(const std::string& path,
                                GotDataCallback callback);
-
-  // Serves remote DevTools frontend from hard-coded App Engine domain.
-  void StartRemoteDataRequest(const GURL& url, GotDataCallback callback);
 
   // Serves remote DevTools frontend from any endpoint, passed through
   // command-line flag.

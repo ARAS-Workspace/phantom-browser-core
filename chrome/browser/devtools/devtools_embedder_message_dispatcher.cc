@@ -10,7 +10,6 @@
 #include "base/logging.h"
 #include "base/types/optional_util.h"
 #include "base/values.h"
-#include "chrome/browser/devtools/devtools_dispatch_http_request_params.h"
 #include "chrome/browser/devtools/devtools_settings.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/devtools/visual_logging.h"
@@ -18,20 +17,6 @@
 namespace {
 
 using DispatchCallback = DevToolsEmbedderMessageDispatcher::DispatchCallback;
-
-bool GetValue(const base::Value& value,
-              DevToolsDispatchHttpRequestParams& params) {
-  const base::DictValue* dict = value.GetIfDict();
-  if (!dict) {
-    return false;
-  }
-  auto parsed_params = DevToolsDispatchHttpRequestParams::FromDict(*dict);
-  if (!parsed_params) {
-    return false;
-  }
-  params = std::move(*parsed_params);
-  return true;
-}
 
 bool GetValue(const base::Value& value, std::string& result) {
   const std::string* str = value.GetIfString();
@@ -448,14 +433,6 @@ DevToolsEmbedderMessageDispatcher::CreateForDevToolsFrontend(
   d->RegisterHandlerWithCallback("canShowSurvey", &Delegate::CanShowSurvey,
                                  delegate);
 
-  d->RegisterHandlerWithCallback("doAidaConversation",
-                                 &Delegate::DoAidaConversation, delegate);
-  d->RegisterHandlerWithCallback("aidaCodeComplete",
-                                 &Delegate::AidaCodeComplete, delegate);
-  d->RegisterHandlerWithCallback("registerAidaClientEvent",
-                                 &Delegate::RegisterAidaClientEvent, delegate);
-  d->RegisterHandlerWithCallback("dispatchHttpRequest",
-                                 &Delegate::DispatchHttpRequest, delegate);
   d->RegisterHandler("requestRestart", &Delegate::RequestRestart, delegate);
   return d;
 }

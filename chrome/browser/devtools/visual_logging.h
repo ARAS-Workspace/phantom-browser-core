@@ -71,8 +71,6 @@ struct FunctionCallEvent {
 
 enum SessionTags {
   kUserSignedIn = 1 << 0,
-  kDevToolsGetAiEnterprisePolicyDisabled = 1 << 1,
-  kDevToolsGetAiEnterprisePolicyAllowWithoutLogging = 1 << 2,
   kDevToolsRemoteDebuggingDisabled = 1 << 3,
 };
 

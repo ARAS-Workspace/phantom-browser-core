@@ -10,8 +10,6 @@
 
 class DevToolsUI : public content::WebUIController {
  public:
-  static GURL GetProxyURL(const std::string& frontend_url);
-  static GURL GetRemoteBaseURL();
   static bool IsFrontendResourceURL(const GURL& url);
 
   explicit DevToolsUI(content::WebUI* web_ui);

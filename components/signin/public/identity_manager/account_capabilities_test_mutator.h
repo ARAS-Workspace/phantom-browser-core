@@ -36,7 +36,6 @@ class AccountCapabilitiesTestMutator {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void set_can_submit_feedback(bool value);
 #endif
-  void set_can_use_devtools_generative_ai_features(bool value);
   void set_can_use_edu_features(bool value);
   void set_can_use_gemini_in_chrome(bool value);
   void set_can_use_manta_service(bool value);

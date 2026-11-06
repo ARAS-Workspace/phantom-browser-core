@@ -262,9 +262,8 @@ TEST_F(DevToolsUIDataSourceTest, TestDevToolsRemoteURL) {
       DevToolsUrl().Resolve(DevToolsRemotePath(kDevToolsUITestFrontEndUrl));
   StartRequest(path.GetPath());
   EXPECT_TRUE(data_received());
-  EXPECT_EQ(
-      data(),
-      "url: https://chrome-devtools-frontend.appspot.com/devtools_app.html");
+  ASSERT_TRUE(base::StartsWith(data(), kDevToolsUITest404Response,
+                               base::CompareCase::SENSITIVE));
 }
 
 TEST_F(DevToolsUIDataSourceTest, TestDevToolsRemoteURLWithQueryParam) {

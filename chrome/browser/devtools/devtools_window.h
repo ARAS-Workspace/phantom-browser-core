@@ -9,6 +9,7 @@
 #include <string>
 
 #include "base/callback_list.h"
+#include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
@@ -163,11 +164,6 @@ class DevToolsWindow : public DevToolsUIBindings::Delegate,
       const content::DevToolsManagerDelegate::DevToolsOptions&
           devtools_options =
               content::DevToolsManagerDelegate::DevToolsOptions());
-  // Similar to previous one, but forces the bundled frontend to be used.
-  static void OpenDevToolsWindowWithBundledFrontend(
-      scoped_refptr<content::DevToolsAgentHost> host,
-      Profile* profile,
-      DevToolsOpenedByAction opened_by);
 
   // Perform specified action for current WebContents inside a |browser|.
   // This may close currently open DevTools window.
@@ -378,19 +374,8 @@ class DevToolsWindow : public DevToolsUIBindings::Delegate,
   // External frontend is always undocked.
   static void OpenExternalFrontend(
       Profile* profile,
-      const std::string& frontend_uri,
       const scoped_refptr<content::DevToolsAgentHost>& agent_host,
-      bool use_bundled_frontend,
       DevToolsOpenedByAction opened_by);
-
-  static void OpenDevToolsWindow(
-      scoped_refptr<content::DevToolsAgentHost> host,
-      Profile* profile,
-      bool use_bundled_frontend,
-      DevToolsOpenedByAction opened_by,
-      const content::DevToolsManagerDelegate::DevToolsOptions&
-          devtools_options =
-              content::DevToolsManagerDelegate::DevToolsOptions());
 
   static DevToolsWindow* Create(Profile* profile,
                                 content::WebContents* inspected_web_contents,

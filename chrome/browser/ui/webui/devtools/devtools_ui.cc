@@ -6,10 +6,7 @@
 
 #include "base/command_line.h"
 #include "base/strings/string_util.h"
-#include "base/strings/stringprintf.h"
-#include "build/util/chromium_git_revision.h"
 #include "chrome/browser/devtools/devtools_availability_checker.h"
-#include "chrome/browser/devtools/url_constants.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/webui/devtools/devtools_ui_data_source.h"
 #include "chrome/common/chrome_switches.h"
@@ -22,33 +19,7 @@
 #include "content/public/common/bindings_policy.h"
 
 // static
-GURL DevToolsUI::GetProxyURL(const std::string& frontend_url) {
-  GURL url(frontend_url);
-  if (url.GetScheme() == content::kChromeDevToolsScheme &&
-      url.GetHost() == chrome::kChromeUIDevToolsHost) {
-    return GURL();
-  }
-  if (!url.is_valid() || url.GetHost() != kRemoteFrontendDomain) {
-    return GURL();
-  }
-  return GURL(base::StringPrintf(
-      "%s://%s/%s/%s?%s", content::kChromeDevToolsScheme,
-      chrome::kChromeUIDevToolsHost, chrome::kChromeUIDevToolsRemotePath,
-      url.GetPath().substr(1).c_str(), url.GetQuery().c_str()));
-}
-
-// static
-GURL DevToolsUI::GetRemoteBaseURL() {
-  return GURL(base::StringPrintf("%s%s/%s/", kRemoteFrontendBase,
-                                 kRemoteFrontendPath, CHROMIUM_GIT_REVISION));
-}
-
-// static
 bool DevToolsUI::IsFrontendResourceURL(const GURL& url) {
-  if (url.host() == kRemoteFrontendDomain) {
-    return true;
-  }
-
   const base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
   if (cmd_line->HasSwitch(switches::kCustomDevtoolsFrontend)) {
     GURL custom_frontend_url =

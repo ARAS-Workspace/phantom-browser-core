@@ -5,6 +5,7 @@
 #include "base/test/bind.h"
 #include "base/test/values_test_util.h"
 #include "chrome/browser/extensions/extension_apitest.h"
+#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"

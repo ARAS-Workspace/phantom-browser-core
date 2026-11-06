@@ -71,10 +71,6 @@ ACCOUNT_CAPABILITY(kCanSubmitFeedbackInChromeCapabilityName,
                    "accountcapabilities/gizdqmrnmnqxa")
 #endif
 
-ACCOUNT_CAPABILITY(kCanUseDevToolsGenerativeAiFeaturesCapabilityName,
-                   CAN_USE_DEVTOOLS_GENERATIVE_AI_FEATURES_CAPABILITY_NAME,
-                   "accountcapabilities/geztenjnmnqxa")
-
 ACCOUNT_CAPABILITY(kCanUseEduFeaturesCapabilityName,
                    CAN_USE_EDU_FEATURES_CAPABILITY_NAME,
                    "accountcapabilities/gezdsmbnmnqxa")

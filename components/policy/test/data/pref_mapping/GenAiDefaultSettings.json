@@ -11,9 +11,6 @@
           "GenAiDefaultSettings": 0
         },
         "prefs": {
-          "devtools.gen_ai_settings": {
-            "value": 0
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 0
           },
@@ -39,9 +36,6 @@
           "GenAiDefaultSettings": 1
         },
         "prefs": {
-          "devtools.gen_ai_settings": {
-            "value": 1
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 1
           },
@@ -67,9 +61,6 @@
           "GenAiDefaultSettings": 2
         },
         "prefs": {
-          "devtools.gen_ai_settings": {
-            "value": 2
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 2
           },
@@ -93,9 +84,6 @@
       {
         "policies": {},
         "prefs": {
-          "devtools.gen_ai_settings": {
-            "default_value": 0
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "default_value": 0
           },
@@ -120,7 +108,6 @@
         "policies": {
           "GenAiDefaultSettings": 1,
           "AutofillPredictionSettings": 2,
-          "DevToolsGenAiSettings": 2,
           "HelpMeWriteSettings": 2,
           "HistorySearchSettings": 2,
           "TabCompareSettings": 2,
@@ -132,9 +119,6 @@
           "ThirdPartyAiChatSettings": 1
         },
         "prefs": {
-          "devtools.gen_ai_settings": {
-            "value": 2
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 2
           },
@@ -182,9 +166,6 @@
           "ash.vc_background_ui.gen_ai_vc_background_enterprise_policy_settings": {
             "value": 0
           },
-          "devtools.gen_ai_settings": {
-            "value": 0
-          },
           "omnibox.ai_mode_settings": {
             "value": 0
           },
@@ -244,9 +225,6 @@
           "ash.vc_background_ui.gen_ai_vc_background_enterprise_policy_settings": {
             "value": 1
           },
-          "devtools.gen_ai_settings": {
-            "value": 1
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 1
           },
@@ -292,7 +270,6 @@
         "policies": {
           "GenAiDefaultSettings": 0,
           "AutofillPredictionSettings": 2,
-          "DevToolsGenAiSettings": 2,
           "GenAiChromeOsSmartActionsSettings": 2,
           "GenAIInlineImageSettings": 2,
           "GenAIPhotoEditingSettings": 2,
@@ -324,9 +301,6 @@
             "value": 2
           },
           "ash.vc_background_ui.gen_ai_vc_background_enterprise_policy_settings": {
-            "value": 2
-          },
-          "devtools.gen_ai_settings": {
             "value": 2
           },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {

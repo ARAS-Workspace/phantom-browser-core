@@ -5,23 +5,22 @@
 #ifndef CHROME_BROWSER_DEVTOOLS_DEVTOOLS_UI_BINDINGS_H_
 #define CHROME_BROWSER_DEVTOOLS_DEVTOOLS_UI_BINDINGS_H_
 
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
-#include <variant>
 #include <vector>
 
 #include "base/containers/unique_ptr_adapters.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
+#include "base/time/time.h"
+#include "base/unguessable_token.h"
 #include "base/values.h"
-#include "chrome/browser/devtools/aida_client.h"
-#include "chrome/browser/devtools/devtools_dispatch_http_request_params.h"
 #include "chrome/browser/devtools/devtools_embedder_message_dispatcher.h"
 #include "chrome/browser/devtools/devtools_file_helper.h"
 #include "chrome/browser/devtools/devtools_file_storage.h"
 #include "chrome/browser/devtools/devtools_file_system_indexer.h"
-#include "chrome/browser/devtools/devtools_http_service_handler.h"
 #include "chrome/browser/devtools/devtools_infobar_delegate.h"
 #include "chrome/browser/devtools/devtools_settings.h"
 #include "chrome/browser/devtools/devtools_targets_ui.h"
@@ -50,17 +49,10 @@ namespace infobars {
 class ContentInfoBarManager;
 }
 
-namespace network {
-class SimpleURLLoader;
-}
-
 namespace permissions {
 enum class PermissionAction;
 }
 
-class DevToolsHttpServiceHandler;
-class DevToolsHttpServiceRegistry;
-class DevToolsUIBindingsDispatchHttpRequestTest;
 class DevToolsUIBindingsLoadNetworkResourceTest;
 class PortForwardingStatusSerializer;
 class Profile;
@@ -73,8 +65,6 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
                            public extensions::ExtensionRegistryObserver,
 #endif
                            public DevToolsFileHelper::Delegate {
-  friend class DevToolsUIBindingsDispatchHttpRequestTest;
-  friend class DevToolsUIBindingsDispatchHttpRequestStreamingTest;
   friend class DevToolsUIBindingsLoadNetworkResourceTest;
 
  public:
@@ -112,7 +102,6 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
 
   static GURL SanitizeFrontendURL(const GURL& url);
   static bool IsValidFrontendURL(const GURL& url);
-  static bool IsValidRemoteFrontendURL(const GURL& url);
 
   static base::DictValue GetHostConfigDictionary(Profile* profile);
   static void SetChromeFlagInternal(Profile* profile,
@@ -153,8 +142,6 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
   // ThemeServiceObserver implementation
   void OnThemeChanged() override;
 
-  void SetHttpServiceRegistryForTesting(
-      std::unique_ptr<DevToolsHttpServiceRegistry> service_registry);
   const std::map<std::string, std::string>& GetExtensionsAPIForTesting() const {
     return extensions_api_;
   }
@@ -285,57 +272,8 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
                   const std::string& trigger) override;
   void CanShowSurvey(DispatchCallback callback,
                      const std::string& trigger) override;
-  bool EnsureAidaClientAvailable();
-  void HandleAidaClientUnavailable(DispatchCallback callback);
-  void DoAidaConversation(DispatchCallback callback,
-                          const std::string& request,
-                          int stream_id) override;
-  void AidaCodeComplete(DispatchCallback callback,
-                        const std::string& request) override;
-  void RegisterAidaClientEvent(DispatchCallback callback,
-                               const std::string& request) override;
   void SetChromeFlag(const std::string& flag_name, bool value) override;
   void RequestRestart() override;
-
-  // Dispatches a generic HTTP request to a backend service.
-  // This is a centralized entry point for DevTools frontend to make network
-  // requests to a allow-listed set of backend services.
-  //
-  // Contract with the DevTools frontend:
-  //
-  // Parameters:
-  // - `service`: A string identifier for the target service (e.g.,
-  //   `aidaService`).
-  // - `path`: The specific API path (e.g., `/v1/aida:codeComplete`).
-  // - `method`: The HTTP method (e.g., `POST`).
-  // - `body`: The optional request payload.
-  // - `queryParams`: An optional dictionary of URL query parameters. Keys are
-  //   strings, and values can be either a string or an array of strings.
-  //
-  // Successful Response:
-  // The callback will be invoked with a dictionary containing:
-  // - `response` (string): The response body from the server.
-  // - `statusCode` (int): The HTTP status code.
-  //
-  // Error Responses:
-  // In case of an error, the callback is invoked with a dictionary
-  // containing an `error` key. The value is a string describing the error.
-  // Additional details may be provided.
-  //
-  // Possible error scenarios:
-  // 1. Service not found: `{"error": "Service not found"}`
-  // 2. Disallowed path or method: `{"error": "Disallowed path or method"}`
-  // 3. Pre-request validation failed: `{"error": "Request validation
-  // failed"}`
-  // 4. Token fetch failure: `{"error": "Token fetch error", "detail":
-  // "<error_details>"}`
-  // 5. Network request failure (including non-2xx responses):
-  //    `{"error": "Request failed", "detail": "<response_body>", "netError":
-  //    net::OK, "netErrorName": "net::ERR_FAILED", "statusCode":
-  //    <http_status>}`
-  void DispatchHttpRequest(
-      DispatchCallback callback,
-      const DevToolsDispatchHttpRequestParams& params) override;
 
   void SendMessageAck(int request_id,
                       const base::Value* arg1);
@@ -389,42 +327,6 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
                                 permissions::PermissionAction result);
   void MaybeStartLogging();
   base::TimeDelta GetTimeSinceSessionStart();
-  void HandleAidaRequestError(
-      DispatchCallback callback,
-      std::variant<network::ResourceRequest, std::string>
-          resource_request_or_error);
-  void OnAidaConversationRequest(
-      DispatchCallback callback,
-      int stream_id,
-      const std::string& request,
-      base::TimeDelta delay,
-      std::variant<network::ResourceRequest, std::string>
-          resource_request_or_error);
-  void OnAidaConversationResponse(
-      DispatchCallback callback,
-      int stream_id,
-      const std::string request,
-      base::TimeDelta delay,
-      std::variant<network::ResourceRequest, std::string>
-          resource_request_or_error,
-      base::TimeTicks start_time,
-      const base::Value* response);
-  void OnAidaRequest(const GURL& url,
-                     const std::string& response_histogram_name,
-                     DispatchCallback callback,
-                     const std::string& request,
-                     std::variant<network::ResourceRequest, std::string>
-                         resource_request_or_error);
-  void OnAidaResponse(
-      const std::string& histogram_name,
-      DispatchCallback callback,
-      std::unique_ptr<network::SimpleURLLoader> simple_url_loader,
-      base::TimeTicks start_time,
-      std::optional<std::string> response_body);
-
-  void OnHttpRequestPerformed(
-      DispatchCallback callback,
-      std::unique_ptr<DevToolsHttpServiceHandler::Result> result);
 
   // Extensions support.
   void AddDevToolsExtensionsToClient();
@@ -485,11 +387,6 @@ class DevToolsUIBindings : public DevToolsEmbedderMessageDispatcher::Delegate,
 
   DevToolsSettings settings_;
   base::TimeTicks session_start_time_;
-
-  std::unique_ptr<AidaClient> aida_client_;
-  bool can_access_aida_ = false;
-
-  std::unique_ptr<DevToolsHttpServiceRegistry> http_service_registry_;
 
   base::UnguessableToken session_id_for_logging_;
   bool is_local_frontend_ = false;

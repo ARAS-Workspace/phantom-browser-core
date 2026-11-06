@@ -163,11 +163,6 @@ signin::Tribool AccountCapabilities::can_submit_feedback() const {
 }
 #endif
 
-signin::Tribool AccountCapabilities::can_use_devtools_generative_ai_features()
-    const {
-  return GetCapabilityByName(kCanUseDevToolsGenerativeAiFeaturesCapabilityName);
-}
-
 signin::Tribool AccountCapabilities::can_use_edu_features() const {
   return GetCapabilityByName(kCanUseEduFeaturesCapabilityName);
 }

@@ -1013,12 +1013,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kIPv6ReachabilityOverrideEnabled,
     prefs::kIPv6ReachabilityOverrideEnabled,
     base::Value::Type::BOOLEAN },
-  { key::kDevToolsGenAiSettings,
-    prefs::kDevToolsGenAiSettings,
-    base::Value::Type::INTEGER },
-  { key::kDevToolsGoogleDeveloperProgramProfileAvailability,
-    prefs::kDevToolsGoogleDeveloperProgramProfileAvailability,
-    base::Value::Type::INTEGER },
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   { key::kExtensionInstallTypeBlocklist,
@@ -1545,8 +1539,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   gen_ai_default_policies.emplace_back(
       key::kHelpMeWriteSettings,
       optimization_guide::prefs::kComposeEnterprisePolicyAllowed);
-  gen_ai_default_policies.emplace_back(key::kDevToolsGenAiSettings,
-                                       prefs::kDevToolsGenAiSettings);
   gen_ai_default_policies.emplace_back(
       key::kHistorySearchSettings,
       optimization_guide::prefs::kHistorySearchEnterprisePolicyAllowed);

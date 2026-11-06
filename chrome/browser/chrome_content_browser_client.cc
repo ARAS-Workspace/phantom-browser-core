@@ -3739,12 +3739,6 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
 
   web_prefs->prefers_default_scrollbar_styles =
       prefs->GetBoolean(prefs::kPrefersDefaultScrollbarStyles);
-
-  if (web_contents->GetVisibleURL().SchemeIs(content::kChromeDevToolsScheme) &&
-      base::FeatureList::IsEnabled(::features::kDevToolsAiOriginTrialsApis)) {
-    web_prefs->ai_ot_apis_enabled = true;
-  }
-
 }
 
 bool ChromeContentBrowserClientParts::OverrideWebPreferencesAfterNavigation(

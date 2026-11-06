@@ -92,7 +92,7 @@ enum class OAuthConsumerId {
   kExtensionsIdentityAPI = 65,
   kManta = 66,
   kChromeMemex = 67,
-  kDevtoolsAida = 68,
+  // kDevtoolsAida = 68, // Removed due to deprecation.
   kChromeOsBabelOrca = 69,
   kChromeOsBocaSchoolToolsAuth = 70,
   kSharedDataPreview = 71,
@@ -105,7 +105,7 @@ enum class OAuthConsumerId {
   kContextualTasks = 78,
   // kEnterprisePlusAddress = 79, // Removed due to deprecation.
   kGlicUserStatus = 80,
-  kDevtoolsGdp = 81,
+  // kDevtoolsGdp = 81, // Removed due to deprecation.
   kAshDriveIntegration = 82,
   kAshBocaClassroomPageHandler = 83,
   kAshScannerKeyedService = 84,
@@ -114,7 +114,7 @@ enum class OAuthConsumerId {
   kPrivateAiService = 87,
   kWalletPasses = 88,
   kAimEligibilityService = 89,
-  kDevtoolsAiCode = 90,
+  // kDevtoolsAiCode = 90, // Removed due to deprecation.
   kAccessibilityAnnotator = 91,
   kActorLoginPermissionService = 92,
   kGapisService = 93,

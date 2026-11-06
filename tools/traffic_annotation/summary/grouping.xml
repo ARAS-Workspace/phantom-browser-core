@@ -161,7 +161,6 @@ after discussions on the right group.
       <annotation id="glic_web_ui"/>
       <annotation id="aim_eligibility_fetch"/>
       <annotation id="enterprise_logo_fetcher_for_browser"/>
-      <annotation id="devtools_gdp_service"/>
       <annotation id="webrtc_rtc_transport"/>
       <annotation id="email_verification"/>
       <annotation id="amount_extraction_model_execution"/>
@@ -173,7 +172,6 @@ after discussions on the right group.
       <annotation id="skills_service_loader"/>
       <annotation id="skills_model_execution"/>
       <annotation id="settings_overridden_dialog_icon_fetcher"/>
-      <annotation id="devtools_gca_service"/>
       <annotation id="actor_login_permission_service"/>
       <annotation id="fetch_email_one_time_token"/>
       <annotation id="glic_private_api_prompt_fetcher"/>
@@ -210,9 +208,7 @@ after discussions on the right group.
       <annotation id="enterprise_proxy_pvd_fetch"/>
     </sender>
     <sender name="Developer Tools">
-      <annotation id="devtools_cdp_console_insights"/>
       <annotation id="devtools_handle_front_end_messages"/>
-      <annotation id="devtools_hard_coded_data_source"/>
       <annotation id="devtools_http_handler"/>
     </sender>
   </group>

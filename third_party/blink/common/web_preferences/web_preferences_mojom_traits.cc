@@ -241,7 +241,6 @@ bool StructTraits<blink::mojom::WebPreferencesDataView,
       data.renderer_wide_named_frame_lookup();
   out->modal_context_menu = data.modal_context_menu();
   out->payment_request_enabled = data.payment_request_enabled();
-  out->ai_ot_apis_enabled = data.ai_ot_apis_enabled();
 
 #if BUILDFLAG(IS_MAC)
   out->should_disable_external_popups = data.should_disable_external_popups();

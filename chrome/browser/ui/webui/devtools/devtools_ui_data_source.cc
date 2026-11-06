@@ -18,8 +18,6 @@
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
 #include "base/task/thread_pool.h"
-#include "chrome/browser/devtools/devtools_ui_bindings.h"
-#include "chrome/browser/devtools/url_constants.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/url_constants.h"
@@ -179,24 +177,13 @@ void DevToolsDataSource::StartDataRequest(
     return;
   }
 
-  // Serve request to devtools://remote from remote location.
+  // Serve request to devtools://remote from the custom frontend.
   std::string remote_path_prefix(chrome::kChromeUIDevToolsRemotePath);
   remote_path_prefix += "/";
   if (base::StartsWith(path, remote_path_prefix,
                        base::CompareCase::INSENSITIVE_ASCII)) {
-    if (MaybeHandleCustomRequest(path.substr(remote_path_prefix.length()),
-                                 &callback)) {
-      return;
-    }
-    GURL remote_url(kRemoteFrontendBase +
-                    path.substr(remote_path_prefix.length()));
-
-    CHECK_EQ(remote_url.GetHost(), kRemoteFrontendDomain);
-    if (remote_url.is_valid() &&
-        DevToolsUIBindings::IsValidRemoteFrontendURL(remote_url)) {
-      StartRemoteDataRequest(remote_url, std::move(callback));
-    } else {
-      DLOG(ERROR) << "Refusing to load invalid remote front-end URL";
+    if (!MaybeHandleCustomRequest(path.substr(remote_path_prefix.length()),
+                                  &callback)) {
       std::move(callback).Run(CreateNotFoundResponse());
     }
     return;
@@ -230,7 +217,7 @@ std::string DevToolsDataSource::GetContentSecurityPolicy(
     case network::mojom::CSPDirectiveName::ObjectSrc:
       return "object-src 'none';";
     case network::mojom::CSPDirectiveName::ScriptSrc:
-      return "script-src 'self' https://chrome-devtools-frontend.appspot.com;";
+      return "script-src 'self';";
     default:
       return std::string();
   }
@@ -252,38 +239,6 @@ void DevToolsDataSource::StartBundledDataRequest(
 
   DLOG_IF(WARNING, !bytes) << "Unable to find DevTools resource: " << path;
   std::move(callback).Run(bytes);
-}
-
-void DevToolsDataSource::StartRemoteDataRequest(
-    const GURL& url,
-    content::URLDataSource::GotDataCallback callback) {
-  CHECK(url.is_valid());
-  net::NetworkTrafficAnnotationTag traffic_annotation =
-      net::DefineNetworkTrafficAnnotation("devtools_hard_coded_data_source",
-                                          R"(
-        semantics {
-          sender: "Developer Tools Remote Data Request From Google"
-          description:
-            "This service fetches Chromium DevTools front-end files from the "
-            "cloud for the remote debugging scenario."
-          trigger:
-            "When user attaches to mobile phone for debugging."
-          data: "None"
-          destination: GOOGLE_OWNED_SERVICE
-        }
-        policy {
-          cookies_allowed: NO
-          setting: "This feature cannot be disabled by settings."
-          chrome_policy {
-            DeveloperToolsAvailability {
-              policy_options {mode: MANDATORY}
-              DeveloperToolsAvailability: 2
-            }
-          }
-        })");
-
-  StartNetworkRequest(url, traffic_annotation, net::LOAD_NORMAL,
-                      std::move(callback));
 }
 
 void DevToolsDataSource::StartCustomDataRequest(

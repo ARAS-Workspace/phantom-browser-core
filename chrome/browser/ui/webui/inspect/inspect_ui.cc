@@ -613,8 +613,8 @@ void InspectUI::InspectFallback(const std::string& source_id,
   scoped_refptr<DevToolsAgentHost> target = FindTarget(source_id, target_id);
   if (target) {
     Profile* profile = Profile::FromWebUI(web_ui());
-    DevToolsWindow::OpenDevToolsWindowWithBundledFrontend(
-        target, profile, DevToolsOpenedByAction::kInspectLink);
+    DevToolsWindow::OpenDevToolsWindow(target, profile,
+                                       DevToolsOpenedByAction::kInspectLink);
   }
 }
 

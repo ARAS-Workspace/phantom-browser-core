@@ -138,7 +138,6 @@ static_library("devtools") {
     "//components/autofill/content/browser",
     "//components/autofill/core/browser",
     "//components/paint_preview/buildflags",
-    "//components/variations/service",
     "//components/vector_icons",
     "//components/webapps/common",
     "//content/public/browser",
@@ -152,16 +151,10 @@ static_library("devtools") {
 
   if (enable_devtools_frontend) {
     sources += [
-      "aida_client.cc",
-      "aida_client.h",
-      "aida_service_handler.cc",
-      "aida_service_handler.h",
       "devtools_availability_checker.cc",
       "devtools_availability_checker.h",
       "devtools_contents_resizing_strategy.cc",
       "devtools_contents_resizing_strategy.h",
-      "devtools_dispatch_http_request_params.cc",
-      "devtools_dispatch_http_request_params.h",
       "devtools_dock_side.h",
       "devtools_embedder_message_dispatcher.cc",
       "devtools_embedder_message_dispatcher.h",
@@ -175,10 +168,6 @@ static_library("devtools") {
       "devtools_file_system_indexer.h",
       "devtools_file_watcher.cc",
       "devtools_file_watcher.h",
-      "devtools_http_service_handler.cc",
-      "devtools_http_service_handler.h",
-      "devtools_http_service_registry.cc",
-      "devtools_http_service_registry.h",
       "devtools_select_file_dialog.cc",
       "devtools_select_file_dialog.h",
       "devtools_settings.cc",
@@ -191,14 +180,8 @@ static_library("devtools") {
       "devtools_window.h",
       "features.cc",
       "features.h",
-      "gca_service_handler.cc",
-      "gca_service_handler.h",
-      "gdp_service_handler.cc",
-      "gdp_service_handler.h",
       "protocol/autofill_handler.cc",
       "protocol/autofill_handler.h",
-      "url_constants.cc",
-      "url_constants.h",
       "visual_logging.cc",
       "visual_logging.h",
     ]
@@ -464,12 +447,10 @@ source_set("unit_tests") {
 
   if (enable_devtools_frontend) {
     sources += [
-      "aida_client_unittest.cc",
       "devtools_contents_resizing_strategy_unittest.cc",
       "devtools_file_helper_unittest.cc",
       "devtools_file_system_indexer_unittest.cc",
       "devtools_file_watcher_unittest.cc",
-      "devtools_http_service_handler_unittest.cc",
       "devtools_select_file_dialog_unittest.cc",
       "devtools_settings_unittest.cc",
       "devtools_ui_bindings_unittest.cc",
