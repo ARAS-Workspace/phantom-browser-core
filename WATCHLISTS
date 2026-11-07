@@ -725,17 +725,14 @@
       'filepath': 'cc/scheduler'
     },
     'certificate_transparency': {
-      'filepath': 'chrome/browser/ssl/sct_'\
-                  '|components/certificate_transparency/'\
+      'filepath': 'components/certificate_transparency/'\
                   '|net/cert/ct_'\
                   '|net/cert/multi_log_ct_verifier'\
                   '|net/cert/sct_status_flags.h'\
                   '|net/cert/signed_certificate_timestamp'\
                   '|net/cert/signed_tree_head'\
-                  '|net/services/network/sct_auditing/'\
                   '|net/services/network/ct_'\
-                  '|net/test/ct_'\
-                  '|services/network/sct_auditing/'
+                  '|net/test/ct_'
     },
     'chrome_camera_app': {
       'filepath': # Exclude string translation .xtb files.

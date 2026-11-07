@@ -2720,19 +2720,6 @@ void StoragePartitionImpl::OnClearSiteData(
       partitioned_state_allowed_only, std::move(callback));
 }
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-void StoragePartitionImpl::OnCanSendSCTAuditingReport(
-    OnCanSendSCTAuditingReportCallback callback) {
-  bool allowed =
-      GetContentClient()->browser()->CanSendSCTAuditingReport(browser_context_);
-  std::move(callback).Run(allowed);
-}
-
-void StoragePartitionImpl::OnNewSCTAuditingReportSent() {
-  GetContentClient()->browser()->OnNewSCTAuditingReportSent(browser_context_);
-}
-#endif
-
 void StoragePartitionImpl::ClearDataImpl(
     uint32_t remove_mask,
     const blink::StorageKey& storage_key,

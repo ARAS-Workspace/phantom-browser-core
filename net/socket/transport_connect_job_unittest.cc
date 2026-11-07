@@ -110,8 +110,7 @@ class TransportConnectJobTest : public WithTaskEnvironment,
                                                                  "test-ua"};
   SSLClientContext ssl_client_context_{&ssl_config_service_, &cert_verifier_,
                                        &transport_security_state_,
-                                       /*ssl_client_session_cache=*/nullptr,
-                                       /*sct_auditing_delegate=*/nullptr};
+                                       /*ssl_client_session_cache=*/nullptr};
   HttpServerProperties http_server_properties_;
   const CommonConnectJobParams common_connect_job_params_;
 };

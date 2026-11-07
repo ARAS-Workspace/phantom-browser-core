@@ -2735,7 +2735,6 @@ class MockQuicSessionPool : public QuicSessionPool {
                         cert_verifier,
                         transport_security_state,
                         /*proxy_delegate=*/nullptr,
-                        /*sct_auditing_delegate=*/nullptr,
                         /*socket_performance_watcher_factory=*/nullptr,
                         /*quic_crypto_client_stream_factory=*/nullptr,
                         context) {}

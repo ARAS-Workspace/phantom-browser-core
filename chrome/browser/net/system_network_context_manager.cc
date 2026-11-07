@@ -31,7 +31,6 @@
 #include "chrome/browser/net/chrome_mojo_proxy_resolver_factory.h"
 #include "chrome/browser/net/convert_explicitly_allowed_network_ports_pref.h"
 #include "chrome/browser/net/default_dns_over_https_config_source.h"
-#include "chrome/browser/ssl/sct_reporting_service.h"
 #include "chrome/browser/ssl/ssl_config_service_manager.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_features.h"
@@ -79,6 +78,7 @@
 #include "services/network/public/cpp/network_switches.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/mojom/cert_verifier_service.mojom.h"
+#include "services/network/public/mojom/ct_log_info.mojom.h"
 #include "services/network/public/mojom/network_annotation_monitor.mojom.h"
 #include "services/network/public/mojom/network_context.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
@@ -780,8 +780,6 @@ void SystemNetworkContextManager::OnNetworkServiceCreated(
     content::GetCertVerifierServiceFactory()->UpdateCtLogList(
         GetStaticCtLogListMojo(),
         certificate_transparency::GetLogListTimestamp(), base::DoNothing());
-    network_service->UpdateCtLogList(GetStaticCtLogListMojo(),
-                                     base::DoNothing());
   }
 
   int max_connections_normal =
@@ -817,9 +815,6 @@ void SystemNetworkContextManager::OnNetworkServiceCreated(
   // Configure the stub resolver. This must be done after the system
   // NetworkContext is created, but before anything has the chance to use it.
   stub_resolver_config_reader_.UpdateNetworkService(true /* record_metrics */);
-
-  // Configure SCT Auditing in the NetworkService.
-  SCTReportingService::ReconfigureAfterNetworkRestart();
 
   component_updater::PKIMetadataComponentInstallerService::GetInstance()
       ->ReconfigureAfterNetworkRestart();

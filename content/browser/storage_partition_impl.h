@@ -46,7 +46,6 @@
 #include "mojo/public/cpp/bindings/unique_receiver_set.h"
 #include "net/cookies/cookie_setting_override.h"
 #include "services/network/public/cpp/connection_allowlist.h"
-#include "services/network/public/cpp/network_service_buildflags.h"
 #include "services/network/public/cpp/originating_process_id.h"
 #include "services/network/public/mojom/cert_verifier_service_updater.mojom.h"
 #include "services/network/public/mojom/device_bound_sessions.mojom.h"
@@ -290,11 +289,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   void OnCanSendReportingReports(
       const std::vector<url::Origin>& origins,
       OnCanSendReportingReportsCallback callback) override;
-#if BUILDFLAG(IS_CT_SUPPORTED)
-  void OnCanSendSCTAuditingReport(
-      OnCanSendSCTAuditingReportCallback callback) override;
-  void OnNewSCTAuditingReportSent() override;
-#endif
 
   // network::mojom::URLLoaderNetworkServiceObserver interface.
   void OnSSLCertificateError(const GURL& url,

@@ -22,7 +22,6 @@
 #include "net/base/network_delegate.h"
 #include "net/base/proxy_delegate.h"
 #include "net/cert/cert_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cookies/cookie_store.h"
 #include "net/dns/dns_platform_attempt_factory.h"
 #include "net/dns/host_resolver.h"
@@ -238,10 +237,6 @@ void URLRequestContext::set_cookie_store(
 void URLRequestContext::set_transport_security_state(
     std::unique_ptr<TransportSecurityState> state) {
   transport_security_state_ = std::move(state);
-}
-void URLRequestContext::set_sct_auditing_delegate(
-    std::unique_ptr<SCTAuditingDelegate> delegate) {
-  sct_auditing_delegate_ = std::move(delegate);
 }
 void URLRequestContext::set_job_factory(
     std::unique_ptr<const URLRequestJobFactory> job_factory) {

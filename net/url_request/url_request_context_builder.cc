@@ -29,7 +29,6 @@
 #include "net/cert/ct_log_verifier.h"
 #include "net/cert/ct_verifier.h"
 #include "net/cert/multi_log_ct_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cookies/cookie_monster.h"
 #include "net/disk_cache/buildflags.h"
 #include "net/dns/context_host_resolver.h"
@@ -94,8 +93,6 @@ void URLRequestContextBuilder::SetHttpNetworkSessionComponents(
   session_context->cert_verifier = request_context->cert_verifier();
   session_context->transport_security_state =
       request_context->transport_security_state();
-  session_context->sct_auditing_delegate =
-      request_context->sct_auditing_delegate();
   session_context->proxy_resolution_service =
       request_context->proxy_resolution_service();
   session_context->proxy_delegate = request_context->proxy_delegate();
@@ -152,11 +149,6 @@ void URLRequestContextBuilder::SetSpdyAndQuicEnabled(bool spdy_enabled,
                                                      bool quic_enabled) {
   http_network_session_params_.enable_http2 = spdy_enabled;
   http_network_session_params_.enable_quic = quic_enabled;
-}
-
-void URLRequestContextBuilder::set_sct_auditing_delegate(
-    std::unique_ptr<SCTAuditingDelegate> sct_auditing_delegate) {
-  sct_auditing_delegate_ = std::move(sct_auditing_delegate);
 }
 
 void URLRequestContextBuilder::set_quic_context(
@@ -427,10 +419,6 @@ std::unique_ptr<URLRequestContext> URLRequestContextBuilder::Build() {
     // TODO(mattm): Should URLRequestContextBuilder create a CertNetFetcher?
     context->set_cert_verifier(
         CertVerifier::CreateDefault(/*cert_net_fetcher=*/nullptr));
-  }
-
-  if (sct_auditing_delegate_) {
-    context->set_sct_auditing_delegate(std::move(sct_auditing_delegate_));
   }
 
   if (quic_context_) {

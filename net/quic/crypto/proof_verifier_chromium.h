@@ -23,7 +23,6 @@
 namespace net {
 
 class CertVerifier;
-class SCTAuditingDelegate;
 class TransportSecurityState;
 
 // ProofVerifyDetailsChromium is the implementation-specific information that a
@@ -71,7 +70,6 @@ class NET_EXPORT_PRIVATE ProofVerifierChromium : public quic::ProofVerifier {
   ProofVerifierChromium(
       CertVerifier* cert_verifier,
       TransportSecurityState* transport_security_state,
-      SCTAuditingDelegate* sct_auditing_delegate,
       std::set<std::string> hostnames_to_allow_unknown_roots,
       const NetworkAnonymizationKey& network_anonymization_key);
 
@@ -119,8 +117,6 @@ class NET_EXPORT_PRIVATE ProofVerifierChromium : public quic::ProofVerifier {
   const raw_ptr<CertVerifier> cert_verifier_;
 
   const raw_ptr<TransportSecurityState> transport_security_state_;
-
-  const raw_ptr<SCTAuditingDelegate> sct_auditing_delegate_;
 
   std::set<std::string> hostnames_to_allow_unknown_roots_;
 

@@ -23,7 +23,6 @@ per-file network_sandbox_hook_linux.*=set noparent
 per-file network_sandbox_hook_linux.*=file://sandbox/linux/OWNERS
 
 per-file BUILD.gn=file://services/network/resource_scheduler/OWNERS
-per-file BUILD.gn=file://services/network/sct_auditing/OWNERS
 
 # Cookies
 per-file *cookie*=file://net/cookies/OWNERS

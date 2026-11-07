@@ -316,7 +316,6 @@ class MockQuicSessionPool : public QuicSessionPool {
       CertVerifier* cert_verifier,
       TransportSecurityState* transport_security_state,
       ProxyDelegate* proxy_delegate,
-      SCTAuditingDelegate* sct_auditing_delegate,
       SocketPerformanceWatcherFactory* socket_performance_watcher_factory,
       QuicCryptoClientStreamFactory* quic_crypto_client_stream_factory,
       QuicContext* context)
@@ -328,7 +327,6 @@ class MockQuicSessionPool : public QuicSessionPool {
                         cert_verifier,
                         transport_security_state,
                         proxy_delegate,
-                        sct_auditing_delegate,
                         socket_performance_watcher_factory,
                         quic_crypto_client_stream_factory,
                         context) {}
@@ -2875,7 +2873,6 @@ TEST_P(QuicSessionPoolTest, CloseSessionDuringCreation) {
       net_log_.net_log(), host_resolver_.get(), &ssl_config_service_,
       socket_factory_.get(), http_server_properties_.get(),
       cert_verifier_.get(), &transport_security_state_, proxy_delegate_.get(),
-      /*sct_auditing_delegate=*/nullptr,
       /*SocketPerformanceWatcherFactory*/ nullptr,
       &crypto_client_stream_factory_, &context_);
 

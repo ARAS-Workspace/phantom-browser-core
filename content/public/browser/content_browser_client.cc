@@ -669,11 +669,6 @@ void ContentBrowserClient::PrewarmServiceWorkerRegistrationForDSE(
     BrowserContext* browser_context,
     ServiceWorkerContext& service_worker_context) {}
 
-bool ContentBrowserClient::CanSendSCTAuditingReport(
-    BrowserContext* browser_context) {
-  return false;
-}
-
 GeneratedCodeCacheSettings ContentBrowserClient::GetGeneratedCodeCacheSettings(
     BrowserContext* context) {
   // By default, code cache is disabled, embedders should override.

@@ -2026,11 +2026,6 @@ inline constexpr char kCorsNonWildcardRequestHeadersSupport[] =
 inline constexpr char kOriginAgentClusterDefaultEnabled[] =
     "origin_agent_cluster_default_enabled";
 
-// An integer count of how many SCT Auditing hashdance reports have ever been
-// sent by this client, across all profiles.
-inline constexpr char kSCTAuditingHashdanceReportCount[] =
-    "sct_auditing.hashdance_report_count";
-
 // An integer count of how many times the user has seen the memory saver mode
 // page action chip in the expanded size. While the feature was renamed to
 // "Memory Saver" the pref cannot be changed without migration.

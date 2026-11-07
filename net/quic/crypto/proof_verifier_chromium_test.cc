@@ -27,7 +27,6 @@
 #include "net/cert/ct_policy_status.h"
 #include "net/cert/ct_serialization.h"
 #include "net/cert/mock_cert_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cert/x509_util.h"
 #include "net/http/transport_security_state.h"
 #include "net/http/transport_security_state_test_util.h"
@@ -77,16 +76,6 @@ class FailsTestCertVerifier : public CertVerifier {
   void SetConfig(const Config& config) override {}
   void AddObserver(Observer* observer) override {}
   void RemoveObserver(Observer* observer) override {}
-};
-
-class MockSCTAuditingDelegate : public SCTAuditingDelegate {
- public:
-  MOCK_METHOD(bool, IsSCTAuditingEnabled, ());
-  MOCK_METHOD(void,
-              MaybeEnqueueReport,
-              (const net::HostPortPair&,
-               const net::X509Certificate*,
-               const net::SignedCertificateTimestampAndStatusList&));
 };
 
 // Proof source callback which saves the signature into |signature|.
@@ -186,7 +175,7 @@ TEST_F(ProofVerifierChromiumTest, VerifyProof) {
   dummy_verifier.AddResultForCert(test_cert_.get(), dummy_result_, OK);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -221,7 +210,7 @@ TEST_F(ProofVerifierChromiumTest, VerifyProof) {
 TEST_F(ProofVerifierChromiumTest, FailsIfCertFails) {
   MockCertVerifier dummy_verifier;
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -251,7 +240,7 @@ TEST_F(ProofVerifierChromiumTest, PassesCertVerifierRequestParams) {
   dummy_verifier.AddResultForCert(test_cert_.get(), dummy_result, OK);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   const std::string kTestOcspResponse = "ocsp";
@@ -277,7 +266,7 @@ TEST_F(ProofVerifierChromiumTest, PassesCertVerifierRequestParams) {
 TEST_F(ProofVerifierChromiumTest, FailsIfSignatureFails) {
   FailsTestCertVerifier cert_verifier;
   ProofVerifierChromium proof_verifier(&cert_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -304,7 +293,7 @@ TEST_F(ProofVerifierChromiumTest, IsFatalErrorNotSetForNonFatalError) {
                                   ERR_CERT_DATE_INVALID);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -341,7 +330,7 @@ TEST_F(ProofVerifierChromiumTest, IsFatalErrorSetForFatalError) {
   transport_security_state_.AddHSTS(kTestHostname, expiry, true);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -381,7 +370,7 @@ TEST_F(ProofVerifierChromiumTest, PKPEnforced) {
   ScopedTransportSecurityStateSource scoped_security_state_source;
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -430,7 +419,7 @@ TEST_F(ProofVerifierChromiumTest, PKPBypassFlagSet) {
   ScopedTransportSecurityStateSource scoped_security_state_source;
 
   ProofVerifierChromium proof_verifier(
-      &dummy_verifier, &transport_security_state_, nullptr, {kCTAndPKPHost},
+      &dummy_verifier, &transport_security_state_, {kCTAndPKPHost},
       NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -479,7 +468,7 @@ TEST_F(ProofVerifierChromiumTest, PKPAndCTBothTested) {
   ScopedTransportSecurityStateSource scoped_security_state_source;
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -520,7 +509,7 @@ TEST_F(ProofVerifierChromiumTest, UnknownRootRejected) {
   dummy_verifier.AddResultForCert(test_cert_.get(), dummy_result_, OK);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -552,7 +541,7 @@ TEST_F(ProofVerifierChromiumTest, UnknownRootAcceptedWithOverride) {
   dummy_verifier.AddResultForCert(test_cert_.get(), dummy_result_, OK);
 
   ProofVerifierChromium proof_verifier(
-      &dummy_verifier, &transport_security_state_, nullptr, {kTestHostname},
+      &dummy_verifier, &transport_security_state_, {kTestHostname},
       NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
@@ -589,8 +578,8 @@ TEST_F(ProofVerifierChromiumTest, UnknownRootAcceptedWithWildcardOverride) {
   dummy_verifier.AddResultForCert(test_cert_.get(), dummy_result_, OK);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr,
-                                       {""}, NetworkAnonymizationKey());
+                                       &transport_security_state_, {""},
+                                       NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();
   quic::QuicAsyncStatus status = proof_verifier.VerifyProof(
@@ -619,43 +608,6 @@ TEST_F(ProofVerifierChromiumTest, UnknownRootAcceptedWithWildcardOverride) {
             verify_details->cert_verify_result.cert_status);
 }
 
-// Tests that the SCTAuditingDelegate is called to enqueue SCT reports when
-// verifying a good proof and cert.
-TEST_F(ProofVerifierChromiumTest, SCTAuditingReportCollected) {
-  dummy_result_.policy_compliance =
-      ct::CTPolicyCompliance::CT_POLICY_COMPLIES_VIA_SCTS;
-  MockCertVerifier cert_verifier;
-  cert_verifier.AddResultForCert(test_cert_.get(), dummy_result_, OK);
-
-  MockSCTAuditingDelegate sct_auditing_delegate;
-  EXPECT_CALL(sct_auditing_delegate, IsSCTAuditingEnabled())
-      .WillRepeatedly(Return(true));
-  // MaybeEnqueueReport() will be called twice: once in VerifyProof() (which
-  // calls VerifyCert()) and once in VerifyCertChain().
-  HostPortPair host_port_pair(kTestHostname, kTestPort);
-  EXPECT_CALL(sct_auditing_delegate, MaybeEnqueueReport(host_port_pair, _, _))
-      .Times(2);
-
-  ProofVerifierChromium proof_verifier(
-      &cert_verifier, &transport_security_state_, &sct_auditing_delegate, {},
-      NetworkAnonymizationKey());
-
-  auto callback = std::make_unique<DummyProofVerifierCallback>();
-  quic::QuicAsyncStatus status = proof_verifier.VerifyProof(
-      kTestHostname, kTestPort, kTestConfig, kTestTransportVersion,
-      kTestChloHash, certs_, kTestEmptySCT, GetTestSignature(),
-      verify_context_.get(), &error_details_, &details_, std::move(callback));
-  ASSERT_EQ(quic::QUIC_SUCCESS, status);
-
-  callback = std::make_unique<DummyProofVerifierCallback>();
-  status = proof_verifier.VerifyCertChain(
-      kTestHostname, kTestPort,
-      std::vector<std::string_view>(certs_.begin(), certs_.end()),
-      kTestEmptyOCSPResponse, kTestEmptySCT, verify_context_.get(),
-      &error_details_, &details_, &tls_alert_, std::move(callback));
-  ASSERT_EQ(quic::QUIC_SUCCESS, status);
-}
-
 // Make sure that destroying ProofVerifierChromium while there's a pending
 // request doesn't result in any raw pointer warnings or other crashes.
 TEST_F(ProofVerifierChromiumTest, DestroyWithPendingRequest) {
@@ -665,7 +617,7 @@ TEST_F(ProofVerifierChromiumTest, DestroyWithPendingRequest) {
   dummy_verifier.set_async(true);
 
   ProofVerifierChromium proof_verifier(&dummy_verifier,
-                                       &transport_security_state_, nullptr, {},
+                                       &transport_security_state_, {},
                                        NetworkAnonymizationKey());
 
   auto callback = std::make_unique<DummyProofVerifierCallback>();

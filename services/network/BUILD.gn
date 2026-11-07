@@ -350,7 +350,6 @@ component("network_service") {
     "//services/network/public/cpp:crash_keys",
     "//services/network/public/cpp/cert_verifier:mojo_cert_verifier",
     "//services/network/public/mojom",
-    "//services/network/public/proto",
     "//services/network/trust_tokens",
     "//services/service_manager/public/cpp",
     "//services/service_manager/public/mojom",
@@ -370,18 +369,7 @@ component("network_service") {
   public_deps = [ "//services/network/public/cpp:buildflags" ]
 
   if (is_ct_supported) {
-    sources += [
-      "sct_auditing/sct_auditing_cache.cc",
-      "sct_auditing/sct_auditing_cache.h",
-      "sct_auditing/sct_auditing_handler.cc",
-      "sct_auditing/sct_auditing_handler.h",
-      "sct_auditing/sct_auditing_reporter.cc",
-      "sct_auditing/sct_auditing_reporter.h",
-    ]
-    deps += [
-      "//components/certificate_transparency",
-      "//components/version_info",
-    ]
+    deps += [ "//components/certificate_transparency" ]
   }
 
   if (is_p2p_enabled) {
@@ -572,7 +560,6 @@ source_set("tests") {
     "//services/network/public/cpp",
     "//services/network/public/cpp:buildflags",
     "//services/network/public/mojom",
-    "//services/network/public/proto",
     "//services/network/trust_tokens",
     "//services/network/trust_tokens:tests",
     "//services/service_manager/public/cpp",
@@ -583,11 +570,6 @@ source_set("tests") {
   ]
 
   if (is_ct_supported) {
-    sources += [
-      "sct_auditing/sct_auditing_cache_unittest.cc",
-      "sct_auditing/sct_auditing_handler_unittest.cc",
-      "sct_auditing/sct_auditing_reporter_unittest.cc",
-    ]
     deps += [ "//components/certificate_transparency" ]
   }
 

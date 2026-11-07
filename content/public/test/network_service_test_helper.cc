@@ -58,17 +58,11 @@
 #include "services/network/network_context.h"
 #include "services/network/network_service.h"
 #include "services/network/public/cpp/features.h"
-#include "services/network/public/cpp/network_service_buildflags.h"
 #include "services/network/public/cpp/originating_process_id.h"
 #include "services/network/public/cpp/resource_request.h"
 #include "services/network/public/mojom/network_change_manager.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/network_service_test.mojom.h"
-
-#if BUILDFLAG(IS_CT_SUPPORTED)
-#include "services/network/sct_auditing/sct_auditing_cache.h"
-#include "services/network/sct_auditing/sct_auditing_reporter.h"
-#endif
 
 namespace content {
 namespace {
@@ -614,15 +608,6 @@ class NetworkServiceTestHelper::NetworkServiceTestImpl
                          ->GetPeerToPeerConnectionsCountChange();
 
     std::move(callback).Run(count);
-  }
-
-  void SetSCTAuditingRetryDelay(
-      std::optional<base::TimeDelta> delay,
-      SetSCTAuditingRetryDelayCallback callback) override {
-#if BUILDFLAG(IS_CT_SUPPORTED)
-    network::SCTAuditingReporter::SetRetryDelayForTesting(delay);
-#endif
-    std::move(callback).Run();
   }
 
   void GetEnvironmentVariableValue(

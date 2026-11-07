@@ -22,7 +22,6 @@ import "services/network/public/mojom/http_response_headers.mojom";
 import "services/network/public/mojom/ip_address_space.mojom";
 import "services/network/public/mojom/ip_endpoint.mojom";
 import "services/network/public/mojom/key_pinning.mojom";
-import "services/network/public/mojom/mutable_network_traffic_annotation_tag.mojom";
 import "services/network/public/mojom/net_log.mojom";
 import "services/network/public/mojom/network_annotation_monitor.mojom";
 import "services/network/public/mojom/network_change_manager.mojom";
@@ -48,9 +47,6 @@ import "url/mojom/url.mojom";
 
 [EnableIf=is_android]
 import "mojo/public/mojom/base/application_state.mojom";
-
-[EnableIf=is_ct_supported]
-import "services/network/public/mojom/ct_log_info.mojom";
 
 [EnableIf=enable_vrp_flags]
 import "components/vrp_flags/vrp_flags.mojom";
@@ -144,34 +140,6 @@ struct NetworkServiceParams {
   // A SystemDnsResolver to provide out-of-process system DNS resolution, in
   // case the system DNS resolver cannot always run sandboxed.
   pending_remote<SystemDnsResolver>? system_dns_resolver;
-};
-
-// Configuration settings for SCT Auditing.
-[EnableIf=is_ct_supported]
-struct SCTAuditingConfiguration {
-  // The sampling rate for SCT auditing reports.
-  double sampling_rate;
-
-  // How long Chrome will wait before assuming a new SCT has been ingested by
-  // the log.
-  mojo_base.mojom.TimeDelta log_expected_ingestion_delay;
-
-  // The maximum random delay that may be added to
-  // |log_expected_ingestion_delay|.
-  mojo_base.mojom.TimeDelta log_max_ingestion_random_delay;
-
-  // The URL where reports should be sent.
-  url.mojom.Url report_uri;
-
-  // An annotated URL template for hashdance lookup queries. $1 should be in
-  // place of the "length" parameter, and $2 in place of the "prefix" parameter.
-  url.mojom.Url hashdance_lookup_uri;
-
-  // Traffic annotation for the report request.
-  MutableNetworkTrafficAnnotationTag traffic_annotation;
-
-  // Traffic annotation for the hashdance lookup query.
-  MutableNetworkTrafficAnnotationTag hashdance_traffic_annotation;
 };
 
 // GssapiLibraryLoadObserver will be notified once when GSSAPI libraries
@@ -358,22 +326,6 @@ interface NetworkService {
   // Tokens design doc:
   // https://docs.google.com/document/d/1TNnya6B8pyomDK2F1R9CL3dY10OAmqWlnCxsWyOBDVQ/edit#heading=h.z52drgpfgulz.
   SetTrustTokenKeyCommitments(string raw_commitments) => ();
-
-  // Clears the SCT auditing cache.
-  [EnableIf=is_ct_supported]
-  ClearSCTAuditingCache();
-
-  // Configures SCT auditing.
-  [EnableIf=is_ct_supported]
-  ConfigureSCTAuditing(SCTAuditingConfiguration configuration);
-
-  // Updates the log list used for CT auditing.
-  [EnableIf=is_ct_supported]
-  UpdateCtLogList(array<CTLogInfo> log_list) => ();
-
-  // Updates the list of popular SCTs queried during CT hashdance auditing.
-  [EnableIf=is_ct_supported]
-  UpdateCtKnownPopularSCTs(array<array<uint8>> sct_hashes) => ();
 
   // Disables or enables CT Enforcement.
   [EnableIf=is_ct_supported]

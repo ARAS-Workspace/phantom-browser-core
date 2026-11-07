@@ -60,7 +60,6 @@ class ProofVerifierChromiumWithOwnership : public net::ProofVerifierChromium {
       : net::ProofVerifierChromium(
             cert_verifier.get(),
             &transport_security_state_,
-            /*sct_auditing_delegate=*/nullptr,
             UnknownRootAllowlistForHost(host),
             // Fine to use an empty NetworkAnonymizationKey
             // here, since this isn't used in Chromium.

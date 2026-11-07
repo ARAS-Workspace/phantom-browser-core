@@ -346,7 +346,6 @@ component("net") {
     "cert/require_ct_delegate.cc",
     "cert/require_ct_delegate.h",
     "cert/root_cert_list_generated.h",
-    "cert/sct_auditing_delegate.h",
     "cert/sct_status_flags.cc",
     "cert/sct_status_flags.h",
     "cert/signed_certificate_timestamp.cc",

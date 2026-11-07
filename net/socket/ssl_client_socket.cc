@@ -219,13 +219,11 @@ SSLClientContext::SSLClientContext(
     SSLConfigService* ssl_config_service,
     CertVerifier* cert_verifier,
     TransportSecurityState* transport_security_state,
-    SSLClientSessionCache* ssl_client_session_cache,
-    SCTAuditingDelegate* sct_auditing_delegate)
+    SSLClientSessionCache* ssl_client_session_cache)
     : ssl_config_service_(ssl_config_service),
       cert_verifier_(cert_verifier),
       transport_security_state_(transport_security_state),
-      ssl_client_session_cache_(ssl_client_session_cache),
-      sct_auditing_delegate_(sct_auditing_delegate) {
+      ssl_client_session_cache_(ssl_client_session_cache) {
   CHECK(cert_verifier_);
   CHECK(transport_security_state_);
 

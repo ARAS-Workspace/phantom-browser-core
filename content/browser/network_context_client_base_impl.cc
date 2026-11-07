@@ -123,13 +123,4 @@ void NetworkContextClientBase::OnCanSendReportingReports(
   std::move(callback).Run(std::vector<url::Origin>());
 }
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-void NetworkContextClientBase::OnCanSendSCTAuditingReport(
-    OnCanSendSCTAuditingReportCallback callback) {
-  std::move(callback).Run(false);
-}
-
-void NetworkContextClientBase::OnNewSCTAuditingReportSent() {}
-#endif
-
 }  // namespace content

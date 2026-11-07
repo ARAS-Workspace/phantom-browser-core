@@ -67,10 +67,6 @@
 #include "services/network/trust_tokens/trust_token_key_commitments.h"
 #include "services/service_manager/public/cpp/binder_registry.h"
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-#include "services/network/public/mojom/ct_log_info.mojom.h"
-#endif  // BUILDFLAG(IS_CT_SUPPORTED)
-
 namespace net {
 class FileNetLogObserver;
 enum class NetLogFileFormat;
@@ -90,7 +86,6 @@ class HttpAuthCacheProxyCopier;
 class NetLogProxySink;
 class NetworkContext;
 class NetworkService;
-class SCTAuditingCache;
 
 class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
     : public mojom::NetworkService,
@@ -212,14 +207,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
   void EnableDataUseUpdates(bool enable) override;
   void SetIPv6ReachabilityOverride(bool reachability_override) override;
 #if BUILDFLAG(IS_CT_SUPPORTED)
-  void ClearSCTAuditingCache() override;
-  void ConfigureSCTAuditing(
-      mojom::SCTAuditingConfigurationPtr configuration) override;
-  void UpdateCtLogList(std::vector<mojom::CTLogInfoPtr> log_list,
-                       UpdateCtLogListCallback callback) override;
-  void UpdateCtKnownPopularSCTs(
-      const std::vector<std::vector<uint8_t>>& sct_hashes,
-      UpdateCtKnownPopularSCTsCallback callback) override;
   void SetCtEnforcementEnabled(
       bool enabled,
       SetCtEnforcementEnabledCallback callback) override;
@@ -341,10 +328,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
   }
 
 #if BUILDFLAG(IS_CT_SUPPORTED)
-  SCTAuditingCache* sct_auditing_cache() { return sct_auditing_cache_.get(); }
-
-  const std::vector<mojom::CTLogInfoPtr>& log_list() const { return log_list_; }
-
   bool is_ct_enforcement_enabled_for_testing() const {
     return ct_enforcement_enabled_;
   }
@@ -527,10 +510,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkService
   std::unique_ptr<DelayedDohProbeActivator> doh_probe_activator_;
 
 #if BUILDFLAG(IS_CT_SUPPORTED)
-  std::unique_ptr<SCTAuditingCache> sct_auditing_cache_;
-
-  std::vector<mojom::CTLogInfoPtr> log_list_;
-
   bool ct_enforcement_enabled_ = true;
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 

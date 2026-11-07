@@ -45,10 +45,6 @@ class PKIMetadataComponentInstallerService final {
   // Returns the live server instance, creating it if it does not exist.
   static PKIMetadataComponentInstallerService* GetInstance();
 
-  // Wraps BytesArrayFromProtoBytes, exposed for testing.
-  static std::vector<std::vector<uint8_t>> BytesArrayFromProtoBytesForTesting(
-      const google::protobuf::RepeatedPtrField<std::string>& proto_bytes);
-
   // Wraps SHA256HashValueArrayFromProtoBytes, exposed for testing.
   static std::vector<net::SHA256HashValue>
   SHA256HashValueArrayFromProtoBytesForTesting(

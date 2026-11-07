@@ -153,7 +153,6 @@
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
-#include "chrome/browser/ssl/sct_reporting_service.h"
 #include "chrome/browser/ssl/ssl_client_certificate_selector.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_utils.h"
 #include "chrome/browser/task_manager/sampling/task_manager_impl.h"
@@ -1125,7 +1124,6 @@ void ChromeContentBrowserClient::RegisterLocalStatePrefs(
   registry->RegisterStringPref(prefs::kIsolateOrigins, std::string());
   registry->RegisterBooleanPref(prefs::kSitePerProcess, false);
   registry->RegisterBooleanPref(prefs::kTabFreezingEnabled, true);
-  registry->RegisterIntegerPref(prefs::kSCTAuditingHashdanceReportCount, 0);
   registry->RegisterBooleanPref(prefs::kDataURLWhitespacePreservationEnabled,
                                 true);
   registry->RegisterBooleanPref(prefs::kEnableUnsafeSwiftShader, false);
@@ -2925,16 +2923,6 @@ std::optional<int>& ChromeContentBrowserClient::
     PrewarmServiceWorkerRegistrationForDSECalledCountForTesting() {
   static std::optional<int> call_count;
   return call_count;
-}
-
-bool ChromeContentBrowserClient::CanSendSCTAuditingReport(
-    content::BrowserContext* browser_context) {
-  return SCTReportingService::CanSendSCTAuditingReport();
-}
-
-void ChromeContentBrowserClient::OnNewSCTAuditingReportSent(
-    content::BrowserContext* browser_context) {
-  SCTReportingService::OnNewSCTAuditingReportSent();
 }
 
 scoped_refptr<network::SharedURLLoaderFactory>

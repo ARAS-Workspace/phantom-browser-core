@@ -382,8 +382,7 @@ class SSLServerSocketTest : public PlatformTest, public WithTaskEnvironment {
 
     client_context_ = std::make_unique<SSLClientContext>(
         ssl_config_service_.get(), cert_verifier_.get(),
-        transport_security_state_.get(), ssl_client_session_cache_.get(),
-        nullptr);
+        transport_security_state_.get(), ssl_client_session_cache_.get());
   }
 
  protected:

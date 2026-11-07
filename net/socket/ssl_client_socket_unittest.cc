@@ -54,7 +54,6 @@
 #include "net/cert/ct_policy_status.h"
 #include "net/cert/mock_cert_verifier.h"
 #include "net/cert/mock_client_cert_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cert/signed_certificate_timestamp_and_status.h"
 #include "net/cert/test_root_certs.h"
 #include "net/cert/x509_util.h"
@@ -591,16 +590,6 @@ class DeleteSocketCallback : public TestCompletionCallbackBase {
   raw_ptr<StreamSocket> socket_;
 };
 
-class MockSCTAuditingDelegate : public SCTAuditingDelegate {
- public:
-  MOCK_METHOD(bool, IsSCTAuditingEnabled, ());
-  MOCK_METHOD(void,
-              MaybeEnqueueReport,
-              (const net::HostPortPair&,
-               const net::X509Certificate*,
-               const net::SignedCertificateTimestampAndStatusList&));
-};
-
 class ManySmallRecordsHttpResponse : public test_server::HttpResponse {
  public:
   static std::unique_ptr<test_server::HttpResponse> HandleRequest(
@@ -661,12 +650,11 @@ class SSLClientSocketTest : public PlatformTest, public WithTaskEnvironment {
         transport_security_state_(std::make_unique<TransportSecurityState>()),
         ssl_client_session_cache_(std::make_unique<SSLClientSessionCache>(
             SSLClientSessionCache::Config())),
-        context_(
-            std::make_unique<SSLClientContext>(ssl_config_service_.get(),
-                                               cert_verifier_.get(),
-                                               transport_security_state_.get(),
-                                               ssl_client_session_cache_.get(),
-                                               nullptr)) {
+        context_(std::make_unique<SSLClientContext>(
+            ssl_config_service_.get(),
+            cert_verifier_.get(),
+            transport_security_state_.get(),
+            ssl_client_session_cache_.get())) {
     cert_verifier_->set_default_result(OK);
     cert_verifier_->set_async(true);
   }
@@ -1479,7 +1467,7 @@ TEST_P(SSLClientSocketVersionTest, SocketDestroyedDuringVerify) {
   HangingCertVerifier verifier;
   context_ = std::make_unique<SSLClientContext>(
       ssl_config_service_.get(), &verifier, transport_security_state_.get(),
-      ssl_client_session_cache_.get(), nullptr);
+      ssl_client_session_cache_.get());
 
   TestCompletionCallback callback;
   auto transport = std::make_unique<TCPClientSocket>(
@@ -4984,42 +4972,6 @@ TEST_P(SSLClientSocketVersionTest, PKPMoreImportantThanCT) {
   EXPECT_TRUE(ssl_info.cert_status &
               CERT_STATUS_CERTIFICATE_TRANSPARENCY_REQUIRED);
   EXPECT_FALSE(sock_->IsConnected());
-}
-
-// Tests that the SCTAuditingDelegate is called to enqueue SCT reports.
-TEST_P(SSLClientSocketVersionTest, SCTAuditingReportCollected) {
-  ASSERT_TRUE(
-      StartEmbeddedTestServer(EmbeddedTestServer::CERT_OK, GetServerConfig()));
-  scoped_refptr<X509Certificate> server_cert =
-      embedded_test_server()->GetCertificate();
-
-  // Certificate is trusted and chains to a public root.
-  CertVerifyResult verify_result;
-  verify_result.is_issued_by_known_root = true;
-  verify_result.verified_cert = server_cert;
-  verify_result.public_key_hashes =
-      MakeHashValueVector(kGoodHashValueVectorInput);
-  verify_result.policy_compliance =
-      ct::CTPolicyCompliance::CT_POLICY_COMPLIES_VIA_SCTS;
-  cert_verifier_->AddResultForCert(server_cert.get(), verify_result, OK);
-
-  MockSCTAuditingDelegate sct_auditing_delegate;
-  context_ = std::make_unique<SSLClientContext>(
-      ssl_config_service_.get(), cert_verifier_.get(),
-      transport_security_state_.get(), ssl_client_session_cache_.get(),
-      &sct_auditing_delegate);
-
-  EXPECT_CALL(sct_auditing_delegate, IsSCTAuditingEnabled())
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(sct_auditing_delegate,
-              MaybeEnqueueReport(host_port_pair(), server_cert.get(), _))
-      .Times(1);
-
-  SSLConfig ssl_config;
-  int rv;
-  ASSERT_TRUE(CreateAndConnectSSLClientSocket(ssl_config, &rv));
-  EXPECT_THAT(rv, 0);
-  EXPECT_TRUE(sock_->IsConnected());
 }
 
 // Test that handshake_failure alerts at the ServerHello are mapped to

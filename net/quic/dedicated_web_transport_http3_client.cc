@@ -103,7 +103,6 @@ std::unique_ptr<quic::ProofVerifier> CreateProofVerifier(
     }
     return std::make_unique<ProofVerifierChromium>(
         context->cert_verifier(), context->transport_security_state(),
-        context->sct_auditing_delegate(),
         std::move(hostnames_to_allow_unknown_roots), anonymization_key);
   }
 

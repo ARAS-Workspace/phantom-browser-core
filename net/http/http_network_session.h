@@ -61,7 +61,6 @@ class QuicCryptoClientStreamFactory;
 #if BUILDFLAG(ENABLE_REPORTING)
 class ReportingService;
 #endif
-class SCTAuditingDelegate;
 class SocketPerformanceWatcherFactory;
 class SSLConfigService;
 class TransportSecurityState;
@@ -172,7 +171,6 @@ struct NET_EXPORT HttpNetworkSessionContext {
   raw_ptr<HostResolver> host_resolver;
   raw_ptr<CertVerifier> cert_verifier;
   raw_ptr<TransportSecurityState> transport_security_state;
-  raw_ptr<SCTAuditingDelegate> sct_auditing_delegate;
   raw_ptr<ProxyResolutionService> proxy_resolution_service;
   raw_ptr<ProxyDelegate> proxy_delegate;
   raw_ptr<const HttpUserAgentSettings> http_user_agent_settings;

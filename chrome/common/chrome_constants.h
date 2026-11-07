@@ -92,8 +92,6 @@ inline constexpr base::FilePath::CharType kQueryTileStorageDirname[] =
     FILE_PATH_LITERAL("Query Tiles");
 inline constexpr base::FilePath::CharType kReadmeFilename[] =
     FILE_PATH_LITERAL("README");
-inline constexpr base::FilePath::CharType kSCTAuditingPendingReportsFileName[] =
-    FILE_PATH_LITERAL("SCT Auditing Pending Reports");
 inline constexpr base::FilePath::CharType kSecurePreferencesFilename[] =
     FILE_PATH_LITERAL("Secure Preferences");
 inline constexpr base::FilePath::CharType kServiceStateFileName[] =

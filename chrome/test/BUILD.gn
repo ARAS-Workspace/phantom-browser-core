@@ -1392,7 +1392,6 @@ test("browser_tests") {
     "//services/network/public/cpp",
     "//services/network/public/cpp:ip_address_space_overrides_test_utils",
     "//services/network/public/mojom",
-    "//services/network/public/proto:sct_audit_report_proto",
     "//services/preferences/public/cpp",
     "//services/preferences/public/cpp/tracked",
     "//services/preferences/tracked:features",

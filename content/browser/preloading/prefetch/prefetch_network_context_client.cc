@@ -27,13 +27,4 @@ void PrefetchNetworkContextClient::OnCanSendReportingReports(
   std::move(callback).Run(std::vector<url::Origin>());
 }
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-void PrefetchNetworkContextClient::OnCanSendSCTAuditingReport(
-    OnCanSendSCTAuditingReportCallback callback) {
-  std::move(callback).Run(false);
-}
-
-void PrefetchNetworkContextClient::OnNewSCTAuditingReportSent() {}
-#endif
-
 }  // namespace content

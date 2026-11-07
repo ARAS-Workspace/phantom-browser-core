@@ -105,7 +105,6 @@ class QuicSessionPoolAsyncDnsJobTest : public QuicSessionPoolTestBase,
         net_log_.net_log(), &fake_resolver_, &ssl_config_service_,
         socket_factory_.get(), http_server_properties_.get(),
         cert_verifier_.get(), &transport_security_state_, proxy_delegate_.get(),
-        /*sct_auditing_delegate=*/nullptr,
         /*SocketPerformanceWatcherFactory*/ nullptr,
         &crypto_client_stream_factory_, &context_);
   }

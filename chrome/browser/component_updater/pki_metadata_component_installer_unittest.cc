@@ -19,6 +19,7 @@
 #include "chrome/browser/component_updater/pki_metadata_component_installer_policy.h"
 #include "chrome/browser/net/key_pinning.pb.h"
 #include "components/certificate_transparency/certificate_transparency_config.pb.h"
+#include "components/certificate_transparency/chrome_ct_policy_enforcer.h"
 #include "components/certificate_transparency/ct_known_logs.h"
 #include "components/component_updater/component_installer.h"
 #include "components/component_updater/mock_component_updater_service.h"
@@ -33,7 +34,6 @@
 #include "services/network/network_service.h"
 #include "services/network/public/cpp/network_service_buildflags.h"
 #include "services/network/public/mojom/ct_log_info.mojom.h"
-#include "services/network/sct_auditing/sct_auditing_cache.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/protobuf/src/google/protobuf/repeated_field.h"
@@ -68,10 +68,6 @@ constexpr base::TimeDelta kPreviousOperator2Start = base::Days(1);
 const char kGoogleLogName[] = "GoogleLog2022";
 const char kGoogleLogOperatorName[] = "Google";
 constexpr base::TimeDelta kGoogleLogDisqualificationDate = base::Days(2);
-
-// BASE64 encoded fake leaf hashes.
-const char kPopularSCT1[] = "EBESExQVFhcYGRobHB0eHwEjRWeJq83v";
-const char kPopularSCT2[] = "oKGio6SlpqeoqaqrrK2urwEjRWeJq83v";
 
 // Constants for test pinset.
 const char kPinsetName[] = "example";
@@ -119,6 +115,30 @@ class PKIMetadataComponentInstallerTest : public testing::Test {
       log_operator->set_name(kGoogleLogOperatorName);
     }
     {
+      // Configure a non-qualified google log without an operator history.
+      auto* ct_log = ct_config_.mutable_log_list()->add_logs();
+      ct_log->set_description(kGoogleLogName);
+      ct_log->set_key(kLogSPKIBase64);
+      ct_log->set_log_id(kLogIdBase64);
+      ct_log->set_mmd_secs(kLogMMDSeconds);
+      ct_log->set_url(kLogURL);
+
+      auto* operator_change = ct_log->add_operator_history();
+      operator_change->set_name(kGoogleLogOperatorName);
+      operator_change->mutable_operator_start()->set_seconds(
+          kCurrentOperatorStart.InSeconds());
+
+      auto* log_state = ct_log->add_state();
+      log_state->set_current_state(
+          chrome_browser_certificate_transparency::CTLog_CurrentState_RETIRED);
+      log_state->mutable_state_start()->set_seconds(
+          kGoogleLogDisqualificationDate.InSeconds());
+      log_state = ct_log->add_state();
+      log_state->set_current_state(chrome_browser_certificate_transparency::
+                                       CTLog_CurrentState_QUALIFIED);
+      log_state->mutable_state_start()->set_seconds(10);
+    }
+    {
       // Configure a qualified non-google log with an operator history.
       auto* ct_log = ct_config_.mutable_log_list()->add_logs();
       ct_log->set_description(kLogName);
@@ -146,30 +166,6 @@ class PKIMetadataComponentInstallerTest : public testing::Test {
       log_state->mutable_state_start()->set_seconds(10);
     }
     {
-      // Configure a non-qualified google log without an operator history.
-      auto* ct_log = ct_config_.mutable_log_list()->add_logs();
-      ct_log->set_description(kGoogleLogName);
-      ct_log->set_key(kLogSPKIBase64);
-      ct_log->set_log_id(kLogIdBase64);
-      ct_log->set_mmd_secs(kLogMMDSeconds);
-      ct_log->set_url(kLogURL);
-
-      auto* operator_change = ct_log->add_operator_history();
-      operator_change->set_name(kGoogleLogOperatorName);
-      operator_change->mutable_operator_start()->set_seconds(
-          kCurrentOperatorStart.InSeconds());
-
-      auto* log_state = ct_log->add_state();
-      log_state->set_current_state(
-          chrome_browser_certificate_transparency::CTLog_CurrentState_RETIRED);
-      log_state->mutable_state_start()->set_seconds(
-          kGoogleLogDisqualificationDate.InSeconds());
-      log_state = ct_log->add_state();
-      log_state->set_current_state(chrome_browser_certificate_transparency::
-                                       CTLog_CurrentState_QUALIFIED);
-      log_state->mutable_state_start()->set_seconds(10);
-    }
-    {
       // Configure a log with an invalid log id.
       auto* ct_log = ct_config_.mutable_log_list()->add_logs();
       ct_log->set_log_id("not base64");
@@ -181,12 +177,6 @@ class PKIMetadataComponentInstallerTest : public testing::Test {
       ct_log->set_log_id(kLogIdBase64);
       ct_log->set_key("not base64");
     }
-    // Configure some popular SCTs.
-    ASSERT_TRUE(
-        base::Base64Decode(kPopularSCT1, ct_config_.add_popular_scts()));
-    ASSERT_TRUE(
-        base::Base64Decode(kPopularSCT2, ct_config_.add_popular_scts()));
-
     // Configure the key pinning pins list.
     {
       pinlist_.mutable_timestamp()->set_seconds(
@@ -250,11 +240,6 @@ TEST_F(PKIMetadataComponentInstallerTest, TestProtoBytesConversion) {
                               std::end(test_bytes[0]));
   std::vector<std::string> repeated_bytes = {bytes_as_string};
 
-  EXPECT_EQ(
-      PKIMetadataComponentInstallerService::BytesArrayFromProtoBytesForTesting(
-          google::protobuf::RepeatedPtrField<std::string>(
-              repeated_bytes.begin(), repeated_bytes.end())),
-      test_bytes);
   EXPECT_EQ(PKIMetadataComponentInstallerService::
                 SHA256HashValueArrayFromProtoBytesForTesting(
                     google::protobuf::RepeatedPtrField<std::string>(
@@ -306,9 +291,11 @@ TEST_F(PKIMetadataComponentInstallerTest, CTEnforcementKillSwitch) {
   ASSERT_TRUE(network_service);
 
   // Logs should not have been updated.
-  const std::vector<network::mojom::CTLogInfoPtr>& logs =
-      network_service->log_list();
-  EXPECT_EQ(logs.size(), 0u);
+  cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
+      content::GetCertVerifierServiceFactoryForTesting();
+  ASSERT_TRUE(cert_verifier_service_factory);
+  EXPECT_EQ(cert_verifier_service_factory->get_impl_params().ct_logs.size(),
+            0u);
   EXPECT_FALSE(network_service->is_ct_enforcement_enabled_for_testing());
 }
 
@@ -455,45 +442,10 @@ TEST_F(PKIMetadataComponentInstallerTest, InstallComponentUpdatesCTConfig) {
   network::NetworkService* network_service =
       network::NetworkService::GetNetworkServiceForTesting();
   ASSERT_TRUE(network_service);
-  const std::vector<network::mojom::CTLogInfoPtr>& logs =
-      network_service->log_list();
-  ASSERT_EQ(logs.size(), 2u);
+  EXPECT_TRUE(network_service->is_ct_enforcement_enabled_for_testing());
+
   std::string expected_log_id;
   ASSERT_TRUE(base::Base64Decode(kLogIdBase64, &expected_log_id));
-  EXPECT_EQ(logs.at(0)->id, expected_log_id);
-  std::string expected_public_key;
-  ASSERT_TRUE(base::Base64Decode(kLogSPKIBase64, &expected_public_key));
-  EXPECT_EQ(logs.at(0)->public_key, expected_public_key);
-  EXPECT_EQ(logs.at(0)->name, kLogName);
-  EXPECT_FALSE(logs.at(0)->disqualified_at);
-  EXPECT_EQ(logs.at(0)->mmd, base::Seconds(kLogMMDSeconds));
-  EXPECT_EQ(logs.at(0)->current_operator, kLogOperatorName);
-
-  EXPECT_EQ(logs.at(1)->id, expected_log_id);
-  EXPECT_EQ(logs.at(1)->public_key, expected_public_key);
-  EXPECT_EQ(logs.at(1)->name, kGoogleLogName);
-  EXPECT_EQ(*logs.at(1)->disqualified_at,
-            base::Time::UnixEpoch() + kGoogleLogDisqualificationDate);
-  EXPECT_EQ(logs.at(1)->mmd, base::Seconds(kLogMMDSeconds));
-  EXPECT_EQ(logs.at(1)->current_operator, kGoogleLogOperatorName);
-
-  // Previous operators should be sorted in the opposite order as in the proto.
-  std::vector<network::mojom::PreviousOperatorEntryPtr>& previous_operators =
-      logs.at(0)->previous_operators;
-  ASSERT_EQ(previous_operators.size(), 2u);
-  EXPECT_EQ(previous_operators.at(0)->name, kPreviousOperator2Name);
-  EXPECT_EQ(previous_operators.at(0)->end_time,
-            base::Time::UnixEpoch() + kPreviousOperator1Start);
-  EXPECT_EQ(previous_operators.at(1)->name, kPreviousOperator1Name);
-  EXPECT_EQ(previous_operators.at(1)->end_time,
-            base::Time::UnixEpoch() + kCurrentOperatorStart);
-
-  network::SCTAuditingCache* cache = network_service->sct_auditing_cache();
-  EXPECT_TRUE(cache->IsPopularSCT(*base::Base64Decode(kPopularSCT1)));
-  EXPECT_TRUE(cache->IsPopularSCT(*base::Base64Decode(kPopularSCT2)));
-  EXPECT_FALSE(cache->IsPopularSCT(std::vector<uint8_t>{1, 2, 3, 4}));
-
-  EXPECT_TRUE(network_service->is_ct_enforcement_enabled_for_testing());
 
   cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
       content::GetCertVerifierServiceFactoryForTesting();
@@ -502,9 +454,38 @@ TEST_F(PKIMetadataComponentInstallerTest, InstallComponentUpdatesCTConfig) {
       cert_verifier_service_factory->get_impl_params();
   ASSERT_EQ(impl_params.ct_logs.size(), 2u);
   EXPECT_EQ(impl_params.ct_logs[0]->key_id(), expected_log_id);
-  EXPECT_EQ(impl_params.ct_logs[0]->description(), kLogName);
+  EXPECT_EQ(impl_params.ct_logs[0]->description(), kGoogleLogName);
   EXPECT_EQ(impl_params.ct_logs[1]->key_id(), expected_log_id);
-  EXPECT_EQ(impl_params.ct_logs[1]->description(), kGoogleLogName);
+  EXPECT_EQ(impl_params.ct_logs[1]->description(), kLogName);
+
+  auto* policy_enforcer =
+      static_cast<certificate_transparency::ChromeCTPolicyEnforcer*>(
+          impl_params.ct_policy_enforcer.get());
+  ASSERT_TRUE(policy_enforcer);
+  const std::vector<std::pair<std::string, base::Time>>& disqualified_logs =
+      policy_enforcer->disqualified_logs_for_testing();
+  ASSERT_EQ(disqualified_logs.size(), 1u);
+  EXPECT_EQ(disqualified_logs.at(0).first, expected_log_id);
+  EXPECT_EQ(disqualified_logs.at(0).second,
+            base::Time::UnixEpoch() + kGoogleLogDisqualificationDate);
+
+  // Both logs share a key, so the map entry holds the second log.
+  const certificate_transparency::OperatorHistoryEntry& operator_history =
+      policy_enforcer->log_info_for_testing()
+          .at(expected_log_id)
+          .operator_history;
+  EXPECT_EQ(operator_history.current_operator, kLogOperatorName);
+
+  // Previous operators should be sorted in the opposite order as in the proto.
+  const std::vector<std::pair<std::string, base::Time>>& previous_operators =
+      operator_history.previous_operators;
+  ASSERT_EQ(previous_operators.size(), 2u);
+  EXPECT_EQ(previous_operators.at(0).first, kPreviousOperator2Name);
+  EXPECT_EQ(previous_operators.at(0).second,
+            base::Time::UnixEpoch() + kPreviousOperator1Start);
+  EXPECT_EQ(previous_operators.at(1).first, kPreviousOperator1Name);
+  EXPECT_EQ(previous_operators.at(1).second,
+            base::Time::UnixEpoch() + kCurrentOperatorStart);
 }
 
 // Tests that installing the PKI Metadata component bails out if the CT proto is
@@ -529,9 +510,6 @@ TEST_F(PKIMetadataComponentInstallerTest, InstallComponentInvalidCTProto) {
   ASSERT_TRUE(network_service);
 
   // The logs should not have been updated.
-  const std::vector<network::mojom::CTLogInfoPtr>& logs =
-      network_service->log_list();
-  EXPECT_EQ(logs.size(), 0u);
   EXPECT_TRUE(network_service->is_ct_enforcement_enabled_for_testing());
 
   cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
@@ -565,9 +543,6 @@ TEST_F(PKIMetadataComponentInstallerTest,
   ASSERT_TRUE(network_service);
 
   // The logs should not have been updated.
-  const std::vector<network::mojom::CTLogInfoPtr>& logs =
-      network_service->log_list();
-  EXPECT_EQ(logs.size(), 0u);
   EXPECT_TRUE(network_service->is_ct_enforcement_enabled_for_testing());
 
   cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
@@ -604,7 +579,6 @@ TEST_F(PKIMetadataComponentInstallerTest,
   ASSERT_TRUE(network_service);
 
   // The logs should not have been updated.
-  EXPECT_EQ(network_service->log_list().size(), 0u);
   EXPECT_TRUE(network_service->is_ct_enforcement_enabled_for_testing());
 
   cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
@@ -626,13 +600,6 @@ TEST_F(PKIMetadataComponentInstallerTest, ReconfigureWhenNotInstalled) {
       ->ReconfigureAfterNetworkRestart();
 
   // The logs should not have been updated.
-  network::NetworkService* network_service =
-      network::NetworkService::GetNetworkServiceForTesting();
-  ASSERT_TRUE(network_service);
-  const std::vector<network::mojom::CTLogInfoPtr>& logs =
-      network_service->log_list();
-  EXPECT_EQ(logs.size(), 0u);
-
   cert_verifier::CertVerifierServiceFactoryImpl* cert_verifier_service_factory =
       content::GetCertVerifierServiceFactoryForTesting();
   ASSERT_TRUE(cert_verifier_service_factory);

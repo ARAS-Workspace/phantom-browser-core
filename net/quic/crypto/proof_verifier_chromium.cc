@@ -24,7 +24,6 @@
 #include "net/cert/cert_status_flags.h"
 #include "net/cert/cert_verifier.h"
 #include "net/cert/ct_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cert/x509_util.h"
 #include "net/http/transport_security_state.h"
 #include "net/third_party/quiche/src/quiche/quic/core/crypto/crypto_protocol.h"
@@ -55,7 +54,6 @@ class ProofVerifierChromium::Job {
   Job(ProofVerifierChromium* proof_verifier,
       CertVerifier* cert_verifier,
       TransportSecurityState* transport_security_state,
-      SCTAuditingDelegate* sct_auditing_delegate,
       int cert_verify_flags,
       const NetLogWithSource& net_log);
 
@@ -142,8 +140,6 @@ class ProofVerifierChromium::Job {
 
   raw_ptr<TransportSecurityState> transport_security_state_;
 
-  raw_ptr<SCTAuditingDelegate> sct_auditing_delegate_;
-
   // |hostname| specifies the hostname for which |certs| is a valid chain.
   std::string hostname_;
   // |port| specifies the target port for the connection.
@@ -174,13 +170,11 @@ ProofVerifierChromium::Job::Job(
     ProofVerifierChromium* proof_verifier,
     CertVerifier* cert_verifier,
     TransportSecurityState* transport_security_state,
-    SCTAuditingDelegate* sct_auditing_delegate,
     int cert_verify_flags,
     const NetLogWithSource& net_log)
     : proof_verifier_(proof_verifier),
       verifier_(cert_verifier),
       transport_security_state_(transport_security_state),
-      sct_auditing_delegate_(sct_auditing_delegate),
       cert_verify_flags_(cert_verify_flags),
       start_time_(base::TimeTicks::Now()),
       net_log_(net_log) {
@@ -399,12 +393,6 @@ int ProofVerifierChromium::Job::DoVerifyCertComplete(int result) {
   // If the connection was good or failed with a CT error, check HPKP
   // and prefer to treat the HPKP error as more serious, if there are both.
   if (result == OK || result == ERR_CERTIFICATE_TRANSPARENCY_REQUIRED) {
-    if (sct_auditing_delegate_) {
-      sct_auditing_delegate_->MaybeEnqueueReport(
-          HostPortPair(hostname_, port_),
-          cert_verify_result.verified_cert.get(), cert_verify_result.scts);
-    }
-
     TransportSecurityState::PKPStatus pin_validity =
         transport_security_state_->CheckPublicKeyPins(
             hostname_, cert_verify_result.is_issued_by_known_root,
@@ -500,12 +488,10 @@ bool ProofVerifierChromium::Job::VerifySignature(
 ProofVerifierChromium::ProofVerifierChromium(
     CertVerifier* cert_verifier,
     TransportSecurityState* transport_security_state,
-    SCTAuditingDelegate* sct_auditing_delegate,
     std::set<std::string> hostnames_to_allow_unknown_roots,
     const NetworkAnonymizationKey& network_anonymization_key)
     : cert_verifier_(cert_verifier),
       transport_security_state_(transport_security_state),
-      sct_auditing_delegate_(sct_auditing_delegate),
       hostnames_to_allow_unknown_roots_(hostnames_to_allow_unknown_roots),
       network_anonymization_key_(network_anonymization_key) {
   DCHECK(cert_verifier_);
@@ -535,7 +521,7 @@ quic::QuicAsyncStatus ProofVerifierChromium::VerifyProof(
   const ProofVerifyContextChromium* chromium_context =
       reinterpret_cast<const ProofVerifyContextChromium*>(verify_context);
   std::unique_ptr<Job> job = std::make_unique<Job>(
-      this, cert_verifier_, transport_security_state_, sct_auditing_delegate_,
+      this, cert_verifier_, transport_security_state_,
       chromium_context->cert_verify_flags, chromium_context->net_log);
   quic::QuicAsyncStatus status = job->VerifyProof(
       hostname, port, server_config, quic_version, chlo_hash, certs, cert_sct,
@@ -565,7 +551,7 @@ quic::QuicAsyncStatus ProofVerifierChromium::VerifyCertChain(
   const ProofVerifyContextChromium* chromium_context =
       reinterpret_cast<const ProofVerifyContextChromium*>(verify_context);
   std::unique_ptr<Job> job = std::make_unique<Job>(
-      this, cert_verifier_, transport_security_state_, sct_auditing_delegate_,
+      this, cert_verifier_, transport_security_state_,
       chromium_context->cert_verify_flags, chromium_context->net_log);
   quic::QuicAsyncStatus status =
       job->VerifyCertChain(hostname, port, certs, ocsp_response, cert_sct,

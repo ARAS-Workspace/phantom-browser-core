@@ -1679,7 +1679,6 @@ source_set("browser") {
     "//services/network:network_service",
     "//services/network/public/cpp",
     "//services/network/public/mojom",
-    "//services/network/public/proto",
     "//services/on_device_model/public/cpp",
     "//services/on_device_model/public/mojom",
     "//services/preferences/public/cpp",

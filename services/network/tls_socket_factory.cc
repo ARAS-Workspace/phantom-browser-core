@@ -61,8 +61,7 @@ TLSSocketFactory::TLSSocketFactory(net::URLRequestContext* url_request_context)
     : ssl_client_context_(url_request_context->ssl_config_service(),
                           url_request_context->cert_verifier(),
                           url_request_context->transport_security_state(),
-                          nullptr /* Disables SSL session caching */,
-                          url_request_context->sct_auditing_delegate()),
+                          nullptr /* Disables SSL session caching */),
       client_socket_factory_(nullptr),
       ssl_config_service_(url_request_context->ssl_config_service()) {
   if (url_request_context->GetNetworkSessionContext()) {
@@ -132,8 +131,7 @@ void TLSSocketFactory::CreateTLSClientSocket(
             std::make_unique<net::SSLClientContext>(
                 ssl_config_service_, no_verification_cert_verifier_.get(),
                 no_verification_transport_security_state_.get(),
-                nullptr /* no session cache */,
-                nullptr /* disable sct auditing */);
+                nullptr /* no session cache */);
       }
       ssl_client_context = no_verification_ssl_client_context_.get();
       send_ssl_info = true;

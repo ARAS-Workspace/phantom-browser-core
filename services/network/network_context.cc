@@ -187,8 +187,6 @@
 // complain about a missing dependency on the target exposing this header. Add a
 // nogncheck to stop it from yelling.
 #include "components/certificate_transparency/chrome_require_ct_delegate.h"  // nogncheck
-#include "services/network/sct_auditing/sct_auditing_cache.h"
-#include "services/network/sct_auditing/sct_auditing_handler.h"
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
 #if BUILDFLAG(ENABLE_WEBSOCKETS)
@@ -459,46 +457,6 @@ std::string HashesToBase64String(
   }
   return base::JoinString(strings, ",");
 }
-
-#if BUILDFLAG(IS_CT_SUPPORTED)
-// SCTAuditingDelegate is an implementation of the delegate interface that is
-// aware of per-NetworkContext details (to allow the cache to notify the
-// associated NetworkContextClient of new reports, and to apply
-// per-NetworkContext enabled/disabled status for the auditing feature).
-class SCTAuditingDelegate : public net::SCTAuditingDelegate {
- public:
-  explicit SCTAuditingDelegate(const base::WeakPtr<NetworkContext>& context);
-  ~SCTAuditingDelegate() override;
-
-  // net::SCTAuditingDelegate:
-  void MaybeEnqueueReport(
-      const net::HostPortPair& host_port_pair,
-      const net::X509Certificate* validated_certificate_chain,
-      const net::SignedCertificateTimestampAndStatusList&
-          signed_certificate_timestamps) override;
-
- private:
-  base::WeakPtr<NetworkContext> context_;
-};
-
-SCTAuditingDelegate::SCTAuditingDelegate(
-    const base::WeakPtr<NetworkContext>& context)
-    : context_(context) {}
-
-SCTAuditingDelegate::~SCTAuditingDelegate() = default;
-
-void SCTAuditingDelegate::MaybeEnqueueReport(
-    const net::HostPortPair& host_port_pair,
-    const net::X509Certificate* validated_certificate_chain,
-    const net::SignedCertificateTimestampAndStatusList&
-        signed_certificate_timestamps) {
-  if (!context_) {
-    return;
-  }
-  context_->MaybeEnqueueSCTReport(host_port_pair, validated_certificate_chain,
-                                  signed_certificate_timestamps);
-}
-#endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
 // Obtains a full data file path from a NetworkContextFilePaths, a class member
 // pointer to the data file. If valid, then returns true and places the full
@@ -790,15 +748,6 @@ NetworkContext::NetworkContext(
   if (params_->ct_policy) {
     SetCTPolicy(std::move(params_->ct_policy));
   }
-
-  base::FilePath sct_auditing_path;
-  GetFullDataFilePath(params_->file_paths,
-                      &network::mojom::NetworkContextFilePaths::
-                          sct_auditing_pending_reports_file_name,
-                      sct_auditing_path);
-  sct_auditing_handler_ =
-      std::make_unique<SCTAuditingHandler>(this, sct_auditing_path);
-  sct_auditing_handler()->SetMode(params_->sct_auditing_mode);
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
   CreateURLLoaderFactoryForCertNetFetcher(
@@ -1351,12 +1300,7 @@ void NetworkContext::ClearNetworkingHistoryBetween(
     base::Time start_time,
     base::Time end_time,
     base::OnceClosure completion_callback) {
-#if BUILDFLAG(IS_CT_SUPPORTED)
-  auto barrier = base::BarrierClosure(3, std::move(completion_callback));
-  sct_auditing_handler()->ClearPendingReports(barrier);
-#else
   auto barrier = base::BarrierClosure(2, std::move(completion_callback));
-#endif  // BUIDLFLAG(IS_CT_SUPPORTED)
 
   url_request_context_->transport_security_state()->DeleteAllDynamicDataBetween(
       start_time, end_time, barrier);
@@ -1856,37 +1800,6 @@ void NetworkContext::SetCTPolicy(mojom::CTPolicyPtr ct_policy) {
 
   require_ct_delegate_->UpdateCTPolicies(ct_policy->excluded_hosts,
                                          ct_policy->excluded_spkis);
-}
-
-void NetworkContext::MaybeEnqueueSCTReport(
-    const net::HostPortPair& host_port_pair,
-    const net::X509Certificate* validated_certificate_chain,
-    const net::SignedCertificateTimestampAndStatusList&
-        signed_certificate_timestamps) {
-  sct_auditing_handler()->MaybeEnqueueReport(host_port_pair,
-                                             validated_certificate_chain,
-                                             signed_certificate_timestamps);
-}
-
-void NetworkContext::SetSCTAuditingMode(mojom::SCTAuditingMode mode) {
-  sct_auditing_handler()->SetMode(mode);
-}
-
-void NetworkContext::CanSendSCTAuditingReport(
-    base::OnceCallback<void(bool)> callback) {
-  // If the NetworkContextClient hasn't been set yet or has disconnected for
-  // some reason, just return `false`. (One case where this could occur is when
-  // restarting SCTAuditingReporter instances loaded form disk at startup -- see
-  // crbug.com/1347180 for more details on that case.)
-  if (!client_) {
-    std::move(callback).Run(false);
-    return;
-  }
-  client_->OnCanSendSCTAuditingReport(std::move(callback));
-}
-
-void NetworkContext::OnNewSCTAuditingReportSent() {
-  client_->OnNewSCTAuditingReportSent();
 }
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
@@ -2715,11 +2628,6 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
   builder.SetCertVerifier(IgnoreErrorsCertVerifier::MaybeWrapCertVerifier(
       *command_line, nullptr, std::move(cert_verifier)));
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-  builder.set_sct_auditing_delegate(
-      std::make_unique<SCTAuditingDelegate>(weak_factory_.GetWeakPtr()));
-#endif  // BUILDFLAG(IS_CT_SUPPORTED)
-
   std::unique_ptr<NetworkServiceNetworkDelegate> network_delegate =
       std::make_unique<NetworkServiceNetworkDelegate>(
           params_->enable_referrers,
@@ -3255,14 +3163,6 @@ void NetworkContext::OnVerifyCertComplete(uint64_t cert_verify_id, int result) {
   bool pkp_bypassed = false;
   if (result == net::OK ||
       result == net::ERR_CERTIFICATE_TRANSPARENCY_REQUIRED) {
-#if BUILDFLAG(IS_CT_SUPPORTED)
-    if (url_request_context_->sct_auditing_delegate()) {
-      url_request_context_->sct_auditing_delegate()->MaybeEnqueueReport(
-          pending_cert_verify->host_port,
-          pending_cert_verify->result->verified_cert.get(),
-          pending_cert_verify->result->scts);
-    }
-#endif  // BUILDFLAG(IS_CT_SUPPORTED)
     net::TransportSecurityState::PKPStatus pin_validity =
         url_request_context_->transport_security_state()->CheckPublicKeyPins(
             pending_cert_verify->host_port.host(),

@@ -42,7 +42,6 @@
 #include "net/cert/ct_policy_enforcer.h"
 #include "net/cert/ct_policy_status.h"
 #include "net/cert/mock_cert_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cert/signed_certificate_timestamp_and_status.h"
 #include "net/filter/mock_source_stream.h"
 #include "net/http/transport_security_state.h"
@@ -176,16 +175,6 @@ class GMockCertVerifier : public net::CertVerifier {
   MOCK_METHOD1(RemoveObserver, void(Observer* observer));
 };
 
-class MockSCTAuditingDelegate : public net::SCTAuditingDelegate {
- public:
-  MOCK_METHOD(bool, IsSCTAuditingEnabled, ());
-  MOCK_METHOD(void,
-              MaybeEnqueueReport,
-              (const net::HostPortPair&,
-               const net::X509Certificate*,
-               const net::SignedCertificateTimestampAndStatusList&));
-};
-
 // Matcher to compare two net::X509Certificates
 MATCHER_P(CertEqualsIncludingChain, cert, "") {
   return arg->EqualsIncludingChain(cert.get());
@@ -215,7 +204,6 @@ class SignedExchangeHandlerTest
     cert_fetcher_factory_ =
         std::make_unique<MockSignedExchangeCertFetcherFactory>();
     mock_cert_fetcher_factory_ = cert_fetcher_factory_.get();
-    mock_sct_auditing_delegate_ = std::make_unique<MockSCTAuditingDelegate>();
   }
 
   void TearDown() override {
@@ -329,14 +317,8 @@ class SignedExchangeHandlerTest
     return *resource_response_;
   }
 
-  // Creates a URLRequestContext that uses |mock_sct_auditing_delegate_|.
   std::unique_ptr<net::URLRequestContext> CreateTestURLRequestContext() {
-    // We consume these mock objects, so register expectations beforehand.
-    DCHECK(mock_sct_auditing_delegate_);
-    auto context_builder = net::CreateTestURLRequestContextBuilder();
-    context_builder->set_sct_auditing_delegate(
-        std::move(mock_sct_auditing_delegate_));
-    return context_builder->Build();
+    return net::CreateTestURLRequestContextBuilder()->Build();
   }
 
   void CreateSignedExchangeHandler(
@@ -390,7 +372,6 @@ class SignedExchangeHandlerTest
   raw_ptr<MockSignedExchangeCertFetcherFactory>
       mock_cert_fetcher_factory_;
   std::unique_ptr<net::CertVerifier> cert_verifier_;
-  std::unique_ptr<MockSCTAuditingDelegate> mock_sct_auditing_delegate_;
   raw_ptr<net::MockSourceStream> source_;
   std::unique_ptr<SignedExchangeHandler> handler_;
 
@@ -1002,44 +983,6 @@ TEST_P(SignedExchangeHandlerTest, CTVerifierParams) {
   int rv = ReadPayloadStream(&payload);
   std::string expected_payload = GetTestFileContents("test.html");
 
-  EXPECT_EQ(expected_payload, payload);
-  EXPECT_EQ(static_cast<int>(expected_payload.size()), rv);
-}
-
-// Test that SignedExchangeHandler calls SCTAuditingDelegate to enqueue reports.
-TEST_P(SignedExchangeHandlerTest, SCTAuditingReportEnqueued) {
-  if (!IsCTSupported()) {
-    GTEST_SKIP() << "CT not supported";
-  }
-  mock_cert_fetcher_factory_->ExpectFetch(
-      GURL("https://cert.example.org/cert.msg"),
-      GetTestFileContents("test.example.org.public.pem.cbor"));
-
-  net::CertVerifyResult cert_result = CreateCertVerifyResult();
-  cert_result.is_issued_by_known_root = true;
-  SetupMockCertVerifier("prime256v1-sha256.public.pem", cert_result);
-
-  // The mock cert verifier will return CT_POLICY_COMPLIES_VIA_SCTS, as
-  // configured in CreateCertVerifyResult().
-
-  // Add SCTAuditingDelegate mock results.
-  EXPECT_CALL(*mock_sct_auditing_delegate_, IsSCTAuditingEnabled())
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(*mock_sct_auditing_delegate_, MaybeEnqueueReport(_, _, _))
-      .Times(1);
-
-  SetSourceStreamContents("test.example.org_test.sxg");
-
-  CreateSignedExchangeHandler(CreateTestURLRequestContext());
-  WaitForHeader();
-
-  ASSERT_TRUE(read_header());
-  EXPECT_EQ(SignedExchangeLoadResult::kSuccess, result());
-  EXPECT_EQ(net::OK, error());
-
-  std::string payload;
-  int rv = ReadPayloadStream(&payload);
-  std::string expected_payload = GetTestFileContents("test.html");
   EXPECT_EQ(expected_payload, payload);
   EXPECT_EQ(static_cast<int>(expected_payload.size()), rv);
 }

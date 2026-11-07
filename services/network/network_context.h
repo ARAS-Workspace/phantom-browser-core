@@ -143,7 +143,6 @@ class PrefetchMatchingURLLoaderFactory;
 class ProxyCheckingHostResolverRequest;
 class ProxyLookupRequest;
 class ResourceSchedulerClient;
-class SCTAuditingHandler;
 class SQLiteTrustTokenPersister;
 class SessionCleanupCookieStore;
 class SharedDictionaryManager;
@@ -340,17 +339,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   void SetEnableReferrers(bool enable_referrers) override;
 #if BUILDFLAG(IS_CT_SUPPORTED)
   void SetCTPolicy(mojom::CTPolicyPtr ct_policy) override;
-  void MaybeEnqueueSCTReport(
-      const net::HostPortPair& host_port_pair,
-      const net::X509Certificate* validated_certificate_chain,
-      const net::SignedCertificateTimestampAndStatusList&
-          signed_certificate_timestamps);
-  void SetSCTAuditingMode(mojom::SCTAuditingMode mode) override;
-  SCTAuditingHandler* sct_auditing_handler() {
-    return sct_auditing_handler_.get();
-  }
-  void CanSendSCTAuditingReport(base::OnceCallback<void(bool)> callback);
-  void OnNewSCTAuditingReportSent();
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
   LogicalInvalidationStore* logical_invalidation_store() {
     return logical_invalidation_store_.get();
@@ -1018,8 +1006,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
 #if BUILDFLAG(IS_CT_SUPPORTED)
   scoped_refptr<certificate_transparency::ChromeRequireCTDelegate>
       require_ct_delegate_;
-
-  std::unique_ptr<SCTAuditingHandler> sct_auditing_handler_;
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
 #if BUILDFLAG(IS_DIRECTORY_TRANSFER_REQUIRED)

@@ -380,8 +380,7 @@ class TcpConnectJobTest : public TcpConnectJobTestBase,
   TransportSecurityState transport_security_state_;
   SSLClientContext ssl_client_context_{&ssl_config_service_, &cert_verifier_,
                                        &transport_security_state_,
-                                       /*ssl_client_session_cache=*/nullptr,
-                                       /*sct_auditing_delegate=*/nullptr};
+                                       /*ssl_client_session_cache=*/nullptr};
   const CommonConnectJobParams common_connect_job_params_;
   // Passed in to TcpConnectJob constructor.
   std::optional<TcpConnectJob::ServiceEndpointOverride>

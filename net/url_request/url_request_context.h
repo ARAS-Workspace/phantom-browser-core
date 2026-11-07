@@ -51,7 +51,6 @@ class NetworkQualityEstimator;
 class ProxyDelegate;
 class ProxyResolutionService;
 class QuicContext;
-class SCTAuditingDelegate;
 class SSLConfigService;
 class TransportSecurityPersister;
 class TransportSecurityState;
@@ -170,10 +169,6 @@ class NET_EXPORT URLRequestContext final {
 
   TransportSecurityState* transport_security_state() const {
     return transport_security_state_.get();
-  }
-
-  SCTAuditingDelegate* sct_auditing_delegate() const {
-    return sct_auditing_delegate_.get();
   }
 
   const URLRequestJobFactory* job_factory() const { return job_factory_; }
@@ -319,7 +314,6 @@ class NET_EXPORT URLRequestContext final {
   void set_cookie_store(std::unique_ptr<CookieStore> cookie_store);
   void set_transport_security_state(
       std::unique_ptr<TransportSecurityState> state);
-  void set_sct_auditing_delegate(std::unique_ptr<SCTAuditingDelegate> delegate);
   void set_job_factory(std::unique_ptr<const URLRequestJobFactory> job_factory);
   void set_quic_context(std::unique_ptr<QuicContext> quic_context);
   void set_http_user_agent_settings(
@@ -385,7 +379,6 @@ class NET_EXPORT URLRequestContext final {
   std::unique_ptr<const HttpUserAgentSettings> http_user_agent_settings_;
   std::unique_ptr<CookieStore> cookie_store_;
   std::unique_ptr<TransportSecurityState> transport_security_state_;
-  std::unique_ptr<SCTAuditingDelegate> sct_auditing_delegate_;
   std::unique_ptr<QuicContext> quic_context_;
   std::unique_ptr<ClientSocketFactory> client_socket_factory_;
   std::unique_ptr<CacheEncryptionDelegate> cache_encryption_delegate_;

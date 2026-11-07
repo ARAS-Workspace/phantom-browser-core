@@ -7,7 +7,6 @@
 
 #include "build/build_config.h"
 #include "mojo/public/cpp/bindings/receiver.h"
-#include "services/network/public/cpp/network_service_buildflags.h"
 #include "services/network/public/mojom/network_context_client.mojom.h"
 #include "services/network/public/mojom/trust_tokens.mojom.h"
 
@@ -37,11 +36,6 @@ class TestNetworkContextClient : public network::mojom::NetworkContextClient {
   void OnCanSendReportingReports(
       const std::vector<url::Origin>& origins,
       OnCanSendReportingReportsCallback callback) override {}
-#if BUILDFLAG(IS_CT_SUPPORTED)
-  void OnCanSendSCTAuditingReport(
-      OnCanSendSCTAuditingReportCallback callback) override;
-  void OnNewSCTAuditingReportSent() override {}
-#endif
 
  private:
   mojo::Receiver<mojom::NetworkContextClient> receiver_;

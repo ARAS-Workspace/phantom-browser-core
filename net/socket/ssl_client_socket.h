@@ -24,7 +24,6 @@
 namespace net {
 
 class HostPortPair;
-class SCTAuditingDelegate;
 class SSLClientSessionCache;
 struct SSLConfig;
 class SSLKeyLogger;
@@ -154,12 +153,11 @@ class NET_EXPORT SSLClientContext : public SSLConfigService::Observer,
   //
   // |ssl_config_service| may be null to always use the default
   // SSLContextConfig. |ssl_client_session_cache| may be null to disable session
-  // caching. |sct_auditing_delegate| may be null to disable SCT auditing.
+  // caching.
   SSLClientContext(SSLConfigService* ssl_config_service,
                    CertVerifier* cert_verifier,
                    TransportSecurityState* transport_security_state,
-                   SSLClientSessionCache* ssl_client_session_cache,
-                   SCTAuditingDelegate* sct_auditing_delegate);
+                   SSLClientSessionCache* ssl_client_session_cache);
 
   SSLClientContext(const SSLClientContext&) = delete;
   SSLClientContext& operator=(const SSLClientContext&) = delete;
@@ -175,9 +173,6 @@ class NET_EXPORT SSLClientContext : public SSLConfigService::Observer,
   }
   SSLClientSessionCache* ssl_client_session_cache() {
     return ssl_client_session_cache_;
-  }
-  SCTAuditingDelegate* sct_auditing_delegate() {
-    return sct_auditing_delegate_;
   }
 
   // Creates a new SSLClientSocket which can then be used to establish an SSL
@@ -268,7 +263,6 @@ class NET_EXPORT SSLClientContext : public SSLConfigService::Observer,
   raw_ptr<CertVerifier> cert_verifier_;
   raw_ptr<TransportSecurityState> transport_security_state_;
   raw_ptr<SSLClientSessionCache> ssl_client_session_cache_;
-  raw_ptr<SCTAuditingDelegate> sct_auditing_delegate_;
 
   SSLClientAuthCache ssl_client_auth_cache_;
 

@@ -314,11 +314,6 @@ struct NetworkContextFilePaths {
   // flag is false.
   mojo_base.mojom.FilePath? reporting_and_nel_store_database_name;
 
-  // The name of the file to store pending SCT auditing reports inside
-  // `data_directory`. If empty, or `data_directory` is empty, or the file can't
-  // be opened, pending reports will instead be stored in-memory only.
-  mojo_base.mojom.FilePath? sct_auditing_pending_reports_file_name;
-
   // Specifies whether or not a migration of existing data should occur from
   // `unsandboxed_data_path` to `data_directory`. It is not valid to set this
   // to true if an `unsandboxed_data_path` is not specified.
@@ -493,12 +488,6 @@ struct NetworkContextParams {
   // true.
   [EnableIf=is_ct_supported]
   bool enforce_chrome_ct_policy = false;
-
-  // The SCT auditing mode. SCT auditing sends reports for SCTs found in
-  // connections made by this network context. Can also be dynamically
-  // configured via NetworkContext::SetSCTAuditingMode().
-  [EnableIf=is_ct_supported]
-  SCTAuditingMode sct_auditing_mode = SCTAuditingMode.kDisabled;
 
   // The initial CT policy to be used for requests. See
   // NetworkContext.SetCTPolicy() for more.
@@ -793,20 +782,6 @@ struct URLLoaderFactoryOverride {
 enum TrustTokenOperationPolicyVerdict {
   kForbid,
   kPotentiallyPermit,
-};
-
-[EnableIf=is_ct_supported]
-enum SCTAuditingMode {
-  // SCT auditing is completely disabled.
-  kDisabled,
-
-  // The user has opted-in to ESBR, so sampled SCTs are sent to Google.
-  kEnhancedSafeBrowsingReporting,
-
-  // The user is not opted-in to ESBR, and hashdance auditing is enabled.
-  // Perform a k-anonymous prefix query for sampled SCTs, and upload only if the
-  // SCT is not present in a log.
-  kHashdance,
 };
 
 struct URLLoaderFactoryParams {
@@ -1774,10 +1749,6 @@ interface NetworkContext {
                               string sct_list) => (int32 error_code);
 
   GetTrustAnchorIDsForTesting() => (array<array<uint8>> trust_anchor_ids);
-
-  // Set the SCT auditing mode for this NetworkContext.
-  [EnableIf=is_ct_supported]
-  SetSCTAuditingMode(SCTAuditingMode mode);
 
   // Adds an observer that will receive Reporting Service callbacks. Generates
   // events for Reporting API reports currently stored in the reporting service.

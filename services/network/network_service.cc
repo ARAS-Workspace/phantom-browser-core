@@ -106,10 +106,6 @@
 #include "services/network/network_change_notifier_passive_factory.h"
 #endif
 
-#if BUILDFLAG(IS_CT_SUPPORTED)
-#include "services/network/sct_auditing/sct_auditing_cache.h"
-#endif
-
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
 #include "components/vrp_flags/vrp_flags.h"       // nogncheck
 #include "components/vrp_flags/vrp_flags_impl.h"  // nogncheck
@@ -418,14 +414,6 @@ void NetworkService::Initialize(mojom::NetworkServiceParamsPtr params,
 
   first_party_sets_manager_ =
       std::make_unique<FirstPartySetsManager>(params->first_party_sets_enabled);
-
-
-#if BUILDFLAG(IS_CT_SUPPORTED)
-  constexpr size_t kMaxSCTAuditingCacheEntries = 1024;
-  sct_auditing_cache_ =
-      std::make_unique<SCTAuditingCache>(kMaxSCTAuditingCacheEntries);
-#endif
-
 }
 
 NetworkService::~NetworkService() {
@@ -866,29 +854,6 @@ void NetworkService::SetIPv6ReachabilityOverride(bool reachability_override) {
 }
 
 #if BUILDFLAG(IS_CT_SUPPORTED)
-void NetworkService::ClearSCTAuditingCache() {
-  sct_auditing_cache_->ClearCache();
-}
-
-void NetworkService::ConfigureSCTAuditing(
-    mojom::SCTAuditingConfigurationPtr configuration) {
-  sct_auditing_cache_->Configure(std::move(configuration));
-}
-
-void NetworkService::UpdateCtLogList(std::vector<mojom::CTLogInfoPtr> log_list,
-                                     UpdateCtLogListCallback callback) {
-  log_list_ = std::move(log_list);
-
-  std::move(callback).Run();
-}
-
-void NetworkService::UpdateCtKnownPopularSCTs(
-    const std::vector<std::vector<uint8_t>>& sct_hashes,
-    UpdateCtLogListCallback callback) {
-  sct_auditing_cache_->set_popular_scts(std::move(sct_hashes));
-  std::move(callback).Run();
-}
-
 void NetworkService::SetCtEnforcementEnabled(
     bool enabled,
     SetCtEnforcementEnabledCallback callback) {

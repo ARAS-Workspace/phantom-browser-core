@@ -1093,13 +1093,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       BrowserContext* browser_context,
       ServiceWorkerContext& service_worker_context);
 
-  // Allows the embedder to implement policy for whether an SCT auditing report
-  // should be sent.
-  virtual bool CanSendSCTAuditingReport(BrowserContext* browser_context);
-
-  // Notification that a new SCT auditing report has been sent.
-  virtual void OnNewSCTAuditingReportSent(BrowserContext* browser_context) {}
-
   // Returns a SharedURLLoaderFactory attached to the system network context.
   // Must be called on the UI thread. The default implementation returns
   // nullptr.

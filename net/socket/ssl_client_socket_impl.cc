@@ -47,7 +47,6 @@
 #include "net/cert/cert_status_flags.h"
 #include "net/cert/cert_verifier.h"
 #include "net/cert/ct_verifier.h"
-#include "net/cert/sct_auditing_delegate.h"
 #include "net/cert/sct_status_flags.h"
 #include "net/cert/x509_certificate_net_log_param.h"
 #include "net/cert/x509_util.h"
@@ -1205,12 +1204,6 @@ ssl_verify_result_t SSLClientSocketImpl::HandleVerifyResult() {
   // If the connection was good, check HPKP and CT status simultaneously,
   // but prefer to treat the HPKP error as more serious, if there was one.
   if (result == OK || result == ERR_CERTIFICATE_TRANSPARENCY_REQUIRED) {
-    if (context_->sct_auditing_delegate()) {
-      context_->sct_auditing_delegate()->MaybeEnqueueReport(
-          host_and_port_, server_cert_verify_result_.verified_cert.get(),
-          server_cert_verify_result_.scts);
-    }
-
     TransportSecurityState::PKPStatus pin_validity =
         context_->transport_security_state()->CheckPublicKeyPins(
             host_and_port_.host(),

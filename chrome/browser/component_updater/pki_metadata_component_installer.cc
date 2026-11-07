@@ -152,19 +152,6 @@ network::mojom::CTLogInfo::LogType ProtoLogTypeToLogType(
   }
 }
 
-// Converts a protobuf repeated bytes array to an array of uint8_t arrays.
-std::vector<std::vector<uint8_t>> BytesArrayFromProtoBytes(
-    const google::protobuf::RepeatedPtrField<std::string>& proto_bytes) {
-  std::vector<std::vector<uint8_t>> bytes;
-  bytes.reserve(proto_bytes.size());
-  std::ranges::transform(
-      proto_bytes, std::back_inserter(bytes), [](const std::string& element) {
-        const auto bytes = base::as_byte_span(element);
-        return std::vector<uint8_t>(bytes.begin(), bytes.end());
-      });
-  return bytes;
-}
-
 // Converts a protobuf repeated bytes array to an array of SHA256HashValues.
 // Elements in `proto_bytes` that are not 32 bytes long are silently ignored.
 std::vector<net::SHA256HashValue> SHA256HashValueArrayFromProtoBytes(
@@ -709,11 +696,7 @@ void PKIMetadataComponentInstallerService::UpdateNetworkServiceCTListOnUI(
     return;
   }
 
-  // TODO(crbug.com/41392053): Log info needs to be sent to both network
-  // service and cert verifier service. Finish refactoring so that it is only
-  // sent to cert verifier service.
   std::vector<network::mojom::CTLogInfoPtr> log_list_mojo;
-  std::vector<network::mojom::CTLogInfoPtr> log_list_mojo_clone_network_service;
 
   // The log list shipped via component updater is a single message of CTLogList
   // type, as defined in
@@ -777,30 +760,15 @@ void PKIMetadataComponentInstallerService::UpdateNetworkServiceCTListOnUI(
       }
     }
 
-    log_ptr->mmd = base::Seconds(log.mmd_secs());
     log_ptr->log_type = ProtoLogTypeToLogType(log.log_type());
-    log_list_mojo_clone_network_service.push_back(log_ptr.Clone());
     log_list_mojo.push_back(std::move(log_ptr));
   }
 
-  // We need to wait for both CT log list updates and the popular SCT list
-  // update.
-  base::RepeatingClosure done_callback = BarrierClosure(
-      /*num_closures=*/3,
+  content::GetCertVerifierServiceFactory()->UpdateCtLogList(
+      std::move(log_list_mojo), proto_timestamp,
       base::BindOnce(
           &PKIMetadataComponentInstallerService::NotifyCTLogListConfigured,
           weak_factory_.GetWeakPtr()));
-  content::GetCertVerifierServiceFactory()->UpdateCtLogList(
-      std::move(log_list_mojo), proto_timestamp, done_callback);
-  network_service->UpdateCtLogList(
-      std::move(log_list_mojo_clone_network_service), done_callback);
-
-  // Send the updated popular SCTs list to the network service, if available.
-  // TODO(crbug.com/41286522): should this also be vector<SHA256HashValue>?
-  std::vector<std::vector<uint8_t>> popular_scts =
-      BytesArrayFromProtoBytes(proto->popular_scts());
-  network_service->UpdateCtKnownPopularSCTs(std::move(popular_scts),
-                                            done_callback);
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 }
 
@@ -860,13 +828,6 @@ void PKIMetadataComponentInstallerService::NotifyCTLogListConfigured() {
   for (Observer& observer : observers_) {
     observer.OnCTLogListConfigured();
   }
-}
-
-// static
-std::vector<std::vector<uint8_t>>
-PKIMetadataComponentInstallerService::BytesArrayFromProtoBytesForTesting(
-    const google::protobuf::RepeatedPtrField<std::string>& proto_bytes) {
-  return BytesArrayFromProtoBytes(proto_bytes);
 }
 
 // static

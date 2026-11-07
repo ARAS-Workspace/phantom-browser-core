@@ -394,10 +394,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::ServiceWorkerContext& service_worker_context) override;
   static std::optional<int>&
   PrewarmServiceWorkerRegistrationForDSECalledCountForTesting();
-  bool CanSendSCTAuditingReport(
-      content::BrowserContext* browser_context) override;
-  void OnNewSCTAuditingReportSent(
-      content::BrowserContext* browser_context) override;
   scoped_refptr<network::SharedURLLoaderFactory>
   GetSystemSharedURLLoaderFactory() override;
   network::mojom::NetworkContext* GetSystemNetworkContext() override;

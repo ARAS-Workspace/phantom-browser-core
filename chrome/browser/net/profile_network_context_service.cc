@@ -41,8 +41,6 @@
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/ssl/sct_reporting_service.h"
-#include "chrome/browser/ssl/sct_reporting_service_factory.h"
 #include "chrome/browser/webid/federated_identity_permission_context.h"
 #include "chrome/browser/webid/federated_identity_permission_context_factory.h"
 #include "chrome/common/buildflags.h"
@@ -1131,8 +1129,6 @@ void ProfileNetworkContextService::ConfigureNetworkContextParamsInternal(
 
     network_context_params->file_paths->transport_security_persister_file_name =
         base::FilePath(chrome::kTransportSecurityPersisterFilename);
-    network_context_params->file_paths->sct_auditing_pending_reports_file_name =
-        base::FilePath(chrome::kSCTAuditingPendingReportsFileName);
     network_context_params->file_paths->device_bound_sessions_database_name =
         base::FilePath(chrome::kDeviceBoundSessionsFilename);
   }
@@ -1149,16 +1145,6 @@ void ProfileNetworkContextService::ConfigureNetworkContextParamsInternal(
   proxy_config_monitor_->AddToNetworkContextParams(network_context_params);
 
   network_context_params->enable_certificate_reporting = true;
-
-  SCTReportingService* sct_reporting_service =
-      SCTReportingServiceFactory::GetForBrowserContext(profile_);
-  if (sct_reporting_service) {
-    network_context_params->sct_auditing_mode =
-        sct_reporting_service->GetReportingMode();
-  } else {
-    network_context_params->sct_auditing_mode =
-        network::mojom::SCTAuditingMode::kDisabled;
-  }
 
   network_context_params->ct_policy = GetCTPolicy();
   cert_verifier_creation_params->ct_policy = GetCTPolicy();

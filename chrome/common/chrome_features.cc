@@ -265,29 +265,6 @@ BASE_FEATURE(kSafetyHubExtensionsUwSTrigger, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSafetyHubThreeDotDetails, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// SCT auditing hashdance allows Chrome clients who are not opted-in to Enhanced
-// Safe Browsing Reporting to perform a k-anonymous query to see if Google knows
-// about an SCT seen in the wild. If it hasn't been seen, then it is considered
-// a security incident and uploaded to Google.
-BASE_FEATURE(kSCTAuditingHashdance, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// An estimated high bound for the time it takes Google to ingest updates to an
-// SCT log. Chrome will wait for at least this time plus the Log's Maximum Merge
-// Delay after an SCT's timestamp before performing a hashdance lookup query.
-const base::FeatureParam<base::TimeDelta> kSCTLogExpectedIngestionDelay{
-    &kSCTAuditingHashdance,
-    "sct_log_expected_ingestion_delay",
-    base::Hours(1),
-};
-
-// A random delay will be added to the expected log ingestion delay between zero
-// and this maximum. This prevents a burst of queries once a new SCT is issued.
-const base::FeatureParam<base::TimeDelta> kSCTLogMaxIngestionRandomDelay{
-    &kSCTAuditingHashdance,
-    "sct_log_max_ingestion_random_delay",
-    base::Hours(1),
-};
-
 // When enabled, an extension service worker's render process is given
 // foreground priority while the worker is STARTING. Extension service workers
 // are often started headlessly (e.g. to register webRequest listeners) with no
