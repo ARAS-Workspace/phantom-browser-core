@@ -380,8 +380,7 @@ export class HistoryItemElement extends HistoryItemElementBase {
       return;
     }
     this.$.icon.style.backgroundImage = getFaviconForPageURL(
-        this.item.url, this.item.isUrlInRemoteUserData,
-        this.item.remoteIconUrlForUma);
+        this.item.url, /*isSyncedUrlForHistoryUi=*/ false);
     this.eventTracker_.add(
         this.$.timeAccessed, 'mouseover', () => this.addTimeTitle_());
   }

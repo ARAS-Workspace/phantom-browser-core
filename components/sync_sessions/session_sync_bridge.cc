@@ -367,9 +367,7 @@ void SessionSyncBridge::ApplyDisableSyncChanges(
   CHECK(recreate_empty_store_callback_);
 
   // Ensure that we clear on-demand favicons that were downloaded using user
-  // synced history data, especially by HistoryUiFaviconRequestHandler. We do
-  // it upon disabling of sessions sync to have symmetry with the condition
-  // checked inside that layer to allow downloads (sessions sync enabled).
+  // synced history data. We do it upon disabling of sessions sync.
   sessions_client_->ClearAllOnDemandFavicons();
 
   notify_foreign_session_updated_cb_.Run();

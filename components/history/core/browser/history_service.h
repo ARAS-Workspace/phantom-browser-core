@@ -84,7 +84,6 @@ class HistoryServiceTest;
 class InMemoryHistoryBackend;
 class URLDatabase;
 class VisitDelegate;
-class WebHistoryService;
 
 // The history service records page titles, visit times, and favicons, as well
 // as information about downloads.
@@ -537,19 +536,17 @@ class HistoryService : public KeyedService,
                                    base::CancelableTaskTracker* tracker);
 
   // Removes all visits to the given URLs in the specified time range. Calls
-  // ExpireHistoryBetween() to delete local visits, and handles deletion of
-  // synced visits if appropriate. If app_id is present, restrict the visits
-  // to those matching the passed app_id only.
-  void DeleteLocalAndRemoteHistoryBetween(WebHistoryService* web_history,
-                                          base::Time begin_time,
+  // ExpireHistoryBetween() to delete local visits. If app_id is present,
+  // restrict the visits to those matching the passed app_id only.
+  void DeleteLocalAndRemoteHistoryBetween(base::Time begin_time,
                                           base::Time end_time,
                                           std::optional<std::string> app_id,
                                           base::OnceClosure callback,
                                           base::CancelableTaskTracker* tracker);
 
   // Removes all visits to the given url. Calls DeleteUrl() to delete local
-  // visits and handles deletion of synced visits if appropriate.
-  void DeleteLocalAndRemoteUrl(WebHistoryService* web_history, const GURL& url);
+  // visits.
+  void DeleteLocalAndRemoteUrl(const GURL& url);
 
   // Processes the given `delete_directive` and sends it to the
   // SyncChangeProcessor (if it exists).

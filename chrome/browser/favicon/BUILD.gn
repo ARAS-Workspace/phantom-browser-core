@@ -7,7 +7,6 @@ source_set("favicon") {
     "chrome_favicon_client.h",
     "favicon_service_factory.h",
     "favicon_utils.h",
-    "history_ui_favicon_request_handler_factory.h",
     "large_icon_service_factory.h",
   ]
 
@@ -27,7 +26,6 @@ source_set("impl") {
     "chrome_favicon_client.cc",
     "favicon_service_factory.cc",
     "favicon_utils.cc",
-    "history_ui_favicon_request_handler_factory.cc",
     "large_icon_service_factory.cc",
   ]
   public_deps = [ ":favicon" ]

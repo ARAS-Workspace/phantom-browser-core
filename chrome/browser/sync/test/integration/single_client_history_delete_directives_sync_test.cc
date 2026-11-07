@@ -9,7 +9,6 @@
 #include "base/task/cancelable_task_tracker.h"
 #include "base/test/bind.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/sync/test/integration/single_client_status_change_checker.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "chrome/browser/sync/test/integration/updated_progress_marker_checker.h"
@@ -127,44 +126,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          SingleClientHistoryDeleteDirectivesSyncTest,
                          GetSyncTestModes(),
                          testing::PrintToStringParamName());
-
-IN_PROC_BROWSER_TEST_P(SingleClientHistoryDeleteDirectivesSyncTest,
-                       ShouldCommitTimeRangeDeleteDirective) {
-  const GURL kPageUrl = GURL("http://foo.com");
-  const base::Time kHistoryEntryTime = base::Time::Now();
-  base::CancelableTaskTracker task_tracker;
-
-  ASSERT_TRUE(SetupSync());
-
-  history::HistoryService* history_service =
-      HistoryServiceFactory::GetForProfileWithoutCreating(GetProfile(0));
-  history_service->AddPage(kPageUrl, kHistoryEntryTime,
-                           history::SOURCE_BROWSED);
-
-  history_service->DeleteLocalAndRemoteHistoryBetween(
-      WebHistoryServiceFactory::GetForProfile(GetProfile(0)),
-      /*begin_time=*/base::Time(), /*end_time=*/base::Time(),
-      history::kNoAppIdFilter, base::DoNothing(), &task_tracker);
-
-  EXPECT_TRUE(WaitForHistoryDeleteDirectives(1));
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientHistoryDeleteDirectivesSyncTest,
-                       ShouldCommitUrlDeleteDirective) {
-  const GURL kPageUrl = GURL("http://foo.com");
-  const base::Time kHistoryEntryTime = base::Time::Now();
-  ASSERT_TRUE(SetupSync());
-
-  history::HistoryService* history_service =
-      HistoryServiceFactory::GetForProfileWithoutCreating(GetProfile(0));
-  history_service->AddPage(kPageUrl, kHistoryEntryTime,
-                           history::SOURCE_BROWSED);
-
-  history_service->DeleteLocalAndRemoteUrl(
-      WebHistoryServiceFactory::GetForProfile(GetProfile(0)), kPageUrl);
-
-  EXPECT_TRUE(WaitForHistoryDeleteDirectives(1));
-}
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistoryDeleteDirectivesSyncTest,
                        ShouldProcessDeleteDirectiveDuringStartup) {

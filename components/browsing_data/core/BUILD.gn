@@ -20,8 +20,6 @@ static_library("core") {
     "counters/sync_tracker.h",
     "features.cc",
     "features.h",
-    "history_notice_utils.cc",
-    "history_notice_utils.h",
     "pref_names.cc",
     "pref_names.h",
   ]
@@ -53,7 +51,6 @@ source_set("unit_tests") {
     "browsing_data_policies_utils_unittest.cc",
     "browsing_data_utils_unittest.cc",
     "counters/browsing_data_counter_unittest.cc",
-    "history_notice_utils_unittest.cc",
   ]
 
   deps = [

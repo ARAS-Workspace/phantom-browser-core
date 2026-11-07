@@ -20,7 +20,6 @@ html {
   --item-height: 36px;
   --separator-color: rgba(0, 0, 0, 0.08);
   --side-bar-width: 256px;
-  --sidebar-footer-text-color: var(--google-grey-700);
   --toolbar-height: 56px;
 }
 
@@ -30,7 +29,6 @@ html {
     --history-item-time-color: var(--cr-secondary-text-color);
     --interactive-color: var(--google-blue-300);
     --separator-color: var(--cr-separator-color);
-    --sidebar-footer-text-color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -39,5 +37,4 @@ html[webui-refresh-2026] {
   --history-item-time-color: var(--color-history-page-text);
   --interactive-color: var(--color-history-page-bookmark-star);
   --separator-color: var(--color-history-page-separator);
-  --sidebar-footer-text-color: var(--cr-color-history-page-text);
 }

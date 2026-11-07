@@ -54,7 +54,6 @@ source_set("misc") {
 
   deps = [
     ":profile",
-    ":profile_downloader",
     ":profile_manager",
     ":profile_util",
     "//base",
@@ -187,7 +186,6 @@ source_set("gaia_info_update_service") {
   ]
   public_deps = [
     ":profile",
-    ":profile_downloader",
     ":profile_util",
     "//base",
     "//components/keyed_service/core",
@@ -761,39 +759,11 @@ source_set("profiles_extra_parts_impl") {
   }
 }
 
-source_set("profile_downloader") {
-  public = [
-    "profile_downloader.h",
-    "profile_downloader_delegate.h",
-  ]
-
-  sources = [ "profile_downloader.cc" ]
-
-  public_deps = [
-    "//base",
-    "//chrome/browser/image_decoder",
-    "//components/signin/public/identity_manager",
-    "//services/network/public/cpp",
-    "//skia",
-  ]
-
-  deps = [
-    ":profile",
-    "//components/signin/public/base",
-    "//google_apis",
-    "//net",
-    "//net/traffic_annotation",
-    "//services/network/public/mojom:url_loader_base",
-    "//url",
-  ]
-}
-
 source_set("unit_tests") {
   testonly = true
   sources = [
     "chrome_incognito_mode_policy_handler_unittest.cc",
     "profile_attributes_storage_unittest.cc",
-    "profile_downloader_unittest.cc",
     "profile_keyed_service_factory_unittest.cc",
     "profile_manager_unittest.cc",
     "profile_metrics_unittest.cc",
@@ -803,7 +773,6 @@ source_set("unit_tests") {
   deps = [
     ":misc",
     ":policy_handlers",
-    ":profile_downloader",
     ":profile_manager",
     ":profile_util",
     ":test_support",

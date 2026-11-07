@@ -18,12 +18,9 @@
 #include "base/task/thread_pool.h"
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "ipc/constants.mojom.h"
 #include "net/base/url_util.h"
 #include "net/http/http_response_headers.h"
@@ -46,7 +43,6 @@ const int64_t kMaxImageSizeInBytes =
     static_cast<int64_t>(IPC::mojom::kChannelMaximumMessageSize);
 
 constexpr char kEncodeTypeKey[] = "encodeType";
-constexpr char kIsGooglePhotosKey[] = "isGooglePhotos";
 constexpr char kStaticEncodeKey[] = "staticEncode";
 constexpr char kUrlKey[] = "url";
 
@@ -63,21 +59,6 @@ std::map<std::string, std::string> ParseParams(std::string_view param_string) {
                    base::UTF16ToUTF8(output.view())});
   }
   return params;
-}
-
-bool IsGooglePhotosUrl(const GURL& url) {
-  static const char* const kGooglePhotosHostSuffixes[] = {
-      ".ggpht.com",
-      ".google.com",
-      ".googleusercontent.com",
-  };
-
-  for (const char* const suffix : kGooglePhotosHostSuffixes) {
-    if (base::EndsWith(url.host(), suffix)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 }  // namespace
@@ -103,17 +84,14 @@ void SanitizedImageSource::DataDecoderDelegate::DecodeAnimation(
 }
 
 SanitizedImageSource::SanitizedImageSource(Profile* profile)
-    : SanitizedImageSource(profile,
-                           profile->GetDefaultStoragePartition()
+    : SanitizedImageSource(profile->GetDefaultStoragePartition()
                                ->GetURLLoaderFactoryForBrowserProcess(),
                            std::make_unique<DataDecoderDelegate>()) {}
 
 SanitizedImageSource::SanitizedImageSource(
-    Profile* profile,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     std::unique_ptr<DataDecoderDelegate> delegate)
-    : identity_manager_(IdentityManagerFactory::GetForProfile(profile)),
-      url_loader_factory_(url_loader_factory),
+    : url_loader_factory_(url_loader_factory),
       data_decoder_delegate_(std::move(delegate)) {}
 
 SanitizedImageSource::~SanitizedImageSource() = default;
@@ -137,7 +115,6 @@ void SanitizedImageSource::StartDataRequest(
 
   RequestAttributes request_attributes;
   GURL image_url = GURL(image_url_or_params);
-  bool send_auth_token = false;
   if (!image_url.is_valid()) {
     // Attempt to parse URL and additional options from params.
     auto params = ParseParams(image_url_or_params);
@@ -161,12 +138,6 @@ void SanitizedImageSource::StartDataRequest(
               ? RequestAttributes::EncodeType::kWebP
               : RequestAttributes::EncodeType::kPng;
     }
-
-    auto google_photos_it = params.find(kIsGooglePhotosKey);
-    if (google_photos_it != params.end() &&
-        google_photos_it->second == "true" && IsGooglePhotosUrl(image_url)) {
-      send_auth_token = true;
-    }
   }
 
   if (image_url.SchemeIs(url::kHttpScheme)) {
@@ -178,41 +149,7 @@ void SanitizedImageSource::StartDataRequest(
   request_attributes.image_url = image_url;
 
   // Download the image body.
-  if (!send_auth_token) {
-    StartImageDownload(std::move(request_attributes), std::move(callback));
-    return;
-  }
-
-  // Request an auth token for downloading the image body.
-  auto fetcher = std::make_unique<signin::PrimaryAccountAccessTokenFetcher>(
-      signin::OAuthConsumerId::kSanitizedImageSource, identity_manager_,
-      signin::PrimaryAccountAccessTokenFetcher::Mode::kImmediate,
-      signin::ConsentLevel::kSignin);
-  auto* fetcher_ptr = fetcher.get();
-  fetcher_ptr->Start(base::BindOnce(
-      [](const base::WeakPtr<SanitizedImageSource>& self,
-         std::unique_ptr<signin::PrimaryAccountAccessTokenFetcher> fetcher,
-         RequestAttributes request_attributes,
-         content::URLDataSource::GotDataCallback callback,
-         GoogleServiceAuthError error,
-         signin::AccessTokenInfo access_token_info) {
-        if (error.state() != GoogleServiceAuthError::NONE) {
-          LOG(ERROR) << "Failed to authenticate for Google Photos in order to "
-                        "download "
-                     << request_attributes.image_url.spec()
-                     << ". Error message: " << error.ToString();
-          return;
-        }
-
-        request_attributes.access_token_info = access_token_info;
-
-        if (self) {
-          self->StartImageDownload(std::move(request_attributes),
-                                   std::move(callback));
-        }
-      },
-      weak_ptr_factory_.GetWeakPtr(), std::move(fetcher),
-      std::move(request_attributes), std::move(callback)));
+  StartImageDownload(std::move(request_attributes), std::move(callback));
 }
 
 SanitizedImageSource::RequestAttributes::RequestAttributes() = default;
@@ -225,46 +162,12 @@ void SanitizedImageSource::StartImageDownload(
     content::URLDataSource::GotDataCallback callback) {
   auto request = std::make_unique<network::ResourceRequest>();
   request->url = request_attributes.image_url;
-  if (request_attributes.image_url.host() == "drive.google.com") {
-    request->credentials_mode = network::mojom::CredentialsMode::kInclude;
-  } else {
-    request->credentials_mode = network::mojom::CredentialsMode::kOmit;
-  }
-  if (request_attributes.access_token_info) {
-    request->headers.SetHeader(
-        net::HttpRequestHeaders::kAuthorization,
-        "Bearer " + request_attributes.access_token_info->token);
-  }
+  request->credentials_mode = network::mojom::CredentialsMode::kOmit;
 
-  std::unique_ptr<network::SimpleURLLoader> loader;
-  if (request_attributes.image_url.host() == "drive.google.com") {
-    loader = network::SimpleURLLoader::Create(
-        std::move(request),
-        net::DefineNetworkTrafficAnnotation("drive_thumbnail_source", R"(
-        semantics {
-          sender: "Drive Thumbnail Source"
-          description:
-            "This request fetches a Google Drive thumbnail image to be "
-            "displayed in a Chrome internal page or dialog."
-          trigger:
-            "When the user opens the Drive File Picker and uploads image/video "
-            "files."
-          data: "Cookies are sent to authenticate the user to Google Drive."
-          destination: WEBSITE
-        }
-        policy {
-          cookies_allowed: YES
-          cookies_store: "user"
-          setting: "This feature cannot be disabled by settings."
-          policy_exception_justification:
-            "This is a helper request that can be indirectly disabled by "
-            "controlling the calling feature (e.g., by disabling Drive File "
-            "Picker)."
-        })"));
-  } else {
-    loader = network::SimpleURLLoader::Create(
-        std::move(request),
-        net::DefineNetworkTrafficAnnotation("sanitized_image_source", R"(
+  std::unique_ptr<network::SimpleURLLoader> loader =
+      network::SimpleURLLoader::Create(
+          std::move(request),
+          net::DefineNetworkTrafficAnnotation("sanitized_image_source", R"(
         semantics {
           sender: "WebUI Sanitized Image Source"
           description:
@@ -285,7 +188,6 @@ void SanitizedImageSource::StartImageDownload(
             "controlling the calling feature (e.g., by disabling New Tab Page "
             "customization via policy)."
         })"));
-  }
   auto* loader_ptr = loader.get();
   loader_ptr->DownloadToString(
       url_loader_factory_.get(),

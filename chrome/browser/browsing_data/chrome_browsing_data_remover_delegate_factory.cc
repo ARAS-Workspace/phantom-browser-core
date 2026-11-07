@@ -11,7 +11,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/domain_reliability/service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/preloading/prefetch/no_state_prefetch/no_state_prefetch_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -63,7 +62,6 @@ ChromeBrowsingDataRemoverDelegateFactory::
   DependsOn(TabRestoreServiceFactory::GetInstance());
   DependsOn(TemplateURLServiceFactory::GetInstance());
   DependsOn(WebDataServiceFactory::GetInstance());
-  DependsOn(WebHistoryServiceFactory::GetInstance());
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   DependsOn(extensions::ActivityLog::GetFactoryInstance());

@@ -116,12 +116,6 @@ BASE_FEATURE(kBrowsingHistorySimilarVisitsGrouping,
 BASE_FEATURE(kBrowsingHistoryActorIntegrationM3,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-
-// If enabled, the WebHistoryService will use a new API for querying browsing
-// history (https://footprints-pa.googleapis.com/...) instead of the old and
-// deprecated one (https://history.google.com/history/api/...).
-BASE_FEATURE(kWebHistoryUseNewApi, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enables WAL (Write-Ahead Logging) mode on the main history database
 // and opens the InMemoryHistoryDB with PRAGMA locking_mode=NORMAL (a
 // prerequisite for WAL mode on the main database).

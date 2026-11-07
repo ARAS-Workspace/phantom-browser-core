@@ -4,14 +4,14 @@
 
 // clang-format off
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
-import type {ClearBrowsingDataBrowserProxy, ClearBrowsingDataResult, TimePeriod, UpdateSyncStateEvent} from 'chrome://settings/lazy_load.js';
+import type {ClearBrowsingDataBrowserProxy, TimePeriod, UpdateSyncStateEvent} from 'chrome://settings/lazy_load.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 // clang-format on
 
 export class TestClearBrowsingDataBrowserProxy extends TestBrowserProxy
     implements ClearBrowsingDataBrowserProxy {
-  private clearBrowsingDataPromise_: Promise<ClearBrowsingDataResult>|null;
+  private clearBrowsingDataPromise_: Promise<void>|null;
 
   constructor() {
     super([
@@ -30,7 +30,7 @@ export class TestClearBrowsingDataBrowserProxy extends TestBrowserProxy
     this.clearBrowsingDataPromise_ = null;
   }
 
-  setClearBrowsingDataPromise(promise: Promise<ClearBrowsingDataResult>) {
+  setClearBrowsingDataPromise(promise: Promise<void>) {
     this.clearBrowsingDataPromise_ = promise;
   }
 
@@ -39,7 +39,7 @@ export class TestClearBrowsingDataBrowserProxy extends TestBrowserProxy
     webUIListenerCallback('browsing-data-removing', true);
     return this.clearBrowsingDataPromise_ !== null ?
         this.clearBrowsingDataPromise_ :
-        Promise.resolve({showHistoryNotice: false});
+        Promise.resolve();
   }
 
   initialize() {

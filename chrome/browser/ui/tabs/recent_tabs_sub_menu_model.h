@@ -303,6 +303,7 @@ class RecentTabsSubMenuModel : public ui::SimpleMenuModel,
   size_t last_local_model_index_ = 0;
 
   base::CancelableTaskTracker local_tab_cancelable_task_tracker_;
+  base::CancelableTaskTracker other_devices_tab_cancelable_task_tracker_;
 
   base::ScopedObservation<sessions::TabRestoreService,
                           sessions::TabRestoreServiceObserver>

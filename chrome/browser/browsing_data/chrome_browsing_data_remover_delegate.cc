@@ -52,7 +52,6 @@
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/heavy_ad_intervention/heavy_ad_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/language/url_language_histogram_factory.h"
 #include "chrome/browser/login_detection/login_detection_prefs.h"
 #include "chrome/browser/media/media_engagement_service.h"
@@ -350,8 +349,7 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       // TODO(dmurph): Support all backends with filter (crbug.com/40152186).
       base::RecordAction(UserMetricsAction("ClearBrowsingData_History"));
       history_service->DeleteLocalAndRemoteHistoryBetween(
-          WebHistoryServiceFactory::GetForProfile(profile_), delete_begin_,
-          delete_end_, history::kNoAppIdFilter,
+          delete_begin_, delete_end_, history::kNoAppIdFilter,
           CreateTaskCompletionClosure(TracingDataType::kHistory),
           &history_task_tracker_);
     }

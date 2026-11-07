@@ -47,14 +47,6 @@ export enum BrowsingDataType {
 // LINT.ThenChange(/components/browsing_data/core/browsing_data_utils.h:BrowsingDataType)
 
 /**
- * ClearBrowsingDataResult contains any possible follow-up notices that should
- * be shown to the user.
- */
-export interface ClearBrowsingDataResult {
-  showHistoryNotice: boolean;
-}
-
-/**
  * UpdateSyncStateEvent contains relevant information for a summary of a user's
  * updated Sync State.
  *
@@ -72,12 +64,9 @@ export interface UpdateSyncStateEvent {
 
 export interface ClearBrowsingDataBrowserProxy {
   /**
-   * @return A promise resolved when data clearing has completed. The boolean
-   *     indicates whether an additional dialog should be shown, informing the
-   *     user about other forms of browsing history.
+   * @return A promise resolved when data clearing has completed.
    */
-  clearBrowsingData(dataTypes: string[], timePeriod: number):
-      Promise<ClearBrowsingDataResult>;
+  clearBrowsingData(dataTypes: string[], timePeriod: number): Promise<void>;
 
   /**
    * Kick off counter updates and return initial state.
@@ -103,8 +92,7 @@ export interface ClearBrowsingDataBrowserProxy {
 export class ClearBrowsingDataBrowserProxyImpl implements
     ClearBrowsingDataBrowserProxy {
   clearBrowsingData(dataTypes: string[], timePeriod: number) {
-    return sendWithPromise<ClearBrowsingDataResult>(
-        'clearBrowsingData', dataTypes, timePeriod);
+    return sendWithPromise<void>('clearBrowsingData', dataTypes, timePeriod);
   }
 
   initialize() {

@@ -4,7 +4,6 @@
 
 #include "components/signin/public/base/oauth_consumer_registry.h"
 
-#include "base/feature_list.h"
 #include "base/notreached.h"
 #include "google_apis/gaia/gaia_constants.h"
 
@@ -206,7 +205,6 @@ constexpr char kFpopServiceName[] = "fpop_service";
 constexpr char kWallpaperGooglePhotosFetcherName[] =
     "wallpaper_google_photos_fetcher";
 constexpr char kWallpaperFetcherDelegateName[] = "wallpaper_fetcher_delegate";
-constexpr char kSanitizedImageSourceName[] = "sanitized_image_source";
 constexpr char kOptimizationGuideGetHintsName[] =
     "optimization_guide_get_hints";
 constexpr char kOptimizationGuideModelExecutionName[] =
@@ -240,7 +238,6 @@ constexpr char kKAnonymityServiceName[] = "k_anonymity_service";
 constexpr char kFeedbackUploaderName[] = "feedback_uploader";
 constexpr char kPasswordSharingRecipientsDownloaderName[] =
     "password_sharing_recipients_downloader";
-constexpr char kWebHistoryServiceName[] = "web_history";
 constexpr char kComposeboxQueryControllerName[] = "ComposeboxQueryController";
 constexpr char kDocumentSuggestionsServiceName[] =
     "document_suggestions_service";
@@ -280,7 +277,6 @@ constexpr char kNearbyPresenceServerClientName[] =
     "nearby_presence_server_client";
 constexpr char kCryptAuthClientName[] = "crypt_auth_client";
 constexpr char kAmbientModeName[] = "ambient_mode";
-constexpr char kProfileDownloaderName[] = "profile_downloader";
 constexpr char kExtensionsIdentityAPIName[] = "extensions_identity_api";
 constexpr char kMantaName[] = "manta";
 constexpr char kChromeMemexName[] = "chrome_memex";
@@ -316,8 +312,6 @@ constexpr char kDeviceAuthorizationRequestName[] =
 
 namespace signin {
 
-BASE_FEATURE(kWebHistoryUseSpecificScope, base::FEATURE_ENABLED_BY_DEFAULT);
-
 OAuthConsumer GetOAuthConsumerForDynamicScopes(
     OAuthConsumerId oauth_consumer_id,
     const signin::ScopeSet& scopes) {
@@ -346,10 +340,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
     case OAuthConsumerId::kWallpaperFetcherDelegate:
       return OAuthConsumer(
           /*name=*/kWallpaperFetcherDelegateName,
-          /*scopes=*/{kPhotosModuleImageOAuth2Scope});
-    case OAuthConsumerId::kSanitizedImageSource:
-      return OAuthConsumer(
-          /*name=*/kSanitizedImageSourceName,
           /*scopes=*/{kPhotosModuleImageOAuth2Scope});
     case OAuthConsumerId::kOptimizationGuideGetHints:
       return OAuthConsumer(
@@ -465,16 +455,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kPasswordSharingRecipientsDownloaderName,
           /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
-    case OAuthConsumerId::kWebHistoryService:
-      if (base::FeatureList::IsEnabled(kWebHistoryUseSpecificScope)) {
-        return OAuthConsumer(
-            /*name=*/kWebHistoryServiceName,
-            /*scopes=*/{kWebHistoryOAuth2Scope});
-      } else {
-        return OAuthConsumer(
-            /*name=*/kWebHistoryServiceName,
-            /*scopes=*/{GaiaConstants::kChromeSyncOAuth2Scope});
-      }
     case OAuthConsumerId::kComposeboxQueryController:
       return OAuthConsumer(
           /*name=*/kComposeboxQueryControllerName,
@@ -594,11 +574,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kAmbientModeName,
           /*scopes=*/{kPhotosOAuth2Scope, kCastBackdropOAuth2Scope});
-    case OAuthConsumerId::kProfileDownloader:
-      return OAuthConsumer(
-          /*name=*/kProfileDownloaderName,
-          /*scopes=*/{GaiaConstants::kGoogleUserInfoProfile,
-                      GaiaConstants::kGoogleUserInfoEmail});
     case OAuthConsumerId::kExtensionsIdentityAPI:
       return OAuthConsumer(
           /*name=*/kExtensionsIdentityAPIName,

@@ -17,7 +17,7 @@ import '/strings.m.js';
 
 import {ColorChangeUpdater, COLORS_CSS_SELECTOR} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
 import {HistoryResultType} from 'chrome://resources/cr_components/history/constants.js';
-import type {PageCallbackRouter, QueryResult, QueryState} from 'chrome://resources/cr_components/history/history.mojom-webui.js';
+import type {QueryResult, QueryState} from 'chrome://resources/cr_components/history/history.mojom-webui.js';
 import {getInstance as getAnnouncerInstance} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import type {CrDrawerElement} from 'chrome://resources/cr_elements/cr_drawer/cr_drawer.js';
 import type {CrLazyRenderLitElement} from 'chrome://resources/cr_elements/cr_lazy_render/cr_lazy_render_lit.js';
@@ -40,7 +40,7 @@ import type {HistoryListElement} from './history_list.js';
 import type {HistoryToolbarElement} from './history_toolbar.js';
 import {Page, TABBED_PAGES} from './router.js';
 import type {HistoryRouterElement} from './router.js';
-import type {FooterInfo, HistorySideBarElement} from './side_bar.js';
+import type {HistorySideBarElement} from './side_bar.js';
 
 // Click/auxclick listeners to intercept any link clicks. If the link points
 // to a chrome: or file: url, then calls into the browser to do the
@@ -124,7 +124,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
       queryState_: {type: Object},
       // True if the window is narrow enough for the page to have a drawer.
       hasDrawer_: {type: Boolean},
-      footerInfo: {type: Object},
       historyClustersEnabled_: {type: Boolean},
       historyClustersVisible_: {type: Boolean},
       lastSelectedTab_: {type: Number},
@@ -145,10 +144,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
     };
   }
 
-  accessor footerInfo: FooterInfo = {
-    otherFormsOfHistory: false,
-    geminiAppsActivity: loadTimeData.getBoolean('isGlicEnabled'),
-  };
   protected accessor hasDrawer_: boolean = false;
   protected accessor historyClustersEnabled_: boolean =
       loadTimeData.getBoolean('isHistoryClustersEnabled');
@@ -200,17 +195,10 @@ export class HistoryAppElement extends HistoryAppElementBase {
   protected accessor isGlicWebActuationAvailable_: boolean =
       loadTimeData.getBoolean('isGlicWebActuationAvailable');
 
-  private callbackRouter_: PageCallbackRouter;
   private eventTracker_: EventTracker = new EventTracker();
   private historyClustersViewStartTime_: Date|null = null;
   private lastRecordedSelectedPageHistogramValue_: HistoryPageViewHistogram =
       HistoryPageViewHistogram.END;
-  private onHasOtherFormsChangedListenerId_: number|null = null;
-
-  constructor() {
-    super();
-    this.callbackRouter_ = BrowserProxyImpl.getInstance().callbackRouter;
-  }
 
   override connectedCallback() {
     super.connectedCallback();
@@ -245,22 +233,11 @@ export class HistoryAppElement extends HistoryAppElementBase {
     this.eventTracker_.add(
         mediaQuery, 'change',
         (e: MediaQueryListEvent) => this.hasDrawer_ = e.matches);
-
-    this.onHasOtherFormsChangedListenerId_ =
-        this.callbackRouter_.onHasOtherFormsChanged.addListener(
-            (hasOtherForms: boolean) =>
-                this.onHasOtherFormsChanged_(hasOtherForms));
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.eventTracker_.removeAll();
-
-    if (this.onHasOtherFormsChangedListenerId_ !== null) {
-      this.callbackRouter_.removeListener(
-          this.onHasOtherFormsChangedListenerId_);
-      this.onHasOtherFormsChangedListenerId_ = null;
-    }
   }
 
   override willUpdate(changedProperties: PropertyValues<this>) {
@@ -497,11 +474,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
    */
   private onIdentityStateChanged_(identityState: HistoryIdentityState) {
     this.identityState_ = identityState;
-  }
-
-  private onHasOtherFormsChanged_(hasOtherForms: boolean) {
-    this.footerInfo = Object.assign(
-        {}, this.footerInfo, {otherFormsOfHistory: hasOtherForms});
   }
 
   /**

@@ -21,9 +21,6 @@ static_library("core") {
     "favicon_url.h",
     "favicon_util.cc",
     "favicon_util.h",
-    "history_ui_favicon_request_handler.h",
-    "history_ui_favicon_request_handler_impl.cc",
-    "history_ui_favicon_request_handler_impl.h",
     "large_icon_service.h",
     "large_icon_service_impl.cc",
     "large_icon_service_impl.h",
@@ -94,7 +91,6 @@ source_set("unit_tests") {
     "favicon_database_unittest.cc",
     "favicon_handler_unittest.cc",
     "favicon_service_impl_unittest.cc",
-    "history_ui_favicon_request_handler_impl_unittest.cc",
     "large_icon_service_impl_unittest.cc",
   ]
 

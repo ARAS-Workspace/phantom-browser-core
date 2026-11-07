@@ -10,11 +10,7 @@
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
 #include "base/test/mock_callback.h"
-#include "base/test/with_feature_override.h"
 #include "chrome/common/webui_url_constants.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "components/sync/base/features.h"
 #include "content/public/test/browser_task_environment.h"
 #include "net/http/http_status_code.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
@@ -65,11 +61,9 @@ class MockDataDecoderDelegate
 class SanitizedImageSourceTest : public testing::Test {
  public:
   void SetUp() override {
-    profile_ = std::make_unique<TestingProfile>();
     auto data_decoder_delegate = std::make_unique<MockDataDecoderDelegate>();
     mock_data_decoder_delegate_ = data_decoder_delegate.get();
     sanitized_image_source_ = std::make_unique<SanitizedImageSource>(
-        profile_.get(),
         base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
             &test_url_loader_factory_),
         std::move(data_decoder_delegate));
@@ -78,13 +72,11 @@ class SanitizedImageSourceTest : public testing::Test {
   void TearDown() override {
     mock_data_decoder_delegate_ = nullptr;
     sanitized_image_source_.reset();
-    profile_.reset();
     test_url_loader_factory_.ClearResponses();
   }
 
  protected:
   content::BrowserTaskEnvironment task_environment_;
-  std::unique_ptr<TestingProfile> profile_;
   network::TestURLLoaderFactory test_url_loader_factory_;
   raw_ptr<MockDataDecoderDelegate> mock_data_decoder_delegate_ = nullptr;
   std::unique_ptr<SanitizedImageSource> sanitized_image_source_;
@@ -202,105 +194,33 @@ TEST_F(SanitizedImageSourceTest, WrongUrl) {
   EXPECT_EQ(0, test_url_loader_factory_.NumPending());
 }
 
-class SanitizedImageSourceSigninPromoTest
-    : public base::test::WithFeatureOverride,
-      public SanitizedImageSourceTest {
- public:
-  SanitizedImageSourceSigninPromoTest()
-      : base::test::WithFeatureOverride(
-            syncer::kReplaceSyncPromosWithSignInPromos) {}
-};
-INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(SanitizedImageSourceSigninPromoTest);
-
-// Verifies that the image source sends a Google Photos auth token with its data
-// request if and only if asked to by URL specification.
-TEST_P(SanitizedImageSourceSigninPromoTest, GooglePhotosImage) {
-  constexpr char kImageUrl[] = "https://lh3.googleusercontent.com/img.png";
+// Verifies that Drive and Google Photos images are requested without
+// credentials.
+TEST_F(SanitizedImageSourceTest, OmitsCredentials) {
   base::MockCallback<content::URLDataSource::GotDataCallback> callback;
-  signin::IdentityTestEnvironment identity_test_env;
-  identity_test_env.MakePrimaryAccountAvailable(
-      "test@gmail.com", syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
-                            ? signin::ConsentLevel::kSignin
-                            : signin::ConsentLevel::kSync);
-  sanitized_image_source_->set_identity_manager_for_test(
-      identity_test_env.identity_manager());
 
-  // Verify that by default, requests are sent with no auth token.
   sanitized_image_source_->StartDataRequest(
-      GURL(base::StrCat({chrome::kChromeUIImageURL, "?", kImageUrl})),
+      GURL(base::StrCat({chrome::kChromeUIImageURL, "?",
+                         "https://drive.google.com/thumbnail?id=test"})),
       content::WebContents::Getter(), callback.Get());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
   ASSERT_EQ(1, test_url_loader_factory_.NumPending());
-  EXPECT_FALSE(
-      test_url_loader_factory_.GetPendingRequest(0)->request.headers.HasHeader(
-          net::HttpRequestHeaders::kAuthorization));
+  EXPECT_EQ(
+      network::mojom::CredentialsMode::kOmit,
+      test_url_loader_factory_.GetPendingRequest(0)->request.credentials_mode);
 
-  // Encode a URL so that it can be used as a param value.
-  url::UriComponentEncoder encoded_url(kImageUrl);
+  url::UriComponentEncoder encoded_url(
+      "https://lh3.googleusercontent.com/img.png");
   EXPECT_GT(encoded_url.view().length(), 0u);
-
-  // Verify that param-formatted requests can be sent with auth tokens.
   sanitized_image_source_->StartDataRequest(
       GURL(base::StrCat({chrome::kChromeUIImageURL, "?url=", encoded_url.view(),
                          "&isGooglePhotos=true"})),
       content::WebContents::Getter(), callback.Get());
-  ASSERT_EQ(1, test_url_loader_factory_.NumPending());
-  EXPECT_TRUE(identity_test_env.IsAccessTokenRequestPending());
-  identity_test_env.WaitForAccessTokenRequestIfNecessaryAndRespondWithToken(
-      "token", base::Time::Max());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
   ASSERT_EQ(2, test_url_loader_factory_.NumPending());
-  EXPECT_TRUE(
+  EXPECT_EQ(
+      network::mojom::CredentialsMode::kOmit,
+      test_url_loader_factory_.GetPendingRequest(1)->request.credentials_mode);
+  EXPECT_FALSE(
       test_url_loader_factory_.GetPendingRequest(1)->request.headers.HasHeader(
-          net::HttpRequestHeaders::kAuthorization));
-
-  // Verify that param-formatted requests can be sent without auth tokens.
-  sanitized_image_source_->StartDataRequest(
-      GURL(base::StrCat({chrome::kChromeUIImageURL, "?url=", encoded_url.view(),
-                         "&isGooglePhotos=false"})),
-      content::WebContents::Getter(), callback.Get());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
-  ASSERT_EQ(3, test_url_loader_factory_.NumPending());
-  EXPECT_FALSE(
-      test_url_loader_factory_.GetPendingRequest(2)->request.headers.HasHeader(
-          net::HttpRequestHeaders::kAuthorization));
-
-  sanitized_image_source_->StartDataRequest(
-      GURL(base::StrCat(
-          {chrome::kChromeUIImageURL, "?url=", encoded_url.view()})),
-      content::WebContents::Getter(), callback.Get());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
-
-  ASSERT_EQ(4, test_url_loader_factory_.NumPending());
-  EXPECT_FALSE(
-      test_url_loader_factory_.GetPendingRequest(3)->request.headers.HasHeader(
-          net::HttpRequestHeaders::kAuthorization));
-
-  // Verify that no download is attempted when authentication fails.
-  sanitized_image_source_->StartDataRequest(
-      GURL(base::StrCat({chrome::kChromeUIImageURL, "?url=", encoded_url.view(),
-                         "&isGooglePhotos=true"})),
-      content::WebContents::Getter(), callback.Get());
-  ASSERT_EQ(4, test_url_loader_factory_.NumPending());
-  EXPECT_TRUE(identity_test_env.IsAccessTokenRequestPending());
-  identity_test_env.WaitForAccessTokenRequestIfNecessaryAndRespondWithError(
-      GoogleServiceAuthError::CreateRequestCanceled());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
-  ASSERT_EQ(4, test_url_loader_factory_.NumPending());
-
-  // Verify that no auth token is sent for URLs not served by Google Photos.
-  constexpr char kBadImageUrl[] = "https://foo.com/img.png";
-  url::UriComponentEncoder encoded_bad_url(kBadImageUrl);
-  EXPECT_GT(encoded_bad_url.view().length(), 0u);
-
-  sanitized_image_source_->StartDataRequest(
-      GURL(base::StrCat({chrome::kChromeUIImageURL, "?url=",
-                         encoded_bad_url.view(), "&isGooglePhotos=true"})),
-      content::WebContents::Getter(), callback.Get());
-  EXPECT_FALSE(identity_test_env.IsAccessTokenRequestPending());
-  ASSERT_EQ(5, test_url_loader_factory_.NumPending());
-  EXPECT_FALSE(
-      test_url_loader_factory_.GetPendingRequest(4)->request.headers.HasHeader(
           net::HttpRequestHeaders::kAuthorization));
 }
 

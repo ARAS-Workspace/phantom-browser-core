@@ -10,8 +10,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
-#include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
@@ -21,10 +19,7 @@
 #include "components/autofill/core/browser/webdata/autofill_webdata_service.h"
 #include "components/browsing_data/core/browsing_data_utils.h"
 #include "components/browsing_data/core/counters/autofill_counter.h"
-#include "components/browsing_data/core/counters/history_counter.h"
 #include "components/browsing_data/core/pref_names.h"
-#include "components/history/core/browser/web_history_service.h"
-#include "components/history/core/test/fake_web_history_service.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/service/sync_service_impl.h"
 #include "content/public/browser/browser_thread.h"
@@ -47,18 +42,8 @@ class SyncAwareCounterTest : public SyncTest {
   ~SyncAwareCounterTest() override = default;
 
   void SetUpOnMainThread() override {
-    fake_web_history_service_ =
-        std::make_unique<history::FakeWebHistoryService>();
     run_loop_ = std::make_unique<base::RunLoop>();
     SyncTest::SetUpOnMainThread();
-  }
-
-  history::WebHistoryService* GetFakeWebHistoryService(Profile* profile) {
-    // Check if history sync is enabled.
-    if (WebHistoryServiceFactory::GetForProfile(profile)) {
-      return fake_web_history_service_.get();
-    }
-    return nullptr;
   }
 
   // Callback and result retrieval ---------------------------------------------
@@ -92,7 +77,6 @@ class SyncAwareCounterTest : public SyncTest {
 
  private:
   std::unique_ptr<base::RunLoop> run_loop_;
-  std::unique_ptr<history::FakeWebHistoryService> fake_web_history_service_;
 
   bool finished_;
   bool sync_enabled_;
@@ -156,82 +140,6 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, AutofillCounter) {
   sync_blocker.reset();
   WaitForCounting();
   EXPECT_TRUE(IsSyncEnabled());
-
-  // Stopping the Sync service triggers a restart.
-  GetClient(0)->SignOutPrimaryAccount();
-  WaitForCounting();
-  EXPECT_FALSE(IsSyncEnabled());
-}
-
-// Test that the counting restarts when history sync state changes.
-// TODO(crbug.com/40443942): Move this to the sync/test/integration directory?
-IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, HistoryCounter) {
-  // Set up the Sync client.
-  ASSERT_TRUE(SetupClients());
-  syncer::SyncService* sync_service = GetSyncService(kFirstProfileIndex);
-  Profile* profile = GetProfile(kFirstProfileIndex);
-
-  // Set up the fake web history service and the counter.
-
-  browsing_data::HistoryCounter counter(
-      HistoryServiceFactory::GetForProfileWithoutCreating(
-          browser()->GetProfile()),
-      base::BindRepeating(&SyncAwareCounterTest::GetFakeWebHistoryService,
-                          base::Unretained(this), base::Unretained(profile)),
-      sync_service);
-
-  counter.Init(profile->GetPrefs(),
-               base::BindRepeating(&SyncAwareCounterTest::OnCounterResult,
-                                   base::Unretained(this)));
-
-  // We sync all datatypes by default, so starting Sync means that we start
-  // syncing history deletion, and this should restart the counter.
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(sync_service->GetTransportState() ==
-              syncer::SyncService::TransportState::ACTIVE);
-  ASSERT_TRUE(sync_service->GetUserSettings()->GetSelectedTypes().Has(
-      syncer::UserSelectableType::kHistory));
-  ASSERT_TRUE(sync_service->GetActiveDataTypes().Has(
-      syncer::HISTORY_DELETE_DIRECTIVES));
-
-  WaitForCounting();
-  EXPECT_TRUE(IsSyncEnabled());
-
-  // We stop syncing history deletion in particular. This restarts the counter.
-  syncer::UserSelectableTypeSet everything_except_history =
-      GetRegisteredSelectableTypes(kFirstProfileIndex);
-  everything_except_history.Remove(syncer::UserSelectableType::kHistory);
-  auto sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, everything_except_history);
-  sync_blocker.reset();
-  WaitForCounting();
-  EXPECT_FALSE(IsSyncEnabled());
-
-  // If the history deletion sync is not affected, the counter is not restarted.
-  syncer::UserSelectableTypeSet only_autofill = {
-      syncer::UserSelectableType::kAutofill};
-  sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, only_autofill);
-  sync_blocker.reset();
-  EXPECT_FALSE(counter.HasTrackedTasksForTesting());
-  EXPECT_FALSE(CountingFinishedSinceLastAsked());
-
-  // We start syncing history deletion again. This restarts the counter.
-  sync_blocker = sync_service->GetSetupInProgressHandle();
-  sync_service->GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false,
-      GetRegisteredSelectableTypes(kFirstProfileIndex));
-  sync_blocker.reset();
-  WaitForCounting();
-  EXPECT_TRUE(IsSyncEnabled());
-
-  // Changing the syncing datatypes to another set that still includes history
-  // deletion should technically not trigger a restart, because the state of
-  // history deletion did not change. However, in reality we can get two
-  // notifications, one that history sync has stopped and another that it is
-  // active again.
 
   // Stopping the Sync service triggers a restart.
   GetClient(0)->SignOutPrimaryAccount();

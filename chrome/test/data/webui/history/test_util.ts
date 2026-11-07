@@ -40,8 +40,6 @@ export function createHistoryEntry(
 
   return {
     allTimestamps: allTimestamps,
-    remoteIconUrlForUma: '',
-    isUrlInRemoteUserData: false,
     blockedVisit: false,
 
     // Formatting the relative day is too hard, will instead display
@@ -50,8 +48,6 @@ export function createHistoryEntry(
     dateShort: '',
     dateTimeOfDay: d.getUTCHours() + ':' + d.getUTCMinutes(),
     debug: null,
-    deviceName: '',
-    deviceType: '',
     domain: domain,
     fallbackFaviconText: '',
     hostFilteringBehavior: 0,

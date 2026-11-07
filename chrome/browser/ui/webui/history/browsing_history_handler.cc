@@ -34,8 +34,6 @@
 #include "chrome/browser/signin/chrome_signin_pref_names.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
-#include "chrome/browser/sync/device_info_sync_service_factory.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/chrome_pages.h"
@@ -66,11 +64,6 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync/service/sync_service.h"
-#include "components/sync_device_info/device_info.h"
-#include "components/sync_device_info/device_info_sync_service.h"
-#include "components/sync_device_info/device_info_tracker.h"
 #include "content/public/browser/url_data_source.h"
 #include "content/public/browser/web_ui.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
@@ -81,7 +74,6 @@
 using bookmarks::BookmarkModel;
 using history::BrowsingHistoryService;
 using history::HistoryService;
-using history::WebHistoryService;
 
 namespace {
 
@@ -93,51 +85,6 @@ history::mojom::AccountInfoPtr CreateAccountInfoDataMojo(
   account_info_mojo->account_image_src =
       GURL(signin::GetAccountPictureUrl(info));
   return account_info_mojo;
-}
-
-// Identifiers for the type of device from which a history entry originated.
-static const char kDeviceTypeLaptop[] = "laptop";
-static const char kDeviceTypePhone[] = "phone";
-static const char kDeviceTypeTablet[] = "tablet";
-
-// Gets the name and type of a device for the given sync client ID.
-// |name| and |type| are out parameters.
-void GetDeviceNameAndType(const syncer::DeviceInfoTracker* tracker,
-                          const std::string& client_id,
-                          std::string* name,
-                          std::string* type) {
-  // DeviceInfoTracker must be syncing in order for remote history entries to
-  // be available.
-  DCHECK(tracker);
-  DCHECK(tracker->IsSyncing());
-
-  const syncer::DeviceInfo* device_info = tracker->GetDeviceInfo(client_id);
-  if (device_info) {
-    *name = device_info->client_name();
-    switch (device_info->form_factor()) {
-      case syncer::DeviceInfo::FormFactor::kPhone:
-        *type = kDeviceTypePhone;
-        break;
-      case syncer::DeviceInfo::FormFactor::kTablet:
-        *type = kDeviceTypeTablet;
-        break;
-      // return the laptop icon as default.
-      case syncer::DeviceInfo::FormFactor::kUnknown:
-        [[fallthrough]];
-      case syncer::DeviceInfo::FormFactor::kAutomotive:
-        [[fallthrough]];
-      case syncer::DeviceInfo::FormFactor::kWearable:
-        [[fallthrough]];
-      case syncer::DeviceInfo::FormFactor::kTv:
-        [[fallthrough]];
-      case syncer::DeviceInfo::FormFactor::kDesktop:
-        *type = kDeviceTypeLaptop;
-    }
-    return;
-  }
-
-  *name = l10n_util::GetStringUTF8(IDS_HISTORY_UNKNOWN_DEVICE);
-  *type = kDeviceTypeLaptop;
 }
 
 // Formats `entry`'s URL and title and adds them to `result`.
@@ -176,25 +123,8 @@ std::pair<std::string, std::string> SetHistoryEntryUrlAndTitle(
 bool IsUrlInLocalDatabase(const BrowsingHistoryService::HistoryEntry& entry) {
   switch (entry.entry_type) {
     case BrowsingHistoryService::HistoryEntry::EntryType::EMPTY_ENTRY:
-    case BrowsingHistoryService::HistoryEntry::EntryType::REMOTE_ENTRY:
       return false;
     case BrowsingHistoryService::HistoryEntry::EntryType::LOCAL_ENTRY:
-    case BrowsingHistoryService::HistoryEntry::EntryType::COMBINED_ENTRY:
-      return true;
-  }
-  NOTREACHED();
-}
-
-// Helper function to check if entry is present in user remote data (server-side
-// history).
-bool IsEntryInRemoteUserData(
-    const BrowsingHistoryService::HistoryEntry& entry) {
-  switch (entry.entry_type) {
-    case BrowsingHistoryService::HistoryEntry::EntryType::EMPTY_ENTRY:
-    case BrowsingHistoryService::HistoryEntry::EntryType::LOCAL_ENTRY:
-      return false;
-    case BrowsingHistoryService::HistoryEntry::EntryType::REMOTE_ENTRY:
-    case BrowsingHistoryService::HistoryEntry::EntryType::COMBINED_ENTRY:
       return true;
   }
   NOTREACHED();
@@ -213,7 +143,6 @@ history::mojom::HistoryEntryPtr HistoryEntryToMojom(
     const BrowsingHistoryService::HistoryEntry& entry,
     BookmarkModel* bookmark_model,
     Profile& profile,
-    const syncer::DeviceInfoTracker* tracker,
     base::Clock* clock) {
   auto result_mojom = history::mojom::HistoryEntry::New();
   base::DictValue dictionary;
@@ -286,15 +215,6 @@ history::mojom::HistoryEntryPtr HistoryEntryToMojom(
     date_time_of_day = base::TimeFormatTimeOfDay(entry.time);
   }
 
-  std::string device_name;
-  std::string device_type;
-  if (!entry.client_id.empty()) {
-    GetDeviceNameAndType(tracker, entry.client_id, &device_name, &device_type);
-  }
-
-  result_mojom->device_name = device_name;
-  result_mojom->device_type = device_type;
-
   result_mojom->host_filtering_behavior =
       history::mojom::FilteringBehavior::kUnknown;
 
@@ -303,8 +223,6 @@ history::mojom::HistoryEntryPtr HistoryEntryToMojom(
   result_mojom->snippet = base::UTF16ToUTF8(snippet_string);
   result_mojom->starred = bookmark_model->IsBookmarked(entry.url);
   result_mojom->blocked_visit = is_blocked_visit;
-  result_mojom->is_url_in_remote_user_data = IsEntryInRemoteUserData(entry);
-  result_mojom->remote_icon_url_for_uma = entry.remote_icon_url_for_uma.spec();
   result_mojom->is_actor_visit = entry.is_actor_visit;
 
   // Additional debugging fields shown only if the debug feature is enabled.
@@ -374,10 +292,8 @@ void BrowsingHistoryHandler::ShowSidePanelUI() {
 void BrowsingHistoryHandler::StartQueryHistory() {
   HistoryService* local_history = HistoryServiceFactory::GetForProfile(
       profile_, ServiceAccessType::EXPLICIT_ACCESS);
-  syncer::SyncService* sync_service =
-      SyncServiceFactory::GetForProfile(profile_);
-  browsing_history_service_ = std::make_unique<BrowsingHistoryService>(
-      this, local_history, sync_service);
+  browsing_history_service_ =
+      std::make_unique<BrowsingHistoryService>(this, local_history);
 
   // 150 = RESULTS_PER_PAGE from chrome/browser/resources/history/constants.js
   SendHistoryQuery(150, std::string(), std::nullopt, true, true);
@@ -552,12 +468,6 @@ void BrowsingHistoryHandler::HandleQueryResults(
   BookmarkModel* bookmark_model =
       BookmarkModelFactory::GetForBrowserContext(profile_);
 
-  const syncer::DeviceInfoTracker* tracker =
-      DeviceInfoSyncServiceFactory::GetForProfile(profile_)
-          ->GetDeviceInfoTracker();
-
-  DCHECK(tracker);
-
   absl::flat_hash_map<history::VisitID,
                       std::vector<history::mojom::CriticalActionPtr>>
       actions_by_visit_id;
@@ -571,7 +481,7 @@ void BrowsingHistoryHandler::HandleQueryResults(
   std::vector<history::mojom::HistoryEntryPtr> results_mojom;
   for (const BrowsingHistoryService::HistoryEntry& entry : results) {
     history::mojom::HistoryEntryPtr entry_mojom =
-        HistoryEntryToMojom(entry, bookmark_model, *profile_, tracker, clock_);
+        HistoryEntryToMojom(entry, bookmark_model, *profile_, clock_);
 
     if (entry.is_actor_visit) {
       for (history::VisitID visit_id : entry.all_visit_ids) {
@@ -620,18 +530,6 @@ void BrowsingHistoryHandler::HistoryDeleted() {
   } else {
     deferred_callbacks_.push_back(base::BindOnce(
         &BrowsingHistoryHandler::HistoryDeleted, weak_factory_.GetWeakPtr()));
-  }
-}
-
-void BrowsingHistoryHandler::HasOtherFormsOfBrowsingHistory(
-    bool has_other_forms,
-    bool has_synced_results) {
-  if (page_) {
-    page_->OnHasOtherFormsChanged(has_other_forms);
-  } else {
-    deferred_callbacks_.push_back(base::BindOnce(
-        &BrowsingHistoryHandler::HasOtherFormsOfBrowsingHistory,
-        weak_factory_.GetWeakPtr(), has_other_forms, has_synced_results));
   }
 }
 

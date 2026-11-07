@@ -86,7 +86,6 @@ class MockHistoryPage : public history::mojom::Page {
   }
 
   MOCK_METHOD(void, OnHistoryDeleted, (), (override));
-  MOCK_METHOD(void, OnHasOtherFormsChanged, (bool), (override));
   MOCK_METHOD(void,
               SendAccountInfo,
               (history::mojom::AccountInfoPtr),
@@ -175,8 +174,8 @@ class BrowsingHistoryHandlerTest : public ChromeRenderViewHostTestHarness {
             BrowsingHistoryService::HistoryEntry entry(
                 BrowsingHistoryService::HistoryEntry::LOCAL_ENTRY,
                 GURL(("http://test.com")), u"Test",
-                base::Time::Now() - base::Minutes(5), std::string(), false,
-                std::u16string(), false, GURL(), 0, 0,
+                base::Time::Now() - base::Minutes(5), false, std::u16string(),
+                false, 0, 0,
                 /*is_actor_visit=*/false, history::kNoAppIdFilter,
                 /*visit_id=*/history::kInvalidVisitID);
             results.push_back(entry);
@@ -185,7 +184,6 @@ class BrowsingHistoryHandlerTest : public ChromeRenderViewHostTestHarness {
           BrowsingHistoryService::QueryResultsInfo info;
           info.search_text = search_text;
           info.reached_beginning = true;
-          info.sync_timed_out = false;
           handler_->OnQueryComplete(
               mock_results.empty() ? results : mock_results, info,
               base::OnceClosure());
@@ -489,8 +487,8 @@ TEST_F(BrowsingHistoryHandlerTest, CriticalActionsPopulatedForActorVisits) {
   // Create an actor history entry with matching visit_id.
   BrowsingHistoryService::HistoryEntry actor_entry(
       BrowsingHistoryService::HistoryEntry::LOCAL_ENTRY,
-      GURL("http://actor-example.com"), u"Actor Visit", visit_time,
-      std::string(), false, std::u16string(), false, GURL(), 1, 0,
+      GURL("http://actor-example.com"), u"Actor Visit", visit_time, false,
+      std::u16string(), false, 1, 0,
       /*is_actor_visit=*/true, history::kNoAppIdFilter, /*visit_id=*/42);
 
   QueryOptions options;
@@ -546,15 +544,15 @@ TEST_F(BrowsingHistoryHandlerTest,
 
   BrowsingHistoryService::HistoryEntry entry2(
       BrowsingHistoryService::HistoryEntry::LOCAL_ENTRY,
-      GURL("http://actor-example.com"), u"Visit 2", visit_time2, std::string(),
-      false, std::u16string(), false, GURL(), 1, 0,
+      GURL("http://actor-example.com"), u"Visit 2", visit_time2, false,
+      std::u16string(), false, 1, 0,
       /*is_actor_visit=*/true, history::kNoAppIdFilter,
       /*visit_id=*/1002);
 
   BrowsingHistoryService::HistoryEntry entry1(
       BrowsingHistoryService::HistoryEntry::LOCAL_ENTRY,
-      GURL("http://actor-example.com"), u"Visit 1", visit_time1, std::string(),
-      false, std::u16string(), false, GURL(), 1, 0,
+      GURL("http://actor-example.com"), u"Visit 1", visit_time1, false,
+      std::u16string(), false, 1, 0,
       /*is_actor_visit=*/true, history::kNoAppIdFilter,
       /*visit_id=*/1001);
 
@@ -616,8 +614,8 @@ TEST_F(BrowsingHistoryHandlerTest,
   // Single aggregated entry representing both visits on the same day.
   BrowsingHistoryService::HistoryEntry entry(
       BrowsingHistoryService::HistoryEntry::LOCAL_ENTRY,
-      GURL("http://actor-example.com"), u"Visit", visit_time2, std::string(),
-      false, std::u16string(), false, GURL(), 2, 0,
+      GURL("http://actor-example.com"), u"Visit", visit_time2, false,
+      std::u16string(), false, 2, 0,
       /*is_actor_visit=*/true, history::kNoAppIdFilter,
       /*visit_id=*/1002);
   entry.all_visit_ids.push_back(1001);

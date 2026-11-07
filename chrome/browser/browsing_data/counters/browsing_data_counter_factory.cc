@@ -4,8 +4,6 @@
 
 #include "chrome/browser/browsing_data/counters/browsing_data_counter_factory.h"
 
-#include "base/functional/bind.h"
-#include "base/functional/callback_helpers.h"
 #include "build/build_config.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
@@ -17,7 +15,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/webdata_services/web_data_service_factory.h"
@@ -25,7 +22,6 @@
 #include "components/browsing_data/core/counters/browsing_data_counter.h"
 #include "components/browsing_data/core/counters/history_counter.h"
 #include "components/browsing_data/core/pref_names.h"
-#include "components/history/core/browser/web_history_service.h"
 #include "components/sync/service/sync_service.h"
 #include "extensions/buildflags/buildflags.h"
 
@@ -35,14 +31,6 @@
 
 #include "content/public/browser/host_zoom_map.h"
 
-namespace {
-
-history::WebHistoryService* GetUpdatedWebHistoryService(Profile* profile) {
-  return WebHistoryServiceFactory::GetForProfile(profile);
-}
-
-}  // namespace
-
 // static
 std::unique_ptr<browsing_data::BrowsingDataCounter>
 BrowsingDataCounterFactory::GetForProfileAndPref(Profile* profile,
@@ -50,10 +38,7 @@ BrowsingDataCounterFactory::GetForProfileAndPref(Profile* profile,
   if (pref_name == browsing_data::prefs::kDeleteBrowsingHistory) {
     return std::make_unique<browsing_data::HistoryCounter>(
         HistoryServiceFactory::GetForProfile(
-            profile, ServiceAccessType::EXPLICIT_ACCESS),
-        base::BindRepeating(&GetUpdatedWebHistoryService,
-                            base::Unretained(profile)),
-        SyncServiceFactory::GetForProfile(profile));
+            profile, ServiceAccessType::EXPLICIT_ACCESS));
   }
 
   if (pref_name == browsing_data::prefs::kDeleteCache) {

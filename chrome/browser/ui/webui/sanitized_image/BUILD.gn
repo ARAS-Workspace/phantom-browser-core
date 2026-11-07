@@ -12,7 +12,6 @@ source_set("sanitized_image_source") {
 
   public_deps = [
     "//base",
-    "//components/signin/public/identity_manager",
     "//content/public/browser",
     "//services/data_decoder/public/cpp",
     "//services/data_decoder/public/mojom",
@@ -21,9 +20,7 @@ source_set("sanitized_image_source") {
   deps = [
     "//chrome/browser/image_fetcher",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/signin",
     "//chrome/common:constants",
-    "//google_apis",
     "//ipc",
     "//net",
     "//services/network/public/cpp",

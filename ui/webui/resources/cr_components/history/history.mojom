@@ -82,18 +82,12 @@ struct HistoryEntry {
   // visit to `url` on a particular day as defined in the local timezone.
   double time;
 
-  // Timestamps of all local or remote visits to this and similar URLs on the
-  // same day, keyed by URL.
+  // Timestamps of all visits to this and similar URLs on the same day, keyed by
+  // URL.
   map<string, array<double>> all_timestamps;
 
   // Date to display on various services.
   string date_short;
-
-  // Name of device entry was visited on.
-  string device_name;
-
-  // Type of device entry was visited on.
-  string device_type;
 
   // Used in the screenreader entry summary.
   string date_time_of_day;
@@ -120,14 +114,8 @@ struct HistoryEntry {
   // Whether an entry is blocked.
   bool blocked_visit;
 
-  // Whether the URL was obtained from a remote device.
-  bool is_url_in_remote_user_data;
-
   // Whether the visit is actor-initiated.
   bool is_actor_visit;
-
-  // Optional parameter used to plumb footprints associated icon url.
-  string remote_icon_url_for_uma;
 
   // Optional debug info about a visit.
   DebugInfo? debug;
@@ -225,9 +213,6 @@ interface PageHandler {
 interface Page {
   // Alerts the page that the history was deleted.
   OnHistoryDeleted();
-
-  // Alerts the page the other forms of history may or may not be available.
-  OnHasOtherFormsChanged(bool has_other_forms);
 
   // Sends account info updates to the UI.
   SendAccountInfo(AccountInfo account_info);

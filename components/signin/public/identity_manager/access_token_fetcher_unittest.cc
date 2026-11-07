@@ -719,7 +719,7 @@ TEST_F(AccessTokenFetcherTest, FetcherWithUnrestrictedOAuth2Scope) {
   CoreAccountInfo account = AddAccount(kTestGaiaId, kTestEmail);
   EXPECT_FALSE(primary_account_manager().HasPrimaryAccount(
       signin::ConsentLevel::kSignin));
-  VerifyScopeAccess(account.account_id, OAuthConsumerId::kProfileDownloader);
+  VerifyScopeAccess(account.account_id, OAuthConsumerId::kNotebooksService);
 }
 
 // Tests that a request with a signed-in client accessing an OAuth2 API

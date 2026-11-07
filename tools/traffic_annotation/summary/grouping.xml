@@ -183,7 +183,6 @@ after discussions on the right group.
       <annotation id="preload_activation_beacon"/>
       <annotation id="ambient_autofill_request"/>
       <annotation id="chrome_sync_preview_fetcher"/>
-      <annotation id="drive_thumbnail_source"/>
       <annotation id="contextual_search_fpop_service"/>
       <annotation id="web_install_manifest_fetcher"/>
       <annotation id="private_insights_fcp_http"/>
@@ -288,16 +287,7 @@ after discussions on the right group.
     </sender>
   </group>
   <group name="Search">
-    <sender name="Web History">
-      <annotation id="web_history_counter"/>
-      <annotation id="web_history_expire"/>
-      <annotation id="web_history_expire_between_dates"/>
-      <annotation id="web_history_query"/>
-      <annotation id="web_history_delete_url"/>
-      <annotation id="history_notice_utils_notice"/>
-      <annotation id="history_notice_utils_popup"/>
-      <annotation id="history_ui_favicon_request_handler_get_favicon"/>
-    </sender>
+    <sender name="Web History"/>
     <sender name="Omnibox">
       <annotation id="omnibox_zerosuggest"/>
       <annotation id="search_prefetch_service"/>
@@ -336,9 +326,7 @@ after discussions on the right group.
       <annotation id="autofill_query"/>
       <annotation id="autofill_upload"/>
     </sender>
-    <sender name="Personalization">
-      <annotation id="signed_in_profile_avatar"/>
-    </sender>
+    <sender name="Personalization"/>
     <sender name="Favicon"/>
     <sender name="Images"/>
     <sender name="Early Hints">

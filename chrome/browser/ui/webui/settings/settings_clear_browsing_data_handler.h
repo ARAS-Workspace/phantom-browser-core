@@ -97,15 +97,6 @@ class ClearBrowsingDataHandler : public SettingsPageUIHandler,
   // Create a SyncStateEvent containing the current sync state.
   base::DictValue CreateSyncStateEvent();
 
-  // Finds out whether we should show notice about other forms of history stored
-  // in user's account.
-  void RefreshHistoryNotice();
-
-  // Called as an asynchronous response to |RefreshHistoryNotice()|. Enables or
-  // disables the dialog about other forms of history stored in user's account
-  // that is shown when the history deletion is finished.
-  void UpdateHistoryDeletionDialog(bool show);
-
   // Adds a browsing data |counter|.
   void AddCounter(std::unique_ptr<browsing_data::BrowsingDataCounter> counter);
 
@@ -136,10 +127,6 @@ class ClearBrowsingDataHandler : public SettingsPageUIHandler,
 
   base::ScopedObservation<TemplateURLService, TemplateURLServiceObserver>
       dse_service_observation_{this};
-
-  // Whether we should show a dialog informing the user about other forms of
-  // history stored in their account after the history deletion is finished.
-  bool show_history_deletion_dialog_;
 
   // A weak pointer factory for asynchronous calls referencing this class.
   // The weak pointers are invalidated in |OnJavascriptDisallowed()| and

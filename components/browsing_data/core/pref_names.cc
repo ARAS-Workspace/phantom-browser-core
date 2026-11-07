@@ -27,8 +27,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(kDeleteCookies, true);
   registry->RegisterBooleanPref(kDeletePasswords, false);
   registry->RegisterBooleanPref(kDeleteFormData, false);
-  registry->RegisterIntegerPref(
-      kClearBrowsingDataHistoryNoticeShownTimes, 0);
 
   registry->RegisterBooleanPref(kDeleteDownloadHistory, true);
   registry->RegisterBooleanPref(kDeleteHostedAppsData, false);

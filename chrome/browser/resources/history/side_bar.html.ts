@@ -34,18 +34,6 @@ export function getHtml(this: HistorySideBarElement) {
     <cr-ripple></cr-ripple>
   </a>
 </cr-menu-selector>
-<div id="spacer"></div>
-<div id="footer" ?hidden="${!this.showFooter_}">
-  <div class="separator"></div>
-  <div id="google-account-footer"
-      ?hidden="${!this.showGoogleAccountFooter_}"
-      @click="${this.onGoogleAccountFooterClick_}">
-    <cr-icon icon="cr:info"></cr-icon>
-    <div ?hidden="${!this.showGMAOnly_}">$i18nRaw{sidebarFooterGMAOnly}</div>
-    <div ?hidden="${!this.showGAAOnly_}">$i18nRaw{sidebarFooterGAAOnly}</div>
-    <div ?hidden="${!this.showGMAAndGAA_}">$i18nRaw{sidebarFooterGMAAndGAA}</div>
-  </div>
-</div>
 <!--_html_template_end_-->`;
   // clang-format on
 }

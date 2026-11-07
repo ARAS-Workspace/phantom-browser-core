@@ -35,7 +35,6 @@ export function getHtml(this: HistoryAppElement) {
           @selected-page-changed="${this.onSelectedPageChanged_}"
           .selectedTab="${this.selectedTab_}"
           @selected-tab-changed="${this.onSelectedTabChanged_}"
-          .footerInfo="${this.footerInfo}"
           ?history-clusters-enabled="${this.historyClustersEnabled_}"
           ?history-clusters-visible="${this.historyClustersVisible_}"
           @history-clusters-visible-changed="${this.onHistoryClustersVisibleChanged_}"
@@ -96,8 +95,7 @@ export function getHtml(this: HistoryAppElement) {
             @selected-tab-changed="${this.onSelectedTabChanged_}"
             ?history-clusters-enabled="${this.historyClustersEnabled_}"
             ?history-clusters-visible="${this.historyClustersVisible_}"
-            @history-clusters-visible-changed="${this.onHistoryClustersVisibleChanged_}"
-            .footerInfo="${this.footerInfo}">
+            @history-clusters-visible-changed="${this.onHistoryClustersVisibleChanged_}">
         </history-side-bar>
       </cr-drawer>`}'>
     </cr-lazy-render-lit>

@@ -15,12 +15,6 @@
  *
  *      <img is="cr-auto-img" auto-src="https://foo.com/bar.png">
  *
- *      If your image URL points to Google Photos storage, meaning it needs an
- *      auth token, you can use the is-google-photos attribute as follows:
- *
- *      <img is="cr-auto-img" auto-src="https://foo.com/bar.png"
- *          is-google-photos>
- *
  *      If you want the image to reset to an empty state when auto-src changes
  *      and the new image is still loading, set the clear-src attribute:
  *
@@ -46,28 +40,18 @@ const AUTO_SRC: string = 'auto-src';
 
 const CLEAR_SRC: string = 'clear-src';
 
-const IS_GOOGLE_PHOTOS: string = 'is-google-photos';
-
 const STATIC_ENCODE: string = 'static-encode';
 
 const ENCODE_TYPE: string = 'encode-type';
 
 export class CrAutoImgElement extends HTMLImageElement {
   static get observedAttributes() {
-    return [AUTO_SRC, IS_GOOGLE_PHOTOS, STATIC_ENCODE, ENCODE_TYPE];
+    return [AUTO_SRC, STATIC_ENCODE, ENCODE_TYPE];
   }
 
   attributeChangedCallback(
-      name: string, oldValue: string|null, newValue: string|null) {
-    if (name !== AUTO_SRC && name !== IS_GOOGLE_PHOTOS &&
-        name !== STATIC_ENCODE && name !== ENCODE_TYPE) {
-      return;
-    }
-
-    // Changes to |IS_GOOGLE_PHOTOS| are only interesting when the attribute is
-    // being added or removed.
-    if (name === IS_GOOGLE_PHOTOS &&
-        ((oldValue === null) === (newValue === null))) {
+      name: string, _oldValue: string|null, _newValue: string|null) {
+    if (name !== AUTO_SRC && name !== STATIC_ENCODE && name !== ENCODE_TYPE) {
       return;
     }
 
@@ -94,16 +78,12 @@ export class CrAutoImgElement extends HTMLImageElement {
       this.src = url.href;
       return;
     }
-    if (!this.hasAttribute(IS_GOOGLE_PHOTOS) &&
-        !this.hasAttribute(STATIC_ENCODE) && !this.hasAttribute(ENCODE_TYPE)) {
+    if (!this.hasAttribute(STATIC_ENCODE) && !this.hasAttribute(ENCODE_TYPE)) {
       this.src = 'chrome://image?' + url.href;
       return;
     }
 
     this.src = `chrome://image?url=${encodeURIComponent(url.href)}`;
-    if (this.hasAttribute(IS_GOOGLE_PHOTOS)) {
-      this.src += `&isGooglePhotos=true`;
-    }
     if (this.hasAttribute(STATIC_ENCODE)) {
       this.src += `&staticEncode=true`;
     }
@@ -126,18 +106,6 @@ export class CrAutoImgElement extends HTMLImageElement {
 
   get clearSrc(): string {
     return this.getAttribute(CLEAR_SRC) || '';
-  }
-
-  set isGooglePhotos(enabled: boolean) {
-    if (enabled) {
-      this.setAttribute(IS_GOOGLE_PHOTOS, '');
-    } else {
-      this.removeAttribute(IS_GOOGLE_PHOTOS);
-    }
-  }
-
-  get isGooglePhotos(): boolean {
-    return this.hasAttribute(IS_GOOGLE_PHOTOS);
   }
 
   set staticEncode(enabled: boolean) {

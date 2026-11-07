@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "base/functional/callback_forward.h"
-#include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
@@ -21,19 +20,12 @@
 #include "base/task/cancelable_task_tracker.h"
 #include "base/time/clock.h"
 #include "base/time/time.h"
-#include "base/timer/timer.h"
 #include "base/values.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_service_observer.h"
 #include "components/history/core/browser/url_row.h"
-#include "components/history/core/browser/web_history_service.h"
-#include "components/history/core/browser/web_history_service_observer.h"
-#include "components/sync/service/sync_service.h"
-#include "components/sync/service/sync_service_observer.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "url/gurl.h"
-
-FORWARD_DECLARE_TEST(BrowsingHistoryHandlerTest, ObservingWebHistoryDeletions);
 
 namespace history {
 
@@ -41,34 +33,27 @@ class BrowsingHistoryDriver;
 class QueryResults;
 struct QueryOptions;
 
-// Interacts with HistoryService, WebHistoryService, and SyncService to query
-// history and provide results to the associated BrowsingHistoryDriver.
-class BrowsingHistoryService : public HistoryServiceObserver,
-                               public WebHistoryServiceObserver,
-                               public syncer::SyncServiceObserver {
+// Interacts with HistoryService to query history and provide results to the
+// associated BrowsingHistoryDriver.
+class BrowsingHistoryService : public HistoryServiceObserver {
  public:
-  // Represents a history entry to be shown to the user, representing either
-  // a local or remote visit. A single entry can represent multiple visits,
-  // since only the most recent visit on a particular day is shown.
+  // Represents a history entry to be shown to the user. A single entry can
+  // represent multiple visits, since only the most recent visit on a particular
+  // day is shown.
   struct HistoryEntry {
-    // Values indicating whether an entry represents only local visits, only
-    // remote visits, or a mixture of both.
+    // Values indicating whether an entry represents local visits.
     enum EntryType {
       EMPTY_ENTRY = 0,
       LOCAL_ENTRY,
-      REMOTE_ENTRY,
-      COMBINED_ENTRY
     };
 
     HistoryEntry(EntryType type,
                  const GURL& url,
                  const std::u16string& title,
                  base::Time time,
-                 const std::string& client_id,
                  bool is_search_result,
                  const std::u16string& snippet,
                  bool blocked_visit,
-                 const GURL& remote_icon_url_for_uma,
                  int visit_count,
                  int typed_count,
                  bool is_actor_visit,
@@ -82,7 +67,7 @@ class BrowsingHistoryService : public HistoryServiceObserver,
     static bool SortByTimeDescending(const HistoryEntry& entry1,
                                      const HistoryEntry& entry2);
 
-    // The type of visits this entry represents: local, remote, or both.
+    // The type of visits this entry represents.
     EntryType entry_type;
 
     GURL url;
@@ -93,11 +78,8 @@ class BrowsingHistoryService : public HistoryServiceObserver,
     // visit to `url` on a particular day as defined in the local timezone.
     base::Time time;
 
-    // The sync ID of the client on which the most recent visit occurred.
-    std::string client_id;
-
-    // Timestamps of all local or remote visits to this or similar URLs on the
-    // same day. Similar URLs are ones with matching title and host.
+    // Timestamps of all visits to this or similar URLs on the same day. Similar
+    // URLs are ones with matching title and host.
     absl::flat_hash_map<GURL, std::set<base::Time>> all_timestamps;
 
     // If true, this entry is a search result.
@@ -108,9 +90,6 @@ class BrowsingHistoryService : public HistoryServiceObserver,
 
     // Whether this entry was blocked when it was attempted.
     bool blocked_visit;
-
-    // Optional parameter used to plumb footprints associated icon url.
-    GURL remote_icon_url_for_uma;
 
     // Total number of times this URL has been visited.
     int visit_count = 0;
@@ -140,14 +119,10 @@ class BrowsingHistoryService : public HistoryServiceObserver,
     // Whether this query reached the end of all results, or if there are more
     // history entries that can be fetched through paging.
     bool reached_beginning = false;
-
-    // Whether the last call to Web History timed out.
-    bool sync_timed_out = false;
   };
 
   BrowsingHistoryService(BrowsingHistoryDriver* driver,
-                         HistoryService* local_history,
-                         syncer::SyncService* sync_service);
+                         HistoryService* local_history);
 
   BrowsingHistoryService(const BrowsingHistoryService&) = delete;
   BrowsingHistoryService& operator=(const BrowsingHistoryService&) = delete;
@@ -179,30 +154,16 @@ class BrowsingHistoryService : public HistoryServiceObserver,
   // the actual implementation.
   void RemoveVisits(const std::vector<HistoryEntry>& items);
 
-  // SyncServiceObserver implementation.
-  void OnStateChanged(syncer::SyncService* sync) override;
-  void OnSyncShutdown(syncer::SyncService* sync) override;
-
  protected:
-  // Constructor that allows specifying more dependencies for unit tests.
-  BrowsingHistoryService(BrowsingHistoryDriver* driver,
-                         HistoryService* local_history,
-                         syncer::SyncService* sync_service,
-                         std::unique_ptr<base::OneShotTimer> web_history_timer);
   // Should be used only for tests when mocking the service.
   BrowsingHistoryService();
 
  private:
-  FRIEND_TEST_ALL_PREFIXES(::BrowsingHistoryHandlerTest,
-                           ObservingWebHistoryDeletions);
-
   // Used to hold and track query state between asynchronous calls.
   struct QueryHistoryState;
 
-  // Used for grouping/merging similar history entries.
-  // Depending on the algorithm, some fields might be unused and left empty.
+  // Used for grouping similar history entries.
   struct GroupingKey {
-    GURL url;
     std::string host;
     std::u16string title;
     std::optional<std::string> app_id;
@@ -210,35 +171,11 @@ class BrowsingHistoryService : public HistoryServiceObserver,
     auto operator<=>(const GroupingKey& other) const = default;
   };
 
-  static bool ShouldQueryRemote(const QueryHistoryState& state);
-
-  // Moves results from `state` into `results`, merging both remote and local
-  // results together and maintaining reverse chronological order. Any results
-  // with the same URL will be merged together for each day. Often holds back
-  // some results in `state` from one of the two sources to ensure that they're
-  // always returned to the driver in correct order. This function also updates
-  // the end times in `state` for both sources that the next query should be
-  // made against.
-  static void MergeDuplicateResults(QueryHistoryState* state,
-                                    std::vector<HistoryEntry>* results);
-
-  // Merges both remote and local results together from `state` while
-  // maintaining reverse chronological order and returns the final results. Any
+  // Returns the local results from `state` in reverse chronological order. Any
   // results with the same host and title will be merged together for each day.
-  // Often holds back some results in `state` from one of the two sources to
-  // ensure that they're always returned to the driver in correct order. This
-  // function also updates the end times in `state` for both sources that the
-  // next query should be made against.
-  static std::vector<HistoryEntry> GroupSimilarVisits(QueryHistoryState* state);
-
-  // Holds back some results in `state` from one of the two sources to ensure
-  // that they're always returned to the driver in correct order. This function
-  // also updates the end times in `state` for both sources that the next query
+  // This function also updates the end time in `state` that the next query
   // should be made against.
-  static void HoldbackAndPartitionResults(QueryHistoryState* state,
-                                          const base::Time oldest_local,
-                                          const base::Time oldest_remote,
-                                          std::vector<HistoryEntry>* results);
+  static std::vector<HistoryEntry> GroupSimilarVisits(QueryHistoryState* state);
 
   // Core implementation of history querying.
   void QueryHistoryInternal(scoped_refptr<QueryHistoryState> state);
@@ -261,8 +198,7 @@ class BrowsingHistoryService : public HistoryServiceObserver,
       base::OnceCallback<void(base::Time)> callback,
       HistoryLastVisitResult result);
 
-  // Combines the query results from the local history database and the history
-  // server, and sends the combined results to the
+  // Sends the query results from the local history database to the
   // BrowsingHistoryDriver.
   void ReturnResultsToDriver(scoped_refptr<QueryHistoryState> state);
 
@@ -272,74 +208,26 @@ class BrowsingHistoryService : public HistoryServiceObserver,
   static void RecordDuplicateVisitsCount(
       const std::vector<HistoryEntry>& results);
 
-  // Callback from `web_history_timer_` when a response from web history has
-  // not been received in time.
-  void WebHistoryTimeout(scoped_refptr<QueryHistoryState> state);
-
-  // Callback from the WebHistoryService when a query has completed.
-  void WebHistoryQueryComplete(
-      scoped_refptr<QueryHistoryState> state,
-      base::Time start_time,
-      WebHistoryService::Request* request,
-      base::optional_ref<const WebHistoryService::QueryHistoryResult> results);
-
-  // Callback telling us whether other forms of browsing history were found
-  // on the history server.
-  void OtherFormsOfBrowsingHistoryQueryComplete(
-      bool found_other_forms_of_browsing_history);
-
   // Callback from the history system when visits were deleted.
   void RemoveComplete();
-
-  // Callback from history server when visits were deleted.
-  void RemoveWebHistoryComplete(bool success);
 
   // HistoryServiceObserver implementation.
   void OnHistoryDeletions(HistoryService* history_service,
                           const DeletionInfo& deletion_info) override;
 
-  // WebHistoryServiceObserver implementation.
-  void OnWebHistoryDeleted() override;
-
   // Tracker for search requests to the history service.
   base::CancelableTaskTracker query_task_tracker_;
 
-  // The currently-executing request for synced history results.
-  // Deleting the request will cancel it.
-  std::unique_ptr<WebHistoryService::Request> web_history_request_;
-
-  // True if there is a pending delete requests to the web service.
-  bool has_pending_delete_request_ = false;
-
   // Tracker for delete requests to the history service.
   base::CancelableTaskTracker delete_task_tracker_;
-
-  // Timer used to implement a timeout on a Web History response.
-  std::unique_ptr<base::OneShotTimer> web_history_timer_;
 
   // HistoryService (local history) observer.
   base::ScopedObservation<HistoryService, HistoryServiceObserver>
       history_service_observation_{this};
 
-  // WebHistoryService (synced history) observer.
-  base::ScopedObservation<WebHistoryService, WebHistoryServiceObserver>
-      web_history_service_observation_{this};
-
-  // SyncService observer listens to late initialization of history sync.
-  base::ScopedObservation<syncer::SyncService, syncer::SyncServiceObserver>
-      sync_service_observation_{this};
-
-  // Whether the last call to Web History returned synced results.
-  bool has_synced_results_ = false;
-
-  // Whether there are other forms of browsing history on the history server.
-  bool has_other_forms_of_browsing_history_ = false;
-
   raw_ptr<BrowsingHistoryDriver, DanglingUntriaged> driver_;
 
   raw_ptr<HistoryService, DanglingUntriaged> local_history_;
-
-  raw_ptr<syncer::SyncService, DanglingUntriaged> sync_service_;
 
   // The clock used to vend times.
   std::unique_ptr<base::Clock> clock_;

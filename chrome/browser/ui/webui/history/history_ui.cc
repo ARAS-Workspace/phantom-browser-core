@@ -69,30 +69,6 @@ content::WebUIDataSource* CreateAndAddHistoryUIHTMLSource(Profile* profile) {
   const bool is_critical_actions_enabled = base::FeatureList::IsEnabled(
       critical_actions::features::kCriticalActionHistory);
 
-  // The history page footer can display messages about other forms of
-  // browsing history, linking to Google My Activity (GMA) and/or
-  // Gemini Apps Activity (GAA). At most one message is shown, depending on
-  // the user's settings.
-  source->AddString(
-      "sidebarFooterGMAOnly",
-      l10n_util::GetStringFUTF16(IDS_HISTORY_OTHER_FORMS_OF_HISTORY_GMA_ONLY,
-                                 chrome::kMyActivityUrlInHistory));
-  source->AddString(
-      "sidebarFooterGAAOnly",
-      l10n_util::GetStringFUTF16(IDS_HISTORY_OTHER_FORMS_OF_HISTORY_GAA_ONLY,
-                                 chrome::kMyActivityGeminiAppsUrl));
-  source->AddString(
-      "sidebarFooterGMAAndGAA",
-      l10n_util::GetStringFUTF16(
-          is_critical_actions_enabled
-              ? IDS_HISTORY_OTHER_FORMS_OF_HISTORY_GMA_AND_GAA_CRITICAL_ACTIONS
-              : IDS_HISTORY_OTHER_FORMS_OF_HISTORY_GMA_AND_GAA,
-          chrome::kMyActivityUrlInHistory, chrome::kMyActivityGeminiAppsUrl));
-  // Links that are used in the messages above.
-  source->AddString("sidebarFooterGMALink", chrome::kMyActivityUrlInHistory);
-  source->AddString("sidebarFooterGAALink", chrome::kMyActivityGeminiAppsUrl);
-
-  source->AddBoolean("isGlicEnabled", false);
   source->AddBoolean("isGlicWebActuationAvailable", false);
 
   source->AddBoolean("isBrowsingHistoryActorIntegrationM3Enabled",

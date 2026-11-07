@@ -54,10 +54,7 @@ void ProfileStatisticsAggregator::StartAggregator() {
   AddCounter(std::make_unique<browsing_data::BookmarkCounter>(bookmark_model_));
 
   // Initiate history counting.
-  AddCounter(std::make_unique<browsing_data::HistoryCounter>(
-      history_service_,
-      browsing_data::HistoryCounter::GetUpdatedWebHistoryServiceCallback(),
-      /*sync_service=*/nullptr));
+  AddCounter(std::make_unique<browsing_data::HistoryCounter>(history_service_));
 }
 
 void ProfileStatisticsAggregator::OnCounterResult(

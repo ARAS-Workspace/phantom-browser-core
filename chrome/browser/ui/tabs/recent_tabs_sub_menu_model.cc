@@ -23,7 +23,6 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/favicon/favicon_utils.h"
-#include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/session_restore.h"
@@ -47,7 +46,6 @@
 #include "chrome/browser/ui/views/side_panel/history_clusters/history_clusters_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/favicon/core/history_ui_favicon_request_handler.h"
 #include "components/favicon_base/favicon_types.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/prefs/scoped_user_pref_update.h"
@@ -1028,36 +1026,24 @@ void RecentTabsSubMenuModel::AddTabFavicon(int command_id,
   // Set default icon first.
   menu_model->SetIcon(index_in_menu, favicon::GetDefaultFaviconModel());
 
-  const bool is_local_tab = IsCommandType(CommandType::LocalTab, command_id);
-  if (is_local_tab) {
-    // Request only from local storage to avoid leaking user data.
-    favicon::FaviconService* favicon_service =
-        FaviconServiceFactory::GetForProfile(
-            browser_->GetProfile(), ServiceAccessType::EXPLICIT_ACCESS);
-    // Can be null for tests.
-    if (!favicon_service) {
-      return;
-    }
-    favicon_service->GetFaviconImageForPageURL(
-        url,
-        base::BindOnce(&RecentTabsSubMenuModel::OnFaviconDataAvailable,
-                       weak_ptr_factory_.GetWeakPtr(), command_id, menu_model),
-        &local_tab_cancelable_task_tracker_);
-  } else {
-    favicon::HistoryUiFaviconRequestHandler*
-        history_ui_favicon_request_handler =
-            HistoryUiFaviconRequestHandlerFactory::GetForBrowserContext(
-                browser_->GetProfile());
-    // Can be null for tests.
-    if (!history_ui_favicon_request_handler) {
-      return;
-    }
-    history_ui_favicon_request_handler->GetFaviconImageForPageURL(
-        url,
-        base::BindOnce(&RecentTabsSubMenuModel::OnFaviconDataAvailable,
-                       weak_ptr_factory_for_other_devices_tab_.GetWeakPtr(),
-                       command_id, menu_model));
+  // Request only from local storage to avoid leaking user data.
+  favicon::FaviconService* favicon_service =
+      FaviconServiceFactory::GetForProfile(browser_->GetProfile(),
+                                           ServiceAccessType::EXPLICIT_ACCESS);
+  // Can be null for tests.
+  if (!favicon_service) {
+    return;
   }
+  const bool is_local_tab = IsCommandType(CommandType::LocalTab, command_id);
+  favicon_service->GetFaviconImageForPageURL(
+      url,
+      base::BindOnce(&RecentTabsSubMenuModel::OnFaviconDataAvailable,
+                     is_local_tab
+                         ? weak_ptr_factory_.GetWeakPtr()
+                         : weak_ptr_factory_for_other_devices_tab_.GetWeakPtr(),
+                     command_id, menu_model),
+      is_local_tab ? &local_tab_cancelable_task_tracker_
+                   : &other_devices_tab_cancelable_task_tracker_);
 }
 
 void RecentTabsSubMenuModel::OnFaviconDataAvailable(

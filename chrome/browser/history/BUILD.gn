@@ -14,7 +14,6 @@ source_set("history") {
     "history_utils.h",
     "profile_based_browsing_history_driver.h",
     "top_sites_factory.h",
-    "web_history_service_factory.h",
   ]
   public_deps = [
     "//base",
@@ -38,7 +37,6 @@ source_set("impl") {
     "history_utils.cc",
     "profile_based_browsing_history_driver.cc",
     "top_sites_factory.cc",
-    "web_history_service_factory.cc",
   ]
   public_deps = [
     ":history",

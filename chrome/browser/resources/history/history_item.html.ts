@@ -136,9 +136,6 @@ export function getHtml(this: HistoryItemElement) {
                 ?hidden="${!this.item?.debug.isUrlInLocalDatabase}">
               in local data
             </div>
-            <div class="debug-info" ?hidden="${!this.item?.isUrlInRemoteUserData}">
-              in remote data
-            </div>
             <div class="debug-info"
                 ?hidden="${!this.item?.debug.isUrlInLocalDatabase}">
               typed count: ${this.item?.debug.typedCount}

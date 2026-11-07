@@ -72,7 +72,6 @@
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/finds/finds_service_factory.h"
@@ -505,7 +504,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   HeavyAdServiceFactory::GetInstance();
   HistoryClustersServiceFactory::EnsureFactoryBuilt();
   HistoryServiceFactory::GetInstance();
-  HistoryUiFaviconRequestHandlerFactory::GetInstance();
   HostContentSettingsMapFactory::GetInstance();
   HttpsEngagementServiceFactory::GetInstance();
   HttpsFirstModeServiceFactory::GetInstance();

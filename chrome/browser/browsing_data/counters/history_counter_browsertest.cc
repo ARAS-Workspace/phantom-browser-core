@@ -13,19 +13,14 @@
 #include "base/run_loop.h"
 #include "base/time/time.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/history/web_history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/browsing_data/core/browsing_data_utils.h"
 #include "components/browsing_data/core/pref_names.h"
 #include "components/history/core/browser/history_service.h"
-#include "components/history/core/browser/web_history_service.h"
-#include "components/history/core/test/fake_web_history_service.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
-#include "net/http/http_status_code.h"
 #include "url/gurl.h"
 
 namespace {
@@ -42,23 +37,16 @@ class HistoryCounterTest : public InProcessBrowserTest {
     time_ = base::Time::Now();
     history_service_ = HistoryServiceFactory::GetForProfileWithoutCreating(
         browser()->GetProfile());
-    fake_web_history_service_ =
-        std::make_unique<history::FakeWebHistoryService>();
 
     SetHistoryDeletionPref(true);
     SetDeletionPeriodPref(browsing_data::TimePeriod::ALL_TIME);
   }
 
-  void TearDownOnMainThread() override {
-    fake_web_history_service_.reset();
-    history_service_ = nullptr;
-  }
+  void TearDownOnMainThread() override { history_service_ = nullptr; }
 
   void AddVisit(std::string_view url) {
     history_service_->AddPage(GURL(url), time_, history::SOURCE_BROWSED);
   }
-
-  const base::Time& GetCurrentTime() { return time_; }
 
   void SetTime(base::Time time) { time_ = time; }
 
@@ -79,11 +67,6 @@ class HistoryCounterTest : public InProcessBrowserTest {
     run_loop_->Run();
   }
 
-  bool HasSyncedVisits() {
-    DCHECK(finished_);
-    return has_synced_visits_;
-  }
-
   std::string GetLastVisitedDomain() {
     DCHECK(finished_);
     return last_visited_domain_;
@@ -102,7 +85,6 @@ class HistoryCounterTest : public InProcessBrowserTest {
           static_cast<HistoryCounter::HistoryResult*>(result.get());
 
       unique_domains_result_ = history_result->Value();
-      has_synced_visits_ = history_result->has_synced_visits();
       last_visited_domain_ = history_result->last_visited_domain();
     }
 
@@ -111,31 +93,14 @@ class HistoryCounterTest : public InProcessBrowserTest {
     }
   }
 
-  history::WebHistoryService* GetFakeWebHistoryService(Profile* profile,
-                                                       bool check_sync_status) {
-    // |check_sync_status| is true when the factory should check if
-    // history sync is enabled.
-    if (!check_sync_status ||
-        WebHistoryServiceFactory::GetForProfile(profile)) {
-      return fake_web_history_service_.get();
-    }
-    return nullptr;
-  }
-
-  history::WebHistoryService* GetRealWebHistoryService(Profile* profile) {
-    return WebHistoryServiceFactory::GetForProfile(profile);
-  }
-
   history::HistoryService* GetHistoryService() { return history_service_; }
 
  private:
   std::unique_ptr<base::RunLoop> run_loop_;
   raw_ptr<history::HistoryService> history_service_ = nullptr;
-  std::unique_ptr<history::FakeWebHistoryService> fake_web_history_service_;
   base::Time time_;
 
   bool finished_;
-  bool has_synced_visits_;
   std::string last_visited_domain_;
   BrowsingDataCounter::ResultInt unique_domains_result_;
 };
@@ -171,11 +136,7 @@ IN_PROC_BROWSER_TEST_F(HistoryCounterTest, DuplicateVisits) {
 
   Profile* profile = browser()->GetProfile();
 
-  HistoryCounter counter(
-      GetHistoryService(),
-      base::BindRepeating(&HistoryCounterTest::GetRealWebHistoryService,
-                          base::Unretained(this), base::Unretained(profile)),
-      SyncServiceFactory::GetForProfile(profile));
+  HistoryCounter counter(GetHistoryService());
 
   counter.Init(profile->GetPrefs(),
                base::BindRepeating(&HistoryCounterTest::Callback,
@@ -187,18 +148,14 @@ IN_PROC_BROWSER_TEST_F(HistoryCounterTest, DuplicateVisits) {
   EXPECT_EQ(3u, GetUniqueDomainsResult());
 }
 
-// Tests that the counter works without |web_history_service_callback| and
-// |sync_service|.
-IN_PROC_BROWSER_TEST_F(HistoryCounterTest, WithoutSyncService) {
+// Tests that the counter reports the local visits.
+IN_PROC_BROWSER_TEST_F(HistoryCounterTest, LocalVisits) {
   AddVisit("https://www.google.com");
   AddVisit("https://www.chrome.com");
 
   Profile* profile = browser()->GetProfile();
 
-  browsing_data::HistoryCounter counter(
-      GetHistoryService(),
-      browsing_data::HistoryCounter::GetUpdatedWebHistoryServiceCallback(),
-      nullptr /* sync_service */);
+  browsing_data::HistoryCounter counter(GetHistoryService());
 
   counter.Init(profile->GetPrefs(),
                base::BindRepeating(&HistoryCounterTest::Callback,
@@ -219,11 +176,7 @@ IN_PROC_BROWSER_TEST_F(HistoryCounterTest, PrefChanged) {
 
   Profile* profile = browser()->GetProfile();
 
-  HistoryCounter counter(
-      GetHistoryService(),
-      base::BindRepeating(&HistoryCounterTest::GetRealWebHistoryService,
-                          base::Unretained(this), base::Unretained(profile)),
-      SyncServiceFactory::GetForProfile(profile));
+  HistoryCounter counter(GetHistoryService());
 
   counter.Init(profile->GetPrefs(),
                base::BindRepeating(&HistoryCounterTest::Callback,
@@ -266,11 +219,7 @@ IN_PROC_BROWSER_TEST_F(HistoryCounterTest, PeriodChanged) {
 
   Profile* profile = browser()->GetProfile();
 
-  HistoryCounter counter(
-      GetHistoryService(),
-      base::BindRepeating(&HistoryCounterTest::GetRealWebHistoryService,
-                          base::Unretained(this), base::Unretained(profile)),
-      SyncServiceFactory::GetForProfile(profile));
+  HistoryCounter counter(GetHistoryService());
 
   counter.Init(profile->GetPrefs(),
                base::BindRepeating(&HistoryCounterTest::Callback,
@@ -304,95 +253,6 @@ IN_PROC_BROWSER_TEST_F(HistoryCounterTest, PeriodChanged) {
   SetDeletionPeriodPref(browsing_data::TimePeriod::OLDER_THAN_30_DAYS);
   WaitForCounting();
   EXPECT_EQ("example.com", GetLastVisitedDomain());
-  EXPECT_EQ(2u, GetUniqueDomainsResult());
-}
-
-// Test the behavior for a profile that syncs history.
-IN_PROC_BROWSER_TEST_F(HistoryCounterTest, Synced) {
-  // WebHistoryService makes network requests, so we need to use a fake one
-  // for testing.
-  Profile* profile = browser()->GetProfile();
-
-  HistoryCounter counter(
-      GetHistoryService(),
-      base::BindRepeating(&HistoryCounterTest::GetFakeWebHistoryService,
-                          base::Unretained(this), base::Unretained(profile),
-                          false),
-      SyncServiceFactory::GetForProfile(profile));
-
-  counter.Init(profile->GetPrefs(),
-               base::BindRepeating(&HistoryCounterTest::Callback,
-                                   base::Unretained(this)));
-
-  history::FakeWebHistoryService* service =
-      static_cast<history::FakeWebHistoryService*>(
-          GetFakeWebHistoryService(profile, false));
-
-  // No entries locally and no entries in Sync.
-  service->SetupFakeResponse(true /* success */, net::HTTP_OK);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_FALSE(HasSyncedVisits());
-  EXPECT_EQ("", GetLastVisitedDomain());
-  EXPECT_EQ(0u, GetUniqueDomainsResult());
-
-  // No entries locally. There are some entries in Sync, but they are out of the
-  // time range.
-  SetDeletionPeriodPref(browsing_data::TimePeriod::LAST_HOUR);
-  service->AddSyncedVisit("www.google.com", GetCurrentTime() - base::Hours(2));
-  service->AddSyncedVisit("www.chrome.com", GetCurrentTime() - base::Hours(2));
-  service->SetupFakeResponse(true /* success */, net::HTTP_OK);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_FALSE(HasSyncedVisits());
-  EXPECT_EQ("", GetLastVisitedDomain());
-  EXPECT_EQ(0u, GetUniqueDomainsResult());
-
-  // No entries locally, but some entries in Sync.
-  service->AddSyncedVisit("www.google.com", GetCurrentTime());
-  service->SetupFakeResponse(true /* success */, net::HTTP_OK);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_TRUE(HasSyncedVisits());
-  EXPECT_EQ("", GetLastVisitedDomain());
-  EXPECT_EQ(0u, GetUniqueDomainsResult());
-
-  // To err on the safe side, if the server request fails, we assume that there
-  // might be some items on the server.
-  service->SetupFakeResponse(true /* success */,
-                             net::HTTP_INTERNAL_SERVER_ERROR);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_TRUE(HasSyncedVisits());
-  EXPECT_EQ("", GetLastVisitedDomain());
-  EXPECT_EQ(0u, GetUniqueDomainsResult());
-
-  // Same when the entire query fails.
-  service->SetupFakeResponse(false /* success */,
-                             net::HTTP_INTERNAL_SERVER_ERROR);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_TRUE(HasSyncedVisits());
-  EXPECT_EQ("", GetLastVisitedDomain());
-  EXPECT_EQ(0u, GetUniqueDomainsResult());
-
-  // Nonzero local count, nonempty sync.
-  AddVisit("https://www.google.com");
-  AddVisit("https://www.chrome.com");
-  service->SetupFakeResponse(true /* success */, net::HTTP_OK);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_TRUE(HasSyncedVisits());
-  EXPECT_EQ("chrome.com", GetLastVisitedDomain());
-  EXPECT_EQ(2u, GetUniqueDomainsResult());
-
-  // Nonzero local count, empty sync.
-  service->ClearSyncedVisits();
-  service->SetupFakeResponse(true /* success */, net::HTTP_OK);
-  counter.Restart();
-  WaitForCounting();
-  EXPECT_FALSE(HasSyncedVisits());
-  EXPECT_EQ("chrome.com", GetLastVisitedDomain());
   EXPECT_EQ(2u, GetUniqueDomainsResult());
 }
 

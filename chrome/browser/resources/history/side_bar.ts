@@ -20,11 +20,6 @@ import {Page, TABBED_PAGES} from './router.js';
 import {getCss} from './side_bar.css.js';
 import {getHtml} from './side_bar.html.js';
 
-export interface FooterInfo {
-  otherFormsOfHistory: boolean;
-  geminiAppsActivity: boolean;
-}
-
 export interface HistorySideBarElement {
   $: {
     history: HTMLAnchorElement,
@@ -47,8 +42,6 @@ export class HistorySideBarElement extends CrLitElement {
 
   static override get properties() {
     return {
-      footerInfo: {type: Object},
-
       historyClustersEnabled: {type: Boolean},
 
       historyClustersVisible: {
@@ -70,49 +63,15 @@ export class HistorySideBarElement extends CrLitElement {
 
       guestSession_: {type: Boolean},
 
-      /**
-       * Used to display notices for profile sign-in status and managed status.
-       */
-      showFooter_: {type: Boolean},
-      /**
-       * Used to display Google Account section in the footer. This section
-       * contains links to Google My Activity and/or Gemini Apps Activity.
-       *
-       * When this property is true, `showFooter_` property should also be true.
-       */
-      showGoogleAccountFooter_: {type: Boolean},
-      /**
-       * Mutually exclusive flags that determine which message to show in the
-       * Google Account footer:
-       *   - message with Google My Activity (GMA) link
-       *   - message with Gemini Apps Activity (GAA) link
-       *   - message with both Google My Activity (GMA) and
-       *     Gemini Apps Activity (GAA) links.
-       *
-       * At most one of these can be true.
-       */
-      showGMAOnly_: {type: Boolean},
-      showGAAOnly_: {type: Boolean},
-      showGMAAndGAA_: {type: Boolean},
-
       showHistoryClusters_: {type: Boolean},
     };
   }
 
-  accessor footerInfo: FooterInfo = {
-    otherFormsOfHistory: false,
-    geminiAppsActivity: false,
-  };
   accessor historyClustersEnabled: boolean = false;
   accessor historyClustersVisible: boolean = false;
   accessor selectedPage: string = '';
   accessor selectedTab: number = -1;
   protected accessor guestSession_ = loadTimeData.getBoolean('isGuestSession');
-  protected accessor showFooter_: boolean = false;
-  protected accessor showGoogleAccountFooter_: boolean = false;
-  protected accessor showGMAOnly_: boolean = false;
-  protected accessor showGAAOnly_: boolean = false;
-  protected accessor showGMAAndGAA_: boolean = false;
   private accessor showHistoryClusters_: boolean = false;
 
   override connectedCallback() {
@@ -123,64 +82,10 @@ export class HistorySideBarElement extends CrLitElement {
   override willUpdate(changedProperties: PropertyValues<this>) {
     super.willUpdate(changedProperties);
 
-    if (changedProperties.has('footerInfo')) {
-      this.updateFooterVisibility();
-    }
     if (changedProperties.has('historyClustersEnabled') ||
         changedProperties.has('historyClustersVisible')) {
       this.showHistoryClusters_ =
           this.historyClustersEnabled && this.historyClustersVisible;
-    }
-  }
-
-  private updateFooterVisibility() {
-    // At most one of these values can be true.
-    this.showGMAOnly_ = false;
-    this.showGAAOnly_ = false;
-    this.showGMAAndGAA_ = false;
-
-    if (this.footerInfo.otherFormsOfHistory &&
-        this.footerInfo.geminiAppsActivity) {
-      this.showGMAAndGAA_ = true;
-    } else if (this.footerInfo.otherFormsOfHistory) {
-      this.showGMAOnly_ = true;
-    } else if (this.footerInfo.geminiAppsActivity) {
-      this.showGAAOnly_ = true;
-    }
-
-    this.showGoogleAccountFooter_ =
-        this.showGMAAndGAA_ || this.showGMAOnly_ || this.showGAAOnly_;
-    this.showFooter_ = this.showGoogleAccountFooter_;
-  }
-
-  protected onGoogleAccountFooterClick_(e: Event) {
-    if ((e.target as HTMLElement).tagName !== 'A') {
-      // Do nothing if a link is not clicked.
-      return;
-    }
-
-    e.preventDefault();
-
-    // Proxy URL navigation to fix CI failures in
-    // `js_code_coverage_browser_tests`. The tests fail because Chrome attempts
-    // to open real URLs.
-
-    const browserProxy = BrowserProxyImpl.getInstance();
-    switch ((e.target as HTMLElement).id) {
-      case 'footerGoogleMyActivityLink':
-        browserProxy.recordAction('SideBarFooterGoogleMyActivityClick');
-        browserProxy.navigateToUrl(
-            loadTimeData.getString('sidebarFooterGMALink'), '_blank',
-            e as MouseEvent);
-        break;
-      case 'footerGeminiAppsActivityLink':
-        browserProxy.recordAction('SideBarFooterGeminiAppsActivityClick');
-        browserProxy.navigateToUrl(
-            loadTimeData.getString('sidebarFooterGAALink'), '_blank',
-            e as MouseEvent);
-        break;
-      default:
-        break;
     }
   }
 

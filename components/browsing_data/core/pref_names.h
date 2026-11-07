@@ -51,8 +51,6 @@ inline constexpr char kCloseTabs[] = "browser.clear_data.close_tabs";
 // Other Clear Browsing Data preferences.
 inline constexpr char kLastClearBrowsingDataTime[] =
     "browser.last_clear_browsing_data_time";
-inline constexpr char kClearBrowsingDataHistoryNoticeShownTimes[] =
-    "browser.clear_data.history_notice_shown_times";
 inline constexpr char kMigratedToQuickDeletePrefValues[] =
     "browser.migrated_to_quick_delete_pref_values";
 // LINT.IfChange(TipsPrefNames)

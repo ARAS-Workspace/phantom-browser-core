@@ -67,50 +67,6 @@ suite('CrAutoImgElementTest', () => {
       });
 
   test(
-      'setting isGooglePhotos creates a URL with autoSrc and isGooglePhotos as params',
-      () => {
-        const autoSrc = 'https://foo.com/img.png';
-
-        // Act.
-        img.isGooglePhotos = true;
-        img.autoSrc = autoSrc;
-
-        // Assert.
-        assertEquals(
-            `chrome://image/?url=${
-                encodeURIComponent(autoSrc)}&isGooglePhotos=true`,
-            img.src);
-
-        // Act.
-        img.isGooglePhotos = false;
-
-        // Assert.
-        assertEquals(`chrome://image/?${autoSrc}`, img.src);
-      });
-
-  test(
-      'setting is-google-photos creates a URL with autoSrc and isGooglePhotos as params',
-      () => {
-        const autoSrc = 'https://foo.com/img.png';
-
-        // Act.
-        img.toggleAttribute('is-google-photos', true);
-        img.autoSrc = autoSrc;
-
-        // Assert.
-        assertEquals(
-            `chrome://image/?url=${
-                encodeURIComponent(autoSrc)}&isGooglePhotos=true`,
-            img.src);
-
-        // Act.
-        img.removeAttribute('is-google-photos');
-
-        // Assert.
-        assertEquals(`chrome://image/?${autoSrc}`, img.src);
-      });
-
-  test(
       'setting clear-src removes the src attribute first when auto-src changes',
       async () => {
         const originalSrc = 'chrome://foo/foo.png';
@@ -232,14 +188,12 @@ suite('CrAutoImgElementTest', () => {
         // Act.
         img.toggleAttribute('static-encode', true);
         img.toggleAttribute('encode-type', true);
-        img.isGooglePhotos = true;
         img.autoSrc = autoSrc;
 
         // Assert.
         assertEquals(
             `chrome://image/?url=${
-                encodeURIComponent(
-                    autoSrc)}&isGooglePhotos=true&staticEncode=true&encodeType=`,
+                encodeURIComponent(autoSrc)}&staticEncode=true&encodeType=`,
             img.src);
       });
 });

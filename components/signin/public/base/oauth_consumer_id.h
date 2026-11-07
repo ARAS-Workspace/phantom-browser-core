@@ -25,7 +25,7 @@ enum class OAuthConsumerId {
   kWallpaperGooglePhotosFetcher = 1,
   kWallpaperFetcherDelegate = 2,
   // kIpProtectionService = 3, // Removed due to deprecation.
-  kSanitizedImageSource = 4,
+  // kSanitizedImageSource = 4, // Removed due to deprecation.
   kOptimizationGuideGetHints = 5,
   kOptimizationGuideModelExecution = 6,
   kNearbySharing = 7,
@@ -54,7 +54,7 @@ enum class OAuthConsumerId {
   kKAnonymityService = 29,
   kFeedbackUploader = 30,
   kPasswordSharingRecipientsDownloader = 31,
-  kWebHistoryService = 32,
+  // kWebHistoryService = 32, // Removed due to deprecation.
   kComposeboxQueryController = 33,
   kDocumentSuggestionsService = 34,
   kEnterpriseSearchAggregator = 35,
@@ -85,7 +85,7 @@ enum class OAuthConsumerId {
   kNearbyPresenceServerClient = 60,
   kCryptAuthClient = 61,
   kAmbientMode = 62,
-  kProfileDownloader = 63,
+  // kProfileDownloader = 63, // Removed due to deprecation.
   // kDataSharingAndroid = 64, // Removed due to deprecation.
   kExtensionsIdentityAPI = 65,
   kManta = 66,

@@ -2676,7 +2676,6 @@ test("unit_tests") {
     "//chrome/browser/private_verification_tokens:unit_tests",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:misc",
-    "//chrome/browser/profiles:profile_downloader",
     "//chrome/browser/profiles:profile_util",
     "//chrome/browser/profiles:profiles_extra_parts",
     "//chrome/browser/profiles:test_support",

@@ -89,8 +89,6 @@ class BrowsingHistoryHandler : public history::mojom::PageHandler,
   void OnRemoveVisitsComplete() override;
   void OnRemoveVisitsFailed() override;
   void HistoryDeleted() override;
-  void HasOtherFormsOfBrowsingHistory(bool has_other_forms,
-                                      bool has_synced_results) override;
 
   // ProfileBasedBrowsingHistoryDriver implementation.
   Profile* GetProfile() override;
@@ -126,8 +124,6 @@ class BrowsingHistoryHandler : public history::mojom::PageHandler,
                                 bool include_actor_visits);
 
  private:
-  FRIEND_TEST_ALL_PREFIXES(BrowsingHistoryHandlerTest,
-                           ObservingWebHistoryDeletions);
   FRIEND_TEST_ALL_PREFIXES(BrowsingHistoryHandlerTest, MdTruncatesTitles);
 
   base::WeakPtr<TopChromeWebUIController::Embedder> side_panel_embedder_;
