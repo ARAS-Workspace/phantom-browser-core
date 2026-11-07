@@ -520,9 +520,6 @@ class MockP2PTrustedSocketManagerClient
 
   // mojom::P2PTrustedSocketManagerClient:
   void InvalidSocketPortRangeRequested() override {}
-  void DumpPacket(const std::vector<uint8_t>& packet_header,
-                  uint64_t packet_length,
-                  bool incoming) override {}
 };
 #endif  // BUILDFLAG(IS_P2P_ENABLED)
 

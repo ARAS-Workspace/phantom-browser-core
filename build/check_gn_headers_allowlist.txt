@@ -36,7 +36,6 @@ chrome/browser/extensions/api/networking_cast_private/chrome_networking_cast_pri
 chrome/browser/mac/bluetooth_utility.h
 chrome/browser/media/webrtc/desktop_media_list_ash.h
 chrome/browser/media/webrtc/desktop_media_list_observer.h
-chrome/browser/media/webrtc/rtp_dump_type.h
 chrome/browser/media_galleries/media_file_system_context.h
 chrome/browser/notifications/displayed_notifications_dispatch_callback.h
 chrome/browser/ui/app_icon_loader_delegate.h

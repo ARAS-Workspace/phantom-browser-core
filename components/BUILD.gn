@@ -378,9 +378,6 @@ test("components_unittests") {
       "//components/webauthn/json:unit_tests",
       "//components/webcrypto:unit_tests",
       "//components/webrtc:unit_tests",
-      "//components/webrtc_logging:unit_tests",
-      "//components/webrtc_logging/browser:unit_tests",
-      "//components/webrtc_logging/common:unit_tests",
     ]
 
     # guest_contents is a supporting component for any solution that embeds

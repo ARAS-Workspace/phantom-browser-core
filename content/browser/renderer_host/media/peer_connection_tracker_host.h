@@ -63,10 +63,6 @@ class CONTENT_EXPORT PeerConnectionTrackerHost
 
   // These methods call out to blink::mojom::PeerConnectionManager on renderer
   // side.
-  void StartEventLog(int peer_connection_local_id, int output_period_ms);
-  void StopEventLog(int lid);
-  void StartDataChannelLog(int peer_connection_local_id);
-  void StopDataChannelLog(int lid);
   void GetStandardStats();
   void GetCurrentState();
 
@@ -112,10 +108,6 @@ class CONTENT_EXPORT PeerConnectionTrackerHost
   void GetDisplayMediaFailure(int request_id,
                               const std::string& error,
                               const std::string& error_message) override;
-  void WebRtcEventLogWrite(int lid,
-                           const std::vector<uint8_t>& output) override;
-  void WebRtcDataChannelLogWrite(int lid,
-                                 const std::vector<uint8_t>& output) override;
   void AddStandardStats(int lid, base::ListValue value) override;
 
   GlobalRenderFrameHostId frame_id_;

@@ -14,22 +14,10 @@ interface P2PTrustedSocketManagerClient {
   // Called when the P2PSocketManager client requests socket creation with a
   // port that's in an invalid range.
   InvalidSocketPortRangeRequested();
-
-  // Called when packet dumping is enabled.
-  DumpPacket(array<uint8> packet_header,
-             uint64 packet_length,
-             bool incoming);
 };
 
 // From the browser process to the network process.
 interface P2PTrustedSocketManager {
-  // Starts dumping of packet headers; the incoming/outgoing arguments control
-  // whether incoming or outgoing or both are dumped.
-  StartRtpDump(bool incoming, bool outgoing);
-  // Stops dumping of packet headers; the incoming/outgoing arguments control
-  // whether incoming or outgoing or both are dumped.
-  StopRtpDump(bool incoming, bool outgoing);
-
   // Pauses network change notifications for this socket manager.
   PauseNetworkChangeNotifications();
   // Resumes network change notifications for this socket manager.

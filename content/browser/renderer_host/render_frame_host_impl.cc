@@ -19144,23 +19144,6 @@ void RenderFrameHostImpl::BindPeerConnectionTrackerHost(
   GetPeerConnectionTrackerHost().BindReceiver(std::move(receiver));
 }
 
-void RenderFrameHostImpl::EnableWebRtcEventLogOutput(int lid,
-                                                     int output_period_ms) {
-  GetPeerConnectionTrackerHost().StartEventLog(lid, output_period_ms);
-}
-
-void RenderFrameHostImpl::DisableWebRtcEventLogOutput(int lid) {
-  GetPeerConnectionTrackerHost().StopEventLog(lid);
-}
-
-void RenderFrameHostImpl::EnableWebRtcDataChannelLogOutput(int lid) {
-  GetPeerConnectionTrackerHost().StartDataChannelLog(lid);
-}
-
-void RenderFrameHostImpl::DisableWebRtcDataChannelLogOutput(int lid) {
-  GetPeerConnectionTrackerHost().StopDataChannelLog(lid);
-}
-
 bool RenderFrameHostImpl::IsDocumentOnLoadCompletedInMainFrame() {
   return GetPage().is_on_load_completed_in_main_document();
 }

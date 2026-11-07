@@ -50,9 +50,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) P2PSocket : public mojom::P2PSocket {
     // Destroys |socket| and removes it from the list of sockets.
     virtual void DestroySocket(P2PSocket* socket) = 0;
 
-    // Called for each incoming/outgoing packet.
-    virtual void DumpPacket(base::span<const uint8_t> data, bool incoming) = 0;
-
    protected:
     virtual ~Delegate() = default;
   };

@@ -62,7 +62,6 @@ grit("resources") {
     "extensions/web_view/chrome_web_view_internal_custom_bindings.js",
     "extensions/web_view/chrome_web_view.js",
     "extensions/webrtc_desktop_capture_private_custom_bindings.js",
-    "extensions/webrtc_logging_private_custom_bindings.js",
   ]
   deps = [
     ":build_grd",

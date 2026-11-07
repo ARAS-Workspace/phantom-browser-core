@@ -36,14 +36,6 @@ class P2PSocketDispatcherHost
 
   ~P2PSocketDispatcherHost() override;
 
-  // Starts the RTP packet header dumping.
-  void StartRtpDump(bool incoming,
-                    bool outgoing,
-                    RenderProcessHost::WebRtcRtpPacketCallback packet_callback);
-
-  // Stops the RTP packet header dumping.
-  void StopRtpDump(bool incoming, bool outgoing);
-
   void BindReceiver(
       RenderProcessHostImpl& process,
       mojo::PendingReceiver<network::mojom::P2PSocketManager> receiver,
@@ -59,23 +51,9 @@ class P2PSocketDispatcherHost
  private:
   // network::mojom::P2PTrustedSocketManagerClient overrides:
   void InvalidSocketPortRangeRequested() override;
-  void DumpPacket(const std::vector<uint8_t>& packet_header,
-                  uint64_t packet_length,
-                  bool incoming) override;
 
   int render_process_id_;
 
-  bool dump_incoming_rtp_packet_ = false;
-  bool dump_outgoing_rtp_packet_ = false;
-  RenderProcessHost::WebRtcRtpPacketCallback packet_callback_;
-
-  // TODO(crbug.com/40169214): We use sets of interfaces for now (instead of
-  // creating a host-per-frame) since RTP dumps are started/stopped at the
-  // process level (for now).
-  // There are, however, plans to:
-  // 1. Make WebRtcLoggingAgent per-frame (and RTP dumps along with it)
-  // 2. (Maybe) deprecate RTP dumps.
-  // Once either of these happens, this can be cleaned up.
   mojo::ReceiverSet<network::mojom::P2PTrustedSocketManagerClient> receivers_;
   mojo::RemoteSet<network::mojom::P2PTrustedSocketManager>
       trusted_socket_managers_;

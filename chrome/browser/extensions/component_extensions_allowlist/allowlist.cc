@@ -9,7 +9,6 @@
 #include "base/notreached.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/extensions/extension_constants.h"
-#include "chrome/grit/browser_resources.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 
@@ -32,24 +31,6 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
              << "allowlist and is not being loaded as a result.";
   NOTREACHED() << "Component extension with id " << extension_id << " not in "
                << "allowlist and is not being loaded as a result.";
-}
-
-bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-  switch (manifest_resource_id) {
-    // Please keep the list in alphabetical order.
-    case IDR_HANGOUT_SERVICES_MANIFEST_V2:
-    case IDR_HANGOUT_SERVICES_MANIFEST_V3:
-      return true;
-  }
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-
-  LOG(ERROR) << "Component extension with manifest resource id "
-             << manifest_resource_id << " not in allowlist and is not being "
-             << "loaded as a result.";
-  NOTREACHED() << "Component extension with manifest resource id "
-               << manifest_resource_id << " not in allowlist and is not being "
-               << "loaded as a result.";
 }
 
 }  // namespace extensions

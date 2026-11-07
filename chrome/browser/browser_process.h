@@ -47,7 +47,6 @@ class ProfileManager;
 class StartupData;
 class StatusTray;
 class SystemNetworkContextManager;
-class WebRtcLogUploader;
 
 namespace embedder_support {
 class OriginTrialsSettingsStorage;
@@ -247,8 +246,6 @@ class BrowserProcess {
   virtual activity_reporter::ActivityReporter* activity_reporter() = 0;
 
   virtual component_updater::ComponentUpdateService* component_updater() = 0;
-
-  virtual WebRtcLogUploader* webrtc_log_uploader() = 0;
 
   // Returns the tab manager. On non-supported platforms, this returns null.
   // TODO(sebmarchand): Update callers to

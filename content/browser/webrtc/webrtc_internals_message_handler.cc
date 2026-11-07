@@ -15,7 +15,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/common/url_constants.h"
-#include "third_party/blink/public/common/features.h"
 
 namespace content {
 
@@ -44,30 +43,6 @@ void WebRTCInternalsMessageHandler::RegisterMessages() {
       "disableAudioDebugRecordings",
       base::BindRepeating(
           &WebRTCInternalsMessageHandler::OnSetAudioDebugRecordingsEnabled,
-          base::Unretained(this), false));
-
-  web_ui()->RegisterMessageCallback(
-      "enableEventLogRecordings",
-      base::BindRepeating(
-          &WebRTCInternalsMessageHandler::OnSetEventLogRecordingsEnabled,
-          base::Unretained(this), true));
-
-  web_ui()->RegisterMessageCallback(
-      "disableEventLogRecordings",
-      base::BindRepeating(
-          &WebRTCInternalsMessageHandler::OnSetEventLogRecordingsEnabled,
-          base::Unretained(this), false));
-
-  web_ui()->RegisterMessageCallback(
-      "enableDataChannelRecordings",
-      base::BindRepeating(
-          &WebRTCInternalsMessageHandler::OnSetDataChannelRecordingsEnabled,
-          base::Unretained(this), true));
-
-  web_ui()->RegisterMessageCallback(
-      "disableDataChannelRecordings",
-      base::BindRepeating(
-          &WebRTCInternalsMessageHandler::OnSetDataChannelRecordingsEnabled,
           base::Unretained(this), false));
 
   web_ui()->RegisterMessageCallback(
@@ -103,36 +78,6 @@ void WebRTCInternalsMessageHandler::OnSetAudioDebugRecordingsEnabled(
   }
 }
 
-void WebRTCInternalsMessageHandler::OnSetEventLogRecordingsEnabled(
-    bool enable,
-    const base::ListValue& /* unused_list */) {
-  if (!webrtc_internals_->CanToggleEventLogRecordings()) {
-    LOG(WARNING) << "Cannot toggle WebRTC event logging.";
-    return;
-  }
-
-  if (enable) {
-    webrtc_internals_->EnableLocalEventLogRecordings(
-        web_ui()->GetWebContents());
-  } else {
-    webrtc_internals_->DisableLocalEventLogRecordings();
-  }
-}
-
-void WebRTCInternalsMessageHandler::OnSetDataChannelRecordingsEnabled(
-    bool enable,
-    const base::ListValue& /* unused_list */) {
-  if (!base::FeatureList::IsEnabled(
-          blink::features::kWebRtcAllowDataChannelRecordingInWebrtcInternals)) {
-    return;
-  }
-  if (enable) {
-    webrtc_internals_->EnableDataChannelRecordings(web_ui()->GetWebContents());
-  } else {
-    webrtc_internals_->DisableDataChannelRecordings();
-  }
-}
-
 void WebRTCInternalsMessageHandler::OnDOMLoadDone(
     const base::ListValue& args_list) {
   CHECK_GE(args_list.size(), 1u);
@@ -145,12 +90,6 @@ void WebRTCInternalsMessageHandler::OnDOMLoadDone(
   base::DictValue params;
   params.Set("audioDebugRecordingsEnabled",
              webrtc_internals_->IsAudioDebugRecordingsEnabled());
-  params.Set("eventLogRecordingsEnabled",
-             webrtc_internals_->IsEventLogRecordingsEnabled());
-  params.Set("eventLogRecordingsToggleable",
-             webrtc_internals_->CanToggleEventLogRecordings());
-  params.Set("dataChannelRecordingsEnabled",
-             webrtc_internals_->IsDataChannelRecordingsEnabled());
 
   for (auto* host : PeerConnectionTrackerHost::GetAllHosts()) {
     host->GetCurrentState();

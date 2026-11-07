@@ -1640,7 +1640,6 @@ source_set("browser") {
     "//components/webapps/common",
     "//components/webdata/common",
     "//components/webdata_services",
-    "//components/webrtc_logging/browser",
     "//components/webui/chrome_urls",
     "//components/webui/flags",
     "//components/zoom",
@@ -2412,10 +2411,6 @@ grit("resources") {
   defines = chrome_grit_defines
 
   defines += [ "enable_src_internal=$enable_src_internal" ]
-
-  if (enable_hangout_services_extension) {
-    defines += [ "enable_hangout_services_extension" ]
-  }
 
   output_dir = "$root_gen_dir/chrome"
   outputs = [

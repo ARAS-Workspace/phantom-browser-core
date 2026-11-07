@@ -34,8 +34,6 @@
 #include "services/network/p2p/socket.h"
 #include "services/network/proxy_resolving_client_socket_factory.h"
 #include "services/network/public/cpp/p2p_param_traits.h"
-#include "third_party/webrtc/media/base/rtp_utils.h"
-#include "third_party/webrtc/media/base/turn_utils.h"
 
 namespace network {
 
@@ -52,22 +50,6 @@ const int kPublicPort = 53;  // DNS port.
 // because of resource exhaustion in the Unix sockets domain.
 // Trouble has been seen on Linux at 3479 sockets in test, so leave a margin.
 const int kMaxSimultaneousSockets = 3000;
-
-const size_t kMinRtcpHeaderLength = 8;
-const size_t kDtlsRecordHeaderLength = 13;
-
-bool IsDtlsPacket(base::span<const uint8_t> data) {
-  return data.size() >= kDtlsRecordHeaderLength &&
-         (data[0] > 19 && data[0] < 64);
-}
-
-bool IsRtcpPacket(base::span<const uint8_t> data) {
-  if (data.size() < kMinRtcpHeaderLength)
-    return false;
-
-  int type = data[1] & 0x7F;
-  return type >= 64 && type < 96;
-}
 
 // Names ending in ".local." are link-local and used with Multicast DNS as
 // described in RFC6762 (https://tools.ietf.org/html/rfc6762#section-3).
@@ -236,37 +218,6 @@ void P2PSocketManager::DestroySocket(P2PSocket* socket) {
   auto iter = sockets_.find(socket);
   CHECK(iter != sockets_.end());
   sockets_.erase(iter);
-}
-
-void P2PSocketManager::DumpPacket(base::span<const uint8_t> packet,
-                                  bool incoming) {
-  if ((incoming && !dump_incoming_rtp_packet_) ||
-      (!incoming && !dump_outgoing_rtp_packet_)) {
-    return;
-  }
-
-  if (IsDtlsPacket(packet) || IsRtcpPacket(packet))
-    return;
-
-  size_t rtp_packet_pos = 0;
-  size_t rtp_packet_size = packet.size();
-  if (!webrtc::UnwrapTurnPacket(packet.data(), packet.size(), &rtp_packet_pos,
-                                &rtp_packet_size)) {
-    return;
-  }
-
-  auto rtp_packet = packet.subspan(rtp_packet_pos, rtp_packet_size);
-
-  size_t header_size = 0;
-  bool valid = webrtc::ValidateRtpHeader(rtp_packet, &header_size);
-  if (!valid) {
-    NOTREACHED();
-  }
-
-  std::vector<uint8_t> header_buffer(rtp_packet.begin(),
-                                     rtp_packet.begin() + header_size);
-  trusted_socket_manager_client_->DumpPacket(header_buffer, rtp_packet.size(),
-                                             incoming);
 }
 
 net::NetworkInterfaceList P2PSocketManager::DoGetNetworkList() {
@@ -456,16 +407,6 @@ void P2PSocketManager::CreateSocket(
   // adding the socket to |sockets_|.
   socket_ptr->Init(local_address, port_range.min_port, port_range.max_port,
                    remote_address, network_anonymization_key_);
-}
-
-void P2PSocketManager::StartRtpDump(bool incoming, bool outgoing) {
-  dump_incoming_rtp_packet_ |= incoming;
-  dump_outgoing_rtp_packet_ |= outgoing;
-}
-
-void P2PSocketManager::StopRtpDump(bool incoming, bool outgoing) {
-  dump_incoming_rtp_packet_ &= !incoming;
-  dump_outgoing_rtp_packet_ &= !outgoing;
 }
 
 void P2PSocketManager::NetworkNotificationClientConnectionError() {

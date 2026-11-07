@@ -16,7 +16,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "chrome/common/media/webrtc_logging.mojom.h"
 #include "content/public/common/buildflags.h"
 #include "content/public/renderer/content_renderer_client.h"
 #include "content/public/renderer/render_thread.h"
@@ -44,11 +43,7 @@ namespace blink {
 class WebServiceWorkerContextProxy;
 enum class ProtocolHandlerSecurityLevel;
 struct WebContentSecurityPolicyHeader;
-}
-
-namespace chrome {
-class WebRtcLoggingAgentImpl;
-}  // namespace chrome
+}  // namespace blink
 
 namespace subresource_filter {
 class UnverifiedRulesetDealer;
@@ -204,8 +199,6 @@ class ChromeContentRendererClient
 
   ChromeRenderThreadObserver* GetChromeObserver() const;
   web_cache::WebCacheImpl* GetWebCache();
-  chrome::WebRtcLoggingAgentImpl* GetWebRtcLoggingAgent();
-
 
  private:
   FRIEND_TEST_ALL_PREFIXES(ChromeContentRendererClientTest, NaClRestriction);
@@ -216,15 +209,11 @@ class ChromeContentRendererClient
   void GetInterface(const std::string& name,
                     mojo::ScopedMessagePipeHandle request_handle) override;
 
-  void BindWebRTCLoggingAgent(
-      mojo::PendingReceiver<chrome::mojom::WebRtcLoggingAgent> receiver);
-
   // Used to profile main thread.
   std::unique_ptr<sampling_profiler::ThreadProfiler> main_thread_profiler_;
 
   std::unique_ptr<ChromeRenderThreadObserver> chrome_observer_;
   std::unique_ptr<web_cache::WebCacheImpl> web_cache_impl_;
-  std::unique_ptr<chrome::WebRtcLoggingAgentImpl> webrtc_logging_agent_impl_;
 
   std::unique_ptr<subresource_filter::UnverifiedRulesetDealer>
       subresource_filter_ruleset_dealer_;

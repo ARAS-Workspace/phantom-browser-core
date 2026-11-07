@@ -109,7 +109,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://user-education-internals",
       "chrome://version",
       "chrome://webrtc-internals",
-      "chrome://webrtc-logs",
       "chrome://webui-gallery",
 
 #if BUILDFLAG(ENABLE_VR)

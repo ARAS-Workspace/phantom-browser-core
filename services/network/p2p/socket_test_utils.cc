@@ -43,9 +43,6 @@ void FakeP2PSocketDelegate::DestroySocket(P2PSocket* socket) {
   sockets_to_be_destroyed_.erase(it);
 }
 
-void FakeP2PSocketDelegate::DumpPacket(base::span<const uint8_t> data,
-                                       bool incoming) {}
-
 void FakeP2PSocketDelegate::ExpectDestruction(
     std::unique_ptr<P2PSocket> socket) {
   sockets_to_be_destroyed_.push_back(std::move(socket));

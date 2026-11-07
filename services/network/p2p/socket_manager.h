@@ -117,7 +117,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) P2PSocketManager
 
   // P2PSocket::Delegate.
   void DestroySocket(P2PSocket* socket) override;
-  void DumpPacket(base::span<const uint8_t> data, bool incoming) override;
 
   // mojom::P2PSocketManager overrides:
   void StartNetworkNotifications(
@@ -136,10 +135,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) P2PSocketManager
       const std::optional<base::UnguessableToken>& devtools_token,
       mojo::PendingRemote<mojom::P2PSocketClient> client,
       mojo::PendingReceiver<mojom::P2PSocket> receiver) override;
-
-  // mojom::P2PTrustedSocketManager overrides:
-  void StartRtpDump(bool incoming, bool outgoing) override;
-  void StopRtpDump(bool incoming, bool outgoing) override;
 
   void NetworkNotificationClientConnectionError();
 
@@ -162,9 +157,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) P2PSocketManager
   std::set<std::unique_ptr<DnsRequest>, base::UniquePtrComparator>
       dns_requests_;
   P2PMessageThrottler throttler_;
-
-  bool dump_incoming_rtp_packet_ = false;
-  bool dump_outgoing_rtp_packet_ = false;
 
   bool notifications_paused_ = false;
   bool pending_network_change_notification_ = false;

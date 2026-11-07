@@ -836,12 +836,6 @@ const char kForceWebRtcIPHandlingPolicy[] = "force-webrtc-ip-handling-policy";
 // This flag expects a value.  Example: --max-gum-fps=17.5
 const char kWebRtcMaxCaptureFramerate[] = "max-gum-fps";
 
-// Enable capture and local storage of WebRTC event logs without visiting
-// chrome://webrtc-internals. This is useful for automated testing. It accepts
-// the path to which the local logs would be stored. Disabling is not possible
-// without restarting the browser and relaunching without this flag.
-const char kWebRtcLocalEventLogging[] = "webrtc-event-logging";
-
 // This switch disables the ScrollToTextFragment feature.
 const char kDisableScrollToTextFragment[] = "disable-scroll-to-text-fragment";
 

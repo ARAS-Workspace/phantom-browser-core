@@ -224,6 +224,7 @@ source_set("unit_tests") {
     "//components/private_verification_tokens/common:private_verification_tokens_database",
     "//components/site_engagement/content",
     "//components/site_isolation",
+    "//components/upload_list",
     "//content/test:test_support",
     "//services/tracing/public/cpp/background_tracing",
     "//testing/gmock",

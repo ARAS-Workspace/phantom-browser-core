@@ -1000,36 +1000,6 @@
       "ADFA45434ABA2F1A4647E673F53FF37F8F6047A3"
     ]
   },
-  "webrtcLoggingPrivate": {
-    "channel": "stable",
-    "extension_types": ["extension", "platform_app"],
-    "allowlist": [
-      // Hangouts test extension
-      "80B9DC58E5210749F052F5B4DB239C50CF72AEB6",
-      // Hangout Services component extension.
-      "DF84F03F9B960409CCDE0D895B9650EBE81C0A8E",
-      // Extension used for API test.
-      "ADFA45434ABA2F1A4647E673F53FF37F8F6047A3",
-      "4F25792AF1AA7483936DE29C07806F203C7170A0",  // http://crbug.com/40546373
-      "BD8781D757D830FC2E85470A1B6E8A718B7EE0D9",  // http://crbug.com/40546373
-      "4AC2B6C63C6480D150DFDA13E4A5956EB1D0DDBB",  // http://crbug.com/40546373
-      "81986D4F846CEDDDB962643FA501D1780DD441BB"   // http://crbug.com/40546373
-    ]
-  },
-  "webrtcLoggingPrivate.audioDebug": {
-    "channel": "stable",
-    "extension_types": ["platform_app"],
-    "component_extensions_auto_granted": false,
-    "allowlist": [
-      // Extension used for API test.
-      "ADFA45434ABA2F1A4647E673F53FF37F8F6047A3",
-      // These apps are for internal Google use only.
-      "4F25792AF1AA7483936DE29C07806F203C7170A0",  // http://crbug.com/40546373
-      "BD8781D757D830FC2E85470A1B6E8A718B7EE0D9",  // http://crbug.com/40546373
-      "4AC2B6C63C6480D150DFDA13E4A5956EB1D0DDBB",  // http://crbug.com/40546373
-      "81986D4F846CEDDDB962643FA501D1780DD441BB"   // http://crbug.com/40546373
-    ]
-  },
   "wmDesksPrivate": {
     "channel": "stable",
     "extension_types": ["extension", "platform_app"],

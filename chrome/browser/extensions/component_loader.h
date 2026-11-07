@@ -74,10 +74,6 @@ class ComponentLoader : public KeyedService {
   ExtensionId Add(std::string_view manifest_contents,
                   const base::FilePath& root_directory);
 
-  // Convenience method for registering a component extension by resource id.
-  ExtensionId Add(int manifest_resource_id,
-                  const base::FilePath& root_directory);
-
   // Convenience method for registering a component extension by parsed
   // manifest.
   ExtensionId Add(base::DictValue manifest,
@@ -168,10 +164,6 @@ class ComponentLoader : public KeyedService {
   void AddDefaultComponentExtensionsWithBackgroundPages(
       bool skip_session_components);
   void AddDefaultComponentExtensionsWithBackgroundPagesForKioskMode();
-
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-  void AddHangoutServicesExtension();
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
 
   scoped_refptr<const Extension> CreateExtension(
       const ComponentExtensionInfo& info,

@@ -57,7 +57,6 @@ buildflag_header("buildflags") {
     "ENABLE_BACKGROUND_CONTENTS=$enable_background_contents",
     "ENABLE_CHROME_NOTIFICATIONS=$enable_chrome_notifications",
     "ENABLE_DOWNGRADE_PROCESSING=$enable_downgrade_processing",
-    "ENABLE_HANGOUT_SERVICES_EXTENSION=$enable_hangout_services_extension",
     "ENABLE_SEPARATE_RENDERER_BINARY=$enable_separate_renderer_binary",
     "ENABLE_SESSION_SERVICE=$enable_session_service",
     "ENABLE_WEBUI_CERTIFICATE_VIEWER=$enable_webui_certificate_viewer",
@@ -547,7 +546,6 @@ mojom("mojo_bindings") {
   sources = [
     "chrome_render_frame.mojom",
     "google_accounts_private_api_extension.mojom",
-    "media/webrtc_logging.mojom",
     "net/net_error_page_support.mojom",
     "net_benchmarking.mojom",
     "network_diagnostics.mojom",

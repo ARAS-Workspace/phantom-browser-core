@@ -41,18 +41,6 @@ interface PeerConnectionManager {
     // Called when the browser process reports a new thermal state from the OS.
     OnThermalStateChange(DeviceThermalState thermal_state);
 
-    // Enable WebRtc event log output.
-    StartEventLog(int32 peer_connection_local_id, int32 output_period_ms);
-
-    // Disable WebRtc event log output.
-    StopEventLog(int32 peer_connection_local_id);
-
-    // Enable WebRtc DataChannel log output.
-    StartDataChannelLog(int32 peer_connection_local_id);
-
-    // Disable WebRtc DataChannel log output.
-    StopDataChannelLog(int32 peer_connection_local_id);
-
     // Requests standard PeerConnection stats for webrtc-internals.
     GetStandardStats();
 
@@ -152,12 +140,6 @@ interface PeerConnectionTrackerHost {
   // The error and error message strings are for display only and should not
   // be parsed by the browser for security reasons.
   GetDisplayMediaFailure(int32 request_id, string error, string error_message);
-
-  // Logs WebRtc log for the connection id.
-  WebRtcEventLogWrite(int32 lid, array<uint8> output);
-
-  // Logs DataChannel log for the connection id.
-  WebRtcDataChannelLogWrite(int32 lid, array<uint8> output);
 
   // Notifies the addition of standard PeerConnection stats.
   // `lid` is the renderer local id.

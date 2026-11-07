@@ -97,14 +97,11 @@
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/media/prefs/capture_device_ranking.h"
 #include "chrome/browser/media/unified_autoplay_config.h"
-#include "chrome/browser/media/webrtc/audio_debug_recordings_handler.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/media/webrtc/chrome_screen_enumerator.h"
 #include "chrome/browser/media/webrtc/desktop_capture_devices_util.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
-#include "chrome/browser/media/webrtc/rtc_diagnostic_logging_utils.h"
-#include "chrome/browser/media/webrtc/webrtc_logging_controller.h"
 #include "chrome/browser/metrics/chrome_feature_list_creator.h"
 #include "chrome/browser/navigation_predictor/anchor_element_preloader.h"
 #include "chrome/browser/net/chrome_network_delegate.h"
@@ -1352,13 +1349,6 @@ bool ChromeContentBrowserClient::AllowGpuLaunchRetryOnIOThread() {
 void ChromeContentBrowserClient::RenderProcessWillLaunch(
     content::RenderProcessHost* host) {
   Profile* profile = Profile::FromBrowserContext(host->GetBrowserContext());
-
-  WebRtcLoggingController::AttachToRenderProcessHost(host);
-
-  host->SetUserData(
-      AudioDebugRecordingsHandler::kAudioDebugRecordingsHandlerKey,
-      std::make_unique<base::UserDataAdapter<AudioDebugRecordingsHandler>>(
-          base::MakeRefCounted<AudioDebugRecordingsHandler>(profile)));
 
   // The RendereUpdater might be null for some irregular profiles, e.g. the
   // System Profile.
@@ -5412,29 +5402,6 @@ bool ChromeContentBrowserClient::IsBuiltinComponent(
 #endif
 }
 
-void ChromeContentBrowserClient::StartRtcDiagnosticLogging(
-    content::RenderFrameHost& frame_host,
-    bool should_upload_on_stop,
-    const base::flat_map<std::string, std::string>& metadata,
-    base::OnceCallback<void(const std::string&)> callback) {
-  rtc_diagnostic_logging::StartRtcDiagnosticLogging(
-      frame_host, should_upload_on_stop, metadata, std::move(callback));
-}
-
-void ChromeContentBrowserClient::FinishRtcDiagnosticLogging(
-    content::RenderFrameHost& frame_host,
-    const base::flat_map<std::string, std::string>& metadata,
-    base::OnceClosure callback) {
-  rtc_diagnostic_logging::FinishRtcDiagnosticLogging(frame_host, metadata,
-                                                     std::move(callback));
-}
-
-void ChromeContentBrowserClient::CancelRtcDiagnosticLogging(
-    content::RenderFrameHost& frame_host,
-    base::OnceClosure callback) {
-  rtc_diagnostic_logging::CancelRtcDiagnosticLogging(frame_host,
-                                                     std::move(callback));
-}
 bool ChromeContentBrowserClient::ShouldBlockRendererDebugURL(
     const GURL& url,
     content::BrowserContext* context,

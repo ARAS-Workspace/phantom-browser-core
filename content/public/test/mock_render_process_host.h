@@ -145,10 +145,6 @@ class MockRenderProcessHost : public RenderProcessHost {
   FilterURLResult FilterURL(bool empty_allowed, GURL* url) override;
   void EnableAudioDebugRecordings(const base::FilePath& file) override;
   void DisableAudioDebugRecordings() override;
-  WebRtcStopRtpDumpCallback StartRtpDump(
-      bool incoming,
-      bool outgoing,
-      WebRtcRtpPacketCallback packet_callback) override;
   void BindReceiver(mojo::GenericPendingReceiver receiver) override;
   std::unique_ptr<base::PersistentMemoryAllocator> TakeMetricsAllocator()
       override;

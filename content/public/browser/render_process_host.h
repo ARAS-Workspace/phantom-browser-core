@@ -439,21 +439,6 @@ class CONTENT_EXPORT RenderProcessHost : public IPC::Listener,
   virtual void EnableAudioDebugRecordings(const base::FilePath& file) = 0;
   virtual void DisableAudioDebugRecordings() = 0;
 
-  using WebRtcRtpPacketCallback =
-      base::RepeatingCallback<void(base::HeapArray<uint8_t> packet_header,
-                                   size_t packet_length,
-                                   bool incoming)>;
-
-  using WebRtcStopRtpDumpCallback =
-      base::OnceCallback<void(bool incoming, bool outgoing)>;
-
-  // Starts passing RTP packets to |packet_callback| and returns the callback
-  // used to stop dumping.
-  virtual WebRtcStopRtpDumpCallback StartRtpDump(
-      bool incoming,
-      bool outgoing,
-      WebRtcRtpPacketCallback packet_callback) = 0;
-
   // Asks the renderer process to bind |receiver|. |receiver| arrives in the
   // renderer process and is carried through the following flow, stopping if any
   // step decides to bind it:

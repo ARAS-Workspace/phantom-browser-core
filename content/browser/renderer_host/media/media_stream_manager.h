@@ -147,9 +147,8 @@ class CONTENT_EXPORT MediaStreamManager
           WebContentsMediaCaptureId,
           base::RepeatingCallback<void(int)> on_zoom_level_change_callback)>;
 
-  // Adds |message| to native logs for outstanding device requests, for use by
-  // render processes hosts whose corresponding render processes are requesting
-  // logging from webrtcLoggingPrivate API. Safe to call from any thread.
+  // Adds |message| to native logs for outstanding device requests. Safe to call
+  // from any thread.
   static void SendMessageToNativeLog(const std::string& message);
 
   // Returns the current MediaStreamManager instance. This is used to get access
@@ -333,9 +332,7 @@ class CONTENT_EXPORT MediaStreamManager
   // (see http://crbug.com/247525#c14).
   void WillDestroyCurrentMessageLoop() override;
 
-  // Sends log messages to the render process hosts whose corresponding render
-  // processes are making device requests, to be used by the
-  // webrtcLoggingPrivate API if requested.
+  // Sends log messages to the registered native log callbacks.
   void AddLogMessageOnIOThread(const std::string& message);
 
   // Called by the tests to specify a factory for creating

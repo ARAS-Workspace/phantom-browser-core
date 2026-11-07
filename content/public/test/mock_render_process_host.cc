@@ -636,13 +636,6 @@ void MockRenderProcessHost::EnableAudioDebugRecordings(
 
 void MockRenderProcessHost::DisableAudioDebugRecordings() {}
 
-RenderProcessHost::WebRtcStopRtpDumpCallback
-MockRenderProcessHost::StartRtpDump(bool incoming,
-                                    bool outgoing,
-                                    WebRtcRtpPacketCallback packet_callback) {
-  return base::NullCallback();
-}
-
 void MockRenderProcessHost::OnChannelConnected(int32_t peer_pid) {}
 
 void MockRenderProcessHost::OverrideBinderForTesting(

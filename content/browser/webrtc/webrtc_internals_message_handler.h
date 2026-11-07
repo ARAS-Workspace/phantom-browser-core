@@ -49,9 +49,6 @@ class CONTENT_EXPORT WebRTCInternalsMessageHandler
   void OnGetCurrentState(const base::ListValue& list);
   void OnSetAudioDebugRecordingsEnabled(bool enable,
                                         const base::ListValue& list);
-  void OnSetEventLogRecordingsEnabled(bool enable, const base::ListValue& list);
-  void OnSetDataChannelRecordingsEnabled(bool enable,
-                                         const base::ListValue& list);
   void OnDOMLoadDone(const base::ListValue& list);
 
   // WebRTCInternalsUIObserver override.

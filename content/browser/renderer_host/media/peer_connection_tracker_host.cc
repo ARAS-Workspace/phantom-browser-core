@@ -245,17 +245,6 @@ void PeerConnectionTrackerHost::GetDisplayMediaFailure(
   }
 }
 
-void PeerConnectionTrackerHost::WebRtcEventLogWrite(
-    int lid,
-    const std::vector<uint8_t>& output) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  std::string message(output.begin(), output.end());
-  for (auto& observer : GetObserverList()) {
-    observer.OnWebRtcEventLogWrite(frame_id_, lid, message);
-  }
-}
-
 void PeerConnectionTrackerHost::OnSuspend() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   tracker_->OnSuspend();
@@ -266,37 +255,6 @@ void PeerConnectionTrackerHost::OnThermalStateChange(
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   tracker_->OnThermalStateChange(
       static_cast<blink::mojom::DeviceThermalState>(new_state));
-}
-
-void PeerConnectionTrackerHost::StartEventLog(int lid, int output_period_ms) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  tracker_->StartEventLog(lid, output_period_ms);
-}
-
-void PeerConnectionTrackerHost::StopEventLog(int lid) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  tracker_->StopEventLog(lid);
-}
-
-void PeerConnectionTrackerHost::StartDataChannelLog(int lid) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  tracker_->StartDataChannelLog(lid);
-}
-
-void PeerConnectionTrackerHost::StopDataChannelLog(int lid) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  tracker_->StopDataChannelLog(lid);
-}
-
-void PeerConnectionTrackerHost::WebRtcDataChannelLogWrite(
-    int lid,
-    const std::vector<uint8_t>& output) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  std::string message(output.begin(), output.end());
-  for (auto& observer : GetObserverList()) {
-    observer.OnWebRtcDataChannelLogWrite(frame_id_, lid, message);
-  }
 }
 
 void PeerConnectionTrackerHost::GetStandardStats() {

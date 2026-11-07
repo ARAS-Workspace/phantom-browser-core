@@ -1820,10 +1820,6 @@ BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(kWorkerThreadRespectTermRequest);
 // Kill switch for https://crbug.com/415810136.
 BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(kNoReferrerForPreloadFromSubresource);
 
-// Kill switch for crbug.com/407785197
-BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(
-    kWebRtcAllowDataChannelRecordingInWebrtcInternals);
-
 // Indicates that renderer is running on an Android XR (AR/VR) device.
 // Enables certain features which are not needed on other platforms.
 BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(kXrDevice);

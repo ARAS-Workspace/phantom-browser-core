@@ -132,18 +132,6 @@ class CONTENT_EXPORT WebRTCInternals : public PeerConnectionTrackerHostObserver,
   bool IsAudioDebugRecordingsEnabled() const;
   const base::FilePath& GetAudioDebugRecordingsFilePath() const;
 
-  // Enables or disables diagnostic event log.
-  void EnableLocalEventLogRecordings(content::WebContents* web_contents);
-  void DisableLocalEventLogRecordings();
-
-  void EnableDataChannelRecordings(content::WebContents* web_contents);
-  void DisableDataChannelRecordings();
-
-  bool IsEventLogRecordingsEnabled() const;
-  bool CanToggleEventLogRecordings() const;
-
-  bool IsDataChannelRecordingsEnabled() const;
-
   int num_connected_connections() const { return num_connected_connections_; }
 
   // Returns whether the stats polling timer is currently running. Used by tests
@@ -175,12 +163,6 @@ class CONTENT_EXPORT WebRTCInternals : public PeerConnectionTrackerHostObserver,
 
   static WebRTCInternals* g_webrtc_internals;
 
-  enum class SelectionType {
-    kRtcEventLogs,
-    kAudioDebugRecordings,
-    kDataChannelRecordings,
-  };
-
   void UpdateStatsTimer();
 
   void SendUpdate(const std::string& event_name, base::Value event_data);
@@ -190,8 +172,7 @@ class CONTENT_EXPORT WebRTCInternals : public PeerConnectionTrackerHostObserver,
   void RenderProcessExited(RenderProcessHost* host,
                            const ChildProcessTerminationInfo& info) override;
 
-  void MaybeShowSelectFileDialog(content::WebContents* web_contents,
-                                 SelectionType log_type);
+  void MaybeShowSelectFileDialog(content::WebContents* web_contents);
   // ui::SelectFileDialog::Listener implementation.
   void FileSelected(const ui::SelectedFileInfo& file, int index) override;
   void FileSelectionCanceled() override;
@@ -202,8 +183,6 @@ class CONTENT_EXPORT WebRTCInternals : public PeerConnectionTrackerHostObserver,
   // Enables diagnostic audio recordings on all render process hosts using
   // |audio_debug_recordings_file_path_|.
   void EnableAudioDebugRecordingsOnAllRenderProcessHosts();
-
-  void EnableDataChannelRecordingsOnAllRenderProcessHosts();
 
   // Updates the number of open PeerConnections. Called when a PeerConnection
   // is stopped or removed.
@@ -280,28 +259,11 @@ class CONTENT_EXPORT WebRTCInternals : public PeerConnectionTrackerHostObserver,
 
   // For managing select file dialog.
   scoped_refptr<ui::SelectFileDialog> select_file_dialog_;
-  SelectionType selection_type_;
 
   // Diagnostic audio recording state.
   base::FilePath audio_debug_recordings_file_path_;
   std::unique_ptr<media::AudioDebugRecordingSession>
       audio_debug_recording_session_;
-
-  // If non-empty, WebRTC (local) event logging should be enabled using this
-  // path, and may not be turned off, except by restarting the browser.
-  const base::FilePath command_line_derived_logging_path_;
-
-  // Diagnostic event log recording state. These are meaningful only when
-  // |command_line_derived_logging_path_| is empty.
-  bool event_log_recordings_;
-  base::FilePath event_log_recordings_file_path_;
-
-  bool data_channel_recording_active_ = false;
-  // If `data_channel_recording_active_` is `true`, the following path indicates
-  // where logs are stored. If `data_channel_recording_active_` is `false`, then
-  // should it ever be turned on, a path picker will be shown to the user, and
-  // the following path indicates the initial path suggested by that picker.
-  base::FilePath data_channel_recordings_file_path_;
 
   // While |num_connected_connections_| is greater than zero, request a wake
   // lock service. This prevents the application from being suspended while

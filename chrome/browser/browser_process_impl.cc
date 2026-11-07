@@ -61,8 +61,6 @@
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/lifetime/switch_utils.h"
 #include "chrome/browser/media/chrome_media_session_client.h"
-#include "chrome/browser/media/webrtc/webrtc_event_log_manager.h"
-#include "chrome/browser/media/webrtc/webrtc_log_uploader.h"
 #include "chrome/browser/metrics/chrome_feature_list_creator.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/metrics/chrome_metrics_services_manager_client.h"
@@ -354,9 +352,6 @@ void BrowserProcessImpl::Init() {
       metrics::prefs::kMetricsReportingEnabled,
       base::BindRepeating(&metrics::ApplyMetricsReportingPolicy));
 
-  DCHECK(!webrtc_event_log_manager_);
-  webrtc_event_log_manager_ = WebRtcEventLogManager::CreateSingletonInstance();
-
   features_->PostBrowserProcessInit();
 
   // `Unretained` is safe as CallbackListSubscription does not outlive `this`.
@@ -459,11 +454,6 @@ void BrowserProcessImpl::StartTearDown() {
 
   platform_part()->StartTearDown();
 
-  // Cancel any uploads to release the system url request context references.
-  if (webrtc_log_uploader_) {
-    webrtc_log_uploader_->Shutdown();
-  }
-
   sessions::SessionIdGenerator::GetInstance()->Shutdown();
 
   // Resetting the status tray will result in calls to
@@ -490,9 +480,6 @@ void BrowserProcessImpl::PostDestroyThreads() {
 
   // With the file_thread_ flushed, we can release any icon resources.
   icon_manager_.reset();
-
-  // Must outlive the worker threads.
-  webrtc_log_uploader_.reset();
 
   // ResourceCoordinatorParts owns TabLifecycleUnitSource, which depends on a
   // Global Feature (GlobalBrowserCollection). Thus, we need to make sure
@@ -879,13 +866,6 @@ void BrowserProcessImpl::SetApplicationLocale(
 
 DownloadStatusUpdater* BrowserProcessImpl::download_status_updater() {
   return download_status_updater_.get();
-}
-
-WebRtcLogUploader* BrowserProcessImpl::webrtc_log_uploader() {
-  if (!webrtc_log_uploader_) {
-    webrtc_log_uploader_ = std::make_unique<WebRtcLogUploader>();
-  }
-  return webrtc_log_uploader_.get();
 }
 
 resource_coordinator::TabManager* BrowserProcessImpl::GetTabManager() {

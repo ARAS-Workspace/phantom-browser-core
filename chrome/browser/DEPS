@@ -341,8 +341,6 @@ include_rules = [
   "+components/webauthn",
   "+components/webdata/common",
   "+components/webdata_services",
-  "+components/webrtc_logging/browser",
-  "+components/webrtc_logging/common",
   "+components/webui/about",
   "+components/webui/chrome_urls",
   "+components/webui/flags",

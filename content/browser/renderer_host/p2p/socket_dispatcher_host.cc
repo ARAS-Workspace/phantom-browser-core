@@ -30,45 +30,6 @@ P2PSocketDispatcherHost::P2PSocketDispatcherHost(int render_process_id)
 
 P2PSocketDispatcherHost::~P2PSocketDispatcherHost() = default;
 
-void P2PSocketDispatcherHost::StartRtpDump(
-    bool incoming,
-    bool outgoing,
-    RenderProcessHost::WebRtcRtpPacketCallback packet_callback) {
-  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M153);
-  if ((!dump_incoming_rtp_packet_ && incoming) ||
-      (!dump_outgoing_rtp_packet_ && outgoing)) {
-    if (incoming)
-      dump_incoming_rtp_packet_ = true;
-
-    if (outgoing)
-      dump_outgoing_rtp_packet_ = true;
-
-    packet_callback_ = std::move(packet_callback);
-    for (auto& trusted_socket_manager : trusted_socket_managers_) {
-      trusted_socket_manager->StartRtpDump(incoming, outgoing);
-    }
-  }
-}
-
-void P2PSocketDispatcherHost::StopRtpDump(bool incoming, bool outgoing) {
-  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M153);
-  if ((dump_incoming_rtp_packet_ && incoming) ||
-      (dump_outgoing_rtp_packet_ && outgoing)) {
-    if (incoming)
-      dump_incoming_rtp_packet_ = false;
-
-    if (outgoing)
-      dump_outgoing_rtp_packet_ = false;
-
-    if (!dump_incoming_rtp_packet_ && !dump_outgoing_rtp_packet_)
-      packet_callback_.Reset();
-
-    for (auto& trusted_socket_manager : trusted_socket_managers_) {
-      trusted_socket_manager->StopRtpDump(incoming, outgoing);
-    }
-  }
-}
-
 void P2PSocketDispatcherHost::BindReceiver(
     RenderProcessHostImpl& process,
     mojo::PendingReceiver<network::mojom::P2PSocketManager> receiver,
@@ -90,10 +51,6 @@ void P2PSocketDispatcherHost::BindReceiver(
       std::move(receiver));
   mojo::Remote<network::mojom::P2PTrustedSocketManager> trusted_socket_manager(
       std::move(pending_trusted_socket_manager));
-  if (dump_incoming_rtp_packet_ || dump_outgoing_rtp_packet_) {
-    trusted_socket_manager->StartRtpDump(dump_incoming_rtp_packet_,
-                                         dump_outgoing_rtp_packet_);
-  }
   mojo::RemoteSetElementId manager_id =
       trusted_socket_managers_.Add(std::move(trusted_socket_manager));
   frame_host_to_socket_manager_id_.emplace(render_frame_host_id, manager_id);
@@ -129,21 +86,6 @@ base::WeakPtr<P2PSocketDispatcherHost> P2PSocketDispatcherHost::GetWeakPtr() {
 void P2PSocketDispatcherHost::InvalidSocketPortRangeRequested() {
   bad_message::ReceivedBadMessage(render_process_id_,
                                   bad_message::SDH_INVALID_PORT_RANGE);
-}
-
-void P2PSocketDispatcherHost::DumpPacket(
-    const std::vector<uint8_t>& packet_header,
-    uint64_t packet_length,
-    bool incoming) {
-  if (!packet_callback_) {
-    return;
-  }
-
-  auto header_buffer = base::HeapArray<uint8_t>::Uninit(packet_header.size());
-  header_buffer.copy_from(packet_header);
-
-  packet_callback_.Run(std::move(header_buffer),
-                       static_cast<size_t>(packet_length), incoming);
 }
 
 }  // namespace content

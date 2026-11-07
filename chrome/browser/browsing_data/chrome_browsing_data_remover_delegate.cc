@@ -55,7 +55,6 @@
 #include "chrome/browser/login_detection/login_detection_prefs.h"
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
-#include "chrome/browser/media/webrtc/webrtc_event_log_manager.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
@@ -123,8 +122,6 @@
 #include "components/signin/public/identity_manager/identity_utils.h"
 #include "components/strike_database/strike_database.h"
 #include "components/web_cache/browser/web_cache_manager.h"
-#include "components/webrtc_logging/browser/log_cleanup.h"
-#include "components/webrtc_logging/browser/text_log_list.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/browsing_data_filter_builder.h"
@@ -387,15 +384,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
           prerender::NoStatePrefetchManager::CLEAR_PRERENDER_CONTENTS |
           prerender::NoStatePrefetchManager::CLEAR_PRERENDER_HISTORY);
     }
-
-    base::ThreadPool::PostTaskAndReply(
-        FROM_HERE, {base::TaskPriority::USER_VISIBLE, base::MayBlock()},
-        base::BindOnce(&webrtc_logging::DeleteOldAndRecentWebRtcLogFiles,
-                       webrtc_logging::TextLogList::
-                           GetWebRtcLogDirectoriesForBrowserContextPath(
-                               profile_->GetPath()),
-                       delete_begin_),
-        CreateTaskCompletionClosure(TracingDataType::kWebrtcLogs));
 
     heavy_ad_intervention::HeavyAdService* heavy_ad_service =
         HeavyAdServiceFactory::GetForBrowserContext(profile_);
@@ -830,18 +818,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       browsing_data::RemovePrerenderCacheData(
           prerender::NoStatePrefetchManagerFactory::GetForBrowserContext(
               profile_));
-    }
-
-    // TODO(crbug.com/41380998): Remove null-check.
-    if (filter_builder->MatchesMostOriginsAndDomains()) {
-      auto* webrtc_event_log_manager = WebRtcEventLogManager::GetInstance();
-      if (webrtc_event_log_manager) {
-        webrtc_event_log_manager->ClearCacheForBrowserContext(
-            profile_, delete_begin_, delete_end_,
-            CreateTaskCompletionClosure(TracingDataType::kWebrtcEventLogs));
-      } else {
-        LOG(ERROR) << "WebRtcEventLogManager not instantiated.";
-      }
     }
 
     // Mark cached favicons as expired to force redownload on next visit.

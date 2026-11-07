@@ -1260,27 +1260,6 @@ bool ContentBrowserClient::IsBuiltinComponent(BrowserContext* browser_context,
   return false;
 }
 
-void ContentBrowserClient::StartRtcDiagnosticLogging(
-    RenderFrameHost& frame_host,
-    bool should_upload_on_stop,
-    const base::flat_map<std::string, std::string>& metadata,
-    base::OnceCallback<void(const std::string&)> callback) {
-  std::move(callback).Run(base::Uuid::GenerateRandomV4().AsLowercaseString());
-}
-
-void ContentBrowserClient::FinishRtcDiagnosticLogging(
-    RenderFrameHost& frame_host,
-    const base::flat_map<std::string, std::string>& metadata,
-    base::OnceClosure callback) {
-  std::move(callback).Run();
-}
-
-void ContentBrowserClient::CancelRtcDiagnosticLogging(
-    RenderFrameHost& frame_host,
-    base::OnceClosure callback) {
-  std::move(callback).Run();
-}
-
 bool ContentBrowserClient::ShouldBlockRendererDebugURL(
     const GURL& url,
     BrowserContext* context,

@@ -756,22 +756,12 @@ inline constexpr char kWebRTCIPHandlingUrl[] = "webrtc.ip_handling_url";
 // post-quantum key agreement for WebRTC.
 inline constexpr char kWebRTCPostQuantumKeyAgreement[] =
     "webrtc.post_quantum_key_agreement";
-// Define the WebRTCDiagnosticLogCollectionAllowedForOrigins policy that
-// controls enabling diagnostic log collection for WebRTC.
-inline constexpr char kWebRTCDiagnosticLogCollectionAllowedForOrigins[] =
-    "webrtc.diagnostic_log_collection_allowed_for_origins";
 // Define range of UDP ports allowed to be used by WebRTC PeerConnections.
 inline constexpr char kWebRTCUDPPortRange[] = "webrtc.udp_port_range";
-// Whether WebRTC event log collection by Google domains is allowed.
-inline constexpr char kWebRtcEventLogCollectionAllowed[] =
-    "webrtc.event_logs_collection";
 // Holds URL patterns that specify URLs for which local IP addresses are exposed
 // in ICE candidates.
 inline constexpr char kWebRtcLocalIpsAllowedUrls[] =
     "webrtc.local_ips_allowed_urls";
-// Whether WebRTC text log collection by Google domains is allowed.
-inline constexpr char kWebRtcTextLogCollectionAllowed[] =
-    "webrtc.text_log_collection_allowed";
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // Boolean that indicates that the first run experience has been finished (or

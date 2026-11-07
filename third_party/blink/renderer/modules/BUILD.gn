@@ -612,7 +612,6 @@ source_set("unit_tests") {
     "webaudio/testing/fake_audio_thread.cc",
     "webaudio/testing/fake_audio_thread.h",
     "webaudio/testing/mock_web_audio_device.h",
-    "webrtc/rtc_test.cc",
     "webrtc/webrtc_audio_device_impl_test.cc",
     "webshare/navigator_share_test.cc",
     "websockets/dom_websocket_test.cc",

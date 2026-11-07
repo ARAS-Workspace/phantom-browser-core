@@ -11,22 +11,9 @@
 #include "build/build_config.h"
 #include "chrome/renderer/chrome_content_renderer_client.h"
 #include "chrome/renderer/chrome_render_thread_observer.h"
-#include "chrome/renderer/media/webrtc_logging_agent_impl.h"
 #include "components/visitedlink/renderer/visitedlink_reader.h"
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "mojo/public/cpp/bindings/binder_map.h"
-
-
-namespace {
-
-void BindWebRTCLoggingAgent(
-    ChromeContentRendererClient* client,
-    mojo::PendingReceiver<chrome::mojom::WebRtcLoggingAgent> receiver) {
-  client->GetWebRtcLoggingAgent()->AddReceiver(std::move(receiver));
-}
-
-
-}  // namespace
 
 void ExposeChromeRendererInterfacesToBrowser(
     ChromeContentRendererClient* client,
@@ -39,10 +26,4 @@ void ExposeChromeRendererInterfacesToBrowser(
       base::BindRepeating(&web_cache::WebCacheImpl::BindReceiver,
                           base::Unretained(client->GetWebCache())),
       base::SequencedTaskRunner::GetCurrentDefault());
-
-  binders->Add<chrome::mojom::WebRtcLoggingAgent>(
-      base::BindRepeating(&BindWebRTCLoggingAgent, client),
-      base::SequencedTaskRunner::GetCurrentDefault());
-
-
 }

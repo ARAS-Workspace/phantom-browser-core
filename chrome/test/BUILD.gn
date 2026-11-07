@@ -1364,7 +1364,6 @@ test("browser_tests") {
     "//components/webauthn/core/browser:passkey_model",
     "//components/webauthn/core/browser:test_support",
     "//components/webrtc",
-    "//components/webrtc_logging/browser",
     "//components/webui/chrome_urls",
     "//components/webui/flags",
     "//content/public/common",
@@ -3192,7 +3191,6 @@ test("unit_tests") {
     "../browser/ui/views/tabs/dragging/test/mock_tab_drag_context.cc",
     "../browser/ui/views/tabs/dragging/test/mock_tab_drag_context.h",
     "../browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler_unittest.cc",
-    "../renderer/media/webrtc_logging_agent_impl_unittest.cc",
   ]
 
   deps += [

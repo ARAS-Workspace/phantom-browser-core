@@ -187,28 +187,14 @@ function initialize() {
     userMediaTable.removeMediaForRenderer(data);
   });
   addWebUiListener(
-      'event-log-recordings-file-selection-cancelled',
-      eventLogRecordingsFileSelectionCancelled);
-  addWebUiListener(
       'audio-debug-recordings-file-selection-cancelled',
       audioDebugRecordingsFileSelectionCancelled);
-  addWebUiListener(
-      'data-channel-recordings-file-selection-cancelled',
-      dataChannelRecordingsFileSelectionCancelled);
 
   // Request initial startup parameters.
   sendWithPromise('finishedDOMLoad').then(params => {
     if (params.audioDebugRecordingsEnabled) {
       dumpCreator.setAudioDebugRecordingsCheckbox();
     }
-    if (params.eventLogRecordingsEnabled) {
-      dumpCreator.setEventLogRecordingsCheckbox();
-    }
-    if (params.dataChannelRecordingsEnabled) {
-      dumpCreator.setDataChannelRecordingsCheckbox();
-    }
-    dumpCreator.setEventLogRecordingsCheckboxMutability(
-        params.eventLogRecordingsToggleable);
   });
 
   addRtcStatsEvent(
@@ -597,20 +583,6 @@ function addStandardStats(data) {
  */
 function audioDebugRecordingsFileSelectionCancelled() {
   dumpCreator.clearAudioDebugRecordingsCheckbox();
-}
-
-
-/**
- * Notification that the event log recordings file selection dialog was
- * cancelled, i.e. recordings have not been enabled.
- */
-function eventLogRecordingsFileSelectionCancelled() {
-  dumpCreator.clearEventLogRecordingsCheckbox();
-}
-
-
-function dataChannelRecordingsFileSelectionCancelled() {
-  dumpCreator.clearDataChannelRecordingsCheckbox();
 }
 
 // Returns a sorted version of the stats report as a Map.

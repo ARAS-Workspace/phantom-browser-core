@@ -161,7 +161,6 @@
 #include "content/public/browser/site_isolation_policy.h"
 #include "content/public/browser/tracing_support.h"
 #include "content/public/browser/weak_document_ptr.h"
-#include "content/public/browser/webrtc_log.h"
 #include "content/public/common/content_client.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"
@@ -4354,12 +4353,6 @@ void RenderProcessHostImpl::Cleanup() {
   // *will* post a `DeleteSoon` task a bit further down.
   deleting_soon_ = true;
 
-  if (is_initialized_) {
-    GetIOThreadTaskRunner({})->PostTask(
-        FROM_HERE,
-        base::BindOnce(&WebRtcLog::ClearLogMessageCallback, GetDeprecatedID()));
-  }
-
   // TODO(crbug.com/540651680): CHECK-exclusion: Convert to a CHECK once we are
   // confident it won't be triggered.
   DCHECK_EQ(0, pending_views_);
@@ -4477,21 +4470,6 @@ void RenderProcessHostImpl::DisableAudioDebugRecordings() {
   CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   aec_dump_manager_.Stop();
-}
-
-RenderProcessHostImpl::WebRtcStopRtpDumpCallback
-RenderProcessHostImpl::StartRtpDump(bool incoming,
-                                    bool outgoing,
-                                    WebRtcRtpPacketCallback packet_callback) {
-#if BUILDFLAG(IS_P2P_ENABLED)
-  p2p_socket_dispatcher_host_->StartRtpDump(incoming, outgoing,
-                                            std::move(packet_callback));
-
-  return base::BindOnce(&P2PSocketDispatcherHost::StopRtpDump,
-                        p2p_socket_dispatcher_host_->GetWeakPtr());
-#else
-  return base::DoNothing();
-#endif  // BUILDFLAG(IS_P2P_ENABLED)
 }
 
 IPC::ChannelProxy* RenderProcessHostImpl::GetChannel() {

@@ -860,8 +860,6 @@ TEST(PermissionsTest, PermissionMessages) {
   skip.insert(APIPermissionID::kTerminalPrivate);
   skip.insert(APIPermissionID::kVirtualKeyboardPrivate);
   skip.insert(APIPermissionID::kWebrtcDesktopCapturePrivate);
-  skip.insert(APIPermissionID::kWebrtcLoggingPrivate);
-  skip.insert(APIPermissionID::kWebrtcLoggingPrivateAudioDebug);
   skip.insert(APIPermissionID::kWmDesksPrivate);
   skip.insert(APIPermissionID::kSystemLog);
   skip.insert(APIPermissionID::kOdfsConfigPrivate);

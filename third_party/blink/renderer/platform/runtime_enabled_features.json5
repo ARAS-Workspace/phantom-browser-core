@@ -5147,13 +5147,6 @@
       status: "experimental",
     },
     {
-      name: "RTCDiagnosticLogging",
-      origin_trial_feature_name: "RTCDiagnosticLogging",
-      status: "experimental",
-      base_feature_status: "enabled",
-      copied_from_base_feature_if: "overridden",
-    },
-    {
       name: "RTCEncodedAudioFrameConstructor",
       status: "experimental",
     },

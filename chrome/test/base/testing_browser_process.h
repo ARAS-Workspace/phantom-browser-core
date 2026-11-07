@@ -155,8 +155,6 @@ class TestingBrowserProcess
   activity_reporter::ActivityReporter* activity_reporter() override;
   component_updater::ComponentUpdateService* component_updater() override;
 
-  WebRtcLogUploader* webrtc_log_uploader() override;
-
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
@@ -174,7 +172,6 @@ class TestingBrowserProcess
   void SetMetricsService(metrics::MetricsService* metrics_service);
   void SetProfileManager(std::unique_ptr<ProfileManager> profile_manager);
   void SetVariationsService(variations::VariationsService* variations_service);
-  void SetWebRtcLogUploader(std::unique_ptr<WebRtcLogUploader> uploader);
   void SetRulesetService(
       std::unique_ptr<subresource_filter::RulesetService> ruleset_service);
   void SetSharedURLLoaderFactory(
@@ -278,7 +275,6 @@ class TestingBrowserProcess
 
   std::unique_ptr<subresource_filter::RulesetService>
       subresource_filter_ruleset_service_;
-  std::unique_ptr<WebRtcLogUploader> webrtc_log_uploader_;
 
   // The following objects are not owned by TestingBrowserProcess:
   scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory_;

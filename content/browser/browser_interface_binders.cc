@@ -53,7 +53,6 @@
 #include "content/browser/renderer_host/media/media_devices_dispatcher_host.h"
 #include "content/browser/renderer_host/media/media_stream_dispatcher_host.h"
 #include "content/browser/renderer_host/media/media_stream_manager.h"
-#include "content/browser/renderer_host/media/rtc_logging_dispatcher.h"
 #include "content/browser/renderer_host/media/video_capture_host.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/renderer_host/render_process_host_impl.h"
@@ -187,7 +186,6 @@
 #include "third_party/blink/public/mojom/webaudio/audio_context_manager.mojom.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom.h"
-#include "third_party/blink/public/mojom/webrtc/rtc_logging.mojom.h"
 #include "third_party/blink/public/mojom/websockets/websocket_connector.mojom.h"
 #include "third_party/blink/public/mojom/webtransport/web_transport_connector.mojom.h"
 #include "third_party/blink/public/mojom/worker/dedicated_worker_host_factory.mojom.h"
@@ -1066,9 +1064,6 @@ void PopulateBinderMapWithContext(
                             base::Unretained(media_stream_manager)),
         GetIOThreadTaskRunner({}));
   }
-
-  map->Add<blink::mojom::RTCLoggingDispatcher>(
-      base::BindRepeating(&RTCLoggingDispatcherImpl::Create));
 
   map->Add<blink::mojom::RendererAudioInputStreamFactory>(
       &BindRenderFrameHostImpl<

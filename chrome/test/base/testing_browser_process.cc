@@ -18,7 +18,6 @@
 #include "chrome/browser/download/download_request_limiter.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
-#include "chrome/browser/media/webrtc/webrtc_log_uploader.h"
 #include "chrome/browser/notifications/notification_platform_bridge.h"
 #include "chrome/browser/notifications/stub_notification_platform_bridge.h"
 #include "chrome/browser/notifications/system_notification_helper.h"
@@ -393,10 +392,6 @@ StatusTray* TestingBrowserProcess::status_tray() {
   return status_tray_.get();
 }
 
-WebRtcLogUploader* TestingBrowserProcess::webrtc_log_uploader() {
-  return webrtc_log_uploader_.get();
-}
-
 subresource_filter::RulesetService*
 TestingBrowserProcess::subresource_filter_ruleset_service() {
   return subresource_filter_ruleset_service_.get();
@@ -610,11 +605,6 @@ void TestingBrowserProcess::ShutdownBrowserPolicyConnector() {
 TestingBrowserProcessPlatformPart*
 TestingBrowserProcess::GetTestPlatformPart() {
   return platform_part_.get();
-}
-
-void TestingBrowserProcess::SetWebRtcLogUploader(
-    std::unique_ptr<WebRtcLogUploader> uploader) {
-  webrtc_log_uploader_ = std::move(uploader);
 }
 
 void TestingBrowserProcess::SetRulesetService(

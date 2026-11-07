@@ -6,8 +6,6 @@ source_set("media") {
   sources = [
     "media_engagement_ui.cc",
     "media_engagement_ui.h",
-    "webrtc_logs_ui.cc",
-    "webrtc_logs_ui.h",
   ]
   public_deps = [
     "//content/public/browser",
@@ -25,9 +23,7 @@ source_set("media") {
     "//chrome/common:constants",
     "//components/component_updater",
     "//components/prefs",
-    "//components/upload_list",
     "//components/version_info",
-    "//components/webrtc_logging/browser",
     "//content/public/common",
     "//mojo/public/cpp/bindings",
     "//services/network/public/mojom",

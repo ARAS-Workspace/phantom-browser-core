@@ -2413,10 +2413,6 @@ BASE_FEATURE(kWebRtcUseMinMaxVEADimensions,
              base::FEATURE_DISABLED_BY_DEFAULT
 );
 
-// Kill switch for crbug.com/407785197.
-BASE_FEATURE(kWebRtcAllowDataChannelRecordingInWebrtcInternals,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables small accelerated canvases for webview (crbug.com/1004304)
 BASE_FEATURE(kWebviewAccelerateSmallCanvases,
              base::FEATURE_DISABLED_BY_DEFAULT);

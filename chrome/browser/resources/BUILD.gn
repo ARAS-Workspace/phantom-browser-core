@@ -122,21 +122,11 @@ if (enable_extensions_core) {
 
     inputs = []
 
-    if (is_chrome_branded || enable_hangout_services_extension) {
-      inputs += [
-        "hangout_services/background.html",
-        "hangout_services/thunk.js",
-      ]
-    }
-
     if (is_mac) {
       inputs += [ "screen_sharing/toggle_animation.json" ]
     }
 
     defines = chrome_grit_defines
-    if (enable_hangout_services_extension) {
-      defines += [ "enable_hangout_services_extension" ]
-    }
 
     # Some resources within component_extension_resources.grd are generated at
     # build time so we include them as explicit dependencies here

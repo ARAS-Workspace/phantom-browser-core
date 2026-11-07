@@ -28,7 +28,6 @@
 #include "content/public/browser/device_service.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
-#include "content/public/browser/webrtc_event_logger.h"
 #include "content/public/common/content_client.h"
 #include "content/public/common/content_switches.h"
 #include "media/audio/audio_debug_recording_session.h"
@@ -46,9 +45,6 @@ using std::string;
 namespace content {
 
 namespace {
-
-const base::FilePath::CharType kEventLogFilename[] =
-    FILE_PATH_LITERAL("event_log");
 
 constexpr char kGetUserMedia[] = "getUserMedia";
 constexpr char kGetDisplayMedia[] = "getDisplayMedia";
@@ -124,11 +120,6 @@ WebRTCInternals::WebRTCInternals() : WebRTCInternals(500, true) {
 WebRTCInternals::WebRTCInternals(int aggregate_updates_ms,
                                  bool should_block_power_saving)
     : peer_connection_data_(base::ListValue()),
-      selection_type_(SelectionType::kAudioDebugRecordings),
-      command_line_derived_logging_path_(
-          base::CommandLine::ForCurrentProcess()->GetSwitchValuePath(
-              switches::kWebRtcLocalEventLogging)),
-      event_log_recordings_(false),
       num_connected_connections_(0),
       should_block_power_saving_(should_block_power_saving),
       aggregate_updates_ms_(aggregate_updates_ms) {
@@ -138,31 +129,11 @@ WebRTCInternals::WebRTCInternals(int aggregate_updates_ms,
   const base::FilePath default_path =
       GetContentClient()->browser()->GetDefaultDownloadDirectory();
   audio_debug_recordings_file_path_ = default_path;
-  event_log_recordings_file_path_ = default_path;
-  data_channel_recordings_file_path_ = default_path;
 
   if (!default_path.empty()) {
     audio_debug_recordings_file_path_ =
         audio_debug_recordings_file_path_.Append(
             FILE_PATH_LITERAL("audio_debug"));
-    event_log_recordings_file_path_ =
-        event_log_recordings_file_path_.Append(kEventLogFilename);
-    data_channel_recordings_file_path_ =
-        data_channel_recordings_file_path_.Append(
-            FILE_PATH_LITERAL("data_channel"));
-  }
-
-  // Allow command-line based setting of (local) WebRTC event logging.
-  if (!command_line_derived_logging_path_.empty()) {
-    const base::FilePath local_logs_path =
-        command_line_derived_logging_path_.Append(kEventLogFilename);
-    WebRtcEventLogger* const logger = WebRtcEventLogger::Get();
-    if (logger) {
-      logger->EnableLocalLogging(local_logs_path);
-    }
-    // For clarity's sake, though these aren't supposed to be regarded now:
-    event_log_recordings_ = true;
-    event_log_recordings_file_path_.clear();
   }
 
   g_webrtc_internals = this;
@@ -525,14 +496,9 @@ void WebRTCInternals::RemoveObserver(WebRTCInternalsUIObserver* observer) {
   // active.
   UpdateStatsTimer();
 
-  // Disables event log and audio debug recordings if enabled and the last
-  // webrtc-internals page is going away.
+  // Disables audio debug recordings if enabled and the last webrtc-internals
+  // page is going away.
   DisableAudioDebugRecordings();
-  if (CanToggleEventLogRecordings()) {
-    // Do not disable event log recording when the browser was started
-    // with the flag to enable the recordings on the command line.
-    DisableLocalEventLogRecordings();
-  }
 
   // TODO(tommi): Consider removing all the peer_connection_data().
   for (auto& dictionary : peer_connection_data())
@@ -572,7 +538,7 @@ void WebRTCInternals::UpdateObserver(WebRTCInternalsUIObserver* observer) {
 void WebRTCInternals::EnableAudioDebugRecordings(
     content::WebContents* web_contents) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  MaybeShowSelectFileDialog(web_contents, SelectionType::kAudioDebugRecordings);
+  MaybeShowSelectFileDialog(web_contents);
 }
 
 void WebRTCInternals::DisableAudioDebugRecordings() {
@@ -596,58 +562,6 @@ bool WebRTCInternals::IsAudioDebugRecordingsEnabled() const {
 const base::FilePath& WebRTCInternals::GetAudioDebugRecordingsFilePath() const {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   return audio_debug_recordings_file_path_;
-}
-
-void WebRTCInternals::EnableLocalEventLogRecordings(
-    content::WebContents* web_contents) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DCHECK(web_contents);
-  DCHECK(CanToggleEventLogRecordings());
-
-  MaybeShowSelectFileDialog(web_contents, SelectionType::kRtcEventLogs);
-}
-
-void WebRTCInternals::DisableLocalEventLogRecordings() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  event_log_recordings_ = false;
-  DCHECK(CanToggleEventLogRecordings());
-  WebRtcEventLogger* const logger = WebRtcEventLogger::Get();
-  if (logger) {
-    logger->DisableLocalLogging();
-  }
-}
-
-void WebRTCInternals::EnableDataChannelRecordings(
-    content::WebContents* web_contents) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  MaybeShowSelectFileDialog(web_contents,
-                            SelectionType::kDataChannelRecordings);
-}
-
-void WebRTCInternals::DisableDataChannelRecordings() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  data_channel_recording_active_ = false;
-  WebRtcEventLogger* const logger = WebRtcEventLogger::Get();
-  if (logger) {
-    logger->DisableDataChannelLogging();
-  }
-}
-
-bool WebRTCInternals::IsEventLogRecordingsEnabled() const {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return event_log_recordings_;
-}
-
-bool WebRTCInternals::IsDataChannelRecordingsEnabled() const {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return data_channel_recording_active_;
-}
-
-bool WebRTCInternals::CanToggleEventLogRecordings() const {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return command_line_derived_logging_path_.empty();
 }
 
 void WebRTCInternals::SendUpdate(const std::string& event_name,
@@ -682,36 +596,18 @@ void WebRTCInternals::RenderProcessExited(
 }
 
 void WebRTCInternals::MaybeShowSelectFileDialog(
-    content::WebContents* web_contents,
-    SelectionType log_type) {
+    content::WebContents* web_contents) {
   if (select_file_dialog_) {
     return;
   }
 
-  base::FilePath* file_path = nullptr;
-  switch (log_type) {
-    case (SelectionType::kRtcEventLogs): {
-      file_path = &event_log_recordings_file_path_;
-      break;
-    }
-    case (SelectionType::kAudioDebugRecordings): {
-      file_path = &audio_debug_recordings_file_path_;
-      break;
-    }
-    case (SelectionType::kDataChannelRecordings): {
-      file_path = &data_channel_recordings_file_path_;
-      break;
-    }
-  }
-  CHECK(file_path);
-
-  selection_type_ = log_type;
   select_file_dialog_ = ui::SelectFileDialog::Create(
       this,
       GetContentClient()->browser()->CreateSelectFilePolicy(web_contents));
   select_file_dialog_->SelectFile(
       ui::SelectFileDialog::SELECT_SAVEAS_FILE,
-      /*title=*/std::u16string(), *file_path, /*file_types=*/nullptr,
+      /*title=*/std::u16string(), audio_debug_recordings_file_path_,
+      /*file_types=*/nullptr,
       /*file_type_index=*/0,
       /*default_extension=*/base::FilePath::StringType(),
       web_contents->GetTopLevelNativeWindow());
@@ -720,55 +616,14 @@ void WebRTCInternals::MaybeShowSelectFileDialog(
 void WebRTCInternals::FileSelected(const ui::SelectedFileInfo& file,
                                    int /* unused_index */) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  switch (selection_type_) {
-    case SelectionType::kRtcEventLogs: {
-      event_log_recordings_file_path_ = file.path();
-      event_log_recordings_ = true;
-      WebRtcEventLogger* const logger = WebRtcEventLogger::Get();
-      if (logger) {
-        logger->EnableLocalLogging(file.path());
-      }
-      break;
-    }
-    case SelectionType::kAudioDebugRecordings: {
-      audio_debug_recordings_file_path_ = file.path();
-      EnableAudioDebugRecordingsOnAllRenderProcessHosts();
-      break;
-    }
-    case SelectionType::kDataChannelRecordings: {
-      data_channel_recordings_file_path_ = file.path();
-      data_channel_recording_active_ = true;
-      WebRtcEventLogger* const logger = WebRtcEventLogger::Get();
-      if (logger) {
-        logger->EnableDataChannelLogging(file.path());
-      }
-      break;
-    }
-    default: {
-      NOTREACHED();
-    }
-  }
+  audio_debug_recordings_file_path_ = file.path();
+  EnableAudioDebugRecordingsOnAllRenderProcessHosts();
   select_file_dialog_.reset();
 }
 
 void WebRTCInternals::FileSelectionCanceled() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  switch (selection_type_) {
-    case SelectionType::kRtcEventLogs:
-      SendUpdate("event-log-recordings-file-selection-cancelled",
-                 base::Value());
-      break;
-    case SelectionType::kAudioDebugRecordings:
-      SendUpdate("audio-debug-recordings-file-selection-cancelled",
-                 base::Value());
-      break;
-    case SelectionType::kDataChannelRecordings:
-      SendUpdate("data-channel-recordings-file-selection-cancelled",
-                 base::Value());
-      break;
-    default:
-      NOTREACHED();
-  }
+  SendUpdate("audio-debug-recordings-file-selection-cancelled", base::Value());
   select_file_dialog_.reset();
 }
 

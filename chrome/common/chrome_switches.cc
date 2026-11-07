@@ -265,10 +265,6 @@ const char kDoNotDeElevateOnLaunch[] = "do-not-de-elevate";
 // given file. The file is overwritten if it exists.
 const char kDumpBrowserHistograms[] = "dump-browser-histograms";
 
-// If the WebRTC logging private API is active, enables audio debug recordings.
-const char kEnableAudioDebugRecordingsFromExtension[] =
-    "enable-audio-debug-recordings-from-extension";
-
 // Enable auto-reload of pages on top-level error.
 const char kEnableAutoReload[] = "enable-auto-reload";
 
@@ -281,10 +277,6 @@ const char kEnableExtensionActivityLogging[] =
 
 const char kEnableExtensionActivityLogTesting[] =
     "enable-extension-activity-log-testing";
-
-// Force enabling HangoutServicesExtension.
-const char kEnableHangoutServicesExtensionForTesting[] =
-    "enable-hangout-services-extension-for-testing";
 
 // Enables the network-related benchmarking extensions.
 const char kEnableNetBenchmarking[] = "enable-net-benchmarking";
@@ -659,24 +651,6 @@ const char kValidateCrx[] = "validate-crx";
 
 // Prints version information and quits.
 const char kVersion[] = "version";
-
-// Sets the delay (in seconds) between proactive prunings of remote-bound
-// WebRTC event logs which are pending upload.
-// All positive values are legal.
-// All negative values are illegal, and ignored.
-// If set to 0, the meaning is "no proactive pruning".
-const char kWebRtcRemoteEventLogProactivePruningDelta[] =
-    "webrtc-event-log-proactive-pruning-delta";
-
-// WebRTC event logs will only be uploaded if the conditions hold for this
-// many milliseconds.
-const char kWebRtcRemoteEventLogUploadDelayMs[] =
-    "webrtc-event-log-upload-delay-ms";
-
-// Normally, remote-bound WebRTC event logs are uploaded only when no
-// peer connections are active. With this flag, the upload is never suppressed.
-const char kWebRtcRemoteEventLogUploadNoSuppression[] =
-    "webrtc-event-log-upload-no-suppression";
 
 // Override WebRTC IP handling policy to mimic the behavior when WebRTC IP
 // handling policy is specified in Preferences.

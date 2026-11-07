@@ -986,7 +986,6 @@ const std::vector<std::string> kDoesNotSupportOriginFilteringDelegate{
 #if BUILDFLAG(ENABLE_DOWNGRADE_PROCESSING)
     "UserDataSnapshot",
 #endif
-    "WebrtcEventLogs",
 };
 
 // See comment on FullyFilteredDataTypes test for advice when this test fails.

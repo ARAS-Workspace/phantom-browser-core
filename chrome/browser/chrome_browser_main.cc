@@ -46,7 +46,6 @@
 #include "chrome/browser/language/url_language_histogram_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
-#include "chrome/browser/media/webrtc/webrtc_log_util.h"
 #include "chrome/browser/memory/chrome_browser_main_extra_parts_memory.h"
 #include "chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.h"
 #include "chrome/browser/metrics/chrome_feature_list_creator.h"
@@ -1332,13 +1331,6 @@ void ChromeBrowserMainParts::PostBrowserStart() {
   ChromeProcessSingleton::GetInstance()->Unlock(
       base::BindRepeating(&ProcessSingletonNotificationCallback));
 #endif
-
-  // Set up a task to delete old WebRTC log files for all profiles. Use a delay
-  // to reduce the impact on startup time.
-  content::GetUIThreadTaskRunner({})->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&WebRtcLogUtil::DeleteOldWebRtcLogFilesForAllProfiles),
-      base::Minutes(1));
 
   if (base::FeatureList::IsEnabled(features::kImprovedStartupBestEffortDelay)) {
     first_idle_ref_ = AfterStartupTaskUtils::RegisterStartupInProgressRef(

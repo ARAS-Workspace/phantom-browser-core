@@ -2376,12 +2376,6 @@ _CONFIG = [
     },
     {
         'paths': [
-            'third_party/blink/renderer/platform/webrtc/rtc_logging_mojom_traits.h'
-        ],
-        'allowed': ['blink::mojom::RTCMetadataDataView'],
-    },
-    {
-        'paths': [
             'third_party/blink/renderer/platform/wtf/',
         ],
         # base::RefCounted and base::RefCountedThreadSafe are prohibited in

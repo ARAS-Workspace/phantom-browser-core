@@ -27,9 +27,6 @@ namespace extensions {
 // Checks using an extension ID.
 bool IsComponentExtensionAllowlisted(const std::string& extension_id);
 
-// Checks using resource ID of manifest.
-bool IsComponentExtensionAllowlisted(int manifest_resource_id);
-
 }  // namespace extensions
 
 #endif  // CHROME_BROWSER_EXTENSIONS_COMPONENT_EXTENSIONS_ALLOWLIST_ALLOWLIST_H_

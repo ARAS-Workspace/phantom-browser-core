@@ -41,10 +41,6 @@ namespace content {
 class BrowserContext;
 }
 
-namespace webrtc_event_logging {
-class WebRtcEventLogManager;
-}  // namespace webrtc_event_logging
-
 // A delegate used by BrowsingDataRemover to delete data specific to Chrome
 // as the embedder.
 class ChromeBrowsingDataRemoverDelegate
@@ -80,8 +76,6 @@ class ChromeBrowsingDataRemoverDelegate
   void OnDoneRemoving() override;
 
  private:
-  using WebRtcEventLogManager = webrtc_event_logging::WebRtcEventLogManager;
-
   // For debugging purposes. Please add new deletion tasks at the end.
   // This enum is recorded in a histogram, so don't change or reuse ids.
   // LINT.IfChange(TracingDataType)

@@ -1585,8 +1585,6 @@ source_set("browser_tests") {
     "api/user_scripts/user_scripts_apitest.h",
     "api/web_navigation/web_navigation_apitest.cc",
     "api/web_request/web_request_apitest.cc",
-    "api/webrtc_logging_private/webrtc_logging_private_apitest.cc",
-    "api/webrtc_logging_private/webrtc_logging_private_browsertest.cc",
     "back_forward_cache_browsertest.cc",
     "background_color_provider_browsertest.cc",
     "background_header_browsertest.cc",

@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/media/webrtc/webrtc_logging_controller.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/bubble_anchor_util.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
@@ -73,9 +72,7 @@ class TabSharingInfoBarDelegate::StopButton
       : ui_(ui), capture_type_(capture_type) {}
   ~StopButton() override = default;
 
-  void Click(infobars::InfoBar* infobar) override {
-    ui_->StopSharing("StopButton clicked");
-  }
+  void Click(infobars::InfoBar* infobar) override { ui_->StopSharing(); }
 
   std::u16string GetLabel() const override {
     switch (capture_type_) {

@@ -121,12 +121,7 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterListPref(prefs::kWebRTCIPHandlingUrl, base::ListValue());
   registry->RegisterBooleanPref(prefs::kWebRTCPostQuantumKeyAgreement, false);
   registry->RegisterStringPref(prefs::kWebRTCUDPPortRange, std::string());
-  registry->RegisterBooleanPref(prefs::kWebRtcEventLogCollectionAllowed, false);
   registry->RegisterListPref(prefs::kWebRtcLocalIpsAllowedUrls);
-  registry->RegisterBooleanPref(prefs::kWebRtcTextLogCollectionAllowed, true);
-  registry->RegisterListPref(
-      prefs::kWebRTCDiagnosticLogCollectionAllowedForOrigins,
-      base::ListValue());
 
 #if BUILDFLAG(IS_MAC)
   // This really belongs in platform code, but there's no good place to

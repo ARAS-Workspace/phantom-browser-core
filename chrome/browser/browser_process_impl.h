@@ -71,10 +71,6 @@ class ChromeBrowserPolicyConnector;
 class PolicyService;
 }  // namespace policy
 
-namespace webrtc_event_logging {
-class WebRtcEventLogManager;
-}  // namespace webrtc_event_logging
-
 // Real implementation of BrowserProcess that creates and returns the services.
 class BrowserProcessImpl : public BrowserProcess,
                            public KeepAliveStateObserver {
@@ -184,7 +180,6 @@ class BrowserProcessImpl : public BrowserProcess,
 
   activity_reporter::ActivityReporter* activity_reporter() override;
   component_updater::ComponentUpdateService* component_updater() override;
-  WebRtcLogUploader* webrtc_log_uploader() override;
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
       override;
@@ -201,8 +196,6 @@ class BrowserProcessImpl : public BrowserProcess,
   GlobalFeatures* GetFeatures() override;
 
  private:
-  using WebRtcEventLogManager = webrtc_event_logging::WebRtcEventLogManager;
-
   // KeepAliveStateObserver implementation
   void OnKeepAliveStateChanged(bool is_keeping_alive) override;
   void OnKeepAliveRestartStateChanged(bool can_restart) override;
@@ -359,15 +352,6 @@ class BrowserProcessImpl : public BrowserProcess,
   std::unique_ptr<component_updater::ComponentUpdateService> component_updater_;
 
   std::unique_ptr<BrowserProcessPlatformPart> platform_part_;
-
-  // Lazily initialized.
-  std::unique_ptr<WebRtcLogUploader> webrtc_log_uploader_;
-
-  // WebRtcEventLogManager is a singleton which is instaniated before anything
-  // that needs it, and lives until ~BrowserProcessImpl(). This allows it to
-  // safely post base::Unretained(this) references to an internally owned task
-  // queue, since after ~BrowserProcessImpl(), those tasks would no longer run.
-  std::unique_ptr<WebRtcEventLogManager> webrtc_event_log_manager_;
 
   std::unique_ptr<resource_coordinator::ResourceCoordinatorParts>
       resource_coordinator_parts_;

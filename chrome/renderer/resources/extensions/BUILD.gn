@@ -33,7 +33,6 @@ generate_grd("build_grdp") {
     "tts_custom_bindings.js",
     "tts_engine_custom_bindings.js",
     "webrtc_desktop_capture_private_custom_bindings.js",
-    "webrtc_logging_private_custom_bindings.js",
     "web_view/chrome_web_view_context_menus_api_methods.js",
     "web_view/chrome_web_view_element.js",
     "web_view/chrome_web_view_internal_custom_bindings.js",

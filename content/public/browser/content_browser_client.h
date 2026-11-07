@@ -2274,25 +2274,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   virtual bool IsBuiltinComponent(BrowserContext* browser_context,
                                   const url::Origin& origin);
 
-  // Tries to start RTC diagnostic logging (best effort).
-  virtual void StartRtcDiagnosticLogging(
-      RenderFrameHost& frame_host,
-      bool should_upload_on_stop,
-      const base::flat_map<std::string, std::string>& metadata,
-      base::OnceCallback<void(const std::string&)> callback);
-
-  // Finishes RTC diagnostic logging if a session is ongoing.
-  // The results of logging are stored to disk and potentially uploaded.
-  virtual void FinishRtcDiagnosticLogging(
-      RenderFrameHost& frame_host,
-      const base::flat_map<std::string, std::string>& metadata,
-      base::OnceClosure callback);
-
-  // Cancels RTC diagnostic logging if a session is ongoing. If a session is
-  // cancelled, the results of logging are not stored in a file or uploaded.
-  virtual void CancelRtcDiagnosticLogging(RenderFrameHost& frame_host,
-                                          base::OnceClosure callback);
-
   // Returns whether given |url| has to be blocked. It's used only for renderer
   // debug URLs, as other requests are handled via NavigationThrottlers and
   // blocklist policies are applied there.

@@ -1238,9 +1238,7 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
 #endif
 
   // Instantiated once using CreateSingletonInstance(), and accessed only using
-  // GetInstance(), which is not allowed to create the object. This allows us
-  // to ensure that it cannot be used before objects it relies on have been
-  // created; namely, WebRtcEventLogManager.
+  // GetInstance(), which is not allowed to create the object.
   // Allowed to leak when the browser exits.
   WebRTCInternals::CreateSingletonInstance();
 

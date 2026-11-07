@@ -221,7 +221,6 @@ CONTENT_EXPORT extern const char kWebOtpBackend[];
 CONTENT_EXPORT extern const char kWebOtpBackendSmsVerification[];
 CONTENT_EXPORT extern const char kWebOtpBackendUserConsent[];
 CONTENT_EXPORT extern const char kWebOtpBackendAuto[];
-CONTENT_EXPORT extern const char kWebRtcLocalEventLogging[];
 extern const char kWebRtcMaxCaptureFramerate[];
 CONTENT_EXPORT extern const char kWebSettingsForTesting[];
 CONTENT_EXPORT extern const char kWebXrForceRuntime[];

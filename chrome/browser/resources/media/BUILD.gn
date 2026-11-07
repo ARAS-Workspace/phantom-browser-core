@@ -6,16 +6,11 @@ import("//ui/webui/resources/tools/build_webui.gni")
 
 build_webui("build") {
   grd_prefix = "media"
-  static_files = [
-    "media_engagement.html",
-    "webrtc_logs.css",
-    "webrtc_logs.html",
-  ]
+  static_files = [ "media_engagement.html" ]
 
   ts_files = [
     "media_data_table.ts",
     "media_engagement.ts",
-    "webrtc_logs.ts",
   ]
 
   mojo_files_deps = [

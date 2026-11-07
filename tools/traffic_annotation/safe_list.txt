@@ -73,8 +73,6 @@ missing_new_fields,chrome/browser/extensions/api/image_writer_private/write_from
 missing_new_fields,chrome/browser/extensions/blocklist_state_fetcher.cc
 missing_new_fields,chrome/browser/k_anonymity_service/k_anonymity_service_client.cc
 missing_new_fields,chrome/browser/k_anonymity_service/k_anonymity_trust_token_getter.cc
-missing_new_fields,chrome/browser/media/webrtc/webrtc_event_log_uploader.cc
-missing_new_fields,chrome/browser/media/webrtc/webrtc_log_uploader.cc
 missing_new_fields,chrome/browser/plugins/plugin_observer.cc
 missing_new_fields,chrome/browser/predictors/prefetch_manager.cc
 missing_new_fields,chrome/browser/preloading/prefetch/prefetch_proxy/prefetch_proxy_origin_prober.cc

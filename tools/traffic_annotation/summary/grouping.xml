@@ -312,8 +312,6 @@ after discussions on the right group.
       <annotation id="metrics_report_uma"/>
     </sender>
     <sender name="WebRTC">
-      <annotation id="webrtc_event_log_uploader"/>
-      <annotation id="webrtc_log_upload"/>
     </sender>
   </group>
   <group name="User Experience">

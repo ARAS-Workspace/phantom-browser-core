@@ -61,7 +61,6 @@
 #include "chrome/renderer/google_accounts_private_api_extension.h"
 #include "chrome/renderer/loadtimes_bindings.h"
 #include "chrome/renderer/media/flash_embed_rewrite.h"
-#include "chrome/renderer/media/webrtc_logging_agent_impl.h"
 #include "chrome/renderer/net/net_error_helper.h"
 #include "chrome/renderer/plugins/non_loadable_plugin_placeholder.h"
 #include "chrome/renderer/plugins/pdf_plugin_placeholder.h"
@@ -1106,16 +1105,6 @@ ChromeRenderThreadObserver* ChromeContentRendererClient::GetChromeObserver()
 web_cache::WebCacheImpl* ChromeContentRendererClient::GetWebCache() {
   return web_cache_impl_.get();
 }
-
-chrome::WebRtcLoggingAgentImpl*
-ChromeContentRendererClient::GetWebRtcLoggingAgent() {
-  if (!webrtc_logging_agent_impl_) {
-    webrtc_logging_agent_impl_ =
-        std::make_unique<chrome::WebRtcLoggingAgentImpl>();
-  }
-  return webrtc_logging_agent_impl_.get();
-}
-
 
 std::unique_ptr<blink::WebSocketHandshakeThrottleProvider>
 ChromeContentRendererClient::CreateWebSocketHandshakeThrottleProvider() {

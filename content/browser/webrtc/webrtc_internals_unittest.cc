@@ -976,7 +976,4 @@ TEST_F(WebRtcInternalsTest, TestWebRtcConnectionsObserver) {
   base::RunLoop().RunUntilIdle();
 }
 
-// TODO(eladalon): Add tests that WebRtcEventLogger::Enable/Disable is
-// correctly called. https://crbug.com/775415
-
 }  // namespace content

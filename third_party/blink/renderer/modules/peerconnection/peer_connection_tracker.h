@@ -232,14 +232,6 @@ class MODULES_EXPORT PeerConnectionTracker
   virtual void TrackGetDisplayMediaFailure(UserMediaRequest* user_media_request,
                                            const String& error,
                                            const String& error_message);
-  // Sends a new fragment on an RtcEventLog.
-  virtual void TrackRtcEventLogWrite(RTCPeerConnectionHandler* pc_handler,
-                                     const Vector<uint8_t>& output);
-
-  // Sends a sent/received DataChannel message.
-  virtual void TrackRtcDataChannelLogWrite(RTCPeerConnectionHandler* pc_handler,
-                                           const Vector<uint8_t>& output);
-
   void Trace(Visitor* visitor) const override {
     visitor->Trace(peer_connection_tracker_host_);
     visitor->Trace(receiver_);
@@ -251,25 +243,6 @@ class MODULES_EXPORT PeerConnectionTracker
   FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, OnThermalStateChange);
   FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest,
                            ReportInitialThermalState);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest,
-                           StartDataChannelLogCalled);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, StopDataChannelLogCalled);
-  FRIEND_TEST_ALL_PREFIXES(
-      PeerConnectionTrackerTest,
-      StartDataChannelLogNotCalledIfMismatchBetweenLidAndPeerConnection);
-  FRIEND_TEST_ALL_PREFIXES(
-      PeerConnectionTrackerTest,
-      StopDataChannelLogNotCalledIfMismatchBetweenLidAndPeerConnection);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, DataChannelLoggingWrite);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, StartEventLogCalled);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, StopEventLogCalled);
-  FRIEND_TEST_ALL_PREFIXES(
-      PeerConnectionTrackerTest,
-      StartEventLogNotCalledIfMismatchBetweenLidAndPeerConnection);
-  FRIEND_TEST_ALL_PREFIXES(
-      PeerConnectionTrackerTest,
-      StopEventLogNotCalledIfMismatchBetweenLidAndPeerConnection);
-  FRIEND_TEST_ALL_PREFIXES(PeerConnectionTrackerTest, EventLoggingWrite);
 
   PeerConnectionTracker(
       mojo::PendingRemote<mojom::blink::PeerConnectionTrackerHost> host,
@@ -297,11 +270,6 @@ class MODULES_EXPORT PeerConnectionTracker
   void OnSuspend() override;
   void OnThermalStateChange(
       mojom::blink::DeviceThermalState thermal_state) override;
-  void StartEventLog(int peer_connection_local_id,
-                     int output_period_ms) override;
-  void StopEventLog(int peer_connection_local_id) override;
-  void StartDataChannelLog(int peer_connection_local_id) override;
-  void StopDataChannelLog(int peer_connection_local_id) override;
   void GetStandardStats() override;
   void GetCurrentState() override;
 

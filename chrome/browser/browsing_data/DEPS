@@ -66,7 +66,6 @@ include_rules = [
   "+chrome/browser/media/clear_key_cdm_test_helper.h",
   "+chrome/browser/media/media_engagement_service.h",
   "+chrome/browser/media/webrtc/media_device_salt_service_factory.h",
-  "+chrome/browser/media/webrtc/webrtc_event_log_manager.h",
   "+chrome/browser/net/system_network_context_manager.h",
   "+chrome/browser/offline_pages/offline_page_model_factory.h",
   "+chrome/browser/offline_pages/offline_page_utils.h",

@@ -51,12 +51,6 @@ class TestPeerConnectionTrackerHostObserver
     on_peer_connection_session_id_set_called_ = true;
     std::move(callback).Run();
   }
-  void OnWebRtcEventLogWrite(GlobalRenderFrameHostId,
-                             int,
-                             const std::string&) override {}
-  void OnWebRtcDataChannelLogWrite(GlobalRenderFrameHostId,
-                                   int,
-                                   const std::string&) override {}
   void OnAddStandardStats(GlobalRenderFrameHostId,
                           int,
                           base::ListValue) override {}

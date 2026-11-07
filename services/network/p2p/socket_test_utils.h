@@ -47,7 +47,6 @@ class FakeP2PSocketDelegate : public P2PSocket::Delegate {
 
   // P2PSocket::Delegate interface.
   void DestroySocket(P2PSocket* socket) override;
-  void DumpPacket(base::span<const uint8_t> data, bool incoming) override;
 
   void ExpectDestruction(std::unique_ptr<P2PSocket> socket);
 

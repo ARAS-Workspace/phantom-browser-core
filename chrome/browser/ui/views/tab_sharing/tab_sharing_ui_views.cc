@@ -16,13 +16,11 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/location.h"
-#include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/same_origin_observer.h"
-#include "chrome/browser/media/webrtc/webrtc_logging_controller.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -175,13 +173,6 @@ TabSharingUIViews::TabSharingUIViews(
       uma_logger_(content::DesktopMediaID::Type::TYPE_WEB_CONTENTS) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-  if (auto* rfh = content::RenderFrameHost::FromID(capturer)) {
-    if (auto* rph = rfh->GetProcess()) {
-      if (auto* wrlc = WebRtcLoggingController::FromRenderProcessHost(rph)) {
-        log_message_callback_ = wrlc->GetLogMessageCallback();
-      }
-    }
-  }
   Observe(shared_tab_);
   shared_tab_name_ = GetSharedTabName(shared_tab_, shared_tab_scheme_display_);
 
@@ -200,7 +191,7 @@ TabSharingUIViews::~TabSharingUIViews() {
   // Unconditionally call StopSharing(), to ensure all clean-up has been
   // performed if tasks race (e.g., OnStarted() is called after
   // OnInfoBarRemoved()). See: https://crbug.com/40054066
-  StopSharing("TabSharingUIViews destroyed");
+  StopSharing();
 }
 
 gfx::NativeViewId TabSharingUIViews::OnStarted(
@@ -255,13 +246,9 @@ void TabSharingUIViews::StartSharing(infobars::InfoBar* infobar) {
       captured_surface_control_active_);
 }
 
-void TabSharingUIViews::StopSharing(std::string_view reason) {
+void TabSharingUIViews::StopSharing() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (!stop_callback_.is_null()) {
-    if (log_message_callback_) {
-      log_message_callback_.Run(
-          base::StrCat({"TabSharingUIViews::StopSharing: ", reason}));
-    }
     std::move(stop_callback_).Run();
   }
   RemoveInfobarsForAllTabs();
@@ -338,7 +325,7 @@ void TabSharingUIViews::OnInfoBarRemoved(infobars::InfoBar* infobar,
   content::WebContents* content_for_removed_infobar = infobars_entry->first;
   infobars_.erase(infobars_entry);
   if (content_for_removed_infobar == shared_tab_) {
-    StopSharing("OnInfoBarRemoved");
+    StopSharing();
   }
 }
 
@@ -359,7 +346,7 @@ void TabSharingUIViews::WebContentsDestroyed() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   // TODO(crbug.com/40207587): Prevent StopSharing() from interacting with
   // |shared_tab_| while it is being destroyed.
-  StopSharing("WebContentsDestroyed");
+  StopSharing();
 }
 
 void TabSharingUIViews::CreateInfobarsForAllTabs() {

@@ -66,10 +66,6 @@ namespace extensions {
 
 namespace {
 
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-BASE_FEATURE(kHangoutsExtensionV3, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-
 bool g_enable_background_extensions_during_testing = false;
 
 ExtensionId GenerateId(const base::DictValue& manifest,
@@ -161,19 +157,6 @@ std::optional<base::DictValue> ComponentLoader::ParseManifest(
     return std::nullopt;
   }
   return manifest;
-}
-
-ExtensionId ComponentLoader::Add(int manifest_resource_id,
-                                 const base::FilePath& root_directory) {
-  if (!ignore_allowlist_for_testing_ &&
-      !IsComponentExtensionAllowlisted(manifest_resource_id)) {
-    return std::string();
-  }
-
-  std::string manifest_contents =
-      ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
-          manifest_resource_id);
-  return Add(manifest_contents, root_directory, true);
 }
 
 ExtensionId ComponentLoader::Add(base::DictValue manifest,
@@ -294,19 +277,6 @@ std::vector<ExtensionId> ComponentLoader::GetRegisteredComponentExtensionsIds()
   return result;
 }
 
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-void ComponentLoader::AddHangoutServicesExtension() {
-  // Finch controlled migration to a v3 Manifest - see crbug.com/326877912.
-  if (base::FeatureList::IsEnabled(kHangoutsExtensionV3)) {
-    Add(IDR_HANGOUT_SERVICES_MANIFEST_V3,
-        base::FilePath(FILE_PATH_LITERAL("hangout_services")));
-  } else {
-    Add(IDR_HANGOUT_SERVICES_MANIFEST_V2,
-        base::FilePath(FILE_PATH_LITERAL("hangout_services")));
-  }
-}
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-
 scoped_refptr<const Extension> ComponentLoader::CreateExtension(
     const ComponentExtensionInfo& info,
     std::u16string* error) {
@@ -371,18 +341,6 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
        command_line->HasSwitch(
            ::switches::kDisableComponentExtensionsWithBackgroundPages));
 
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-  const bool enable_hangout_services_extension_for_testing =
-      command_line->HasSwitch(::switches::kTestType) &&
-      command_line->HasSwitch(
-          ::switches::kEnableHangoutServicesExtensionForTesting);
-  if (!skip_session_components &&
-      (!should_disable_background_extensions ||
-       enable_hangout_services_extension_for_testing)) {
-    AddHangoutServicesExtension();
-  }
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-
   if (should_disable_background_extensions) {
     return;
   }
@@ -401,10 +359,6 @@ void ComponentLoader::
            ::switches::kDisableComponentExtensionsWithBackgroundPages))) {
     return;
   }
-
-#if BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
-  AddHangoutServicesExtension();
-#endif  // BUILDFLAG(ENABLE_HANGOUT_SERVICES_EXTENSION)
 }
 
 void ComponentLoader::UnloadComponent(ComponentExtensionInfo* component) {

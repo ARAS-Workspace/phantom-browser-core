@@ -133,8 +133,6 @@ void ChromeExtensionsRendererAPIProvider::PopulateSourceMap(
 
       {"webrtcDesktopCapturePrivate",
        IDR_RENDERER_RESOURCES_EXTENSIONS_WEBRTC_DESKTOP_CAPTURE_PRIVATE_CUSTOM_BINDINGS_JS},
-      {"webrtcLoggingPrivate",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_WEBRTC_LOGGING_PRIVATE_CUSTOM_BINDINGS_JS},
 
       // Platform app sources that are not API-specific..
       {"chromeWebViewContextMenusApiMethods",

@@ -89,7 +89,6 @@
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/media/media_engagement_service_factory.h"
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
-#include "chrome/browser/media/webrtc/webrtc_event_log_manager_keyed_service_factory.h"
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
@@ -674,7 +673,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
 
   WebDataServiceFactory::GetInstance();
-  webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
   ZeroSuggestCacheServiceFactory::GetInstance();
 }
 

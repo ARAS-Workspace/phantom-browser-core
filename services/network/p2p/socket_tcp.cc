@@ -272,7 +272,6 @@ bool P2PSocketTcpBase::OnPacket(base::span<const uint8_t> data) {
   // TODO(crbug.com/40243224): Batch multiple packets in the TCP case as well.
   client_->DataReceived(std::move(received_packets));
 
-  delegate_->DumpPacket(data, true);
   return true;
 }
 
@@ -552,9 +551,6 @@ bool P2PSocketStunTcp::DoSend(const net::IPEndPoint& to,
       base::MakeRefCounted<net::DrainableIOBuffer>(
           base::MakeRefCounted<net::VectorIOBuffer>(std::move(buffer)),
           buffer_size));
-
-  // WriteOrQueue may free the memory, so dump it first.
-  delegate_->DumpPacket(send_buffer.buffer->span(), false);
 
   return WriteOrQueue(send_buffer);
 }
