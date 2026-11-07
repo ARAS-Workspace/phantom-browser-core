@@ -123,12 +123,6 @@ void NetworkContextClientBase::OnCanSendReportingReports(
   std::move(callback).Run(std::vector<url::Origin>());
 }
 
-void NetworkContextClientBase::OnCanSendDomainReliabilityUpload(
-    const url::Origin& origin,
-    OnCanSendDomainReliabilityUploadCallback callback) {
-  std::move(callback).Run(false);
-}
-
 #if BUILDFLAG(IS_CT_SUPPORTED)
 void NetworkContextClientBase::OnCanSendSCTAuditingReport(
     OnCanSendSCTAuditingReportCallback callback) {

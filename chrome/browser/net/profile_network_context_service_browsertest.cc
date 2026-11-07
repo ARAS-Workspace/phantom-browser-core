@@ -126,6 +126,11 @@ class ProfileNetworkContextServiceBrowsertest : public InProcessBrowserTest {
                           .get();
   }
 
+  void TearDownOnMainThread() override {
+    loader_factory_ = nullptr;
+    InProcessBrowserTest::TearDownOnMainThread();
+  }
+
   network::mojom::URLLoaderFactory* loader_factory() const {
     return loader_factory_;
   }

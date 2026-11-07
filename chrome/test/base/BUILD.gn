@@ -258,7 +258,6 @@ source_set("testing_profile") {
     "//base/test:test_support",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:profile_manager",
-    "//components/domain_reliability",
     "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//components/policy/core/common",

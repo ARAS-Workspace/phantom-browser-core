@@ -121,7 +121,6 @@ source_set("impl") {
     "//components/collaboration/public:prefs",
     "//components/content_settings/core/browser",
     "//components/custom_handlers",
-    "//components/domain_reliability:prefs",
     "//components/feature_engagement/public:prefs",
     "//components/history_clusters/core",
     "//components/image_fetcher/core/cache",

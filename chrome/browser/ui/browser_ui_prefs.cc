@@ -34,7 +34,6 @@ void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
           UpgradeDetector::GetDefaultHighAnnoyanceThreshold()
               .InMilliseconds()));
   registry->RegisterDictionaryPref(prefs::kRelaunchWindow);
-  registry->RegisterIntegerPref(prefs::kRelaunchFastIfOutdated, 0);
 
 #if BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(

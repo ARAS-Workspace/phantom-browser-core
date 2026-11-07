@@ -123,8 +123,6 @@ class ProfileNetworkContextService
   // Flushes all pending proxy configuration changes.
   void FlushProxyConfigMonitorForTesting();
 
-  static void SetDiscardDomainReliabilityUploadsForTesting(bool value);
-
   void set_client_cert_store_factory_for_testing(
       base::RepeatingCallback<std::unique_ptr<net::ClientCertStore>()>
           factory) {

@@ -1616,11 +1616,6 @@ inline constexpr char kRelaunchNotificationPeriod[] =
 // relaunch should take place.
 inline constexpr char kRelaunchWindow[] = "browser.relaunch_window";
 
-// Pref name for the policy controlling the maximum age of a build before
-// forcing a fast relaunch.
-inline constexpr char kRelaunchFastIfOutdated[] =
-    "browser.relaunch_fast_if_outdated";
-
 #if BUILDFLAG(IS_MAC)
 // Counts how many times prominent call-to-actions have occurred as part of the
 // Mac restore permissions experiment. https://crbug.com/1211052

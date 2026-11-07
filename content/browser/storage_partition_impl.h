@@ -290,9 +290,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   void OnCanSendReportingReports(
       const std::vector<url::Origin>& origins,
       OnCanSendReportingReportsCallback callback) override;
-  void OnCanSendDomainReliabilityUpload(
-      const url::Origin& origin,
-      OnCanSendDomainReliabilityUploadCallback callback) override;
 #if BUILDFLAG(IS_CT_SUPPORTED)
   void OnCanSendSCTAuditingReport(
       OnCanSendSCTAuditingReportCallback callback) override;

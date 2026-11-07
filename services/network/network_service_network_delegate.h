@@ -65,8 +65,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkServiceNetworkDelegate
       const net::IPEndPoint& endpoint,
       std::optional<GURL>* preserve_fragment_on_redirect_url,
       const std::optional<net::SSLInfo>& ssl_info) override;
-  void OnBeforeRedirect(net::URLRequest* request,
-                        const GURL& new_location) override;
   void OnResponseStarted(net::URLRequest* request, int net_error) override;
   void OnCompleted(net::URLRequest* request,
                    bool started,

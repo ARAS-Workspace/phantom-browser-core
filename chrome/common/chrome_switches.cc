@@ -218,9 +218,6 @@ const char kDisableCrashpadForTesting[] = "disable-crashpad-for-testing";
 // automated testing.
 const char kDisableDefaultApps[] = "disable-default-apps";
 
-// Disables Domain Reliability Monitoring.
-const char kDisableDomainReliability[] = "disable-domain-reliability";
-
 // Disables lazy loading of images and frames.
 const char kDisableLazyLoading[] = "disable-lazy-loading";
 
@@ -277,10 +274,6 @@ const char kEnableAutoReload[] = "enable-auto-reload";
 
 // Enables the multi-level undo system for bookmarks.
 const char kEnableBookmarkUndo[] = "enable-bookmark-undo";
-
-
-// Enables Domain Reliability Monitoring.
-const char kEnableDomainReliability[] = "enable-domain-reliability";
 
 // Enables logging for extension activity.
 const char kEnableExtensionActivityLogging[] =

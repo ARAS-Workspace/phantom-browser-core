@@ -523,15 +523,6 @@ struct NetworkContextParams {
   [EnableIf=is_android]
   pending_receiver<CookieStoreReadyCallback>? cookie_store_ready_callback;
 
-  // Whether to enable Domain Reliability.
-  bool enable_domain_reliability = false;
-
-  // The uploader reporter name to use for Domain Reliability uploads.
-  string domain_reliability_upload_reporter;
-
-  // Whether to discard Domain Reliability uploads.
-  bool discard_domain_reliablity_uploads = false;
-
   // When reporting is enabled, this sets the delay between sending reports.
   // When omitted a default value is used.
   mojo_base.mojom.TimeDelta? reporting_delivery_interval;
@@ -1264,16 +1255,6 @@ interface NetworkContext {
   // filter.
   ClearNetworkErrorLogging(ClearDataFilter? filter) => ();
 
-  // Mirror of domain_reliability::DomainReliabilityClearMode.
-  enum DomainReliabilityClearMode {
-    CLEAR_CONTEXTS,
-    CLEAR_BEACONS,
-  };
-
-  // Clears Domain Reliability entries, specified by |mode|.
-  ClearDomainReliability(
-      ClearDataFilter? filter, DomainReliabilityClearMode mode) => ();
-
   // Clears dictionaries from the shared dictionary cache. A specific range of
   // time can be specified with `start_time` and `end_time`. This supports
   // unbounded deletes in either direction by using null Time values for either
@@ -1793,14 +1774,6 @@ interface NetworkContext {
                               string sct_list) => (int32 error_code);
 
   GetTrustAnchorIDsForTesting() => (array<array<uint8>> trust_anchor_ids);
-
-  // Adds a Domain Reliability Context.
-  AddDomainReliabilityContextForTesting(
-      url.mojom.Origin origin, url.mojom.Url upload_url) => ();
-
-  // Forces all pending Domain Reliability uploads to run now, even if their
-  // minimum delay has not yet passed.
-  ForceDomainReliabilityUploadsForTesting() => ();
 
   // Set the SCT auditing mode for this NetworkContext.
   [EnableIf=is_ct_supported]

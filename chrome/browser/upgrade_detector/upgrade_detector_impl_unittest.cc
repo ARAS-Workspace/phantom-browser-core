@@ -11,23 +11,17 @@
 #include <utility>
 #include <vector>
 
-#include "base/i18n/time_formatting.h"
 #include "base/memory/raw_ptr.h"
-#include "base/strings/stringprintf.h"
 #include "base/time/clock.h"
 #include "base/time/tick_clock.h"
 #include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/upgrade_detector/upgrade_observer.h"
-#include "chrome/browser/upgrade_detector/version_history_client.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/version_info/version_info.h"
 #include "content/public/test/browser_task_environment.h"
-#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
-#include "services/network/test/test_url_loader_factory.h"
 #include "services/network/test/test_utils.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -128,8 +122,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
  protected:
   UpgradeDetectorImplTest()
       : task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME) {
-    TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(
-        url_loader_factory_.GetSafeWeakWrapper());
     // Disable the detector's check to see if autoupdates are enabled.
     // Without this, tests put the detector into an invalid state by detecting
     // upgrades before the detection task completes.
@@ -150,10 +142,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
 
   const base::TickClock* GetMockTickClock() {
     return task_environment_.GetMockTickClock();
-  }
-
-  network::TestURLLoaderFactory& GetTestURLLoaderFactory() {
-    return url_loader_factory_;
   }
 
   // Sets the browser.relaunch_notification_period preference in Local State to
@@ -191,12 +179,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
         prefs::kRelaunchWindow, base::Value(std::move(dict)));
   }
 
-  // Sets the browser.relaunch_fast_if_outdated preference in Local State.
-  void SetRelaunchFastIfOutdatedPref(int days) {
-    TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetManagedPref(
-        prefs::kRelaunchFastIfOutdated, base::Value(days));
-  }
-
   void RunUntilIdle() { task_environment_.RunUntilIdle(); }
 
   // Fast-forwards virtual time by |delta|.
@@ -206,7 +188,6 @@ class UpgradeDetectorImplTest : public ::testing::Test {
 
  private:
   content::BrowserTaskEnvironment task_environment_;
-  network::TestURLLoaderFactory url_loader_factory_;
 };
 
 TEST_F(UpgradeDetectorImplTest, VariationsChanges) {
@@ -251,49 +232,6 @@ TEST_F(UpgradeDetectorImplTest, VariationsCriticalChanges) {
   RunUntilIdle();
 
   detector.Shutdown();
-}
-
-TEST_F(UpgradeDetectorImplTest, RelaunchFastIfOutdated) {
-  SetRelaunchFastIfOutdatedPref(7);
-
-  TestUpgradeDetectorImpl upgrade_detector(GetMockClock(), GetMockTickClock());
-  ::testing::StrictMock<MockUpgradeObserver> mock_observer(&upgrade_detector);
-  upgrade_detector.Init();
-
-  // Pretend that an upgrade was just detected now. Initially the period is
-  // 7 days.
-  upgrade_detector.UpgradeDetected(
-      TestUpgradeDetectorImpl::UPGRADE_AVAILABLE_REGULAR);
-  EXPECT_EQ(upgrade_detector.GetThresholdForLevel(
-                UpgradeDetector::UPGRADE_ANNOYANCE_HIGH),
-            base::Days(7));
-
-  base::Time end_time = base::Time::Now() - base::Days(7) - base::Hours(1);
-
-  // This should've fired off a URL request to the VersionHistory API. After
-  // it completes, the period should change to 2 hours.
-  GURL version_history_url = GetVersionReleasesUrl(version_info::GetVersion());
-  EXPECT_TRUE(GetTestURLLoaderFactory().IsPending(version_history_url.spec()));
-  GetTestURLLoaderFactory().AddResponse(
-      version_history_url.spec(),
-      base::StringPrintf(R"({
-        "releases": [{
-          "serving": {
-            "endTime": "%s"
-          }
-        }]
-      })",
-                         base::TimeFormatAsIso8601(end_time)),
-      net::HTTP_OK);
-  RunUntilIdle();
-  EXPECT_EQ(upgrade_detector.GetThresholdForLevel(
-                UpgradeDetector::UPGRADE_ANNOYANCE_HIGH),
-            base::Hours(2));
-
-  // Execute tasks posted by |detector| referencing it while it's still in
-  // scope.
-  RunUntilIdle();
-  upgrade_detector.Shutdown();
 }
 
 // Tests that the proper notifications are sent for the expected stages as the

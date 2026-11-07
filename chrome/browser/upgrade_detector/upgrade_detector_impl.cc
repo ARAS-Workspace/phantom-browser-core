@@ -127,9 +127,8 @@ void UpgradeDetectorImpl::DoCalculateThresholds() {
   base::TimeDelta notification_period = GetRelaunchNotificationPeriod();
   const std::optional<RelaunchWindow> relaunch_window =
       GetRelaunchWindowPolicyValue();
-  bool fast_relaunch = ShouldRelaunchFast();
 
-  if (notification_period.is_zero() && !relaunch_window && !fast_relaunch) {
+  if (notification_period.is_zero() && !relaunch_window) {
     // Use the default values when no override is set and we don't expect to
     // adjust the levels according to the relaunch time interval.
     stages_[kStagesIndexHigh] = kDefaultHighThreshold;
@@ -144,10 +143,6 @@ void UpgradeDetectorImpl::DoCalculateThresholds() {
     base::TimeDelta effective_notification_period = notification_period;
     if (notification_period.is_zero()) {
       effective_notification_period = kDefaultHighThreshold;
-    }
-    if (fast_relaunch) {
-      effective_notification_period =
-          std::min(effective_notification_period, base::Hours(2));
     }
 
     const RelaunchWindow effective_relaunch_window =
@@ -188,11 +183,6 @@ void UpgradeDetectorImpl::UpgradeDetected(UpgradeAvailable upgrade_available) {
   if (upgrade_available != UPGRADE_AVAILABLE_NONE ||
       critical_experiment_updates_available()) {
     StartUpgradeNotificationTimer();
-    if (ShouldFetchLastServedDate()) {
-      base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-          FROM_HERE, base::BindOnce(&UpgradeDetectorImpl::FetchLastServedDate,
-                                    weak_factory_.GetWeakPtr()));
-    }
   } else {
     // There is no longer anything to notify the user about, so stop the timer
     // and reset state.

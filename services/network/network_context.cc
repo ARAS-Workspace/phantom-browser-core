@@ -48,7 +48,6 @@
 #include "base/types/optional_util.h"
 #include "build/build_config.h"
 #include "components/cookie_config/cookie_store_util.h"
-#include "components/domain_reliability/monitor.h"
 #include "components/network_session_configurator/browser/network_session_configurator.h"
 #include "components/network_session_configurator/common/network_switches.h"
 #include "components/os_crypt/async/common/encryptor.h"
@@ -928,18 +927,6 @@ NetworkContext::~NetworkContext() {
     network_service_->DeregisterNetworkContext(this);
   }
 
-  if (domain_reliability_monitor_) {
-    domain_reliability_monitor_->Shutdown();
-  }
-  // Because of the order of declaration in the class,
-  // domain_reliability_monitor_ will be destroyed before
-  // |url_loader_factories_| which could own URLLoader's whose destructor call
-  // back into this class and might use domain_reliability_monitor_. So we reset
-  // |domain_reliability_monitor_| here explicitly, instead of changing the
-  // order, because any work calling into |domain_reliability_monitor_| at
-  // shutdown would be unnecessary as the reports would be thrown out.
-  domain_reliability_monitor_.reset();
-
   if (url_request_context_ &&
       url_request_context_->transport_security_state()) {
 #if BUILDFLAG(IS_CT_SUPPORTED)
@@ -1801,25 +1788,6 @@ void NetworkContext::AddVariationsHeadersToReportingRequest(
 }
 #endif  // BUILDFLAG(ENABLE_REPORTING)
 
-void NetworkContext::ClearDomainReliability(
-    mojom::ClearDataFilterPtr filter,
-    DomainReliabilityClearMode mode,
-    ClearDomainReliabilityCallback callback) {
-  if (domain_reliability_monitor_) {
-    domain_reliability::DomainReliabilityClearMode dr_mode;
-    if (mode ==
-        mojom::NetworkContext::DomainReliabilityClearMode::CLEAR_CONTEXTS) {
-      dr_mode = domain_reliability::CLEAR_CONTEXTS;
-    } else {
-      dr_mode = domain_reliability::CLEAR_BEACONS;
-    }
-
-    domain_reliability_monitor_->ClearBrowsingData(
-        dr_mode, BuildOriginFilter(std::move(filter)));
-  }
-  std::move(callback).Run();
-}
-
 void NetworkContext::CloseAllConnections(CloseAllConnectionsCallback callback) {
   net::HttpNetworkSession* http_session =
       url_request_context_->http_transaction_factory()->GetSession();
@@ -2579,26 +2547,6 @@ void NetworkContext::CreateMdnsResponder(
 #endif  // BUILDFLAG(ENABLE_MDNS)
 }
 
-void NetworkContext::AddDomainReliabilityContextForTesting(
-    const url::Origin& origin,
-    const GURL& upload_url,
-    AddDomainReliabilityContextForTestingCallback callback) {
-  auto config = std::make_unique<domain_reliability::DomainReliabilityConfig>();
-  config->origin = origin;
-  config->include_subdomains = false;
-  config->collectors.push_back(std::make_unique<GURL>(upload_url));
-  config->success_sample_rate = 1.0;
-  config->failure_sample_rate = 1.0;
-  domain_reliability_monitor_->AddContextForTesting(std::move(config));
-  std::move(callback).Run();
-}
-
-void NetworkContext::ForceDomainReliabilityUploadsForTesting(
-    ForceDomainReliabilityUploadsForTestingCallback callback) {
-  domain_reliability_monitor_->ForceUploadsForTesting();
-  std::move(callback).Run();
-}
-
 void NetworkContext::SetSplitAuthCacheByNetworkAnonymizationKey(
     bool split_auth_cache_by_network_anonymization_key) {
   url_request_context_->http_transaction_factory()
@@ -3167,18 +3115,6 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
   }
 #endif  // BUILDFLAG(IS_CT_SUPPORTED)
 
-  if (params_->enable_domain_reliability) {
-    domain_reliability_monitor_ =
-        std::make_unique<domain_reliability::DomainReliabilityMonitor>(
-            result.url_request_context.get(),
-            params_->domain_reliability_upload_reporter,
-            base::BindRepeating(&NetworkContext::CanUploadDomainReliability,
-                                base::Unretained(this)));
-    domain_reliability_monitor_->AddBakedInConfigs();
-    domain_reliability_monitor_->SetDiscardUploads(
-        params_->discard_domain_reliablity_uploads);
-  }
-
   return result;
 }
 
@@ -3308,24 +3244,6 @@ void NetworkContext::DestroySocketManager(P2PSocketManager* socket_manager) {
   socket_managers_.erase(iter);
 }
 #endif  // BUILDFLAG(IS_P2P_ENABLED)
-
-void NetworkContext::CanUploadDomainReliability(
-    const url::Origin& origin,
-    base::OnceCallback<void(bool)> callback) {
-  // If the NetworkContextClient hasn't been set yet or has disconnected for
-  // some reason, just return `false`. This could occur in the case of CCT for
-  // captive portal -- see crbug.com/446496025 for more details, do the similar
-  // check to CanSendSCTAuditingReport().
-  if (!client_) {
-    std::move(callback).Run(false);
-    return;
-  }
-  client_->OnCanSendDomainReliabilityUpload(
-      origin,
-      base::BindOnce([](base::OnceCallback<void(bool)> callback,
-                        bool allowed) { std::move(callback).Run(allowed); },
-                     std::move(callback)));
-}
 
 void NetworkContext::OnVerifyCertComplete(uint64_t cert_verify_id, int result) {
   auto iter = cert_verifier_requests_.find(cert_verify_id);

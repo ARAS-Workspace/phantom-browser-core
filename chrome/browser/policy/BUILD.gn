@@ -796,8 +796,6 @@ source_set("impl") {
     "//components/collaboration/public:prefs",
     "//components/content_settings/core/browser",
     "//components/custom_handlers",
-    "//components/domain_reliability",
-    "//components/domain_reliability:prefs",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
     "//components/history/core/common",

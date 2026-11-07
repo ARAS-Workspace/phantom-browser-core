@@ -37,11 +37,6 @@ namespace subscription_eligibility {
 class SubscriptionEligibilityMetricsProvider;
 }  // namespace subscription_eligibility
 
-class ChromeDomainReliabilityDelegate;
-namespace domain_reliability {
-class TestDomainReliabilityServiceDelegate;
-}
-
 namespace extensions {
 class ChromeGuestViewManagerDelegate;
 class ChromeMetricsPrivateDelegate;
@@ -129,8 +124,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class ChromeContentBrowserClient;
   friend class ChromeMetricsServicesManagerClient;
   friend class browser_sync::ChromeSyncClient;
-  friend class ChromeDomainReliabilityDelegate;
-  friend class domain_reliability::TestDomainReliabilityServiceDelegate;
   friend class extensions::ChromeGuestViewManagerDelegate;
   friend class extensions::ChromeMetricsPrivateDelegate;
   friend class extensions::GlicPrivateInvokeFunction;

@@ -15,7 +15,6 @@
 #include "base/types/optional_ref.h"
 #include "base/types/optional_util.h"
 #include "build/build_config.h"
-#include "components/domain_reliability/monitor.h"
 #include "net/base/features.h"
 #include "net/base/isolation_info.h"
 #include "net/base/load_flags.h"
@@ -155,12 +154,6 @@ int NetworkServiceNetworkDelegate::OnHeadersReceived(
   return chain->GetResult();
 }
 
-void NetworkServiceNetworkDelegate::OnBeforeRedirect(net::URLRequest* request,
-                                                     const GURL& new_location) {
-  if (network_context_->domain_reliability_monitor())
-    network_context_->domain_reliability_monitor()->OnBeforeRedirect(request);
-}
-
 void NetworkServiceNetworkDelegate::OnResponseStarted(net::URLRequest* request,
                                                       int net_error) {
   ForwardProxyErrors(net_error);
@@ -172,11 +165,6 @@ void NetworkServiceNetworkDelegate::OnCompleted(net::URLRequest* request,
   // TODO(mmenke): Once the network service ships on all platforms, can move
   // this logic into URLLoader's completion method.
   DCHECK_NE(net::ERR_IO_PENDING, net_error);
-
-  if (network_context_->domain_reliability_monitor()) {
-    network_context_->domain_reliability_monitor()->OnCompleted(
-        request, started, net_error);
-  }
 
   ForwardProxyErrors(net_error);
 }

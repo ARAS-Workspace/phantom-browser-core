@@ -17,7 +17,6 @@ source_set("upgrade_detector") {
   sources += [
     "build_state.h",
     "upgrade_detector.h",
-    "version_history_client.h",
   ]
   public_deps = [
     "//base",
@@ -55,7 +54,6 @@ source_set("impl") {
   sources += [
     "build_state.cc",
     "upgrade_detector.cc",
-    "version_history_client.cc",
   ]
   deps += [
     ":build_state_observer",
@@ -118,7 +116,6 @@ source_set("unit_tests") {
     "mock_build_state_observer.cc",
     "mock_build_state_observer.h",
     "upgrade_detector_unittest.cc",
-    "version_history_client_unittest.cc",
   ]
 
   public_deps = [ ":build_state_observer" ]

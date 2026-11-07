@@ -117,10 +117,6 @@ namespace certificate_transparency {
 class ChromeRequireCTDelegate;
 }  // namespace certificate_transparency
 
-namespace domain_reliability {
-class DomainReliabilityMonitor;
-}  // namespace domain_reliability
-
 namespace url_matcher {
 class URLMatcher;
 }
@@ -334,9 +330,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   void ClearNetworkErrorLogging(
       mojom::ClearDataFilterPtr filter,
       ClearNetworkErrorLoggingCallback callback) override;
-  void ClearDomainReliability(mojom::ClearDataFilterPtr filter,
-                              DomainReliabilityClearMode mode,
-                              ClearDomainReliabilityCallback callback) override;
   void CloseAllConnections(CloseAllConnectionsCallback callback) override;
   void CloseIdleConnections(CloseIdleConnectionsCallback callback) override;
   void SetNetworkConditions(
@@ -538,12 +531,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   void QueueSignedExchangeReport(
       mojom::SignedExchangeReportPtr report,
       const net::NetworkAnonymizationKey& network_anonymization_key) override;
-  void AddDomainReliabilityContextForTesting(
-      const url::Origin& origin,
-      const GURL& upload_url,
-      AddDomainReliabilityContextForTestingCallback callback) override;
-  void ForceDomainReliabilityUploadsForTesting(
-      ForceDomainReliabilityUploadsForTestingCallback callback) override;
   void SetSplitAuthCacheByNetworkAnonymizationKey(
       bool split_auth_cache_by_network_anonymization_key) override;
   void SaveHttpAuthCacheProxyEntries(
@@ -676,10 +663,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   void CreateTrustedUrlLoaderFactoryForNetworkService(
       mojo::PendingReceiver<mojom::URLLoaderFactory>
           url_loader_factory_pending_receiver);
-
-  domain_reliability::DomainReliabilityMonitor* domain_reliability_monitor() {
-    return domain_reliability_monitor_.get();
-  }
 
   // The http_auth_dynamic_params_ would be used to populate
   // the |http_auth_merged_preferences| of the given NetworkContext.
@@ -870,9 +853,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   void DestroySocketManager(P2PSocketManager* socket_manager);
 #endif  // BUILDFLAG(IS_P2P_ENABLED)
 
-  void CanUploadDomainReliability(const url::Origin& origin,
-                                  base::OnceCallback<void(bool)> callback);
-
   void VerifyCertInternal(
       const scoped_refptr<net::X509Certificate>& certificate,
       const net::HostPortPair& host_port,
@@ -931,9 +911,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   // SharedDictionaryNetworkTransactionFactory. So `url_request_context_owner_`
   // needs to be defined after `shared_dictionary_manager_`.
   std::unique_ptr<SharedDictionaryManager> shared_dictionary_manager_;
-
-  std::unique_ptr<domain_reliability::DomainReliabilityMonitor>
-      domain_reliability_monitor_;
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
   // This must be declared before `url_request_context_owner_` because the

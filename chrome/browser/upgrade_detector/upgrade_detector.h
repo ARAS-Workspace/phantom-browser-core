@@ -228,18 +228,6 @@ class UpgradeDetector {
   // annoyance levels.
   static base::TimeDelta GetGracePeriod(base::TimeDelta elevated_to_high_delta);
 
-  // Returns true if `last_served_date_` is known and older than the number
-  // of days specified by the RelaunchFastIfOutdated policy.
-  bool ShouldRelaunchFast();
-
-  // Returns true if the last served date should be fetched on update, for
-  // the RelaunchOutdatedInstall policy.
-  bool ShouldFetchLastServedDate() const;
-
-  // Fetches the last served date via GetLastServedDate(), and updates
-  // `last_served_date_`.
-  void FetchLastServedDate();
-
   const base::Clock* clock() {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     return clock_;
@@ -329,10 +317,9 @@ class UpgradeDetector {
   friend class UpgradeMetricsProviderTest;
   friend class UpdateMetricsProviderBrowserTest;
 
-  // Called on the UI thread after one or more monitored prefs or
-  // `last_served_date_` have changed. If an update has been detected,
-  // subclasses may need to recompute the schedule for advancing through the
-  // annoyance levels.
+  // Called on the UI thread after one or more monitored prefs have changed. If
+  // an update has been detected, subclasses may need to recompute the schedule
+  // for advancing through the annoyance levels.
   virtual void RecomputeSchedule() {}
 
   // Initiates an Idle check. Tells us whether Chrome has received any
@@ -343,9 +330,6 @@ class UpgradeDetector {
   // preferences. Posts a task to call OnThresholdPrefChanged() if it isn't
   // already posted and pending for execution.
   void OnRelaunchPrefChanged();
-
-  // Handles the result of GetLastServedDate().
-  void OnGotLastServedDate(std::optional<base::Time> last_served_date);
 
   // A provider of Time to the detector.
   const raw_ptr<const base::Clock> clock_;
@@ -388,9 +372,6 @@ class UpgradeDetector {
   // Whether we have waited long enough after detecting an upgrade (to see
   // is we should start nagging about upgrading).
   bool notify_upgrade_;
-
-  bool fetched_last_served_date_ = false;
-  std::optional<base::Time> last_served_date_;
 
   SEQUENCE_CHECKER(sequence_checker_);
 

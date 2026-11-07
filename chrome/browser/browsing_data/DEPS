@@ -41,7 +41,6 @@ include_rules = [
   "+chrome/browser/crash_upload_list/crash_upload_list.h",
   "+chrome/browser/critical_actions/critical_action_factory.h",
   "+chrome/browser/custom_handlers/protocol_handler_registry_factory.h",
-  "+chrome/browser/domain_reliability/service_factory.h",
   "+chrome/browser/downgrade/snapshot_file_collector.h",
   "+chrome/browser/downgrade/user_data_downgrade.h",
   "+chrome/browser/download/chrome_download_manager_delegate.h",

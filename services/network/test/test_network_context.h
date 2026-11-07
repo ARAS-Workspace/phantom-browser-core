@@ -129,10 +129,6 @@ class TestNetworkContext : public mojom::NetworkContext {
   void ClearNetworkErrorLogging(
       mojom::ClearDataFilterPtr filter,
       ClearNetworkErrorLoggingCallback callback) override {}
-  void ClearDomainReliability(
-      mojom::ClearDataFilterPtr filter,
-      DomainReliabilityClearMode mode,
-      ClearDomainReliabilityCallback callback) override {}
   void ClearTrustTokenData(mojom::ClearDataFilterPtr filter,
                            ClearTrustTokenDataCallback callback) override {}
   void ClearTrustTokenSessionOnlyData(
@@ -334,12 +330,6 @@ class TestNetworkContext : public mojom::NetworkContext {
   void DeleteDynamicDataForHost(
       const std::string& host,
       DeleteDynamicDataForHostCallback callback) override {}
-  void AddDomainReliabilityContextForTesting(
-      const url::Origin& origin,
-      const GURL& upload_url,
-      AddDomainReliabilityContextForTestingCallback callback) override {}
-  void ForceDomainReliabilityUploadsForTesting(
-      ForceDomainReliabilityUploadsForTestingCallback callback) override {}
   void SetSplitAuthCacheByNetworkAnonymizationKey(
       bool split_auth_cache_by_network_anonymization_key) override {}
   void SaveHttpAuthCacheProxyEntries(

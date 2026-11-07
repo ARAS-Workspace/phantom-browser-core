@@ -41,7 +41,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/crash_upload_list/crash_upload_list.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
-#include "chrome/browser/domain_reliability/service_factory.h"
 #include "chrome/browser/downgrade/snapshot_file_collector.h"
 #include "chrome/browser/downgrade/user_data_downgrade.h"  // nogncheck
 #include "chrome/browser/download/download_core_service.h"
@@ -204,23 +203,8 @@ bool DoesOriginMatchEmbedderMask(uint64_t origin_type_mask,
 
 ChromeBrowsingDataRemoverDelegate::ChromeBrowsingDataRemoverDelegate(
     BrowserContext* browser_context)
-    : profile_(Profile::FromBrowserContext(browser_context))
-      ,
-      credential_store_(MakeCredentialStore()) {
-  domain_reliability_clearer_ = base::BindRepeating(
-      [](BrowserContext* browser_context,
-         content::BrowsingDataFilterBuilder* filter_builder,
-         network::mojom::NetworkContext_DomainReliabilityClearMode mode,
-         network::mojom::NetworkContext::ClearDomainReliabilityCallback
-             callback) {
-        network::mojom::NetworkContext* network_context =
-            browser_context->GetDefaultStoragePartition()->GetNetworkContext();
-        network_context->ClearDomainReliability(
-            filter_builder->BuildNetworkServiceFilter(), mode,
-            std::move(callback));
-      },
-      browser_context);
-}
+    : profile_(Profile::FromBrowserContext(browser_context)),
+      credential_store_(MakeCredentialStore()) {}
 
 ChromeBrowsingDataRemoverDelegate::~ChromeBrowsingDataRemoverDelegate() =
     default;
@@ -933,22 +917,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // Domain reliability.
-  if (remove_mask & (content::BrowsingDataRemover::DATA_TYPE_COOKIES |
-                     constants::DATA_TYPE_HISTORY)) {
-    network::mojom::NetworkContext_DomainReliabilityClearMode mode;
-    if (remove_mask & content::BrowsingDataRemover::DATA_TYPE_COOKIES)
-      mode = network::mojom::NetworkContext::DomainReliabilityClearMode::
-          CLEAR_CONTEXTS;
-    else
-      mode = network::mojom::NetworkContext::DomainReliabilityClearMode::
-          CLEAR_BEACONS;
-    domain_reliability_clearer_.Run(filter_builder, mode,
-                                    CreateTaskCompletionClosureForMojo(
-                                        TracingDataType::kDomainReliability));
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // Persisted isolated origins.
   // Clear persisted isolated origins when cookies and other site data are
   // cleared (DATA_TYPE_ISOLATED_ORIGINS is part of DATA_TYPE_SITE_DATA), or
@@ -1199,8 +1167,6 @@ const char* ChromeBrowsingDataRemoverDelegate::GetHistogramSuffix(
       return "AutofillData";
     case TracingDataType::kAutofillOrigins:
       return "AutofillOrigins";
-    case TracingDataType::kDomainReliability:
-      return "DomainReliability";
     case TracingDataType::kWebrtcLogs:
       return "WebrtcLogs";
     case TracingDataType::kVideoDecodeHistory:
@@ -1293,12 +1259,6 @@ void ChromeBrowsingDataRemoverDelegate::RecordUnfinishedSubTasks() {
     UMA_HISTOGRAM_ENUMERATION(
         "History.ClearBrowsingData.Duration.SlowTasks180sChrome", task);
   }
-}
-
-void ChromeBrowsingDataRemoverDelegate::
-    OverrideDomainReliabilityClearerForTesting(
-        DomainReliabilityClearer clearer) {
-  domain_reliability_clearer_ = std::move(clearer);
 }
 
 bool ChromeBrowsingDataRemoverDelegate::IsForAllTime() const {

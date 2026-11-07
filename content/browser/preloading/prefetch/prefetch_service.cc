@@ -1748,7 +1748,6 @@ PrefetchService::CreateIsolatedNetworkContext(
   // Explicitly disallow network service features which could cause a privacy
   // leak.
   context_params->enable_certificate_reporting = false;
-  context_params->enable_domain_reliability = false;
 
   mojo::Remote<network::mojom::NetworkContext> network_context;
   CreateNetworkContextInNetworkService(

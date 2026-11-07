@@ -35,7 +35,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/domain_reliability/service_factory.h"
 #include "chrome/browser/first_party_sets/first_party_sets_policy_service.h"
 #include "chrome/browser/first_party_sets/first_party_sets_policy_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"
@@ -65,7 +64,6 @@
 #include "components/language/core/browser/language_prefs.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/metrics/metrics_pref_names.h"
-#include "components/metrics/metrics_reporting_choice_service.h"
 #include "components/permissions/features.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -125,28 +123,7 @@
 #include "components/unexportable_keys/mojom/unexportable_key_service_proxy_impl.h"  // nogncheck
 #endif
 
-#include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
-#include "components/domain_reliability/domain_reliability_prefs.h"
-
-class ChromeDomainReliabilityDelegate
-    : public domain_reliability::DomainReliabilityServiceDelegate {
- public:
-  ChromeDomainReliabilityDelegate() = default;
-  ~ChromeDomainReliabilityDelegate() override = default;
-
-  bool IsDomainReliabilityAllowed() const override {
-    return g_browser_process->local_state()->GetBoolean(
-        domain_reliability::prefs::kDomainReliabilityAllowedByPolicy);
-  }
-
-  bool IsMetricsAndCrashReportingEnabled() const override {
-    return ChromeMetricsServiceAccessor::IsMetricsAndCrashReportingEnabled();
-  }
-};
-
 namespace {
-
-bool* g_discard_domain_reliability_uploads_for_testing = nullptr;
 
 const char kHttpCacheFinchExperimentGroups[] =
     "profile_network_context_service.http_cache_finch_experiment_groups";
@@ -1028,11 +1005,6 @@ void ProfileNetworkContextService::FlushProxyConfigMonitorForTesting() {
   proxy_config_monitor_->FlushForTesting();  // IN-TEST
 }
 
-void ProfileNetworkContextService::SetDiscardDomainReliabilityUploadsForTesting(
-    bool value) {
-  g_discard_domain_reliability_uploads_for_testing = new bool(value);
-}
-
 std::unique_ptr<net::ClientCertStore>
 ProfileNetworkContextService::CreateClientCertStore() {
   if (is_shutting_down_) {
@@ -1190,19 +1162,6 @@ void ProfileNetworkContextService::ConfigureNetworkContextParamsInternal(
 
   network_context_params->ct_policy = GetCTPolicy();
   cert_verifier_creation_params->ct_policy = GetCTPolicy();
-
-  ChromeDomainReliabilityDelegate delegate;
-  if (domain_reliability::ShouldCreateService(&delegate)) {
-    network_context_params->enable_domain_reliability = true;
-    network_context_params->domain_reliability_upload_reporter =
-        domain_reliability::kUploadReporterString;
-    network_context_params->discard_domain_reliablity_uploads =
-        g_discard_domain_reliability_uploads_for_testing
-            ? *g_discard_domain_reliability_uploads_for_testing
-            : !metrics::MetricsReportingChoiceService::
-                  IsBasicMetricsReportingEnabled(
-                      g_browser_process->local_state());
-  }
 
   // TODO(crbug.com/40928765): check to see if IsManaged() ensures the pref
   // isn't set in user profiles, or if that does something else. If that's true,

@@ -25,12 +25,10 @@
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/ui/browser_otr_state.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/upgrade_detector/version_history_client.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
-#include "components/version_info/version_info.h"
 #include "ui/base/idle/idle.h"
 
 namespace {
@@ -108,17 +106,6 @@ base::Time ComputeRelaunchWindowStartForDay(
   return window_start;
 }
 
-// Returns the value of the RelaunchFastIfOutdated policy, or a zero TimeDelta
-// if the policy is unset.
-base::TimeDelta GetRelaunchFastIfOutdated() {
-  auto* local_state = g_browser_process->local_state();
-  if (!local_state) {
-    return base::TimeDelta();
-  }
-  return base::Days(
-      local_state->GetInteger(prefs::kRelaunchFastIfOutdated));
-}
-
 }  // namespace
 
 // static
@@ -134,7 +121,6 @@ void UpgradeDetector::Init() {
     pref_change_registrar_.Init(local_state);
     MonitorPrefChanges(prefs::kRelaunchNotificationPeriod);
     MonitorPrefChanges(prefs::kRelaunchWindow);
-    MonitorPrefChanges(prefs::kRelaunchFastIfOutdated);
   }
 }
 
@@ -346,36 +332,6 @@ base::TimeDelta UpgradeDetector::GetGracePeriod(
 }
 
 // static
-bool UpgradeDetector::ShouldRelaunchFast() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!last_served_date_.has_value()) {
-    return false;
-  }
-  base::TimeDelta max_age = GetRelaunchFastIfOutdated();
-  if (max_age.is_zero()) {
-    return false;
-  }
-  return base::Time::Now() - last_served_date_.value() > max_age;
-}
-
-bool UpgradeDetector::ShouldFetchLastServedDate() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return !fetched_last_served_date_ &&
-         !GetRelaunchFastIfOutdated().is_zero();
-}
-
-void UpgradeDetector::FetchLastServedDate() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (fetched_last_served_date_) {
-    // Only do it once.
-    return;
-  }
-  fetched_last_served_date_ = true;
-  GetLastServedDate(version_info::GetVersion(),
-                    base::BindOnce(&UpgradeDetector::OnGotLastServedDate,
-                                   weak_factory_.GetWeakPtr()));
-}
-
 void UpgradeDetector::NotifyUpgrade() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   // An implementation will request that a notification be sent after dropping
@@ -511,13 +467,4 @@ void UpgradeDetector::OnRelaunchPrefChanged() {
                        }
                      },
                      weak_factory_.GetWeakPtr()));
-}
-
-void UpgradeDetector::OnGotLastServedDate(
-    std::optional<base::Time> last_served_date) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (last_served_date.has_value()) {
-    last_served_date_ = last_served_date;
-    RecomputeSchedule();
-  }
 }

@@ -79,13 +79,6 @@ class ChromeBrowsingDataRemoverDelegate
   void OnStartRemoving() override;
   void OnDoneRemoving() override;
 
-  using DomainReliabilityClearer = base::RepeatingCallback<void(
-      content::BrowsingDataFilterBuilder* filter_builder,
-      network::mojom::NetworkContext_DomainReliabilityClearMode,
-      network::mojom::NetworkContext::ClearDomainReliabilityCallback)>;
-  void OverrideDomainReliabilityClearerForTesting(
-      DomainReliabilityClearer clearer);
-
  private:
   using WebRtcEventLogManager = webrtc_event_logging::WebRtcEventLogManager;
 
@@ -102,7 +95,7 @@ class ChromeBrowsingDataRemoverDelegate
     kAutofillOrigins = 7,
     // kPluginData = 8, deprecated
     // kFlashLsoHelper = 9, deprecated
-    kDomainReliability = 10,
+    // kDomainReliability = 10, deprecated
     // kNetworkPredictor = 11, deprecated
     kWebrtcLogs = 12,
     kVideoDecodeHistory = 13,
@@ -211,8 +204,6 @@ class ChromeBrowsingDataRemoverDelegate
   // Fires after some time to track slow tasks. Cancelled when all tasks
   // are finished.
   base::CancelableOnceClosure slow_pending_tasks_closure_;
-
-  DomainReliabilityClearer domain_reliability_clearer_;
 
   // Used if we need to clear history.
   base::CancelableTaskTracker history_task_tracker_;

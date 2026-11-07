@@ -60,7 +60,6 @@
 #include "components/content_settings/core/browser/cookie_settings_policy_handler.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/custom_handlers/pref_names.h"
-#include "components/domain_reliability/domain_reliability_prefs.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/language/core/browser/pref_names.h"
@@ -200,9 +199,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kForcePermissionPolicyUnloadDefaultEnabled,
     policy_prefs::kForcePermissionPolicyUnloadDefaultEnabled,
     base::Value::Type::BOOLEAN},
-  { key::kDomainReliabilityAllowed,
-    domain_reliability::prefs::kDomainReliabilityAllowedByPolicy,
-    base::Value::Type::BOOLEAN },
   { key::kEditBookmarksEnabled,
     bookmarks::prefs::kEditBookmarksEnabled,
     base::Value::Type::BOOLEAN },
@@ -551,9 +547,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::INTEGER },
   { key::kRelaunchNotificationPeriod,
     prefs::kRelaunchNotificationPeriod,
-    base::Value::Type::INTEGER },
-  { key::kRelaunchFastIfOutdated,
-    prefs::kRelaunchFastIfOutdated,
     base::Value::Type::INTEGER },
   { key::kRemoteDebuggingAllowed,
     prefs::kDevToolsRemoteDebuggingAllowed,

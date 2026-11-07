@@ -944,7 +944,6 @@ const std::vector<std::string> kSupportsOriginFilteringImpl{
     "TrustTokens",
 };
 const std::vector<std::string> kSupportsOriginFilteringDelegate{
-    "DomainReliability",
     "MediaDeviceSalts",
     "Synchronous",
 };

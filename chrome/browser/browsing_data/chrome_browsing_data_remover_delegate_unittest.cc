@@ -49,7 +49,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/critical_actions/critical_action_factory.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
-#include "chrome/browser/domain_reliability/service_factory.h"
 #include "chrome/browser/download/chrome_download_manager_delegate.h"
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/download/download_core_service_impl.h"
@@ -108,8 +107,6 @@
 #include "components/custom_handlers/protocol_handler.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/custom_handlers/test_protocol_handler_registry_delegate.h"
-#include "components/domain_reliability/clear_mode.h"
-#include "components/domain_reliability/monitor.h"
 #include "components/favicon/core/favicon_service.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/common/pref_names.h"
@@ -225,8 +222,6 @@
 #endif  // BUILDFLAG(ENABLE_REPORTING)
 
 using content::BrowsingDataFilterBuilder;
-using domain_reliability::DomainReliabilityClearMode;
-using domain_reliability::DomainReliabilityMonitor;
 using testing::_;
 using testing::ByRef;
 using testing::Eq;
@@ -456,45 +451,6 @@ std::unique_ptr<KeyedService> BuildProtocolHandlerRegistry(
       profile->GetPrefs(),
       std::make_unique<custom_handlers::TestProtocolHandlerRegistryDelegate>());
 }
-
-class ClearDomainReliabilityTester {
- public:
-  explicit ClearDomainReliabilityTester(TestingProfile* profile) {
-    static_cast<ChromeBrowsingDataRemoverDelegate*>(
-        profile->GetBrowsingDataRemoverDelegate())
-        ->OverrideDomainReliabilityClearerForTesting(base::BindRepeating(
-            &ClearDomainReliabilityTester::Clear, base::Unretained(this)));
-  }
-
-  unsigned clear_count() const { return clear_count_; }
-
-  network::mojom::NetworkContext::DomainReliabilityClearMode last_clear_mode()
-      const {
-    return last_clear_mode_;
-  }
-
-  const base::RepeatingCallback<bool(const GURL&)>& last_filter() const {
-    return last_filter_;
-  }
-
- private:
-  void Clear(
-      content::BrowsingDataFilterBuilder* filter_builder,
-      network::mojom::NetworkContext_DomainReliabilityClearMode mode,
-      network::mojom::NetworkContext::ClearDomainReliabilityCallback callback) {
-    ++clear_count_;
-    last_clear_mode_ = mode;
-    std::move(callback).Run();
-
-    last_filter_ = filter_builder->MatchesAllOriginsAndDomains()
-                       ? base::RepeatingCallback<bool(const GURL&)>()
-                       : filter_builder->BuildUrlFilter();
-  }
-
-  unsigned clear_count_ = 0;
-  network::mojom::NetworkContext::DomainReliabilityClearMode last_clear_mode_;
-  base::RepeatingCallback<bool(const GURL&)> last_filter_;
-};
 
 class RemovePermissionPromptCountsTest {
  public:
@@ -1597,119 +1553,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, ZeroSuggestPrefsBasedCacheClear) {
   EXPECT_EQ(content::BrowsingDataRemover::DATA_TYPE_COOKIES, GetRemovalMask());
   EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
             GetOriginTypeMask());
-}
-
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, DomainReliability_Null) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  EXPECT_EQ(0u, tester.clear_count());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, DomainReliability_Beacons) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_HISTORY, false);
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(
-      network::mojom::NetworkContext::DomainReliabilityClearMode::CLEAR_BEACONS,
-      tester.last_clear_mode());
-  EXPECT_TRUE(tester.last_filter().is_null());
-}
-
-// TODO(crbug.com/40458377): Disabled, since history is not yet marked as
-// a filterable datatype.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DISABLED_DomainReliability_Beacons_WithFilter) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  std::unique_ptr<BrowsingDataFilterBuilder> builder(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kDelete));
-  builder->AddRegisterableDomain(kTestRegisterableDomain1);
-
-  BlockUntilOriginDataRemoved(base::Time(), base::Time::Max(),
-                              constants::DATA_TYPE_HISTORY, builder->Copy());
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(
-      network::mojom::NetworkContext::DomainReliabilityClearMode::CLEAR_BEACONS,
-      tester.last_clear_mode());
-  EXPECT_TRUE(
-      ProbablySameFilters(builder->BuildUrlFilter(), tester.last_filter()));
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, DomainReliability_Contexts) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(network::mojom::NetworkContext::DomainReliabilityClearMode::
-                CLEAR_CONTEXTS,
-            tester.last_clear_mode());
-  EXPECT_TRUE(tester.last_filter().is_null());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DomainReliability_Contexts_WithFilter) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  std::unique_ptr<BrowsingDataFilterBuilder> builder(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kDelete));
-  builder->AddRegisterableDomain(kTestRegisterableDomain1);
-
-  BlockUntilOriginDataRemoved(base::Time(), base::Time::Max(),
-                              content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                              builder->Copy());
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(network::mojom::NetworkContext::DomainReliabilityClearMode::
-                CLEAR_CONTEXTS,
-            tester.last_clear_mode());
-  EXPECT_TRUE(
-      ProbablySameFilters(builder->BuildUrlFilter(), tester.last_filter()));
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, DomainReliability_ContextsWin) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  BlockUntilBrowsingDataRemoved(
-      base::Time(), base::Time::Max(),
-      constants::DATA_TYPE_HISTORY |
-          content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-      false);
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(network::mojom::NetworkContext::DomainReliabilityClearMode::
-                CLEAR_CONTEXTS,
-            tester.last_clear_mode());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DomainReliability_ProtectedOrigins) {
-  ClearDomainReliabilityTester tester(GetProfile());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                true);
-  EXPECT_EQ(1u, tester.clear_count());
-  EXPECT_EQ(network::mojom::NetworkContext::DomainReliabilityClearMode::
-                CLEAR_CONTEXTS,
-            tester.last_clear_mode());
-}
-
-// TODO(juliatuttle): This isn't actually testing the no-monitor case, since
-// BrowsingDataRemoverTest now creates one unconditionally, since it's needed
-// for some unrelated test cases. This should be fixed so it tests the no-
-// monitor case again.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DISABLED_DomainReliability_NoMonitor) {
-  BlockUntilBrowsingDataRemoved(
-      base::Time(), base::Time::Max(),
-      constants::DATA_TYPE_HISTORY |
-          content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-      false);
 }
 
 // Tests that the deletion of downloads completes successfully and that

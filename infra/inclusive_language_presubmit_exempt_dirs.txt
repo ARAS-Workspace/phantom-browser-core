@@ -110,7 +110,6 @@ components/browser_ui/util/android/java/src/org/chromium/components/browser_ui/u
 components/cbor
 components/certificate_transparency
 components/cronet/gn2bp/templates
-components/domain_reliability
 components/gcm_driver
 components/input
 components/metrics
