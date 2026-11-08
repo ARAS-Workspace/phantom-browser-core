@@ -218,7 +218,6 @@ Refer to README.md for content description and update process.
  <item id="gemini_antiscam_protection_model_execution" added_in_milestone="146" content_hash_code="07503f35" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="skills_model_execution" added_in_milestone="146" content_hash_code="02f1c115" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="settings_overridden_dialog_icon_fetcher" added_in_milestone="147" content_hash_code="040080cc" os_list="windows,linux,chromeos" file_path="chrome/browser/ui/extensions/settings_overridden_params_providers.cc" />
- <item id="fetch_email_one_time_token" added_in_milestone="148" content_hash_code="02856672" os_list="linux,windows,android,chromeos" file_path="components/one_time_tokens/core/browser/email_one_time_token_fetcher.cc" />
  <item id="finds_model_execution" added_in_milestone="148" content_hash_code="05f6c664" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="device_management_enrollment" added_in_milestone="149" content_hash_code="0446a753" os_list="linux,windows,android,chromeos" file_path="components/policy/core/common/cloud/device_management_service.cc" />
  <item id="device_management_reporting" added_in_milestone="149" content_hash_code="07f8910c" os_list="linux,windows,android,chromeos" file_path="components/policy/core/common/cloud/device_management_service.cc" />
@@ -241,5 +240,4 @@ Refer to README.md for content description and update process.
  <item id="read_aloud_synthesize" added_in_milestone="152" content_hash_code="01f5f507" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
  <item id="safe_browsing_v5_get_hash" added_in_milestone="152" content_hash_code="042aa735" os_list="linux,windows,android,chromeos" file_path="components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.cc" />
  <item id="iwa_dev_ui_update_manifest" added_in_milestone="153" type="partial" second_id="iwa_update_manifest_fetcher" content_hash_code="03008323" os_list="linux,windows,chromeos" semantics_fields="1,2,3,6" policy_fields="3,5" file_path="chrome/browser/ui/webui/iwa_dev/iwa_dev_page_handler.cc" />
- <item id="fetch_user_data_processing_consent" added_in_milestone="153" content_hash_code="036ac1e5" os_list="linux,windows,android,chromeos" file_path="components/one_time_tokens/core/browser/user_data_processing_consent_fetcher.cc" />
 </annotations>

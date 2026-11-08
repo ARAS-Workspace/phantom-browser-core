@@ -114,7 +114,7 @@ enum class OAuthConsumerId {
   kAccessibilityAnnotator = 91,
   kActorLoginPermissionService = 92,
   // kGapisService = 93, // Removed due to deprecation.
-  kOneTimeTokenService = 94,
+  // kOneTimeTokenService = 94, // Removed due to deprecation.
   kMultistepFilter = 95,
   kIndigo = 96,
   kGlicInvokeApi = 97,

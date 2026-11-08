@@ -97,12 +97,6 @@ constexpr char kGCMCheckinServerOAuth2Scope[] =
     "https://www.googleapis.com/auth/android_checkin";
 constexpr char kGCMGroupServerOAuth2Scope[] =
     "https://www.googleapis.com/auth/gcm";
-// OAuth2 scope for readonly access to Gmail metadata.
-constexpr char kGmailMetadataOAuth2Scope[] =
-    "https://www.googleapis.com/auth/gmail.metadata";
-// OAuth2 scope for readonly access to Gmail OTP email data.
-constexpr char kGmailOtpReadonlyOAuth2Scope[] =
-    "https://www.googleapis.com/auth/gmail.otp.readonly";
 // OAuth 2 scope for the k-Anonymity Service API.
 constexpr char kKAnonymityServiceOAuth2Scope[] =
     "https://www.googleapis.com/auth/chromekanonymity";
@@ -127,9 +121,6 @@ constexpr char kNearbyPresenceOAuth2Scope[] =
 // OAuth2 scope for access to nearby sharing.
 constexpr char kNearbyShareOAuth2Scope[] =
     "https://www.googleapis.com/auth/nearbysharing-pa";
-// OAuth2 scope for One Time Token Service.
-constexpr char kOneTimeTokenOAuth2Scope[] =
-    "https://www.googleapis.com/auth/chrome.passwords.onetimetoken";
 // OAuth2 scopes for Optimization Guide.
 constexpr char kOptimizationGuideServiceGetHintsOAuth2Scope[] =
     "https://www.googleapis.com/auth/chrome-optimization-guide";
@@ -301,7 +292,6 @@ constexpr char kWalletPassesName[] = "wallet_passes";
 constexpr char kAccessibilityAnnotatorName[] = "accessibility_annotator";
 constexpr char kActorLoginPermissionServiceName[] =
     "actor_login_permission_service";
-constexpr char kOneTimeTokenServiceName[] = "one_time_token_service";
 constexpr char kMultistepFilterName[] = "multistep_filter";
 constexpr char kContextMemoryServiceName[] = "context_memory_service";
 constexpr char kSyncPreviewName[] = "chromesync_preview";
@@ -669,11 +659,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kActorLoginPermissionServiceName,
           /*scopes=*/{kAgenticPermissionOAuth2Scope});
-    case OAuthConsumerId::kOneTimeTokenService:
-      return OAuthConsumer(
-          /*name=*/kOneTimeTokenServiceName,
-          /*scopes=*/{kOneTimeTokenOAuth2Scope, kGmailMetadataOAuth2Scope,
-                      kGmailOtpReadonlyOAuth2Scope});
     case OAuthConsumerId::kMultistepFilter:
       return OAuthConsumer(
           /*name=*/kMultistepFilterName,

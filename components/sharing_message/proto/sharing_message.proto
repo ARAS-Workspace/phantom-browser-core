@@ -7,7 +7,6 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "org.chromium.components.sharing_message.proto";
 
-import "one_time_token_backend_notification.proto";
 import "optimization_guide_push_notification.proto";
 import "peer_connection_messages.proto";
 import "remote_copy_message.proto";
@@ -20,8 +19,9 @@ option optimize_for = LITE_RUNTIME;
 // Message for sending between devices in Sharing.
 // Next tag: 19
 message SharingMessage {
-  reserved 4, 5, 18;
-  reserved "shared_clipboard_message", "glic_experimental_triggering";
+  reserved 4, 5, 17, 18;
+  reserved "shared_clipboard_message", "glic_experimental_triggering",
+      "one_time_token_backend_notification";
 
   // Identifier of sender. required unless any of the following is true:
   // 1. payload is a AckMessage
@@ -40,7 +40,6 @@ message SharingMessage {
     DiscoveryRequest discovery_request = 13;
     WebRtcSignalingMessage web_rtc_signaling_frame = 14;
     OptimizationGuidePushNotification optimization_guide_push_notification = 16;
-    OneTimeTokenBackendNotification one_time_token_backend_notification = 17;
   }
 
   oneof ack_channel_configuration {
