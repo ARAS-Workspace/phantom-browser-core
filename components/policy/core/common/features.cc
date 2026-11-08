@@ -16,23 +16,6 @@ namespace policy::features {
 BASE_FEATURE(kProfileSeparationDomainExceptionListRetroactive,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kEnhancedSecurityEventFields, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kUseCECFlagInPolicyData, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables a configurable delay for policy registration.
-BASE_FEATURE(kCustomPolicyRegistrationDelay, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta> kPolicyRegistrationDelay{
-    &kCustomPolicyRegistrationDelay, "PolicyRegistrationDelay", base::Hours(6)};
-
-// Used to enable extension install policy support.
-BASE_FEATURE(kEnableExtensionInstallPolicyFetching,
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
 // When enabled, uses ManagementService to determine whether to honor sensitive
 // policies. When disabled, falls back to the original ShouldHonorPolicies()
 // behavior.

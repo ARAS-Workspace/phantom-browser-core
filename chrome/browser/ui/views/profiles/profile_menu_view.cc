@@ -505,13 +505,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
         GetManagedUiIcon(&profile()), ui::kColorIcon);
   }
 
-  // Clarify Dasherless profile with subtitle while not adding the button.
-  if (entry.IsDasherlessManagement()) {
-    params.subtitle =
-        l10n_util::GetStringUTF16(IDS_PROFILES_DASHER_FEATURE_DISABLED_TITLE);
-    return params;
-  }
-
   syncer::SyncService* service = SyncServiceFactory::GetForProfile(&profile());
   syncer::SyncService::UserActionableError error =
       syncer::SyncService::UserActionableError::kNone;

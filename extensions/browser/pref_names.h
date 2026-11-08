@@ -148,12 +148,6 @@ inline constexpr char kPrefIncognitoContentSettings[] =
 inline constexpr char kGlobalShortcutsUuid[] =
     "extensions.global_shortcuts.uuid";
 
-// Boolean that specifies whether ExtensionInstallCloudPolicyChecks is enabled.
-// This pref is used by both the profile and the browser, it can be found in the
-// local state as well as the profile prefs.
-inline constexpr char kExtensionInstallCloudPolicyChecksEnabled[] =
-    "extensions.install.cloud_policy_checks_enabled";
-
 // A pref that stores whether the extension was pinned to the toolbar by default
 // upon installation. This excludes extensions that are pinned by default due to
 // policies.

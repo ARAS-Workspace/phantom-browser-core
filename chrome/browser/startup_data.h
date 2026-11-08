@@ -18,7 +18,6 @@ class PrefRegistrySyncable;
 namespace policy {
 class ProfilePolicyConnector;
 class SchemaRegistryService;
-class UserCloudPolicyManager;
 }  // namespace policy
 
 namespace sync_preferences {

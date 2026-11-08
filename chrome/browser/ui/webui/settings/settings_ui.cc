@@ -207,8 +207,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
           ->GetProfileAttributesStorage()
           .GetProfileAttributesWithPath(profile->GetPath());
 
-  html_source->AddBoolean("isDasherlessProfile",
-                          entry && entry->IsDasherlessManagement());
+  html_source->AddBoolean("isDasherlessProfile", false);
 
   html_source->AddBoolean("hasEnterpriseLabel",
                           entry && !entry->GetEnterpriseProfileLabel().empty());

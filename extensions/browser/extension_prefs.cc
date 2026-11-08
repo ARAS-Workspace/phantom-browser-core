@@ -2155,12 +2155,6 @@ AppSorting* ExtensionPrefs::app_sorting() const {
   return ExtensionSystem::Get(browser_context_)->app_sorting();
 }
 
-void ExtensionPrefs::RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
-  registry->RegisterBooleanPref(
-      pref_names::kExtensionInstallCloudPolicyChecksEnabled,
-      /*default_value=*/false);
-}
-
 // static
 void ExtensionPrefs::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
@@ -2198,10 +2192,6 @@ void ExtensionPrefs::RegisterProfilePrefs(
   registry->RegisterBooleanPref(
       ManifestV2Handler::kMV2UnsupportedAcknowledgedGloballyPref.name, false);
   registry->RegisterStringPref(pref_names::kGlobalShortcutsUuid, std::string());
-
-  registry->RegisterBooleanPref(
-      pref_names::kExtensionInstallCloudPolicyChecksEnabled,
-      /*default_value=*/false);
 
   registry->RegisterListPref(pref_names::kInitialInstallList);
   registry->RegisterStringPref(pref_names::kInitialInstallProviderName,

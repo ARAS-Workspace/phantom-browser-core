@@ -29,26 +29,6 @@ source_set("policy_namespace_internal") {
   ]
 }
 
-source_set("util") {
-  sources = [
-    "cloud/cloud_policy_util.cc",
-    "cloud/cloud_policy_util.h",
-  ]
-
-  configs += [ "//components/policy:component_implementation" ]
-
-  public_deps = [
-    ":common_constants",
-    "//components/policy/proto",
-    "//components/version_info",
-  ]
-
-  deps = [
-    "//base",
-    "//net",
-  ]
-}
-
 source_set("internal") {
   visibility = [
     "//components/policy/*",
@@ -66,61 +46,6 @@ source_set("internal") {
     "chrome_schema.h",
     "cloud/affiliation.cc",
     "cloud/affiliation.h",
-    "cloud/cloud_external_data_manager.cc",
-    "cloud/cloud_external_data_manager.h",
-    "cloud/cloud_policy_client.cc",
-    "cloud/cloud_policy_client.h",
-    "cloud/cloud_policy_client_registration_helper.cc",
-    "cloud/cloud_policy_client_registration_helper.h",
-    "cloud/cloud_policy_client_types.cc",
-    "cloud/cloud_policy_client_types.h",
-    "cloud/cloud_policy_core.cc",
-    "cloud/cloud_policy_core.h",
-    "cloud/cloud_policy_manager.cc",
-    "cloud/cloud_policy_manager.h",
-    "cloud/cloud_policy_refresh_scheduler.cc",
-    "cloud/cloud_policy_refresh_scheduler.h",
-    "cloud/cloud_policy_refresh_scheduler_observer.h",
-    "cloud/cloud_policy_service.cc",
-    "cloud/cloud_policy_service.h",
-    "cloud/cloud_policy_store.cc",
-    "cloud/cloud_policy_store.h",
-    "cloud/cloud_policy_validator.cc",
-    "cloud/cloud_policy_validator.h",
-    "cloud/component_cloud_policy_service.cc",
-    "cloud/component_cloud_policy_service.h",
-    "cloud/component_cloud_policy_service_observer.h",
-    "cloud/component_cloud_policy_store.cc",
-    "cloud/component_cloud_policy_store.h",
-    "cloud/component_cloud_policy_updater.cc",
-    "cloud/component_cloud_policy_updater.h",
-    "cloud/device_management_service.cc",
-    "cloud/device_management_service.h",
-    "cloud/dm_auth.cc",
-    "cloud/dm_auth.h",
-    "cloud/dm_token.cc",
-    "cloud/dm_token.h",
-    "cloud/dmserver_job_configurations.cc",
-    "cloud/dmserver_job_configurations.h",
-    "cloud/enterprise_metrics.h",
-    "cloud/external_policy_data_fetcher.cc",
-    "cloud/external_policy_data_fetcher.h",
-    "cloud/external_policy_data_updater.cc",
-    "cloud/external_policy_data_updater.h",
-    "cloud/policy_value_validator.h",
-    "cloud/resource_cache.cc",
-    "cloud/resource_cache.h",
-    "cloud/signing_service.h",
-    "cloud/user_cloud_policy_manager.cc",
-    "cloud/user_cloud_policy_manager.h",
-    "cloud/user_cloud_policy_store.cc",
-    "cloud/user_cloud_policy_store.h",
-    "cloud/user_cloud_policy_store_base.cc",
-    "cloud/user_cloud_policy_store_base.h",
-    "cloud/user_info_fetcher.cc",
-    "cloud/user_info_fetcher.h",
-    "cloud/user_policy_metrics_recorder.cc",
-    "cloud/user_policy_metrics_recorder.h",
     "command_line_policy_provider.cc",
     "command_line_policy_provider.h",
     "config_dir_policy_loader.cc",
@@ -161,8 +86,6 @@ source_set("internal") {
     "policy_merger.h",
     "policy_migrator.cc",
     "policy_migrator.h",
-    "policy_proto_decoders.cc",
-    "policy_proto_decoders.h",
     "policy_service.cc",
     "policy_service.h",
     "policy_service_impl.cc",
@@ -189,10 +112,10 @@ source_set("internal") {
   public_deps = [
     ":common_constants",
     ":policy_namespace",
-    ":util",
     "//components/enterprise/common/proto:upload_request_response",
     "//components/policy:generated",
     "//components/policy/proto",
+    "//components/version_info",
     "//extensions/buildflags",
   ]
 
@@ -209,7 +132,6 @@ source_set("internal") {
     "//components/signin/public/identity_manager",
     "//components/strings",
     "//components/user_manager",
-    "//components/version_info",
     "//google_apis",
     "//net",
     "//services/network/public/cpp",
@@ -229,15 +151,6 @@ source_set("internal") {
     sources += [
       "management/platform_management_status_provider_mac.cc",
       "management/platform_management_status_provider_mac.h",
-    ]
-  }
-
-  if (is_mac || is_linux) {
-    sources += [
-      "cloud/profile_cloud_policy_manager.cc",
-      "cloud/profile_cloud_policy_manager.h",
-      "cloud/profile_cloud_policy_store.cc",
-      "cloud/profile_cloud_policy_store.h",
     ]
   }
 
@@ -270,14 +183,6 @@ source_set("internal") {
 static_library("test_support") {
   testonly = true
   sources = [
-    "cloud/mock_cloud_policy_client.cc",
-    "cloud/mock_cloud_policy_client.h",
-    "cloud/mock_cloud_policy_service.cc",
-    "cloud/mock_cloud_policy_service.h",
-    "cloud/mock_cloud_policy_store.cc",
-    "cloud/mock_cloud_policy_store.h",
-    "cloud/test/policy_builder.cc",
-    "cloud/test/policy_builder.h",
     "configuration_policy_provider_test.cc",
     "configuration_policy_provider_test.h",
     "fake_async_policy_loader.cc",
@@ -337,8 +242,6 @@ source_set("common_constants") {
   deps = [ "//base" ]
   sources = [
     "../../policy_export.h",
-    "cloud/cloud_policy_constants.cc",
-    "cloud/cloud_policy_constants.h",
     "policy_pref_names.h",
     "policy_switches.cc",
     "policy_switches.h",
@@ -372,7 +275,6 @@ source_set("unit_tests") {
     "policy_loader_command_line_unittest.cc",
     "policy_logger_unittest.cc",
     "policy_map_unittest.cc",
-    "policy_proto_decoders_unittest.cc",
     "policy_service_impl_unittest.cc",
     "policy_statistics_collector_unittest.cc",
     "schema_map_unittest.cc",

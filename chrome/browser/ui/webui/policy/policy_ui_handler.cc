@@ -54,9 +54,6 @@
 #include "components/policy/core/browser/webui/json_generation.h"
 #include "components/policy/core/browser/webui/policy_webui_constants.h"
 #include "components/policy/core/browser/webui/statistics_collector.h"
-#include "components/policy/core/common/cloud/cloud_policy_manager.h"
-#include "components/policy/core/common/cloud/cloud_policy_refresh_scheduler.h"
-#include "components/policy/core/common/cloud/cloud_policy_util.h"
 #include "components/policy/core/common/local_test_policy_loader.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
 #include "components/policy/core/common/policy_details.h"
@@ -83,8 +80,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
-
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 
 // LINT.IfChange
 

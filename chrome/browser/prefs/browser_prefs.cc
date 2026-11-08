@@ -127,7 +127,6 @@
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/pref_names.h"
 #include "components/personal_context/core/personal_context_prefs.h"
-#include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/browser/url_list/url_blocklist_manager.h"
 #include "components/policy/core/browser/url_list/url_list_policy_pref_names.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
@@ -940,7 +939,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   omnibox_everywhere::prefs::RegisterLocalStatePrefs(registry);
   optimization_guide::prefs::RegisterLocalStatePrefs(registry);
   optimization_guide::model_execution::prefs::RegisterLocalStatePrefs(registry);
-  policy::BrowserPolicyConnector::RegisterPrefs(registry);
   policy::LocalTestPolicyProvider::RegisterLocalStatePrefs(registry);
   policy::ManagementService::RegisterLocalStatePrefs(registry);
   policy::PolicyStatisticsCollector::RegisterPrefs(registry);
@@ -988,7 +986,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   UpgradeDetector::RegisterPrefs(registry);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  extensions::ExtensionPrefs::RegisterLocalStatePrefs(registry);
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)

@@ -54,7 +54,6 @@
 #include "chrome/browser/extensions/updater/chrome_extension_downloader_factory.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
 #include "chrome/browser/lifetime/termination_notification.h"
-#include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/ui/webui/extensions/extension_icon_source.h"
@@ -224,13 +223,6 @@ ExtensionService::ExtensionService(
 
   ExtensionManagementFactory::GetForBrowserContext(profile_)->AddObserver(this);
 
-  if (auto* extension_install_policy_service =
-          policy::ExtensionInstallPolicyServiceFactory::GetForBrowserContext(
-              profile_)) {
-    extension_install_policy_observation_.Observe(
-        extension_install_policy_service);
-  }
-
   if (autoupdate_enabled) {
     // Initialize and enable the ExtensionUpdater.
     updater_->InitAndEnable(
@@ -275,7 +267,6 @@ ExtensionService::~ExtensionService() {
 
 void ExtensionService::Shutdown() {
   delayed_install_manager_ = nullptr;
-  extension_install_policy_observation_.Reset();
   ExtensionManagementFactory::GetForBrowserContext(profile())->RemoveObserver(
       this);
   external_install_manager_->Shutdown();
@@ -663,10 +654,6 @@ void ExtensionService::OnExtensionManagementSettingsChanged() {
     }
   }
 
-  CheckManagementPolicy();
-}
-
-void ExtensionService::OnExtensionInstallPolicyUpdated() {
   CheckManagementPolicy();
 }
 

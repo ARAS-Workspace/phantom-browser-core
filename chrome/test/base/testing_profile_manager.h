@@ -21,8 +21,6 @@
 #include "components/policy/core/common/policy_service.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
-
 class ProfileAttributesStorage;
 class ProfileManager;
 class TestingBrowserProcess;
@@ -79,9 +77,7 @@ class TestingProfileManager : public ProfileObserver {
       std::optional<std::unique_ptr<policy::PolicyService>> policy_service =
           std::nullopt,
       scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory =
-          nullptr,
-      std::unique_ptr<policy::UserCloudPolicyManager>
-          user_cloud_policy_manager = nullptr);
+          nullptr);
   TestingProfile* CreateTestingProfile(
       const std::string& name,
       TestingProfile::TestingFactories testing_factories = {},

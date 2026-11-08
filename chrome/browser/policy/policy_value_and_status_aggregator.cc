@@ -19,20 +19,13 @@
 #include "chrome/browser/policy/value_provider/policy_value_provider.h"
 #include "components/policy/core/browser/webui/policy_status_provider.h"
 #include "components/policy/core/browser/webui/policy_webui_constants.h"
-#include "components/policy/core/common/features.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/policy/core/common/policy_logger.h"
 #include "components/prefs/pref_service.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
-#include "chrome/browser/policy/value_provider/extension_install_policies_value_provider.h"
 #include "chrome/browser/policy/value_provider/extension_policies_value_provider.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "components/policy/core/common/cloud/profile_cloud_policy_manager.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
 void AppendPolicyIdsToList(const base::DictValue& policy_values,
@@ -67,16 +60,6 @@ PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
   aggregator->AddPolicyValueProvider(
       std::make_unique<ChromePoliciesValueProvider>(profile));
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  if (base::FeatureList::IsEnabled(
-          policy::features::kEnableExtensionInstallPolicyFetching)) {
-    if (auto* extension_install_policy_service =
-            policy::ExtensionInstallPolicyServiceFactory::GetForBrowserContext(
-                profile)) {
-      aggregator->AddPolicyValueProvider(
-          std::make_unique<ExtensionInstallPoliciesValueProvider>(
-              profile, extension_install_policy_service));
-    }
-  }
   aggregator->AddPolicyValueProvider(
       std::make_unique<ExtensionPoliciesValueProvider>(profile));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)

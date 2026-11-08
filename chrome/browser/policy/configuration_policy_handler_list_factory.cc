@@ -519,9 +519,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kPdfViewerOutOfProcessIframeEnabled,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(ENABLE_PDF)
-  { key::kPolicyRefreshRate,
-    policy_prefs::kUserPolicyRefreshRate,
-    base::Value::Type::INTEGER },
   { key::kPrintHeaderFooter,
     prefs::kPrintHeaderFooter,
     base::Value::Type::BOOLEAN },
@@ -863,9 +860,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kDiskCacheSize,
     prefs::kDiskCacheSize,
     base::Value::Type::INTEGER },
-  { key::kCloudManagementEnrollmentMandatory,
-    policy_prefs::kCloudManagementEnrollmentMandatory,
-    base::Value::Type::BOOLEAN },
   { key::kDisablePrintPreview,
     prefs::kPrintPreviewDisabled,
     base::Value::Type::BOOLEAN },
@@ -1486,10 +1480,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       key::kExtensionAllowedTypes, extensions::pref_names::kAllowedTypes,
       base::BindRepeating(GetExtensionAllowedTypesMap)));
   handlers->AddHandler(std::make_unique<ExtensionDeveloperModePolicyHandler>());
-  handlers->AddHandler(std::make_unique<SimplePolicyHandler>(
-      key::kExtensionInstallCloudPolicyChecksEnabled,
-      extensions::pref_names::kExtensionInstallCloudPolicyChecksEnabled,
-      base::Value::Type::BOOLEAN));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)

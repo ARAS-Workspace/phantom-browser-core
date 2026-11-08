@@ -151,10 +151,6 @@ class ProfileAttributesTestObserver
                void(const base::FilePath& profile_path));
   MOCK_METHOD1(OnProfileUserManagementAcceptanceChanged,
                void(const base::FilePath& profile_path));
-  MOCK_METHOD1(OnProfileManagementEnrollmentTokenChanged,
-               void(const base::FilePath& profile_path));
-  MOCK_METHOD1(OnProfileManagementIdChanged,
-               void(const base::FilePath& profile_path));
 };
 
 size_t GetDefaultAvatarIconResourceIDAtIndex(int index) {
@@ -204,9 +200,6 @@ class ProfileAttributesStorageTest : public testing::Test {
     EXPECT_CALL(observer_, OnProfileThemeColorsChanged(_)).Times(0);
     EXPECT_CALL(observer_, OnProfileHostedDomainChanged(_)).Times(0);
     EXPECT_CALL(observer_, OnProfileIsManagedChanged(_)).Times(0);
-    EXPECT_CALL(observer_, OnProfileManagementEnrollmentTokenChanged(_))
-        .Times(0);
-    EXPECT_CALL(observer_, OnProfileManagementIdChanged(_)).Times(0);
   }
 
   void EnableObserver() { scoped_observation_.Observe(storage()); }
@@ -769,14 +762,6 @@ TEST_F(ProfileAttributesStorageTest, EntryAccessors) {
   EXPECT_CALL(observer(), OnProfileUserManagementAcceptanceChanged(_)).Times(2);
   TEST_BOOL_ACCESSORS(ProfileAttributesEntry, entry,
                       UserAcceptedAccountManagement);
-
-  EXPECT_CALL(observer(), OnProfileManagementEnrollmentTokenChanged(path))
-      .Times(2);
-  TEST_STRING_ACCESSORS(ProfileAttributesEntry, entry,
-                        ProfileManagementEnrollmentToken);
-
-  EXPECT_CALL(observer(), OnProfileManagementIdChanged(path)).Times(2);
-  TEST_STRING_ACCESSORS(ProfileAttributesEntry, entry, ProfileManagementId);
 
   VerifyAndResetCallExpectations();
 }

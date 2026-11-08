@@ -73,9 +73,6 @@
 #include "components/leveldb_proto/public/proto_database_provider.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/in_memory_url_index.h"
-#include "components/policy/core/common/cloud/cloud_external_data_manager.h"
-#include "components/policy/core/common/cloud/profile_cloud_policy_manager.h"
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/policy/core/common/configuration_policy_provider.h"
 #include "components/policy/core/common/policy_service.h"
 #include "components/policy/core/common/policy_service_impl.h"
@@ -193,7 +190,6 @@ TestingProfile::TestingProfile(const base::FilePath& path,
                      /*guest_session=*/false,
                      /*allows_browser_windows=*/true,
                      /*is_new_profile=*/false,
-                     /*policy_manager=*/{},
                      /*policy_service=*/nullptr,
                      /*testing_factories=*/{},
                      /*profile_name=*/kDefaultProfileUserName,
@@ -214,9 +210,6 @@ TestingProfile::TestingProfile(
     bool guest_session,
     bool allows_browser_windows,
     bool is_new_profile,
-    std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
-                 std::unique_ptr<policy::ProfileCloudPolicyManager>>
-        policy_manager,
     std::unique_ptr<policy::PolicyService> policy_service,
     TestingFactories testing_factories,
     const std::string& profile_name,
@@ -241,16 +234,6 @@ TestingProfile::TestingProfile(
       url_loader_factory_(url_loader_factory)
 {
   set_allows_browser_windows_for_testing(allows_browser_windows);
-  if (std::holds_alternative<std::unique_ptr<policy::UserCloudPolicyManager>>(
-          policy_manager)) {
-    user_cloud_policy_manager_ =
-        std::move(std::get<std::unique_ptr<policy::UserCloudPolicyManager>>(
-            policy_manager));
-  } else {
-    profile_cloud_policy_manager_ =
-        std::move(std::get<std::unique_ptr<policy::ProfileCloudPolicyManager>>(
-            policy_manager));
-  }
 
   if (parent)
     parent->SetOffTheRecordProfile(std::unique_ptr<Profile>(this));
@@ -480,13 +463,6 @@ TestingProfile::~TestingProfile() {
 
   if (profile_policy_connector_)
     profile_policy_connector_->Shutdown();
-
-  if (user_cloud_policy_manager_)
-    user_cloud_policy_manager_->Shutdown();
-
-  if (profile_cloud_policy_manager_) {
-    profile_cloud_policy_manager_->Shutdown();
-  }
 
   if (host_content_settings_map_.get())
     host_content_settings_map_->ShutdownOnUIThread();
@@ -754,25 +730,6 @@ TestingProfile::GetPolicySchemaRegistryService() {
   return schema_registry_service_.get();
 }
 
-policy::UserCloudPolicyManager* TestingProfile::GetUserCloudPolicyManager() {
-  return user_cloud_policy_manager_.get();
-}
-
-policy::ProfileCloudPolicyManager*
-TestingProfile::GetProfileCloudPolicyManager() {
-  return profile_cloud_policy_manager_.get();
-}
-
-policy::CloudPolicyManager* TestingProfile::GetCloudPolicyManager() {
-  if (user_cloud_policy_manager_) {
-    return GetUserCloudPolicyManager();
-  }
-  if (profile_cloud_policy_manager_) {
-    return GetProfileCloudPolicyManager();
-  }
-  return nullptr;
-}
-
 policy::ProfilePolicyConnector* TestingProfile::GetProfilePolicyConnector() {
   // This matches OffTheRecordProfileImpl::GetProfilePolicyConnector()
   // implementation.
@@ -952,21 +909,6 @@ TestingProfile::Builder& TestingProfile::Builder::SetIsNewProfile(
   return *this;
 }
 
-TestingProfile::Builder& TestingProfile::Builder::SetUserCloudPolicyManager(
-    std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager) {
-  DCHECK_EQ(profile_cloud_policy_manager_, nullptr);
-  user_cloud_policy_manager_ = std::move(user_cloud_policy_manager);
-  return *this;
-}
-
-TestingProfile::Builder& TestingProfile::Builder::SetProfileCloudPolicyManager(
-    std::unique_ptr<policy::ProfileCloudPolicyManager>
-        profile_cloud_policy_manager) {
-  DCHECK_EQ(user_cloud_policy_manager_, nullptr);
-  profile_cloud_policy_manager_ = std::move(profile_cloud_policy_manager);
-  return *this;
-}
-
 TestingProfile::Builder& TestingProfile::Builder::SetPolicyService(
     std::unique_ptr<policy::PolicyService> policy_service) {
   policy_service_ = std::move(policy_service);
@@ -1019,15 +961,6 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
   DCHECK(!build_called_);
   build_called_ = true;
 
-  std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
-               std::unique_ptr<policy::ProfileCloudPolicyManager>>
-      policy_manager;
-  if (user_cloud_policy_manager_) {
-    DCHECK(!profile_cloud_policy_manager_);
-    policy_manager = std::move(user_cloud_policy_manager_);
-  } else {
-    policy_manager = std::move(profile_cloud_policy_manager_);
-  }
   return std::make_unique<TestingProfile>(
       path_, delegate_, create_mode_,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -1035,7 +968,6 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
 #endif
       std::move(pref_service_), nullptr, guest_session_,
       allows_browser_windows_, is_new_profile_,
-      std::move(policy_manager),
       std::move(policy_service_), std::move(testing_factories_), profile_name_,
       override_policy_connector_is_managed_, nullptr, url_loader_factory_
   );
@@ -1063,8 +995,7 @@ TestingProfile* TestingProfile::Builder::BuildOffTheRecord(
 #endif
       std::move(pref_service_), original_profile, guest_session_,
       allows_browser_windows_, is_new_profile_,
-      std::move(user_cloud_policy_manager_), std::move(policy_service_),
-      std::move(testing_factories_), profile_name_,
+      std::move(policy_service_), std::move(testing_factories_), profile_name_,
       override_policy_connector_is_managed_, &otr_profile_id,
       url_loader_factory_
   );

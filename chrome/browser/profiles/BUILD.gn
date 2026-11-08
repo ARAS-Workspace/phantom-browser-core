@@ -450,7 +450,6 @@ source_set("profile_util") {
     "profile_statistics_aggregator.h",
     "profile_statistics_common.h",
     "profile_statistics_factory.h",
-    "reporting_util.h",
   ]
 
   public_deps = [
@@ -483,7 +482,6 @@ source_set("profile_util_impl") {
     "profile_statistics_aggregator.cc",
     "profile_statistics_common.cc",
     "profile_statistics_factory.cc",
-    "reporting_util.cc",
   ]
 
   public_deps = [

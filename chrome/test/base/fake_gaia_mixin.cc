@@ -31,10 +31,8 @@ const int FakeGaiaMixin::kFakeAccessTokenExpiration = 3600;
 const char FakeGaiaMixin::kFakeSIDCookie[] = "fake-SID-cookie";
 const char FakeGaiaMixin::kFakeLSIDCookie[] = "fake-LSID-cookie";
 
-// LINT.IfChange
 const char FakeGaiaMixin::kEnterpriseUser1[] = "username@example.com";
 const GaiaId::Literal FakeGaiaMixin::kEnterpriseUser1GaiaId("0000111111");
-// LINT.ThenChange(/components/policy/core/common/cloud/test/policy_builder.cc)
 const char FakeGaiaMixin::kEnterpriseUser2[] = "user-2@example.com";
 const GaiaId::Literal FakeGaiaMixin::kEnterpriseUser2GaiaId("0000222222");
 

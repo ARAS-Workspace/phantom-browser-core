@@ -19,24 +19,10 @@ namespace policy::features {
 POLICY_EXPORT BASE_DECLARE_FEATURE(
     kProfileSeparationDomainExceptionListRetroactive);
 
-// Enables the addition of new security fields for SecOps.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kEnhancedSecurityEventFields);
-
-// Controls if we can use the cec flag in PolicyData.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kUseCECFlagInPolicyData);
-
-// Enables a configurable delay for policy registration.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kCustomPolicyRegistrationDelay);
-POLICY_EXPORT extern const base::FeatureParam<base::TimeDelta>
-    kPolicyRegistrationDelay;
-
 // A blocklist of policies supported on Desktop Android.
 POLICY_EXPORT BASE_DECLARE_FEATURE(kDesktopAndroidPolicy);
 POLICY_EXPORT extern const base::FeatureParam<std::string>
     kDesktopAndroidPolicyBlocklist;
-
-// Used to enable extension install policy support.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kEnableExtensionInstallPolicyFetching);
 
 // When enabled, uses ManagementService to determine whether to honor sensitive
 // policies. When disabled, falls back to the original ShouldHonorPolicies()

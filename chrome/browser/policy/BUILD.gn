@@ -121,17 +121,8 @@ source_set("test_support") {
     "//url",
   ]
 
-  if (enable_dice_support) {
-    sources += [
-      "cloud/user_policy_signin_service_test_util.cc",
-      "cloud/user_policy_signin_service_test_util.h",
-    ]
-  }
-
   if (enable_extensions_core) {
     sources += [
-      "cloud/mock_extension_install_policy_service.cc",
-      "cloud/mock_extension_install_policy_service.h",
       "extension_policy_test_base.cc",
       "extension_policy_test_base.h",
     ]
@@ -501,7 +492,6 @@ source_set("policy") {
     "developer_tools_policy_checker.h",
     "developer_tools_policy_checker_factory.h",
     "developer_tools_policy_handler.h",
-    "device_management_service_configuration.h",
     "homepage_location_policy_handler.h",
     "isolate_origins_policy_handler.h",
     "javascript_policy_handler.h",
@@ -536,11 +526,7 @@ source_set("policy") {
   ]
 
   if (enable_extensions_core) {
-    public += [
-      "cloud/extension_install_policy_service.h",
-      "cloud/extension_install_policy_service_factory.h",
-      "extension_developer_mode_policy_handler.h",
-    ]
+    public += [ "extension_developer_mode_policy_handler.h" ]
     public_deps += [
       "//extensions/browser",
       "//extensions/common",
@@ -550,16 +536,9 @@ source_set("policy") {
   public += [ "managed_account_policy_handler.h" ]
   public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
-  public += [
-    "cloud/user_policy_signin_service.h",
-    "file_selection_dialogs_policy_handler.h",
-  ]
+  public += [ "file_selection_dialogs_policy_handler.h" ]
 
-  public += [
-    "browser_signin_policy_handler.h",
-    "cloud/user_policy_signin_service_factory.h",
-    "cloud/user_policy_signin_service_util.h",
-  ]
+  public += [ "browser_signin_policy_handler.h" ]
 
   if (is_linux || is_mac) {
     public += [
@@ -578,10 +557,7 @@ source_set("policy") {
   }
 
   if (enable_extensions_core) {
-    public += [
-      "value_provider/extension_install_policies_value_provider.h",
-      "value_provider/extension_policies_value_provider.h",
-    ]
+    public += [ "value_provider/extension_policies_value_provider.h" ]
   }
 }
 
@@ -596,7 +572,6 @@ source_set("impl") {
     "developer_tools_policy_checker.cc",
     "developer_tools_policy_checker_factory.cc",
     "developer_tools_policy_handler.cc",
-    "device_management_service_configuration.cc",
     "homepage_location_policy_handler.cc",
     "isolate_origins_policy_handler.cc",
     "javascript_policy_handler.cc",
@@ -664,11 +639,7 @@ source_set("impl") {
   ]
 
   if (enable_extensions_core) {
-    sources += [
-      "cloud/extension_install_policy_service.cc",
-      "cloud/extension_install_policy_service_factory.cc",
-      "extension_developer_mode_policy_handler.cc",
-    ]
+    sources += [ "extension_developer_mode_policy_handler.cc" ]
     deps += [
       "//chrome/browser/extensions",
       "//chrome/browser/extensions/api/messaging",
@@ -688,16 +659,9 @@ source_set("impl") {
     "//components/headless/policy",
   ]
 
-  sources += [
-    "cloud/user_policy_signin_service.cc",
-    "file_selection_dialogs_policy_handler.cc",
-  ]
+  sources += [ "file_selection_dialogs_policy_handler.cc" ]
 
-  sources += [
-    "browser_signin_policy_handler.cc",
-    "cloud/user_policy_signin_service_factory.cc",
-    "cloud/user_policy_signin_service_util.cc",
-  ]
+  sources += [ "browser_signin_policy_handler.cc" ]
 
   if (is_linux || is_mac) {
     sources += [
@@ -716,9 +680,6 @@ source_set("impl") {
   }
 
   if (enable_extensions_core) {
-    sources += [
-      "value_provider/extension_install_policies_value_provider.cc",
-      "value_provider/extension_policies_value_provider.cc",
-    ]
+    sources += [ "value_provider/extension_policies_value_provider.cc" ]
   }
 }

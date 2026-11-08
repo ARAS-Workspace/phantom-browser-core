@@ -29,7 +29,6 @@ namespace internal {
 class LocalTestInfoBarVisibilityManager;
 }  // namespace internal
 
-class CloudPolicyStore;
 class ConfigurationPolicyProvider;
 class PolicyMigrator;
 class PolicyServiceImpl;
@@ -48,14 +47,11 @@ class ProfilePolicyConnector final : public PolicyService::Observer {
   ~ProfilePolicyConnector() override;
 
   // |user| is only used in Chrome OS builds and should be set to nullptr
-  // otherwise.  |configuration_policy_provider| and |policy_store| are nullptr
-  // for non-regular users.
+  // otherwise.
   // If |force_immediate_load| is true, DeviceLocalAccountPolicy is loaded
   // synchronously.
   void Init(const user_manager::User* user,
             SchemaRegistry* schema_registry,
-            ConfigurationPolicyProvider* configuration_policy_provider,
-            const CloudPolicyStore* policy_store,
             policy::ChromeBrowserPolicyConnector* browser_policy_connector,
             bool force_immediate_load);
 
@@ -76,11 +72,6 @@ class ProfilePolicyConnector final : public PolicyService::Observer {
   // TODO(crbug.com/489635809): Remove the location parameter.
   bool IsManaged(
   ) const;
-
-  // Returns true if the |policy_key| user policy is currently set via the
-  // |configuration_policy_provider_| and isn't being overridden by a
-  // higher-level provider.
-  bool IsProfilePolicy(const char* policy_key) const;
 
   // Returns affiliation IDs contained in the PolicyData corresponding to the
   // profile.
@@ -104,15 +95,6 @@ class ProfilePolicyConnector final : public PolicyService::Observer {
  private:
   void DoPostInit();
 
-  // Returns the policy store which is actually used.
-  const CloudPolicyStore* GetActualPolicyStore() const;
-
-  // Find the policy provider that provides the |policy_key| policy, if any. In
-  // case of multiple providers sharing the same policy, the one with the
-  // highest priority will be returned.
-  const ConfigurationPolicyProvider* DeterminePolicyProviderForPolicy(
-      const char* policy_key) const;
-
   void AppendPolicyProviderWithSchemaTracking(
       ConfigurationPolicyProvider* policy_provider,
       SchemaRegistry* schema_registry);
@@ -131,10 +113,6 @@ class ProfilePolicyConnector final : public PolicyService::Observer {
   // extensions' policy schema update.
   std::vector<std::unique_ptr<ConfigurationPolicyProvider>>
       wrapped_policy_providers_;
-
-  raw_ptr<const ConfigurationPolicyProvider> configuration_policy_provider_ =
-      nullptr;
-  raw_ptr<const CloudPolicyStore> policy_store_ = nullptr;
 
   // |policy_providers_| contains a list of the policy providers available for
   // the PolicyService of this connector, in decreasing order of priority.

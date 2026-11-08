@@ -12,13 +12,8 @@
 namespace policy {
 namespace switches {
 
-extern const char kDeviceManagementUrl[];
-extern const char kRealtimeReportingUrl[];
-extern const char kEncryptedReportingUrl[];
 extern const char kChromePolicy[];
 extern const char kSecureConnectApiUrl[];
-extern const char kFileStorageServerUploadUrl[];
-extern const char kPolicyVerificationKey[];
 
 }  // namespace switches
 }  // namespace policy

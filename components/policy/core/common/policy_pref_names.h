@@ -65,16 +65,6 @@ inline constexpr char kSystemFeaturesDisableList[] =
 inline constexpr char kSystemFeaturesDisableMode[] =
     "policy.system_features_disable_mode";
 
-// Integer that specifies the policy refresh rate for user-policy in
-// milliseconds. Not all values are meaningful, so it is clamped to a sane range
-// by the cloud policy subsystem.
-inline constexpr char kUserPolicyRefreshRate[] = "policy.user_refresh_rate";
-
-// Boolean indicates whether the cloud management enrollment is mandatory or
-// not.
-inline constexpr char kCloudManagementEnrollmentMandatory[] =
-    "policy.cloud_management_enrollment_mandatory";
-
 // Integer that sets the minimal limit on the data size in the clipboard to be
 // checked against Data Leak Prevention rules.
 inline constexpr char kDlpClipboardCheckSizeLimit[] =

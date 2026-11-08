@@ -14,10 +14,6 @@
 #include "content/public/browser/browser_context.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
 namespace policy {
 
 // static
@@ -59,11 +55,7 @@ ManagementServiceFactory::ManagementServiceFactory()
               // TODO(crbug.com/41488885): Check if this service is needed for
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOwnInstance)
-              .Build()) {
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  DependsOn(ExtensionInstallPolicyServiceFactory::GetInstance());
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-}
+              .Build()) {}
 
 ManagementServiceFactory::~ManagementServiceFactory() = default;
 

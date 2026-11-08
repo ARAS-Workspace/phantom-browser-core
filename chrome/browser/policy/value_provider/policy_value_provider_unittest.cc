@@ -36,10 +36,7 @@
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/extension_management_test_util.h"
-#include "chrome/browser/policy/cloud/mock_extension_install_policy_service.h"
-#include "chrome/browser/policy/value_provider/extension_install_policies_value_provider.h"
 #include "chrome/browser/policy/value_provider/extension_policies_value_provider.h"
-#include "components/policy/proto/device_management_backend.pb.h"
 #include "components/strings/grit/components_strings.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/pref_names.h"
@@ -57,7 +54,6 @@ namespace policy {
 namespace {
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-namespace em = enterprise_management;
 constexpr char kExtensionId[] = "abcdefghijklmnoabcdefghijklmnoab";
 #endif
 
@@ -190,102 +186,6 @@ TEST_F(ChromePoliciesValueProviderTest, GetNames) {
       std::vector<std::string>(std::begin(metapolicy::kPrecedence),
                                std::end(metapolicy::kPrecedence)));
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-class ExtensionInstallPoliciesValueProviderTest
-    : public PolicyValueProviderTestBase {
- public:
-  void SetUp() override {
-    PolicyValueProviderTestBase::SetUp();
-
-    profile_->GetPrefs()->SetBoolean(
-        extensions::pref_names::kExtensionInstallCloudPolicyChecksEnabled,
-        true);
-  }
-
- protected:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kEnableExtensionInstallPolicyFetching};
-  testing::NiceMock<MockExtensionInstallPolicyService> mock_service_;
-};
-
-TEST_F(ExtensionInstallPoliciesValueProviderTest, GetValues) {
-  SetPolicy(
-      policy_map_, "extension_id",
-      base::Value(base::DictValue().Set(
-          "1.2.3",
-          base::DictValue()
-              .Set("action", em::ExtensionInstallPolicy::ACTION_BLOCK)
-              .Set("reasons",
-                   base::ListValue().Append(
-                       em::ExtensionInstallPolicy::REASON_BLOCKED_CATEGORY)))));
-
-  EXPECT_CALL(*policy_service_,
-              GetPolicies(PolicyNamespace(POLICY_DOMAIN_EXTENSION_INSTALL,
-                                          std::string())))
-      .WillOnce(ReturnRef(policy_map_));
-
-  ExtensionInstallPoliciesValueProvider provider(profile_.get(),
-                                                 &mock_service_);
-  base::DictValue values = provider.GetValues();
-  const base::DictValue* policy =
-      GetPolicyDict(values, kExtensionInstallPoliciesId, "extension_id@1.2.3");
-  ASSERT_TRUE(policy);
-  EXPECT_EQ(*policy,
-            base::DictValue()
-                .Set("level", "mandatory")
-                .Set("scope", "user")
-                .Set("source", "cloud")
-                .Set("value", base::DictValue()
-                                  .Set("action", "block")
-                                  .Set("reasons",
-                                       base::ListValue().Append("category"))));
-}
-
-TEST_F(ExtensionInstallPoliciesValueProviderTest, GetNames) {
-  ExtensionInstallPoliciesValueProvider provider(profile_.get(),
-                                                 &mock_service_);
-  VerifyProviderNames(provider.GetNames(), kExtensionInstallPoliciesId,
-                      kExtensionInstallPoliciesName, {});
-}
-
-TEST_F(ExtensionInstallPoliciesValueProviderTest,
-       GetValues_IgnoredByInstallationMode) {
-  SetPolicy(policy_map_, kExtensionId,
-            base::Value(base::DictValue().Set(
-                "1.2.3",
-                base::DictValue()
-                    .Set("action", em::ExtensionInstallPolicy::ACTION_BLOCK)
-                    .Set("reasons",
-                         base::ListValue().Append(
-                             em::ExtensionInstallPolicy::REASON_RISK_SCORE)))));
-
-  EXPECT_CALL(*policy_service_,
-              GetPolicies(PolicyNamespace(POLICY_DOMAIN_EXTENSION_INSTALL,
-                                          std::string())))
-      .WillRepeatedly(ReturnRef(policy_map_));
-
-  // Explicitly allow the extension.
-  {
-    extensions::ExtensionManagementPrefUpdater<
-        sync_preferences::TestingPrefServiceSyncable>
-        pref_updater(profile_->GetTestingPrefService());
-    pref_updater.SetIndividualExtensionInstallationAllowed(kExtensionId, true);
-  }
-
-  ExtensionInstallPoliciesValueProvider provider(profile_.get(),
-                                                 &mock_service_);
-  base::DictValue values = provider.GetValues();
-  const base::DictValue* policy =
-      GetPolicyDict(values, kExtensionInstallPoliciesId,
-                    absl::StrFormat("%s@1.2.3", kExtensionId));
-  ASSERT_TRUE(policy);
-  EXPECT_TRUE(policy->FindBool("ignored").value_or(false));
-  EXPECT_EQ(base::UTF8ToUTF16(*policy->FindString("info")),
-            l10n_util::GetStringUTF16(
-                IDS_POLICY_EXTENSION_INSTALL_IGNORED_BY_INSTALLATION_MODE));
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 class ExtensionPoliciesValueProviderTest : public PolicyValueProviderTestBase {

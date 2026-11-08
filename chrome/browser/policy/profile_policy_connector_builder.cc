@@ -15,8 +15,6 @@
 #include "components/policy/core/common/policy_service.h"
 #include "components/policy/core/common/policy_service_impl.h"
 
-#include "components/policy/core/common/cloud/cloud_policy_manager.h"
-
 namespace policy {
 
 namespace {
@@ -31,36 +29,26 @@ std::list<ConfigurationPolicyProvider*>* GetTestProviders() {
 std::unique_ptr<ProfilePolicyConnector>
 CreateProfilePolicyConnectorForBrowserContext(
     SchemaRegistry* schema_registry,
-    CloudPolicyManager* cloud_policy_manager,
-    ConfigurationPolicyProvider* policy_provider,
     policy::ChromeBrowserPolicyConnector* browser_policy_connector,
     bool force_immediate_load,
     content::BrowserContext* context) {
   const user_manager::User* user = nullptr;
-  const CloudPolicyStore* policy_store = nullptr;
-
-  if (cloud_policy_manager) {
-    policy_store = cloud_policy_manager->core()->store();
-  }
 
   return CreateAndInitProfilePolicyConnector(
-      schema_registry, browser_policy_connector, policy_provider, policy_store,
-      force_immediate_load, user);
+      schema_registry, browser_policy_connector, force_immediate_load, user);
 }
 
 std::unique_ptr<ProfilePolicyConnector> CreateAndInitProfilePolicyConnector(
     SchemaRegistry* schema_registry,
     policy::ChromeBrowserPolicyConnector* browser_policy_connector,
-    ConfigurationPolicyProvider* policy_provider,
-    const CloudPolicyStore* policy_store,
     bool force_immediate_load,
     const user_manager::User* user) {
   auto connector = std::make_unique<ProfilePolicyConnector>();
 
   std::list<ConfigurationPolicyProvider*>* test_providers = GetTestProviders();
   if (test_providers->empty()) {
-    connector->Init(user, schema_registry, policy_provider, policy_store,
-                    browser_policy_connector, force_immediate_load);
+    connector->Init(user, schema_registry, browser_policy_connector,
+                    force_immediate_load);
   } else {
     PolicyServiceImpl::Providers providers;
     providers.push_back(test_providers->front());

@@ -15,7 +15,6 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#include "components/policy/core/common/cloud/test/policy_builder.h"
 #include "extensions/common/extension_id.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 

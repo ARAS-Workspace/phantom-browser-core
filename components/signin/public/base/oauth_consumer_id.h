@@ -58,7 +58,6 @@ enum class OAuthConsumerId {
   kEnterpriseSearchAggregator = 35,
   kParentPermissionDialog = 36,
   kUserCloudSigninRestrictionPolicyFetcher = 37,
-  kCloudPolicyClientRegistration = 38,
   kSafeBrowsing = 39,
   kTailoredSecurityService = 40,
   kLensOverlayQueryController = 41,

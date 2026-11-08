@@ -96,10 +96,7 @@ source_set("signin") {
     "//chrome/app:generated_resources",
   ]
 
-  # enterprise headers include turn_sync_on_helper_policy_fetch_tracker.h.
   allow_circular_includes_from = [
-    "//chrome/browser/enterprise",
-
     # signin headers include turn_sync_on_helper.h for SigninAbortedMode.
     "//chrome/browser/signin",
   ]
@@ -121,7 +118,6 @@ source_set("signin") {
     "sync_service_startup_state_observer.h",
     "turn_sync_on_helper.h",
     "turn_sync_on_helper_delegate_impl.h",
-    "turn_sync_on_helper_policy_fetch_tracker.h",
   ]
   public_deps += [
     ":signin_utils",
@@ -201,7 +197,6 @@ source_set("signin_impl") {
     "sync_service_startup_state_observer.cc",
     "turn_sync_on_helper.cc",
     "turn_sync_on_helper_delegate_impl.cc",
-    "turn_sync_on_helper_policy_fetch_tracker.cc",
   ]
 
   deps += [

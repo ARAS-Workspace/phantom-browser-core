@@ -42,7 +42,6 @@ namespace policy {
 class PolicyService;
 class ProfilePolicyConnector;
 class SchemaRegistryService;
-class UserCloudPolicyManager;
 }  // namespace policy
 
 namespace storage {
@@ -192,13 +191,6 @@ class TestingProfile : public Profile {
     // Set the value to be returned by Profile::IsNewProfile().
     Builder& SetIsNewProfile(bool is_new_profile);
 
-    Builder& SetUserCloudPolicyManager(
-        std::unique_ptr<policy::UserCloudPolicyManager>
-            user_cloud_policy_manager);
-    Builder& SetProfileCloudPolicyManager(
-        std::unique_ptr<policy::ProfileCloudPolicyManager>
-            profile_cloud_policy_manager);
-
     // Sets the PolicyService to be used by this profile.
     Builder& SetPolicyService(
         std::unique_ptr<policy::PolicyService> policy_service);
@@ -241,9 +233,6 @@ class TestingProfile : public Profile {
     bool guest_session_ = false;
     bool allows_browser_windows_ = true;
     bool is_new_profile_ = false;
-    std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager_;
-    std::unique_ptr<policy::ProfileCloudPolicyManager>
-        profile_cloud_policy_manager_;
     std::unique_ptr<policy::PolicyService> policy_service_;
     TestingFactories testing_factories_;
     std::string profile_name_{kDefaultProfileUserName};
@@ -280,9 +269,6 @@ class TestingProfile : public Profile {
       bool guest_session,
       bool allows_browser_windows,
       bool is_new_profile,
-      std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
-                   std::unique_ptr<policy::ProfileCloudPolicyManager>>
-          policy_manager,
       std::unique_ptr<policy::PolicyService> policy_service,
       TestingFactories testing_factories,
       const std::string& profile_name,
@@ -369,9 +355,6 @@ class TestingProfile : public Profile {
   base::Time GetStartTime() const override;
   ProfileKey* GetProfileKey() const override;
   policy::SchemaRegistryService* GetPolicySchemaRegistryService() override;
-  policy::UserCloudPolicyManager* GetUserCloudPolicyManager() override;
-  policy::ProfileCloudPolicyManager* GetProfileCloudPolicyManager() override;
-  policy::CloudPolicyManager* GetCloudPolicyManager() override;
   policy::ProfilePolicyConnector* GetProfilePolicyConnector() override;
   const policy::ProfilePolicyConnector* GetProfilePolicyConnector()
       const override;
@@ -478,9 +461,6 @@ class TestingProfile : public Profile {
       BrowserContextDependencyManager::GetInstance()};
 
   std::unique_ptr<policy::SchemaRegistryService> schema_registry_service_;
-  std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager_;
-  std::unique_ptr<policy::ProfileCloudPolicyManager>
-      profile_cloud_policy_manager_;
   std::unique_ptr<policy::ProfilePolicyConnector> profile_policy_connector_;
 
   // Weak pointer to a delegate for indicating that a profile was created.

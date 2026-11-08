@@ -57,9 +57,6 @@ class OffTheRecordProfileImpl : public Profile {
   PrefService* GetPrefs() override;
   const PrefService* GetPrefs() const override;
   policy::SchemaRegistryService* GetPolicySchemaRegistryService() override;
-  policy::UserCloudPolicyManager* GetUserCloudPolicyManager() override;
-  policy::ProfileCloudPolicyManager* GetProfileCloudPolicyManager() override;
-  policy::CloudPolicyManager* GetCloudPolicyManager() override;
   bool IsSameOrParent(Profile* profile) override;
   base::Time GetStartTime() const override;
   ProfileKey* GetProfileKey() const override;

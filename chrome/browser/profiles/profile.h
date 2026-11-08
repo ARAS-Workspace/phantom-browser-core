@@ -42,9 +42,6 @@ class WebUI;
 namespace policy {
 class SchemaRegistryService;
 class ProfilePolicyConnector;
-class ProfileCloudPolicyManager;
-class UserCloudPolicyManager;
-class CloudPolicyManager;
 
 }  // namespace policy
 
@@ -280,19 +277,6 @@ class Profile : public content::BrowserContext {
 
   // Returns the SchemaRegistryService.
   virtual policy::SchemaRegistryService* GetPolicySchemaRegistryService() = 0;
-
-  // Returns the UserCloudPolicyManager.
-  virtual policy::UserCloudPolicyManager* GetUserCloudPolicyManager() = 0;
-  virtual policy::ProfileCloudPolicyManager* GetProfileCloudPolicyManager() = 0;
-
-  // Returns CloudPolicyManager.
-  // This function combine three Get*CloudPolicyManager functions above and
-  // always returns the one that is currently activated.
-  //
-  // Returns UserCloudPolicyManagerAsh on ChromeOS.
-  // For others, returns UserCloudPolicyManager if it exists, otherwise use
-  // ProfileCloudPolicyManager.
-  virtual policy::CloudPolicyManager* GetCloudPolicyManager() = 0;
 
   virtual policy::ProfilePolicyConnector* GetProfilePolicyConnector() = 0;
   virtual const policy::ProfilePolicyConnector* GetProfilePolicyConnector()

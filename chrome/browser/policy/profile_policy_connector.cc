@@ -33,9 +33,6 @@
 #include "components/infobars/core/infobar.h"
 #include "components/infobars/core/infobar_delegate.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
-#include "components/policy/core/common/cloud/cloud_policy_core.h"
-#include "components/policy/core/common/cloud/cloud_policy_manager.h"
-#include "components/policy/core/common/cloud/cloud_policy_store.h"
 #include "components/policy/core/common/configuration_policy_provider.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
 #include "components/policy/core/common/policy_bundle.h"
@@ -223,16 +220,10 @@ ProfilePolicyConnector::~ProfilePolicyConnector() {
 void ProfilePolicyConnector::Init(
     const user_manager::User* user,
     SchemaRegistry* schema_registry,
-    ConfigurationPolicyProvider* configuration_policy_provider,
-    const CloudPolicyStore* policy_store,
     policy::ChromeBrowserPolicyConnector* connector,
     bool force_immediate_load) {
-  DCHECK(!configuration_policy_provider_);
-  DCHECK(!policy_store_);
   DCHECK(!policy_service_);
 
-  configuration_policy_provider_ = configuration_policy_provider;
-  policy_store_ = policy_store;
   local_test_infobar_visibility_manager_ =
       std::make_unique<internal::LocalTestInfoBarVisibilityManager>();
 
@@ -249,10 +240,6 @@ void ProfilePolicyConnector::Init(
   }
 
     local_test_policy_provider_ = connector->local_test_policy_provider();
-
-  if (configuration_policy_provider) {
-    policy_providers_.push_back(configuration_policy_provider);
-  }
 
   std::vector<std::unique_ptr<PolicyMigrator>> migrators;
 
@@ -288,28 +275,12 @@ bool ProfilePolicyConnector::IsManaged(
 ) const {
   if (is_managed_override_)
     return *is_managed_override_;
-  const CloudPolicyStore* actual_policy_store = GetActualPolicyStore();
-  if (actual_policy_store)
-    return actual_policy_store->is_managed();
   return false;
-}
-
-bool ProfilePolicyConnector::IsProfilePolicy(const char* policy_key) const {
-  const ConfigurationPolicyProvider* const provider =
-      DeterminePolicyProviderForPolicy(policy_key);
-  return provider == configuration_policy_provider_;
 }
 
 base::flat_set<std::string> ProfilePolicyConnector::user_affiliation_ids()
     const {
-  if (!user_affiliation_ids_for_testing_.empty()) {
-    return user_affiliation_ids_for_testing_;
-  }
-  auto* store = GetActualPolicyStore();
-  if (!store || !store->has_policy())
-    return {};
-  const auto& ids = store->policy()->user_affiliation_ids();
-  return {ids.begin(), ids.end()};
+  return user_affiliation_ids_for_testing_;
 }
 
 void ProfilePolicyConnector::SetUserAffiliationIdsForTesting(
@@ -325,23 +296,6 @@ void ProfilePolicyConnector::OnPolicyServiceInitialized(PolicyDomain domain) {
 void ProfilePolicyConnector::DoPostInit() {
   DCHECK(policy_service_);
   policy_service_->AddObserver(POLICY_DOMAIN_CHROME, this);
-}
-
-const CloudPolicyStore* ProfilePolicyConnector::GetActualPolicyStore() const {
-  if (policy_store_)
-    return policy_store_;
-  return nullptr;
-}
-
-const ConfigurationPolicyProvider*
-ProfilePolicyConnector::DeterminePolicyProviderForPolicy(
-    const char* policy_key) const {
-  const PolicyNamespace chrome_ns(POLICY_DOMAIN_CHROME, "");
-  for (const ConfigurationPolicyProvider* provider : policy_providers_) {
-    if (provider->policies().Get(chrome_ns).Get(policy_key))
-      return provider;
-  }
-  return nullptr;
 }
 
 void ProfilePolicyConnector::AppendPolicyProviderWithSchemaTracking(

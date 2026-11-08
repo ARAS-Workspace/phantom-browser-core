@@ -52,14 +52,6 @@ const char kForceSigninProfileLockedKey[] = "force_signin_profile_locked";
 const char kHostedDomain[] = "hosted_domain";
 const char kIsManaged[] = "is_managed";
 const char kOIDCIdentityNameKey[] = "oidc_identity_name";
-const char kProfileManagementEnrollmentToken[] =
-    "profile_management_enrollment_token";
-const char kDasherlessManagement[] = "dasherless_management";
-const char kProfileManagementOidcAuthToken[] =
-    "profile_management_oidc_auth_token";
-const char kProfileManagementOidcIdToken[] = "profile_management_oidc_id_token";
-const char kProfileManagementId[] = "profile_management_id";
-const char kProfileManagementOidcState[] = "profile_management_oidc_state";
 const char kUserAcceptedAccountManagement[] =
     "user_accepted_account_management";
 
@@ -129,38 +121,6 @@ void ProfileAttributesEntry::RegisterLocalStatePrefs(
 }
 
 ProfileAttributesEntry::ProfileAttributesEntry() = default;
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens() = default;
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens(
-    const std::string& auth_token,
-    const std::string& id_token,
-    const std::u16string& identity_name)
-    : auth_token(auth_token),
-      id_token(id_token),
-      identity_name(identity_name) {}
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens(
-    const std::string& auth_token,
-    const std::string& id_token,
-    const std::string& state)
-    : auth_token(auth_token), id_token(id_token), state(state) {}
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens(
-    const std::string& encrypted_user_info)
-    : auth_token(""), id_token(encrypted_user_info), is_token_encrypted(true) {}
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens(
-    ProfileManagementOidcTokens&& other) = default;
-ProfileManagementOidcTokens& ProfileManagementOidcTokens::operator=(
-    ProfileManagementOidcTokens&& other) = default;
-
-ProfileManagementOidcTokens::ProfileManagementOidcTokens(
-    const ProfileManagementOidcTokens& other) = default;
-ProfileManagementOidcTokens& ProfileManagementOidcTokens::operator=(
-    const ProfileManagementOidcTokens& other) = default;
-
-ProfileManagementOidcTokens::~ProfileManagementOidcTokens() = default;
 
 void ProfileAttributesEntry::Initialize(ProfileAttributesStorage* storage,
                                         const base::FilePath& path,
@@ -490,10 +450,6 @@ bool ProfileAttributesEntry::IsSignedInWithCredentialProvider() const {
   return GetBool(prefs::kSignedInWithCredentialProvider);
 }
 
-bool ProfileAttributesEntry::IsDasherlessManagement() const {
-  return GetBool(kDasherlessManagement);
-}
-
 size_t ProfileAttributesEntry::GetAvatarIconIndex() const {
   std::string icon_url = GetString(kAvatarIconKey);
   size_t icon_index = 0;
@@ -583,26 +539,6 @@ signin::Tribool ProfileAttributesEntry::GetIsManaged() const {
     return signin::Tribool::kUnknown;
   }
   return static_cast<signin::Tribool>(value);
-}
-
-std::string ProfileAttributesEntry::GetProfileManagementEnrollmentToken()
-    const {
-  return GetString(kProfileManagementEnrollmentToken);
-}
-
-ProfileManagementOidcTokens
-ProfileAttributesEntry::GetProfileManagementOidcTokens() const {
-  std::string auth_token = GetString(kProfileManagementOidcAuthToken);
-  std::string id_token = GetString(kProfileManagementOidcIdToken);
-  return (auth_token.empty() && !id_token.empty())
-             ? ProfileManagementOidcTokens(id_token)
-             : ProfileManagementOidcTokens(
-                   auth_token, id_token,
-                   GetString(kProfileManagementOidcState));
-}
-
-std::string ProfileAttributesEntry::GetProfileManagementId() const {
-  return GetString(kProfileManagementId);
 }
 
 std::string ProfileAttributesEntry::GetAccountIdKey() const {
@@ -714,10 +650,6 @@ void ProfileAttributesEntry::SetSignedInWithCredentialProvider(bool value) {
   SetBool(prefs::kSignedInWithCredentialProvider, value);
 }
 
-void ProfileAttributesEntry::SetDasherlessManagement(bool value) {
-  SetBool(kDasherlessManagement, value);
-}
-
 void ProfileAttributesEntry::LockForceSigninProfile(bool is_lock) {
   DCHECK(signin_util::IsForceSigninEnabled());
   if (SetBool(kForceSigninProfileLockedKey, is_lock)) {
@@ -807,30 +739,6 @@ void ProfileAttributesEntry::SetHostedDomain(
 void ProfileAttributesEntry::SetIsManaged(signin::Tribool value) {
   if (SetInteger(kIsManaged, std::to_underlying(value))) {
     profile_attributes_storage_->NotifyProfileIsManagedChanged(GetPath());
-  }
-}
-
-void ProfileAttributesEntry::SetProfileManagementEnrollmentToken(
-    const std::string& enrollment_token) {
-  if (SetString(kProfileManagementEnrollmentToken, enrollment_token)) {
-    profile_attributes_storage_->NotifyProfileManagementEnrollmentTokenChanged(
-        GetPath());
-  }
-}
-
-void ProfileAttributesEntry::SetProfileManagementOidcTokens(
-    const ProfileManagementOidcTokens& oidc_tokens) {
-  SetString(kProfileManagementOidcAuthToken, oidc_tokens.auth_token);
-  SetString(kProfileManagementOidcIdToken, oidc_tokens.id_token);
-  SetString(kProfileManagementOidcState, oidc_tokens.state);
-  if (SetString16(kOIDCIdentityNameKey, oidc_tokens.identity_name)) {
-    profile_attributes_storage_->NotifyIfProfileNamesHaveChanged();
-  }
-}
-
-void ProfileAttributesEntry::SetProfileManagementId(const std::string& id) {
-  if (SetString(kProfileManagementId, id)) {
-    profile_attributes_storage_->NotifyProfileManagementIdChanged(GetPath());
   }
 }
 

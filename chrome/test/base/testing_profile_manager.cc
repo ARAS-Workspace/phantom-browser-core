@@ -29,8 +29,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#include "components/policy/core/common/cloud/cloud_policy_manager.h"
-
 constexpr char kGuestProfileName[] = "$guest";
 constexpr char kSystemProfileName[] = "System";
 
@@ -78,8 +76,7 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
     bool is_supervised_profile,
     std::optional<bool> is_new_profile,
     std::optional<std::unique_ptr<policy::PolicyService>> policy_service,
-    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
-    std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager) {
+    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory) {
   DCHECK(called_set_up_);
 
   // Create the profile and register it.
@@ -89,9 +86,6 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
   builder.SetIsNewProfile(is_new_profile.value_or(false));
   if (policy_service)
     builder.SetPolicyService(std::move(*policy_service));
-  if (user_cloud_policy_manager) {
-    builder.SetUserCloudPolicyManager(std::move(user_cloud_policy_manager));
-  }
   builder.AddTestingFactories(std::move(testing_factories));
   builder.SetSharedURLLoaderFactory(shared_url_loader_factory);
 

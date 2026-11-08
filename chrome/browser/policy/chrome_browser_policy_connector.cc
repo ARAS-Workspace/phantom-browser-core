@@ -19,15 +19,10 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/policy/configuration_policy_handler_list_factory.h"
-#include "chrome/browser/policy/device_management_service_configuration.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome_browser_policy_connector.h"
 #include "components/policy/core/common/async_policy_provider.h"
-#include "components/policy/core/common/cloud/cloud_external_data_manager.h"
-#include "components/policy/core/common/cloud/cloud_policy_client_registration_helper.h"
-#include "components/policy/core/common/cloud/device_management_service.h"
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/policy/core/common/command_line_policy_provider.h"
 #include "components/policy/core/common/configuration_policy_provider.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
@@ -35,7 +30,6 @@
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/policy/core/common/policy_pref_names.h"
-#include "components/policy/core/common/policy_proto_decoders.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
@@ -76,15 +70,7 @@ void ChromeBrowserPolicyConnector::Init(
     PrefService* local_state,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   PolicyLogger::GetInstance()->EnableLogDeletion();
-  auto configuration = std::make_unique<DeviceManagementServiceConfiguration>(
-      GetDeviceManagementUrl(), GetRealtimeReportingUrl(),
-      GetEncryptedReportingUrl());
-  auto device_management_service =
-      std::make_unique<DeviceManagementService>(std::move(configuration));
-  device_management_service->ScheduleInitialization(
-      kServiceInitializationStartupDelay);
-
-  InitInternal(local_state, std::move(device_management_service));
+  InitInternal(local_state);
 }
 
 void ChromeBrowserPolicyConnector::OnBrowserStarted() {}

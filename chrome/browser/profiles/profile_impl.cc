@@ -136,9 +136,6 @@
 #include "components/metrics/metrics_service.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/permissions/permission_manager.h"
-#include "components/policy/core/common/cloud/cloud_policy_manager.h"
-#include "components/policy/core/common/cloud/profile_cloud_policy_manager.h"
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
@@ -270,12 +267,6 @@ base::Time CreateProfileDirectory(base::SequencedTaskRunner* io_task_runner,
   return base::Time::Now();
 }
 
-ProfileImpl::CloudPolicyManagerTestFactory&
-GetTestingCloudPolicyManagerFactory() {
-  static base::NoDestructor<ProfileImpl::CloudPolicyManagerTestFactory> factory;
-  return *factory;
-}
-
 }  // namespace
 
 // static
@@ -371,12 +362,6 @@ void ProfileImpl::RegisterProfilePrefs(
   registry->RegisterUint64Pref(prefs::kLomProfileId, 0u);
 }
 
-// static
-void ProfileImpl::SetCloudPolicyManagerFactoryForTesting(
-    CloudPolicyManagerTestFactory factory) {
-  GetTestingCloudPolicyManagerFactory() = std::move(factory);
-}
-
 ProfileImpl::ProfileImpl(
     const base::FilePath& path,
     Delegate* delegate,
@@ -455,62 +440,10 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
   // policy data immediately.
   bool force_immediate_policy_load = !async_prefs;
 
-  policy::CloudPolicyManager* cloud_policy_manager = nullptr;
-  policy::ConfigurationPolicyProvider* policy_provider = nullptr;
-  {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    if (GetTestingCloudPolicyManagerFactory()) {
-      auto result = GetTestingCloudPolicyManagerFactory().Run(this);
-      if (std::holds_alternative<
-              std::unique_ptr<policy::ProfileCloudPolicyManager>>(result)) {
-        profile_cloud_policy_manager_ = std::move(
-            std::get<std::unique_ptr<policy::ProfileCloudPolicyManager>>(
-                result));
-        cloud_policy_manager = profile_cloud_policy_manager_.get();
-      } else if (std::holds_alternative<
-                     std::unique_ptr<policy::UserCloudPolicyManager>>(result)) {
-        user_cloud_policy_manager_ = std::move(
-            std::get<std::unique_ptr<policy::UserCloudPolicyManager>>(result));
-        cloud_policy_manager = user_cloud_policy_manager_.get();
-      }
-    }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-    if (!cloud_policy_manager) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      ProfileAttributesEntry* entry = nullptr;
-      if (g_browser_process->profile_manager()) {
-        entry = g_browser_process->profile_manager()
-                    ->GetProfileAttributesStorage()
-                    .GetProfileAttributesWithPath(GetPath());
-      }
-
-      if (entry && (!entry->GetProfileManagementEnrollmentToken().empty() ||
-                    entry->IsDasherlessManagement())) {
-        profile_cloud_policy_manager_ =
-            policy::ProfileCloudPolicyManager::Create(
-                GetPath(), GetPolicySchemaRegistryService()->registry(),
-                force_immediate_policy_load, io_task_runner_,
-                base::BindRepeating(&content::GetNetworkConnectionTracker),
-                entry->IsDasherlessManagement());
-        cloud_policy_manager = profile_cloud_policy_manager_.get();
-      } else {
-#else
-      {
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-        user_cloud_policy_manager_ = policy::UserCloudPolicyManager::Create(
-            GetPath(), GetPolicySchemaRegistryService()->registry(),
-            force_immediate_policy_load, io_task_runner_,
-            base::BindRepeating(&content::GetNetworkConnectionTracker));
-        cloud_policy_manager = user_cloud_policy_manager_.get();
-      }
-    }
-    policy_provider = cloud_policy_manager;
-  }
   profile_policy_connector_ =
       policy::CreateProfilePolicyConnectorForBrowserContext(
-          schema_registry_service_->registry(), cloud_policy_manager,
-          policy_provider, g_browser_process->browser_policy_connector(),
+          schema_registry_service_->registry(),
+          g_browser_process->browser_policy_connector(),
           force_immediate_policy_load, this);
 
   bool is_signin_profile = false;
@@ -751,8 +684,6 @@ ProfileImpl::~ProfileImpl() {
   SimpleKeyMap::GetInstance()->Dissociate(this);
 
   profile_policy_connector_->Shutdown();
-  if (configuration_policy_provider())
-    configuration_policy_provider()->Shutdown();
 
   // This must be called before ProfileIOData::ShutdownOnUIThread but after
   // other profile-related destroy notifications are dispatched.
@@ -1028,33 +959,6 @@ PrefService* ProfileImpl::GetReadOnlyOffTheRecordPrefs() {
 
 policy::SchemaRegistryService* ProfileImpl::GetPolicySchemaRegistryService() {
   return schema_registry_service_.get();
-}
-
-policy::UserCloudPolicyManager* ProfileImpl::GetUserCloudPolicyManager() {
-  return user_cloud_policy_manager_.get();
-}
-
-policy::ProfileCloudPolicyManager* ProfileImpl::GetProfileCloudPolicyManager() {
-  return profile_cloud_policy_manager_.get();
-}
-
-policy::CloudPolicyManager* ProfileImpl::GetCloudPolicyManager() {
-  if (user_cloud_policy_manager_) {
-    return GetUserCloudPolicyManager();
-  }
-  if (profile_cloud_policy_manager_) {
-    return GetProfileCloudPolicyManager();
-  }
-  return nullptr;
-}
-
-policy::ConfigurationPolicyProvider*
-ProfileImpl::configuration_policy_provider() {
-  if (user_cloud_policy_manager_.get()) {
-    return user_cloud_policy_manager_.get();
-  } else {
-    return profile_cloud_policy_manager_.get();
-  }
 }
 
 policy::ProfilePolicyConnector* ProfileImpl::GetProfilePolicyConnector() {

@@ -28,7 +28,6 @@
 
 class BrowserWindowInterface;
 class SigninUIError;
-class TurnSyncOnHelperPolicyFetchTracker;
 
 class DiceSignedInProfileCreator;
 class SyncServiceStartupStateObserver;
@@ -203,22 +202,8 @@ class TurnSyncOnHelper {
   // Used as callback for ShowMergeSyncDataConfirmation().
   void OnMergeAccountConfirmation(signin::SigninChoice choice);
 
-  // Used as callback for ShowEnterpriseAccountConfirmation().
-  void OnEnterpriseAccountConfirmation(signin::SigninChoice choice);
-
   // Turns sync on with the current profile or a new profile.
   void TurnSyncOnWithProfileMode(ProfileMode profile_mode);
-
-  // Callback invoked once policy registration is complete.
-  void OnRegisteredForPolicy(bool is_account_managed);
-
-  // Helper function that loads policy with the cached |dm_token_| and
-  // |client_id|, then completes the signin process.
-  void LoadPolicyWithCachedCredentials();
-
-  // Callback invoked when a policy fetch request has completed. |success| is
-  // true if policy was successfully fetched.
-  void OnPolicyFetchComplete(bool success);
 
   // Called to create a new profile, which is then signed in with the
   // in-progress auth credentials currently stored in this object.
@@ -269,8 +254,6 @@ class TurnSyncOnHelper {
   // Whether the refresh token should be deleted if the Sync flow is aborted.
   SigninAbortedMode signin_aborted_mode_;
 
-  const bool user_already_signed_in_;
-
   // Account information.
   const AccountInfo account_info_;
 
@@ -281,7 +264,6 @@ class TurnSyncOnHelper {
   base::ScopedClosureRunner scoped_callback_runner_;
 
   std::unique_ptr<SyncServiceStartupStateObserver> sync_startup_state_observer_;
-  std::unique_ptr<TurnSyncOnHelperPolicyFetchTracker> policy_fetch_tracker_;
   std::unique_ptr<DiceSignedInProfileCreator> dice_signed_in_profile_creator_;
 
   // The initial primary account is restored if the flow aborts.

@@ -183,10 +183,6 @@ class ProfileAttributesStorage {
   void NotifyProfileIsManagedChanged(const base::FilePath& profile_path) const;
   void NotifyProfileUserManagementAcceptanceChanged(
       const base::FilePath& profile_path) const;
-  void NotifyProfileManagementEnrollmentTokenChanged(
-      const base::FilePath& profile_path) const;
-  void NotifyProfileManagementIdChanged(
-      const base::FilePath& profile_path) const;
 
   // Returns a pref dictionary key of a profile at `profile_path`.
   std::string StorageKeyFromProfilePath(

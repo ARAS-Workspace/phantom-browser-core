@@ -43,51 +43,6 @@ enum class NameForm {
   kGaiaAndLocalName,
 };
 
-// TODO(381117479): Currently we support two different OIDC enrollment flows:
-// 1. by sending both Auth and ID token through URL param and
-// 2. by sending encrypted user information in the auth header
-// Usage for method 1 has been removed and we will deprecate related support
-// code in a follow up.
-struct ProfileManagementOidcTokens {
-  ProfileManagementOidcTokens();
-  ProfileManagementOidcTokens(const std::string& auth_token,
-                              const std::string& id_token,
-                              const std::u16string& identity_name);
-  ProfileManagementOidcTokens(const std::string& auth_token,
-                              const std::string& id_token,
-                              const std::string& state);
-  // This will be the new format of the `ProfileManagementOidcTokens` struct,
-  // after we fully migrate.
-  explicit ProfileManagementOidcTokens(const std::string& encrypted_user_info);
-
-  ProfileManagementOidcTokens(const ProfileManagementOidcTokens& other);
-  ProfileManagementOidcTokens& operator=(
-      const ProfileManagementOidcTokens& other);
-
-  ProfileManagementOidcTokens(ProfileManagementOidcTokens&& other);
-  ProfileManagementOidcTokens& operator=(ProfileManagementOidcTokens&& other);
-  ~ProfileManagementOidcTokens();
-
-  // Authorization token from the authorization response.
-  std::string auth_token;
-
-  // ID token from the authorization response or the encrypted user information.
-  // Field will be renamed to encrypted_user_information once we fully migrate.
-  std::string id_token;
-
-  // Identity name of the profile. This is only relevant after the completion of
-  // profile registration.
-  std::u16string identity_name;
-
-  // OIDC configuration state. This is only relevant during profile
-  // registration.
-  std::string state;
-
-  // Whether the passing ID token/user info is encrypted. This field will be
-  // removed after we fully migrate.
-  bool is_token_encrypted = false;
-};
-
 class ProfileAttributesEntry {
  public:
   static void RegisterLocalStatePrefs(PrefRegistrySimple* registry);
@@ -191,9 +146,6 @@ class ProfileAttributesEntry {
   bool IsUsingDefaultAvatar() const;
   // Indicates that profile was signed in through native OS credential provider.
   bool IsSignedInWithCredentialProvider() const;
-  // Returns true if the profile is managed by a third party identity that is
-  // not sync-ed to Google (i.e dasher-based).
-  bool IsDasherlessManagement() const;
   // Returns the index of the default icon used by the profile.
   size_t GetAvatarIconIndex() const;
   // Returns the colors specified by the profile theme, or default colors if no
@@ -215,18 +167,6 @@ class ProfileAttributesEntry {
 
   // Returns management status of the current signed-in account.
   signin::Tribool GetIsManaged() const;
-
-  // Returns the enrollment token to get policies for a profile.
-  std::string GetProfileManagementEnrollmentToken() const;
-
-  // Returns the Oauth token and Id token from the OIDC authentication response
-  // that created the profile. The existence of these tokens are also used to
-  // check whether the profile is created by an OIDC authentication response.
-  ProfileManagementOidcTokens GetProfileManagementOidcTokens() const;
-
-  // Returns the signin id for a profile managed by a token. This may be empty
-  // even if there is an enrollment token.
-  std::string GetProfileManagementId() const;
 
   // Returns an account id key of the user of the profile. Empty if the profile
   // doesn't have any associated `user_manager::User`.
@@ -251,7 +191,6 @@ class ProfileAttributesEntry {
   void SetLastDownloadedGAIAPictureUrlWithSize(
       const std::string& image_url_with_size);
   void SetSignedInWithCredentialProvider(bool value);
-  void SetDasherlessManagement(bool value);
   // Only non-omitted profiles can be set as non-ephemeral. It's the
   // responsibility of the caller to make sure that the entry is set as
   // non-ephemeral only if prefs::kForceEphemeralProfiles is false.
@@ -268,11 +207,6 @@ class ProfileAttributesEntry {
   // Clears the hosted_domain value when std::nullopt is passed.
   void SetHostedDomain(std::optional<std::string_view> hosted_domain);
   void SetIsManaged(signin::Tribool value);
-
-  void SetProfileManagementEnrollmentToken(const std::string& enrollment_token);
-  void SetProfileManagementOidcTokens(
-      const ProfileManagementOidcTokens& oidc_tokens);
-  void SetProfileManagementId(const std::string& id);
 
   void SetAuthInfo(const GaiaId& gaia_id,
                    const std::u16string& user_name,

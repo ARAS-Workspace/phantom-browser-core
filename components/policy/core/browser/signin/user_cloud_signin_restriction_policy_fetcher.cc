@@ -16,7 +16,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/browser/signin/profile_separation_policies.h"
-#include "components/policy/core/common/cloud/cloud_policy_client_registration_helper.h"
 #include "components/policy/core/common/policy_logger.h"
 #include "components/policy/core/common/policy_switches.h"
 #include "components/policy/proto/secure_connect.pb.h"

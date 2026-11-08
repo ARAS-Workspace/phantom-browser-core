@@ -20,12 +20,9 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/pref_names.h"
-#include "components/policy/core/browser/policy_data_utils.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/account_managed_status_finder.h"
-
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 
 namespace {
 
@@ -107,12 +104,6 @@ std::optional<std::string> GetAccountManagerIdentity(Profile* profile) {
     }
   }
 #endif
-
-  const std::optional<std::string> managed_by =
-      policy::GetManagedBy(profile->GetCloudPolicyManager());
-  if (managed_by) {
-    return *managed_by;
-  }
 
   if (profile->GetProfilePolicyConnector()->IsUsingLocalTestPolicyProvider()) {
     return "Local Test Policies";

@@ -23,8 +23,6 @@
 #include "base/timer/elapsed_timer.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/policy/cloud/user_policy_signin_service.h"
-#include "chrome/browser/policy/cloud/user_policy_signin_service_factory.h"
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/signin/account_reconcilor_factory.h"
 #include "chrome/browser/signin/dice_signed_in_profile_creator.h"
@@ -39,7 +37,6 @@
 #include "chrome/browser/ui/webui/signin/signin_ui_error.h"
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper_delegate_impl.h"
-#include "chrome/browser/ui/webui/signin/turn_sync_on_helper_policy_fetch_tracker.h"
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "components/keyed_service/content/browser_context_keyed_service_shutdown_notifier_factory.h"
 #include "components/keyed_service/core/keyed_service_shutdown_notifier.h"
@@ -87,7 +84,6 @@ class TurnSyncOnHelperShutdownNotifierFactory
     DependsOn(IdentityManagerFactory::GetInstance());
     DependsOn(SyncServiceFactory::GetInstance());
     DependsOn(UnifiedConsentServiceFactory::GetInstance());
-    DependsOn(policy::UserPolicySigninServiceFactory::GetInstance());
   }
   ~TurnSyncOnHelperShutdownNotifierFactory() override = default;
 };
@@ -162,7 +158,6 @@ TurnSyncOnHelper::TurnSyncOnHelper(
       signin_access_point_(signin_access_point),
       signin_promo_action_(signin_promo_action),
       signin_aborted_mode_(signin_aborted_mode),
-      user_already_signed_in_(user_already_signed_in),
       account_info_(
           identity_manager_->FindExtendedAccountInfoByAccountId(account_id)),
       scoped_callback_runner_(std::move(callback)),
@@ -295,57 +290,11 @@ void TurnSyncOnHelper::OnMergeAccountConfirmation(signin::SigninChoice choice) {
   }
 }
 
-void TurnSyncOnHelper::OnEnterpriseAccountConfirmation(
-    signin::SigninChoice choice) {
-  enterprise_account_confirmed_ = choice == signin::SIGNIN_CHOICE_CONTINUE ||
-                                  choice == signin::SIGNIN_CHOICE_NEW_PROFILE;
-  signin_util::RecordEnterpriseProfileCreationUserChoice(
-      profile_, enterprise_account_confirmed_);
-
-  switch (choice) {
-    case signin::SIGNIN_CHOICE_CANCEL:
-      // When profile creation/separation is enforced, declining the creation
-      // should fully sign the user out (even from the Web area) in order for
-      // the make sure not to bypass the policies in anyway.
-      if (delegate_->IsProfileCreationRequiredByPolicy() &&
-          !enterprise_util::UserAcceptedAccountManagement(profile_)) {
-        signin_aborted_mode_ = SigninAbortedMode::REMOVE_ACCOUNT;
-      } else if (!user_already_signed_in_) {
-        signin_aborted_mode_ = SigninAbortedMode::KEEP_ACCOUNT_ON_WEB_ONLY;
-      }
-      base::RecordAction(
-          base::UserMetricsAction("Signin_EnterpriseAccountPrompt_Cancel"));
-      AbortAndDelete();
-      break;
-    case signin::SIGNIN_CHOICE_CONTINUE:
-      base::RecordAction(
-          base::UserMetricsAction("Signin_EnterpriseAccountPrompt_ImportData"));
-      LoadPolicyWithCachedCredentials();
-      break;
-    case signin::SIGNIN_CHOICE_NEW_PROFILE:
-      base::RecordAction(base::UserMetricsAction(
-          "Signin_EnterpriseAccountPrompt_DontImportData"));
-      CreateNewSignedInProfile();
-      break;
-    case signin::SIGNIN_CHOICE_SIZE:
-      NOTREACHED();
-  }
-}
-
 void TurnSyncOnHelper::TurnSyncOnWithProfileMode(ProfileMode profile_mode) {
   switch (profile_mode) {
-    case ProfileMode::CURRENT_PROFILE: {
-      // If this is a new signin (no account authenticated yet) try loading
-      // policy for this user now, before any signed in services are
-      // initialized.
-      policy_fetch_tracker_ =
-          TurnSyncOnHelperPolicyFetchTracker::CreateInstance(profile_,
-                                                             account_info_);
-      policy_fetch_tracker_->RegisterForPolicy(base::BindOnce(
-          &TurnSyncOnHelper::OnRegisteredForPolicy, base::Unretained(this)),
-          /*is_registration_for_management_consistency_check=*/false);
+    case ProfileMode::CURRENT_PROFILE:
+      SigninAndShowSyncConfirmationUI();
       break;
-    }
     case ProfileMode::NEW_PROFILE:
       // If this is a new signin (no account authenticated yet) in a new
       // profile, then just create the new signed-in profile and skip loading
@@ -355,35 +304,6 @@ void TurnSyncOnHelper::TurnSyncOnWithProfileMode(ProfileMode profile_mode) {
       CreateNewSignedInProfile();
       break;
   }
-}
-
-void TurnSyncOnHelper::OnRegisteredForPolicy(bool is_account_managed) {
-  if (!is_account_managed) {
-    // Just finish signing in.
-    DVLOG(1) << "Policy registration failed";
-    SigninAndShowSyncConfirmationUI();
-    return;
-  }
-
-  if (!enterprise_util::UserAcceptedAccountManagement(profile_)) {
-    // Allow user to create a new profile before continuing with sign-in.
-    delegate_->ShowEnterpriseAccountConfirmation(
-        account_info_,
-        base::BindOnce(&TurnSyncOnHelper::OnEnterpriseAccountConfirmation,
-                       weak_pointer_factory_.GetWeakPtr()));
-    return;
-  }
-
-  DCHECK(enterprise_util::UserAcceptedAccountManagement(profile_));
-  LoadPolicyWithCachedCredentials();
-}
-
-void TurnSyncOnHelper::LoadPolicyWithCachedCredentials() {
-  DCHECK(policy_fetch_tracker_);
-  bool fetch_started = policy_fetch_tracker_->FetchPolicy(
-      base::BindOnce(&TurnSyncOnHelper::SigninAndShowSyncConfirmationUI,
-                     base::Unretained(this)));
-  DCHECK(fetch_started);
 }
 
 void TurnSyncOnHelper::CreateNewSignedInProfile() {
@@ -434,17 +354,7 @@ void TurnSyncOnHelper::OnNewSignedInProfileCreated(
   search_engines::UpdateProfileFromChoiceData(*new_profile,
                                               search_engine_choice_data);
 
-  if (policy_fetch_tracker_) {
-    // Load policy for the just-created profile - once policy has finished
-    // loading the signin process will complete.
-    // Note: the fetch might not happen if the account is not managed.
-    policy_fetch_tracker_->FetchPolicy(
-        base::BindOnce(&TurnSyncOnHelper::SigninAndShowSyncConfirmationUI,
-                       base::Unretained(this)));
-  } else {
-    // No policy to load - simply complete the signin process.
-    SigninAndShowSyncConfirmationUI();
-  }
+  SigninAndShowSyncConfirmationUI();
 }
 
 void TurnSyncOnHelper::SigninAndShowSyncConfirmationUI() {
@@ -610,8 +520,6 @@ void TurnSyncOnHelper::SwitchToProfile(Profile* new_profile) {
   DCHECK(!sync_blocker_);
   DCHECK(!sync_startup_state_observer_);
 
-  policy::UserPolicySigninServiceFactory::GetForProfile(profile_)
-      ->ShutdownCloudPolicyManager();
   SetCurrentTurnSyncOnHelper(profile_, nullptr);  // Detach from old profile
   profile_ = new_profile;
   initial_primary_account_ = CoreAccountId();
@@ -624,9 +532,6 @@ void TurnSyncOnHelper::SwitchToProfile(Profile* new_profile) {
           ->Subscribe(base::BindOnce(&TurnSyncOnHelper::AbortAndDelete,
                                      base::Unretained(this)));
   delegate_->SwitchToProfile(new_profile);
-  if (policy_fetch_tracker_) {
-    policy_fetch_tracker_->SwitchToProfile(profile_);
-  }
 }
 
 void TurnSyncOnHelper::AttachToProfile() {
@@ -637,8 +542,6 @@ void TurnSyncOnHelper::AttachToProfile() {
     if (current_helper->account_info_.account_id == account_info_.account_id) {
       current_helper->signin_aborted_mode_ = SigninAbortedMode::KEEP_ACCOUNT;
     }
-    policy::UserPolicySigninServiceFactory::GetForProfile(profile_)
-        ->ShutdownCloudPolicyManager();
     current_helper->AbortAndDelete();
   }
   DCHECK(!GetCurrentTurnSyncOnHelper(profile_));
@@ -681,8 +584,6 @@ void TurnSyncOnHelper::RemoveAccount() {
       identity_manager_->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
           .account_id;
   if (is_primary_account) {
-    policy::UserPolicySigninServiceFactory::GetForProfile(profile_)
-        ->ShutdownCloudPolicyManager();
     auto* primary_account_mutator =
         identity_manager_->GetPrimaryAccountMutator();
     if (signin_aborted_mode_ == SigninAbortedMode::KEEP_ACCOUNT_ON_WEB_ONLY) {

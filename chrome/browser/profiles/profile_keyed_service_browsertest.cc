@@ -38,10 +38,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "components/policy/core/common/features.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
 namespace {
 // Creates a Profile and its underlying OTR Profile for testing.
 // Waits for all tasks to be done to get as many services created as possible.
@@ -620,7 +616,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "TtsAPI",
     "UDPSocketEventDispatcher",
     "UkmBackgroundRecorderService",
-    "UserPolicySigninService",
     "UserScriptWorldConfigurationManager",
     "WarningBadgeService",
     "WarningService",
@@ -639,12 +634,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
   if (SearchEnginePreconnector::ShouldBeEnabledAsKeyedService()) {
     guest_active_services.insert("SearchEnginePreconnector");
   }
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  if (base::FeatureList::IsEnabled(
-          policy::features::kEnableExtensionInstallPolicyFetching)) {
-    guest_active_services.insert("ExtensionInstallPolicyService");
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   Browser* guest_browser = CreateGuestBrowser();
   Profile* guest_parent_profile =
       guest_browser->GetProfile()->GetOriginalProfile();

@@ -32,7 +32,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/crx_file/crx_verifier.h"
 #include "components/crx_file/id_util.h"
-#include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_namespace.h"

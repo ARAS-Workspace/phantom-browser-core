@@ -378,18 +378,6 @@ OffTheRecordProfileImpl::GetPolicySchemaRegistryService() {
   return nullptr;
 }
 
-policy::UserCloudPolicyManager*
-OffTheRecordProfileImpl::GetUserCloudPolicyManager() {
-  return GetOriginalProfile()->GetUserCloudPolicyManager();
-}
-policy::ProfileCloudPolicyManager*
-OffTheRecordProfileImpl::GetProfileCloudPolicyManager() {
-  return GetOriginalProfile()->GetProfileCloudPolicyManager();
-}
-policy::CloudPolicyManager* OffTheRecordProfileImpl::GetCloudPolicyManager() {
-  return GetOriginalProfile()->GetCloudPolicyManager();
-}
-
 content::BrowserPluginGuestManager* OffTheRecordProfileImpl::GetGuestManager() {
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
   return guest_view::GuestViewManager::FromBrowserContext(this);

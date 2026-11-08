@@ -8,7 +8,6 @@
 
 #include "base/values.h"
 #include "build/build_config.h"
-#include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "components/policy/core/common/policy_bundle.h"
 #include "components/policy/core/common/policy_switches.h"
 #include "components/policy/core/common/policy_types.h"

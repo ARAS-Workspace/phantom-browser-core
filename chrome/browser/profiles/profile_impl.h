@@ -37,9 +37,7 @@ class SequencedTaskRunner;
 }
 
 namespace policy {
-class ConfigurationPolicyProvider;
 class ProfilePolicyConnector;
-class ProfileCloudPolicyManager;
 }  // namespace policy
 
 namespace sync_preferences {
@@ -58,13 +56,6 @@ class ProfileImpl : public Profile {
   ~ProfileImpl() override;
 
   static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
-
-  using CloudPolicyManagerTestFactory = base::RepeatingCallback<std::variant<
-      std::unique_ptr<policy::UserCloudPolicyManager>,
-      std::unique_ptr<policy::ProfileCloudPolicyManager>>(Profile*)>;
-
-  static void SetCloudPolicyManagerFactoryForTesting(
-      CloudPolicyManagerTestFactory factory);
 
   // content::BrowserContext implementation:
   std::unique_ptr<content::ZoomLevelDelegate> CreateZoomLevelDelegate(
@@ -124,9 +115,6 @@ class ProfileImpl : public Profile {
   ChromeZoomLevelPrefs* GetZoomLevelPrefs() override;
   PrefService* GetReadOnlyOffTheRecordPrefs() override;
   policy::SchemaRegistryService* GetPolicySchemaRegistryService() override;
-  policy::UserCloudPolicyManager* GetUserCloudPolicyManager() override;
-  policy::ProfileCloudPolicyManager* GetProfileCloudPolicyManager() override;
-  policy::CloudPolicyManager* GetCloudPolicyManager() override;
   policy::ProfilePolicyConnector* GetProfilePolicyConnector() override;
   const policy::ProfilePolicyConnector* GetProfilePolicyConnector()
       const override;
@@ -195,8 +183,6 @@ class ProfileImpl : public Profile {
   void UpdateIsEphemeralInStorage();
   void UpdateAiSubscriptionTierInStorage();
 
-  policy::ConfigurationPolicyProvider* configuration_policy_provider();
-
   base::FilePath path_;
 
   base::Time path_creation_time_;
@@ -215,19 +201,9 @@ class ProfileImpl : public Profile {
   // can be removed once |prefs_| becomes a KeyedService too.
 
   // - |prefs_| depends on |profile_policy_connector_|
-  // - |profile_policy_connector_| depends on configuration_policy_provider(),
-  //   which can be:
-  //     - |user_cloud_policy_manager_|;
-  //     - |user_cloud_policy_manager_ash_|;
-  // - configuration_policy_provider() depends on |schema_registry_service_|
+  // - |profile_policy_connector_| depends on |schema_registry_service_|
 
   std::unique_ptr<policy::SchemaRegistryService> schema_registry_service_;
-
-  // configuration_policy_provider() is either of these, or nullptr in some
-  // tests.
-  std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager_;
-  std::unique_ptr<policy::ProfileCloudPolicyManager>
-      profile_cloud_policy_manager_;
 
   std::unique_ptr<policy::ProfilePolicyConnector> profile_policy_connector_;
 

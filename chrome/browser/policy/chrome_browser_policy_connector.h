@@ -28,10 +28,6 @@ class LocalTestPolicyProvider;
 // implementations and Android.
 class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
  public:
-  // Service initialization delay time in millisecond on startup. (So that
-  // displaying Chrome's GUI does not get delayed.)
-  static const int64_t kServiceInitializationStartupDelay = 5000;
-
   // Builds an uninitialized ChromeBrowserPolicyConnector, suitable for testing.
   // Init() should be called to create and start the policy machinery.
   ChromeBrowserPolicyConnector();

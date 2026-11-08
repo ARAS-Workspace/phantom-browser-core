@@ -14,7 +14,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_selections.h"
 #include "components/bookmarks/managed/managed_bookmark_service.h"
-#include "components/policy/policy_constants.h"
 
 namespace {
 
@@ -54,8 +53,7 @@ std::string ManagedBookmarkServiceFactory::GetManagedBookmarksManager(
     Profile* profile) {
   policy::ProfilePolicyConnector* connector =
       profile->GetProfilePolicyConnector();
-  if (connector->IsManaged() &&
-      connector->IsProfilePolicy(policy::key::kManagedBookmarks)) {
+  if (connector->IsManaged()) {
     std::optional<std::string> account_manager =
         GetAccountManagerIdentity(profile);
     if (account_manager)

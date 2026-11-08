@@ -237,8 +237,6 @@ constexpr char kEnterpriseSearchAggregatorName[] =
 constexpr char kParentPermissionDialogName[] = "parent_permission_dialog";
 constexpr char kUserCloudSigninRestrictionPolicyFetcherName[] =
     "user_cloud_signin_restriction_policy_fetcher";
-constexpr char kCloudPolicyClientRegistrationName[] =
-    "cloud_policy_client_registration";
 constexpr char kSafeBrowsingName[] = "safe_browsing_service";
 constexpr char kTailoredSecurityServiceName[] = "tailored_security_service";
 constexpr char kLensOverlayQueryControllerName[] =
@@ -466,11 +464,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kUserCloudSigninRestrictionPolicyFetcherName,
           /*scopes=*/{GaiaConstants::kSecureConnectOAuth2Scope});
-    case OAuthConsumerId::kCloudPolicyClientRegistration:
-      return OAuthConsumer(
-          /*name=*/kCloudPolicyClientRegistrationName,
-          /*scopes=*/{GaiaConstants::kDeviceManagementServiceOAuth,
-                      GaiaConstants::kGoogleUserInfoEmail});
     case OAuthConsumerId::kSafeBrowsing:
       return OAuthConsumer(
           /*name=*/kSafeBrowsingName,

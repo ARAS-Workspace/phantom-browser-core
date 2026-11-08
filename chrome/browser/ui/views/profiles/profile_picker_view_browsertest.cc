@@ -43,9 +43,6 @@
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/metrics/first_web_contents_profiler_base.h"
-#include "chrome/browser/policy/cloud/user_policy_signin_service.h"
-#include "chrome/browser/policy/cloud/user_policy_signin_service_factory.h"
-#include "chrome/browser/policy/cloud/user_policy_signin_service_test_util.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/policy/profile_policy_connector_builder.h"
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
@@ -409,10 +406,6 @@ class ProfilePickerCreationFlowBrowserTest
 
   virtual void OnWillCreateBrowserContextServices(
       content::BrowserContext* context) {
-    policy::UserPolicySigninServiceFactory::GetInstance()->SetTestingFactory(
-        context,
-        base::BindRepeating(&policy::FakeUserPolicySigninService::Build));
-
     // Clear the previous cookie responses (if any) before using it for a new
     // profile (as test_url_loader_factory() is shared across profiles).
     test_url_loader_factory()->ClearResponses();

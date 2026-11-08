@@ -168,8 +168,6 @@ after discussions on the right group.
       <annotation id="actor_login_permission_service"/>
       <annotation id="glic_private_api_prompt_fetcher"/>
       <annotation id="finds_model_execution"/>
-      <annotation id="device_management_enrollment"/>
-      <annotation id="device_management_reporting"/>
       <annotation id="skills_fetcher"/>
       <annotation id="web_app_custom_icon_fetcher"/>
       <annotation id="suggestions_powered_by_ai"/>
@@ -187,8 +185,6 @@ after discussions on the right group.
   </group>
   <group name="Admin Features">
     <sender name="Cloud Policy">
-      <annotation id="external_policy_fetcher"/>
-      <annotation id="user_info_fetcher"/>
       <annotation id="managed_configuration_loader"/>
       <annotation id="managed_acccount_signin_restrictions_secure_connect"/>
       <annotation id="enterprise_proxy_pvd_fetch"/>
@@ -233,7 +229,6 @@ after discussions on the right group.
     <sender name="Accounts, Identity, and Authentication">
       <annotation id="accounts_image_fetcher"/>
       <annotation id="device_bound_session_register"/>
-      <annotation id="device_management_service"/>
     </sender>
     <sender name="OAuth 2.0 and FedCM">
       <annotation id="fedcm"/>

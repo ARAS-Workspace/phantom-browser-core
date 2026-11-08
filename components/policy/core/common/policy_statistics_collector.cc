@@ -14,7 +14,6 @@
 #include "base/notreached.h"
 #include "base/task/task_runner.h"
 #include "base/time/time.h"
-#include "components/policy/core/common/cloud/enterprise_metrics.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/policy/core/common/policy_service.h"
