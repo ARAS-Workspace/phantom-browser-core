@@ -128,9 +128,9 @@ class ChromeBrowsingDataRemoverDelegate
     kMediaDeviceSalts = 45,
     // See also kDisableAutoSigninForProfilePasswords.
     kDisableAutoSigninForAccountPasswords = 46,
-    kPrivateVerificationTokens = 47,
+    // kPrivateVerificationTokens = 47, deprecated
 
-    kMaxValue = kPrivateVerificationTokens,
+    kMaxValue = kDisableAutoSigninForAccountPasswords,
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/history/enums.xml:ChromeBrowsingDataRemoverTasks)
 

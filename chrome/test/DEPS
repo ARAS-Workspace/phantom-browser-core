@@ -69,7 +69,6 @@ include_rules = [
   "+components/power_bookmarks/core",
   "+components/prefs",
   "+components/privacy_sandbox",
-  "+components/private_verification_tokens",
   "+components/profile_metrics",
   "+components/sampling_profiler",
   "+components/search",

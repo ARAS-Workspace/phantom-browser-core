@@ -625,7 +625,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/privacy",
     "//chrome/browser/privacy_sandbox:headers",
     "//chrome/browser/private_insights",
-    "//chrome/browser/private_verification_tokens",
     "//chrome/browser/reduce_accept_language",
     "//chrome/browser/regional_capabilities",
     "//chrome/browser/search_engine_choice",

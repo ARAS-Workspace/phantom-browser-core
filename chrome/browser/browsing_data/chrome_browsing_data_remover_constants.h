@@ -42,8 +42,6 @@ constexpr DataType DATA_TYPE_ISOLATED_WEB_APP_COOKIES = DATA_TYPE_EMBEDDER_BEGIN
 constexpr DataType DATA_TYPE_TABS = DATA_TYPE_EMBEDDER_BEGIN << 15;
 constexpr DataType DATA_TYPE_SEARCH_ENGINE_CHOICE = DATA_TYPE_EMBEDDER_BEGIN
                                                     << 16;
-constexpr DataType DATA_TYPE_PRIVATE_VERIFICATION_TOKENS =
-    DATA_TYPE_EMBEDDER_BEGIN << 17;
 
 // Group datatypes.
 
@@ -58,8 +56,7 @@ constexpr DataType DATA_TYPE_SITE_DATA =
     DATA_TYPE_ISOLATED_WEB_APP_COOKIES |
     content::BrowsingDataRemover::DATA_TYPE_PRIVACY_SANDBOX |
     content::BrowsingDataRemover::DATA_TYPE_DEVICE_BOUND_SESSIONS |
-    content::BrowsingDataRemover::DATA_TYPE_DECLARATIVE_PERFORMANCE_OBSERVER |
-    DATA_TYPE_PRIVATE_VERIFICATION_TOKENS;
+    content::BrowsingDataRemover::DATA_TYPE_DECLARATIVE_PERFORMANCE_OBSERVER;
 
 // Datatypes protected by Important Sites.
 constexpr DataType IMPORTANT_SITES_DATA_TYPES =

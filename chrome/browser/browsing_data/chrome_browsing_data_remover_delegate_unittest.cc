@@ -61,8 +61,6 @@
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
-#include "chrome/browser/private_verification_tokens/private_verification_tokens_service.h"
-#include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/test_signin_client_builder.h"
 
@@ -130,8 +128,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_attestations/scoped_privacy_sandbox_attestations.h"
 #include "components/privacy_sandbox/privacy_sandbox_settings.h"
 #include "components/privacy_sandbox/privacy_sandbox_test_util.h"
-#include "components/private_verification_tokens/common/private_verification_tokens_database.h"
-#include "components/private_verification_tokens/common/private_verification_tokens_token.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/site_isolation/pref_names.h"
@@ -154,7 +150,6 @@
 #include "content/public/test/test_web_contents_factory.h"
 #include "content/public/test/web_contents_tester.h"
 #include "mojo/public/cpp/bindings/remote.h"
-#include "net/base/features.h"
 #include "net/base/isolation_info.h"
 #include "net/base/network_anonymization_key.h"
 #include "net/cookies/canonical_cookie.h"
@@ -3082,233 +3077,4 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest,
       settings_map->GetContentSetting(kRequestedSubdomain, kTopLevel,
                                       ContentSettingsType::STORAGE_ACCESS),
       CONTENT_SETTING_ASK);
-}
-
-class ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest
-    : public ChromeBrowsingDataRemoverDelegateTest {
- public:
-  ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        net::features::kEnablePrivateVerificationTokens);
-  }
-
-  void SetUp() override { ChromeBrowsingDataRemoverDelegateTest::SetUp(); }
-
-  void TearDown() override {
-    pvt_service_ = nullptr;
-    ChromeBrowsingDataRemoverDelegateTest::TearDown();
-  }
-
- protected:
-  void PrepopulateDatabase(
-      const std::vector<
-          private_verification_tokens::PrivateVerificationTokensToken>&
-          tokens) {
-    base::FilePath db_path = GetProfile()->GetPath().Append(
-        FILE_PATH_LITERAL("PrivateVerificationTokens"));
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    std::unique_ptr<
-        private_verification_tokens::PrivateVerificationTokensDatabase>
-        database = private_verification_tokens::
-            PrivateVerificationTokensDatabase::Create(db_path);
-    ASSERT_TRUE(database);
-    database->StoreTokens(tokens);
-  }
-
-  void InitializeService() {
-    pvt_service_ =
-        PrivateVerificationTokensServiceFactory::GetForProfile(GetProfile());
-    ASSERT_TRUE(pvt_service_);
-  }
-
-  void WaitForInitialization() {
-    ASSERT_TRUE(pvt_service_);
-    if (pvt_service_->is_initialized()) {
-      return;
-    }
-    base::test::TestFuture<void> init_future;
-    class Waiter : public PrivateVerificationTokensService::Observer {
-     public:
-      explicit Waiter(base::OnceClosure callback)
-          : callback_(std::move(callback)) {}
-      void OnInitializationComplete() override { std::move(callback_).Run(); }
-
-     private:
-      base::OnceClosure callback_;
-    };
-    Waiter waiter(init_future.GetCallback());
-    base::ScopedObservation<PrivateVerificationTokensService,
-                            PrivateVerificationTokensService::Observer>
-        observation(&waiter);
-    observation.Observe(pvt_service_);
-    EXPECT_TRUE(init_future.Wait());
-  }
-
-  std::vector<url::Origin> GetTokenIssuers() {
-    base::test::TestFuture<std::vector<url::Origin>> future;
-    pvt_service_->GetTokenIssuers(future.GetCallback());
-    return future.Get();
-  }
-
- private:
-  raw_ptr<PrivateVerificationTokensService> pvt_service_ = nullptr;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_F(ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest,
-       RemoveAllTokens) {
-  const auto expiration = base::Time::Now() + base::Hours(2);
-  PrepopulateDatabase({
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example1.com")), {1, 2, 3}, 1,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example2.com")), {4, 5, 6}, 2,
-          expiration, 1),
-  });
-  InitializeService();
-  WaitForInitialization();
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
-
-  BlockUntilBrowsingDataRemoved(
-      base::Time(), base::Time::Max(),
-      chrome_browsing_data_remover::DATA_TYPE_PRIVATE_VERIFICATION_TOKENS,
-      false);
-  EXPECT_TRUE(GetTokenIssuers().empty());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest,
-       RemoveOneToken) {
-  const auto expiration = base::Time::Now() + base::Hours(2);
-  PrepopulateDatabase({
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example1.com")), {1, 2, 3}, 1,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example2.com")), {4, 5, 6}, 2,
-          expiration, 1),
-  });
-  InitializeService();
-  WaitForInitialization();
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
-
-  std::unique_ptr<BrowsingDataFilterBuilder> filter(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kDelete));
-  filter->AddRegisterableDomain("example1.com");
-
-  BlockUntilOriginDataRemoved(
-      base::Time(), base::Time::Max(),
-      chrome_browsing_data_remover::DATA_TYPE_PRIVATE_VERIFICATION_TOKENS,
-      std::move(filter));
-  EXPECT_THAT(
-      GetTokenIssuers(),
-      testing::ElementsAre(url::Origin::Create(GURL("https://example2.com"))));
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest,
-       RemoveSiteToken) {
-  const auto expiration = base::Time::Now() + base::Hours(2);
-  PrepopulateDatabase({
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example1.com")), {1, 2, 3}, 1,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://www.example1.com")), {4, 5, 6}, 2,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example2.com")), {7, 8, 9}, 3,
-          expiration, 1),
-  });
-  InitializeService();
-  WaitForInitialization();
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://www.example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
-
-  std::unique_ptr<BrowsingDataFilterBuilder> filter(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kDelete));
-  filter->AddRegisterableDomain("example1.com");
-
-  BlockUntilOriginDataRemoved(
-      base::Time(), base::Time::Max(),
-      chrome_browsing_data_remover::DATA_TYPE_PRIVATE_VERIFICATION_TOKENS,
-      std::move(filter));
-  EXPECT_THAT(
-      GetTokenIssuers(),
-      testing::ElementsAre(url::Origin::Create(GURL("https://example2.com"))));
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest,
-       PreserveOneToken) {
-  const auto expiration = base::Time::Now() + base::Hours(2);
-  PrepopulateDatabase({
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example1.com")), {1, 2, 3}, 1,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example2.com")), {4, 5, 6}, 2,
-          expiration, 1),
-  });
-  InitializeService();
-  WaitForInitialization();
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
-
-  std::unique_ptr<BrowsingDataFilterBuilder> filter(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kPreserve));
-  filter->AddRegisterableDomain("example1.com");
-
-  BlockUntilOriginDataRemoved(
-      base::Time(), base::Time::Max(),
-      chrome_browsing_data_remover::DATA_TYPE_PRIVATE_VERIFICATION_TOKENS,
-      std::move(filter));
-  EXPECT_THAT(
-      GetTokenIssuers(),
-      testing::ElementsAre(url::Origin::Create(GURL("https://example1.com"))));
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegatePrivateVerificationTokensTest,
-       RemoveCookiesDoesNotRemoveTokens) {
-  const auto expiration = base::Time::Now() + base::Hours(2);
-  PrepopulateDatabase({
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example1.com")), {1, 2, 3}, 1,
-          expiration, 1),
-      private_verification_tokens::PrivateVerificationTokensToken(
-          url::Origin::Create(GURL("https://example2.com")), {4, 5, 6}, 2,
-          expiration, 1),
-  });
-  InitializeService();
-  WaitForInitialization();
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-
-  EXPECT_THAT(GetTokenIssuers(),
-              testing::UnorderedElementsAre(
-                  url::Origin::Create(GURL("https://example1.com")),
-                  url::Origin::Create(GURL("https://example2.com"))));
 }

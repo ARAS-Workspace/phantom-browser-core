@@ -1360,7 +1360,6 @@ source_set("browser") {
     "//chrome/browser/preloading/search_preload",
     "//chrome/browser/privacy",
     "//chrome/browser/privacy_sandbox:impl",
-    "//chrome/browser/private_verification_tokens",
     "//chrome/browser/profiles:misc",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles:profile_util_impl",
