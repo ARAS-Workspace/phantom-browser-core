@@ -9,9 +9,6 @@
 #include "components/policy/resources/webui/mojom/policy.mojom.h"
 #include "google_apis/gaia/gaia_auth_util.h"
 
-#include "chrome/browser/enterprise/util/affiliation.h"
-#include "chrome/browser/policy/dm_token_utils.h"
-
 const char kDevicePolicyStatusDescription[] = "statusDevice";
 const char kUserPolicyStatusDescription[] = "statusUser";
 
@@ -32,12 +29,6 @@ void SetDomainExtractedFromUsername(policy::mojom::StatusPtr& status) {
 
 void GetUserAffiliationStatus(base::DictValue* dict, Profile* profile) {
   CHECK(profile);
-
-  // Don't show affiliation status if the browser isn't enrolled in CBCM.
-  if (!policy::GetDMToken(profile).is_valid()) {
-    return;
-  }
-  dict->Set("isAffiliated", enterprise_util::IsProfileAffiliated(profile));
 }
 
 void SetProfileId(base::DictValue* dict, Profile* profile) {

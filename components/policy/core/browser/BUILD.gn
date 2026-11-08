@@ -88,7 +88,6 @@ source_set("internal") {
     "//components/policy/resources/webui/mojom:mojo_bindings",
     "//components/pref_registry",
     "//components/prefs",
-    "//components/reporting/proto:record_proto",
     "//components/signin/public/identity_manager",
     "//components/strings",
     "//components/url_formatter",

@@ -98,38 +98,10 @@ if (enable_extensions) {
   }
 }
 
-source_set("test_support_fakes") {
-  testonly = true
-
-  sources = [
-    "messaging_layer/upload/fake_upload_client.cc",
-    "messaging_layer/upload/fake_upload_client.h",
-  ]
-
-  public_deps = [ ":policy" ]
-
-  deps = [
-    "//base",
-    "//components/reporting/proto:record_proto",
-    "//components/reporting/resources:resource_manager",
-    "//components/reporting/util:status",
-  ]
-}
-
 source_set("test_support") {
   testonly = true
 
   sources = [
-    "messaging_layer/public/report_client_test_util.cc",
-    "messaging_layer/public/report_client_test_util.h",
-    "messaging_layer/upload/file_upload_job_test_util.cc",
-    "messaging_layer/upload/file_upload_job_test_util.h",
-    "messaging_layer/util/reporting_server_connector_test_util.cc",
-    "messaging_layer/util/reporting_server_connector_test_util.h",
-    "messaging_layer/util/test_request_payload.cc",
-    "messaging_layer/util/test_request_payload.h",
-    "messaging_layer/util/test_response_payload.cc",
-    "messaging_layer/util/test_response_payload.h",
     "policy_test_utils.cc",
     "policy_test_utils.h",
     "safe_browsing_policy_test.cc",
@@ -140,19 +112,11 @@ source_set("test_support") {
     "//base",
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/policy:impl",
-    "//chrome/browser/policy/messaging_layer/storage_selector",
     "//chrome/test:test_support",
     "//components/google/core/common",
     "//components/policy/core/common",
     "//components/policy/core/common:common_constants",
     "//components/policy/core/common:test_support",
-    "//components/reporting/proto:record_constants",
-    "//components/reporting/proto:record_proto",
-    "//components/reporting/storage:storage_module",
-    "//components/reporting/storage:test_support",
-    "//components/reporting/util:status",
-    "//components/reporting/util:status_macros",
-    "//components/reporting/util:test_callbacks_support",
     "//components/security_interstitials/content:security_interstitial_page",
     "//url",
   ]
@@ -485,25 +449,6 @@ source_set("unit_tests") {
     "isolate_origins_policy_handler_unittest.cc",
     "javascript_policy_handler_unittest.cc",
     "local_network_access_ip_address_space_overrides_policy_handler_unittest.cc",
-    "messaging_layer/public/report_client_unittest.cc",
-    "messaging_layer/upload/configuration_file_controller_unittest.cc",
-    "messaging_layer/upload/encrypted_reporting_client_unittest.cc",
-    "messaging_layer/upload/event_upload_size_controller_unittest.cc",
-    "messaging_layer/upload/file_upload_job_unittest.cc",
-    "messaging_layer/upload/network_condition_service_unittest.cc",
-    "messaging_layer/upload/record_handler_impl_unittest.cc",
-    "messaging_layer/upload/record_handler_upload_unittest.cc",
-    "messaging_layer/upload/record_upload_request_builder_unittest.cc",
-    "messaging_layer/upload/server_uploader_unittest.cc",
-    "messaging_layer/upload/testing_network_condition_service.cc",
-    "messaging_layer/upload/testing_network_condition_service.h",
-    "messaging_layer/upload/upload_client_unittest.cc",
-    "messaging_layer/upload/upload_provider_unittest.cc",
-    "messaging_layer/util/dm_token_retriever_provider_unittest.cc",
-    "messaging_layer/util/report_queue_manual_test_context_unittest.cc",
-    "messaging_layer/util/reporting_server_connector_unittest.cc",
-    "messaging_layer/util/upload_response_parser_unittest.cc",
-    "messaging_layer/util/user_dm_token_retriever_unittest.cc",
     "profile_policy_connector_unittest.cc",
     "value_provider/policy_value_provider_unittest.cc",
   ]
@@ -517,13 +462,6 @@ source_set("unit_tests") {
     "//components/account_id:test_support",
     "//components/policy/core/browser:test_support",
     "//components/policy/core/common:test_support",
-    "//components/reporting/client:test_support",
-    "//components/reporting/encryption:decryption",
-    "//components/reporting/encryption:primitives",
-    "//components/reporting/encryption:testing_primitives",
-    "//components/reporting/storage:test_support",
-    "//components/reporting/util:status_macros",
-    "//components/reporting/util:test_callbacks_support",
     "//components/site_isolation",
     "//extensions/buildflags",
     "//testing/gmock",
@@ -564,28 +502,10 @@ source_set("policy") {
     "developer_tools_policy_checker_factory.h",
     "developer_tools_policy_handler.h",
     "device_management_service_configuration.h",
-    "dm_token_utils.h",
     "homepage_location_policy_handler.h",
     "isolate_origins_policy_handler.h",
     "javascript_policy_handler.h",
     "local_network_access_ip_address_space_overrides_policy_handler.h",
-    "messaging_layer/public/report_client.h",
-    "messaging_layer/upload/configuration_file_controller.h",
-    "messaging_layer/upload/encrypted_reporting_client.h",
-    "messaging_layer/upload/event_upload_size_controller.h",
-    "messaging_layer/upload/file_upload_job.h",
-    "messaging_layer/upload/network_condition_service.h",
-    "messaging_layer/upload/record_handler_impl.h",
-    "messaging_layer/upload/record_upload_request_builder.h",
-    "messaging_layer/upload/server_uploader.h",
-    "messaging_layer/upload/upload_client.h",
-    "messaging_layer/upload/upload_provider.h",
-    "messaging_layer/util/dm_token_retriever_provider.h",
-    "messaging_layer/util/report_queue_manual_test_context.h",
-    "messaging_layer/util/reporting_server_connector.h",
-    "messaging_layer/util/upload_declarations.h",
-    "messaging_layer/util/upload_response_parser.h",
-    "messaging_layer/util/user_dm_token_retriever.h",
     "policy_ui_utils.h",
     "policy_value_and_status_aggregator.h",
     "profile_policy_connector.h",
@@ -603,7 +523,6 @@ source_set("policy") {
   public_deps = [
     "//base",
     "//chrome/browser/enterprise",
-    "//chrome/browser/policy/messaging_layer/proto:log_upload_event_proto",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles:profile_util",
     "//chrome/common:constants",
@@ -612,15 +531,6 @@ source_set("policy") {
     "//components/policy/core/common",
     "//components/policy/resources/webui/mojom:mojo_bindings",
     "//components/prefs",
-    "//components/reporting/client:report_queue",
-    "//components/reporting/client:report_queue_configuration",
-    "//components/reporting/client:report_queue_provider",
-    "//components/reporting/encryption:verification",
-    "//components/reporting/proto:configuration_file_proto",
-    "//components/reporting/proto:upload_tracker_proto",
-    "//components/reporting/resources:resource_manager",
-    "//components/reporting/util:status",
-    "//components/reporting/util:task_runner_context",
     "//components/signin/public/identity_manager",
     "//google_apis",
     "//net",
@@ -665,13 +575,6 @@ source_set("policy") {
     public += [ "local_sync_policy_handler.h" ]
   }
 
-  if (is_linux) {
-    public += [
-      "messaging_layer/util/manual_test_heartbeat_event.h",
-      "messaging_layer/util/manual_test_heartbeat_event_factory.h",
-    ]
-  }
-
   if (enable_printing) {
     public += [ "printing_restrictions_policy_handler.h" ]
     public_deps += [ "//printing/backend" ]
@@ -697,27 +600,10 @@ source_set("impl") {
     "developer_tools_policy_checker_factory.cc",
     "developer_tools_policy_handler.cc",
     "device_management_service_configuration.cc",
-    "dm_token_utils.cc",
     "homepage_location_policy_handler.cc",
     "isolate_origins_policy_handler.cc",
     "javascript_policy_handler.cc",
     "local_network_access_ip_address_space_overrides_policy_handler.cc",
-    "messaging_layer/public/report_client.cc",
-    "messaging_layer/upload/configuration_file_controller.cc",
-    "messaging_layer/upload/encrypted_reporting_client.cc",
-    "messaging_layer/upload/event_upload_size_controller.cc",
-    "messaging_layer/upload/file_upload_job.cc",
-    "messaging_layer/upload/network_condition_service.cc",
-    "messaging_layer/upload/record_handler_impl.cc",
-    "messaging_layer/upload/record_upload_request_builder.cc",
-    "messaging_layer/upload/server_uploader.cc",
-    "messaging_layer/upload/upload_client.cc",
-    "messaging_layer/upload/upload_provider.cc",
-    "messaging_layer/util/dm_token_retriever_provider.cc",
-    "messaging_layer/util/report_queue_manual_test_context.cc",
-    "messaging_layer/util/reporting_server_connector.cc",
-    "messaging_layer/util/upload_response_parser.cc",
-    "messaging_layer/util/user_dm_token_retriever.cc",
     "policy_ui_utils.cc",
     "policy_value_and_status_aggregator.cc",
     "profile_policy_connector.cc",
@@ -752,7 +638,6 @@ source_set("impl") {
     "//chrome/browser/lifetime",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/net",
-    "//chrome/browser/policy/messaging_layer/storage_selector",
     "//chrome/browser/prefetch",
     "//chrome/browser/privacy_sandbox:headers",
     "//chrome/browser/profiles",
@@ -777,15 +662,6 @@ source_set("impl") {
     "//components/language/core/browser",
     "//components/pref_registry",
     "//components/proxy_config",
-    "//components/reporting/encryption:primitives",
-    "//components/reporting/proto:record_proto",
-    "//components/reporting/proto:upload_tracker_proto",
-    "//components/reporting/resources:resource_manager",
-    "//components/reporting/storage:storage_module_interface",
-    "//components/reporting/util:backoff_settings",
-    "//components/reporting/util:status",
-    "//components/reporting/util:status_macros",
-    "//components/reporting/util:task_runner_context",
     "//components/site_isolation",
     "//components/unified_consent",
     "//components/user_manager",
@@ -839,13 +715,6 @@ source_set("impl") {
   if (is_linux || is_mac) {
     sources += [ "local_sync_policy_handler.cc" ]
     deps += [ "//components/themes:policy" ]
-  }
-
-  if (is_linux) {
-    sources += [
-      "messaging_layer/util/manual_test_heartbeat_event.cc",
-      "messaging_layer/util/manual_test_heartbeat_event_factory.cc",
-    ]
   }
 
   if (enable_printing) {

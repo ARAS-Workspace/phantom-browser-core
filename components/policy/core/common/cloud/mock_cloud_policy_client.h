@@ -12,7 +12,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "components/policy/core/common/cloud/device_management_service.h"
-#include "components/reporting/proto/synced/record.pb.h"
 #include "device_management_backend.pb.h"
 #include "testing/gmock/include/gmock/gmock.h"
 

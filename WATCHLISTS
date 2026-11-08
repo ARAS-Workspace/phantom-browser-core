@@ -982,11 +982,6 @@
                   '|components/policy/'\
                   '|docs/website/site/administrators/',
     },
-    'cros_reporting': {
-      'filepath': 'chrome/browser/policy/messaging_layer/'\
-                  '|chrome/browser/ash/policy/status_collector/'\
-                  '|components/policy/proto/record',
-    },
     'crostini': {
       'filepath': 'cicerone'\
                   '|concierge'\
@@ -2722,7 +2717,6 @@
               'wry+watch-creator@chromium.org',],
     'cros_commercial_enrollment': ['asumaneev+watch@google.com'],
     'cros_commercial_policy': ['enterprise-policy-review@google.com'],
-    'cros_reporting': ['cros-reporting-reviews@google.com'],
     'crostini': ['crostini-ui@chromium.org'],
     'cups_printing': ['print-reviews+cups@chromium.org',
                       'cros-printing-reviews@google.com'],

@@ -444,9 +444,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AppLoadService",
     "AppRestoreService",
     "AppServiceProxy",
-#if BUILDFLAG(IS_LINUX)
-    "ManualTestHeartbeatEvent",
-#endif  // BUILDFLAG(IS_LINUX)
     "AppTerminationObserver",
     "AppWindowRegistry",
     "AudioAPI",

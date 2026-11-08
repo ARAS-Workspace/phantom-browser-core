@@ -7,7 +7,6 @@
 #include "base/json/json_reader.h"
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
-#include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
@@ -33,8 +32,6 @@ class DownloadUiEnterpriseUtilTest : public ::testing::Test {
     ASSERT_TRUE(testing_profile_manager_.SetUp());
 
     profile_ = testing_profile_manager_.CreateTestingProfile("testing_profile");
-    policy::SetDMTokenForTesting(
-        policy::DMToken::CreateValidToken("fake-token"));
   }
 
   void TearDown() override { profile_ = nullptr; }

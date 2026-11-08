@@ -253,9 +253,6 @@
 #include "chrome/browser/multistep_filter/core/multistep_filter_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "device/fido/public/features.h"
-#if BUILDFLAG(IS_LINUX)
-#include "chrome/browser/policy/messaging_layer/util/manual_test_heartbeat_event_factory.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/search_integrity/search_integrity_factory.h"  // nogncheck
@@ -588,9 +585,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ReduceAcceptLanguageFactory::GetInstance();
   RendererUpdaterFactory::GetInstance();
   regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX)
-  reporting::ManualTestHeartbeatEventFactory::GetInstance();
-#endif
   search_engines::SearchEngineChoiceServiceFactory::GetInstance();
   SearchPrefetchServiceFactory::GetInstance();
   SearchPrewarmProgressServiceFactory::GetInstance();

@@ -81,9 +81,6 @@ const char* JobTypeToRequestType(
       return dm_protocol::kValueRequestUploadPolicyValidationReport;
     case DeviceManagementService::JobConfiguration::TYPE_REQUEST_SAML_URL:
       return dm_protocol::kValueRequestPublicSamlUser;
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_REAL_TIME_REPORT:
-      NOTREACHED() << "Not a DMServer request type " << type;
     case DeviceManagementService::JobConfiguration::TYPE_CHROME_OS_USER_REPORT:
       return dm_protocol::kValueRequestChromeOsUserReport;
     case DeviceManagementService::JobConfiguration::
@@ -97,9 +94,6 @@ const char* JobTypeToRequestType(
     case DeviceManagementService::JobConfiguration::
         TYPE_BROWSER_UPLOAD_PUBLIC_KEY:
       return dm_protocol::kValueBrowserUploadPublicKey;
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_ENCRYPTED_REPORT:
-      NOTREACHED() << "Not a DMServer request type " << type;
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_EUICC_INFO:
       return dm_protocol::kValueRequestUploadEuiccInfo;
     case DeviceManagementService::JobConfiguration::TYPE_CHROME_PROFILE_REPORT:

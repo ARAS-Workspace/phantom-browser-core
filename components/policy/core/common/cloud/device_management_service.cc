@@ -258,17 +258,11 @@ std::string DeviceManagementService::JobConfiguration::GetJobTypeAsString(
       return "Unregistration";
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_CERTIFICATE:
       return "UploadCertificate";
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_ENCRYPTED_REPORT:
-      return "UploadEncryptedReport";
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_EUICC_INFO:
       return "UploadEuiccInfo";
     case DeviceManagementService::JobConfiguration::
         TYPE_UPLOAD_POLICY_VALIDATION_REPORT:
       return "UploadPolicyValidationReport";
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_REAL_TIME_REPORT:
-      return "UploadrealtimeReport";
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_STATUS:
       return "UploadStatus";
     case DeviceManagementService::JobConfiguration::
@@ -408,11 +402,7 @@ JobConfigurationBase::GetTrafficAnnotationTag() {
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_STATUS:
     case DeviceManagementService::JobConfiguration::TYPE_CHROME_DESKTOP_REPORT:
     case DeviceManagementService::JobConfiguration::TYPE_CHROME_PROFILE_REPORT:
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_REAL_TIME_REPORT:
     case DeviceManagementService::JobConfiguration::TYPE_REQUEST_SAML_URL:
-    case DeviceManagementService::JobConfiguration::
-        TYPE_UPLOAD_ENCRYPTED_REPORT:
       return net::DefineNetworkTrafficAnnotation("device_management_reporting",
                                                  R"(
         semantics {
