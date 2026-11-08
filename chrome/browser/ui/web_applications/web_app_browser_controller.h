@@ -31,10 +31,6 @@
 
 class SkBitmap;
 
-namespace content_relationship_verification {
-class DigitalAssetLinksHandler;
-}
-
 namespace base {
 class TimeTicks;
 }  // namespace base
@@ -157,7 +153,6 @@ class WebAppBrowserController : public AppBrowserController,
 
   void OnReadHomeTabIcon(SkBitmap home_tab_icon_bitmap) const;
   void OnReadIcon(IconPurpose purpose, SkBitmap bitmap);
-  void PerformDigitalAssetLinkVerification(BrowserWindowInterface* browser);
   void CreateMetadataAndTriggerAppUpdateDialog(
       base::TimeTicks start_time) const;
   void CreateMetadataAndTriggerAppMigrationDialog(

@@ -25,7 +25,6 @@
 #include "content/public/browser/browsing_data_remover.h"
 
 class Profile;
-class BrandcodeConfigFetcher;
 
 namespace base {
 class AtomicFlag;
@@ -122,9 +121,6 @@ class ProfileResetter : public content::BrowsingDataRemover::Observer {
   // Callback for when TemplateURLService has loaded.
   void OnTemplateURLServiceLoaded();
 
-  // Callback to check if the settings is fetched properly.
-  void OnDefaultSettingsFetched();
-
   const raw_ptr<Profile, DanglingUntriaged> profile_;
   std::unique_ptr<BrandcodedDefaultSettings> master_settings_;
   raw_ptr<TemplateURLService, DanglingUntriaged> template_url_service_;
@@ -141,11 +137,6 @@ class ProfileResetter : public content::BrowsingDataRemover::Observer {
   raw_ptr<content::BrowsingDataRemover> cookies_remover_;
 
   base::CallbackListSubscription template_url_service_subscription_;
-
-  // Contains Chrome brand code; empty for organic Chrome.
-  std::string brandcode_;
-
-  std::unique_ptr<BrandcodeConfigFetcher> config_fetcher_;
 
   SEQUENCE_CHECKER(sequence_checker_);
 

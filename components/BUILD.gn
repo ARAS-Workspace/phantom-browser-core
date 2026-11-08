@@ -305,7 +305,6 @@ test("components_unittests") {
       "//components/certificate_transparency:unit_tests",
       "//components/content_capture/browser:unit_tests",
       "//components/content_extraction/content/browser:unit_tests",
-      "//components/content_relationship_verification:unit_tests",
       "//components/content_settings/browser:unit_tests",
       "//components/custom_handlers:unit_tests",
       "//components/devtools/simple_devtools_protocol_client:unit_tests",
@@ -451,7 +450,6 @@ test("components_unittests") {
       "//components/metrics/private_metrics:unit_tests",
       "//components/metrics/structured:unit_tests",
       "//components/metrics/structured/mojom:unit_tests",
-      "//components/private_insights:unit_tests",
       "//components/stability_report:unit_tests",
     ]
   }

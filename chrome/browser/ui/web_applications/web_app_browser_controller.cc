@@ -103,7 +103,6 @@ WebAppBrowserController::WebAppBrowserController(
       registrar().GetAppEffectiveDisplayMode(this->app_id());
   install_manager_observation_.Observe(&provider.install_manager());
   registrar_observation_.Observe(&provider.registrar_unsafe());
-  PerformDigitalAssetLinkVerification(browser);
 
   if (AppUsesWindowControlsOverlay()) {
     per_window_wco_enabled_ =
@@ -675,10 +674,6 @@ void WebAppBrowserController::OnReadIcon(IconPurpose purpose, SkBitmap bitmap) {
   if (IconLoadCallbackForTesting()) {
     std::move(IconLoadCallbackForTesting()).Run();
   }
-}
-
-void WebAppBrowserController::PerformDigitalAssetLinkVerification(
-    BrowserWindowInterface* browser) {
 }
 
 void WebAppBrowserController::OnMetadataObtainedTriggerUpdateDialog(

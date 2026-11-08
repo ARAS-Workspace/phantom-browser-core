@@ -108,7 +108,6 @@ after discussions on the right group.
       <annotation id="direct_sockets"/>
       <annotation id="sanitized_image_source"/>
       <annotation id="web_app_origin_association_download"/>
-      <annotation id="digital_asset_links"/>
       <annotation id="device_trust_key_rotation"/>
     </sender>
     <sender name="Recently Added">
@@ -182,7 +181,6 @@ after discussions on the right group.
       <annotation id="chrome_sync_preview_fetcher"/>
       <annotation id="contextual_search_fpop_service"/>
       <annotation id="web_install_manifest_fetcher"/>
-      <annotation id="private_insights_fcp_http"/>
       <annotation id="doodle_impression_android"/>
       <annotation id="read_aloud_generate_text"/>
       <annotation id="read_aloud_synthesize"/>
@@ -270,9 +268,6 @@ after discussions on the right group.
     </sender>
   </group>
   <group name="Networking">
-    <sender name="Brandcode Configuration">
-      <annotation id="brandcode_config"/>
-    </sender>
     <sender name="DNS">
       <annotation id="dns_over_https"/>
       <annotation id="dns_transaction"/>

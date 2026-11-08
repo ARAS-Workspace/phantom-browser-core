@@ -17,15 +17,11 @@
 #include "base/task/thread_pool.h"
 #include "base/threading/scoped_blocking_call.h"
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
-#include "chrome/browser/google/google_brand.h"
-#include "chrome/browser/net/system_network_context_manager.h"
-#include "chrome/browser/profile_resetter/brandcode_config_fetcher.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -63,22 +59,6 @@ ProfileResetter::ProfileResetter(Profile* profile)
       cookies_remover_(nullptr) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK(profile_);
-
-  google_brand::GetBrand(&brandcode_);
-  if (brandcode_.empty()) {
-    return;
-  }
-  config_fetcher_ = std::make_unique<BrandcodeConfigFetcher>(
-      g_browser_process->system_network_context_manager()
-          ->GetURLLoaderFactory(),
-      base::BindOnce(&ProfileResetter::OnDefaultSettingsFetched,
-                     base::Unretained(this)),
-      GURL("https://tools.google.com/service/update2"), brandcode_);
-}
-
-void ProfileResetter::OnDefaultSettingsFetched() {
-  CHECK(config_fetcher_);
-  DCHECK(!config_fetcher_->IsActive());
 }
 
 ProfileResetter::~ProfileResetter() {
@@ -93,28 +73,8 @@ void ProfileResetter::ResetSettings(
     base::OnceClosure callback) {
   // TODO(b/364615847) remove master_settings parameter, it is only used in
   // tests.
-  DCHECK(brandcode_.empty() || config_fetcher_);
-  if (config_fetcher_ && config_fetcher_->IsActive()) {
-    // Reset once the prefs are fetched.
-    config_fetcher_->SetCallback(base::BindOnce(
-        &ProfileResetter::ResetSettings, base::Unretained(this),
-        resettable_flags, std::move(master_settings), std::move(callback)));
-    return;
-  }
   if (!master_settings) {
-    if (config_fetcher_) {
-      DCHECK(!config_fetcher_->IsActive());
-      master_settings = config_fetcher_->GetSettings();
-      config_fetcher_.reset();
-    } else {
-      DCHECK(brandcode_.empty());
-    }
-
-    // If failed to fetch BrandcodedDefaultSettings or this is an organic
-    // installation, use default settings.
-    if (!master_settings) {
-      master_settings = std::make_unique<BrandcodedDefaultSettings>();
-    }
+    master_settings = std::make_unique<BrandcodedDefaultSettings>();
   }
 
   ResetSettingsImpl(resettable_flags, std::move(master_settings),

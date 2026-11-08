@@ -18,7 +18,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/run_loop.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/scoped_path_override.h"
 #include "base/test/with_feature_override.h"
@@ -29,7 +28,6 @@
 #include "chrome/browser/extensions/tab_helper.h"
 #include "chrome/browser/google/google_brand.h"
 #include "chrome/browser/prefs/session_startup_pref.h"
-#include "chrome/browser/profile_resetter/brandcode_config_fetcher.h"
 #include "chrome/browser/profile_resetter/profile_resetter_test_base.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
@@ -55,14 +53,6 @@
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/manifest_constants.h"
-#include "net/http/http_response_headers.h"
-#include "net/http/http_status_code.h"
-#include "net/http/http_util.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-#include "services/network/public/cpp/resource_request.h"
-#include "services/network/public/mojom/url_response_head.mojom.h"
-#include "services/network/test/test_url_loader_factory.h"
-#include "services/network/test/test_utils.h"
 #include "url/gurl.h"
 
 
@@ -120,16 +110,6 @@ const char kDistributionConfigWithSearch[] =
     "  }"
     "}";
 
-const char kXmlConfig[] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-    "<response protocol=\"3.0\" server=\"prod\">"
-      "<app appid=\"{8A69D345-D564-463C-AFF1-A69D9E530F96}\" status=\"ok\">"
-        "<data index=\"skipfirstrunui-importsearch-defaultbrowser\" "
-          "name=\"install\" status=\"ok\">"
-          "placeholder_for_data"
-        "</data>"
-      "</app>"
-    "</response>";
-
 using extensions::Extension;
 using extensions::Manifest;
 
@@ -166,51 +146,6 @@ void ProfileResetterTest::SetUp() {
 
   google_brand::BrandForTesting brand_for_testing("");
   resetter_ = std::make_unique<ProfileResetter>(profile());
-}
-
-// ConfigParserTest -----------------------------------------------------------
-
-class ConfigParserTest : public testing::Test {
- protected:
-  ConfigParserTest();
-  ~ConfigParserTest() override;
-
-  std::unique_ptr<BrandcodeConfigFetcher> WaitForRequest(const GURL& url);
-
-  network::TestURLLoaderFactory& test_url_loader_factory() {
-    return test_url_loader_factory_;
-  }
-
- private:
-  MOCK_METHOD0(Callback, void(void));
-
-  content::BrowserTaskEnvironment task_environment_;
-  network::TestURLLoaderFactory test_url_loader_factory_;
-  data_decoder::test::InProcessDataDecoder data_decoder_;
-};
-
-ConfigParserTest::ConfigParserTest()
-    : task_environment_(content::BrowserTaskEnvironment::IO_MAINLOOP) {}
-
-ConfigParserTest::~ConfigParserTest() = default;
-
-std::unique_ptr<BrandcodeConfigFetcher> ConfigParserTest::WaitForRequest(
-    const GURL& url) {
-  EXPECT_CALL(*this, Callback());
-  std::string upload_data;
-  test_url_loader_factory_.SetInterceptor(
-      base::BindLambdaForTesting([&](const network::ResourceRequest& request) {
-        upload_data = network::GetUploadData(request);
-      }));
-  std::unique_ptr<BrandcodeConfigFetcher> fetcher(new BrandcodeConfigFetcher(
-      &test_url_loader_factory_,
-      base::BindOnce(&ConfigParserTest::Callback, base::Unretained(this)), url,
-      "ABCD"));
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(fetcher->IsActive());
-  // Look for the brand code in the request.
-  EXPECT_NE(std::string::npos, upload_data.find("ABCD"));
-  return fetcher;
 }
 
 // A helper class to create/delete/check a Chrome desktop shortcut on Windows.
@@ -669,87 +604,6 @@ TEST_F(ProfileResetterTest, ResetFewFlags) {
   ResetAndWait(ProfileResetter::DEFAULT_SEARCH_ENGINE |
                ProfileResetter::HOMEPAGE |
                ProfileResetter::CONTENT_SETTINGS);
-}
-
-// Tries to load unavailable config file.
-TEST_F(ConfigParserTest, NoConnectivity) {
-  const GURL url("http://test");
-  test_url_loader_factory().AddResponse(
-      url, network::mojom::URLResponseHead::New(), "",
-      network::URLLoaderCompletionStatus(net::HTTP_INTERNAL_SERVER_ERROR));
-
-  std::unique_ptr<BrandcodeConfigFetcher> fetcher = WaitForRequest(url);
-  EXPECT_FALSE(fetcher->GetSettings());
-}
-
-// Tries to load available config file.
-TEST_F(ConfigParserTest, ParseConfig) {
-  const GURL url("http://test");
-  std::string xml_config(kXmlConfig);
-  ReplaceString(&xml_config, "placeholder_for_data", kDistributionConfig);
-  ReplaceString(&xml_config,
-                "placeholder_for_id",
-                "abbaabbaabbaabbaabbaabbaabbaabba");
-  auto head = network::mojom::URLResponseHead::New();
-  std::string headers("HTTP/1.1 200 OK\nContent-type: text/xml\n\n");
-  head->headers = base::MakeRefCounted<net::HttpResponseHeaders>(
-      net::HttpUtil::AssembleRawHeaders(headers));
-  head->mime_type = "text/xml";
-  network::URLLoaderCompletionStatus status;
-  status.decoded_body_length = base::ByteSize(xml_config.size());
-  test_url_loader_factory().AddResponse(url, std::move(head), xml_config,
-                                        status);
-
-  std::unique_ptr<BrandcodeConfigFetcher> fetcher = WaitForRequest(url);
-  std::unique_ptr<BrandcodedDefaultSettings> settings = fetcher->GetSettings();
-  ASSERT_TRUE(settings);
-
-  std::vector<std::string> extension_ids;
-  EXPECT_TRUE(settings->GetExtensions(&extension_ids));
-  EXPECT_EQ(1u, extension_ids.size());
-  EXPECT_EQ("abbaabbaabbaabbaabbaabbaabbaabba", extension_ids[0]);
-
-  std::string homepage;
-  EXPECT_TRUE(settings->GetHomepage(&homepage));
-  EXPECT_EQ("http://www.foo.com", homepage);
-
-  std::optional<base::ListValue> startup_list(
-      settings->GetUrlsToRestoreOnStartup());
-  EXPECT_TRUE(startup_list.has_value());
-  std::vector<std::string> startup_pages;
-  for (const auto& entry : *startup_list) {
-    ASSERT_TRUE(entry.is_string());
-    startup_pages.push_back(entry.GetString());
-  }
-  ASSERT_EQ(2u, startup_pages.size());
-  EXPECT_EQ("http://goo.gl", startup_pages[0]);
-  EXPECT_EQ("http://foo.de", startup_pages[1]);
-}
-
-// Return an invalid response from the fetch request and delete the
-// Fetcher object in the callback, which mimics how ResetSettingsHandler uses
-// the class. See https://crbug.com/40935719.
-TEST_F(ConfigParserTest, InvalidResponseDeleteFromCallback) {
-  const GURL url("http://test");
-  auto head = network::mojom::URLResponseHead::New();
-  head->headers = base::MakeRefCounted<net::HttpResponseHeaders>(
-      net::HttpUtil::AssembleRawHeaders(
-          "HTTP/1.1 200 OK\nContent-type: application/custom\n\n"));
-  head->mime_type = "application/custom";
-  test_url_loader_factory().AddResponse(url, std::move(head),
-                                        "Custom app data, not XML",
-                                        network::URLLoaderCompletionStatus());
-
-  base::RunLoop run_loop;
-  std::unique_ptr<BrandcodeConfigFetcher> fetcher;
-  auto callback = base::BindLambdaForTesting([&fetcher, &run_loop] {
-    EXPECT_FALSE(fetcher->GetSettings());
-    fetcher.reset();
-    run_loop.Quit();
-  });
-  fetcher = std::make_unique<BrandcodeConfigFetcher>(&test_url_loader_factory(),
-                                           std::move(callback), url, "ABCD");
-  run_loop.Run();
 }
 
 TEST_F(ProfileResetterTest, ResetNTPCustomizationsTest) {

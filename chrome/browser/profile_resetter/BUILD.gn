@@ -4,7 +4,6 @@
 
 source_set("profile_resetter") {
   sources = [
-    "brandcode_config_fetcher.h",
     "brandcoded_default_settings.h",
     "profile_resetter.h",
     "triggered_profile_resetter.h",
@@ -28,7 +27,6 @@ source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
   sources = [
-    "brandcode_config_fetcher.cc",
     "brandcoded_default_settings.cc",
     "profile_resetter.cc",
     "triggered_profile_resetter.cc",

@@ -1481,7 +1481,6 @@ source_set("browser") {
     "//components/collaboration/public",
     "//components/component_updater",
     "//components/component_updater/installer_policies",
-    "//components/content_relationship_verification",
     "//components/country_codes",
     "//components/crash/core/browser",
     "//components/crx_file",

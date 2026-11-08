@@ -78,7 +78,6 @@ missing_new_fields,chrome/browser/predictors/prefetch_manager.cc
 missing_new_fields,chrome/browser/preloading/prefetch/prefetch_proxy/prefetch_proxy_origin_prober.cc
 missing_new_fields,chrome/browser/preloading/prefetch/prefetch_proxy/prefetch_proxy_tab_helper.cc
 missing_new_fields,chrome/browser/preloading/prefetch/search_prefetch/search_prefetch_request.cc
-missing_new_fields,chrome/browser/profile_resetter/brandcode_config_fetcher.cc
 missing_new_fields,chrome/browser/renderer_context_menu/render_view_context_menu.cc
 missing_new_fields,chrome/browser/safe_browsing/download_protection/check_client_download_request_base.cc
 missing_new_fields,chrome/browser/safe_browsing/download_protection/download_feedback.cc

@@ -18,7 +18,6 @@ Refer to README.md for content description and update process.
  <item id="bidirectional_stream" added_in_milestone="67" content_hash_code="07c03a44" os_list="linux,windows,chromeos,android" file_path="net/http/bidirectional_stream.cc" />
  <item id="blink_extension_resource_loader" added_in_milestone="63" content_hash_code="03c97c39" os_list="linux,windows,chromeos,android" file_path="third_party/blink/renderer/platform/loader/fetch/fetch_utils.cc" />
  <item id="blink_resource_loader" added_in_milestone="62" content_hash_code="047d7664" os_list="linux,windows,chromeos,android" file_path="third_party/blink/renderer/platform/loader/fetch/fetch_utils.cc" />
- <item id="brandcode_config" added_in_milestone="62" content_hash_code="07ae0010" os_list="linux,windows,chromeos" file_path="chrome/browser/profile_resetter/brandcode_config_fetcher.cc" />
  <item id="browser_switcher_ieem_sitelist" added_in_milestone="72" content_hash_code="07b15836" os_list="linux,windows" file_path="chrome/browser/browser_switcher/browser_switcher_service.cc" />
  <item id="certificate_verifier_url_loader" added_in_milestone="80" content_hash_code="05856cc0" os_list="linux,windows,chromeos,android" file_path="services/cert_verifier/cert_net_url_loader/cert_net_fetcher_url_loader.cc" />
  <item id="certificate_verifier_url_request" added_in_milestone="80" content_hash_code="03884604" os_list="linux,windows,chromeos,android" file_path="net/cert_net/cert_net_fetcher_url_request.cc" />
@@ -35,7 +34,6 @@ Refer to README.md for content description and update process.
  <item id="devtools_http_handler" added_in_milestone="66" content_hash_code="054518b9" os_list="linux,windows,chromeos,android" file_path="content/browser/devtools/devtools_http_handler.cc" />
  <item id="devtools_network_resource" added_in_milestone="62" content_hash_code="06958290" os_list="linux,windows,chromeos,android" file_path="chrome/browser/devtools/devtools_ui_bindings.cc" />
  <item id="devtools_proxy_config" added_in_milestone="85" content_hash_code="01e83c36" os_list="linux,windows,chromeos,android" file_path="content/browser/devtools/protocol/target_handler.cc" />
- <item id="digital_asset_links" added_in_milestone="90" content_hash_code="05caa66d" os_list="linux,windows,chromeos,android" file_path="components/content_relationship_verification/digital_asset_links_handler.cc" />
  <item id="direct_sockets" added_in_milestone="88" content_hash_code="03dc0aad" os_list="linux,windows,chromeos" file_path="content/browser/direct_sockets/direct_sockets_service_impl.cc" />
  <item id="dns_over_https" added_in_milestone="66" content_hash_code="0661730a" os_list="linux,windows,chromeos,android" file_path="net/dns/dns_http_attempt.cc" />
  <item id="dns_transaction" added_in_milestone="65" content_hash_code="07799517" os_list="linux,windows,chromeos,android" file_path="net/dns/dns_attempt.cc" />
@@ -232,7 +230,6 @@ Refer to README.md for content description and update process.
  <item id="chrome_sync_preview_fetcher" added_in_milestone="150" content_hash_code="08039e6b" os_list="linux,windows,chromeos,android" file_path="components/signin/core/browser/account_preview_data_fetcher.cc" />
  <item id="contextual_search_fpop_service" added_in_milestone="150" content_hash_code="07a1f58b" os_list="linux,windows,android,chromeos" file_path="components/contextual_search/footprints/internal/fpop_service_impl.cc" />
  <item id="web_install_manifest_fetcher" added_in_milestone="151" content_hash_code="0593db17" os_list="linux,windows,chromeos" file_path="chrome/browser/web_applications/web_install_manifest_fetcher.cc" />
- <item id="private_insights_fcp_http" added_in_milestone="151" content_hash_code="05f37c08" os_list="linux,windows,android,chromeos" file_path="components/private_insights/fcp_http_client.cc" />
  <item id="doodle_impression_android" added_in_milestone="152" content_hash_code="00cd483d" os_list="android" file_path="chrome/browser/ui/android/logo/logo_bridge.cc" />
  <item id="enterprise_proxy_pvd_fetch" added_in_milestone="152" content_hash_code="038d0700" os_list="linux,windows,chromeos,android" file_path="components/enterprise/net/core/provisioning_domain_client.cc" />
  <item id="read_aloud_generate_text" added_in_milestone="152" content_hash_code="004d1146" os_list="linux,windows,android,chromeos" file_path="components/optimization_guide/core/model_execution/model_execution_fetcher_impl.cc" />
