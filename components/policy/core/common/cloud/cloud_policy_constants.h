@@ -56,7 +56,6 @@ extern const char kValueRequestUploadCertificate[];
 extern const char kValueRequestUploadEuiccInfo[];
 extern const char kValueRequestDeviceStateRetrieval[];
 extern const char kValueRequestUploadStatus[];
-extern const char kValueRequestRemoteCommands[];
 extern const char kValueRequestDeviceAttributeUpdatePermission[];
 extern const char kValueRequestDeviceAttributeUpdate[];
 extern const char kValueRequestGcmIdUpdate[];

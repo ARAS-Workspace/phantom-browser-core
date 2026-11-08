@@ -33,7 +33,6 @@
 #include "components/policy/core/common/cloud/device_management_service.h"
 #include "components/policy/core/common/cloud/dm_auth.h"
 #include "components/policy/core/common/policy_types.h"
-#include "components/policy/core/common/remote_commands/remote_command_job.h"
 #include "components/policy/policy_export.h"
 #include "components/policy/proto/device_management_backend.pb.h"
 
@@ -41,18 +40,11 @@ namespace network {
 class SharedURLLoaderFactory;
 }
 
-namespace chrome::cros::reporting::proto {
-class UploadEventsRequest;
-}
-
 namespace policy {
 
-class ClientDataDelegate;
 class DMServerJobConfiguration;
-class RegistrationJobConfiguration;
 class SigningService;
 struct DMServerJobResult;
-enum class RemoteCommandsFetchReason;
 
 inline constexpr char kPolicyFetchingTimeHistogramName[] =
     "Enterprise.CloudManagement.PolicyFetchingTime";
@@ -83,11 +75,6 @@ class POLICY_EXPORT CloudPolicyClient {
   // TODO(b/256553070) Use `ResultCallback` instead of `StatusCallback`
   // everywhere.
   using StatusCallback = base::OnceCallback<void(bool status)>;
-
-  // A callback which receives fetched remote commands.
-  using RemoteCommandCallback = base::OnceCallback<void(
-      DeviceManagementStatus,
-      const std::vector<enterprise_management::SignedData>&)>;
 
   // A callback for fetching device robot OAuth2 authorization tokens.
   // Only occurs during enrollment, after the device is registered.
@@ -146,21 +133,6 @@ class POLICY_EXPORT CloudPolicyClient {
     Result(DeviceManagementStatus, int, base::DictValue);
     explicit Result(NotRegistered);
 
-    static Result CreateForRealtimeUpload(
-        DeviceManagementStatus status,
-        int response_code,
-        base::DictValue response,
-        ::chrome::cros::reporting::proto::UploadEventsRequest upload_request);
-
-    static Result CreateForRealtimeUpload(
-        DeviceManagementStatus status,
-        int response_code,
-        ::chrome::cros::reporting::proto::UploadEventsRequest upload_request);
-
-    static Result CreateForRealtimeUpload(
-        NotRegistered not_registered,
-        ::chrome::cros::reporting::proto::UploadEventsRequest upload_request);
-
     Result(const Result& other);
     Result& operator=(const Result& other);
     Result(Result&& other);
@@ -177,16 +149,12 @@ class POLICY_EXPORT CloudPolicyClient {
     bool operator==(const Result& other) const;
 
     const base::DictValue& GetResponse() const;
-    const ::chrome::cros::reporting::proto::UploadEventsRequest&
-    upload_events_request() const;
 
    private:
     std::variant<NotRegistered, DeviceManagementStatus> result_;
     int net_error_ = 0;
     int response_code_ = 0;
     base::DictValue response_;
-    std::unique_ptr<::chrome::cros::reporting::proto::UploadEventsRequest>
-        upload_events_request_;
   };
 
   // A callback which receives the operations result.
@@ -320,19 +288,6 @@ class POLICY_EXPORT CloudPolicyClient {
       const std::string& sub_organization,
       std::unique_ptr<SigningService> signing_service);
 
-  // Attempts to enroll a browser with the device management service using an
-  // enrollment token. Results in a registration change or error notification.
-  // To emphasize, this method is used to register browser (e.g. for
-  // machine-level policies).
-  // Device registration with enrollment token should be performed using
-  // RegisterWithEnrollmentToken method, and this request will timeout after 30
-  // seconds if the enrollment is not mandatory.
-  virtual void RegisterBrowserWithEnrollmentToken(
-      const std::string& token,
-      const std::string& client_id,
-      const ClientDataDelegate& client_data_delegate,
-      bool is_mandatory);
-
   // Attempts to enroll with the device management service using an enrollment
   // token. Results in a registration change or error notification.
   //
@@ -343,16 +298,6 @@ class POLICY_EXPORT CloudPolicyClient {
       const RegistrationParameters& parameters,
       const std::string& client_id,
       DMAuth enrollment_token_auth);
-
-  // Attempts to enroll a policy agent, (i.e. Omaha, Keystone, or the Chrome
-  // Enterprise Companion App) with the device management service using an
-  // enrollment token. Results in a registration change or error notification.
-  // To emphasize, this method is used to register browser (e.g. for
-  // machine-level policies).
-  virtual void RegisterPolicyAgentWithEnrollmentToken(
-      const std::string& token,
-      const std::string& client_id,
-      const ClientDataDelegate& client_data_delegate);
 
   // Attempts to register the profile with the device management service using a
   // OIDC response from a third party IdP's authentication. Results in a
@@ -490,34 +435,6 @@ class POLICY_EXPORT CloudPolicyClient {
       std::unique_ptr<enterprise_management::ChromeProfileReportRequest>
           chrome_profile_report,
       ResultCallback callback);
-
-  // Uploads a report containing enterprise connectors real-time security
-  // events to the server. As above, the client must be in a registered state.
-  // If |include_device_info| is true, information specific to the device such
-  // as the device name, user, id and OS will be included in the report. The
-  // |callback| will be called when the operation completes.
-  virtual void UploadSecurityEvent(
-      bool include_device_info,
-      ::chrome::cros::reporting::proto::UploadEventsRequest request,
-      ResultCallback callback);
-
-  // Attempts to fetch remote commands, with `last_command_id` being the ID of
-  // the last command that finished execution, `command_results` being
-  // results for previous commands which have not been reported yet,
-  // `signature_type` being a security signature type that the server will use
-  // to sign the remote commands and `request_type` being the type of the fetch
-  // request. The |callback| will be called when the operation completes.
-  // Note that sending |last_command_id| will acknowledge this command and any
-  // previous commands. A nullptr indicates that no commands have finished
-  // execution.
-  virtual void FetchRemoteCommands(
-      std::unique_ptr<RemoteCommandJob::UniqueIDType> last_command_id,
-      const std::vector<enterprise_management::RemoteCommandResult>&
-          command_results,
-      enterprise_management::PolicyFetchRequest::SignatureType signature_type,
-      const std::string& request_type,
-      RemoteCommandsFetchReason reason,
-      RemoteCommandCallback callback);
 
   // Sends a device attribute update permission request to the server, uses
   // |auth| to identify user who requests a permission to name a device, calls
@@ -824,20 +741,6 @@ class POLICY_EXPORT CloudPolicyClient {
   void OnReportUploadCompleted(ResultCallback callback,
                                DMServerJobResult result);
 
-  // Callback for realtime report upload requests.
-  void OnRealtimeReportUploadCompleted(
-      ResultCallback callback,
-      DeviceManagementService::Job* job,
-      DeviceManagementStatus status,
-      int response_code,
-      std::optional<base::DictValue> response,
-      const ::chrome::cros::reporting::proto::UploadEventsRequest&
-          upload_request);
-
-  // Callback for remote command fetch requests.
-  void OnRemoteCommandsFetched(RemoteCommandCallback callback,
-                               DMServerJobResult result);
-
   // Callback for device attribute update permission requests.
   void OnDeviceAttributeUpdatePermissionCompleted(StatusCallback callback,
                                                   DMServerJobResult result);
@@ -956,20 +859,6 @@ class POLICY_EXPORT CloudPolicyClient {
   scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
 
  private:
-  // Creates a new real-time reporting job and appends it to |request_jobs_|.
-  // The job will send its report to the |server_url| endpoint.  If
-  // |include_device_info| is true, information specific to the device such as
-  // the device name, user, id and OS will be included in the report. If
-  // |add_connector_url_params| is true then URL paramaters specific to
-  // enterprise connectors are added to the request uploading the report.
-  // |callback| is invoked once the report is uploaded.
-  DeviceManagementService::Job* CreateNewRealtimeReportingJob(
-      ::chrome::cros::reporting::proto::UploadEventsRequest request,
-      const std::string& server_url,
-      bool include_device_info,
-      ResultCallback callback);
-
-
   void SetClientId(const std::string& client_id);
   // Fills in the common fields of a DeviceRegisterRequest for |Register| and
   // |RegisterWithCertificate|.
@@ -998,10 +887,6 @@ class POLICY_EXPORT CloudPolicyClient {
   // retained by this method.
   void ExecuteCertUploadJob(std::unique_ptr<DMServerJobConfiguration> config);
 
-  // Sets `unique_request_job_` with a new job created with `config`.
-  void CreateUniqueRequestJob(
-      std::unique_ptr<RegistrationJobConfiguration> config);
-
   // Shared logic for reading fields out of DeviceRegisterResponse and
   // notifying observers of the response status.
   void ProcessDeviceRegisterResponse(
@@ -1014,16 +899,6 @@ class POLICY_EXPORT CloudPolicyClient {
 
   enterprise_management::PolicyFetchRequest::SignatureType
   GetPolicyFetchRequestSignatureType();
-
-  // Fills a request and creates a job for browser or policy agent enrollment,
-  // which differ only by request type.
-  virtual void RegisterBrowserOrPolicyAgentWithEnrollmentToken(
-      const std::string& token,
-      const std::string& client_id,
-      const ClientDataDelegate& client_data_delegate,
-      bool is_mandatory,
-      DeviceManagementService::JobConfiguration::JobType type);
-
 
   // Used to store a copy of the previously used `dm_token_`. This is used
   // during re-registration, which gets triggered by a failed policy fetch

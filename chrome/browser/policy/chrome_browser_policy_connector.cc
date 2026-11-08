@@ -54,9 +54,6 @@
 #include "components/policy/core/common/config_dir_policy_loader.h"
 #endif
 
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
-#include "components/policy/core/common/proxy_policy_provider.h"
-
 namespace policy {
 namespace {
 bool g_command_line_enabled_for_testing = false;
@@ -100,9 +97,6 @@ bool ChromeBrowserPolicyConnector::HasMachineLevelPolicies() {
   if (ProviderHasPolicies(GetPlatformProvider())) {
     return true;
   }
-  if (ProviderHasPolicies(machine_level_user_cloud_policy_manager())) {
-    return true;
-  }
   if (ProviderHasPolicies(command_line_provider_)) {
     return true;
   }
@@ -110,11 +104,6 @@ bool ChromeBrowserPolicyConnector::HasMachineLevelPolicies() {
 }
 
 void ChromeBrowserPolicyConnector::Shutdown() {
-  if (machine_level_user_cloud_policy_manager_) {
-    machine_level_user_cloud_policy_manager_->Shutdown();
-    machine_level_user_cloud_policy_manager_ = nullptr;
-  }
-
   if (HasPolicyService()) {
     GetPolicyService()->UseLocalTestPolicyProvider(nullptr);
   }
@@ -181,17 +170,6 @@ void ChromeBrowserPolicyConnector::MaybeApplyLocalTestPolicies(
   local_state->ClearPref(policy_prefs::kLocalTestPoliciesForNextStartup);
 }
 
-void ChromeBrowserPolicyConnector::
-    SetMachineLevelUserCloudPolicyManagerForTesting(
-        MachineLevelUserCloudPolicyManager* manager) {
-  machine_level_user_cloud_policy_manager_ = manager;
-}
-
-void ChromeBrowserPolicyConnector::SetProxyPolicyProviderForTesting(
-    ProxyPolicyProvider* proxy_policy_provider) {
-  proxy_policy_provider_ = proxy_policy_provider;
-}
-
 bool ChromeBrowserPolicyConnector::IsCommandLineSwitchSupported() const {
   if (g_command_line_enabled_for_testing) {
     return true;
@@ -209,21 +187,7 @@ void ChromeBrowserPolicyConnector::EnableCommandLineSupportForTesting() {
 
 base::flat_set<std::string>
 ChromeBrowserPolicyConnector::device_affiliation_ids() const {
-  if (!device_affiliation_ids_for_testing_.empty()) {
-    return device_affiliation_ids_for_testing_;
-  }
-  if (!machine_level_user_cloud_policy_manager_ ||
-      !machine_level_user_cloud_policy_manager_->IsClientRegistered() ||
-      !machine_level_user_cloud_policy_manager_->core() ||
-      !machine_level_user_cloud_policy_manager_->core()->store() ||
-      !machine_level_user_cloud_policy_manager_->core()->store()->policy()) {
-    return {};
-  }
-  const auto& ids = machine_level_user_cloud_policy_manager_->core()
-                        ->store()
-                        ->policy()
-                        ->device_affiliation_ids();
-  return {ids.begin(), ids.end()};
+  return device_affiliation_ids_for_testing_;
 }
 
 void ChromeBrowserPolicyConnector::SetDeviceAffiliatedIdsForTesting(

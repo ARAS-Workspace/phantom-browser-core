@@ -103,8 +103,6 @@
 #include "components/metrics/metrics_service.h"
 #include "components/metrics/metrics_shutdown.h"
 #include "components/offline_pages/buildflags/buildflags.h"
-#include "components/policy/core/browser/policy_data_utils.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/sampling_profiler/process_type.h"
@@ -996,15 +994,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
         "startup",
         "ChromeBrowserMainParts::PreCreateThreadsImpl:InitBrowserProcessImpl");
     browser_process_->Init();
-  }
-
-  std::optional<std::string> managed_by =
-      policy::GetManagedBy(browser_process_->browser_policy_connector()
-                               ->machine_level_user_cloud_policy_manager());
-  if (managed_by) {
-    static constexpr std::string_view kEnrollmentDomain = "enrollment-domain";
-    crash_keys::AllocateCrashKeyInBrowserAndChildren(kEnrollmentDomain,
-                                                     managed_by.value());
   }
 
   // These members must be initialized before returning from this function.

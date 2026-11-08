@@ -23,9 +23,6 @@ class PrefService;
 namespace policy {
 class ConfigurationPolicyProvider;
 class LocalTestPolicyProvider;
-class ProxyPolicyProvider;
-
-class MachineLevelUserCloudPolicyManager;
 
 // Extends BrowserPolicyConnector with the setup shared among the desktop
 // implementations and Android.
@@ -77,27 +74,9 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // at the right time.
   void MaybeApplyLocalTestPolicies(PrefService* local_state);
 
-  // TODO(chromium:1502062): MachineLevelUserCloudPolicyManager is CBCM's policy
-  // provider. Refactor the code accordingly.
-  MachineLevelUserCloudPolicyManager*
-  machine_level_user_cloud_policy_manager() {
-    return machine_level_user_cloud_policy_manager_;
-  }
-  void SetMachineLevelUserCloudPolicyManagerForTesting(
-      MachineLevelUserCloudPolicyManager* manager);
-
-  ProxyPolicyProvider* proxy_policy_provider() {
-    return proxy_policy_provider_;
-  }
-
   ConfigurationPolicyProvider* command_line_policy_provider() {
     return command_line_provider_;
   }
-
-  // Set ProxyPolicyProvider for testing, caller needs to init and shutdown the
-  // provider.
-  void SetProxyPolicyProviderForTesting(
-      ProxyPolicyProvider* proxy_policy_provider);
 
   // BrowserPolicyConnector:
   // Command line switch only supports Dev and Canary channel, trunk and
@@ -120,22 +99,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
  private:
   // Returns the policy provider that supplies platform policies.
   std::unique_ptr<ConfigurationPolicyProvider> CreatePlatformProvider();
-
-  // If CBCM enrollment is needed, then this proxy points to a
-  // MachineLevelUserCloudPolicyManager object. Otherwise, this is innocuous.
-  // Using a proxy allows unblocking PolicyService creation on platforms where
-  // cloud management decision depends on non-CBCM policy providers to be
-  // initialized (e.g. Android). Once platform policies are loaded, the proxy
-  // can refer to the actual policy manager if cloud management is enabled.
-  // Owned by base class.
-  raw_ptr<ProxyPolicyProvider> proxy_policy_provider_ = nullptr;
-
-  // The MachineLevelUserCloudPolicyManager is not directly included in the
-  // vector of policy providers (defined in the base class). A proxy policy
-  // provider allows this object to be initialized after the policy service
-  // is created. Owned by the proxy policy provider.
-  raw_ptr<MachineLevelUserCloudPolicyManager>
-      machine_level_user_cloud_policy_manager_ = nullptr;
 
   // Owned by base class.
   raw_ptr<ConfigurationPolicyProvider> platform_provider_ = nullptr;

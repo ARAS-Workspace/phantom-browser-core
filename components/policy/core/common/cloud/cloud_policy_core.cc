@@ -16,18 +16,11 @@
 #include "components/policy/core/common/cloud/cloud_policy_refresh_scheduler.h"
 #include "components/policy/core/common/cloud/cloud_policy_service.h"
 #include "components/policy/core/common/cloud/cloud_policy_store.h"
-#include "components/policy/core/common/cloud/policy_invalidation_scope.h"
-#include "components/policy/core/common/remote_commands/remote_commands_factory.h"
-#include "components/policy/core/common/remote_commands/remote_commands_fetch_reason.h"
-#include "components/policy/core/common/remote_commands/remote_commands_service.h"
 #include "components/prefs/pref_service.h"
 
 namespace policy {
 
 CloudPolicyCore::Observer::~Observer() = default;
-
-void CloudPolicyCore::Observer::OnRemoteCommandsServiceStarted(
-    CloudPolicyCore* core) {}
 
 void CloudPolicyCore::Observer::OnCoreDestruction(CloudPolicyCore* core) {}
 
@@ -72,27 +65,8 @@ void CloudPolicyCore::Disconnect() {
   }
   refresh_delay_.reset();
   refresh_scheduler_.reset();
-  remote_commands_service_.reset();
   service_.reset();
   client_.reset();
-}
-
-void CloudPolicyCore::StartRemoteCommandsService(
-    std::unique_ptr<RemoteCommandsFactory> factory,
-    PolicyInvalidationScope scope) {
-  DCHECK(client_);
-  DCHECK(factory);
-
-  remote_commands_service_ = std::make_unique<RemoteCommandsService>(
-      std::move(factory), client_.get(), store_, scope);
-
-  // Do an initial remote commands fetch immediately.
-  remote_commands_service_->FetchRemoteCommands(
-      RemoteCommandsFetchReason::kStartup);
-
-  for (auto& observer : observers_) {
-    observer.OnRemoteCommandsServiceStarted(this);
-  }
 }
 
 void CloudPolicyCore::RefreshSoon(PolicyFetchReason reason) {

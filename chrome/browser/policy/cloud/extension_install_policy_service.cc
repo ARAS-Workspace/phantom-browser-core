@@ -16,13 +16,11 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/extension_management.h"
-#include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/policy/core/common/cloud/cloud_policy_client_types.h"
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/cloud_policy_service.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_store.h"
 #include "components/policy/core/common/features.h"
 #include "components/policy/core/common/policy_namespace.h"
@@ -500,13 +498,6 @@ ExtensionInstallPolicyServiceImpl::GetPolicyManagerInfos() const {
     managers.push_back(
         {raw_ref<CloudPolicyManager>::from_ptr(user_cloud_policy_manager),
          dm_protocol::kChromeExtensionInstallUserCloudPolicyType});
-  }
-  if (auto* machine_level_policy_manager =
-          g_browser_process->browser_policy_connector()
-              ->machine_level_user_cloud_policy_manager()) {
-    managers.push_back(
-        {raw_ref<CloudPolicyManager>::from_ptr(machine_level_policy_manager),
-         dm_protocol::kChromeExtensionInstallMachineLevelCloudPolicyType});
   }
   return managers;
 }

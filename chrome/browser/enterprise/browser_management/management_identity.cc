@@ -21,7 +21,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/pref_names.h"
 #include "components/policy/core/browser/policy_data_utils.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/account_managed_status_finder.h"
@@ -88,9 +87,7 @@ std::optional<std::string> GetDeviceManagerIdentity() {
     }
   }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  return policy::GetManagedBy(g_browser_process->browser_policy_connector()
-                                  ->machine_level_user_cloud_policy_manager())
-      .value_or(std::string());
+  return std::string();
 }
 
 std::optional<std::string> GetAccountManagerIdentity(Profile* profile) {

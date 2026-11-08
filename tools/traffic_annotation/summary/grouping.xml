@@ -172,7 +172,6 @@ after discussions on the right group.
       <annotation id="finds_model_execution"/>
       <annotation id="device_management_enrollment"/>
       <annotation id="device_management_reporting"/>
-      <annotation id="device_management_remote_commands"/>
       <annotation id="skills_fetcher"/>
       <annotation id="web_app_custom_icon_fetcher"/>
       <annotation id="suggestions_powered_by_ai"/>

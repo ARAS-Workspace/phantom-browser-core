@@ -46,7 +46,7 @@ class POLICY_EXPORT CloudExternalDataManager : public ExternalDataManager {
     bool operator<(const MetadataKey& other) const;
 
     // For situations where you need an opaque identifier for the key, e.g.
-    // the ExternalPolicyDataUpdater or the CloudExternalDataStore.
+    // the ExternalPolicyDataUpdater.
     // Do not use in situation where you might need to parse this.
     std::string ToString() const;
 

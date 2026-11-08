@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/observer_list.h"
-#include "components/policy/core/common/cloud/policy_invalidation_scope.h"
 #include "components/policy/policy_export.h"
 #include "components/prefs/pref_member.h"
 #include "services/network/public/cpp/network_connection_tracker.h"
@@ -29,8 +28,6 @@ class CloudPolicyClient;
 class CloudPolicyRefreshScheduler;
 class CloudPolicyService;
 class CloudPolicyStore;
-class RemoteCommandsFactory;
-class RemoteCommandsService;
 
 // CloudPolicyCore glues together the ingredients that are essential for
 // obtaining a fully-functional cloud policy system: CloudPolicyClient and
@@ -53,10 +50,6 @@ class POLICY_EXPORT CloudPolicyCore {
 
     // Called before the core is disconnected.
     virtual void OnCoreDisconnecting(CloudPolicyCore* core) = 0;
-
-    // Called after the remote commands service is started. Defaults to be
-    // empty.
-    virtual void OnRemoteCommandsServiceStarted(CloudPolicyCore* core);
 
     // Called upon core destruction. Defaults to be empty.
     virtual void OnCoreDestruction(CloudPolicyCore* core);
@@ -89,13 +82,6 @@ class POLICY_EXPORT CloudPolicyCore {
     return refresh_scheduler_.get();
   }
 
-  RemoteCommandsService* remote_commands_service() {
-    return remote_commands_service_.get();
-  }
-  const RemoteCommandsService* remote_commands_service() const {
-    return remote_commands_service_.get();
-  }
-
   // Initializes the cloud connection.
   void Connect(std::unique_ptr<CloudPolicyClient> client);
 
@@ -103,13 +89,6 @@ class POLICY_EXPORT CloudPolicyCore {
   void Disconnect();
 
   bool IsConnected() const { return client() && service(); }
-
-  // Starts a remote commands service, with the provided factory. Will attempt
-  // to fetch commands immediately, thus requiring the cloud policy client to
-  // be registered.
-  void StartRemoteCommandsService(
-      std::unique_ptr<RemoteCommandsFactory> factory,
-      PolicyInvalidationScope scope);
 
   // Requests a policy refresh to be performed immediately by the `scheduler_`.
   // This is a no-op if the `scheduler_` is not initialized yet.
@@ -155,7 +134,6 @@ class POLICY_EXPORT CloudPolicyCore {
   std::unique_ptr<CloudPolicyClient> client_;
   std::unique_ptr<CloudPolicyService> service_;
   std::unique_ptr<CloudPolicyRefreshScheduler> refresh_scheduler_;
-  std::unique_ptr<RemoteCommandsService> remote_commands_service_;
   std::unique_ptr<IntegerPrefMember> refresh_delay_;
   base::ObserverList<Observer, true>::Unchecked observers_;
 };

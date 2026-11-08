@@ -39,7 +39,6 @@
 #include "components/policy/core/common/cloud/cloud_policy_core.h"
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/device_management_service.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/reporting/proto/synced/record.pb.h"
 #include "components/reporting/proto/synced/record_constants.pb.h"
@@ -240,8 +239,7 @@ ReportingServerConnector::GetUserCloudPolicyManager() {
                                    "Browser process not fit to retrieve "
                                    "CloudPolicyManager"));
   }
-  return g_browser_process->browser_policy_connector()
-      ->machine_level_user_cloud_policy_manager();
+  return nullptr;
 }
 
 Status ReportingServerConnector::EnsureUsableCore() {

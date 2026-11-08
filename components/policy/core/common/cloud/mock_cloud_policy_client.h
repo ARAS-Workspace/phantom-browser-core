@@ -10,7 +10,6 @@
 #include <string>
 
 #include "base/task/single_thread_task_runner.h"
-#include "components/enterprise/common/proto/upload_request_response.pb.h"
 #include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "components/policy/core/common/cloud/device_management_service.h"
 #include "components/reporting/proto/synced/record.pb.h"
@@ -69,15 +68,6 @@ class MockCloudPolicyClient : public CloudPolicyClient {
                ResultCallback),
               (override));
   MOCK_METHOD(void, FetchPolicy, (PolicyFetchReason), (override));
-  MOCK_METHOD(void,
-              FetchRemoteCommands,
-              (std::unique_ptr<RemoteCommandJob::UniqueIDType>,
-               const std::vector<enterprise_management::RemoteCommandResult>&,
-               enterprise_management::PolicyFetchRequest::SignatureType,
-               const std::string&,
-               RemoteCommandsFetchReason,
-               RemoteCommandCallback),
-              (override));
   MOCK_METHOD(void,
               UploadEnterpriseMachineCertificate,
               (const std::string&, ResultCallback),
@@ -142,13 +132,6 @@ class MockCloudPolicyClient : public CloudPolicyClient {
               UploadEuiccInfo,
               (std::unique_ptr<enterprise_management::UploadEuiccInfoRequest>,
                StatusCallback),
-              (override));
-
-  MOCK_METHOD(void,
-              UploadSecurityEvent,
-              (bool,
-               ::chrome::cros::reporting::proto::UploadEventsRequest request,
-               ResultCallback),
               (override));
 
   MOCK_METHOD(void,

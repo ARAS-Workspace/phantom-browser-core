@@ -248,8 +248,6 @@ std::string DeviceManagementService::JobConfiguration::GetJobTypeAsString(
       return "PublicSamlUserRequest";
     case DeviceManagementService::JobConfiguration::TYPE_REGISTRATION:
       return "Registration";
-    case DeviceManagementService::JobConfiguration::TYPE_REMOTE_COMMANDS:
-      return "RemoteCommands";
     // Type TOKEN_ENROLLMENT was renamed to BROWSER_REGISTRATION when device
     // token-based enrollment was added, but unfortunately we have to keep the
     // stringified job type as "TokenEnrollment" because this string defines
@@ -454,46 +452,6 @@ JobConfigurationBase::GetTrafficAnnotationTag() {
             "can sign out of Chrome to prevent signin-based management."
           policy_exception_justification:
             "Must be configured explicitly by the admin."
-        })");
-
-    case DeviceManagementService::JobConfiguration::TYPE_REMOTE_COMMANDS:
-      return net::DefineNetworkTrafficAnnotation(
-          "device_management_remote_commands", R"(
-        semantics {
-          sender: "Cloud Policy"
-          description:
-            "Communication used to receive and report results for remote "
-            "management commands issued by administrators, such as clearing "
-            "browsing data or forcing extension updates."
-          trigger:
-            "Periodic polling by the client or a push notification 'nudge' "
-            "from the server."
-          data:
-            "The result and status of executing the remote command (e.g., "
-            "success or failure with error details)."
-          user_data {
-            type: ACCESS_TOKEN
-            type: DEVICE_ID
-          }
-          destination: GOOGLE_OWNED_SERVICE
-          last_reviewed: "2026-04-29"
-          internal {
-            contacts {
-              email: "cbe-eng@google.com"
-            }
-          }
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be controlled by Chrome settings, but users "
-            "can sign out of Chrome to disable it."
-          chrome_policy {
-            BrowserSignin {
-              policy_options {mode: MANDATORY}
-              BrowserSignin: 0
-            }
-          }
         })");
 
     // TODO: crbug.com/507736506 - Separate these into granular annotations.

@@ -12,7 +12,6 @@
 #include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "components/policy/core/common/cloud/client_data_delegate.h"
 #include "components/policy/core/common/cloud/dm_auth.h"
 #include "components/policy/core/common/policy_logger.h"
 #include "components/signin/public/identity_manager/access_token_fetcher.h"
@@ -114,21 +113,6 @@ void CloudPolicyClientRegistrationHelper::StartRegistration(
       identity_manager, account_id,
       base::BindOnce(&CloudPolicyClientRegistrationHelper::OnTokenFetched,
                      base::Unretained(this)));
-}
-
-void CloudPolicyClientRegistrationHelper::StartRegistrationWithEnrollmentToken(
-    const std::string& token,
-    const std::string& client_id,
-    const ClientDataDelegate& client_data_delegate,
-    bool is_mandatory,
-    base::OnceClosure callback) {
-  DVLOG_POLICY(1, POLICY_AUTH)
-      << "Starting browser registration with enrollment token = " << token;
-  DCHECK(!client_->is_registered());
-  callback_ = std::move(callback);
-  client_->AddObserver(this);
-  client_->RegisterBrowserWithEnrollmentToken(
-      token, client_id, client_data_delegate, is_mandatory);
 }
 
 void CloudPolicyClientRegistrationHelper::StartRegistrationWithOidcTokens(

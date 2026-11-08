@@ -29,12 +29,6 @@ BrowserCloudManagementStatusProvider::~BrowserCloudManagementStatusProvider() =
 
 EnterpriseManagementAuthority
 BrowserCloudManagementStatusProvider::FetchAuthority() {
-  // A machine level user cloud policy manager is only created if the browser is
-  // managed by CBCM.
-  if (g_browser_process->browser_policy_connector()
-          ->machine_level_user_cloud_policy_manager() != nullptr) {
-    return EnterpriseManagementAuthority::CLOUD_DOMAIN;
-  }
   return EnterpriseManagementAuthority::NONE;
 }
 

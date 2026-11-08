@@ -65,8 +65,6 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/policy/core/common/policy_utils.h"
-#include "components/policy/core/common/remote_commands/remote_commands_fetch_reason.h"
-#include "components/policy/core/common/remote_commands/remote_commands_service.h"
 #include "components/policy/core/common/schema.h"
 #include "components/policy/core/common/schema_map.h"
 #include "components/policy/policy_constants.h"

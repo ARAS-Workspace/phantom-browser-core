@@ -36,7 +36,6 @@
 #include "components/policy/core/common/cloud/cloud_policy_core.h"
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/cloud_policy_store.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/configuration_policy_provider.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
 #include "components/policy/core/common/policy_bundle.h"
@@ -44,7 +43,6 @@
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/policy/core/common/policy_service_impl.h"
 #include "components/policy/core/common/policy_types.h"
-#include "components/policy/core/common/proxy_policy_provider.h"
 #include "components/policy/core/common/schema_registry_tracking_policy_provider.h"
 #include "components/policy/policy_constants.h"
 #include "components/strings/grit/components_strings.h"
@@ -244,12 +242,6 @@ void ProfilePolicyConnector::Init(
       connector->GetPlatformProvider();
   if (platform_provider) {
     AppendPolicyProviderWithSchemaTracking(platform_provider, schema_registry);
-  }
-
-  ConfigurationPolicyProvider* machine_level_user_cloud_policy_provider =
-      connector->proxy_policy_provider();
-  if (machine_level_user_cloud_policy_provider) {
-    policy_providers_.push_back(machine_level_user_cloud_policy_provider);
   }
 
   if (connector->command_line_policy_provider()) {

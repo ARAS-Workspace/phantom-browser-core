@@ -25,8 +25,6 @@ class IdentityManager;
 
 namespace policy {
 
-class ClientDataDelegate;
-
 // Helper class that registers a CloudPolicyClient. It fetches an OAuth2 token
 // for the DM service if needed, and checks with Gaia if the account has policy
 // management enabled.
@@ -52,15 +50,6 @@ class POLICY_EXPORT CloudPolicyClientRegistrationHelper
   void StartRegistration(signin::IdentityManager* identity_manager,
                          const CoreAccountId& account_id,
                          base::OnceClosure callback);
-
-  // Starts the device registration with an token enrollment process.
-  // |callback| is invoked when the registration is complete.
-  void StartRegistrationWithEnrollmentToken(
-      const std::string& token,
-      const std::string& client_id,
-      const ClientDataDelegate& client_data_delegate,
-      bool is_mandatory,
-      base::OnceClosure callback);
 
   // Starts the client registration with an OIDC token enrollment process.
   // `oauth_token` and `id_token` pair is received and extracted from a valid

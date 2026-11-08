@@ -644,7 +644,6 @@ source_set("policy") {
   public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
   public += [
-    "client_data_delegate_desktop.h",
     "cloud/user_policy_signin_service.h",
     "file_selection_dialogs_policy_handler.h",
   ]
@@ -820,7 +819,6 @@ source_set("impl") {
   ]
 
   sources += [
-    "client_data_delegate_desktop.cc",
     "cloud/user_policy_signin_service.cc",
     "file_selection_dialogs_policy_handler.cc",
   ]

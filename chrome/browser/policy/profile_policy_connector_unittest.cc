@@ -34,7 +34,6 @@
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/policy/core/common/policy_service.h"
 #include "components/policy/core/common/policy_types.h"
-#include "components/policy/core/common/proxy_policy_provider.h"
 #include "components/policy/core/common/schema_registry.h"
 #include "components/policy/policy_constants.h"
 #include "components/policy/proto/device_management_backend.pb.h"
@@ -239,35 +238,6 @@ TEST_F(ProfilePolicyConnectorTest, IsProfilePolicy) {
   // Cleanup.
   connector.Shutdown();
   g_browser_process->browser_policy_connector()->Shutdown();
-}
-
-TEST_F(ProfilePolicyConnectorTest, MachineLevelUserCloudPolicyForProfile) {
-  // Setup mock MachineLevelUserCloudPolicyManager.
-  NiceMock<MockConfigurationPolicyProvider>
-      mock_machine_level_cloud_policy_provider;
-  mock_machine_level_cloud_policy_provider.SetDefaultReturns(
-      true /* is_initialization_complete_return */,
-      true /* is_first_policy_load_complete_return */);
-
-  // Init and set ProxyPolicyProvider
-  ProxyPolicyProvider proxy_policy_provider;
-  proxy_policy_provider.SetUnownedDelegate(
-      &mock_machine_level_cloud_policy_provider);
-  proxy_policy_provider.Init(&schema_registry_);
-  g_browser_process->browser_policy_connector()
-      ->SetProxyPolicyProviderForTesting(&proxy_policy_provider);
-
-  ProfilePolicyConnector connector;
-  connector.Init(nullptr /* user */, &schema_registry_,
-                 cloud_policy_manager_.get(), cloud_policy_store_.get(),
-                 g_browser_process->browser_policy_connector(), false);
-
-  UpdateChromePolicyToMockProviderAndVerify(
-      &mock_machine_level_cloud_policy_provider, connector);
-
-  connector.Shutdown();
-  g_browser_process->browser_policy_connector()->Shutdown();
-  proxy_policy_provider.Shutdown();
 }
 
 TEST_F(ProfilePolicyConnectorTest, LocalTestProviderUseAndRevert) {

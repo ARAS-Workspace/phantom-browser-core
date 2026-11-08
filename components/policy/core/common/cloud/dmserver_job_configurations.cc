@@ -47,8 +47,6 @@ const char* JobTypeToRequestType(
       return dm_protocol::kValueRequestDeviceStateRetrieval;
     case DeviceManagementService::JobConfiguration::TYPE_UPLOAD_STATUS:
       return dm_protocol::kValueRequestUploadStatus;
-    case DeviceManagementService::JobConfiguration::TYPE_REMOTE_COMMANDS:
-      return dm_protocol::kValueRequestRemoteCommands;
     case DeviceManagementService::JobConfiguration::
         TYPE_ATTRIBUTE_UPDATE_PERMISSION:
       return dm_protocol::kValueRequestDeviceAttributeUpdatePermission;
