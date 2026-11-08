@@ -17,7 +17,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
@@ -30,10 +29,6 @@
 #include "components/certificate_matching/certificate_principal_pattern.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/image_fetcher/core/image_fetcher.h"
-#include "components/image_fetcher/core/image_fetcher_service.h"
-#include "components/image_fetcher/core/image_fetcher_types.h"
-#include "components/image_fetcher/core/request_metadata.h"
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -113,18 +108,6 @@ bool CertMatchesSelectionFilters(
   return false;
 }
 
-void OnManagementIconReceived(
-    base::OnceCallback<void(const gfx::Image&)> callback,
-    const gfx::Image& icon,
-    const image_fetcher::RequestMetadata& metadata) {
-  if (icon.IsEmpty()) {
-    LOG(WARNING) << "EnterpriseLogoUrl fetch failed with error code "
-                 << metadata.http_response_code << " and MIME type "
-                 << metadata.mime_type;
-  }
-  std::move(callback).Run(icon);
-}
-
 // Expected to be called when Management is set and enterprise badging is
 // enabled. Returns:
 // - true for Work.
@@ -140,87 +123,6 @@ bool IsManagementWork(Profile* profile) {
            enterprise_util::ManagementEnvironment::kNone);
   return management_environment ==
          enterprise_util::ManagementEnvironment::kWork;
-}
-
-// Helper function to get the correct annotation based on the policy name.
-net::NetworkTrafficAnnotationTag GetTrafficAnnotationForPolicy(
-    EnterpriseLogoUrlScope url_scope) {
-  switch (url_scope) {
-    case EnterpriseLogoUrlScope::kBrowser: {
-      return net::DefineNetworkTrafficAnnotation("enterprise_logo_fetcher_for_browser",
-                                                 R"(
-        semantics {
-          sender: "Browser Management Service"
-          description:
-            "Retrieves an image set by the admin as the enterprise logo. This "
-            "is used to show the user which organization manages their browser "
-            "in the new tab page footer."
-          trigger:
-            "When the user launches the browser and the "
-            "EnterpriseLogoUrlForBrowser policy is set."
-          data:
-            "An admin-controlled URL for an image in the managed browser "
-            "footer."
-          destination: OTHER
-          internal {
-            contacts {
-              email: "cec-growth@google.com"
-            }
-          }
-          user_data {
-            type: SENSITIVE_URL
-          }
-          last_reviewed: "2025-08-22"
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "There is no setting. This fetch is enabled for any managed browser "
-            "with the EnterpriseLogoUrlForBrowser policy set."
-          chrome_policy {
-            EnterpriseLogoUrlForBrowser {
-              EnterpriseLogoUrlForBrowser: ""
-            }
-          }
-        })");
-    }
-    case EnterpriseLogoUrlScope::kProfile:
-      return net::DefineNetworkTrafficAnnotation("enterprise_logo_fetcher",
-                                                 R"(
-        semantics {
-          sender: "Browser Management Service"
-          description:
-            "Retrieves an image set by the admin as the enterprise logo. This "
-            "is used to show the user which organization manages their browser "
-            "in the profile menu."
-          trigger:
-            "When the user launches the browser and the EnterpriseLogoUrl "
-            "policy is set."
-          data:
-            "An admin-controlled URL for an image on the profile menu."
-          destination: OTHER
-          internal {
-            contacts {
-              email: "cec-growth@google.com"
-            }
-          }
-          user_data {
-            type: SENSITIVE_URL
-          }
-          last_reviewed: "2025-08-22"
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "There is no setting. This fetch is enabled for any managed user "
-            "with the EnterpriseLogoUrl policy set."
-          chrome_policy {
-            EnterpriseLogoUrl {
-              EnterpriseLogoUrl: ""
-            }
-          }
-        })");
-  }
 }
 }  // namespace
 
@@ -350,17 +252,8 @@ bool CanShowEnterpriseBadgingForMenu(Profile* profile) {
   if (!CanShowEnterpriseProfileUI(profile) && !profile->IsChild()) {
     return false;
   }
-  if (base::FeatureList::IsEnabled(
-          features::kEnterpriseProfileBadgingForMenu)) {
-    return true;
-  }
-
-  // The check for supervised users is here as a precaution since the
-  // kEnterpriseLogoUrlForProfile should be set by policy.
-  return !profile->GetPrefs()
-              ->GetString(prefs::kEnterpriseLogoUrlForProfile)
-              .empty() &&
-         !profile->IsChild();
+  return base::FeatureList::IsEnabled(
+      features::kEnterpriseProfileBadgingForMenu);
 }
 
 bool CanShowEnterpriseBadgingForAvatar(Profile* profile) {
@@ -383,27 +276,6 @@ bool CanShowEnterpriseProfileUI(Profile* profile) {
 bool IsKnownConsumerDomain(const std::string& email_domain) {
   return !signin::AccountManagedStatusFinder::MayBeEnterpriseDomain(
       email_domain);
-}
-
-void GetManagementIcon(const GURL& url,
-                       Profile* profile,
-                       EnterpriseLogoUrlScope url_scope,
-                       base::OnceCallback<void(const gfx::Image&)> callback) {
-  net::NetworkTrafficAnnotationTag traffic_annotation =
-      GetTrafficAnnotationForPolicy(url_scope);
-
-  if (!url.is_valid()) {
-    std::move(callback).Run(gfx::Image());
-    return;
-  }
-  image_fetcher::ImageFetcher* fetcher =
-      ImageFetcherServiceFactory::GetForKey(profile->GetProfileKey())
-          ->GetImageFetcher(image_fetcher::ImageFetcherConfig::kDiskCacheOnly);
-  fetcher->FetchImage(
-      url, base::BindOnce(&OnManagementIconReceived, std::move(callback)),
-      image_fetcher::ImageFetcherParams(
-          traffic_annotation,
-          /*uma_client_name=*/"BrowserManagementMetadata"));
 }
 
 std::u16string GetEnterpriseLabel(Profile* profile, bool truncated) {

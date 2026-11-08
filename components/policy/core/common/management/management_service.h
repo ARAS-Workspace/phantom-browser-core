@@ -26,14 +26,6 @@
 class PrefService;
 class PrefRegistrySimple;
 
-namespace gfx {
-class Image;
-}
-
-namespace ui {
-class ImageModel;
-}
-
 namespace policy {
 
 class ManagementService;
@@ -125,7 +117,6 @@ class POLICY_EXPORT ManagementService {
   class POLICY_EXPORT Observer : public base::CheckedObserver {
    public:
     virtual void OnEnterpriseLabelUpdated() {}
-    virtual void OnEnterpriseLogoUpdatedForBrowser() {}
   };
 
   explicit ManagementService(
@@ -144,9 +135,6 @@ class POLICY_EXPORT ManagementService {
   // on an instance of ManagementService that is certain to not be destroyed
   // until `callback` is called.
   virtual void RefreshCache(CacheRefreshCallback callback);
-
-  virtual ui::ImageModel* GetManagementIconForProfile();
-  virtual gfx::Image* GetManagementIconForBrowser();
 
   // Returns true if `authority` is are actively managed.
   bool HasManagementAuthority(EnterpriseManagementAuthority authority);
@@ -185,8 +173,6 @@ class POLICY_EXPORT ManagementService {
   void SetManagementStatusProviderForTesting(
       std::vector<std::unique_ptr<ManagementStatusProvider>> providers);
   virtual void TriggerPolicyStatusChangedForTesting() {}
-  virtual void SetBrowserManagementIconForTesting(
-      const gfx::Image& management_icon) {}
 
   static void RegisterLocalStatePrefs(PrefRegistrySimple* registry);
 
@@ -199,7 +185,6 @@ class POLICY_EXPORT ManagementService {
       std::unique_ptr<ManagementStatusProvider> provider);
 
   void NotifyEnterpriseLabelUpdated();
-  void NotifyEnterpriseLogoForBrowserUpdated();
 
   const std::vector<std::unique_ptr<ManagementStatusProvider>>&
   management_status_providers() {

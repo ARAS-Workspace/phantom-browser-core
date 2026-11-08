@@ -38,12 +38,6 @@ enum EnterpriseProfileBadgingTemporarySetting : int {
 // Represents which type of managed environment we have.
 enum class ManagementEnvironment { kNone, kSchool, kWork };
 
-// Represents the management scope for which the enterprise logo applies.
-enum class EnterpriseLogoUrlScope {
-  kBrowser,
-  kProfile
-};
-
 // Determines whether the browser with `profile` as its primary profile is
 // managed. This is determined by looking it there are any policies applied or
 // if `profile` is an enterprise profile.
@@ -110,14 +104,6 @@ void SetEnterpriseProfileLabel(Profile* profile);
 // can still return `false` for consumer domains which are not hardcoded in
 // implementation.
 bool IsKnownConsumerDomain(const std::string& email_domain);
-
-// Returns an enterprise icon hosted at `url` for `profile` using `callback`.
-// An empty image is returned in case `url` is invalid or we fail to fetch the
-// image.
-void GetManagementIcon(const GURL& url,
-                       Profile* profile,
-                       EnterpriseLogoUrlScope url_scope,
-                       base::OnceCallback<void(const gfx::Image&)> callback);
 
 // Returns the default enterprise label "Work"/"School" or the
 // `EnterpriseCustomLabel` set by policy if present.

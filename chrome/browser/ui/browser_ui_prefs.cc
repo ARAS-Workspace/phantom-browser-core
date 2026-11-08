@@ -68,8 +68,6 @@ void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterStringPref(prefs::kEnterpriseCustomLabelForBrowser,
                                std::string());
-  registry->RegisterStringPref(prefs::kEnterpriseLogoUrlForBrowser,
-                               std::string());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(prefs::kSplitViewDragAndDropNudgeShownCount, 0);
   registry->RegisterIntegerPref(prefs::kSplitViewDragAndDropNudgeUsedCount, 0);
@@ -175,8 +173,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterDictionaryPref(prefs::kHttpsUpgradeNavigations);
   registry->RegisterBooleanPref(prefs::kHttpsOnlyModeAutoEnabled, false);
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  registry->RegisterStringPref(prefs::kEnterpriseLogoUrlForProfile,
-                               std::string());
   registry->RegisterStringPref(prefs::kEnterpriseCustomLabelForProfile,
                                std::string());
   registry->RegisterIntegerPref(prefs::kEnterpriseProfileBadgeToolbarSettings,

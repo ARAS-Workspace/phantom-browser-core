@@ -17,13 +17,10 @@ constexpr char kCopyToJsonHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.CopyToJson";
 constexpr char kExportToJsonHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.ExportToJson";
-constexpr char kUploadReportHistogram[] =
-    "Enterprise.PolicyUI.ButtonUsage.UploadReport";
 
 constexpr uint32_t kReloadPoliciesCount = 5;
 constexpr uint32_t kExportToJsonCount = 3;
 constexpr uint32_t kCopyToJsonCount = 7;
-constexpr uint32_t kUploadReportCount = 2;
 constexpr uint32_t kZeroCount = 0;
 
 }  // namespace
@@ -32,7 +29,7 @@ TEST(PolicyWebUIStatisticsCollectorTest, RecordPolicyUIButtonUsage) {
   base::HistogramTester histogram_tester;
 
   RecordPolicyUIButtonUsage(kReloadPoliciesCount, kExportToJsonCount,
-                            kCopyToJsonCount, kUploadReportCount);
+                            kCopyToJsonCount);
 
   histogram_tester.ExpectUniqueSample(kReloadPoliciesHistogram,
                                       kReloadPoliciesCount, 1);
@@ -40,27 +37,24 @@ TEST(PolicyWebUIStatisticsCollectorTest, RecordPolicyUIButtonUsage) {
                                       1);
   histogram_tester.ExpectUniqueSample(kExportToJsonHistogram,
                                       kExportToJsonCount, 1);
-  histogram_tester.ExpectUniqueSample(kUploadReportHistogram,
-                                      kUploadReportCount, 1);
 }
 
 TEST(PolicyWebUIStatisticsCollectorTest, RecordZeroCounts) {
   base::HistogramTester histogram_tester;
 
-  RecordPolicyUIButtonUsage(kZeroCount, kZeroCount, kZeroCount, kZeroCount);
+  RecordPolicyUIButtonUsage(kZeroCount, kZeroCount, kZeroCount);
 
   histogram_tester.ExpectUniqueSample(kReloadPoliciesHistogram, kZeroCount, 1);
   histogram_tester.ExpectUniqueSample(kCopyToJsonHistogram, kZeroCount, 1);
   histogram_tester.ExpectUniqueSample(kExportToJsonHistogram, kZeroCount, 1);
-  histogram_tester.ExpectUniqueSample(kUploadReportHistogram, kZeroCount, 1);
 }
 
 TEST(PolicyWebUIStatisticsCollectorTest, MultipleRecords) {
   base::HistogramTester histogram_tester;
 
   RecordPolicyUIButtonUsage(kReloadPoliciesCount, kExportToJsonCount,
-                            kCopyToJsonCount, kUploadReportCount);
-  RecordPolicyUIButtonUsage(kZeroCount, kZeroCount, kZeroCount, kZeroCount);
+                            kCopyToJsonCount);
+  RecordPolicyUIButtonUsage(kZeroCount, kZeroCount, kZeroCount);
 
   histogram_tester.ExpectTotalCount(kReloadPoliciesHistogram, 2);
   histogram_tester.ExpectBucketCount(kReloadPoliciesHistogram,
@@ -75,11 +69,6 @@ TEST(PolicyWebUIStatisticsCollectorTest, MultipleRecords) {
   histogram_tester.ExpectBucketCount(kExportToJsonHistogram, kExportToJsonCount,
                                      1);
   histogram_tester.ExpectBucketCount(kExportToJsonHistogram, kZeroCount, 1);
-
-  histogram_tester.ExpectTotalCount(kUploadReportHistogram, 2);
-  histogram_tester.ExpectBucketCount(kUploadReportHistogram, kUploadReportCount,
-                                     1);
-  histogram_tester.ExpectBucketCount(kUploadReportHistogram, kZeroCount, 1);
 }
 
 }  // namespace policy

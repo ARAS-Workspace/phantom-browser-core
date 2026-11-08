@@ -13,8 +13,7 @@ namespace policy {
 
 POLICY_EXPORT void RecordPolicyUIButtonUsage(uint32_t reload_policies_count,
                                              uint32_t export_to_json_count,
-                                             uint32_t copy_to_json_count,
-                                             uint32_t upload_report_count);
+                                             uint32_t copy_to_json_count);
 }  // namespace policy
 
 #endif  // COMPONENTS_POLICY_CORE_BROWSER_WEBUI_STATISTICS_COLLECTOR_H_

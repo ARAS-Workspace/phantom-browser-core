@@ -8,7 +8,6 @@ import 'chrome://resources/js/action_link.js';
 import 'chrome://resources/js/ios/web_ui.js';
 // </if>
 
-import './status_box.js';
 import './policy_table.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_checkbox/cr_checkbox.js';
@@ -25,7 +24,6 @@ import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import {BrowserProxy} from './browser_proxy.js';
 import {GetPoliciesReason} from './policy.mojom-webui.js';
-import type {Status} from './policy.mojom-webui.js';
 import {getCss} from './policy_app.css.js';
 import {getHtml} from './policy_app.html.js';
 import type {Policy} from './policy_row.js';
@@ -69,32 +67,24 @@ export class PolicyAppElement extends CrLitElement {
     return {
       filterPattern_: {type: String},
       showUnset_: {type: Boolean},
-      status_: {type: Object},
       policyGroups_: {type: Array},
       shouldShowCommandLineArgumentsWarning_: {type: Boolean},
       commandLineArguments_: {type: String},
       toastText_: {type: String},
       reloadButtonDisabled_: {type: Boolean},
-      uploadReportButtonDisabled_: {type: Boolean},
-      enableReportButton_: {type: Boolean},
       hideExportButton_: {type: Boolean},
-      hideUploadReportButton_: {type: Boolean},
     };
   }
 
   protected accessor filterPattern_: string = '';
   protected accessor showUnset_: boolean = false;
-  protected accessor status_: Record<string, Status> = {};
   protected accessor policyGroups_: PolicyTableModel[] = [];
   protected accessor shouldShowCommandLineArgumentsWarning_: boolean = false;
   protected accessor commandLineArguments_: string = '';
   protected accessor toastText_: string = '';
   protected accessor reloadButtonDisabled_: boolean = false;
-  protected accessor uploadReportButtonDisabled_: boolean = false;
-  protected accessor enableReportButton_: boolean = false;
 
   protected accessor hideExportButton_ = false;
-  protected accessor hideUploadReportButton_ = false;
 
 
   private toastTimeoutId_: number|null = null;
@@ -126,14 +116,8 @@ export class PolicyAppElement extends CrLitElement {
 
     this.hideExportButton_ = loadTimeData.valueExists('hideExportButton') &&
         loadTimeData.getBoolean('hideExportButton');
-    this.hideUploadReportButton_ =
-        loadTimeData.valueExists('hideUploadReportButton') &&
-        loadTimeData.getBoolean('hideUploadReportButton');
 
     sendWithPromise<void>('listenPoliciesUpdates');
-    addWebUiListener(
-        'status-updated',
-        (status: Record<string, Status>) => this.status_ = status);
     addWebUiListener(
         'policies-updated',
         (names: PolicyNamesResponse, values: PolicyValuesResponse) =>
@@ -184,15 +168,6 @@ export class PolicyAppElement extends CrLitElement {
       };
     });
 
-    // <if expr="not is_chromeos">
-    this.enableReportButton_ =
-        [
-          'CloudReportingEnabled',
-          'CloudProfileReportingEnabled',
-          'UserSecuritySignalsReporting',
-        ].map(p => !!policyValues['chrome']?.policies[p]?.value)
-            .reduce((accumulator, current) => accumulator ||= current, false);
-    // </if>
     this.reloadPoliciesDone_();
   }
 
@@ -226,16 +201,6 @@ export class PolicyAppElement extends CrLitElement {
     this.showToast_(loadTimeData.getString('copyPoliciesDone'));
   }
 
-  protected onUploadReportClick_() {
-    this.closeActionMenu_();
-    this.uploadReportButtonDisabled_ = true;
-    this.showToast_(loadTimeData.getString('reportUploading'));
-    sendWithPromise<void>('uploadReport').then(() => {
-      this.uploadReportButtonDisabled_ = false;
-      this.showToast_(loadTimeData.getString('reportUploaded'));
-    });
-  }
-
   protected onViewLogsClick_() {
     this.closeActionMenu_();
     window.location.href = 'chrome://policy/logs';
@@ -243,11 +208,6 @@ export class PolicyAppElement extends CrLitElement {
 
   protected onShowUnsetCheckedChanged_(e: CustomEvent<{value: boolean}>) {
     this.showUnset_ = e.detail.value;
-  }
-
-  protected hasStatus_(): boolean {
-    return Object.values(this.status_)
-        .some(boxStatus => !!boxStatus.policyDescriptionKey);
   }
 
   private closeActionMenu_() {

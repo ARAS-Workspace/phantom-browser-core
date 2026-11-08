@@ -22,7 +22,6 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/browser_management_service.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -495,24 +494,15 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
     params.avatar_ring = AvatarRingType::kGradient;
   }
 
-  ui::ImageModel* custom_management_image = nullptr;
   if (enterprise_util::CanShowEnterpriseBadgingForMenu(&profile())) {
     if (profile().IsChild()) {
       params.header_string = l10n_util::GetStringUTF16(IDS_MANAGED_BY_PARENT);
     } else {
       params.header_string =
           l10n_util::GetStringUTF16(IDS_PROFILE_MENU_PROFILE_MANAGED_HEADER);
-      custom_management_image =
-          policy::ManagementServiceFactory::GetForProfile(&profile())
-              ->GetManagementIconForProfile();
     }
-
-    if (custom_management_image) {
-      params.header_image = *custom_management_image;
-    } else {
-      params.header_image = ui::ImageModel::FromVectorIcon(
-          GetManagedUiIcon(&profile()), ui::kColorIcon);
-    }
+    params.header_image = ui::ImageModel::FromVectorIcon(
+        GetManagedUiIcon(&profile()), ui::kColorIcon);
   }
 
   // Clarify Dasherless profile with subtitle while not adding the button.

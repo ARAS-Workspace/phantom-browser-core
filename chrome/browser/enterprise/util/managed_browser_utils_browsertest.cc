@@ -128,10 +128,6 @@ IN_PROC_BROWSER_TEST_P(EnterpriseProfileBadgingTest, CanShowEnterpriseBadging) {
                                  "some_label");
   EXPECT_EQ(CanShowEnterpriseBadgingForAvatar(profile),
                 managed_profile());
-
-  profile->GetPrefs()->SetString(prefs::kEnterpriseLogoUrlForProfile,
-                                 "some_url");
-  EXPECT_EQ(CanShowEnterpriseBadgingForMenu(profile), managed_profile());
 }
 
 IN_PROC_BROWSER_TEST_P(EnterpriseProfileBadgingTest,

@@ -39,12 +39,6 @@ export function getHtml(this: PolicyAppElement) {
             $i18n{copyPoliciesJSON}
           </button>
 <if expr="not is_chromeos">
-          <button id="upload-report" class="dropdown-item"
-              ?hidden="${!this.enableReportButton_ || this.hideUploadReportButton_}"
-              ?disabled="${this.uploadReportButtonDisabled_}"
-              @click="${this.onUploadReportClick_}">
-            $i18n{uploadReport}
-          </button>
           <button id="view-logs" class="dropdown-item"
               @click="${this.onViewLogsClick_}">
             $i18n{viewLogs}
@@ -74,16 +68,6 @@ export function getHtml(this: PolicyAppElement) {
         </div>
       ` : ''}
 </if>
-      <section id="status-section" class="status-box-section"
-          ?hidden="${!this.hasStatus_()}">
-        <h2>$i18n{status}</h2>
-        <div id="status-box-container">
-          ${Object.entries(this.status_).map(([scope, boxStatus]) =>
-            boxStatus.policyDescriptionKey ? html`
-              <status-box .scope="${scope}" .status="${boxStatus}"></status-box>
-            ` : '')}
-        </div>
-      </section>
       <section id="main-section"
           class="${this.policyGroups_.length === 0 ? 'empty' : ''}">
         ${this.policyGroups_.map(group => html`

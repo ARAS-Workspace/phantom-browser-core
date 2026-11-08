@@ -9,20 +9,6 @@ import type {PolicyRowElement} from './policy_row.js';
 import type {PolicyTableElement} from './policy_table.js';
 
 // Functions for tests that directly inject JS to access certain UI elements.
-function getPolicyFieldsets() {
-  const app = document.querySelector('policy-app');
-  if (!app || !app.shadowRoot) {
-    return [];
-  }
-  const statusBoxes = app.shadowRoot.querySelectorAll('status-box');
-  return Array.from(statusBoxes)
-      .map(
-          box => box.shadowRoot ?
-              box.shadowRoot.querySelector('.status-box-fields') :
-              null)
-      .filter((el): el is Element => !!el);
-}
-
 function getAllPolicyTables() {
   const app = document.querySelector('policy-app');
   if (!app || !app.shadowRoot) {
@@ -62,31 +48,6 @@ function getPrecedenceRowValue() {
   return precedenceRow;
 }
 
-function getRefreshIntervalEl() {
-  const app = document.querySelector('policy-app');
-  if (!app || !app.shadowRoot) {
-    return null;
-  }
-  const statusBox = app.shadowRoot.querySelector('status-box');
-  if (!statusBox || !statusBox.shadowRoot) {
-    return null;
-  }
-  return statusBox.shadowRoot.querySelector('.refresh-interval');
-}
-
-function getReportButtonVisibility() {
-  const app = document.querySelector('policy-app');
-  if (!app || !app.shadowRoot) {
-    return 'none';
-  }
-  const button =
-      app.shadowRoot.querySelector<HTMLElement>('button#upload-report');
-  if (!button || button.hidden) {
-    return 'none';
-  }
-  return 'block';
-}
-
 function reloadPolicies(): Promise<void> {
   const app = document.querySelector('policy-app');
   const reloadPoliciesBtn = app && app.shadowRoot ?
@@ -110,12 +71,9 @@ function reloadPolicies(): Promise<void> {
 }
 
 Object.assign(window, {
-  getPolicyFieldsets,
   getAllPolicyTables,
   getAllPolicyRows,
   getAllPolicyRowDivs,
   getPrecedenceRowValue,
-  getRefreshIntervalEl,
-  getReportButtonVisibility,
   reloadPolicies,
 });

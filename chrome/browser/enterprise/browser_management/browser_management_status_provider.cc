@@ -21,17 +21,6 @@ bool IsProfileManaged(Profile* profile) {
 
 }  // namespace
 
-BrowserCloudManagementStatusProvider::BrowserCloudManagementStatusProvider() =
-    default;
-
-BrowserCloudManagementStatusProvider::~BrowserCloudManagementStatusProvider() =
-    default;
-
-EnterpriseManagementAuthority
-BrowserCloudManagementStatusProvider::FetchAuthority() {
-  return EnterpriseManagementAuthority::NONE;
-}
-
 LocalBrowserManagementStatusProvider::LocalBrowserManagementStatusProvider() =
     default;
 

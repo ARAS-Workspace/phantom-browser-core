@@ -132,7 +132,6 @@ after discussions on the right group.
       <annotation id="wallpaper_create_themes_model_execution"/>
       <annotation id="help_me_write_model_execution"/>
       <annotation id="controlled_frame_content_scripts_download"/>
-      <annotation id="enterprise_logo_fetcher"/>
       <annotation id="private_metrics_encryption_key"/>
       <annotation id="lens_overlay"/>
       <annotation id="dbsc_registration"/>
@@ -156,7 +155,6 @@ after discussions on the right group.
       <annotation id="password_change_submission_model_execution"/>
       <annotation id="glic_web_ui"/>
       <annotation id="aim_eligibility_fetch"/>
-      <annotation id="enterprise_logo_fetcher_for_browser"/>
       <annotation id="webrtc_rtc_transport"/>
       <annotation id="email_verification"/>
       <annotation id="amount_extraction_model_execution"/>

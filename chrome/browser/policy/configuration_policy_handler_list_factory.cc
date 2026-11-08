@@ -1412,12 +1412,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           key::kEnterpriseCustomLabel, prefs::kEnterpriseCustomLabelForProfile,
           base::Value::Type::STRING)));
 
-  handlers->AddHandler(std::make_unique<URLPolicyHandler>(
-      key::kEnterpriseLogoUrlForBrowser, prefs::kEnterpriseLogoUrlForBrowser));
-  handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
-      std::make_unique<URLPolicyHandler>(key::kEnterpriseLogoUrl,
-                                         prefs::kEnterpriseLogoUrlForProfile)));
-
   handlers->AddHandler(std::make_unique<SimpleSchemaValidatingPolicyHandler>(
       key::kEnterpriseProfileBadgeToolbarSettings,
       prefs::kEnterpriseProfileBadgeToolbarSettings, chrome_schema,

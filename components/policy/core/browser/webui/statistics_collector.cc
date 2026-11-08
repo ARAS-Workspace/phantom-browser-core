@@ -18,8 +18,7 @@ constexpr int kMetricsBucket = 52;
 
 void RecordPolicyUIButtonUsage(uint32_t reload_policies_count,
                                uint32_t export_to_json_count,
-                               uint32_t copy_to_json_count,
-                               uint32_t upload_report_count) {
+                               uint32_t copy_to_json_count) {
   base::UmaHistogramCustomCounts(
       "Enterprise.PolicyUI.ButtonUsage.ReloadPolicies", reload_policies_count,
       kMetricsCountMin, kMetricsCountMax, kMetricsBucket);
@@ -28,9 +27,6 @@ void RecordPolicyUIButtonUsage(uint32_t reload_policies_count,
                                  kMetricsCountMax, kMetricsBucket);
   base::UmaHistogramCustomCounts("Enterprise.PolicyUI.ButtonUsage.ExportToJson",
                                  export_to_json_count, kMetricsCountMin,
-                                 kMetricsCountMax, kMetricsBucket);
-  base::UmaHistogramCustomCounts("Enterprise.PolicyUI.ButtonUsage.UploadReport",
-                                 upload_report_count, kMetricsCountMin,
                                  kMetricsCountMax, kMetricsBucket);
 }
 

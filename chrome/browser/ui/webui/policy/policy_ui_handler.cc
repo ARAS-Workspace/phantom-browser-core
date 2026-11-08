@@ -40,7 +40,6 @@
 #include "chrome/browser/policy/policy_value_and_status_aggregator.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/policy/schema_registry_service.h"
-#include "chrome/browser/policy/status_provider/status_provider_util.h"
 #include "chrome/browser/policy/value_provider/chrome_policies_value_provider.h"
 #include "chrome/browser/policy/value_provider/value_provider_util.h"
 #include "chrome/browser/profiles/profile.h"
@@ -111,8 +110,7 @@ PolicyUIHandler::PolicyUIHandler(
 
 PolicyUIHandler::~PolicyUIHandler() {
   policy::RecordPolicyUIButtonUsage(reload_policies_count_,
-                                    export_to_json_count_, copy_to_json_count_,
-                                    upload_report_count_);
+                                    export_to_json_count_, copy_to_json_count_);
 }
 
 void PolicyUIHandler::AddCommonLocalizedStringsToSource(
@@ -157,8 +155,6 @@ void PolicyUIHandler::AddCommonLocalizedStringsToSource(
       {"sort", IDS_POLICY_TABLE_COLUMN_SORT},
       {"sortAscending", IDS_POLICY_TABLE_COLUMN_SORT_ASCENDING},
       {"sortDescending", IDS_POLICY_TABLE_COLUMN_SORT_DESCENDING},
-      {"reportUploading", IDS_REPORT_UPLOADING},
-      {"reportUploaded", IDS_REPORT_UPLOADED},
   };
   source->AddLocalizedStrings(kStrings);
 
@@ -221,17 +217,10 @@ void PolicyUIHandler::RegisterMessages() {
       "getPoliciesJson",
       base::BindRepeating(&PolicyUIHandler::HandleGetPoliciesJson,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "uploadReport", base::BindRepeating(&PolicyUIHandler::HandleUploadReport,
-                                          base::Unretained(this)));
 }
 
 void PolicyUIHandler::OnPolicyValueAndStatusChanged() {
   SendPolicies();
-  // Send also the status to UI because when policy value is updated, policy
-  // status also might be updated and PolicyStatusProviders may not be listening
-  // this change.
-  SendStatus();
 }
 
 void PolicyUIHandler::OnSchemaRegistryUpdated(bool has_new_schemas) {
@@ -247,11 +236,10 @@ void PolicyUIHandler::SendSchema() {
 }
 
 void PolicyUIHandler::HandleListenPoliciesUpdates(const base::ListValue& args) {
-  // Send initial policy values and status to UI page.
+  // Send initial policy values to UI page.
   AllowJavascript();
   SendSchema();
   SendPolicies();
-  SendStatus();
 }
 
 void PolicyUIHandler::HandleReloadPolicies(const base::ListValue&) {
@@ -387,13 +375,6 @@ void PolicyUIHandler::GetPolicyLogs(GetPolicyLogsCallback callback) {
   std::move(callback).Run(policy::PolicyLogger::GetInstance()->GetAsMojoList());
 }
 
-void PolicyUIHandler::HandleUploadReport(const base::ListValue& args) {
-  upload_report_count_ += 1;
-  DCHECK_EQ(1u, args.size());
-  const std::string& callback_id = args[0].GetString();
-  OnReportUploaded(callback_id);
-}
-
 void PolicyUIHandler::SendPolicies() {
   if (!IsJavascriptAllowed()) {
     return;
@@ -404,30 +385,6 @@ void PolicyUIHandler::SendPolicies() {
           policy_value_and_status_aggregator_->GetAggregatedPolicyNames()),
       base::Value(
           policy_value_and_status_aggregator_->GetAggregatedPolicyValues()));
-}
-
-void PolicyUIHandler::SendStatus() {
-  if (IsMojoMigrationEnabled()) {
-    client_->StatusUpdated(
-        policy_value_and_status_aggregator_->GetAggregatedPolicyStatusMojo());
-  } else {
-    if (!IsJavascriptAllowed()) {
-      return;
-    }
-
-    FireWebUIListener(
-        "status-updated",
-        policy_value_and_status_aggregator_->GetAggregatedPolicyStatus());
-  }
-}
-
-void PolicyUIHandler::OnReportUploaded(const std::string& callback_id) {
-  if (!IsJavascriptAllowed()) {
-    return;
-  }
-  ResolveJavascriptCallback(base::Value(callback_id),
-                            /*response=*/base::Value());
-  SendStatus();
 }
 
 std::string PolicyUIHandler::GetPoliciesJsonImpl(

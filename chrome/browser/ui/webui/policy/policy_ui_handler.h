@@ -85,7 +85,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   void HandleSetUserAffiliated(const base::ListValue& args);
   void HandleGetAppliedTestPolicies(const base::ListValue& args);
   void HandleGetPoliciesJson(const base::ListValue& args);
-  void HandleUploadReport(const base::ListValue& args);
 
   // Core logic for setting the user affiliation status for test policies.
   // This is used to simulate user affiliation for testing purposes.
@@ -120,14 +119,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   // extension policies, and their types.
   void SendSchema();
 
-  // Send the status of cloud policy to the UI. For each scope that has cloud
-  // policy enabled (device and/or user), a dictionary containing status
-  // information.
-  void SendStatus();
-
-  // Called when report has been uploaded, successfully or not.
-  void OnReportUploaded(const std::string& callback_id);
-
   // Builds a raw JSON string representation of all the policies.
   std::string GetPoliciesJsonImpl(policy::mojom::GetPoliciesReason reason);
 
@@ -146,7 +137,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   uint32_t reload_policies_count_ = 0;
   uint32_t export_to_json_count_ = 0;
   uint32_t copy_to_json_count_ = 0;
-  uint32_t upload_report_count_ = 0;
 
   const mojo::Receiver<policy::mojom::PolicyPageHandler> receiver_{this};
   const mojo::Remote<policy::mojom::PolicyPageClient> client_{

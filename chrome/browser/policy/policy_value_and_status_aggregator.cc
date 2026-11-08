@@ -22,10 +22,6 @@
 #include "components/policy/core/common/features.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/policy/core/common/policy_logger.h"
-#include "components/policy/resources/webui/mojom/policy.mojom.h"
-
-#include "chrome/browser/policy/status_provider/user_cloud_policy_status_provider.h"
-#include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/prefs/pref_service.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -53,18 +49,6 @@ void MergePolicyValuesAndIds(base::DictValue policy_values,
                              base::ListValue& out_policy_ids) {
   AppendPolicyIdsToList(policy_values, out_policy_ids);
   out_policy_values.Merge(std::move(policy_values));
-}
-
-// Returns the PolicyStatusProvider for user policies for the current platform.
-std::unique_ptr<policy::PolicyStatusProvider> GetUserPolicyStatusProvider(
-    Profile* profile) {
-  policy::CloudPolicyManager* cloud_policy_manager =
-      profile->GetCloudPolicyManager();
-  if (cloud_policy_manager) {
-    return std::make_unique<UserCloudPolicyStatusProvider>(cloud_policy_manager,
-                                                           profile);
-  }
-  return std::make_unique<policy::PolicyStatusProvider>();
 }
 
 }  // namespace
@@ -100,7 +84,7 @@ PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
   // Add PolicyStatusProviders.
   // User policies.
   aggregator->AddPolicyStatusProvider(kUserStatusKey,
-                                      GetUserPolicyStatusProvider(profile));
+                                      std::make_unique<PolicyStatusProvider>());
 
   // Device policies.
   if (policy::ManagementServiceFactory::GetForPlatform()->IsManaged()) {
@@ -127,22 +111,6 @@ base::DictValue PolicyValueAndStatusAggregator::GetAggregatedPolicyStatus() {
                status_provider_description_pair.second->GetStatus());
   }
   return status;
-}
-
-base::flat_map<std::string, policy::mojom::StatusPtr>
-PolicyValueAndStatusAggregator::GetAggregatedPolicyStatusMojo() {
-  std::vector<std::pair<std::string, policy::mojom::StatusPtr>> entries;
-  for (const auto& status_provider_description_pair : status_providers_) {
-    DVLOG_POLICY(3, POLICY_PROCESSING)
-        << status_provider_description_pair.first
-        << " status: " << status_provider_description_pair.second->GetStatus();
-
-    entries.emplace_back(
-        status_provider_description_pair.first,
-        status_provider_description_pair.second->GetStatusMojo());
-  }
-  return base::flat_map<std::string, policy::mojom::StatusPtr>(
-      std::move(entries));
 }
 
 base::DictValue PolicyValueAndStatusAggregator::GetAggregatedPolicyValues() {

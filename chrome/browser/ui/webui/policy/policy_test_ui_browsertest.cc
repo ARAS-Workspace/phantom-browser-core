@@ -297,9 +297,6 @@ class PolicyTestHandlerTest : public base::test::WithFeatureOverride,
     }
   }
 
-  void StatusUpdated(
-      base::flat_map<std::string, policy::mojom::StatusPtr> status) override {}
-
  private:
   content::TestWebUI web_ui_;
 
