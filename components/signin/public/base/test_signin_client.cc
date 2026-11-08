@@ -42,14 +42,6 @@ class TestOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
     return signin::OAuthConsumer(
         signin::oauth_consumer_name::kDrivePickerHostName, {});
   }
-
-  signin::OAuthConsumer GetOAuthConsumerForBrowserActuator() const override {
-    NOTREACHED();
-  }
-
-  signin::OAuthConsumer GetOAuthConsumerForSiteTokenProvider() const override {
-    return signin::OAuthConsumer("site_token_provider", {"test_scope"});
-  }
 };
 
 }  // namespace

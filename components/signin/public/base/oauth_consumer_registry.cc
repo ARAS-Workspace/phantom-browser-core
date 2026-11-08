@@ -705,10 +705,6 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
       return OAuthConsumer(
           /*name=*/kNotebooksServiceName,
           /*scopes=*/{GaiaConstants::kGoogleUserInfoEmail});
-    case OAuthConsumerId::kBrowserActuator:
-      return GetOAuthConsumerForBrowserActuator();
-    case OAuthConsumerId::kSiteTokenProvider:
-      return GetOAuthConsumerForSiteTokenProvider();
     case OAuthConsumerId::kDeviceAuthorizationRequest:
       return OAuthConsumer(
           /*name=*/kDeviceAuthorizationRequestName,

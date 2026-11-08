@@ -13,8 +13,6 @@ inline extern const char kDrivePickerHostName[] = "drive_picker_host";
 inline extern const char kGlicInvokeApiName[] = "glic_invoke_api";
 inline extern const char kSkillsServiceName[] = "skills_service";
 inline extern const char kContextualTasksName[] = "contextual_tasks";
-inline extern const char kBrowserActuatorName[] = "browser_actuator";
-inline extern const char kSiteTokenProviderName[] = "site_token_provider";
 }  // namespace oauth_consumer_name
 
 // LINT.IfChange(OAuthConsumerId)
@@ -128,9 +126,9 @@ enum class OAuthConsumerId {
   kFpopService = 103,
   kNotebooksService = 104,
   // kRemoteActorLoginCredentialsService = 105, // Removed due to deprecation.
-  kBrowserActuator = 106,
+  // kBrowserActuator = 106, // Removed due to deprecation.
   // kTabContextContainersService = 107, // Removed due to deprecation.
-  kSiteTokenProvider = 108,
+  // kSiteTokenProvider = 108, // Removed due to deprecation.
   kDeviceAuthorizationRequest = 109,
   kMaxValue = kDeviceAuthorizationRequest,
 };

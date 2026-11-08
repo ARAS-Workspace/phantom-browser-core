@@ -41,11 +41,6 @@ class OAuthConsumerRegistry {
   virtual OAuthConsumer GetOAuthConsumerForSkillsService() const = 0;
   virtual OAuthConsumer GetOAuthConsumerForContextualTasks() const = 0;
   virtual OAuthConsumer GetOAuthConsumerForDrivePickerHost() const = 0;
-
-  // TODO(crbug.com/536892467): Remove this and hard-code the scope after
-  // BrowserActuator is launched.
-  virtual OAuthConsumer GetOAuthConsumerForBrowserActuator() const = 0;
-  virtual OAuthConsumer GetOAuthConsumerForSiteTokenProvider() const = 0;
 };
 
 }  // namespace signin

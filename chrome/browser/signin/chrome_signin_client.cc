@@ -37,7 +37,6 @@
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
-#include "components/browser_actuator/public/features.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/metrics/metrics_service.h"
 #include "components/omnibox/common/omnibox_features.h"
@@ -53,7 +52,6 @@
 #include "components/signin/public/identity_manager/access_token_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_change_event.h"
-#include "components/site_token_provider/features.h"
 #include "components/version_info/channel.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
@@ -177,20 +175,6 @@ class ChromeOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
     return signin::OAuthConsumer(
         signin::oauth_consumer_name::kDrivePickerHostName,
         {"https://www.googleapis.com/auth/drive.readonly"});
-  }
-
-  signin::OAuthConsumer GetOAuthConsumerForBrowserActuator() const override {
-    CHECK(base::FeatureList::IsEnabled(browser_actuator::kBrowserActuator));
-
-    return signin::OAuthConsumer(
-        signin::oauth_consumer_name::kBrowserActuatorName,
-        {browser_actuator::kBrowserActuatorOAuth2ScopeParam.Get()});
-  }
-
-  signin::OAuthConsumer GetOAuthConsumerForSiteTokenProvider() const override {
-    return signin::OAuthConsumer(
-        signin::oauth_consumer_name::kSiteTokenProviderName,
-        {site_token_provider::features::kSiteTokenOAuth2Scope.Get()});
   }
 };
 

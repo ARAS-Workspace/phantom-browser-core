@@ -44,7 +44,6 @@
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/breadcrumbs/breadcrumb_manager_keyed_service_factory.h"
-#include "chrome/browser/browser_actuator/browser_actuator_service_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/browsing_data_history_observer_service.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager_factory.h"
@@ -159,7 +158,6 @@
 #include "chrome/browser/signin/signin_metrics_service_factory.h"
 #include "chrome/browser/signin/signin_policy_service_factory.h"
 #include "chrome/browser/signin/signin_profile_attributes_updater_factory.h"
-#include "chrome/browser/site_token_provider/site_token_provider_service_factory.h"
 #include "chrome/browser/ssl/https_first_mode_settings_tracker.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/storage_access_api/storage_access_api_service_factory.h"
@@ -197,13 +195,12 @@
 #include "chrome/common/chrome_features.h"
 #include "components/autofill/content/browser/autofill_log_router_factory.h"
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
-#include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/permissions/features.h"
 #include "components/policy/core/browser/url_list/policy_blocklist_service.h"
+#include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/site_engagement/content/site_engagement_service.h"
-#include "components/site_token_provider/features.h"
 #include "components/sync/base/features.h"
 #include "content/public/common/buildflags.h"
 #include "crypto/crypto_buildflags.h"
@@ -429,7 +426,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   DiceBoundSessionCookieServiceFactory::GetInstance();
 #endif
 #endif
-  browser_actuator::BrowserActuatorServiceFactory::GetInstance();
   browser_sync::UserEventServiceFactory::GetInstance();
   BrowserManagerServiceFactory::GetInstance();
   BrowsingDataHistoryObserverService::Factory::GetInstance();
@@ -625,10 +621,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   SigninProfileAttributesUpdaterFactory::GetInstance();
   if (site_engagement::SiteEngagementService::IsEnabled()) {
     site_engagement::SiteEngagementServiceFactory::GetInstance();
-  }
-  if (base::FeatureList::IsEnabled(
-          site_token_provider::features::kSiteTokenProviderEnabled)) {
-    site_token_provider::SiteTokenProviderServiceFactory::GetInstance();
   }
   StatefulSSLHostStateDelegateFactory::GetInstance();
   StorageAccessAPIServiceFactory::GetInstance();
