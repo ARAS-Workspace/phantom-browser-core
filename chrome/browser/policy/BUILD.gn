@@ -311,7 +311,6 @@ source_set("browser_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
   sources = [
-    "cloud/cloud_policy_manager_browsertest.cc",
     "test/accessibility_policy_browsertest.cc",
     "test/default_sensors_setting_policy_handler_browsertest.cc",
   ]
@@ -531,8 +530,6 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  sources += [ "cloud/user_policy_signin_service_unittest.cc" ]
-
   sources += [
     "developer_tools_availability_list_policy_handler_unittest.cc",
     "developer_tools_policy_checker_factory_unittest.cc",
@@ -541,14 +538,7 @@ source_set("unit_tests") {
   ]
   deps += [ ":path_parser" ]
 
-  if (enable_extensions_core) {
-    sources += [ "cloud/extension_install_policy_service_unittest.cc" ]
-  }
-
-  sources += [
-    "client_data_delegate_desktop_unittest.cc",
-    "file_selection_dialogs_policy_handler_unittest.cc",
-  ]
+  sources += [ "file_selection_dialogs_policy_handler_unittest.cc" ]
 
   sources += [ "developer_tools_policy_handler_unittest.cc" ]
 

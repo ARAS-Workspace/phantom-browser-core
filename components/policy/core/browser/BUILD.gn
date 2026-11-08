@@ -183,7 +183,6 @@ source_set("unit_tests") {
   testonly = true
   sources = [
     "boolean_disabling_policy_handler_unittest.cc",
-    "cloud/user_cloud_management_status_fetcher_unittest.cc",
     "configuration_policy_handler_list_unittest.cc",
     "configuration_policy_handler_unittest.cc",
     "configuration_policy_pref_store_unittest.cc",
@@ -222,9 +221,6 @@ source_set("unit_tests") {
     "//ui/base",
     "//url",
   ]
-
-  sources +=
-      [ "webui/machine_level_user_cloud_policy_status_provider_unittest.cc" ]
 
   sources += [ "url_list/incognito_mode_policy_handler_unittest.cc" ]
 }

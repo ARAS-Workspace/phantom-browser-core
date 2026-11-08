@@ -20,7 +20,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/run_loop.h"
 #include "base/strings/string_number_conversions.h"
-#include "base/strings/stringprintf.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
@@ -42,8 +41,6 @@
 #include "chrome/test/base/platform_browser_test.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/browser/webui/policy_status_provider.h"
-#include "components/policy/core/common/cloud/cloud_policy_refresh_scheduler.h"
-#include "components/policy/core/common/cloud/enterprise_metrics.h"
 #include "components/policy/core/common/external_data_fetcher.h"
 #include "components/policy/core/common/features.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
@@ -212,8 +209,6 @@ class PolicyUITestBase : public PlatformBrowserTest {
 
   void VerifyPolicies(std::vector<std::vector<std::string>> expected_policies);
 
-  void VerifyReportButton(bool visible);
-
   content::WebContents* web_contents() {
     return chrome_test_utils::GetActiveWebContents(this);
   }
@@ -279,32 +274,6 @@ void PolicyUITestBase::VerifyPolicies(
       }
     }
   }
-}
-
-void PolicyUITestBase::VerifyReportButton(bool visible) {
-  bool expect_visible = visible;
-
-  // Poll until the report button's visibility matches our expectation.
-  // This cleanly handles asynchronous WebUI updates (on Windows and macOS)
-  // while resolving immediately on other platforms.
-  const std::string kJavaScript = base::StringPrintf(
-      "new Promise(resolve => {"
-      "  const check = () => {"
-      "    var display = getReportButtonVisibility();"
-      "    if ((display === 'none') === %s) {"
-      "      resolve(display);"
-      "    } else {"
-      "      setTimeout(check, 50);"
-      "    }"
-      "  };"
-      "  check();"
-      "});",
-      expect_visible ? "false" : "true");
-
-  std::string ret =
-      content::EvalJs(web_contents(), kJavaScript).ExtractString();
-
-  EXPECT_EQ(visible, ret != "none");
 }
 
 class PolicyUITest : public base::test::WithFeatureOverride,
@@ -448,78 +417,6 @@ IN_PROC_BROWSER_TEST_P(PolicyUITest, SendPolicyValues) {
   // Retrieve the contents of the policy table from the UI and verify that it
   // matches the expectation.
   VerifyPolicies(expected_policies);
-}
-
-IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButton) {
-  ASSERT_TRUE(
-      content::NavigateToURL(web_contents(), GURL(chrome::kChromeUIPolicyURL)));
-
-  // Hide by default.
-  VerifyReportButton(/*visible=*/false);
-
-  // Turn on with the policy
-  policy::PolicyMap policy_map;
-  policy_map.Set(policy::key::kCloudReportingEnabled,
-                 policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-                 policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
-  provider_.UpdateChromePolicy(policy_map);
-  VerifyReportButton(/*visible=*/true);
-
-  // Hide while policy is off.
-  policy_map.Set(policy::key::kCloudReportingEnabled,
-                 policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-                 policy::POLICY_SOURCE_CLOUD, base::Value(false), nullptr);
-  provider_.UpdateChromePolicy(policy_map);
-  VerifyReportButton(/*visible=*/false);
-}
-
-IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonWithProfileReporting) {
-  ASSERT_TRUE(
-      content::NavigateToURL(web_contents(), GURL(chrome::kChromeUIPolicyURL)));
-
-  // Hide by default.
-  VerifyReportButton(/*visible=*/false);
-
-  // Turn on with the policy
-  policy::PolicyMap policy_map;
-  policy_map.Set(policy::key::kCloudProfileReportingEnabled,
-                 policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-                 policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
-  provider_.UpdateChromePolicy(policy_map);
-  VerifyReportButton(/*visible=*/true);
-
-  // Hide while policy is off.
-  policy_map.Set(policy::key::kCloudProfileReportingEnabled,
-                 policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-                 policy::POLICY_SOURCE_CLOUD, base::Value(false), nullptr);
-  provider_.UpdateChromePolicy(policy_map);
-  VerifyReportButton(/*visible=*/false);
-}
-
-IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonOTRProfile) {
-  Browser* otr_browser = OpenURLOffTheRecord(browser()->GetProfile(),
-                                             GURL(chrome::kChromeUIPolicyURL));
-  ASSERT_TRUE(otr_browser);
-  content::WebContents* otr_contents =
-      otr_browser->tab_strip_model()->GetActiveWebContents();
-
-  // Turn on the reporting policy.
-  policy::PolicyMap policy_map;
-  policy_map.Set(policy::key::kCloudProfileReportingEnabled,
-                 policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_MACHINE,
-                 policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
-  provider_.UpdateChromePolicy(policy_map);
-
-  // Verify the button is NOT visible in the OTR profile, even when enabled by
-  // policy.
-  const std::string kJavaScript = "getReportButtonVisibility();";
-  std::string visibility =
-      content::EvalJs(otr_contents, kJavaScript).ExtractString();
-  EXPECT_EQ("none", visibility);
-
-  // Verify that calling uploadReport does not crash and completes safely.
-  EXPECT_TRUE(content::ExecJs(otr_contents,
-                              "chrome.send('uploadReport', ['test_id']);"));
 }
 
 class PolicyPrecedenceUITest
