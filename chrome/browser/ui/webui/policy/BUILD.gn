@@ -63,7 +63,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui:ui_features",
     "//chrome/test:test_support",
     "//components/policy/core/common",
-    "//components/policy/test_support",
     "//content/test:test_support",
     "//testing/gtest",
   ]

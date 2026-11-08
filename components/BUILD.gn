@@ -185,7 +185,6 @@ test("components_unittests") {
     "//components/personal_context/core:unit_tests",
     "//components/policy/core/browser:unit_tests",
     "//components/policy/core/common:unit_tests",
-    "//components/policy/test_support:unittests",
     "//components/power_bookmarks/core:unit_tests",
     "//components/power_metrics:unit_tests",
     "//components/prefs:unit_tests",

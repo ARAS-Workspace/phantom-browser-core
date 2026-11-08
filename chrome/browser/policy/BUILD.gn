@@ -120,8 +120,6 @@ source_set("test_support") {
   testonly = true
 
   sources = [
-    "cloud/cloud_policy_test_utils.cc",
-    "cloud/cloud_policy_test_utils.h",
     "messaging_layer/public/report_client_test_util.cc",
     "messaging_layer/public/report_client_test_util.h",
     "messaging_layer/upload/file_upload_job_test_util.cc",
@@ -293,7 +291,6 @@ source_set("policy_specific_browser_tests") {
     "//components/policy/core/browser",
     "//components/policy/core/common:common_constants",
     "//components/policy/proto",
-    "//components/policy/test_support",
     "//components/search",
     "//components/webrtc",
   ]
@@ -314,9 +311,7 @@ source_set("browser_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
   sources = [
-    "cloud/cloud_policy_browsertest.cc",
     "cloud/cloud_policy_manager_browsertest.cc",
-    "cloud/device_management_service_browsertest.cc",
     "test/accessibility_policy_browsertest.cc",
     "test/default_sensors_setting_policy_handler_browsertest.cc",
   ]
@@ -347,7 +342,6 @@ source_set("browser_tests") {
     "//components/policy/core/common",
     "//components/policy/core/common:common_constants",
     "//components/policy/proto",
-    "//components/policy/test_support",
     "//components/prefs",
     "//components/signin/public/identity_manager:test_support",
     "//components/user_manager",
@@ -359,11 +353,6 @@ source_set("browser_tests") {
     "//services/network/public/mojom",
     "//testing/gmock",
   ]
-
-  if (enable_dice_support) {
-    sources += [ "cloud/user_policy_signin_service_browsertest.cc" ]
-    deps += [ "//chrome/browser/ui/webui/signin" ]
-  }
 
   if (enable_extensions_core) {
     sources += [ "extension_policy_browsertest.cc" ]
@@ -390,8 +379,6 @@ source_set("browser_tests") {
   if (is_linux) {
     sources += [ "test/network_service_sandbox_enabled_browsertest.cc" ]
   }
-
-  sources += [ "cloud/component_cloud_policy_browsertest.cc" ]
 
   deps += [ "//chrome/test:test_support" ]
 

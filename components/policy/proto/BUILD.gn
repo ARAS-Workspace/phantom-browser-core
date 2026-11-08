@@ -37,10 +37,7 @@ proto_library("policy_common_definitions_compile_proto") {
 }
 
 proto_library("proto_internal") {
-  visibility = [
-    ":proto",
-    "//components/policy/test_support:*",
-  ]
+  visibility = [ ":proto" ]
 
   sources = [
     "device_management_backend.proto",
