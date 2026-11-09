@@ -123,7 +123,6 @@
 #include "chrome/browser/ui/views/tabs/organizer/organizer_panel_utils.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/views/upgrade_notification_controller.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_user_education_interface_impl.h"
 #include "chrome/browser/ui/waap/initial_web_ui_manager.h"
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
@@ -749,9 +748,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
     toast_service_ = std::make_unique<ToastService>(browser);
   }
 
-  upgrade_notification_controller_ =
-      std::make_unique<UpgradeNotificationController>(browser);
-
   if (browser_view) {
     user_education_->Init(browser_view);
   }
@@ -889,7 +885,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   if (user_education_) {
     user_education_->TearDown();
   }
-  upgrade_notification_controller_.reset();
   toast_service_.reset();
   synced_window_delegate_.reset();
   // TODO(crbug.com/346148093): This logic should not be gated behind a

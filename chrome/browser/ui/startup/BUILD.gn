@@ -56,10 +56,6 @@ source_set("startup") {
     "//components/signin/public/base:signin_buildflags",
   ]
 
-  if (is_chrome_for_testing) {
-    sources += [ "chrome_for_testing_infobar_delegate.h" ]
-  }
-
   if (is_mac || is_linux) {
     sources += [ "web_app_startup_utils.h" ]
     public_deps += [ "//components/services/app_service/public/cpp:app_types" ]
@@ -242,10 +238,6 @@ source_set("impl") {
 
   if (enable_extensions) {
     deps += [ "//extensions/common" ]
-  }
-
-  if (is_chrome_for_testing) {
-    sources += [ "chrome_for_testing_infobar_delegate.cc" ]
   }
 
   if (is_mac || is_linux) {

@@ -33,12 +33,6 @@
 
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt.h"
 
-#if BUILDFLAG(CHROME_FOR_TESTING)
-#include "chrome/browser/infobars/browser_infobar_manager.h"
-#include "chrome/browser/infobars/infobar_features.h"
-#include "chrome/browser/ui/startup/chrome_for_testing_infobar_delegate.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/feature_list.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
@@ -83,13 +77,6 @@ bool IsKioskModeEnabled() {
       switches::kKioskMode);
 }
 
-#if BUILDFLAG(CHROME_FOR_TESTING)
-bool IsGpuTest() {
-  return base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
-             switches::kTestType) == "gpu";
-}
-#endif
-
 }  // namespace
 
 void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
@@ -110,22 +97,6 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
   bool show_bad_flags_security_warnings = ShouldShowBadFlagsSecurityWarnings();
 
   if (show_bad_flags_security_warnings) {
-#if BUILDFLAG(CHROME_FOR_TESTING)
-    if (!IsGpuTest()) {
-      if (infobars::IsInfoBarMigrated(
-              infobars::InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE)) {
-        auto* browser_infobar_manager =
-            infobars::BrowserInfoBarManager::From(g_browser_process);
-        if (browser_infobar_manager) {
-          browser_infobar_manager->ShowGlobally(
-              infobars::InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE);
-        }
-      } else {
-        ChromeForTestingInfoBarDelegate::Create();
-      }
-    }
-#endif
-
     if (IsAutomationEnabled()) {
       AutomationInfoBarDelegate::Create();
     }

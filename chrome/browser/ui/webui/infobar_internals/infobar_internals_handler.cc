@@ -48,10 +48,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(CHROME_FOR_TESTING)
-#include "chrome/browser/ui/startup/chrome_for_testing_infobar_delegate.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "chrome/browser/plugins/reload_plugin_infobar_delegate.h"
 #endif
@@ -96,13 +92,6 @@ void InfoBarInternalsHandler::TriggerInfoBar(InfoBarType type,
 void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
   // Please keep the entries in alphabetized order base on the type.
   std::vector<InfoBarEntryPtr> infobar_list;
-#if BUILDFLAG(CHROME_FOR_TESTING)
-  infobar_list.emplace_back(InfoBarEntry::New(
-      /*type=*/InfoBarType::kChromeForTesting, /*name=*/"Chrome for Testing",
-      /*description=*/
-      "The Chrome for Testing infobar warns users that this version is only "
-      "for automated testing."));
-#endif
   infobar_list.emplace_back(InfoBarEntry::New(
       /*type=*/InfoBarType::kCollectedCookies, /*name=*/"Collected Cookies",
       /*description=*/
@@ -198,23 +187,6 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
 
   // Please keep the entries in alphabetized order base on the type.
   switch (type) {
-#if BUILDFLAG(CHROME_FOR_TESTING)
-    case InfoBarType::kChromeForTesting: {
-      if (infobars::IsInfoBarMigrated(
-              infobars::InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE)) {
-        auto* browser_infobar_manager =
-            infobars::BrowserInfoBarManager::From(g_browser_process);
-        if (!browser_infobar_manager) {
-          return false;
-        }
-        browser_infobar_manager->ShowGlobally(
-            infobars::InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE);
-      } else {
-        ChromeForTestingInfoBarDelegate::Create();
-      }
-      return true;
-    }
-#endif
     case InfoBarType::kCollectedCookies: {
       if (!bwi || !bwi->GetActiveTabInterface()) {
         return false;

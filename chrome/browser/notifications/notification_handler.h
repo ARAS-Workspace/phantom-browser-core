@@ -35,7 +35,7 @@ class NotificationHandler {
     // PERMISSION_REQUEST = 5,  // A permission request that is presented to the
     //                          // user via a notification.
     SHARING = 6,
-    ANNOUNCEMENT = 7,
+    // ANNOUNCEMENT = 7,  // Deprecated.
     NEARBY_SHARE = 8,
     NOTIFICATIONS_MUTED = 9,
     TAILORED_SECURITY = 10,

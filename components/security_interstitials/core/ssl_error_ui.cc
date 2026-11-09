@@ -230,16 +230,6 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
       controller_->Reload();
       break;
     }
-    case CMD_OPEN_REPORTING_PRIVACY:
-    case CMD_OPEN_REPORTING_PRIVACY_IN_NEW_TAB: {
-      controller_->OpenExtendedReportingPrivacyPolicy(true);
-      break;
-    }
-    case CMD_OPEN_WHITEPAPER:
-    case CMD_OPEN_WHITEPAPER_IN_NEW_TAB: {
-      controller_->OpenExtendedReportingWhitepaper(true);
-      break;
-    }
     case CMD_SHOW_CERTIFICATE_VIEWER: {
       controller_->metrics_helper()->RecordUserInteraction(
           security_interstitials::MetricsHelper::VIEW_CERTIFICATE);
@@ -255,6 +245,10 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
     case CMD_REQUEST_SITE_ACCESS_PERMISSION:
     case CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
     case CMD_REPORT_PHISHING_ERROR_IN_NEW_TAB:
+    case CMD_OPEN_REPORTING_PRIVACY:
+    case CMD_OPEN_REPORTING_PRIVACY_IN_NEW_TAB:
+    case CMD_OPEN_WHITEPAPER:
+    case CMD_OPEN_WHITEPAPER_IN_NEW_TAB:
     case CMD_OPEN_DIAGNOSTIC_IN_NEW_TAB: {
       // Not supported by the SSL error page.
       DUMP_WILL_BE_NOTREACHED() << "Unsupported command: " << command;

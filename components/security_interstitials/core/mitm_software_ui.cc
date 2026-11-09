@@ -77,17 +77,9 @@ void MITMSoftwareUI::HandleCommand(SecurityInterstitialCommand command) {
           security_interstitials::MetricsHelper::SHOW_ADVANCED);
       break;
     case CMD_OPEN_REPORTING_PRIVACY:
-      controller_->OpenExtendedReportingPrivacyPolicy(true);
-      break;
     case CMD_OPEN_WHITEPAPER:
-      controller_->OpenExtendedReportingWhitepaper(true);
-      break;
     case CMD_OPEN_REPORTING_PRIVACY_IN_NEW_TAB:
-      controller_->OpenExtendedReportingPrivacyPolicy(true);
-      break;
     case CMD_OPEN_WHITEPAPER_IN_NEW_TAB:
-      controller_->OpenExtendedReportingWhitepaper(true);
-      break;
     case CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
     case CMD_DONT_PROCEED:
     case CMD_OPEN_HELP_CENTER:

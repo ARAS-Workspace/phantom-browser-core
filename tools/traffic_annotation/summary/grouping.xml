@@ -187,7 +187,6 @@ after discussions on the right group.
     <sender name="Cloud Policy">
       <annotation id="managed_configuration_loader"/>
       <annotation id="managed_acccount_signin_restrictions_secure_connect"/>
-      <annotation id="enterprise_proxy_pvd_fetch"/>
     </sender>
     <sender name="Developer Tools">
       <annotation id="devtools_handle_front_end_messages"/>

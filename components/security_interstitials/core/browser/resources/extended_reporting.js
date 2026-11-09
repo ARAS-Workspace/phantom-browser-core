@@ -22,20 +22,6 @@ export function setupExtendedReportingCheckbox() {
     return;
   }
 
-  const privacyLink = document.querySelector('#privacy-link');
-  if (privacyLink) {
-    privacyLink.addEventListener('click', function(e) {
-      sendCommand(SecurityInterstitialCommandId.CMD_OPEN_REPORTING_PRIVACY);
-      e.preventDefault();
-    });
-    privacyLink.addEventListener('auxclick', function(e) {
-      if (e.button === 1) {  // Middle click
-        sendCommand(
-            SecurityInterstitialCommandId.CMD_OPEN_REPORTING_PRIVACY_IN_NEW_TAB);
-        e.preventDefault();
-      }
-    });
-  }
   document.querySelector('#opt-in-checkbox').checked =
       loadTimeData.getBoolean(SB_BOX_CHECKED);
   document.querySelector('#extended-reporting-opt-in')
@@ -53,20 +39,6 @@ export function setupExtendedReportingCheckbox() {
 
   document.querySelector('#body').classList.add(
       'extended-reporting-has-checkbox');
-
-  const whitepaperLink = document.querySelector('#whitepaper-link');
-  if (whitepaperLink) {
-    whitepaperLink.addEventListener('click', function(event) {
-      sendCommand(SecurityInterstitialCommandId.CMD_OPEN_WHITEPAPER);
-      event.preventDefault();
-    });
-    whitepaperLink.addEventListener('auxclick', function(event) {
-      if (event.button === 1) { // Middle click
-        sendCommand(SecurityInterstitialCommandId.CMD_OPEN_WHITEPAPER_IN_NEW_TAB);
-        event.preventDefault();
-      }
-    });
-  }
 
   const optInCheckbox = document.querySelector('#opt-in-checkbox');
   optInCheckbox.addEventListener('click', function() {

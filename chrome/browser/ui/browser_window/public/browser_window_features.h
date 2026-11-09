@@ -101,7 +101,6 @@ class TabsFromOtherDevicesSidePanelCoordinator;
 class ToastController;
 class ToastService;
 class UnloadController;
-class UpgradeNotificationController;
 class VerticalTabIphController;
 class WebUIBrowserExclusiveAccessContext;
 class WebUIBrowserSidePanelUI;
@@ -593,8 +592,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<TabsFromOtherDevicesSidePanelCoordinator>
       tabs_from_other_devices_side_panel_coordinator_;
   std::unique_ptr<ToastService> toast_service_;
-  std::unique_ptr<UpgradeNotificationController>
-      upgrade_notification_controller_;
   std::unique_ptr<BrowserUserEducationInterface> user_education_;
   std::unique_ptr<VerticalTabIphController> vertical_tab_iph_controller_;
   std::unique_ptr<tabs::VerticalTabStripStateController>

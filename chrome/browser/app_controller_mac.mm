@@ -1616,7 +1616,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
         case IDC_SHOW_DOWNLOADS:
         case IDC_IMPORT_SETTINGS:
         case IDC_MANAGE_EXTENSIONS:
-        case IDC_HELP_PAGE_VIA_MENU:
         case IDC_OPTIONS:
           enable = canOpenNewBrowser && ![self keyWindowIsModal];
           break;
@@ -1930,7 +1929,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
   _menuState->UpdateCommandEnabled(IDC_SHOW_HISTORY, true);
   _menuState->UpdateCommandEnabled(IDC_SHOW_DOWNLOADS, true);
   _menuState->UpdateCommandEnabled(IDC_MANAGE_EXTENSIONS, true);
-  _menuState->UpdateCommandEnabled(IDC_HELP_PAGE_VIA_MENU, true);
   _menuState->UpdateCommandEnabled(IDC_IMPORT_SETTINGS, true);
   _menuState->UpdateCommandEnabled(IDC_TASK_MANAGER_MAIN_MENU, true);
   _menuState->UpdateCommandEnabled(IDC_EXIT, true);

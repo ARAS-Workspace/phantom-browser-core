@@ -52,7 +52,7 @@ const StarterPackEngine tabs = {
     // chrome://tabs does not currently exist and the tab search engine will
     // only provide suggestions from the OpenTabProvider.
     .search_url = "chrome://tabs/?q={searchTerms}",
-    .destination_url = "http://support.google.com/chrome/?p=tab_search",
+    .destination_url = "chrome://tabs",
     .id = StarterPackId::kTabs,
     .type = SEARCH_ENGINE_STARTER_PACK_TABS,
 };

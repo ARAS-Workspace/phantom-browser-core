@@ -153,28 +153,4 @@ void RegisterInfoBars() {
   }
 }
 
-#if BUILDFLAG(CHROME_FOR_TESTING)
-void RegisterChromeForTestingInfoBar() {
-  if (IsInfoBarMigrated(InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE)) {
-    auto* browser_infobar_manager =
-        BrowserInfoBarManager::From(g_browser_process);
-    CHECK(browser_infobar_manager);
-    auto spec =
-        InfoBarSpec::Builder(
-            InfoBarDelegate::CHROME_FOR_TESTING_INFOBAR_DELEGATE)
-            .SetMessageText(l10n_util::GetStringFUTF16(
-                IDS_CHROME_FOR_TESTING_DISCLAIMER,
-                base::UTF8ToUTF16(version_info::GetVersionNumber())))
-            .SetLinkText(l10n_util::GetStringUTF16(IDS_DOWNLOAD_CHROME))
-            .SetLinkNavigationUrl(GURL("https://www.google.com/chrome/"))
-            .SetScope(InfoBarScope::kGlobal)
-            .SetExpireOnNavigation(false)
-            .SetShouldAnimate(false)
-            .SetIsCloseable(false)
-            .Build();
-    browser_infobar_manager->Register(std::move(spec));
-  }
-}
-#endif
-
 }  // namespace infobars

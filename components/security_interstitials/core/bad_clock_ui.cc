@@ -101,11 +101,7 @@ void BadClockUI::HandleCommand(SecurityInterstitialCommand command) {
       controller_->LaunchDateAndTimeSettings();
       break;
     case CMD_OPEN_REPORTING_PRIVACY:
-      controller_->OpenExtendedReportingPrivacyPolicy(true);
-      break;
     case CMD_OPEN_WHITEPAPER:
-      controller_->OpenExtendedReportingWhitepaper(true);
-      break;
     case CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
     case CMD_SHOW_CERTIFICATE_VIEWER:
     case CMD_PROCEED:

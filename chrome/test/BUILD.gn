@@ -3399,7 +3399,6 @@ test("unit_tests") {
     "//components/app_constants",
     "//components/application_locale_storage",
     "//components/color",
-    "//components/endpoint_fetcher",
     "//components/favicon/content",
     "//components/feature_engagement/test:test_support",
     "//components/fullscreen_control",

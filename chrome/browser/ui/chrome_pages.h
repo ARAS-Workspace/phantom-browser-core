@@ -48,11 +48,7 @@ void ShowDownloads(BrowserWindowInterface* browser);
 void ShowExtensions(BrowserWindowInterface* browser,
                     const std::string& extension_to_highlight = std::string());
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-void ShowChromeTips(BrowserWindowInterface* browser);
-#endif
 void LaunchReleaseNotes(Profile* profile, apps::LaunchSource source);
-void ShowChromeEnterpriseReleaseNotes(BrowserWindowInterface* browser);
 void ShowSlow(BrowserWindowInterface* browser);
 
 // Constructs a settings GURL for the specified |sub_page|.

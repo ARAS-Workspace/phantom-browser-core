@@ -54,10 +54,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
       (omnibox_feature_configs::OmniboxUrlSuggestionsOnFocus::Get().enabled
            ? AutocompleteProvider::TYPE_MOST_VISITED_SITES
            : 0) |
-      (omnibox_feature_configs::OmniboxUrlSuggestionsOnFocus::Get()
-               .show_recently_closed_tabs
-           ? AutocompleteProvider::TYPE_RECENTLY_CLOSED_TABS
-           : 0) |
       (history_clusters::GetConfig().is_journeys_enabled_no_locale_check &&
                history_clusters::GetConfig().omnibox_history_cluster_provider
            ? AutocompleteProvider::TYPE_HISTORY_CLUSTER_PROVIDER

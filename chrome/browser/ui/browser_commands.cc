@@ -73,7 +73,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
-#include "chrome/browser/ui/dialogs/outdated_upgrade_bubble.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/exclusive_access/fullscreen_controller.h"
 #include "chrome/browser/ui/find_bar/find_bar.h"
@@ -2390,23 +2389,14 @@ void ShowAvatarMenu(BrowserWindowInterface* browser) {
 // full rollout of the code, this name will be misleading. We will clean up the
 // code and its related source enums.
 void OpenUpdateChromeDialog(BrowserWindowInterface* browser) {
-  UpgradeDetector* detector = UpgradeDetector::GetInstance();
-  if (detector->is_outdated_install()) {
-    ShowOutdatedUpgradeBubble(browser, browser,
-                              /*auto_update_enabled=*/true);
-  } else if (detector->is_outdated_install_no_au()) {
-    ShowOutdatedUpgradeBubble(browser, browser,
-                              /*auto_update_enabled=*/false);
-  } else {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    if (base::FeatureList::IsEnabled(features::kFewerUpdateConfirmations)) {
-      chrome::AttemptRelaunch();
-      return;
-    }
-#endif
-    base::RecordAction(UserMetricsAction("UpdateChrome"));
-    BrowserWindow::FromBrowser(browser)->ShowUpdateChromeDialog();
+  if (base::FeatureList::IsEnabled(features::kFewerUpdateConfirmations)) {
+    chrome::AttemptRelaunch();
+    return;
   }
+#endif
+  base::RecordAction(UserMetricsAction("UpdateChrome"));
+  BrowserWindow::FromBrowser(browser)->ShowUpdateChromeDialog();
 }
 
 bool CanRequestTabletSite(WebContents* current_tab) {

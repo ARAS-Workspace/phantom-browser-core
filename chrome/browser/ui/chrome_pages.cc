@@ -271,24 +271,7 @@ void ShowExtensions(BrowserWindowInterface* browser,
   ShowSingletonTabIgnorePathOverwriteNTP(browser, url);
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-void ShowChromeTips(BrowserWindowInterface* browser) {
-  static const char kChromeTipsURL[] = "https://www.google.com/chrome/tips/";
-  ShowSingletonTab(browser, GURL(kChromeTipsURL));
-}
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
 void LaunchReleaseNotes(Profile* profile, apps::LaunchSource source) {
-}
-
-void ShowChromeEnterpriseReleaseNotes(BrowserWindowInterface* browser) {
-  std::string url = base::StrCat(
-      {"https://chromeenterprise.google/resources/release-notes/",
-       "?utm_source=release-notes-chrome-enterprise",
-       "&utm_medium=release-notes",
-       "&utm_campaign=release-notes-chrome-enterprise",
-       "&utm_term=release-notes-m", version_info::GetMajorVersionNumber()});
-  ShowSingletonTab(browser, GURL(url));
 }
 
 void ShowSlow(BrowserWindowInterface* browser) {

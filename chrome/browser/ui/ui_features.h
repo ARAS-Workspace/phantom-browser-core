@@ -241,7 +241,6 @@ BASE_DECLARE_FEATURE(kUseDefaultDeadlineWhenAnimatingBounds);
 BASE_DECLARE_FEATURE(kEnterpriseProfileBadgingForMenu);
 
 BASE_DECLARE_FEATURE(kEnterpriseManagementDisclaimerUsesCustomLabel);
-BASE_DECLARE_FEATURE(kEnterpriseReleaseNotes);
 
 // Cocoa to views migration.
 #if BUILDFLAG(IS_MAC)

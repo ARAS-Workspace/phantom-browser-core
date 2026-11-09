@@ -468,7 +468,6 @@ struct OmniboxUrlSuggestionsOnFocus : Config<OmniboxUrlSuggestionsOnFocus> {
   OmniboxUrlSuggestionsOnFocus& operator=(const OmniboxUrlSuggestionsOnFocus&);
   ~OmniboxUrlSuggestionsOnFocus();
   bool enabled;
-  bool show_recently_closed_tabs;
   // Number of days to consider for most visited sites (0-indexed).
   size_t most_visited_recency_window;
   // Recency factor heuristic used to calculate most visited sites.  Must be

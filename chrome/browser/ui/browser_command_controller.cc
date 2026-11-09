@@ -1127,18 +1127,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_UPGRADE_DIALOG:
       OpenUpdateChromeDialog(browser_);
       break;
-    case IDC_CHROME_TIPS:
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      ShowChromeTips(browser_);
-      break;
-#else
-      NOTREACHED();
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    case IDC_CHROME_ENTERPRISE_RELEASE_NOTES:
-      if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
-        chrome::ShowChromeEnterpriseReleaseNotes(browser_);
-      }
-      break;
     case IDC_WINDOW_MUTE_SITE:
       MuteSite(browser_);
       break;
@@ -1532,9 +1520,6 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_SHOW_SIGNIN, true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_ADDRESSES, !guest_session);
   command_updater_->UpdateCommandEnabled(kHelpMenuId, true);
-  command_updater_->UpdateCommandEnabled(
-      IDC_CHROME_ENTERPRISE_RELEASE_NOTES,
-      base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes));
   command_updater_->UpdateCommandEnabled(
       kBookmarksMenuId, (!guest_session && !profile()->IsSystemProfile()));
   command_updater_->UpdateCommandEnabled(kSavedTabGroupsMenuId, true);
@@ -1938,9 +1923,6 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
 
   command_updater_->UpdateCommandEnabled(IDC_EDIT_SEARCH_ENGINES, show_main_ui);
   command_updater_->UpdateCommandEnabled(IDC_ABOUT, show_main_ui);
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  command_updater_->UpdateCommandEnabled(IDC_CHROME_TIPS, show_main_ui);
-#endif
   command_updater_->UpdateCommandEnabled(IDC_CONTENT_CONTEXT_SHARING_SUBMENU,
                                          show_main_ui);
   command_updater_->UpdateCommandEnabled(IDC_SHARING_HUB, show_main_ui);

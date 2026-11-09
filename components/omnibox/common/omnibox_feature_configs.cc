@@ -565,10 +565,6 @@ BASE_FEATURE(OmniboxUrlSuggestionsOnFocus::kOmniboxUrlSuggestionsOnFocus,
 OmniboxUrlSuggestionsOnFocus::OmniboxUrlSuggestionsOnFocus() {
   const char kMvtScoringParamRecencyFactor_Classic[] = "default";
   enabled = base::FeatureList::IsEnabled(kOmniboxUrlSuggestionsOnFocus);
-  show_recently_closed_tabs =
-      base::FeatureParam<bool>(&kOmniboxUrlSuggestionsOnFocus,
-                               "ShowRecentlyClosedTabs", false)
-          .Get();
   most_visited_recency_window =
       base::FeatureParam<size_t>(&kOmniboxUrlSuggestionsOnFocus,
                                  "OnFocusMostVisitedRecencyWindow", 0)

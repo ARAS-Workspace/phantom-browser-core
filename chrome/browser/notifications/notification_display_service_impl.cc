@@ -17,7 +17,6 @@
 #include "chrome/browser/notifications/notification_display_service_factory.h"
 #include "chrome/browser/notifications/persistent_notification_handler.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/updates/announcement_notification/announcement_notification_handler.h"
 #include "chrome/common/pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
@@ -64,9 +63,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
         NotificationHandler::Type::EXTENSION,
         std::make_unique<extensions::ExtensionNotificationHandler>());
 #endif
-
-    AddNotificationHandler(NotificationHandler::Type::ANNOUNCEMENT,
-                           std::make_unique<AnnouncementNotificationHandler>());
 
     auto screen_capture_blocker =
         std::make_unique<ScreenCaptureNotificationBlocker>(this);

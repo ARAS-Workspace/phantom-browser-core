@@ -638,8 +638,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/accessibility:impl",
     "//chrome/browser/ui/webui/history",
     "//chrome/browser/undo",
-    "//chrome/browser/updates/announcement_notification",
-    "//chrome/browser/updates/announcement_notification:impl",
     "//chrome/browser/v8_compile_hints",
     "//chrome/browser/vr",
     "//chrome/browser/vr:impl",
@@ -952,11 +950,6 @@ static_library("ui") {
     # c/b/ui/browser.h, browser_window.h
     # c/b/ui/views/frame/browser_view.h, picture_in_picture_browser_frame_view.h
     "//chrome/browser/content_settings:content_settings_util_impl",
-
-    # TODO(crbug.com/353332589): Remove this circular dependency when the
-    # following header gets componentized:
-    # c/b/ui/browser.h
-    "//chrome/browser/updates/announcement_notification:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
     # following header gets componentized:
@@ -1924,8 +1917,6 @@ static_library("ui") {
       "views/tabs/z_orderable_tab_container_element.h",
       "views/task_manager_view.cc",
       "views/task_manager_view.h",
-      "views/upgrade_notification_controller.cc",
-      "views/upgrade_notification_controller.h",
       "views/web_apps/create_shortcut_confirmation_view.cc",
       "views/web_apps/create_shortcut_confirmation_view.h",
       "views/web_apps/frame_toolbar/web_app_content_settings_container.cc",

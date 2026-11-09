@@ -149,7 +149,6 @@ source_set("impl") {
     "//chrome/browser/permissions",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/exclusive_access",
-    "//chrome/browser/updates/announcement_notification",
     "//components/content_settings/browser",
     "//components/content_settings/core/browser",
     "//components/pref_registry",

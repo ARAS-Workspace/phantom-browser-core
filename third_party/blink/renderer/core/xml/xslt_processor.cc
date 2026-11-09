@@ -190,15 +190,7 @@ static void InjectCAPAlertXSLTBanner(Document& document) {
   banner->appendChild(CreateBannerLink(
       document, "https://chromestatus.com/feature/4709671889534976",
       "removed from this browser"));
-  banner->appendChild(
-      document.createTextNode(". When that happens, this alert will be shown "
-                              "as raw XML data. You might "
-                              "be able to "));
-  banner->appendChild(CreateBannerLink(
-      document, "https://chromewebstore.google.com/search/XSLT%20Polyfill",
-      "install a browser extension"));
-  banner->appendChild(
-      document.createTextNode(" that allows you to continue viewing it."));
+  banner->appendChild(document.createTextNode("."));
   target->insertBefore(banner, target->firstChild());
 }
 }  // namespace

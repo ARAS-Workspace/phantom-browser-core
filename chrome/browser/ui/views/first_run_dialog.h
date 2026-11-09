@@ -39,12 +39,10 @@ class FirstRunDialog : public views::DialogDelegateView {
       base::OnceCallback<void(bool closed_through_accept_button)>;
 
   // Displays the first run UI for reporting opt-in, import data etc.
-  static void Show(base::RepeatingClosure learn_more_callback,
-                   OnCloseCallback on_close_callback);
+  static void Show(OnCloseCallback on_close_callback);
 
  private:
-  FirstRunDialog(base::RepeatingClosure learn_more_callback,
-                 OnCloseCallback on_close_callback);
+  explicit FirstRunDialog(OnCloseCallback on_close_callback);
   ~FirstRunDialog() override;
 
   // views::DialogDelegate:

@@ -166,12 +166,6 @@ std::vector<std::pair<ui::MenuModel*, size_t>> FindMenuItemsForCommand(
   return menu_items;
 }
 
-std::vector<DbusAppmenuCommand> BuildHelpMenu(Profile& profile) {
-  std::vector<DbusAppmenuCommand> help_menu;
-  help_menu.push_back({IDC_HELP_PAGE_VIA_MENU, IDS_HELP_PAGE});
-  return help_menu;
-}
-
 }  // namespace
 
 struct DbusAppmenu::HistoryItem {
@@ -246,7 +240,6 @@ void DbusAppmenu::Initialize(DbusMenu::InitializedCallback callback) {
   history_menu_ = BuildStaticMenu(IDS_HISTORY_MENU_LINUX, kHistoryMenu);
   BuildStaticMenu(IDS_TOOLS_MENU_LINUX, kToolsMenu);
   profiles_menu_ = BuildStaticMenu(IDS_PROFILES_MENU_NAME, kProfilesMenu);
-  BuildStaticMenu(IDS_HELP_MENU_LINUX, BuildHelpMenu(*browser_->GetProfile()));
 
   pref_change_registrar_.Init(browser_->GetProfile()->GetPrefs());
   pref_change_registrar_.Add(

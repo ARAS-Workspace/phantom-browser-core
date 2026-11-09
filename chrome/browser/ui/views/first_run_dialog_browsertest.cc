@@ -26,7 +26,7 @@ class FirstRunDialogTest : public DialogBrowserTest {
         },
         &closed_through_accept_button_);
 
-    FirstRunDialog::Show(base::DoNothing(), std::move(on_close_callback));
+    FirstRunDialog::Show(std::move(on_close_callback));
   }
 
  protected:

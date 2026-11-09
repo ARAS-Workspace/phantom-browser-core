@@ -17,10 +17,8 @@
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/metrics/metrics_reporting_state.h"
-#include "chrome/browser/platform_util.h"
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
@@ -29,7 +27,6 @@
 #include "ui/base/mojom/dialog_button.mojom.h"
 #include "ui/gfx/native_ui_types.h"
 #include "ui/views/controls/button/checkbox.h"
-#include "ui/views/controls/link.h"
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/dialog_delegate.h"
@@ -54,10 +51,7 @@ void ShowFirstRunDialog() {
         quit_loop.Run();
       },
       &closed_through_accept_button, run_loop.QuitClosure());
-  FirstRunDialog::Show(
-      base::BindRepeating(&platform_util::OpenExternal,
-                          GURL(chrome::kLearnMoreReportingURL)),
-      std::move(on_close_callback));
+  FirstRunDialog::Show(std::move(on_close_callback));
   run_loop.Run();
 
   if (!closed_through_accept_button) {
@@ -78,23 +72,17 @@ void FirstRunDialog::TestApi::SetMakeDefaultCheckboxChecked(bool checked) {
 
 
 // static
-void FirstRunDialog::Show(base::RepeatingClosure learn_more_callback,
-                          OnCloseCallback on_close_callback) {
-  FirstRunDialog* dialog = new FirstRunDialog(std::move(learn_more_callback),
-                                              std::move(on_close_callback));
+void FirstRunDialog::Show(OnCloseCallback on_close_callback) {
+  FirstRunDialog* dialog = new FirstRunDialog(std::move(on_close_callback));
   views::Widget* widget = views::DialogDelegate::CreateDialogWidget(
       dialog, gfx::NativeWindow(), gfx::NativeView());
   widget->Show();
 }
 
-FirstRunDialog::FirstRunDialog(base::RepeatingClosure learn_more_callback,
-                               OnCloseCallback on_close_callback)
+FirstRunDialog::FirstRunDialog(OnCloseCallback on_close_callback)
     : on_close_callback_(std::move(on_close_callback)) {
   SetTitle(l10n_util::GetStringUTF16(IDS_FIRST_RUN_DIALOG_WINDOW_TITLE));
   SetButtons(static_cast<int>(ui::mojom::DialogButton::kOk));
-  SetExtraView(
-      std::make_unique<views::Link>(l10n_util::GetStringUTF16(IDS_LEARN_MORE)))
-      ->SetCallback(std::move(learn_more_callback));
 
   SetLayoutManager(std::make_unique<views::BoxLayout>(
       views::BoxLayout::Orientation::kVertical,

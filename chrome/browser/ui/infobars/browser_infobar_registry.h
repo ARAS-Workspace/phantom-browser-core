@@ -13,10 +13,6 @@ namespace infobars {
 // Registers all infobars supported by the centralized infobar framework.
 void RegisterInfoBars();
 
-#if BUILDFLAG(CHROME_FOR_TESTING)
-void RegisterChromeForTestingInfoBar();
-#endif
-
 }  // namespace infobars
 
 #endif  // CHROME_BROWSER_UI_INFOBARS_BROWSER_INFOBAR_REGISTRY_H_

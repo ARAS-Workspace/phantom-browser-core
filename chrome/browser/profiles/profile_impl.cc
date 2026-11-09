@@ -101,8 +101,6 @@
 #include "chrome/browser/ui/signin/dice_migration_service.h"
 #include "chrome/browser/ui/startup/startup_browser_creator.h"
 #include "chrome/browser/ui/webui/prefs_internals_source.h"
-#include "chrome/browser/updates/announcement_notification/announcement_notification_service.h"
-#include "chrome/browser/updates/announcement_notification/announcement_notification_service_factory.h"
 #include "chrome/browser/webid/federated_identity_api_permission_context.h"
 #include "chrome/browser/webid/federated_identity_api_permission_context_factory.h"
 #include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context.h"
@@ -600,13 +598,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   // The Privacy Sandbox service must be created with the profile to ensure that
   // preference reconciliation occurs.
   PrivacySandboxServiceFactory::GetForProfile(this);
-
-  // The announcement notification  service might not be available for some
-  // irregular profiles, like the System Profile.
-  if (AnnouncementNotificationService* announcement_notification =
-          AnnouncementNotificationServiceFactory::GetForProfile(this)) {
-    announcement_notification->MaybeShowNotification();
-  }
 
   // Request an OriginTrialsControllerDelegate to ensure it is initialized.
   // OriginTrialsControllerDelegate needs to be explicitly created here instead

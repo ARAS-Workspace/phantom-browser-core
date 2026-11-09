@@ -6,10 +6,8 @@
 
 #include <utility>
 
-#include "components/google/core/common/google_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/core/metrics_helper.h"
-#include "components/security_interstitials/core/urls.h"
 #include "components/strings/grit/components_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -37,32 +35,6 @@ void ControllerClient::SetReportingPreference(bool report) {
   metrics_helper_->RecordUserInteraction(
       report ? MetricsHelper::SET_EXTENDED_REPORTING_ENABLED
              : MetricsHelper::SET_EXTENDED_REPORTING_DISABLED);
-}
-
-void ControllerClient::OpenExtendedReportingPrivacyPolicy(
-    bool open_links_in_new_tab) {
-  metrics_helper_->RecordUserInteraction(MetricsHelper::SHOW_PRIVACY_POLICY);
-  GURL privacy_url(kSafeBrowsingPrivacyPolicyUrl);
-  privacy_url =
-      google_util::AppendGoogleLocaleParam(privacy_url, GetApplicationLocale());
-  OpenURL(open_links_in_new_tab, privacy_url);
-}
-
-void ControllerClient::OpenExtendedReportingWhitepaper(
-    bool open_links_in_new_tab) {
-  metrics_helper_->RecordUserInteraction(MetricsHelper::SHOW_WHITEPAPER);
-  GURL whitepaper_url(kSafeBrowsingWhitePaperUrl);
-  whitepaper_url = google_util::AppendGoogleLocaleParam(whitepaper_url,
-                                                        GetApplicationLocale());
-  OpenURL(open_links_in_new_tab, whitepaper_url);
-}
-
-void ControllerClient::OpenURL(bool open_links_in_new_tab, const GURL& url) {
-  if (open_links_in_new_tab) {
-    OpenUrlInNewForegroundTab(url);
-  } else {
-    OpenUrlInCurrentTab(url);
-  }
 }
 
 bool ControllerClient::HasSeenRecurrentError() {

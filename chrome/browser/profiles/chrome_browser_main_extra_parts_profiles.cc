@@ -181,7 +181,6 @@
 #include "chrome/browser/undo/bookmark_undo_service_factory.h"
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "chrome/browser/universal_optout/universal_optout_service_factory.h"
-#include "chrome/browser/updates/announcement_notification/announcement_notification_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/iwa_permissions_policy_cache.h"
 #include "chrome/browser/webauthn/immediate_request_rate_limiter_factory.h"
 #include "chrome/browser/webdata_services/web_data_service_factory.h"
@@ -370,7 +369,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   search_integrity::SearchIntegrityFactory::GetInstance();
 #endif
   AiDataKeyedServiceFactory::GetInstance();
-  AnnouncementNotificationServiceFactory::GetInstance();
   apps::AppServiceProxyFactory::GetInstance();
   AutocompleteClassifierFactory::GetInstance();
   AutocompleteControllerEmitterFactory::GetInstance();

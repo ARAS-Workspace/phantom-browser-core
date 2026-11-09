@@ -167,20 +167,6 @@ class ExtensionsMenuModel : public ui::SimpleMenuModel {
   void Build(BrowserWindowInterface* browser);
 };
 
-class HelpMenuModel : public ui::SimpleMenuModel {
- public:
-  HelpMenuModel(ui::SimpleMenuModel::Delegate* delegate,
-                BrowserWindowInterface* browser);
-
-  HelpMenuModel(const HelpMenuModel&) = delete;
-  HelpMenuModel& operator=(const HelpMenuModel&) = delete;
-
-  ~HelpMenuModel() override;
-
- private:
-  void Build(BrowserWindowInterface* browser);
-};
-
 // A menu model that builds the contents of the app menu.
 class AppMenuModel : public ui::SimpleMenuModel,
                      public user_education::HighlightingSimpleMenuModelDelegate,
@@ -201,7 +187,6 @@ class AppMenuModel : public ui::SimpleMenuModel,
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kInstallAppItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kCreateShortcutItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSetBrowserAsDefaultMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kHelpMenuItem);
 
   // Internal placeholder container command IDs.
   static constexpr int kEditMenuPlaceholder = kEditMenuId;

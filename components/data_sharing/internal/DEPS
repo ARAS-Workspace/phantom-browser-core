@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/endpoint_fetcher",
   "+components/image_fetcher",
   "+components/signin/public",
   "+components/sqlite_proto",

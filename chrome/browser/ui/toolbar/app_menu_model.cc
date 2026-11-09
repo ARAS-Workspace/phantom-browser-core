@@ -165,7 +165,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kInstallAppItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kCreateShortcutItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel,
                                       kSetBrowserAsDefaultMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kHelpMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kPerformanceMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kManageExtensionsMenuItem);
@@ -973,25 +972,6 @@ void LogWrenchMenuAction(AppMenuAction action_id) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// HelpMenuModel
-// Only used in branded builds.
-
-HelpMenuModel::HelpMenuModel(ui::SimpleMenuModel::Delegate* delegate,
-                             BrowserWindowInterface* browser)
-    : SimpleMenuModel(delegate) {
-  Build(browser);
-}
-
-HelpMenuModel::~HelpMenuModel() = default;
-
-void HelpMenuModel::Build(BrowserWindowInterface* browser) {
-  AddItemWithStringIdAndVectorIcon(this, IDC_ABOUT, IDS_ABOUT,
-                                   features::IsRoundedIconsEnabled()
-                                       ? vector_icons::kInfoIcon
-                                       : vector_icons::kInfoRefreshOldIcon);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // ToolsMenuModel
 
 ToolsMenuModel::ToolsMenuModel(ui::SimpleMenuModel::Delegate* delegate,
@@ -1506,16 +1486,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_ABOUT);
       break;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    // Help menu.
-    case IDC_CHROME_TIPS:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ChromeTips",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_CHROME_TIPS);
-      break;
-#endif
 
     case IDC_TOGGLE_REQUEST_TABLET_SITE:
       if (!uma_action_recorded_) {
@@ -1919,22 +1889,10 @@ void AppMenuModel::Build() {
                          kMoreToolsMenuItem);
 
   AddSeparator(ui::NORMAL_SEPARATOR);
-// The help submenu is only displayed on official Chrome builds. As the
-// 'About' item has been moved to this submenu, it's reinstated here for
-// Chromium builds.
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  sub_menus_.push_back(std::make_unique<HelpMenuModel>(this, browser_));
-  AddSubMenuWithStringIdAndVectorIcon(
-      this, kHelpMenuPlaceholder, IDS_HELP_MENU, sub_menus_.back().get(),
-      features::IsRoundedIconsEnabled() ? kHelpCustomIcon : kHelpMenuOldIcon);
-  SetElementIdentifierAt(GetIndexOfCommandId(kHelpMenuPlaceholder).value(),
-                         kHelpMenuItem);
-#else
   AddItemWithStringIdAndVectorIcon(this, IDC_ABOUT, IDS_ABOUT,
                                    features::IsRoundedIconsEnabled()
                                        ? vector_icons::kInfoIcon
                                        : vector_icons::kInfoRefreshOldIcon);
-#endif
 
   AddItemWithStringIdAndVectorIcon(
       this, IDC_OPTIONS, IDS_SETTINGS,

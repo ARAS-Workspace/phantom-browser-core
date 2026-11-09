@@ -30,8 +30,6 @@ static_library("core") {
     "ssl_error_options_mask.h",
     "ssl_error_ui.cc",
     "ssl_error_ui.h",
-    "urls.cc",
-    "urls.h",
     "utils.cc",
     "utils.h",
   ]

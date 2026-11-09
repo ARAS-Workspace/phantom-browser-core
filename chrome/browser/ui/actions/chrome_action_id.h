@@ -154,8 +154,6 @@
   E(kActionAbout, IDC_ABOUT) \
   E(kActionShowAppMenu, IDC_SHOW_APP_MENU) \
   E(kActionManageExtensions, IDC_MANAGE_EXTENSIONS) \
-  E(kActionChromeEnterpriseReleaseNotes, \
-    IDC_CHROME_ENTERPRISE_RELEASE_NOTES) \
   E(kActionDevToolsInspect, IDC_DEV_TOOLS_INSPECT) \
   E(kActionUpgradeDialog, IDC_UPGRADE_DIALOG) \
   E(kActionSetBrowserAsDefault, IDC_SET_BROWSER_AS_DEFAULT) \
@@ -176,7 +174,6 @@
   E(kActionRecordReplay) \
   E(kActionShowSearchTools, IDC_SHOW_SEARCH_TOOLS) \
   E(kActionCaretBrowsingToggle, IDC_CARET_BROWSING_TOGGLE) \
-  E(kActionChromeTips, IDC_CHROME_TIPS) \
   E(kActionPerformance, IDC_PERFORMANCE) \
   E(kActionExtensionsSubmenuManageExtensions, \
     IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS) \

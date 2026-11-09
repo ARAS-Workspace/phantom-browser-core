@@ -170,10 +170,7 @@ function processProcessingInstruction(parentElement, node)
     // This will only get hit if XSLT is disabled in the renderer.
     headerSpan.innerHTML =
         'This document cannot be formatted as intended. It uses XSLT, which ' +
-        'the browser does not support. You might be able to <a ' +
-        'target="_blank" rel="noopener noreferrer" ' +
-        'href="https://chromewebstore.google.com/search/XSLT%20Polyfill">install ' +
-        'a browser extension</a> that allows you to view it.';
+        'the browser does not support.';
   }
 }
 
