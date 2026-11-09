@@ -49,6 +49,7 @@
 #include "chrome/grit/branded_strings.h"
 #include "chrome/test/base/browser_with_test_window_test.h"
 #include "chrome/test/base/testing_profile_manager.h"
+#include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
 #include "components/version_info/channel.h"
 #include "content/public/test/navigation_simulator.h"
@@ -498,6 +499,16 @@ TEST_F(BrowserViewTest, WindowTitleOmitsLowMemoryUsage) {
   // Expect that high memory usage is in the window title.
   EXPECT_TRUE(browser_view()->GetAccessibleWindowTitle().find(
                   u"High memory usage") != std::string::npos);
+}
+
+// Tests that the product name strings and a listed component string carry
+// the Phantom Browser name.
+TEST_F(BrowserViewTest, ProductNameIsPhantomBrowser) {
+  EXPECT_EQ(u"Phantom Browser", l10n_util::GetStringUTF16(IDS_PRODUCT_NAME));
+  EXPECT_EQ(u"Phantom Browser",
+            l10n_util::GetStringUTF16(IDS_SHORT_PRODUCT_NAME));
+  EXPECT_EQ(u"Restart Phantom Browser",
+            l10n_util::GetStringUTF16(IDS_SAD_TAB_RELOAD_RESTART_BROWSER));
 }
 
 #if BUILDFLAG(IS_MAC)

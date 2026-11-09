@@ -781,7 +781,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionResourceRequestPolicyTest,
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   expected_error = "This page has been blocked by Chrome";
 #else
-  expected_error = "This page has been blocked by Chromium";
+  expected_error = "This page has been blocked by Phantom Browser";
 #endif
 
   EXPECT_TRUE(body.contains(expected_error));

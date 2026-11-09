@@ -21,7 +21,8 @@ suite('ProfileCustomizationTest', function() {
 
   const AVATAR_URL_1 = 'chrome://theme/IDR_PROFILE_AVATAR_1';
   const AVATAR_URL_2 = 'chrome://theme/IDR_PROFILE_AVATAR_2';
-  const STATIC_TITLE_PATTERN = /^Customize your (Chromium|Chrome) profile$/g;
+  const STATIC_TITLE_PATTERN =
+      /^Customize your (Phantom Browser|Chrome) profile$/g;
 
   setup(function() {
     loadTimeData.overrideValues({

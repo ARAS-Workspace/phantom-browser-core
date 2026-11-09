@@ -4,6 +4,7 @@
 
 '''Handling of the <message> element.'''
 
+import os
 import re
 
 from grit.node import base
@@ -17,6 +18,44 @@ from grit import util
 # Matches exactly three dots ending a line or followed by whitespace.
 _ELLIPSIS_PATTERN = re.compile(r'(?<!\.)\.\.\.(?=$|\s)')
 _ELLIPSIS_SYMBOL = '\u2026'  # Ellipsis
+
+# Phantom: messages from these branding string files, and the messages
+# named below from other string files, carry the Phantom Browser name in
+# place of Chromium, in the source text and in every translation.
+_PHANTOM_BRAND_FILES = frozenset((
+  'chromium_strings.grd',
+  'components_chromium_strings.grd',
+  'extensions_chromium_strings.grdp',
+  'settings_chromium_strings.grdp',
+))
+_PHANTOM_BRAND_MESSAGES = frozenset((
+  'IDS_AUTOFILL_DELETE_AUTOCOMPLETE_SUGGESTION_CONFIRMATION_BODY',
+  'IDS_AUTOFILL_DELETE_CREDIT_CARD_SUGGESTION_CONFIRMATION_BODY',
+  'IDS_AUTOFILL_DELETE_PROFILE_SUGGESTION_CONFIRMATION_BODY',
+  'IDS_AUTOFILL_SAVE_AND_FILL_DIALOG_EXPLANATION_LOCAL',
+  'IDS_AUTOFILL_SAVE_AND_FILL_DIALOG_EXPLANATION_UPLOAD',
+  'IDS_AUTOFILL_SAVE_AND_FILL_TO_WALLET_DIALOG_EXPLANATION_UPLOAD',
+  'IDS_CERT_ERROR_AUTHORITY_INVALID_DETAILS_V2',
+  'IDS_CLOCK_ERROR_EXPLANATION',
+  'IDS_KNOWN_INTERCEPTION_BODY2',
+  'IDS_NEW_TAB_OTR_NOT_SAVED',
+  'IDS_PRIVACY_GUIDE_COOKIE_SETTINGS_ALLOW_THINGS_TO_CONSIDER_BULLET_TWO',
+  'IDS_SAD_TAB_RELOAD_RESTART_BROWSER',
+  'IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_FIRST_PARAGRAPH',
+  'IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_SECOND_PARAGRAPH',
+  'IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH',
+  'IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH_INSTRUCTIVE',
+  'IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_TITLE',
+  'IDS_SEARCH_ENGINE_CHOICE_PAGE_SUBTITLE_INFO_LINK_A11Y_LABEL',
+  'IDS_SETTINGS_AUTOFILL_AI_TOGGLE_SUB_LABEL',
+  'IDS_SETTINGS_AUTOFILL_AI_TOGGLE_SUB_LABEL_V2',
+  'IDS_SETTINGS_AUTOFILL_AI_WHEN_ON_CAN_FILL_DIFFICULT_FIELDS',
+  'IDS_SETTINGS_COOKIES_BLOCK_THIRD_PARTY_SETTINGS_ALLOW_BULLET_THREE',
+  'IDS_SSL_NONOVERRIDABLE_INVALID',
+  'IDS_SSL_NONOVERRIDABLE_MORE',
+))
+_PHANTOM_BRAND_PATTERN = re.compile(r'(?<![A-Za-z])Chromium(?!\s?OS)')
+_PHANTOM_BRAND_NAME = 'Phantom Browser'
 
 # Finds whitespace at the start and end of a string which can be multiline.
 _WHITESPACE = re.compile(
@@ -291,6 +330,10 @@ class MessageNode(base.ContentNode):
       msg = _ELLIPSIS_PATTERN.sub(_ELLIPSIS_SYMBOL, msg)
     # Always remove all byte order marks (\uFEFF) https://crbug.com/1033305
     msg = msg.replace('\ufeff', '')
+    source = os.path.basename(getattr(self, 'source', None) or '')
+    if (source in _PHANTOM_BRAND_FILES or
+        self.attrs.get('name') in _PHANTOM_BRAND_MESSAGES):
+      msg = _PHANTOM_BRAND_PATTERN.sub(_PHANTOM_BRAND_NAME, msg)
     return msg.replace('[GRITLANGCODE]', lang)
 
   def NameOrOffset(self):

@@ -389,8 +389,8 @@ suite('SiteDetailsPermission', function() {
               }
             })() as string;
 
-        const variant = warningElement.innerHTML.includes('Chromium') ?
-            'Chromium' :
+        const variant = warningElement.innerHTML.includes('Phantom Browser') ?
+            'Phantom Browser' :
             'Chrome';
 
         // Check the visible text of the warning.

@@ -865,8 +865,9 @@ suite('SiteList', function() {
       }
 
       assertFalse(warningElement.hidden);
-      const variant =
-          warningElement.innerHTML.includes('Chromium') ? 'Chromium' : 'Chrome';
+      const variant = warningElement.innerHTML.includes('Phantom Browser') ?
+          'Phantom Browser' :
+          'Chrome';
       assertEquals(
           warningElement.textContent,
           `To use your ${categoryName} on these sites,` +
