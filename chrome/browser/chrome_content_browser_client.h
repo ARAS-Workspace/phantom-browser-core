@@ -1001,8 +1001,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::optional<bool> GetOverrideValueForStaticStorageQuota(
       content::BrowserContext* browser_context) override;
 
-  std::string GetDnsTxtResolverUrlPrefix() override;
-
   bool ShouldAllowPrefetchRedirection(
       content::BrowserContext& browser_context,
       const GURL& url,

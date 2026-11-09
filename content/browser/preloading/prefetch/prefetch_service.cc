@@ -362,17 +362,12 @@ PrefetchService::PrefetchService(BrowserContext* browser_context)
           browser_context_)),
       prefetch_proxy_configurator_(
           PrefetchProxyConfigurator::MaybeCreatePrefetchProxyConfigurator(
-              PrefetchProxyHost(delegate_
-                                    ? delegate_->GetDefaultPrefetchProxyHost()
-                                    : GURL("")),
-              delegate_ ? delegate_->GetAPIKey() : "")),
+              PrefetchProxyHost(GURL()),
+              /*api_key=*/std::string())),
       origin_prober_(std::make_unique<PrefetchOriginProber>(
           browser_context_,
-          PrefetchDNSCanaryCheckURL(
-              delegate_ ? delegate_->GetDefaultDNSCanaryCheckURL() : GURL("")),
-          PrefetchTLSCanaryCheckURL(
-              delegate_ ? delegate_->GetDefaultTLSCanaryCheckURL()
-                        : GURL("")))),
+          PrefetchDNSCanaryCheckURL(GURL()),
+          PrefetchTLSCanaryCheckURL(GURL()))),
       scheduler_(std::make_unique<PrefetchScheduler>(this)) {}
 
 PrefetchService::~PrefetchService() {  // NOLINT(modernize-use-equals-default)

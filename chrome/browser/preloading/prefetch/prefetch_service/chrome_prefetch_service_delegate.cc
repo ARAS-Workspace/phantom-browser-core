@@ -19,7 +19,6 @@
 #include "components/unified_consent/url_keyed_data_collection_consent_helper.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/web_contents.h"
-#include "google_apis/google_api_keys.h"
 #include "net/http/http_util.h"
 #include "url/gurl.h"
 #include "url/origin.h"
@@ -35,22 +34,6 @@ ChromePrefetchServiceDelegate::~ChromePrefetchServiceDelegate() = default;
 std::string ChromePrefetchServiceDelegate::GetAcceptLanguageHeader() {
   return net::HttpUtil::GenerateAcceptLanguageHeader(
       profile_->GetPrefs()->GetString(language::prefs::kAcceptLanguages));
-}
-
-GURL ChromePrefetchServiceDelegate::GetDefaultPrefetchProxyHost() {
-  return GURL("https://tunnel.googlezip.net/");
-}
-
-std::string ChromePrefetchServiceDelegate::GetAPIKey() {
-  return google_apis::GetAPIKey();
-}
-
-GURL ChromePrefetchServiceDelegate::GetDefaultDNSCanaryCheckURL() {
-  return GURL("http://dns-tunnel-check.googlezip.net/connect");
-}
-
-GURL ChromePrefetchServiceDelegate::GetDefaultTLSCanaryCheckURL() {
-  return GURL("http://tls-tunnel-check.googlezip.net/connect");
 }
 
 void ChromePrefetchServiceDelegate::ReportOriginRetryAfter(

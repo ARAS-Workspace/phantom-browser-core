@@ -33,10 +33,6 @@ class ChromePrefetchServiceDelegate : public content::PrefetchServiceDelegate {
 
   // content::PrefetchServiceDelegate
   std::string GetAcceptLanguageHeader() override;
-  GURL GetDefaultPrefetchProxyHost() override;
-  std::string GetAPIKey() override;
-  GURL GetDefaultDNSCanaryCheckURL() override;
-  GURL GetDefaultTLSCanaryCheckURL() override;
   void ReportOriginRetryAfter(const GURL& url,
                               base::TimeDelta retry_after) override;
   bool IsOriginOutsideRetryAfterWindow(const GURL& url) override;

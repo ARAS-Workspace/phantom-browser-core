@@ -6654,12 +6654,6 @@ ChromeContentBrowserClient::GetOverrideValueForStaticStorageQuota(
   }
 }
 
-std::string ChromeContentBrowserClient::GetDnsTxtResolverUrlPrefix() {
-  static constexpr char kGoogleDnsResolverUrl[] =
-      "https://dns.google/resolve?type=txt&do=1&name=";
-  return kGoogleDnsResolverUrl;
-}
-
 bool ChromeContentBrowserClient::ShouldAllowPrefetchRedirection(
     content::BrowserContext& browser_context,
     const GURL& url,

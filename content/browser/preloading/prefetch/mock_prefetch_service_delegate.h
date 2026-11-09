@@ -27,10 +27,6 @@ class MockPrefetchServiceDelegate : public PrefetchServiceDelegate {
 
   // PrefetchServiceDelegate.
   MOCK_METHOD(std::string, GetAcceptLanguageHeader, (), (override));
-  MOCK_METHOD(GURL, GetDefaultPrefetchProxyHost, (), (override));
-  MOCK_METHOD(std::string, GetAPIKey, (), (override));
-  MOCK_METHOD(GURL, GetDefaultDNSCanaryCheckURL, (), (override));
-  MOCK_METHOD(GURL, GetDefaultTLSCanaryCheckURL, (), (override));
   MOCK_METHOD(void,
               ReportOriginRetryAfter,
               (const GURL&, base::TimeDelta),

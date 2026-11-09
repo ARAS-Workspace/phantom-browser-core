@@ -17,6 +17,7 @@
 #include "base/strings/string_util.h"
 #include "base/task/thread_pool.h"
 #include "base/test/mock_callback.h"
+#include "base/test/scoped_command_line.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
 #include "base/time/time.h"
@@ -393,6 +394,10 @@ class PrefetchServiceTestBase : public PrefetchingMetricsTestBase {
 
   void SetUp() override {
     PrefetchingMetricsTestBase::SetUp();
+
+    scoped_command_line_.GetProcessCommandLine()->AppendSwitchASCII(
+        "isolated-prerender-tunnel-proxy",
+        MockPrefetchServiceDelegate::kPrefetchProxyAddress);
 
     InitScopedFeatureList();
 
@@ -1075,6 +1080,7 @@ class PrefetchServiceTestBase : public PrefetchingMetricsTestBase {
       test_shared_url_loader_factory_;
 
   base::test::ScopedFeatureList scoped_feature_list_base_params_;
+  base::test::ScopedCommandLine scoped_command_line_;
   // Disable sampling of UKM preloading logs.
   content::test::PreloadingConfigOverride preloading_config_override_;
 
@@ -1967,9 +1973,8 @@ TEST_P(PrefetchServiceTest, NotEligiblePrefetchProxyNotAvailable) {
 
   // If the prefetch proxy URL is invalid, then we can't make prefetches that
   // require the proxy. However, non-proxied prefetches are fine.
-  EXPECT_CALL(*mock_prefetch_service_delegate, GetDefaultPrefetchProxyHost)
-      .Times(1)
-      .WillOnce(testing::Return(GURL("")));
+  scoped_command_line_.GetProcessCommandLine()->RemoveSwitch(
+      "isolated-prerender-tunnel-proxy");
 
   MakePrefetchService(std::move(mock_prefetch_service_delegate));
 
@@ -1993,9 +1998,8 @@ TEST_P(PrefetchServiceTest,
 
   // If the prefetch proxy URL is invalid, then we can't make prefetches that
   // require the proxy. However, non-proxied prefetches are fine.
-  EXPECT_CALL(*mock_prefetch_service_delegate, GetDefaultPrefetchProxyHost)
-      .Times(1)
-      .WillOnce(testing::Return(GURL("")));
+  scoped_command_line_.GetProcessCommandLine()->RemoveSwitch(
+      "isolated-prerender-tunnel-proxy");
 
   MakePrefetchService(std::move(mock_prefetch_service_delegate));
 

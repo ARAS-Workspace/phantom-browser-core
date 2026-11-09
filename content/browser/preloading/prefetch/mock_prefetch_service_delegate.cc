@@ -6,19 +6,12 @@
 
 namespace content {
 
-namespace {
-const char kApiKey[] = "APIKEY";
-}  // namespace
-
 const char MockPrefetchServiceDelegate::kPrefetchProxyAddress[] =
     "https://testprefetchproxy.com";
 
 MockPrefetchServiceDelegate::MockPrefetchServiceDelegate(
     std::optional<int> num_on_prefetch_likely_calls) {
   // Sets default behavior for the delegate.
-  ON_CALL(*this, GetDefaultPrefetchProxyHost)
-      .WillByDefault(testing::Return(GURL(kPrefetchProxyAddress)));
-  ON_CALL(*this, GetAPIKey).WillByDefault(testing::Return(kApiKey));
   ON_CALL(*this, IsOriginOutsideRetryAfterWindow(testing::_))
       .WillByDefault(testing::Return(true));
   ON_CALL(*this, DisableDecoysBasedOnUserSettings)

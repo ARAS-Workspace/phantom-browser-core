@@ -29,16 +29,6 @@ class CONTENT_EXPORT PrefetchServiceDelegate {
   // Gets the accept language header to be included in prefetch requests.
   virtual std::string GetAcceptLanguageHeader() = 0;
 
-  // Gets the default host of the prefetch proxy.
-  virtual GURL GetDefaultPrefetchProxyHost() = 0;
-
-  // Gets API key for making prefetching requests.
-  virtual std::string GetAPIKey() = 0;
-
-  // Gets the default URLs used in the DNS and TLS canary checks.
-  virtual GURL GetDefaultDNSCanaryCheckURL() = 0;
-  virtual GURL GetDefaultTLSCanaryCheckURL() = 0;
-
   // Reports that a 503 response with a "Retry-After" header was received from
   // |url|. Indicates that we shouldn't send new prefetch requests to that
   // origin for |retry_after| amount of time.
