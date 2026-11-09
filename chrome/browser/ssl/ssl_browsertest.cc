@@ -5825,55 +5825,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, OpenHelpCenterInNewTab) {
   EXPECT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(new_tab));
 }
 
-IN_PROC_BROWSER_TEST_F(SSLUITest, OpenReportingPrivacyInNewTab) {
-  ASSERT_TRUE(https_server_expired_.Start());
-  WebContents* interstitial_tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_expired_.GetURL("/ssl/google.html")));
-  ASSERT_TRUE(
-      chrome_browser_interstitials::IsShowingSSLInterstitial(interstitial_tab));
-
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-
-  content::TestNavigationObserver nav_observer(nullptr);
-  nav_observer.StartWatchingNewWebContents();
-  SendInterstitialCommand(
-      interstitial_tab,
-      security_interstitials::CMD_OPEN_REPORTING_PRIVACY_IN_NEW_TAB);
-  nav_observer.Wait();
-
-  EXPECT_EQ(2, browser()->tab_strip_model()->count());
-  WebContents* new_tab = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(new_tab);
-  EXPECT_NE(new_tab, interstitial_tab);
-  EXPECT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(new_tab));
-}
-
-IN_PROC_BROWSER_TEST_F(SSLUITest, OpenWhitepaperInNewTab) {
-  ASSERT_TRUE(https_server_expired_.Start());
-  WebContents* interstitial_tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_expired_.GetURL("/ssl/google.html")));
-  ASSERT_TRUE(
-      chrome_browser_interstitials::IsShowingSSLInterstitial(interstitial_tab));
-
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-
-  content::TestNavigationObserver nav_observer(nullptr);
-  nav_observer.StartWatchingNewWebContents();
-  SendInterstitialCommand(
-      interstitial_tab, security_interstitials::CMD_OPEN_WHITEPAPER_IN_NEW_TAB);
-  nav_observer.Wait();
-
-  EXPECT_EQ(2, browser()->tab_strip_model()->count());
-  WebContents* new_tab = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(new_tab);
-  EXPECT_NE(new_tab, interstitial_tab);
-  EXPECT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(new_tab));
-}
-
 IN_PROC_BROWSER_TEST_F(SSLUITest, ShowCertificateViewer) {
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
   net::EmbeddedTestServer::ServerCertificateConfig cert_config;

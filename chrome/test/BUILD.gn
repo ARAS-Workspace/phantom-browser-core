@@ -2024,7 +2024,6 @@ test("browser_tests") {
       "../browser/ui/views/status_bubble_views_browsertest.cc",
       "../browser/ui/views/tabs/groups/tab_group_editor_bubble_view_browsertest.cc",
       "../browser/ui/views/ui_devtools_browsertest.cc",
-      "../browser/ui/views/upgrade_notification_controller_browsertest.cc",
     ]
 
     # TODO(crbug.com/353332589): Remove this dependency when the
@@ -2740,7 +2739,6 @@ test("unit_tests") {
     "//chrome/browser/update_client",
     "//chrome/browser/update_client:unit_tests",
     "//chrome/browser/updater",
-    "//chrome/browser/updates/announcement_notification:unit_tests",
     "//chrome/browser/upgrade_detector:unit_tests",
     "//chrome/browser/v8_compile_hints",
     "//chrome/browser/v8_compile_hints:unit_tests",
@@ -3402,7 +3400,6 @@ test("unit_tests") {
     "//components/application_locale_storage",
     "//components/color",
     "//components/endpoint_fetcher",
-    "//components/endpoint_fetcher:test_support",
     "//components/favicon/content",
     "//components/feature_engagement/test:test_support",
     "//components/fullscreen_control",

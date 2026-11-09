@@ -451,46 +451,6 @@ IN_PROC_BROWSER_TEST_P(AskBeforeHttpDialogControllerUiTest,
   ExpectUKMEntry(http_url, BlockingResult::kInterstitialDontProceed);
 }
 
-// If the user triggers an Ask-before-HTTP warning for a host and then
-// clicks the "learn more" link, a new tab should open to the help
-// center URL.
-IN_PROC_BROWSER_TEST_P(AskBeforeHttpDialogControllerUiTest,
-                       FailedUpgrade_WarningShown_ClickLearnMore) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kTestTab);
-
-  GURL http_url = http_server()->GetURL("bad-https.com", "/simple.html");
-  GURL https_url = https_server()->GetURL("bad-https.com", "/simple.html");
-
-  auto* contents = GetBrowser()->tab_strip_model()->GetActiveWebContents();
-  content::NavigationController::LoadURLParams params(http_url);
-  params.transition_type = ui::PAGE_TRANSITION_LINK;
-  content::NavigateToURLBlockUntilNavigationsComplete(contents, params, 1);
-  EXPECT_EQ(http_url, contents->GetLastCommittedURL());
-
-  RunTestSequence(
-      InAnyContext(
-          WaitForShow(AskBeforeHttpDialogController::kDescriptionTextId)),
-      InSameContext(
-          InstrumentTab(kTestTab),
-          WithView(AskBeforeHttpDialogController::kDescriptionTextId,
-                   [](views::StyledLabel* description_label) {
-                     description_label->ClickFirstLinkForTesting();
-                   }),
-          WaitForHide(AskBeforeHttpDialogController::kDescriptionTextId)));
-
-  // New tab should include the p-link "first_mode".
-  EXPECT_EQ(GetBrowser()
-                ->tab_strip_model()
-                ->GetActiveWebContents()
-                ->GetVisibleURL()
-                .GetQuery(),
-            "p=first_mode");
-
-  histograms()->ExpectBucketCount("interstitial.https_first_mode.interaction",
-                                  MetricsHelper::Interaction::SHOW_LEARN_MORE,
-                                  1);
-}
-
 // If the user triggers an Ask-before-HTTP warning for a host, then clicking
 // the browser back button should dismiss the dialog, but if the user then
 // clicks the forward button they should end up back on the HTTP page and

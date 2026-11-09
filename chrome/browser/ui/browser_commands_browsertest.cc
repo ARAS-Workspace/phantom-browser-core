@@ -663,7 +663,7 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandsTest,
                        MoveActiveTabToNewWindowMultipleSelection) {
   GURL url1("chrome://version");
   GURL url2("chrome://about");
-  GURL url3("chrome://terms");
+  GURL url3("chrome://credits");
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url1));
   ASSERT_TRUE(AddTabAtIndex(1, url2, ui::PAGE_TRANSITION_LINK));
   ASSERT_TRUE(AddTabAtIndex(2, url3, ui::PAGE_TRANSITION_LINK));

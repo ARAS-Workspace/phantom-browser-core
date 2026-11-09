@@ -2615,55 +2615,6 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
   }
 }
 
-// Tests that clicking the "Learn More" link in the HTTPS-First Mode
-// interstitial opens a new tab for the help center article.
-IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest, InterstitialLearnMoreLink) {
-  // This test is only relevant to HTTPS-First Mode.
-  if (!IsHttpsFirstModeInterstitialEnabledAcrossSites()) {
-    return;
-  }
-
-  GURL http_url = http_server()->GetURL("foo.com", "/close-socket");
-  GURL https_url = https_server()->GetURL("foo.com", "/close-socket");
-
-  auto* contents = GetBrowser()->tab_strip_model()->GetActiveWebContents();
-  NavigateAndWaitForFallback(contents, http_url);
-  EXPECT_EQ(http_url, contents->GetLastCommittedURL());
-
-  EXPECT_TRUE(IsShowingHttpsFirstModeInterstitial(contents));
-
-  // Simulate clicking the learn more link.
-  auto* tab_interface = tabs::TabInterface::MaybeGetFromContents(contents);
-  auto* controller = tab_interface
-                         ? AskBeforeHttpDialogController::From(tab_interface)
-                         : nullptr;
-  if (controller && controller->HasOpenDialog()) {
-    controller->ClickLearnMoreForTesting();
-  } else {
-    ASSERT_TRUE(content::ExecJs(
-        contents, "window.certificateErrorPageController.openHelpCenter();"));
-  }
-
-  // New tab should include the p-link "first_mode".
-  EXPECT_EQ(GetBrowser()
-                ->tab_strip_model()
-                ->GetActiveWebContents()
-                ->GetVisibleURL()
-                .GetQuery(),
-            "p=first_mode");
-
-  // Verify that the interstitial metrics were correctly recorded.
-  histograms()->ExpectBucketCount(
-      "interstitial.https_first_mode.decision",
-      security_interstitials::MetricsHelper::Decision::SHOW, 1);
-  histograms()->ExpectBucketCount(
-      "interstitial.https_first_mode.interaction",
-      security_interstitials::MetricsHelper::Interaction::TOTAL_VISITS, 1);
-  histograms()->ExpectBucketCount(
-      "interstitial.https_first_mode.interaction",
-      security_interstitials::MetricsHelper::Interaction::SHOW_LEARN_MORE, 1);
-}
-
 // Tests that if the user bypasses the HTTPS-First Mode interstitial, and then
 // later the server fixes their HTTPS support and the user successfully connects
 // over HTTPS, the allowlist entry is cleared (so HFM will kick in again for

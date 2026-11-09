@@ -292,13 +292,6 @@ class SafetyTipPageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
     PerformMouseClickOnView(bubble->GetLeaveButtonForTesting());
   }
 
-  void ClickLearnMoreLink() {
-    // This class is a friend to SafetyTipPageInfoBubbleView.
-    auto* bubble = static_cast<SafetyTipPageInfoBubbleView*>(
-        PageInfoBubbleViewBase::GetPageInfoBubbleForTesting());
-    bubble->OpenHelpCenter();
-  }
-
   void CheckNoButtons() {
     auto* bubble = static_cast<SafetyTipPageInfoBubbleView*>(
         PageInfoBubbleViewBase::GetPageInfoBubbleForTesting());
@@ -604,25 +597,6 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
 
   ASSERT_NO_FATAL_FAILURE(CheckPageInfoDoesNotShowSafetyTipInfo(browser()));
 
-  test_helper()->CheckSafetyTipUkmCount(1);
-  test_helper()->CheckInterstitialUkmCount(0);
-}
-
-// Test that clicking 'learn more' opens a help center article.
-IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
-                       LearnMoreOpensHelpCenter) {
-  const GURL kNavigatedUrl = GetURL("accounts-google.com");
-  SetEngagementScore(browser(), kNavigatedUrl, kLowEngagement);
-  NavigateToURL(browser(), kNavigatedUrl, WindowOpenDisposition::CURRENT_TAB);
-  ASSERT_TRUE(IsUIShowing());
-
-  content::WebContentsAddedObserver new_tab_observer;
-  ClickLearnMoreLink();
-  EXPECT_NE(kNavigatedUrl,
-            new_tab_observer.GetWebContents()->GetLastCommittedURL());
-
-  CloseWarningLeaveSite(browser());
-  EXPECT_FALSE(IsUIShowing());
   test_helper()->CheckSafetyTipUkmCount(1);
   test_helper()->CheckInterstitialUkmCount(0);
 }

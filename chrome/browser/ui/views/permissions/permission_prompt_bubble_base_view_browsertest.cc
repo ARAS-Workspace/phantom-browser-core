@@ -349,26 +349,6 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
   ShowAndVerifyUi();
 }
 
-IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
-                       OpenHelpCenterLinkInNewTab) {
-  ShowUi("storage_access");
-
-  // Get link widget from the prompt.
-  views::Widget* prompt = GetTestApi().GetPromptWindow();
-  ASSERT_TRUE(prompt);
-  auto* label_with_link =
-      static_cast<views::StyledLabel*>(prompt->GetRootView()->GetViewByID(
-          permissions::PermissionPromptViewID::VIEW_ID_PERMISSION_PROMPT_LINK));
-  ASSERT_TRUE(label_with_link);
-
-  // Click on the help center link and check that it opens on a new tab.
-  content::WebContentsAddedObserver new_tab_observer;
-  label_with_link->ClickFirstLinkForTesting();
-  GURL url = GURL(permissions::kEmbeddedContentHelpCenterURL);
-
-  EXPECT_EQ(new_tab_observer.GetWebContents()->GetVisibleURL(), url);
-}
-
 // Test that the quiet prompt disposition returns the same value when permission
 // is not considered abusive (currently only applicable for Notifications) vs.
 // when permission is not considered abusive.

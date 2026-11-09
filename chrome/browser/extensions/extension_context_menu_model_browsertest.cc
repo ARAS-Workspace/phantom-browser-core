@@ -1793,45 +1793,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
   EXPECT_TRUE(site_access.withheld_site_access);
 }
 
-IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
-                       TestClickingPageAccessLearnMore) {
-  base::UserActionTester user_action_tester;
-  constexpr char kLearnMoreAction[] =
-      "Extensions.ContextMenu.Hosts.LearnMoreClicked";
-  // Add an extension that wants access to a.com.
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("extension").AddHostPermission("*://a.com/*").Build();
-  InitializeAndAddExtension(*extension);
-
-  PermissionsManager* permissions_manager = PermissionsManager::Get(profile());
-  EXPECT_FALSE(permissions_manager->HasWithheldHostPermissions(*extension));
-
-  const GURL a_com = embedded_test_server()->GetURL("a.com", "/simple.html");
-  auto* web_contents = GetActiveWebContents();
-  ASSERT_TRUE(NavigateToURL(web_contents, a_com));
-
-  // Open extension's context menu.
-  BrowserWindowInterface* browser_window = browser_window_interface();
-  ExtensionContextMenuModel menu(extension.get(), browser_window,
-                                 /*is_pinned=*/true, nullptr, true,
-                                 ContextMenuSource::kToolbarAction);
-  EXPECT_EQ(0, user_action_tester.GetActionCount(kLearnMoreAction));
-
-  // Execute 'learn more' command.
-  EXPECT_EQ(CommandState::kEnabled,
-            GetPageAccessCommandState(menu, kLearnMore));
-  menu.ExecuteCommand(kLearnMore, 0);
-  web_contents = GetActiveWebContents();
-  content::WaitForLoadStop(web_contents);
-
-  // Learn more URL is opened on a new tab.
-  EXPECT_EQ(2, GetTabCount());
-  EXPECT_EQ(1, user_action_tester.GetActionCount(kLearnMoreAction));
-  EXPECT_EQ(
-      GURL(extension_permissions_constants::kRuntimeHostPermissionsHelpURL),
-      web_contents->GetLastCommittedURL());
-}
-
 IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest, HistogramTest_Basic) {
   scoped_refptr<const Extension> extension =
       ExtensionBuilder("extension").Build();

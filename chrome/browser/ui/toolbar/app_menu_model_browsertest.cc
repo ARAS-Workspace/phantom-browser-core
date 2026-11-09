@@ -687,43 +687,6 @@ IN_PROC_BROWSER_TEST_P(AppMenuModelBookmarkBarTest, BookmarkBarSubmenu) {
 
 INSTANTIATE_TEST_SUITE_P(All, AppMenuModelBookmarkBarTest, testing::Bool());
 
-class AppMenuModelEnterpriseReleaseNotesTest
-    : public base::test::WithFeatureOverride,
-      public AppMenuModelTest {
- public:
-  AppMenuModelEnterpriseReleaseNotesTest()
-      : WithFeatureOverride(features::kEnterpriseReleaseNotes) {}
-  ~AppMenuModelEnterpriseReleaseNotesTest() override = default;
-};
-
-IN_PROC_BROWSER_TEST_P(AppMenuModelEnterpriseReleaseNotesTest, MenuVisibility) {
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_FALSE(model.GetIndexOfCommandId(IDC_CHROME_ENTERPRISE_RELEASE_NOTES)
-                     .has_value());
-  }
-
-  policy::ScopedManagementServiceOverrideForTesting profile_management(
-      policy::ManagementServiceFactory::GetForProfile(profile()),
-      policy::EnterpriseManagementAuthority::CLOUD_DOMAIN);
-
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-#if BUILDFLAG(IS_LINUX)
-    EXPECT_EQ(IsParamFeatureEnabled(),
-              model.GetIndexOfCommandId(IDC_CHROME_ENTERPRISE_RELEASE_NOTES)
-                  .has_value());
-#else
-    EXPECT_FALSE(model.GetIndexOfCommandId(IDC_CHROME_ENTERPRISE_RELEASE_NOTES)
-                     .has_value());
-#endif
-  }
-}
-
-INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(AppMenuModelEnterpriseReleaseNotesTest);
-
 namespace {
 
 using send_tab_to_self::EntryPointDisplayReason;

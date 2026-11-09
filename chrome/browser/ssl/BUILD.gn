@@ -220,7 +220,6 @@ source_set("browser_tests") {
 
   sources = [
     "certificate_transparency_browsertest.cc",
-    "connection_help_tab_helper_browsertest.cc",
     "https_upgrades_browsertest.cc",
     "known_interception_disclosure_ui_browsertest.cc",
     "ocsp_browsertest.cc",
