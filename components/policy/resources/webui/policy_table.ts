@@ -91,14 +91,14 @@ export class PolicyTableElement extends CrLitElement {
     sorted.sort((a, b) => {
       if ((a.value !== undefined && b.value !== undefined) ||
           a.value === b.value) {
-        if (a.link !== undefined && b.link !== undefined) {
+        if (a.known && b.known) {
           if (field !== 'name' && a[field] === b[field]) {
             return orderMultiplier * (a.name > b.name ? 1 : -1);
           }
           return orderMultiplier *
               ((a[field] as string) > (b[field] as string) ? 1 : -1);
         }
-        return a.link !== undefined ? -1 : 1;
+        return a.known ? -1 : 1;
       }
       return a.value !== undefined ? -1 : 1;
     });

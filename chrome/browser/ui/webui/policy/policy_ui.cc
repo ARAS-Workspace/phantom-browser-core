@@ -121,7 +121,6 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
       {"moreActions", IDS_POLICY_MORE_ACTIONS},
       {"noPoliciesSet", IDS_POLICY_NO_POLICIES_SET},
       {"policyCopyValue", IDS_POLICY_COPY_VALUE},
-      {"policyLearnMore", IDS_POLICY_LEARN_MORE},
       {"reloadPolicies", IDS_POLICY_RELOAD_POLICIES},
       {"showLess", IDS_POLICY_SHOW_LESS},
       {"showMore", IDS_POLICY_SHOW_MORE},

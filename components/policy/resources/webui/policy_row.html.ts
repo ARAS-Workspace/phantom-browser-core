@@ -11,11 +11,7 @@ export function getHtml(this: PolicyRowElement) {
   return html`<!--_html_template_start_-->
 <div class="policy row" role="row">
   <div class="name" role="rowheader" aria-labelledby="name">
-    <a class="link" target="_blank" href="${this.policy?.link || '#'}" title="${
-      this.getLearnMoreTooltip()}">
-      <span id="name">${this.policy?.name || ''}</span>
-      <img src="${this.getOpenInNewIconSrc()}" alt="">
-    </a>
+    <span id="name">${this.policy?.name || ''}</span>
   </div>
   <div class="value" role="cell">${this.getTruncatedValue()}</div>
   <div class="source" role="cell">${this.getSourceText()}</div>

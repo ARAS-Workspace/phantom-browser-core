@@ -147,13 +147,11 @@ export class PolicyAppElement extends CrLitElement {
           name => Object.assign(
               {
                 name,
-                link: [
+                known: [
                   policyNames['chrome']?.policyNames,
                   policyNames['precedence']?.policyNames,
                 ].includes(knownPolicyNames) &&
-                        knownPolicyNamesSet.has(name) ?
-                    `https://chromeenterprise.google/policies/?policy=${name}` :
-                    undefined,
+                    knownPolicyNamesSet.has(name),
                 isExtension: value.isExtension || false,
               },
               value?.policies[name]));

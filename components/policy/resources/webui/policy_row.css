@@ -133,17 +133,6 @@ a {
   padding: 0;
 }
 
-.name .link {
-  align-items: center;
-  display: flex;
-}
-
-.link span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .link img {
   height: 12px;
   width: 12px;
@@ -151,16 +140,6 @@ a {
 
 .copy {
   flex: 0 0 auto;
-}
-
-:host([no-help-link]) .name .link {
-  color: inherit;
-  pointer-events: none;
-  text-decoration: none;
-}
-
-:host([no-help-link]) .link img {
-  display: none;
 }
 
 @media (min-width: 768px) {

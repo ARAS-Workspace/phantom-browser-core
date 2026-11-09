@@ -27,7 +27,7 @@ export interface Policy {
   ignored?: boolean;
   name: string;
   level: string;
-  link?: string;
+  known?: boolean;
   scope: string;
   source: string;
   error: string;
@@ -89,27 +89,8 @@ export class PolicyRowElement extends CrLitElement {
     }
   }
 
-  override updated(changedProperties: PropertyValues<this>) {
-    super.updated(changedProperties);
-    if (changedProperties.has('policy')) {
-      if (this.policy && this.policy.link) {
-        this.removeAttribute('no-help-link');
-      } else {
-        this.setAttribute('no-help-link', '');
-      }
-    }
-  }
-
-
-
   protected getShowMoreLessLabel(): string {
     return loadTimeData.getString(this.expanded ? 'showLess' : 'showMore');
-  }
-
-  protected getLearnMoreTooltip(): string {
-    return this.policy?.name ?
-        loadTimeData.getStringF('policyLearnMore', this.policy.name) :
-        '';
   }
 
   protected getCopyLabel(): string {
@@ -238,12 +219,6 @@ export class PolicyRowElement extends CrLitElement {
   // Toggle the visibility of an additional row containing the complete text.
   protected onToggleExpandedClick() {
     this.expanded = !this.expanded;
-  }
-
-  protected getOpenInNewIconSrc(): string {
-    return document.documentElement.hasAttribute('webui-rounded-icons') ?
-        'chrome://resources/images/open_in_new.svg' :
-        'chrome://resources/images/open_in_new_old.svg';
   }
 
   protected getCopyIconSrc(): string {
