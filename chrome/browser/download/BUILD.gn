@@ -154,7 +154,6 @@ source_set("impl") {
     "//chrome/common:non_code_constants",
     "//components/background_fetch",
     "//components/download/content/factory",
-    "//components/enterprise/common/proto:connectors_proto_gen",
     "//components/history/content/browser",
     "//components/infobars/content",
     "//components/pdf/common:constants",

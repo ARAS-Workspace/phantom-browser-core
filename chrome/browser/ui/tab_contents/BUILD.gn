@@ -56,7 +56,6 @@ source_set("impl") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/browser_window",
     "//chrome/common:non_code_constants",
-    "//components/enterprise/common:files_scan_data",
     "//components/search",
     "//components/strings:components_strings",
     "//components/tabs:public",

@@ -3,15 +3,11 @@
 # found in the LICENSE file.
 
 source_set("management_identity") {
-  configs += [ "//components/enterprise:extra_warnings" ]
-
   public = [ "management_identity.h" ]
   public_deps = [ "//chrome/browser/profiles" ]
 }
 
 source_set("management_identity_impl") {
-  configs += [ "//components/enterprise:extra_warnings" ]
-
   sources = [ "management_identity.cc" ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
@@ -36,7 +32,6 @@ source_set("management_identity_impl") {
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  configs += [ "//components/enterprise:extra_warnings" ]
 
   sources = [ "management_service_browsertest.cc" ]
 

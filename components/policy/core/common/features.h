@@ -19,11 +19,6 @@ namespace policy::features {
 POLICY_EXPORT BASE_DECLARE_FEATURE(
     kProfileSeparationDomainExceptionListRetroactive);
 
-// A blocklist of policies supported on Desktop Android.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kDesktopAndroidPolicy);
-POLICY_EXPORT extern const base::FeatureParam<std::string>
-    kDesktopAndroidPolicyBlocklist;
-
 // When enabled, uses ManagementService to determine whether to honor sensitive
 // policies. When disabled, falls back to the original ShouldHonorPolicies()
 // behavior. This flag allows reverting if the new approach causes issues.
@@ -58,16 +53,6 @@ POLICY_EXPORT BASE_DECLARE_FEATURE(kPolicyPageMojoMigration);
 // When enabled, URLs in the general blocklist are still blocked in incognito
 // even if they are in the incognito allowlist.
 POLICY_EXPORT BASE_DECLARE_FEATURE(kURLBlocklistOverridesIncognitoAllowlist);
-
-// Enables the export of platform policies as JSON on the chrome://policy page.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kExportPlatformPoliciesJson);
-
-// When enabled, migrates user cloud management status and sign-in interception
-// policy fetching from the legacy SecureConnect endpoint to Device Management
-// Server.
-POLICY_EXPORT BASE_DECLARE_FEATURE(kMigrateSecureConnectApiToDmServer);
-POLICY_EXPORT extern const base::FeatureParam<base::TimeDelta>
-    kMigrateSecureConnectApiToDmServerFetchTimeout;
 
 }  // namespace policy::features
 

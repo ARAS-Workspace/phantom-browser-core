@@ -5,8 +5,6 @@
 #include "components/policy/core/common/features.h"
 
 #include "base/feature_list.h"
-#include "base/metrics/field_trial_params.h"
-#include "base/time/time.h"
 #include "build/android_buildflags.h"
 #include "build/build_config.h"
 #include "extensions/buildflags/buildflags.h"
@@ -41,19 +39,5 @@ BASE_FEATURE(kPolicyPageMojoMigration, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kURLBlocklistOverridesIncognitoAllowlist,
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kExportPlatformPoliciesJson,
-             "ExportPlatformPoliciesJson",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, migrates user cloud management status and sign-in interception
-// policy fetching from the legacy SecureConnect endpoint to Device Management
-// Server.
-BASE_FEATURE(kMigrateSecureConnectApiToDmServer,
-             "MigrateSecureConnectApiToDmServer",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kMigrateSecureConnectApiToDmServerFetchTimeout{
-        &kMigrateSecureConnectApiToDmServer, "fetch_timeout", base::Seconds(10)};
 
 }  // namespace policy::features

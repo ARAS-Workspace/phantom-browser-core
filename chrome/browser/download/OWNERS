@@ -6,5 +6,4 @@ per-file insecure_download_blocking*=jdeblasio@chromium.org
 per-file download_item_model*=file://chrome/browser/download/bubble/OWNERS
 per-file download_item_warning_data*=file://chrome/browser/download/bubble/OWNERS
 per-file download_ui_controller*=file://chrome/browser/download/bubble/OWNERS
-per-file download_ui_enterprise_util*=file://components/enterprise/connectors/OWNERS
 per-file download_ui_model*=file://chrome/browser/download/bubble/OWNERS

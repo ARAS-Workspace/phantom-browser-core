@@ -26,7 +26,6 @@
 #include "components/policy/core/common/schema_registry.h"
 #include "components/policy/core/common/values_util.h"
 #include "components/policy/policy_constants.h"
-#include "components/policy/proto/device_management_backend.pb.h"
 #include "components/strings/grit/components_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 

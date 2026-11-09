@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/enterprise",
   "+components/json_schema",
   "+components/prefs",
   "+components/version_info",
