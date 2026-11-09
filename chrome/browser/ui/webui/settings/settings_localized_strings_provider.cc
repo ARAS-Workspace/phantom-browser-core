@@ -223,13 +223,6 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
                           ObsoleteSystem::IsObsoleteNowOrSoon());
   html_source->AddString("aboutObsoleteSystem",
                          ObsoleteSystem::LocalizedObsoleteString());
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || \
-    BUILDFLAG(GOOGLE_CHROME_FOR_TESTING_BRANDING)
-  html_source->AddString("aboutTermsURL", chrome::kChromeUITermsURL);
-  html_source->AddLocalizedString("aboutProductTos",
-                                  IDS_ABOUT_TERMS_OF_SERVICE);
-#endif
 }
 
 void AddAppearanceStrings(content::WebUIDataSource* html_source,

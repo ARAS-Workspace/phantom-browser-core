@@ -39,13 +39,13 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/webui/chrome_urls/chrome_urls_ui.h"
+#include "chrome/browser/ui/webui/theme_source.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/grit/components_resources.h"
-#include "components/strings/grit/components_locale_settings.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/webui/about/credit_utils.h"
 #include "content/public/browser/browser_thread.h"
@@ -58,8 +58,6 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/webui/web_ui_util.h"
 #include "url/gurl.h"
-
-#include "chrome/browser/ui/webui/theme_source.h"
 
 using content::BrowserThread;
 
@@ -128,9 +126,6 @@ AboutUIConfigBase::AboutUIConfigBase(std::string_view host)
 CreditsUIConfig::CreditsUIConfig()
     : AboutUIConfigBase(chrome::kChromeUICreditsHost) {}
 
-TermsUIConfig::TermsUIConfig()
-    : AboutUIConfigBase(chrome::kChromeUITermsHost) {}
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 LinuxProxyConfigUI::LinuxProxyConfigUI()
     : AboutUIConfigBase(chrome::kChromeUILinuxProxyConfigHost) {}
@@ -174,10 +169,6 @@ void AboutUIHTMLSource::StartDataRequest(
   } else if (source_name_ == chrome::kChromeUILinuxProxyConfigHost) {
     response = AboutLinuxProxyConfig();
 #endif
-  } else if (source_name_ == chrome::kChromeUITermsHost) {
-    response =
-        ui::ResourceBundle::GetSharedInstance().LoadLocalizedResourceString(
-            IDS_TERMS_HTML);
   }
 
   FinishDataRequest(response, std::move(callback));

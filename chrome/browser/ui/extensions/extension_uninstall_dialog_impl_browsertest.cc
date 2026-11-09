@@ -30,7 +30,6 @@
 #include "extensions/browser/test_extension_registry_observer.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_builder.h"
-#include "extensions/common/extension_urls.h"
 #include "ui/views/layout/animating_layout_manager_test_util.h"
 #include "ui/views/test/widget_test.h"
 
@@ -361,16 +360,8 @@ class ExtensionUninstallDialogImplInteractiveBrowserTest
     MANUAL_UNINSTALL,
     UNINSTALL_BY_EXTENSION,
   };
-  enum ExtensionOrigin {
-    EXTENSION_LOCAL_SOURCE,
-    EXTENSION_FROM_WEBSTORE,
-  };
   void ShowUi(const std::string& name) override {
     extensions::ExtensionBuilder extension_builder("ExtensionForRemoval");
-    if (extension_origin_ == EXTENSION_FROM_WEBSTORE) {
-      extension_builder.SetManifestKey(
-          "update_url", extension_urls::GetWebstoreUpdateUrl().spec());
-    }
 
     extension_ = extension_builder.Build();
     extensions::ExtensionRegistrar::Get(browser()->GetProfile())
@@ -397,10 +388,8 @@ class ExtensionUninstallDialogImplInteractiveBrowserTest
     content::RunAllPendingInMessageLoop();
   }
 
-  void RunTest(UninstallMethod uninstall_method,
-               ExtensionOrigin extension_origin) {
+  void RunTest(UninstallMethod uninstall_method) {
     uninstall_method_ = uninstall_method;
-    extension_origin_ = extension_origin;
 
     ShowAndVerifyUi();
   }
@@ -424,19 +413,18 @@ class ExtensionUninstallDialogImplInteractiveBrowserTest
   std::unique_ptr<extensions::ExtensionUninstallDialog> dialog_;
 
   UninstallMethod uninstall_method_;
-  ExtensionOrigin extension_origin_;
 };
 
 #define MAYBE_InvokeUi_ManualUninstall InvokeUi_ManualUninstall
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_ManualUninstall) {
-  RunTest(MANUAL_UNINSTALL, EXTENSION_LOCAL_SOURCE);
+  RunTest(MANUAL_UNINSTALL);
 }
 
 #define MAYBE_InvokeUi_UninstallByExtension InvokeUi_UninstallByExtension
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_UninstallByExtension) {
-  RunTest(UNINSTALL_BY_EXTENSION, EXTENSION_LOCAL_SOURCE);
+  RunTest(UNINSTALL_BY_EXTENSION);
 }
 
 INSTANTIATE_TEST_SUITE_P(

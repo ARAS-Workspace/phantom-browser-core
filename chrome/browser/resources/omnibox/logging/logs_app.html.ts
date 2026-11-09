@@ -71,12 +71,7 @@ export function getHtml(this: LogsAppElement) {
           </td>
           <td class="message">${item.message}</td>
           <td class="proto">
-            ${item.protoType ? html`
-              <a target="_blank"
-                 href="${`http://protoshop/embed?tabs=viewer,editor,textproto&type=${item.protoType}&protobytes=${encodeURIComponent(item.protoBase64 || '')}`}">
-                View ${item.protoType.split('.').pop()}
-              </a>
-            ` : ''}
+            ${item.protoType ? item.protoType.split('.').pop() : ''}
           </td>
         </tr>
       `)}

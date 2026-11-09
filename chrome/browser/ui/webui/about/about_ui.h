@@ -35,12 +35,6 @@ class CreditsUIConfig : public AboutUIConfigBase {
   CreditsUIConfig();
 };
 
-// chrome://terms
-class TermsUIConfig : public AboutUIConfigBase {
- public:
-  TermsUIConfig();
-};
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 // chrome://linux-proxy-config
 class LinuxProxyConfigUI : public AboutUIConfigBase {
@@ -49,8 +43,6 @@ class LinuxProxyConfigUI : public AboutUIConfigBase {
 };
 #endif
 
-// We expose this class because the OOBE flow may need to explicitly add the
-// chrome://terms source outside of the normal flow.
 class AboutUIHTMLSource : public content::URLDataSource {
  public:
   // Construct a data source for the specified |source_name|.

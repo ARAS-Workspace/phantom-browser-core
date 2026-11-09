@@ -51,7 +51,6 @@ interface EventLogMessage {
   fileName: string;
   message: string;
   protoType: string|null;
-  protoBase64: string|null;
 }
 
 export class LogsAppElement extends CrLitElement {
@@ -188,7 +187,7 @@ export class LogsAppElement extends CrLitElement {
 
   private onLogMessageAdded_(
       eventTime: Time, tag: string, sourceFile: string, sourceLine: number,
-      message: string, protoType: string|null, protoBase64: string|null) {
+      message: string, protoType: string|null, _protoBase64: string|null) {
     const lastSlash = sourceFile.lastIndexOf('/');
     const fileName =
         lastSlash !== -1 ? sourceFile.slice(lastSlash + 1) : sourceFile;
@@ -201,7 +200,6 @@ export class LogsAppElement extends CrLitElement {
       fileName,
       message,
       protoType,
-      protoBase64,
     });
 
     this.uniqueTags_.add(tag);

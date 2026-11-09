@@ -120,26 +120,8 @@ grit_strings("components_locale_settings") {
   inputs = process_file_template(
           _xtb_locales,
           [ "components_locale_settings_{{source_name_part}}.xtb" ])
-  _terms_locales = _xtb_locales + [ "en" ] - [
-                     "ar-XB",
-                     "ms",
-                   ]
-  if (is_chrome_branded) {
-    inputs += process_file_template(
-            _terms_locales,
-            [ "../resources/terms/terms_{{source_name_part}}.html" ])
-  } else {
-    inputs += [ "../resources/terms/terms_chromium.html" ]
-  }
-
   if (is_linux) {
-    if (is_chrome_branded) {
-      inputs += process_file_template(
-              _terms_locales,
-              [ "../resources/terms/terms_{{source_name_part}}.txt" ])
-    } else {
-      inputs += [ "../resources/terms/terms_chromium.txt" ]
-    }
+    inputs += [ "../resources/terms/terms_chromium.txt" ]
   }
 
   outputs = [ "grit/components_locale_settings.h" ]

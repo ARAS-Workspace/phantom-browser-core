@@ -38,11 +38,6 @@ export function getHtml(this: SettingsAboutPageElement) {
       <div class="secondary">$i18n{aboutProductTitle}</div>
       <div class="secondary">$i18n{aboutProductCopyright}</div>
     </div>
-<if expr="_google_chrome or _is_chrome_for_testing_branded">
-    <div class="secondary">
-      <a id="tos" href="$i18n{aboutTermsURL}">$i18n{aboutProductTos}</a>
-    </div>
-</if>
   </div>
 </settings-section>
 <!--_html_template_end_-->`;
