@@ -218,8 +218,6 @@ ExtensionContextMenuModel::ContextMenuAction CommandIdToContextMenuAction(
       return ContextMenuAction::kPageAccessRunOnAllSites;
     case ExtensionContextMenuModel::PAGE_ACCESS_PERMISSIONS_PAGE:
       return ContextMenuAction::kPageAccessPermissionsPage;
-    case ExtensionContextMenuModel::PAGE_ACCESS_LEARN_MORE:
-      return ContextMenuAction::kPageAccessLearnMore;
     case ExtensionContextMenuModel::PAGE_ACCESS_CANT_ACCESS:
     case ExtensionContextMenuModel::PAGE_ACCESS_SUBMENU:
     case ExtensionContextMenuModel::PAGE_ACCESS_ALL_EXTENSIONS_GRANTED:
@@ -268,10 +266,6 @@ void LogPageAccessAction(int command_id) {
     case ExtensionContextMenuModel::PAGE_ACCESS_PERMISSIONS_PAGE:
       base::RecordAction(base::UserMetricsAction(
           "Extensions.ContextMenu.Hosts.PermissionsPageClicked"));
-      break;
-    case ExtensionContextMenuModel::PAGE_ACCESS_LEARN_MORE:
-      base::RecordAction(base::UserMetricsAction(
-          "Extensions.ContextMenu.Hosts.LearnMoreClicked"));
       break;
     default:
       NOTREACHED() << "Unknown option: " << command_id;
@@ -470,7 +464,6 @@ bool ExtensionContextMenuModel::IsCommandIdEnabled(int command_id) const {
       return false;
     case PAGE_ACCESS_SUBMENU:
     case PAGE_ACCESS_PERMISSIONS_PAGE:
-    case PAGE_ACCESS_LEARN_MORE:
       // When these commands are shown, they are always enabled.
       return true;
     case PAGE_ACCESS_RUN_ON_CLICK:
@@ -638,14 +631,6 @@ void ExtensionContextMenuModel::ExecuteCommand(int command_id,
       OpenUrl(
           GetActiveWebContents(),
           GURL(extension_permissions_constants::kExtensionsSitePermissionsURL));
-      break;
-    case PAGE_ACCESS_LEARN_MORE:
-      LogPageAccessAction(command_id);
-      OpenUrl(
-          GetActiveWebContents(),
-          GURL(
-              extension_permissions_constants::kRuntimeHostPermissionsHelpURL));
-
       break;
     default:
       NOTREACHED() << "Unknown option";
@@ -1051,11 +1036,6 @@ void ExtensionContextMenuModel::CreatePageAccessItems(
   page_access_submenu_->AddRadioItemWithStringId(
       PAGE_ACCESS_RUN_ON_ALL_SITES,
       IDS_EXTENSIONS_CONTEXT_MENU_PAGE_ACCESS_RUN_ON_ALL_SITES, kRadioGroup);
-
-  page_access_submenu_->AddSeparator(ui::NORMAL_SEPARATOR);
-  page_access_submenu_->AddItemWithStringId(
-      PAGE_ACCESS_LEARN_MORE,
-      IDS_EXTENSIONS_CONTEXT_MENU_PAGE_ACCESS_LEARN_MORE);
 
   AddSubMenuWithStringId(PAGE_ACCESS_SUBMENU,
                          IDS_EXTENSIONS_CONTEXT_MENU_PAGE_ACCESS,

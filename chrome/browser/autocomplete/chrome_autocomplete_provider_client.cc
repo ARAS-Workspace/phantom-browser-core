@@ -150,9 +150,8 @@ ChromeAutocompleteProviderClient::ChromeAutocompleteProviderClient(
       omnibox_triggered_feature_service_(
           std::make_unique<OmniboxTriggeredFeatureService>()) {
   pedal_provider_ = std::make_unique<OmniboxPedalProvider>(
-      *this,
-      GetPedalImplementations(profile_->IsIncognitoProfile(),
-                              profile_->IsGuestSession(), /*testing=*/false));
+      *this, GetPedalImplementations(profile_->IsIncognitoProfile(),
+                                     profile_->IsGuestSession()));
 }
 
 ChromeAutocompleteProviderClient::~ChromeAutocompleteProviderClient() = default;

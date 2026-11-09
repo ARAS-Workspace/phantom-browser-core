@@ -12,7 +12,6 @@ export enum UserAction {
   ALL_TOGGLED_OFF = 'Extensions.Settings.HostList.AllHostsToggledOff',
   SPECIFIC_TOGGLED_ON = 'Extensions.Settings.HostList.SpecificHostToggledOn',
   SPECIFIC_TOGGLED_OFF = 'Extensions.Settings.HostList.SpecificHostToggledOff',
-  LEARN_MORE = 'Extensions.Settings.HostList.LearnMoreActivated',
 }
 
 // Values for logging Extension Safety Hub metrics.

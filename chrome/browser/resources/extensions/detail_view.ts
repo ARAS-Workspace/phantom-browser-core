@@ -532,22 +532,6 @@ export class ExtensionsDetailViewElement extends
   }
 
   /**
-   * Returns the HTML representation of the Manifest V2 deprecation message
-   * subtitle string. We need the HTML representation instead of the string
-   * since the string holds substitutions.
-   */
-  protected getMv2DeprecationMessageSubtitle_(): TrustedHTML {
-    return this.i18nAdvanced('mv2DeprecationMessageDisabledSubtitle', {
-      substitutions: [
-        'https://support.google.com/chrome_webstore' +
-            '?p=unsupported_extensions',
-        this.i18n('opensInNewTab'),
-      ],
-      attrs: ['aria-description'],
-    });
-  }
-
-  /**
    * Returns the Manifest V2 deprecation message icon.
    */
   protected getMv2DeprecationMessageIcon_(): string {

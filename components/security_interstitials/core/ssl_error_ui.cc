@@ -20,8 +20,8 @@
 namespace security_interstitials {
 namespace {
 
-// Path to the relevant help center page. Used if |support_url_| is invalid.
-const char kHelpPath[] = "answer/6098869";
+// Bundled connection help page. Used if |support_url_| is invalid.
+const char kConnectionHelpUrl[] = "chrome://connection-help";
 
 bool IsMasked(int options, SSLErrorOptionsMask mask) {
   return ((options & mask) != 0);
@@ -209,18 +209,16 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
       controller_->metrics_helper()->RecordUserInteraction(
           security_interstitials::MetricsHelper::SHOW_LEARN_MORE);
 
-      // Add cert error code as a ref to support URL, this is used to expand the
-      // right section if the user is redirected to chrome://connection-help.
+      // Add cert error code as a ref, this is used to expand the right section
+      // of chrome://connection-help.
       GURL::Replacements replacements;
       // This has to be stored in a separate variable, otherwise asan throws a
       // use-after-scope error
       std::string cert_error_string = base::NumberToString(cert_error_);
       replacements.SetRefStr(cert_error_string);
-      // If |support_url_| is invalid, use the default help center url.
+      // If |support_url_| is invalid, use chrome://connection-help.
       controller_->OpenUrlInNewForegroundTab(
-          (support_url_.is_valid()
-               ? support_url_
-               : controller_->GetBaseHelpCenterUrl().Resolve(kHelpPath))
+          (support_url_.is_valid() ? support_url_ : GURL(kConnectionHelpUrl))
               .ReplaceComponents(replacements));
       break;
     }

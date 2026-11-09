@@ -15,8 +15,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/extensions/permissions_url_constants.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
@@ -33,7 +31,6 @@
 #include "chrome/grit/extensions_resources_map.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/favicon_base/favicon_url_parser.h"
-#include "components/google/core/common/google_util.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
@@ -43,7 +40,6 @@
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/manifest_v2_handler.h"
 #include "extensions/common/extension_features.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/grit/extensions_browser_resources.h"
 #include "extensions/strings/grit/extensions_strings.h"
 #include "services/network/public/mojom/content_security_policy.mojom.h"
@@ -130,14 +126,11 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
        IDS_EXTENSIONS_SAFETY_CHECK_PRIMARY_LABEL},
       {"safetyCheckExtensionsKeep", IDS_CONFIRM_DOWNLOAD},
       {"stackTrace", IDS_EXTENSIONS_ERROR_STACK_TRACE},
-      {"sidebarDocsPromo", IDS_EXTENSIONS_MODERN_WEB_GUIDANCE_PROMO},
       {"keyboardShortcuts", IDS_EXTENSIONS_SIDEBAR_KEYBOARD_SHORTCUTS},
       {"incognitoInfoWarning", IDS_EXTENSIONS_INCOGNITO_WARNING},
       {"userScriptInfoWarning", IDS_EXTENSIONS_ALLOW_USER_SCRIPTS_WARNING},
       {"hostPermissionsDescription",
        IDS_EXTENSIONS_HOST_PERMISSIONS_DESCRIPTION},
-      {"permissionsLearnMoreLabel",
-       IDS_EXTENSIONS_PERMISSIONS_LEARN_MORE_A11Y_LABEL},
       {"hostPermissionsEdit", IDS_EXTENSIONS_HOST_PERMISSIONS_EDIT},
       {"hostPermissionsHeading", IDS_EXTENSIONS_ITEM_HOST_PERMISSIONS_HEADING},
       {"newHostPermissionsHeading",
@@ -221,8 +214,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"itemRemoveExtension", IDS_EXTENSIONS_ITEM_REMOVE_EXTENSION},
       {"itemShowAccessRequestsInToolbar",
        IDS_EXTENSIONS_ITEM_SHOW_ACCESS_REQUESTS_IN_TOOLBAR},
-      {"itemShowAccessRequestsLearnMore",
-       IDS_EXTENSIONS_ACCESS_REQUESTS_LEARN_MORE},
       {"itemSiteAccess", IDS_EXTENSIONS_ITEM_SITE_ACCESS},
       {"itemSiteAccessAddHost", IDS_EXTENSIONS_ITEM_SITE_ACCESS_ADD_HOST},
       {"itemSiteAccessEmpty", IDS_EXTENSIONS_ITEM_SITE_ACCESS_EMPTY},
@@ -332,8 +323,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
        IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_REMOVE_BUTTON_ACC_LABEL},
       {"mv2DeprecationMessageDisabledHeader",
        IDS_EXTENSIONS_MV2_DEPRECATION_MESSAGE_DISABLED_HEADER},
-      {"mv2DeprecationMessageDisabledSubtitle",
-       IDS_EXTENSIONS_MV2_DEPRECATION_MESSAGE_DISABLED_SUBTITLE},
       {"mv2DeprecationMessageRemoveButton",
        IDS_EXTENSIONS_MV2_DEPRECATION_MESSAGE_REMOVE_BUTTON},
       {"mv2DeprecationMessageWarningHeader",
@@ -401,17 +390,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       l10n_util::GetStringFUTF16(
           IDS_EXTENSIONS_ADDED_WITHOUT_KNOWLEDGE,
           l10n_util::GetStringUTF16(IDS_EXTENSION_WEB_STORE_TITLE)));
-  source->AddString(
-      "modernWebGuidanceURL",
-      base::ASCIIToUTF16(google_util::AppendGoogleLocaleParam(
-                             extension_urls::AppendUtmSource(
-                                 extension_urls::GetModernWebGuidanceURL(),
-                                 extension_urls::kExtensionsSidebarUtmSource),
-                             g_browser_process->GetApplicationLocale())
-                             .spec()));
-  source->AddString(
-      "hostPermissionsLearnMoreLink",
-      extension_permissions_constants::kRuntimeHostPermissionsHelpURL);
   source->AddBoolean(kInDevModeKey, in_dev_mode);
   source->AddBoolean(
       "enableExtensionsPinnedByDefault",
@@ -425,9 +403,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
   source->AddBoolean(kEnableEnhancedSiteControls,
                      base::FeatureList::IsEnabled(
                          extensions_features::kExtensionsMenuAccessControl));
-  source->AddString(
-      "showAccessRequestsInToolbarLearnMoreLink",
-      extension_permissions_constants::kShowAccessRequestsInToolbarHelpURL);
   source->AddBoolean(
       "enableUserPermittedSites",
       base::FeatureList::IsEnabled(
@@ -506,9 +481,6 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
   plural_string_handler->AddLocalizedString(
       "mv2DeprecationPanelDisabledHeader",
       IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_DISABLED_HEADER);
-  plural_string_handler->AddLocalizedString(
-      "mv2DeprecationPanelDisabledSubtitle",
-      IDS_EXTENSIONS_MV2_DEPRECATION_PANEL_DISABLED_SUBTITLE);
   web_ui->AddMessageHandler(std::move(plural_string_handler));
 }
 

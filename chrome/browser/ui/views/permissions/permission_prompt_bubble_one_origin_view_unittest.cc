@@ -99,7 +99,6 @@ class TestDelegate : public permissions::PermissionPrompt::Delegate {
     return std::nullopt;
   }
   void FinalizeCurrentRequests() override {}
-  void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
   void SwitchToLoudPrompt() override {}

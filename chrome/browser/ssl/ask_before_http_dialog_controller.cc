@@ -13,6 +13,9 @@
 #include "chrome/browser/ssl/https_only_mode_tab_helper.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
+#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/tabs/public/tab_dialog_manager.h"
+#include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/security_interstitials/core/https_only_mode_metrics.h"
@@ -30,13 +33,7 @@
 #include "ui/base/mojom/ui_base_types.mojom-shared.h"
 #include "ui/base/page_transition_types.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
-#include "ui/base/window_open_disposition.h"
-#include "ui/base/window_open_disposition_utils.h"
 #include "ui/events/event.h"
-
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/tabs/public/tab_dialog_manager.h"
-#include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "ui/views/bubble/bubble_dialog_model_host.h"
 #include "ui/views/controls/bulleted_label_list/bulleted_label_list_view.h"
 #include "ui/views/controls/label.h"
@@ -47,9 +44,6 @@ using HttpWarningReason =
     security_interstitials::https_only_mode::InterstitialReason;
 
 namespace {
-
-inline constexpr char kLearnMoreLink[] =
-    "https://support.google.com/chrome?p=first_mode";
 
 // Helper to create the prompt body view based on the Ask-before-HTTP warning
 // type.
@@ -280,12 +274,6 @@ AskBeforeHttpDialogController::GetInterstitialReasonForTesting() const {
   return warning_reason_;
 }
 
-void AskBeforeHttpDialogController::ClickLearnMoreForTesting() {
-  ui::MouseEvent dummy_event(ui::EventType::kMousePressed, gfx::Point(),
-                             gfx::Point(), base::TimeTicks(), 0, 0);
-  OnHelpCenterLinkClicked(dummy_event);
-}
-
 void AskBeforeHttpDialogController::OnDialogDestroying() {}
 
 void AskBeforeHttpDialogController::OnUserDismissed() {}
@@ -335,12 +323,9 @@ AskBeforeHttpDialogController::CreateDialogModel(const GURL& request_url) {
           .SetStyle(ui::ButtonStyle::kDefault)
           .SetId(kContinueButtonId));
 
-  // We separately add on the main warning text, including the learn more link.
-  ui::DialogModelLabel::TextReplacement link = ui::DialogModelLabel::CreateLink(
-      IDS_ABH_PROMPT_LEARN_MORE_LINK,
-      base::BindRepeating(
-          &AskBeforeHttpDialogController::OnHelpCenterLinkClicked,
-          weak_ptr_factory_.GetWeakPtr()));
+  // We separately add on the main warning text.
+  ui::DialogModelLabel::TextReplacement link =
+      ui::DialogModelLabel::CreatePlainText(std::u16string());
   security_interstitials::https_only_mode::HttpInterstitialState
       interstitial_state =
           ComputeInterstitialState(web_contents(), request_url);
@@ -351,24 +336,6 @@ AskBeforeHttpDialogController::CreateDialogModel(const GURL& request_url) {
 
   AddAskBeforeHttpDialogText(builder, warning_reason_, link);
   return builder.Build();
-}
-
-void AskBeforeHttpDialogController::OnHelpCenterLinkClicked(
-    const ui::Event& event) {
-  metrics_helper_->RecordUserInteraction(
-      security_interstitials::MetricsHelper::SHOW_LEARN_MORE);
-
-  content::WebContents* contents = web_contents();
-  if (!contents) {
-    return;
-  }
-
-  content::OpenURLParams params(
-      GURL(kLearnMoreLink), content::Referrer(),
-      ui::DispositionFromEventFlags(event.flags(),
-                                    WindowOpenDisposition::NEW_FOREGROUND_TAB),
-      ui::PAGE_TRANSITION_LINK, false);
-  contents->OpenURL(params, /*navigation_handle_callback=*/{});
 }
 
 void AskBeforeHttpDialogController::OnGoBackButtonClicked() {

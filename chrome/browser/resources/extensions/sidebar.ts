@@ -44,7 +44,6 @@ export class ExtensionsSidebarElement extends ExtensionsSidebarElementBase {
   static override get properties() {
     return {
       enableEnhancedSiteControls: {type: Boolean},
-      inDevMode: {type: Boolean},
 
       /**
        * The data path/page that identifies the entry to be selected in the
@@ -60,7 +59,6 @@ export class ExtensionsSidebarElement extends ExtensionsSidebarElementBase {
   protected accessor selectedPath_: Page = Page.LIST;
   protected accessor webuiRoundedIconsEnabled_: boolean =
       loadTimeData.getBoolean('webuiRoundedIconsEnabled');
-  accessor inDevMode: boolean = false;
 
   /**
    * The ID of the listener on |navigation|. Stored so that the
@@ -108,14 +106,6 @@ export class ExtensionsSidebarElement extends ExtensionsSidebarElementBase {
     navigation.navigateTo(
         {page: ((e.currentTarget as HTMLElement).dataset['path'] as Page)});
     this.fire('close-drawer');
-  }
-
-  protected computeModernWebGuidancePromoText_(): TrustedHTML {
-    return this.i18nAdvanced('sidebarDocsPromo', {
-      tags: ['a'],
-      attrs: ['target'],
-      substitutions: [loadTimeData.getString('modernWebGuidanceURL')],
-    });
   }
 }
 

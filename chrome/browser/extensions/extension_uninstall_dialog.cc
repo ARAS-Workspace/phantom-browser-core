@@ -12,11 +12,8 @@
 #include "base/notimplemented.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/chrome_app_icon_service.h"
-#include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/navigator/browser_navigator.h"
-#include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "content/public/browser/clear_site_data_utils.h"
 #include "extensions/browser/extension_dialog_auto_confirm.h"
 #include "extensions/browser/extension_registrar.h"
@@ -25,7 +22,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_urls.h"
 #include "extensions/common/manifest_handlers/icons_handler.h"
 #include "extensions/common/manifest_handlers/manifest_url_handlers.h"
 #include "ui/base/page_transition_types.h"
@@ -47,10 +43,6 @@ constexpr int kIconSize = 64;
 
 constexpr char16_t kExtensionRemovedError[] =
     u"Extension was removed before dialog closed.";
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-constexpr char kReferrerId[] = "chrome-remove-extension-dialog";
-#endif
 
 float GetScaleFactor(gfx::NativeWindow window) {
   const display::Screen* screen = display::Screen::Get();
@@ -113,11 +105,6 @@ void ExtensionUninstallDialog::ConfirmUninstall(
     return;
   }
 
-  ExtensionManagement* extension_management =
-      ExtensionManagementFactory::GetForBrowserContext(profile_);
-  show_report_abuse_checkbox_ =
-      extension_management->UpdatesFromWebstore(*extension_);
-
   // Track that extension uninstalled externally.
   registry_observation_.Observe(ExtensionRegistry::Get(profile_));
 
@@ -150,8 +137,6 @@ void ExtensionUninstallDialog::OnIconUpdated(ChromeAppIcon* icon) {
       Show();
       break;
     case ScopedTestDialogAutoConfirm::ACCEPT_AND_OPTION:
-      OnDialogClosed(CLOSE_ACTION_UNINSTALL_AND_CHECKBOX_CHECKED);
-      break;
     case ScopedTestDialogAutoConfirm::ACCEPT:
       OnDialogClosed(CLOSE_ACTION_UNINSTALL);
       break;
@@ -181,10 +166,6 @@ void ExtensionUninstallDialog::OnProfileWillBeDestroyed(Profile* profile) {
   OnDialogClosed(CLOSE_ACTION_CANCELED);
 }
 
-bool ExtensionUninstallDialog::ShouldShowCheckbox() const {
-  return show_report_abuse_checkbox_;
-}
-
 void ExtensionUninstallDialog::OnDialogClosed(CloseAction action) {
   // Ensure the dialog isn't notified of an uninstallation after the dialog was
   // closed.
@@ -193,20 +174,6 @@ void ExtensionUninstallDialog::OnDialogClosed(CloseAction action) {
   bool success = false;
   std::u16string error;
   switch (action) {
-    case CLOSE_ACTION_UNINSTALL_AND_CHECKBOX_CHECKED:
-      DCHECK(profile_);
-      success = Uninstall(&error);
-      base::RecordAction(base::UserMetricsAction(
-          "Extensions.UninstallDialogReportAbuseChecked"));
-      base::RecordAction(
-          base::UserMetricsAction("Extensions.UninstallDialogRemoveClick"));
-      // If the extension specifies a custom uninstall page via
-      // chrome.runtime.setUninstallURL, then at uninstallation its uninstall
-      // page opens. To ensure that the CWS Report Abuse page is the active
-      // tab at uninstallation, HandleReportAbuse() is called after
-      // Uninstall().
-      HandleReportAbuse();
-      break;
     case CLOSE_ACTION_UNINSTALL:
       base::RecordAction(
           base::UserMetricsAction("Extensions.UninstallDialogRemoveClick"));
@@ -218,6 +185,7 @@ void ExtensionUninstallDialog::OnDialogClosed(CloseAction action) {
       error = extension_uninstalled_early_ ? kExtensionRemovedError
                                            : u"User canceled uninstall dialog";
       break;
+    case CLOSE_ACTION_UNINSTALL_AND_CHECKBOX_CHECKED:
     case CLOSE_ACTION_LAST:
       NOTREACHED();
   }
@@ -240,22 +208,6 @@ bool ExtensionUninstallDialog::Uninstall(std::u16string* error) {
   }
   *error = kExtensionRemovedError;
   return false;
-}
-
-void ExtensionUninstallDialog::HandleReportAbuse() {
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  DCHECK(profile_);
-  NavigateParams params(
-      profile_,
-      extension_urls::GetWebstoreReportAbuseUrl(extension_->id(), kReferrerId),
-      ui::PAGE_TRANSITION_LINK);
-  params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
-  Navigate(&params);
-#else   // BUILDFLAG(ENABLE_EXTENSIONS)
-  // TODO(crbug.com/424011073): Implement this method once we compile `Navigate`
-  // on Desktop Android.
-  NOTIMPLEMENTED();
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 }
 
 }  // namespace extensions

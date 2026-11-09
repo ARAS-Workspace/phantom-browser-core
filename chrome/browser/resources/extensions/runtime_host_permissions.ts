@@ -300,11 +300,6 @@ export class ExtensionsRuntimeHostPermissionsElement extends CrLitElement {
     menu.close();
   }
 
-  protected onLearnMoreClick_() {
-    chrome.metricsPrivate.recordUserAction(
-        'Extensions.Settings.Hosts.LearnMoreActivated');
-  }
-
   protected onEditHostClick_(e: Event) {
     const index = getEventTargetIndex(e);
     const item = this.getRuntimeHosts_()[index]!;

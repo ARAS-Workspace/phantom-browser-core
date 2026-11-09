@@ -17,12 +17,6 @@ ${!this.enableEnhancedSiteControls ? html`
         <span id="section-heading-text">
           $i18n{hostPermissionsHeading}
         </span>
-        <a class="link-icon-button"
-            aria-label="$i18n{permissionsLearnMoreLabel}"
-            href="$i18n{hostPermissionsLearnMoreLink}" target="_blank"
-            @click="${this.onLearnMoreClick_}">
-          <cr-icon icon="cr:help"></cr-icon>
-        </a>
       </div>
       <div>
         <select id="hostAccess" class="md-select"
@@ -55,12 +49,6 @@ ${!this.enableEnhancedSiteControls ? html`
         <span id="new-section-heading-text">
           $i18n{newHostPermissionsHeading}
         </span>
-        <a class="link-icon-button"
-            aria-label="$i18n{permissionsLearnMoreLabel}"
-            href="$i18n{hostPermissionsLearnMoreLink}" target="_blank"
-            @click="${this.onLearnMoreClick_}">
-          <cr-icon icon="cr:help"></cr-icon>
-        </a>
       </div>
       <span id="new-section-heading-subtext">
         $i18n{hostPermissionsSubHeading}

@@ -295,7 +295,6 @@ class SafetyTipPageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
   void CheckNoButtons() {
     auto* bubble = static_cast<SafetyTipPageInfoBubbleView*>(
         PageInfoBubbleViewBase::GetPageInfoBubbleForTesting());
-    EXPECT_FALSE(bubble->info_link_);
     EXPECT_FALSE(bubble->leave_button_);
   }
 

@@ -13,9 +13,7 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 // don't need to be in //extensions/permissions.
 namespace extension_permissions_constants {
 
-extern const char kRuntimeHostPermissionsHelpURL[];
 extern const char kExtensionsSitePermissionsURL[];
-extern const char kShowAccessRequestsInToolbarHelpURL[];
 
 }  // namespace extension_permissions_constants
 

@@ -24,9 +24,6 @@ class ContentSettingBubbleModelDelegate {
   // Shows the settings page for media.
   virtual void ShowMediaSettingsPage() = 0;
 
-  // Shows the Learn More page for a given content type.
-  virtual void ShowLearnMorePage(ContentSettingsType type) = 0;
-
  protected:
   virtual ~ContentSettingBubbleModelDelegate() = default;
 };

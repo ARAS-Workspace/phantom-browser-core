@@ -52,7 +52,6 @@ suite('ExtensionSidebarTest', function() {
         // enableEnhancedSiteControls is set to false.
         boundTestVisible('#sectionsSitePermissions', false);
         boundTestVisible('#sectionsShortcuts', true);
-        boundTestVisible('#moreExtensions', false);
 
         sidebar.enableEnhancedSiteControls = true;
         await microtasksFinished();

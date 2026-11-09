@@ -107,12 +107,6 @@ SafetyTipPageInfoBubbleView::SafetyTipPageInfoBubbleView(
   button_view->SetCrossAxisAlignment(
       views::BoxLayout::CrossAxisAlignment::kCenter);
 
-  // Learn more link.
-  info_link_ = button_view->AddChildView(std::make_unique<views::Link>(
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFETY_TIP_MORE_INFO_LINK)));
-  info_link_->SetCallback(base::BindRepeating(
-      &SafetyTipPageInfoBubbleView::OpenHelpCenter, base::Unretained(this)));
-
   auto* flex_view = button_view->AddChildView(std::make_unique<views::View>());
   button_view->SetFlexForView(flex_view, 1);
 
@@ -171,11 +165,6 @@ void SafetyTipPageInfoBubbleView::ExecuteLeaveCommand() {
       safety_tip_status_ == security_state::SafetyTipStatus::kLookalike
           ? suggested_url_
           : GURL());
-}
-
-void SafetyTipPageInfoBubbleView::OpenHelpCenter() {
-  action_taken_ = SafetyTipInteraction::kLearnMore;
-  OpenHelpCenterFromSafetyTip(web_contents());
 }
 
 void SafetyTipPageInfoBubbleView::RenderFrameDeleted(

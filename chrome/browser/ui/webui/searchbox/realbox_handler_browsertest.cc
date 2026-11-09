@@ -181,8 +181,7 @@ INSTANTIATE_TEST_SUITE_P(All, RealboxHandlerTest, testing::Bool());
 // the NTP Realbox.
 IN_PROC_BROWSER_TEST_P(RealboxHandlerTest, PedalVectorIcons) {
   std::unordered_map<OmniboxPedalId, scoped_refptr<OmniboxPedal>> pedals =
-      GetPedalImplementations(/*incognito=*/true, /*guest=*/false,
-                              /*testing=*/true);
+      GetPedalImplementations(/*incognito=*/true, /*guest=*/false);
   for (auto const& it : pedals) {
     const scoped_refptr<OmniboxPedal> pedal = it.second;
     const gfx::VectorIcon& vector_icon = pedal->GetVectorIcon();

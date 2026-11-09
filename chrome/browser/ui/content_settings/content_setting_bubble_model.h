@@ -183,7 +183,6 @@ class ContentSettingBubbleModel {
     std::u16string manage_text;
     std::u16string manage_tooltip;
     ManageTextStyle manage_text_style = ManageTextStyle::kButton;
-    bool show_learn_more = false;
     std::u16string done_button_text;
   };
 
@@ -214,7 +213,6 @@ class ContentSettingBubbleModel {
   virtual void OnCustomLinkClicked() {}
   virtual void OnManageButtonClicked() {}
   virtual void OnManageCheckboxChecked(bool is_checked) {}
-  virtual void OnLearnMoreClicked() {}
   virtual void OnDoneButtonClicked() {}
   // Called by the view code when the bubble is closed.
   virtual void CommitChanges() {}
@@ -291,9 +289,6 @@ class ContentSettingBubbleModel {
   }
   void set_manage_text_style(ManageTextStyle manage_text_style) {
     bubble_content_.manage_text_style = manage_text_style;
-  }
-  void set_show_learn_more(bool show_learn_more) {
-    bubble_content_.show_learn_more = show_learn_more;
   }
   void set_done_button_text(const std::u16string& done_button_text) {
     bubble_content_.done_button_text = done_button_text;
@@ -490,7 +485,6 @@ class ContentSettingSubresourceFilterBubbleModel
   void OnManageCheckboxChecked(bool is_checked) override;
   ContentSettingSubresourceFilterBubbleModel* AsSubresourceFilterBubbleModel()
       override;
-  void OnLearnMoreClicked() override;
   void CommitChanges() override;
 
   bool is_checked_ = false;

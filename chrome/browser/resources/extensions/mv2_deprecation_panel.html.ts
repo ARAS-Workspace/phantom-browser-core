@@ -23,8 +23,6 @@ export function getHtml(this: ExtensionsMv2DeprecationPanelElement) {
     </cr-icon>
     <div class="panel-header-text">
       <h3 id="headingText">${this.headerString_}</h3>
-      <div class="cr-secondary-text" .innerHTML="${this.getSubtitleString_()}">
-      </div>
     </div>
     <cr-button class="header-button" @click="${this.onDismissButtonClick_}">
       $i18n{mv2DeprecationPanelDismissButton}

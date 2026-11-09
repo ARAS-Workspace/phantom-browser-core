@@ -45,9 +45,6 @@ namespace {
 const char kChromeUIScheme[] = "chrome";
 const char kChromeUIDinoHost[] = "dino";
 
-static const char kRedirectLoopLearnMoreUrl[] =
-    "https://support.google.com/chrome?p=rl_error";
-
 enum NAV_SUGGESTIONS {
   SUGGEST_NONE = 0,
   SUGGEST_DIAGNOSE_TOOL = 1 << 0,
@@ -56,7 +53,6 @@ enum NAV_SUGGESTIONS {
   SUGGEST_FIREWALL_CONFIG = 1 << 3,
   SUGGEST_PROXY_CONFIG = 1 << 4,
   SUGGEST_DISABLE_EXTENSION = 1 << 5,
-  SUGGEST_LEARNMORE = 1 << 6,
   SUGGEST_CONTACT_ADMINISTRATOR = 1 << 7,
   SUGGEST_UNSUPPORTED_CIPHER = 1 << 8,
   SUGGEST_ANTIVIRUS_CONFIG = 1 << 9,
@@ -201,7 +197,7 @@ const LocalizedErrorMap net_error_options[] = {
   {net::ERR_TOO_MANY_REDIRECTS,
    IDS_ERRORPAGES_HEADING_PAGE_NOT_WORKING,
    IDS_ERRORPAGES_SUMMARY_TOO_MANY_REDIRECTS,
-   SUGGEST_LEARNMORE,
+   SUGGEST_NONE,
    SHOW_BUTTON_RELOAD,
   },
   {net::ERR_EMPTY_RESPONSE,
@@ -594,29 +590,6 @@ base::DictValue SingleEntryDictionary(std::string_view path, int message_id) {
   return result;
 }
 
-// Adds a linked suggestion dictionary entry to the suggestions list.
-void AddLinkedSuggestionToList(const int error_code,
-                               const std::string& locale,
-                               base::ListValue& suggestions_summary_list) {
-  GURL learn_more_url(kRedirectLoopLearnMoreUrl);
-  DCHECK(learn_more_url.is_valid());
-  // Add the language parameter to the URL.
-  std::string query = learn_more_url.GetQuery() + "&hl=" + locale;
-  GURL::Replacements repl;
-  repl.SetQueryStr(query);
-  GURL learn_more_url_with_locale = learn_more_url.ReplaceComponents(repl);
-
-  CHECK_EQ(error_code, net::ERR_TOO_MANY_REDIRECTS);
-  std::u16string suggestion_string = l10n_util::GetStringFUTF16(
-      IDS_ERRORPAGES_SUGGESTION_DELETE_COOKIES_SUMMARY,
-      base::UTF8ToUTF16(
-          base::EscapeForHTML(learn_more_url_with_locale.spec())));
-
-  base::DictValue suggestion_list_item;
-  suggestion_list_item.Set("summary", suggestion_string);
-  suggestions_summary_list.Append(std::move(suggestion_list_item));
-}
-
 // Check if a suggestion is in the bitmap of suggestions.
 bool IsSuggested(int suggestions, int suggestion) {
   return !!(suggestions & suggestion);
@@ -695,15 +668,6 @@ void GetSuggestionsSummaryList(int error_code,
     return;
   }
   DCHECK(!IsSuggested(suggestions, SUGGEST_NAVIGATE_TO_ORIGIN));
-
-  if (IsOnlySuggestion(suggestions, SUGGEST_LEARNMORE)) {
-    DCHECK(suggestions_summary_list.empty());
-    AddLinkedSuggestionToList(error_code, locale, suggestions_summary_list);
-    return;
-  }
-  if (IsSuggested(suggestions, SUGGEST_LEARNMORE)) {
-    AddLinkedSuggestionToList(error_code, locale, suggestions_summary_list);
-  }
 
   if (suggestions & SUGGEST_CAPTIVE_PORTAL_SIGNIN) {
     suggestions_summary_list.Append(SingleEntryDictionary(
@@ -1016,7 +980,6 @@ LocalizedError::PageState LocalizedError::GetPageState(
   // Do not show any suggestions with links while in kiosk mode.
   if (is_kiosk_mode) {
     options.suggestions &= ~SUGGEST_DIAGNOSE_TOOL;
-    options.suggestions &= ~SUGGEST_LEARNMORE;
     options.suggestions &= ~SUGGEST_CONTACT_ADMINISTRATOR;
   }
 

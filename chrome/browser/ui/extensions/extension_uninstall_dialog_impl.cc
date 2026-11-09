@@ -22,8 +22,6 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace {
 
-DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kCheckboxId);
-
 // The implementation of the uninstall dialog.
 class ExtensionUninstallDialogImpl
     : public extensions::ExtensionUninstallDialog {
@@ -107,20 +105,6 @@ void ExtensionUninstallDialogImpl::Show() {
             .set_allow_character_break());
   }
 
-  if (ShouldShowCheckbox()) {
-    std::u16string checkbox_label =
-        triggering_extension()
-            ? l10n_util::GetStringFUTF16(
-                  IDS_EXTENSION_PROMPT_UNINSTALL_REPORT_ABUSE_FROM_EXTENSION,
-                  extensions::ui_util::GetFixupExtensionNameForUIDisplay(
-                      extension()->name()))
-            : l10n_util::GetStringUTF16(
-                  IDS_EXTENSION_PROMPT_UNINSTALL_REPORT_ABUSE);
-
-    dialog_builder.AddCheckbox(kCheckboxId,
-                               ui::DialogModelLabel(checkbox_label));
-  }
-
   std::unique_ptr<ui::DialogModel> dialog_model = dialog_builder.Build();
   dialog_model_ = dialog_model.get();
 
@@ -134,13 +118,8 @@ void ExtensionUninstallDialogImpl::Close() {
 
 void ExtensionUninstallDialogImpl::DialogAccepted() {
   DCHECK(dialog_model_);
-  const bool checkbox_is_checked =
-      ShouldShowCheckbox() &&
-      dialog_model_->GetCheckboxByUniqueId(kCheckboxId)->is_checked();
   dialog_model_ = nullptr;
-  OnDialogClosed(checkbox_is_checked
-                     ? CLOSE_ACTION_UNINSTALL_AND_CHECKBOX_CHECKED
-                     : CLOSE_ACTION_UNINSTALL);
+  OnDialogClosed(CLOSE_ACTION_UNINSTALL);
 }
 
 void ExtensionUninstallDialogImpl::DialogClosing() {

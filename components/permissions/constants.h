@@ -17,11 +17,6 @@ class TimeDelta;
 
 namespace permissions {
 
-// The URL for the Embedded Content help center article in the SAA permission
-// prompt.
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-extern const char kEmbeddedContentHelpCenterURL[];
-
 // TODO(crbug.com/40254381): Remove the code related to unused site permissions
 // from Android builds.
 

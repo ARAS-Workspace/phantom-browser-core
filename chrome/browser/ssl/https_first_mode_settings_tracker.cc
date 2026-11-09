@@ -25,7 +25,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
-#include "components/security_interstitials/content/https_only_mode_blocking_page.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/variations/synthetic_trials.h"
@@ -144,14 +143,9 @@ GURL GetHttpUrlFromHttps(const GURL& https_url) {
   const std::string port_str = base::NumberToString(http_port_for_testing);
   if (http_port_for_testing) {
     // Only reached in testing, where the original URL will always have a
-    // non-default port. One of the tests navigates to Google support pages, so
-    // exclude that.
-    // TODO(crbug.com/40904694): Remove this exception.
-    if (https_url != GURL(security_interstitials::HttpsOnlyModeBlockingPage::
-                              kLearnMoreLink)) {
-      DCHECK(!https_url.GetPort().empty());
-      upgrade_url.SetPortStr(port_str);
-    }
+    // non-default port.
+    DCHECK(!https_url.GetPort().empty());
+    upgrade_url.SetPortStr(port_str);
   }
 
   return https_url.ReplaceComponents(upgrade_url);

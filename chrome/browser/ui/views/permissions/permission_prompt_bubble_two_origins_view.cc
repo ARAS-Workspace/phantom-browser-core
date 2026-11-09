@@ -53,12 +53,6 @@ std::optional<std::u16string> GetExtraTextTwoOrigin(
   }
 }
 
-bool HasExtraText(permissions::PermissionPrompt::Delegate& delegate) {
-  CHECK_GT(delegate.Requests().size(), 0u);
-  return delegate.Requests()[0]->request_type() ==
-         permissions::RequestType::kStorageAccess;
-}
-
 }  // namespace
 
 PermissionPromptBubbleTwoOriginsView::PermissionPromptBubbleTwoOriginsView(
@@ -86,7 +80,6 @@ PermissionPromptBubbleTwoOriginsView::PermissionPromptBubbleTwoOriginsView(
       views::DISTANCE_MODAL_DIALOG_PREFERRED_WIDTH));
 
   CreateFaviconRow();
-  MaybeAddLink();
 
   CHECK(GetNativeWindow());
 
@@ -254,57 +247,6 @@ void PermissionPromptBubbleTwoOriginsView::OnRequestingOriginFaviconLoaded(
         gfx::Image::CreateFrom1xPNGBytes(favicon_result.bitmap_data)));
   }
   MaybeShow();
-}
-
-void PermissionPromptBubbleTwoOriginsView::MaybeAddLink() {
-  gfx::Range link_range;
-  views::StyledLabel::RangeStyleInfo link_style;
-  std::optional<std::u16string> link = GetLink(link_range, link_style);
-  if (link.has_value()) {
-    size_t index = HasExtraText(*delegate()) ? 1 : 0;
-    auto* link_label =
-        AddChildViewAt(std::make_unique<views::StyledLabel>(), index);
-    link_label->SetText(link.value());
-    link_label->SetID(
-        permissions::PermissionPromptViewID::VIEW_ID_PERMISSION_PROMPT_LINK);
-    if (!link_range.is_empty()) {
-      link_label->AddStyleRange(link_range, link_style);
-    }
-  }
-}
-
-std::optional<std::u16string> PermissionPromptBubbleTwoOriginsView::GetLink(
-    gfx::Range& link_range,
-    views::StyledLabel::RangeStyleInfo& link_style) {
-  CHECK_GT(delegate()->Requests().size(), 0u);
-  switch (delegate()->Requests()[0]->request_type()) {
-    case permissions::RequestType::kStorageAccess:
-      return GetLinkStorageAccess(link_range, link_style);
-    default:
-      return std::nullopt;
-  }
-}
-
-std::u16string PermissionPromptBubbleTwoOriginsView::GetLinkStorageAccess(
-    gfx::Range& link_range,
-    views::StyledLabel::RangeStyleInfo& link_style) {
-  auto settings_text_for_link =
-      l10n_util::GetStringUTF16(IDS_STORAGE_ACCESS_PERMISSION_TWO_ORIGIN_LINK);
-
-  link_range = gfx::Range(0, settings_text_for_link.length());
-  link_style =
-      views::StyledLabel::RangeStyleInfo::CreateForLink(base::BindRepeating(
-          &PermissionPromptBubbleTwoOriginsView::HelpCenterLinkClicked,
-          base::Unretained(this)));
-
-  return settings_text_for_link;
-}
-
-void PermissionPromptBubbleTwoOriginsView::HelpCenterLinkClicked(
-    const ui::Event& event) {
-  if (delegate()) {
-    delegate()->OpenHelpCenterLink(event);
-  }
 }
 
 void PermissionPromptBubbleTwoOriginsView::MaybeShow() {

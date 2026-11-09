@@ -28,7 +28,6 @@ class WebContents;
 
 namespace ui {
 class DialogModel;
-class Event;
 }  // namespace ui
 
 inline constexpr char kAskBeforeHttpDialogName[] = "AskBeforeHttpDialog";
@@ -70,7 +69,6 @@ class AskBeforeHttpDialogController : public content::WebContentsObserver {
   void CancelForTesting();
   security_interstitials::https_only_mode::InterstitialReason
   GetInterstitialReasonForTesting() const;
-  void ClickLearnMoreForTesting();
 
   // Closes the dialog widget, if one is open.
   void CloseDialogWidget(views::Widget::ClosedReason reason);
@@ -80,7 +78,6 @@ class AskBeforeHttpDialogController : public content::WebContentsObserver {
 
  private:
   std::unique_ptr<ui::DialogModel> CreateDialogModel(const GURL& request_url);
-  void OnHelpCenterLinkClicked(const ui::Event& event);
   void OnGoBackButtonClicked();
   void OnContinueButtonClicked(const GURL& request_url);
   void OnDialogDestroying();

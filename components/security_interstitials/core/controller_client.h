@@ -123,10 +123,6 @@ class ControllerClient {
   // fact that the user has seen the same error multiple times.
   virtual bool HasSeenRecurrentError();
 
-  GURL GetBaseHelpCenterUrl() const;
-
-  void SetBaseHelpCenterUrlForTesting(const GURL& test_url);
-
   // The following methods are for handling the new `_IN_NEW_TAB` commands.
   virtual void OpenHelpCenterInNewTab() {}
   virtual void OpenReportingPrivacyInNewTab() {}
@@ -137,8 +133,6 @@ class ControllerClient {
 
  private:
   std::unique_ptr<MetricsHelper> metrics_helper_;
-  // Link to the help center.
-  GURL help_center_url_;
 };
 
 }  // namespace security_interstitials

@@ -84,8 +84,6 @@ const MenuEntries kOnAllSites =
     ExtensionContextMenuModel::PAGE_ACCESS_RUN_ON_ALL_SITES;
 const MenuEntries kPermissionsPage =
     ExtensionContextMenuModel::PAGE_ACCESS_PERMISSIONS_PAGE;
-const MenuEntries kLearnMore =
-    ExtensionContextMenuModel::PAGE_ACCESS_LEARN_MORE;
 const MenuEntries kUninstall = ExtensionContextMenuModel::UNINSTALL;
 const MenuEntries kPolicyInstalled =
     ExtensionContextMenuModel::POLICY_INSTALLED;
@@ -400,8 +398,7 @@ ExtensionContextMenuModelTest::GetPageAccessCommandState(
     int command) const {
   // Check this method is called only for submenu page access commands.
   DCHECK(command == kOnClick || command == kOnSite || command == kOnAllSites ||
-         command == kLearnMore || command == kPermissionsPage ||
-         command == kPolicyInstalled);
+         command == kPermissionsPage || command == kPolicyInstalled);
 
   // Every page access command is absent if there is no page access submenu.
   if (!HasPageAccessSubmenu(menu))
@@ -1357,11 +1354,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
       continue;
     }
 
-    // The learn more option should be visible whenever the page access submenu
-    // is.
-    EXPECT_EQ(CommandState::kEnabled,
-              GetPageAccessCommandState(menu, kLearnMore));
-
     auto get_expected_state = [test_case](MenuEntries command) {
       if (!test_case.expected_entries.count(command))
         return CommandState::kAbsent;
@@ -1570,8 +1562,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
   EXPECT_EQ(CommandState::kDisabled, GetPageAccessCommandState(menu, kOnSite));
   EXPECT_EQ(CommandState::kDisabled,
             GetPageAccessCommandState(menu, kOnAllSites));
-  EXPECT_EQ(CommandState::kEnabled,
-            GetPageAccessCommandState(menu, kLearnMore));
 }
 
 // Test that when there is a page navigation with the menu open the page access
@@ -1675,8 +1665,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
     EXPECT_EQ(CommandState::kEnabled, GetPageAccessCommandState(menu, kOnSite));
     EXPECT_EQ(CommandState::kDisabled,
               GetPageAccessCommandState(menu, kOnAllSites));
-    EXPECT_EQ(CommandState::kEnabled,
-              GetPageAccessCommandState(menu, kLearnMore));
 
     EXPECT_TRUE(menu.IsCommandIdChecked(kOnSite));
     EXPECT_FALSE(menu.IsCommandIdChecked(kOnClick));
@@ -1714,8 +1702,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuModelTest,
     EXPECT_EQ(CommandState::kEnabled, GetPageAccessCommandState(menu, kOnSite));
     EXPECT_EQ(CommandState::kDisabled,
               GetPageAccessCommandState(menu, kOnAllSites));
-    EXPECT_EQ(CommandState::kEnabled,
-              GetPageAccessCommandState(menu, kLearnMore));
 
     EXPECT_TRUE(menu.IsCommandIdChecked(kOnSite));
     EXPECT_FALSE(menu.IsCommandIdChecked(kOnClick));
@@ -2070,12 +2056,8 @@ IN_PROC_BROWSER_TEST_P(ExtensionContextMenuModelWithUserHostControlsTest,
     if (is_feature_enabled) {
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage),
                 CommandState::kEnabled);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kAbsent);
     } else {
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kEnabled);
     }
   }
 
@@ -2107,22 +2089,16 @@ IN_PROC_BROWSER_TEST_P(ExtensionContextMenuModelWithUserHostControlsTest,
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage),
                 CommandState::kEnabled);
-      EXPECT_EQ(GetCommandState(menu, kLearnMore), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kAbsent);
     } else {
       // Even though we added a site as a user restricted site, the site
       // permission behaves as "customize by extension". Verify page access
-      // submenu is visible and enabled, the "learn more" item is in in the
-      // submenu and the "permissions page" item is nowhere visible.
+      // submenu is visible and enabled and the "permissions page" item is
+      // nowhere visible.
       EXPECT_EQ(GetCommandState(menu, kGrantAllExtensions),
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kBlockAllExtensions),
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kPageAccessSubmenu),
-                CommandState::kEnabled);
-      EXPECT_EQ(GetCommandState(menu, kLearnMore), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
                 CommandState::kEnabled);
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage), CommandState::kAbsent);
       EXPECT_EQ(GetPageAccessCommandState(menu, kPermissionsPage),
@@ -2414,12 +2390,8 @@ IN_PROC_BROWSER_TEST_P(
     if (is_feature_enabled) {
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage),
                 CommandState::kEnabled);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kAbsent);
     } else {
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kEnabled);
     }
   }
 
@@ -2451,22 +2423,16 @@ IN_PROC_BROWSER_TEST_P(
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage),
                 CommandState::kEnabled);
-      EXPECT_EQ(GetCommandState(menu, kLearnMore), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
-                CommandState::kAbsent);
     } else {
       // Even though we added a site as a user permitted site, the site
       // permission behaves as "customize by extension". Verify page access
-      // submenu is visible and enabled, the "learn more" item is in in the
-      // submenu and the "permissions page" item is nowhere visible.
+      // submenu is visible and enabled and the "permissions page" item is
+      // nowhere visible.
       EXPECT_EQ(GetCommandState(menu, kGrantAllExtensions),
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kBlockAllExtensions),
                 CommandState::kAbsent);
       EXPECT_EQ(GetCommandState(menu, kPageAccessSubmenu),
-                CommandState::kEnabled);
-      EXPECT_EQ(GetCommandState(menu, kLearnMore), CommandState::kAbsent);
-      EXPECT_EQ(GetPageAccessCommandState(menu, kLearnMore),
                 CommandState::kEnabled);
       EXPECT_EQ(GetCommandState(menu, kPermissionsPage), CommandState::kAbsent);
       EXPECT_EQ(GetPageAccessCommandState(menu, kPermissionsPage),

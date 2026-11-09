@@ -21,15 +21,10 @@
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/template_url_service.h"
-#include "content/public/browser/page_navigator.h"
-#include "content/public/common/referrer.h"
 #include "services/preferences/tracked/pref_hash_filter.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/models/dialog_model.h"
-#include "ui/base/window_open_disposition.h"
 #include "ui/views/bubble/bubble_dialog_model_host.h"
-#include "ui/views/controls/link.h"
-#include "url/gurl.h"
 
 namespace search_engines {
 
@@ -39,14 +34,8 @@ namespace {
 const char kDefaultSearchEngineResetNotificationShown[] =
     "Search.DefaultSearchEngineResetNotificationShown";
 
-void OpenLearnMoreLink(Browser* browser, const ui::Event& event) {
-  const GURL kLearnMoreUrl(
-      "https://support.google.com/chrome?p=chrome_reset_settings");
-  browser->OpenURL(
-      content::OpenURLParams(kLearnMoreUrl, content::Referrer(),
-                             WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                             ui::PAGE_TRANSITION_LINK, false),
-      {});
+void OpenSearchEngineSettings(Browser* browser, const ui::Event& event) {
+  chrome::ShowSearchEngineSettings(browser);
 }
 
 // Checks if a default search engine reset occurred that requires the
@@ -106,7 +95,7 @@ void ShowSearchEngineResetNotification(
               IDS_DEFAULT_SEARCH_ENGINE_RESET_NOTIFICATION_BODY,
               ui::DialogModelLabel::CreateLink(
                   IDS_DEFAULT_SEARCH_ENGINE_RESET_NOTIFICATION_LEARN_MORE_BUTTON,
-                  base::BindRepeating(&OpenLearnMoreLink, browser)))
+                  base::BindRepeating(&OpenSearchEngineSettings, browser)))
               .set_is_secondary())
       .AddCancelButton(
           base::BindOnce(&chrome::ShowSearchEngineSettings, browser),

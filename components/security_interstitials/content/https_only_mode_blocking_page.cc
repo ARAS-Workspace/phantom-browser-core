@@ -25,10 +25,6 @@ const SecurityInterstitialPage::TypeID
     HttpsOnlyModeBlockingPage::kTypeForTesting =
         &HttpsOnlyModeBlockingPage::kTypeForTesting;
 
-// static
-const char HttpsOnlyModeBlockingPage::kLearnMoreLink[] =
-    "https://support.google.com/chrome?p=first_mode";
-
 HttpsOnlyModeBlockingPage::HttpsOnlyModeBlockingPage(
     content::WebContents* web_contents,
     const GURL& request_url,
@@ -99,14 +95,9 @@ void HttpsOnlyModeBlockingPage::CommandReceived(const std::string& command) {
           MetricsHelper::PROCEED);
       controller()->Proceed();
       break;
-    case security_interstitials::CMD_OPEN_HELP_CENTER: {
-      controller()->metrics_helper()->RecordUserInteraction(
-          security_interstitials::MetricsHelper::SHOW_LEARN_MORE);
-      controller()->OpenUrlInNewForegroundTab(GURL(kLearnMoreLink));
-      break;
-    }
     case security_interstitials::CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
       break;
+    case security_interstitials::CMD_OPEN_HELP_CENTER:
     case security_interstitials::CMD_DO_REPORT:
     case security_interstitials::CMD_DONT_REPORT:
     case security_interstitials::CMD_SHOW_MORE_SECTION:

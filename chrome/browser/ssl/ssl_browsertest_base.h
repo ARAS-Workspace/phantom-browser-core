@@ -22,7 +22,6 @@ class WebContents;
 
 namespace security_interstitials {
 class SecurityInterstitialPage;
-class SecurityInterstitialControllerClient;
 }  // namespace security_interstitials
 
 class SSLBlockingPage;
@@ -77,12 +76,6 @@ class SSLUITestBase : public InProcessBrowserTest,
 
   security_interstitials::SecurityInterstitialPage* GetInterstitialPage(
       content::WebContents* tab);
-
-  // Helper function for TestInterstitialLinksOpenInNewTab. Implemented as a
-  // test fixture method because the whole test fixture class is friended by
-  // SSLBlockingPage.
-  security_interstitials::SecurityInterstitialControllerClient*
-  GetControllerClientFromSSLBlockingPage(SSLBlockingPage* ssl_interstitial);
 
   net::EmbeddedTestServer https_server_;
   net::EmbeddedTestServer https_server_expired_;

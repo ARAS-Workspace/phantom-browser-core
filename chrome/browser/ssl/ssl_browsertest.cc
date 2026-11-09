@@ -3269,6 +3269,12 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestLearnMoreLinkContainsErrorCode) {
                 ->GetVisibleURL()
                 .GetRef(),
             base::NumberToString(net::ERR_CERT_DATE_INVALID));
+  EXPECT_EQ(browser()
+                ->tab_strip_model()
+                ->GetActiveWebContents()
+                ->GetVisibleURL()
+                .GetHost(),
+            "connection-help");
 }
 
 // Checks that interstitials are not used for subframe SSL errors. Regression
@@ -3351,21 +3357,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestInterstitialLinksOpenInNewTab) {
   content::TestNavigationObserver nav_observer(nullptr);
   nav_observer.StartWatchingNewWebContents();
 
-  SSLBlockingPage* ssl_interstitial =
-      static_cast<SSLBlockingPage*>(GetInterstitialPage(interstitial_tab));
-  security_interstitials::SecurityInterstitialControllerClient* client =
-      GetControllerClientFromSSLBlockingPage(ssl_interstitial);
-
-  // Mock out the help center URL so that our test will hit the test server
-  // instead of a real server.
-  // NOTE: The CMD_OPEN_HELP_CENTER code in
-  // components/security_interstitials/core/ssl_error_ui.cc ends up appending
-  // a path to whatever URL is passed to it. Since that path doesn't exist on
-  // our test server, this results in a 404. This is expected behavior, and
-  // things are still working as expected so long as the test passes!
-  const GURL mock_help_center_url = https_server_.GetURL("/title1.html");
-  client->SetBaseHelpCenterUrlForTesting(mock_help_center_url);
-
   EXPECT_EQ(1, browser()->tab_strip_model()->count());
 
   SendInterstitialCommand(interstitial_tab,
@@ -3376,8 +3367,7 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestInterstitialLinksOpenInNewTab) {
   EXPECT_EQ(2, browser()->tab_strip_model()->count());
   WebContents* new_tab = browser()->tab_strip_model()->GetActiveWebContents();
   ASSERT_TRUE(new_tab);
-  EXPECT_EQ(mock_help_center_url.GetHost(),
-            new_tab->GetLastCommittedURL().GetHost());
+  EXPECT_EQ("connection-help", new_tab->GetLastCommittedURL().GetHost());
 }
 
 // Verifies that switching tabs, while showing interstitial page, will not
@@ -5823,6 +5813,7 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, OpenHelpCenterInNewTab) {
   ASSERT_TRUE(new_tab);
   EXPECT_NE(new_tab, interstitial_tab);
   EXPECT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(new_tab));
+  EXPECT_EQ("connection-help", new_tab->GetLastCommittedURL().GetHost());
 }
 
 IN_PROC_BROWSER_TEST_F(SSLUITest, ShowCertificateViewer) {

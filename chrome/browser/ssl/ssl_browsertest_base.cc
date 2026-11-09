@@ -302,12 +302,6 @@ SSLUITestBase::GetInterstitialPage(content::WebContents* tab) {
   return helper->GetBlockingPageForCurrentlyCommittedNavigationForTesting();
 }
 
-security_interstitials::SecurityInterstitialControllerClient*
-SSLUITestBase::GetControllerClientFromSSLBlockingPage(
-    SSLBlockingPage* ssl_interstitial) {
-  return ssl_interstitial->controller();
-}
-
 network::mojom::NetworkContextParamsPtr
 SSLUITestBase::CreateDefaultNetworkContextParams() {
   return g_browser_process->system_network_context_manager()

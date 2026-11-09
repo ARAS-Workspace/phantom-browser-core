@@ -120,40 +120,8 @@ export class SuggestRequestElement extends CrLitElement {
     return PageClassification[parseInt(this.pgcl_)]!;
   }
 
-  private insertTextProtoLinks_(stringJSON: string): string {
-    // Create regex to match against strings of desired form
-    // Ex. "google:entityinfo" : "<base64 encoding>".
-    // Extract the type (groups or entity) and proto (base64 encoding).
-    const regexGroups =
-        /"(?<type>(?:google:entityinfo|google:groupsinfo|X-Client-Data))":\s"(?<proto>(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?)"/g;
-    // Replace base64 groupinfo or entityinfo encodings with links to
-    // textproto in protoshop and return final string.
-    return stringJSON.replace(
-        regexGroups, (_match, _p1, _p2, _offset, _string, groups) => {
-          let urlType = '';
-          switch (groups.type) {
-            case 'google:entityinfo':
-              urlType = 'omnibox.EntityInfo';
-              break;
-            case 'google:groupsinfo':
-              urlType = 'omnibox.GroupsInfo';
-              break;
-            case 'X-Client-Data':
-              urlType = 'webserver.gws.ClientDataHeader';
-              break;
-            default:
-              break;
-          }
-          return `"${
-              groups
-                  .type}": <a target='_blank' href=https://protoshop.corp.google.com/embed?tabs=textproto&type=${
-              urlType}&protobytes=${groups.proto}>${groups.proto}</a>`;
-        });
-  }
-
   protected getRequestDataHtml_(): TrustedHTML {
-    const htmlJSON = this.insertTextProtoLinks_(this.requestDataJson_);
-    return sanitizeInnerHtml(htmlJSON);
+    return sanitizeInnerHtml(this.requestDataJson_);
   }
 
   protected getRequestPath_(): string {
@@ -171,8 +139,7 @@ export class SuggestRequestElement extends CrLitElement {
   }
 
   protected getResponseHtml_(): TrustedHTML {
-    const htmlJSON = this.insertTextProtoLinks_(this.responseJson_);
-    return sanitizeInnerHtml(htmlJSON);
+    return sanitizeInnerHtml(this.responseJson_);
   }
 
   protected getStatusIcon_(): string {

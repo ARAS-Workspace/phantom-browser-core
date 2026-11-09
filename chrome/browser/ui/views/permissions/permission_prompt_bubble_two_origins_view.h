@@ -10,7 +10,6 @@
 #include "base/timer/timer.h"
 #include "chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.h"
 #include "components/favicon_base/favicon_types.h"
-#include "ui/views/controls/styled_label.h"
 #include "ui/views/layout/flex_layout_view.h"
 #include "ui/views/view_observer.h"
 
@@ -60,25 +59,6 @@ class PermissionPromptBubbleTwoOriginsView
       const favicon_base::FaviconRawBitmapResult& favicon_result);
   void OnRequestingOriginFaviconLoaded(
       const favicon_base::FaviconRawBitmapResult& favicon_result);
-
-  void MaybeAddLink();
-
-  /**
-   * Returns a string for the link associated with the request in
-   * |delegate|. The link is stylized via |link_range| and |link_style|.
-   */
-  std::optional<std::u16string> GetLink(
-      gfx::Range& link_range,
-      views::StyledLabel::RangeStyleInfo& link_style);
-
-  /**
-   * Returns a string for the link for a |RequestType::kStorageAccess|.
-   * The link is stylized via |link_range| and |link_style|.
-   */
-  std::u16string GetLinkStorageAccess(
-      gfx::Range& link_range,
-      views::StyledLabel::RangeStyleInfo& link_style);
-  void HelpCenterLinkClicked(const ui::Event& event);
 
   void MaybeShow();
 

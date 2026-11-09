@@ -70,7 +70,6 @@ class TestDelegateTwoOrigins : public permissions::PermissionPrompt::Delegate {
     NOTREACHED();
   }
   void FinalizeCurrentRequests() override {}
-  void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
   void SwitchToLoudPrompt() override {}
@@ -165,18 +164,4 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleTwoOriginsViewBrowserTest,
   EXPECT_PRED_FORMAT2(::testing::IsNotSubstring, "www", description);
   EXPECT_PRED_FORMAT2(::testing::IsNotSubstring, "test.requesting",
                       description);
-}
-
-IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleTwoOriginsViewBrowserTest,
-                       LinkIsPresent) {
-  TestDelegateTwoOrigins delegate(GURL("https://www.test.requesting.com"),
-                                  GURL("https://www.test.embedding.com"),
-                                  {permissions::RequestType::kStorageAccess});
-  auto bubble = CreateBubble(&delegate);
-
-  auto* label_with_link = static_cast<views::StyledLabel*>(bubble->GetViewByID(
-      permissions::PermissionPromptViewID::VIEW_ID_PERMISSION_PROMPT_LINK));
-  EXPECT_TRUE(label_with_link);
-  const auto link = base::UTF16ToUTF8(label_with_link->GetText());
-  EXPECT_PRED_FORMAT2(::testing::IsSubstring, "Learn more", link);
 }

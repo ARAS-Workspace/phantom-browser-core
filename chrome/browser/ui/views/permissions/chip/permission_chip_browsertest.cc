@@ -181,7 +181,6 @@ class MockPermissionRequestManager
   MOCK_METHOD(void, PreIgnoreQuietPrompt, (), (override));
   MOCK_METHOD(void, FinalizeCurrentRequests, (), (override));
 
-  void OpenHelpCenterLink(const ui::Event& event) override {}
   void SetManageClicked() override { requests_.clear(); }
 
   bool RecreateView() override { return false; }

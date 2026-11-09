@@ -45,14 +45,6 @@ export function getHtml(this: ExtensionsSidebarElement) {
     <cr-ripple></cr-ripple>
   </a>
 </cr-menu-selector>
-<div class="separator" ?hidden="${!this.inDevMode}"></div>
-${this.inDevMode ? html`
-  <div class="cr-nav-menu-item" id="moreExtensions">
-    <span id="promo-message-text" class="cr-secondary-text"
-        .innerHTML="${this.computeModernWebGuidancePromoText_()}">
-    </span>
-  </div>
-`: ''}
 <!--_html_template_end_-->`;
   // clang-format on
 }

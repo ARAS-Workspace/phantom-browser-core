@@ -24,7 +24,6 @@ import {getFaviconUrl} from './url_util.js';
 export interface ExtensionsHostPermissionsToggleListElement {
   $: {
     allHostsToggle: ExtensionsToggleRowElement,
-    linkIconButton: HTMLAnchorElement,
   };
 }
 
@@ -161,10 +160,6 @@ export class ExtensionsHostPermissionsToggleListElement extends
 
   protected getAllHostsToggleLabelClass_(): string {
     return this.enableEnhancedSiteControls ? 'new-all-hosts-toggle-label' : '';
-  }
-
-  protected onLearnMoreClick_() {
-    this.delegate.recordUserAction(UserAction.LEARN_MORE);
   }
 
   protected getFaviconUrl_(url: string): string {

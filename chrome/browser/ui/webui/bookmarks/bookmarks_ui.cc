@@ -90,7 +90,6 @@ content::WebUIDataSource* CreateAndAddBookmarksUIHTMLSource(Profile* profile) {
       {"menuDelete", IDS_DELETE},
       {"menuEdit", IDS_EDIT},
       {"menuExport", IDS_BOOKMARK_MANAGER_MENU_EXPORT},
-      {"menuHelpCenter", IDS_BOOKMARK_MANAGER_MENU_HELP_CENTER},
       {"menuImport", IDS_BOOKMARK_MANAGER_MENU_IMPORT},
       {"menuOpenAllNewTab", IDS_BOOKMARK_MANAGER_MENU_OPEN_ALL},
       {"menuOpenAllNewTabWithCount",

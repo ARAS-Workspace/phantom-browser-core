@@ -21,9 +21,6 @@ class WebContents;
 void LeaveSiteFromSafetyTip(content::WebContents* web_contents,
                             const GURL& safe_url);
 
-// Opens the Help Center URL when 'Learn more' button is clicked.
-void OpenHelpCenterFromSafetyTip(content::WebContents* web_contents);
-
 // Get the titles, descriptions, and button strings or IDs needed to describe
 // the applicable warning type.  Handles both Android and desktop warnings.
 // |suggested_url| is the suggested URL to navigate to, used in some strings.

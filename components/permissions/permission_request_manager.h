@@ -178,7 +178,6 @@ class PermissionRequestManager
   void Dismiss(const PromptOptions& prompt_options) override;
   void Ignore(const PromptOptions& prompt_options) override;
   void FinalizeCurrentRequests() override;
-  void OpenHelpCenterLink(const ui::Event& event) override;
   void PreIgnoreQuietPrompt() override;
   bool WasCurrentRequestAlreadyDisplayed() override;
   bool ShouldCurrentRequestUseQuietUI() const override;

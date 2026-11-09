@@ -69,9 +69,6 @@ constexpr char kDisallowChildFrameConsoleMessageFormat[] =
     "ads that interrupt, distract, mislead, or prevent user control. Learn "
     "more at https://www.chromestatus.com/feature/5738264052891648";
 
-constexpr char kLearnMoreLink[] =
-    "https://support.google.com/chrome/?p=blocked_ads";
-
 }  // namespace subresource_filter
 
 #endif  // COMPONENTS_SUBRESOURCE_FILTER_CORE_BROWSER_SUBRESOURCE_FILTER_CONSTANTS_H_

@@ -22,7 +22,6 @@ class Rect;
 }  // namespace gfx
 
 namespace views {
-class Link;
 class Widget;
 }  // namespace views
 
@@ -58,7 +57,6 @@ class SafetyTipPageInfoBubbleView : public PageInfoBubbleViewBase {
   friend class SafetyTipPageInfoBubbleViewBrowserTest;
 
   void ExecuteLeaveCommand();
-  void OpenHelpCenter();
 
   views::Button* GetLeaveButtonForTesting() { return leave_button_; }
 
@@ -74,7 +72,6 @@ class SafetyTipPageInfoBubbleView : public PageInfoBubbleViewBase {
   // applicable (for SafetyTipStatus::kLookalike).
   const GURL suggested_url_;
 
-  raw_ptr<views::Link> info_link_ = nullptr;
   raw_ptr<views::MdTextButton> leave_button_ = nullptr;
   base::OnceCallback<void(SafetyTipInteraction)> close_callback_;
   SafetyTipInteraction action_taken_ = SafetyTipInteraction::kNoAction;

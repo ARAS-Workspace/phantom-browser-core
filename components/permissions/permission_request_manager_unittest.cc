@@ -151,13 +151,6 @@ class PermissionRequestManagerTest : public content::RenderViewHostTestHarness {
     task_environment()->RunUntilIdle();
   }
 
-  void OpenHelpCenterLink() {
-    const ui::MouseEvent event(ui::EventType::kMousePressed, gfx::Point(),
-                               gfx::Point(), ui::EventTimeForNow(), 0, 0);
-    manager_->OpenHelpCenterLink(event);
-    task_environment()->RunUntilIdle();
-  }
-
   void WaitForFrameLoad() {
     // PermissionRequestManager ignores all parameters. Yay?
     manager_->DOMContentLoaded(nullptr);
@@ -625,25 +618,6 @@ TEST_F(PermissionRequestManagerTest, MixOfMediaAndNotMediaRequests) {
   EXPECT_TRUE(prompt_factory_->is_visible());
   ASSERT_LT(prompt_factory_->request_count(), 3);
   Accept();
-}
-
-TEST_F(PermissionRequestManagerTest, OpenHelpCenterLink) {
-  manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                       CreateRequest(iframe_request_camera_other_domain_));
-  WaitForBubbleToBeShown();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-
-  OpenHelpCenterLink();
-  SUCCEED();
-}
-
-TEST_F(PermissionRequestManagerTest, OpenHelpCenterLink_RequestNotSupported) {
-  manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                       CreateRequest(request1_));
-  WaitForBubbleToBeShown();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-
-  EXPECT_DEATH_IF_SUPPORTED(OpenHelpCenterLink(), "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,6 @@ import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import {I18nMixinLit} from '//resources/cr_elements/i18n_mixin_lit.js';
 import {assert} from 'chrome://resources/js/assert.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
-import {sanitizeInnerHtml} from 'chrome://resources/js/parse_html_subset.js';
 import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
@@ -57,11 +56,6 @@ export class ExtensionsMv2DeprecationPanelElement extends
        */
       headerString_: {type: String},
 
-      /**
-       * The string for the panel's subtitle.
-       */
-      subtitleString_: {type: String},
-
       webuiRoundedIconsEnabled_: {type: Boolean},
     };
   }
@@ -72,7 +66,6 @@ export class ExtensionsMv2DeprecationPanelElement extends
   protected accessor headerString_: string = '';
   protected accessor webuiRoundedIconsEnabled_: boolean =
       loadTimeData.getBoolean('webuiRoundedIconsEnabled');
-  private accessor subtitleString_: string = '';
 
   override willUpdate(changedProperties: PropertyValues<this>) {
     super.willUpdate(changedProperties);
@@ -87,18 +80,10 @@ export class ExtensionsMv2DeprecationPanelElement extends
    */
   private async onExtensionsChanged_(): Promise<void> {
     const headerVar = 'mv2DeprecationPanelDisabledHeader';
-    const subtitleVar = 'mv2DeprecationPanelDisabledSubtitle';
-    const subtitleLink = 'https://support.google.com/chrome_webstore?' +
-        'p=unsupported_extensions';
 
     this.headerString_ =
         await PluralStringProxyImpl.getInstance().getPluralString(
             headerVar, this.extensions.length);
-    const subtitle = await PluralStringProxyImpl.getInstance().getPluralString(
-        subtitleVar, this.extensions.length);
-    this.subtitleString_ = subtitle.replace('$1', subtitleLink);
-    this.subtitleString_ =
-        this.subtitleString_.replace('$2', this.i18n('opensInNewTab'));
   }
 
   /**
@@ -115,15 +100,6 @@ export class ExtensionsMv2DeprecationPanelElement extends
    */
   protected getRemoveButtonLabelFor_(extensionName: string): string {
     return this.i18n('mv2DeprecationPanelRemoveButtonAccLabel', extensionName);
-  }
-
-  /**
-   * Returns the HTML representation of the subtitle string. We need the HTML
-   * representation instead of the string since the string holds a link.
-   */
-  protected getSubtitleString_(): TrustedHTML {
-    return sanitizeInnerHtml(
-        this.subtitleString_, {attrs: ['aria-description']});
   }
 
   /**

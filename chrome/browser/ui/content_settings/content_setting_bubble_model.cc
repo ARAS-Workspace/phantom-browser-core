@@ -443,7 +443,6 @@ class ContentSettingMixedScriptBubbleModel
   void SetManageText();
 
   // ContentSettingBubbleModel:
-  void OnLearnMoreClicked() override;
   void OnCustomLinkClicked() override;
 };
 
@@ -454,14 +453,7 @@ ContentSettingMixedScriptBubbleModel::ContentSettingMixedScriptBubbleModel(
                                       page,
                                       ContentSettingsType::MIXEDSCRIPT) {
   set_custom_link_enabled(true);
-  set_show_learn_more(true);
   SetManageText();
-}
-
-void ContentSettingMixedScriptBubbleModel::OnLearnMoreClicked() {
-  if (delegate()) {
-    delegate()->ShowLearnMorePage(content_type());
-  }
 }
 
 void ContentSettingMixedScriptBubbleModel::OnCustomLinkClicked() {
@@ -1484,7 +1476,6 @@ ContentSettingSubresourceFilterBubbleModel::
   SetMessage();
   SetManageText();
   set_done_button_text(l10n_util::GetStringUTF16(IDS_OK));
-  set_show_learn_more(true);
   subresource_filter::ContentSubresourceFilterThrottleManager::LogAction(
       subresource_filter::SubresourceFilterAction::kDetailsShown);
 }
@@ -1510,13 +1501,6 @@ void ContentSettingSubresourceFilterBubbleModel::OnManageCheckboxChecked(
   set_done_button_text(
       l10n_util::GetStringUTF16(is_checked ? IDS_APP_MENU_RELOAD : IDS_OK));
   is_checked_ = is_checked;
-}
-
-void ContentSettingSubresourceFilterBubbleModel::OnLearnMoreClicked() {
-  DCHECK(delegate());
-  subresource_filter::ContentSubresourceFilterThrottleManager::LogAction(
-      subresource_filter::SubresourceFilterAction::kClickedLearnMore);
-  delegate()->ShowLearnMorePage(ContentSettingsType::ADS);
 }
 
 void ContentSettingSubresourceFilterBubbleModel::CommitChanges() {
@@ -1724,7 +1708,6 @@ ContentSettingQuietRequestBubbleModel::ContentSettingQuietRequestBubbleModel(
               : IDS_GEOLOCATION_QUIET_PERMISSION_BUBBLE_DESCRIPTION));
       set_done_button_text(l10n_util::GetStringUTF16(
           IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_ALLOW_BUTTON));
-      set_show_learn_more(false);
       base::RecordAction(
           base::UserMetricsAction("Notifications.Quiet.AnimatedIconClicked"));
       break;
@@ -1753,7 +1736,6 @@ ContentSettingQuietRequestBubbleModel::ContentSettingQuietRequestBubbleModel(
       set_message(l10n_util::GetStringUTF16(bubble_message_string_id));
       set_done_button_text(
           l10n_util::GetStringUTF16(bubble_done_button_string_id));
-      set_show_learn_more(false);
       base::RecordAction(
           base::UserMetricsAction("Notifications.Quiet.AnimatedIconClicked"));
       break;

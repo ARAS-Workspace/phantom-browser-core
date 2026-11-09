@@ -266,11 +266,11 @@ export class BookmarksCommandManagerElement extends
       case Command.SORT:
       case Command.EXPORT:
       case Command.IMPORT:
-      case Command.HELP_CENTER:
         return true;
       case Command.COPY:
       case Command.CUT:
       case Command.DESELECT_ALL:
+      case Command.HELP_CENTER:
       case Command.OPEN:
       case Command.OPEN_BOOKMARK:
       case Command.OPEN_FOLDER:
@@ -472,8 +472,6 @@ export class BookmarksCommandManagerElement extends
         chrome.bookmarkManagerPrivate.export();
         break;
       case Command.HELP_CENTER:
-        window.open('https://support.google.com/chrome/?p=bookmarks');
-        break;
       case Command.OPEN_BOOKMARK:
       case Command.OPEN_FOLDER:
       case Command.MAX_VALUE:
@@ -684,9 +682,6 @@ export class BookmarksCommandManagerElement extends
       case Command.EXPORT:
         label = 'menuExport';
         break;
-      case Command.HELP_CENTER:
-        label = 'menuHelpCenter';
-        break;
       case Command.OPEN_SPLIT_VIEW:
         label = 'menuOpenSplitView';
         break;
@@ -782,8 +777,6 @@ export class BookmarksCommandManagerElement extends
           // <hr>
           Command.IMPORT,
           Command.EXPORT,
-          // <hr>
-          Command.HELP_CENTER,
         ];
       case MenuSource.LIST:
         return [
@@ -821,7 +814,6 @@ export class BookmarksCommandManagerElement extends
     switch (command) {
       case Command.SORT:
       case Command.ADD_FOLDER:
-      case Command.EXPORT:
         return this.menuSource_ === MenuSource.TOOLBAR;
       case Command.DELETE:
         return this.globalCanEdit_;

@@ -5,7 +5,6 @@
 #include "chrome/browser/lookalikes/safety_tip_ui_helper.h"
 
 #include "build/build_config.h"
-#include "chrome/common/url_constants.h"
 #include "components/security_interstitials/core/common_string_util.h"
 #include "components/security_state/core/security_state.h"
 #include "components/strings/grit/components_strings.h"
@@ -31,15 +30,6 @@ void LeaveSiteFromSafetyTip(content::WebContents* web_contents,
       ui::PAGE_TRANSITION_AUTO_TOPLEVEL, false /* is_renderer_initiated */);
   params.should_replace_current_entry = true;
   web_contents->OpenURL(params, /*navigation_handle_callback=*/{});
-}
-
-void OpenHelpCenterFromSafetyTip(content::WebContents* web_contents) {
-  web_contents->OpenURL(
-      content::OpenURLParams(
-          GURL(chrome::kSafetyTipHelpCenterURL), content::Referrer(),
-          WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
-          false /*is_renderer_initiated*/),
-      /*navigation_handle_callback=*/{});
 }
 
 std::u16string GetSafetyTipTitle(

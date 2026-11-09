@@ -160,31 +160,6 @@ suite('HostPermissionsToggleList', function() {
     assertFalse(hostToggles[2]!.checked);
   });
 
-  // Tests that clicking the "learn more" button is logged as a user action
-  // correctly.
-  test('clicking learn more link', async function() {
-    const permissions = {
-      hostAccess: HostAccess.ON_CLICK,
-      hasAllHosts: false,
-      hosts: [
-        {host: EXAMPLE_COM, granted: false},
-      ],
-    };
-
-    element.permissions = permissions;
-    await microtasksFinished();
-
-    const learnMoreButton = element.$.linkIconButton;
-    assertTrue(!!learnMoreButton);
-    // Prevent triggering the navigation, which could interfere with tests.
-    learnMoreButton.href = '#';
-    learnMoreButton.target = '_self';
-    learnMoreButton.click();
-
-    const metricName = await delegate.whenCalled('recordUserAction');
-    assertEquals(UserAction.LEARN_MORE, metricName);
-  });
-
   // Tests that clicking the "allow on the following sites" toggle when it is in
   // the "off" state calls the delegate as expected.
   test('clicking all hosts toggle from off to on', async function() {

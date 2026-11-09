@@ -41,10 +41,6 @@ inline constexpr char kGoogleAccountDeviceActivityURL[] =
 // The URL for "Your Gemini Apps Activity" page.
 inline constexpr char16_t kMyActivityGeminiAppsUrl[] = u"";
 
-// "Learn more" URL for safety tip bubble.
-inline constexpr char kSafetyTipHelpCenterURL[] =
-    "https://support.google.com/chrome?p=safety_tip";
-
 // The URL for the "Learn more" page on sync encryption.
 inline constexpr char16_t kSyncEncryptionHelpURL[] =
     u"https://support.google.com/chrome?p=settings_encryption";

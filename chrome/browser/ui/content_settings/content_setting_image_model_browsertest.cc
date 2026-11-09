@@ -16,9 +16,7 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/subresource_filter/core/browser/subresource_filter_constants.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/test_navigation_observer.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 
 using content::WebContents;
@@ -109,25 +107,4 @@ IN_PROC_BROWSER_TEST_F(ContentSettingImageModelBrowserTest,
   browser()->tab_strip_model()->AppendWebContents(std::move(other_web_contents),
                                                   true);
   EXPECT_TRUE(model->ShouldRunAnimation(raw_other_web_contents));
-}
-
-// Tests that we go to the correct link when learn more is clicked in Ads
-// bubble.
-IN_PROC_BROWSER_TEST_F(ContentSettingImageModelBrowserTest,
-                       AdsLearnMoreLinkClicked) {
-  WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  auto model = ContentSettingImageModel::CreateForContentType(ImageType::kAds);
-  std::unique_ptr<ContentSettingBubbleModel> bubble(model->CreateBubbleModel(
-      browser()->GetFeatures().content_setting_bubble_model_delegate(),
-      web_contents));
-
-  content::TestNavigationObserver observer(nullptr);
-  observer.StartWatchingNewWebContents();
-  bubble->OnLearnMoreClicked();
-  observer.Wait();
-
-  std::string link_value(subresource_filter::kLearnMoreLink);
-  EXPECT_EQ(link_value, observer.last_navigation_url().spec());
 }

@@ -7,8 +7,6 @@
 #include "chrome/browser/infobars/confirm_infobar_creator.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/infobar.h"
-#include "components/strings/grit/components_strings.h"
-#include "ui/base/l10n/l10n_util.h"
 
 // static
 void InstallationErrorInfoBarDelegate::Create(
@@ -28,18 +26,6 @@ InstallationErrorInfoBarDelegate::~InstallationErrorInfoBarDelegate() = default;
 infobars::InfoBarDelegate::InfoBarIdentifier
 InstallationErrorInfoBarDelegate::GetIdentifier() const {
   return INSTALLATION_ERROR_INFOBAR_DELEGATE;
-}
-
-std::u16string InstallationErrorInfoBarDelegate::GetLinkText() const {
-  return error_.type() == extensions::CrxInstallErrorType::OTHER &&
-                 error_.detail() == extensions::CrxInstallErrorDetail::
-                                        OFFSTORE_INSTALL_DISALLOWED
-             ? l10n_util::GetStringUTF16(IDS_LEARN_MORE)
-             : std::u16string();
-}
-
-GURL InstallationErrorInfoBarDelegate::GetLinkURL() const {
-  return GURL("https://support.google.com/chrome_webstore/?p=crx_warning");
 }
 
 std::u16string InstallationErrorInfoBarDelegate::GetMessageText() const {

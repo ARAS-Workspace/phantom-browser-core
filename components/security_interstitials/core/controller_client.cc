@@ -16,12 +16,10 @@ namespace security_interstitials {
 const char kBoxChecked[] = "boxchecked";
 const char kDisplayCheckBox[] = "displaycheckbox";
 const char kOptInLink[] = "optInLink";
-const char kHelpCenterUrl[] = "https://support.google.com/chrome/";
 
 ControllerClient::ControllerClient(
     std::unique_ptr<MetricsHelper> metrics_helper)
-    : metrics_helper_(std::move(metrics_helper)),
-      help_center_url_(kHelpCenterUrl) {}
+    : metrics_helper_(std::move(metrics_helper)) {}
 
 ControllerClient::~ControllerClient() = default;
 
@@ -39,14 +37,6 @@ void ControllerClient::SetReportingPreference(bool report) {
 
 bool ControllerClient::HasSeenRecurrentError() {
   return false;
-}
-
-GURL ControllerClient::GetBaseHelpCenterUrl() const {
-  return help_center_url_;
-}
-
-void ControllerClient::SetBaseHelpCenterUrlForTesting(const GURL& test_url) {
-  help_center_url_ = test_url;
 }
 
 }  // namespace security_interstitials

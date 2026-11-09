@@ -42,7 +42,6 @@ class MockPermissionPromptDelegate : public PermissionPrompt::Delegate {
               (),
               (const, override));
   MOCK_METHOD(void, FinalizeCurrentRequests, (), (override));
-  MOCK_METHOD(void, OpenHelpCenterLink, (const ui::Event&), (override));
   MOCK_METHOD(void, PreIgnoreQuietPrompt, (), (override));
   MOCK_METHOD(std::optional<PermissionUiSelector::QuietUiReason>,
               ReasonForUsingQuietUi,

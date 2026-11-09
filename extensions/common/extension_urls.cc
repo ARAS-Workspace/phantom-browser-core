@@ -13,7 +13,6 @@
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/extensions_client.h"
-#include "net/base/url_util.h"
 #include "url/gurl.h"
 #include "url/origin.h"
 
@@ -31,14 +30,9 @@ namespace extension_urls {
 
 const char kChromeWebstoreBaseURL[] = "https://chrome.google.com/webstore";
 const char kNewChromeWebstoreBaseURL[] = "https://chromewebstore.google.com/";
-const char kModernWebGuidanceURL[] =
-    "https://developer.chrome.com/docs/extensions/ai/"
-    "build-with-ai#modern_web_guidance";
 const char kChromeWebstoreUpdateURL[] =
     "https://clients2.google.com/service/update2/crx";
 const char kChromeWebstoreApiURL[] = "https://chromewebstore.googleapis.com/";
-
-const char kExtensionsSidebarUtmSource[] = "ext_sidebar";
 
 GURL GetWebstoreLaunchURL() {
   extensions::ExtensionsClient* client = extensions::ExtensionsClient::Get();
@@ -47,19 +41,11 @@ GURL GetWebstoreLaunchURL() {
   return GURL(kChromeWebstoreBaseURL);
 }
 
-GURL GetModernWebGuidanceURL() {
-  return GURL(kModernWebGuidanceURL);
-}
-
 GURL GetNewWebstoreLaunchURL() {
   extensions::ExtensionsClient* client = extensions::ExtensionsClient::Get();
   if (client)
     return client->GetNewWebstoreBaseURL();
   return GURL(kNewChromeWebstoreBaseURL);
-}
-
-GURL AppendUtmSource(const GURL& url, std::string_view utm_source_value) {
-  return net::AppendQueryParameter(url, "utm_source", utm_source_value);
 }
 
 std::string GetWebstoreItemDetailURLPrefix() {

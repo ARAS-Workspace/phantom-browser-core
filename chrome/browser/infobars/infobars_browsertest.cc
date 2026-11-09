@@ -162,7 +162,6 @@ class InfoBarUiTest : public TestInfoBar,
           infobars::kCentralizedInfoBarFramework,
           {{"MigratedCollectedCookies", "true"},
            {"MigratedPageInfo", "true"},
-           {"MigratedGoogleApiKeys", "true"},
            {"MigratedObsoleteSystem", "true"}});
     } else {
       feature_list_.InitAndDisableFeature(
@@ -213,7 +212,6 @@ void InfoBarUiTest::ShowUi(const std::string& name) {
           {"installation_error", IBD::INSTALLATION_ERROR_INFOBAR_DELEGATE},
           {"bad_flags", IBD::BAD_FLAGS_INFOBAR_DELEGATE},
           {"default_browser", IBD::DEFAULT_BROWSER_INFOBAR_DELEGATE},
-          {"google_api_keys", IBD::GOOGLE_API_KEYS_INFOBAR_DELEGATE},
           {"obsolete_system", IBD::OBSOLETE_SYSTEM_INFOBAR_DELEGATE},
           {"oscryptasync_availability",
            IBD::OSCRYPTASYNC_AVAILABILITY_INFOBAR_DELEGATE},
@@ -430,10 +428,6 @@ IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_bad_flags) {
 }
 
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_default_browser) {
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_google_api_keys) {
   ShowAndVerifyUi();
 }
 

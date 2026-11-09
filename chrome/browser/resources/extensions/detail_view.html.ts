@@ -79,9 +79,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
           <span class="section-title" aria-level="2">
             ${this.getMv2DeprecationMessageHeader_()}
           </span>
-          <div class="section-content"
-              .innerHTML="${this.getMv2DeprecationMessageSubtitle_()}">
-          </div>
         </div>
         <cr-button class="remove-button" @click="${this.onRemoveButtonClick_}"
             ?hidden="${!this.shouldShowMv2DeprecationRemoveButton_()}">
@@ -283,12 +280,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
                 @change="${this.onShowAccessRequestsChange_}">
               <div id="access-toggle-and-link">
                 <span>$i18n{itemShowAccessRequestsInToolbar}</span>
-                <a class="link-icon-button"
-                    aria-label="$i18n{itemShowAccessRequestsLearnMore}"
-                    href="$i18n{showAccessRequestsInToolbarLearnMoreLink}"
-                    target="_blank">
-                  <cr-icon icon="cr:help"></cr-icon>
-                </a>
               </div>
             </extensions-toggle-row>
           ` : ''}

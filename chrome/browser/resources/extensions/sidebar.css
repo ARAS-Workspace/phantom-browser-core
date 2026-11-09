@@ -33,36 +33,3 @@
 #sectionMenu {
   padding-top: 8px;
 }
-
-.separator {
-  border-top: var(--cr-separator-line);
-  margin: 8px 0;
-}
-
-#moreExtensions {
-  align-items: center;
-  display: flex;
-  margin-bottom: 8px;
-}
-
-.cr-secondary-text {
-  line-height: 19px;
-  margin-inline-end: 10px;
-}
-
-#promo-message-text a {
-  color: var(--cr-link-color);
-}
-
-:host-context([webui-refresh-2026]) {
-  #promo-message-text a:focus {
-    border-radius: 2px;
-    outline: solid 2px var(--cr-focus-outline-color);
-  }
-}
-
-#promo-message-text {
-  overflow-wrap: anywhere;
-  hyphens: auto;
-}
-

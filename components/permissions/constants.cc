@@ -7,9 +7,6 @@
 
 namespace permissions {
 
-const char kEmbeddedContentHelpCenterURL[] =
-    "https://support.google.com/chrome/?p=embedded_content";
-
 // TODO(crbug.com/40254381): Remove the code related to unused site permissions
 // from Android builds.
 

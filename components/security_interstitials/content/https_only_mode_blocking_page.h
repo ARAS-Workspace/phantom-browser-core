@@ -28,9 +28,6 @@ class HttpsOnlyModeBlockingPage : public SecurityInterstitialPage {
 
   static const SecurityInterstitialPage::TypeID kTypeForTesting;
 
-  // URL to open when the user clicks "Learn More".
-  static const char kLearnMoreLink[];
-
   ~HttpsOnlyModeBlockingPage() override;
 
   // SecurityInterstitialPage:

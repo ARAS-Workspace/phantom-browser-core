@@ -106,7 +106,6 @@ class StubBubbleModelDelegate : public ContentSettingBubbleModelDelegate {
   }
   void ShowContentSettingsPage(ContentSettingsType type) override {}
   void ShowMediaSettingsPage() override {}
-  void ShowLearnMorePage(ContentSettingsType type) override {}
 };
 
 // SimpleWebViewDialog class ---------------------------------------------------

@@ -90,9 +90,6 @@ class ExtensionUninstallDialog : public ChromeAppIconDelegate,
       UninstallReason reason,
       UninstallSource source);
 
-  // Returns true if a checkbox should be shown in the dialog.
-  bool ShouldShowCheckbox() const;
-
   // Called when the dialog is closing to do any book-keeping.
   void OnDialogClosed(CloseAction action);
 
@@ -120,10 +117,6 @@ class ExtensionUninstallDialog : public ChromeAppIconDelegate,
   // Uninstalls the extension. Returns true on success, and populates `error` on
   // failure.
   bool Uninstall(std::u16string* error);
-
-  // Handles the "report abuse" checkbox being checked at the close of the
-  // dialog.
-  void HandleReportAbuse();
 
   // ChromeAppIconDelegate:
   void OnIconUpdated(ChromeAppIcon* icon) override;
@@ -166,9 +159,6 @@ class ExtensionUninstallDialog : public ChromeAppIconDelegate,
 
   // Indicates that dialog was shown.
   bool dialog_shown_ = false;
-
-  // True if a checkbox for reporting abuse is shown.
-  bool show_report_abuse_checkbox_ = false;
 
   // Whether the extension was uninstalled before the user closed the dialog
   // (e.g. by another source).

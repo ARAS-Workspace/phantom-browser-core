@@ -42,7 +42,6 @@
 #include "ui/gfx/vector_icon_types.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/controls/button/image_button.h"
-#include "ui/views/controls/button/image_button_factory.h"
 #include "ui/views/controls/button/radio_button.h"
 #include "ui/views/controls/image_view.h"
 #include "ui/views/controls/label.h"
@@ -591,21 +590,6 @@ ContentSettingBubbleContents::CreateHelpAndManageView() {
   const auto& bubble_content = content_setting_bubble_model_->bubble_content();
   const auto* layout = ChromeLayoutProvider::Get();
   std::vector<std::unique_ptr<views::View>> extra_views;
-  // Optionally add a help icon if the view wants to link to a help page.
-  if (bubble_content.show_learn_more) {
-    auto learn_more_button = views::CreateVectorImageButtonWithNativeTheme(
-        base::BindRepeating(
-            [](ContentSettingBubbleContents* bubble) {
-              bubble->GetWidget()->Close();
-              bubble->content_setting_bubble_model_->OnLearnMoreClicked();
-            },
-            base::Unretained(this)),
-        features::IsRoundedIconsEnabled() ? vector_icons::kHelpIcon
-                                          : vector_icons::kHelpOutlineOldIcon);
-    learn_more_button->SetTooltipText(
-        l10n_util::GetStringUTF16(IDS_LEARN_MORE));
-    extra_views.push_back(std::move(learn_more_button));
-  }
   // Optionally add a "Manage" button if the view wants to use a button to
   // invoke a separate management UI related to the dialog content.
   if (ShouldShowManageButton(bubble_content)) {

@@ -102,6 +102,10 @@ function setupEvents() {
     body.classList.add('insecure-form');
   } else if (httpsOnly) {
     body.classList.add('https-only');
+    const httpsOnlyLearnMoreLink = document.querySelector('#learn-more-link');
+    if (httpsOnlyLearnMoreLink) {
+      httpsOnlyLearnMoreLink.remove();
+    }
     if (loadTimeData.valueExists('august2024Refresh') &&
         loadTimeData.getBoolean('august2024Refresh')) {
       body.classList.add('https-only-august2024-refresh');
