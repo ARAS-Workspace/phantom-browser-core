@@ -6479,19 +6479,6 @@ void ChromeContentBrowserClient::ShowCaptionSettings(
   // Mac caption styles come from the OS settings. Open the native dialog to
   // allow users to change them.
   captions::CaptionSettingsDialog::ShowCaptionSettingsDialog();
-#else
-  // Other platforms have no native dialog, so navigate to the Chrome
-  // caption settings page.
-  content::WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(rfh);
-  if (!web_contents) {
-    return;
-  }
-  content::OpenURLParams params(
-      GURL(captions::GetCaptionSettingsUrl()), content::Referrer(),
-      WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
-      /*is_renderer_initiated=*/false);
-  web_contents->OpenURL(params, /*navigation_handle_callback=*/{});
 #endif
 }
 

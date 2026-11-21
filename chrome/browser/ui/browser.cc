@@ -144,6 +144,7 @@
 #include "content/public/browser/invalidate_type.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_view_host.h"
+#include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/ssl_status.h"
 #include "content/public/browser/web_exposed_isolation_level.h"
 #include "content/public/common/child_process_id.h"

@@ -76,7 +76,11 @@ ChromeComponentExtensionResourceManager::Data::Data() {
 
   };
 
+#if BUILDFLAG(IS_MAC)
+  // The generated array has entries only on macOS; on Linux it is a
+  // zero-length array, which base::span does not accept.
   AddComponentResourceEntries(kComponentExtensionResources);
+#endif
   AddComponentResourceEntries(kExtraComponentExtensionResources);
 
 #if BUILDFLAG(ENABLE_PDF)
