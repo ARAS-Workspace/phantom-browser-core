@@ -87,10 +87,6 @@ if (enable_extensions) {
     schema_sources_ += [ "web_authentication_proxy.webidl" ]
   }
 
-  if (is_linux) {
-    schema_sources_ += [ "input_ime.json" ]
-  }
-
   if (enable_pdf) {
     schema_sources_ += [ "pdf_viewer_private.idl" ]
   }
