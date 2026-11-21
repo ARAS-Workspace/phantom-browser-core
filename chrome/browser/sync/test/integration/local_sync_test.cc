@@ -112,10 +112,6 @@ IN_PROC_BROWSER_TEST_F(LocalSyncTest, ShouldStart) {
 
   expected_active_data_types.Put(syncer::AUTOFILL_WALLET_CREDENTIAL);
 
-  // The dictionary is currently only synced on Linux.
-#if BUILDFLAG(IS_LINUX)
-  expected_active_data_types.Put(syncer::DICTIONARY);
-#endif
   EXPECT_EQ(service->GetActiveDataTypes(), expected_active_data_types);
 
   // Verify certain features are disabled.

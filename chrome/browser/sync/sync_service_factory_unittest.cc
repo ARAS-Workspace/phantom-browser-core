@@ -103,10 +103,6 @@ class SyncServiceFactoryTest : public testing::Test {
 
     datatypes.Put(syncer::SAVED_TAB_GROUP);
 
-#if BUILDFLAG(IS_LINUX)
-    datatypes.Put(syncer::DICTIONARY);
-#endif
-
     // Common types.
     datatypes.Put(syncer::AUTOFILL);
     datatypes.Put(syncer::AUTOFILL_PROFILE);

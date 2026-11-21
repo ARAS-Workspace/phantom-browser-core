@@ -1042,12 +1042,5 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
     allowed_types.Put(syncer::THEMES);
   }
 
-#if BUILDFLAG(IS_LINUX)
-  if (base::FeatureList::IsEnabled(
-          syncer::kSpellcheckSeparateLocalAndAccountDictionaries)) {
-    allowed_types.Put(syncer::DICTIONARY);
-  }
-#endif  // BUILDFLAG(IS_LINUX)
-
   return allowed_types;
 }
