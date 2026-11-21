@@ -660,7 +660,7 @@ TEST(TextEliderTest, FormatUrlForDisplayOmitSchemePathAndTrivialSubdomains) {
       url_formatter::FormatUrlForDisplayOmitSchemePathAndTrivialSubdomains(
           GURL("http://user:pass@google.com/path")));
   EXPECT_EQ(
-      u"chrome://version",
+      u"phantom://version",
       url_formatter::FormatUrlForDisplayOmitSchemePathAndTrivialSubdomains(
           GURL("chrome://version")));
   EXPECT_EQ(

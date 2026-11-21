@@ -23,11 +23,15 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/open_from_clipboard/fake_clipboard_recent_content.h"
 #include "components/search_engines/search_engines_test_environment.h"
+#include "components/search_engines/template_url.h"
+#include "components/search_engines/template_url_data_util.h"
+#include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_service_client.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_focus_type.pb.h"
 #include "third_party/omnibox_proto/groups.pb.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 #include "ui/gfx/image/image.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_unittest_util.h"
@@ -121,6 +125,18 @@ class ClipboardProviderTest : public testing::Test,
 
   void MatchesImageCallback(std::optional<AutocompleteMatch> match) {
     matches_image_match_ = match;
+  }
+
+  // The fallback default search provider is DuckDuckGo; add Google and make
+  // it the user selected default search provider.
+  void SelectGoogleAsDefaultSearchProvider() {
+    TemplateURLService* service =
+        search_engines_test_environment_.template_url_service();
+    TemplateURL* google_provider = service->Add(
+        std::make_unique<TemplateURL>(*TemplateURLDataFromPrepopulatedEngine(
+            TemplateURLPrepopulateData::google)));
+    ASSERT_TRUE(google_provider);
+    service->SetUserSelectedDefaultSearchProvider(google_provider);
   }
 
  protected:
@@ -225,6 +241,7 @@ TEST_F(ClipboardProviderTest, CreateBlankImageMatchOnStart) {
   client_->set_template_url_service(
       search_engines_test_environment_.template_url_service());
 
+  SelectGoogleAsDefaultSearchProvider();
   gfx::Image test_image = gfx::test::CreateImage(/*width=*/10, /*height=*/10);
   SetClipboardImage(test_image);
   provider_->Start(
@@ -371,6 +388,7 @@ TEST_F(ClipboardProviderTest, CreateTextMatchWithContent) {
 }
 
 TEST_F(ClipboardProviderTest, CreateImageMatchWithContent) {
+  SelectGoogleAsDefaultSearchProvider();
   {
     SCOPED_TRACE("Copy Image");
     gfx::Image test_image = gfx::test::CreateImage(/*width=*/10, /*height=*/10);

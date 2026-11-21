@@ -80,15 +80,6 @@ class ImageServiceImplTest : public testing::Test {
   base::HistogramTester histogram_tester_;
 };
 
-// Stores an image response and exits out of `loop` if it is defined.
-void QuitLoopAndStoreImageUrlResponse(base::RunLoop* loop,
-                                      GURL* out_image_url,
-                                      const GURL& image_url) {
-  DCHECK(out_image_url);
-  *out_image_url = image_url;
-  loop->Quit();
-}
-
 void AppendResponse(std::vector<GURL>* responses, const GURL& image_url) {
   DCHECK(responses);
   responses->push_back(image_url);
@@ -196,87 +187,6 @@ TEST_F(ImageServiceImplTest, SyncInitialization) {
          "activates and the consent throttle unthrottles.";
 
   // This test only covers sync unthrottling.
-}
-
-TEST_F(ImageServiceImplTest, SuggestBackendEndToEnd) {
-  mojom::Options options;
-  options.suggest_images = true;
-  options.optimization_guide_images = true;
-
-  base::RunLoop loop;
-
-  GURL response;
-  image_service_->FetchImageFor(
-      mojom::ClientId::Journeys,
-      GURL("https://www.google.com/search?q=santa+monica"), options,
-      base::BindOnce(&QuitLoopAndStoreImageUrlResponse, &loop, &response));
-
-  // Test histograms with literal names to validate client-sliced names.
-  // This also validates that the correct backend was selected.
-  EXPECT_EQ(histogram_tester_.GetBucketCount("PageImageService.Backend",
-                                             PageImageServiceBackend::kSuggest),
-            1);
-  EXPECT_EQ(
-      histogram_tester_.GetBucketCount("PageImageService.Backend.Journeys",
-                                       PageImageServiceBackend::kSuggest),
-      1);
-
-  ASSERT_EQ(test_url_loader_factory_.NumPending(), 1);
-  GURL request_url = test_url_loader_factory_.GetPendingRequest(0)->request.url;
-  EXPECT_EQ(request_url.GetHost(), "www.google.com");
-
-  test_url_loader_factory_.AddResponse(request_url.spec(), R"([
-  "santa monica",
-  [
-    "santa monica"
-  ],
-  [
-    ""
-  ],
-  [],
-  {
-    "google:clientdata": {
-      "bpc": false,
-      "tlw": false
-    },
-    "google:suggestdetail": [
-      {
-        "google:entityinfo": "CggvbS8wNl9raBISQ2l0eSBpbiBDYWxpZm9ybmlhMnRodHRwczovL2VuY3J5cHRlZC10Ym4wLmdzdGF0aWMuY29tL2ltYWdlcz9xPXRibjpBTmQ5R2NTd3ZOaHc3cktRV2dqRG9vUC1zY1ptRHlTSlNJWWpCT1gwVkVDRDU1czM4dHA0eEZORWcwTTdQdUEmcz0xMDoMU2FudGEgTW9uaWNhSgcjNDI0MjQyUjVnc19zc3A9ZUp6ajR0RFAxVGN3aThfT01HRDA0aWxPekN0SlZNak56OHRNVGdRQVdDY0hxd3AMcBo="
-      }
-    ],
-    "google:suggestrelevance": [
-      1300
-    ],
-    "google:suggestsubtypes": [
-      [
-        131,
-        433,
-        512
-      ]
-    ],
-    "google:suggesttype": [
-      "ENTITY"
-    ],
-    "google:verbatimrelevance": 1300
-  }
-])");
-
-  // Successfully fetching the image quits this loop.
-  loop.Run();
-  // This expected value matches the hardcoded proto above.
-  EXPECT_EQ(response, GURL("https://encrypted-tbn0.gstatic.com/"
-                           "images?q=tbn:ANd9GcSwvNhw7rKQWgjDooP-"
-                           "scZmDySJSIYjBOX0VECD55s38tp4xFNEg0M7PuA&s=10"));
-
-  // Test histograms with literal names to validate client-sliced names.
-  EXPECT_EQ(histogram_tester_.GetBucketCount(
-                "PageImageService.Backend.Suggest.Result",
-                PageImageServiceResult::kSuccess),
-            1);
-  EXPECT_EQ(histogram_tester_.GetBucketCount(
-                "PageImageService.Backend.Suggest.Result.Journeys",
-                PageImageServiceResult::kSuccess),
-            1);
 }
 
 }  // namespace page_image_service

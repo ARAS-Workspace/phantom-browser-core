@@ -212,7 +212,7 @@ TEST_F(TabGroupProviderTest, TestFilterChromePrefixedTabs) {
   ASSERT_TRUE(
       tab_group_provider().matches()[0].matching_tab_group_uuid.has_value());
   ASSERT_EQ("0", tab_group_provider().matches()[0].image_dominant_color);
-  ASSERT_EQ(u"chrome://newtab, google.com/saved_2",
+  ASSERT_EQ(u"phantom://newtab, google.com/saved_2",
             tab_group_provider().matches()[0].description);
 }
 
@@ -235,7 +235,7 @@ TEST_F(TabGroupProviderTest, TestFilterChromePrefixedTabsNoDescription) {
   ASSERT_TRUE(
       tab_group_provider().matches()[0].matching_tab_group_uuid.has_value());
   ASSERT_EQ("0", tab_group_provider().matches()[0].image_dominant_color);
-  ASSERT_EQ(u"chrome://newtab", tab_group_provider().matches()[0].description);
+  ASSERT_EQ(u"phantom://newtab", tab_group_provider().matches()[0].description);
 }
 
 TEST_F(TabGroupProviderTest, TestNoMatchResultsOnChromePrefixedUrlMatch) {

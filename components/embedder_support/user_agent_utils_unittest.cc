@@ -327,9 +327,8 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   const std::string full_version(version_info::GetVersionNumber());
 
   // According to spec, Sec-CH-UA should contain what project the browser is
-  // based on (i.e. Chromium in this case) as well as the actual product.
-  // In CHROMIUM_BRANDING builds this will check chromium twice. That should be
-  // ok though.
+  // based on (i.e. Chromium in this case). Phantom Browser keeps its own
+  // product name out of the brand lists.
 
   const blink::UserAgentBrandVersion chromium_brand_version = {"Chromium",
                                                                major_version};
@@ -338,7 +337,7 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
 
   EXPECT_TRUE(ContainsBrandVersion(metadata.brand_version_list,
                                    chromium_brand_version));
-  EXPECT_TRUE(
+  EXPECT_FALSE(
       ContainsBrandVersion(metadata.brand_version_list, product_brand_version));
 
   // verify full version list
@@ -349,8 +348,8 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
 
   EXPECT_TRUE(ContainsBrandVersion(metadata.brand_full_version_list,
                                    chromium_brand_full_version));
-  EXPECT_TRUE(ContainsBrandVersion(metadata.brand_full_version_list,
-                                   product_brand_full_version));
+  EXPECT_FALSE(ContainsBrandVersion(metadata.brand_full_version_list,
+                                    product_brand_full_version));
   EXPECT_EQ(metadata.full_version, full_version);
 
 #if BUILDFLAG(IS_LINUX)
@@ -391,7 +390,7 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   metadata = GetUserAgentMetadata(true);
   EXPECT_TRUE(ContainsBrandVersion(metadata.brand_version_list,
                                    chromium_brand_version));
-  EXPECT_TRUE(
+  EXPECT_FALSE(
       ContainsBrandVersion(metadata.brand_version_list, product_brand_version));
   // High entropy should be empty.
   EXPECT_TRUE(metadata.brand_full_version_list.empty());

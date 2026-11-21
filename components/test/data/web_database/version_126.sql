@@ -35,5 +35,4 @@ CREATE INDEX autofill_name ON autofill(name);
 CREATE INDEX autofill_name_value_lower ON autofill(name, value_lower);
 CREATE TABLE benefit_merchant_domains(benefit_id VARCHAR NOT NULL,merchant_domain VARCHAR NOT NULL);
 CREATE TABLE masked_credit_card_benefits(benefit_id VARCHAR PRIMARY KEY NOT NULL,instrument_id INTEGER NOT NULL DEFAULT 0,benefit_type INTEGER NOT NULL DEFAULT 0,benefit_category INTEGER NOT NULL DEFAULT 0,benefit_description VARCHAR NOT NULL,start_time INTEGER,end_time INTEGER);
-CREATE TABLE plus_addresses (facet VARCHAR PRIMARY KEY, plus_address VARCHAR);
 COMMIT;

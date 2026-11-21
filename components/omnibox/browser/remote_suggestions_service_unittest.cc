@@ -23,6 +23,7 @@
 #include "base/types/optional_ref.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/search_engines/search_engines_test_environment.h"
+#include "components/search_engines/template_url_data_util.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/variations/scoped_variations_ids_provider.h"
 #include "net/base/load_flags.h"
@@ -35,6 +36,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
+#include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
 namespace {
 
@@ -160,6 +162,17 @@ class RemoteSuggestionsServiceTest : public testing::Test {
     return *search_engines_test_environment_.template_url_service();
   }
 
+  // The fallback default search provider is DuckDuckGo; add Google and make
+  // it the user selected default search provider.
+  void SelectGoogleAsDefaultSearchProvider() {
+    TemplateURL* google_provider = template_url_service().Add(
+        std::make_unique<TemplateURL>(*TemplateURLDataFromPrepopulatedEngine(
+            TemplateURLPrepopulateData::google)));
+    ASSERT_TRUE(google_provider);
+    template_url_service().SetUserSelectedDefaultSearchProvider(
+        google_provider);
+  }
+
   std::string response_body() { return response_body_; }
 
  protected:
@@ -182,6 +195,7 @@ TEST_F(RemoteSuggestionsServiceTest, AttachCookies_ZeroPrefixSuggest) {
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
+  SelectGoogleAsDefaultSearchProvider();
   TemplateURLRef::SearchTermsArgs search_terms_args;
   search_terms_args.current_page_url = "https://www.google.com/";
   auto loader = service.StartZeroPrefixSuggestionsRequest(
@@ -211,6 +225,7 @@ TEST_F(RemoteSuggestionsServiceTest, AttachCookies_Suggest) {
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
+  SelectGoogleAsDefaultSearchProvider();
   TemplateURLRef::SearchTermsArgs search_terms_args;
   search_terms_args.current_page_url = "https://www.google.com/";
   auto loader = service.StartSuggestionsRequest(
@@ -260,6 +275,7 @@ TEST_F(RemoteSuggestionsServiceTest, BypassCache) {
       /*enterprise_search_aggregator_suggestions_service_*/ nullptr,
       GetUrlLoaderFactory());
 
+  SelectGoogleAsDefaultSearchProvider();
   TemplateURLRef::SearchTermsArgs search_terms_args;
   search_terms_args.current_page_url = "https://www.google.com/";
   search_terms_args.bypass_cache = true;

@@ -158,8 +158,10 @@ TEST_F(OriginIsolationForJsOptExceptionsTest,
 
 TEST_F(OriginIsolationForJsOptExceptionsTest, ReturnsTrueWhenFeatureEnabled) {
   base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      site_isolation::features::kOriginIsolationForJsOptExceptions);
+  feature_list.InitWithFeatures(
+      {site_isolation::features::kOriginIsolationForJsOptExceptions},
+      {::features::kStrictOriginIsolation,
+       ::features::kOriginKeyedProcessesByDefault});
   EXPECT_TRUE(
       SiteIsolationPolicy::IsOriginIsolationForJsOptExceptionsEnabled(nullptr));
 }
