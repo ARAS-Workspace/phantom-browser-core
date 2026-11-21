@@ -668,14 +668,10 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        // create(): Security key hint should show security key UI.
        {L, mc, {usb, internal, cable}, {rk, hint_sk},
         {t(internal), t(usb)}, usb_ui},
-       // But not if USB isn't a valid transport.
-       {L, mc, {internal, cable}, {rk, hint_sk}, {t(internal)},
 #if BUILDFLAG(IS_MAC)
-         create_pk,
-#else
-         qr,
+       // But not if USB isn't a valid transport.
+       {L, mc, {internal, cable}, {rk, hint_sk}, {t(internal)}, create_pk},
 #endif
-       },
        // If webauthn.dll is present, jump to it.
        {L, mc, {cable}, {has_winapi, rk, hint_sk}, {winapi}, plat_ui},
 

@@ -275,20 +275,6 @@ const ProfileMenuViewPixelTestParam kPixelTestParams[] = {
             {{syncer::kReplaceSyncPromosWithSignInPromos, {}}},
     },
     {
-        .pixel_test_param = {.test_suffix = "AvatarSyncPromo"},
-        .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
-        // `switches::kAvatarButtonSyncPromoForTesting` and
-        // `syncer::kReplaceSyncPromosWithSignInPromos` are not compatible and
-        // cannot be activated at the same time, as
-        // `syncer::kReplaceSyncPromosWithSignInPromos` would override the
-        // behavior. Explicitly disable in this case.
-        .extra_features_and_params =
-            {{switches::kAvatarButtonSyncPromoForTesting, {}}},
-        .disabled_features =
-            {syncer::kReplaceSyncPromosWithSignInPromos,
-             syncer::kReplaceSyncPromosWithSigninPromosNewSignin},
-    },
-    {
         .pixel_test_param = {.test_suffix = "SignedIn_HistorySyncEnabled"},
         .signin_status = SigninStatusPixelTestParam::kSignedInWithHistorySync,
     },
@@ -332,15 +318,8 @@ class ProfileMenuViewPixelTest
  public:
   ProfileMenuViewPixelTest()
       : ProfilesPixelTestBaseT<DialogBrowserTest>(GetParam().pixel_test_param) {
-    // 1. Get default-disabled features.
-    // Disabled by default but may be overridden by `extra_features_and_params`.
-    base::flat_set<base::test::FeatureRef> disabled_features_set = {
-        // This feature is disabled by default as it is not compatible with
-        // `syncer::kReplaceSyncPromosWithSignInPromos` (enabled by default in
-        // the test suite). If this feature needs to be enabled, then
-        // `syncer::kReplaceSyncPromosWithSignInPromos` should explicitly be
-        // disabled as well.
-        switches::kAvatarButtonSyncPromoForTesting};
+    // 1. Start with no default-disabled features.
+    base::flat_set<base::test::FeatureRef> disabled_features_set;
 
     // 2. Remove params-enabled features from the default-disabled set.
     for (const auto& [feature, _] : GetParam().extra_features_and_params) {
