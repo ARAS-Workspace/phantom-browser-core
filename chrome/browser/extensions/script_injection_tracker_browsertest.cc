@@ -13,6 +13,7 @@
 #include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
+#include "base/test/scoped_feature_list.h"
 #include "build/buildflag.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
@@ -117,7 +118,13 @@ void ExecuteProgrammaticContentScript(content::WebContents* web_contents,
 // //extensions/browser/content_script_matching_browsertest.cc.
 class ScriptInjectionTrackerBrowserTest : public ExtensionBrowserTest {
  public:
-  ScriptInjectionTrackerBrowserTest() = default;
+  ScriptInjectionTrackerBrowserTest() {
+    // Phantom turns on origin-keyed processes and strict origin isolation by
+    // default; these tests expect same-site frames to share a process.
+    isolation_feature_list_.InitWithFeatures(
+        {}, {features::kOriginKeyedProcessesByDefault,
+             features::kStrictOriginIsolation});
+  }
 
   void SetUpOnMainThread() override {
     ExtensionBrowserTest::SetUpOnMainThread();
@@ -196,6 +203,9 @@ class ScriptInjectionTrackerBrowserTest : public ExtensionBrowserTest {
 
     return child_frame;
   }
+
+ private:
+  base::test::ScopedFeatureList isolation_feature_list_;
 };
 
 // Helper class for executing a content script right before handling a DidCommit

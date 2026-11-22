@@ -195,6 +195,9 @@ class OriginAgentClusterBrowserTest : public InProcessBrowserTest {
     } else {
       disabled_features.push_back(features::kOriginKeyedProcessesByDefault);
     }
+    // Phantom turns on strict origin isolation by default; these tests count
+    // processes under site isolation.
+    disabled_features.push_back(features::kStrictOriginIsolation);
 
     feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }

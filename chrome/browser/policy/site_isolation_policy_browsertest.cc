@@ -272,7 +272,8 @@ class OriginKeyedProcessesEnabledPolicyBrowserTest
       // enabled.
       scoped_feature_list_.InitWithFeaturesAndParameters(
           {/*enabled_features*/},
-          {/*disabled_features=*/features::kOriginKeyedProcessesByDefault});
+          {/*disabled_features=*/features::kOriginKeyedProcessesByDefault,
+           features::kStrictOriginIsolation});
     } else {
       // Without user override, set the memory threshold to a high value that
       // would not be reached, normally causing the feature to remain disabled.

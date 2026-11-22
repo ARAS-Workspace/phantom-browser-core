@@ -759,7 +759,8 @@ IN_PROC_BROWSER_TEST_F(ChromeNavigationBrowserTest,
   // and process selection should still honor the initiator, rather than end up
   // in an unlocked process and an unassigned SiteInstance.  See
   // https://crbug.com/40261555.
-  EXPECT_EQ("http://a.com/", web_contents->GetPrimaryMainFrame()
+  // Phantom isolates by origin, so the site URL keeps the port.
+  EXPECT_EQ(url.GetWithEmptyPath(), web_contents->GetPrimaryMainFrame()
                                  ->GetSiteInstance()
                                  ->GetSecurityPrincipal()
                                  .GetDeprecatedSiteURL());

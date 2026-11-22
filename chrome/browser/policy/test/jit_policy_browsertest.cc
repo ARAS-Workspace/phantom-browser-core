@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include "base/test/scoped_feature_list.h"
 #include "base/values.h"
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/ui/browser.h"
@@ -14,6 +15,7 @@
 #include "components/policy/policy_constants.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
+#include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_utils.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -36,7 +38,13 @@ class JITPolicyTest
     : public PolicyTest,
       public testing::WithParamInterface<DefaultJitPolicyVariants> {
  public:
-  JITPolicyTest() = default;
+  JITPolicyTest() {
+    // Phantom turns on origin-keyed processes and strict origin isolation by
+    // default; the JIT policy tests expect site-keyed processes.
+    isolation_feature_list_.InitWithFeatures(
+        {}, {features::kOriginKeyedProcessesByDefault,
+             features::kStrictOriginIsolation});
+  }
   ~JITPolicyTest() override = default;
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -71,6 +79,9 @@ class JITPolicyTest
                                         const char* url_value,
                                         bool expect_jit_disabled);
   bool DetermineExpectedResultForDefault();
+
+ private:
+  base::test::ScopedFeatureList isolation_feature_list_;
 };
 
 void JITPolicyTest::AddDefaultPolicy(PolicyMap* policies) {

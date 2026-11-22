@@ -101,8 +101,9 @@ class JavascriptOptimizerBrowserTest_NoOriginKeyedProcessesByDefault
     : public JavascriptOptimizerBrowserTest {
  public:
   JavascriptOptimizerBrowserTest_NoOriginKeyedProcessesByDefault() {
-    feature_list_.InitAndDisableFeature(
-        features::kOriginKeyedProcessesByDefault);
+    // Phantom also turns on strict origin isolation by default.
+    feature_list_.InitWithFeatures({}, {features::kOriginKeyedProcessesByDefault,
+                                        features::kStrictOriginIsolation});
   }
 
  private:
