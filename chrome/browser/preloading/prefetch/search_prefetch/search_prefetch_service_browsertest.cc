@@ -3317,6 +3317,10 @@ class GooglePFTest : public InProcessBrowserTest {
     ASSERT_TRUE(model);
     search_test_utils::WaitForTemplateURLServiceToLoad(model);
     ASSERT_TRUE(model->loaded());
+    // Phantom defaults to DuckDuckGo; these tests read the Google template.
+    TemplateURL* google = model->GetTemplateURLForKeyword(u"google.com");
+    ASSERT_TRUE(google);
+    model->SetUserSelectedDefaultSearchProvider(google);
   }
 };
 

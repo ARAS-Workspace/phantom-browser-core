@@ -38,6 +38,7 @@
 namespace {
 
 using ::TemplateURLPrepopulateData::bing;
+using ::TemplateURLPrepopulateData::duckduckgo;
 using ::TemplateURLPrepopulateData::google;
 using ::TemplateURLPrepopulateData::PrepopulatedEngine;
 using ::testing::ElementsAreArray;
@@ -101,12 +102,15 @@ using RegionalAndNonRegionalEngines =
     std::pair<std::vector<raw_ptr<const PrepopulatedEngine>>,
               std::vector<raw_ptr<const PrepopulatedEngine>>>;
 
+// Phantom takes DuckDuckGo from the regional list as the default search
+// engine; each regional list below starts with it.
+
 // Sample set of prepopulated engines. This version is the basic,
 // pre-migration one: android search in the current region, and chrome and
 // android codesearch are known variants that are assumed to be used in
 // different regions.
 RegionalAndNonRegionalEngines android_region_engines = {
-    {&google, &bing, &android_codesearch},
+    {&duckduckgo, &google, &bing, &android_codesearch},
     {&chromium_codesearch, &chrome_codesearch},
 };
 
@@ -114,7 +118,7 @@ RegionalAndNonRegionalEngines android_region_engines = {
 // Android codesearch is still in the current region, but we are indicating that
 // we are migrating it to a new standalone entry with its own ID.
 RegionalAndNonRegionalEngines android_migrated_region_engines = {
-    {&google, &bing, &android_codesearch_migrating},
+    {&duckduckgo, &google, &bing, &android_codesearch_migrating},
     {&chromium_codesearch, &android_codesearch_next, &chrome_codesearch},
 };
 
@@ -124,12 +128,12 @@ RegionalAndNonRegionalEngines android_migrated_region_engines = {
 // URL is not matching the value from the migrated engine.
 // This is the set with Chrome codesearch being the relevant regional variant.
 RegionalAndNonRegionalEngines chrome_region_engines = {
-    {&google, &bing, &chrome_codesearch},
+    {&duckduckgo, &google, &bing, &chrome_codesearch},
     {&chromium_codesearch, &android_codesearch},
 };
 
 RegionalAndNonRegionalEngines chrome_migrated_region_engines = {
-    {&google, &bing, &chrome_codesearch},
+    {&duckduckgo, &google, &bing, &chrome_codesearch},
     {&chromium_codesearch, &android_codesearch_migrating,
      &android_codesearch_next},
 };
@@ -364,7 +368,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest, PRE_NonDse) {
   ASSERT_EQ(active_engines_config_, android_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -373,7 +378,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest, NonDse) {
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations{
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -388,6 +394,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest, PRE_Dse) {
       template_url_service().GetTemplateURLForKeyword(android_keyword));
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_keyword, true}};
@@ -405,6 +412,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest, Dse) {
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations{
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, true}};
@@ -438,7 +446,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest,
                                           android_codesearch.search_url);
 
   std::vector<SearchProviderSummary> expectations = {
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, custom_keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -447,7 +456,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesMigrationBrowserTest, UserModified) {
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations{
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, custom_keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -483,7 +493,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
   ASSERT_EQ(active_engines_config_, android_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_codesearch.keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -493,7 +504,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
   ASSERT_EQ(active_engines_config_, chrome_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, chrome_codesearch.keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -503,7 +515,8 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations{
-      {google.id, google.keyword, true},
+      {duckduckgo.id, duckduckgo.keyword, true},
+      {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, false}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
@@ -519,23 +532,25 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
       template_url_service().GetTemplateURLForKeyword(android_keyword));
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_codesearch.keyword, true}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
   EXPECT_EQ(GetSearchProviderFromPrefs(
                 DefaultSearchManager::kDefaultSearchProviderDataPrefName),
-            expectations[2]);
+            expectations[3]);
   EXPECT_EQ(
       GetSearchProviderFromPrefs(
           DefaultSearchManager::kMirroredDefaultSearchProviderDataPrefName),
-      expectations[2]);
+      expectations[3]);
 }
 IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
                        PRE_Dse) {
   ASSERT_EQ(active_engines_config_, chrome_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, chrome_codesearch.keyword, true}};
@@ -557,6 +572,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionMigrationBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations{
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, true}};
@@ -605,23 +621,25 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionNoMigrationBrowserTest,
           chrome_codesearch.keyword));
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, chrome_codesearch.keyword, true}};
   EXPECT_THAT(GetServiceSearchProviders(), ElementsAreArray(expectations));
   EXPECT_EQ(GetSearchProviderFromPrefs(
                 DefaultSearchManager::kDefaultSearchProviderDataPrefName),
-            expectations[2]);
+            expectations[3]);
   EXPECT_EQ(
       GetSearchProviderFromPrefs(
           DefaultSearchManager::kMirroredDefaultSearchProviderDataPrefName),
-      expectations[2]);
+      expectations[3]);
 }
 IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionNoMigrationBrowserTest,
                        PRE_Dse) {
   ASSERT_EQ(active_engines_config_, android_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_codesearch.keyword, true}};
@@ -643,6 +661,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesCrossRegionNoMigrationBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations;
+  expectations.push_back({duckduckgo.id, duckduckgo.keyword, false});
   expectations.push_back({google.id, google.keyword, false});
   expectations.push_back({bing.id, bing.keyword, false});
   if (IsParamFeatureEnabled()) {
@@ -734,6 +753,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
       template_url_service().GetTemplateURLForKeyword(android_keyword));
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, android_keyword, true, android_codesearch.search_url}};
@@ -759,6 +779,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, chrome_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, chrome_codesearch.keyword, true,
@@ -782,6 +803,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, true,
@@ -803,6 +825,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, true,
@@ -826,6 +849,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, chrome_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
   };
@@ -864,6 +888,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, android_keyword, true,
@@ -900,6 +925,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
       u"Searchy Search", custom_keyword, android_codesearch.search_url);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {generic_id, custom_keyword, true, android_codesearch.search_url,
@@ -925,6 +951,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, chrome_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       // Since the keyword was changed, the entry is not `safe_for_autoreplace`
@@ -952,6 +979,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, custom_keyword, true,
@@ -975,6 +1003,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, custom_keyword, true,
@@ -999,6 +1028,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, chrome_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
   };
@@ -1035,6 +1065,7 @@ IN_PROC_BROWSER_TEST_P(PrepopulatedEnginesExtendedCrossRegionsBrowserTest,
   ASSERT_EQ(active_engines_config_, android_migrated_region_engines);
 
   std::vector<SearchProviderSummary> expectations = {
+      {duckduckgo.id, duckduckgo.keyword, false},
       {google.id, google.keyword, false},
       {bing.id, bing.keyword, false},
       {IsParamFeatureEnabled() ? new_id : generic_id, custom_keyword, true,
@@ -1086,7 +1117,9 @@ IN_PROC_BROWSER_TEST_F(PrepopulatedEnginesOverridesBrowserTest,
     entry.Set("search_url", "https://override.com/s?q={searchTerms}");
     entry.Set("favicon_url", "http://override.com/favicon.ico");
     entry.Set("encoding", "UTF-8");
-    entry.Set("id", 9999);
+    // Phantom takes the fallback search engine from the overrides by the
+    // DuckDuckGo ID.
+    entry.Set("id", duckduckgo.id);
     overrides.Append(std::move(entry));
 
     PrefService* prefs = GetProfile()->GetPrefs();
@@ -1102,7 +1135,7 @@ IN_PROC_BROWSER_TEST_F(PrepopulatedEnginesOverridesBrowserTest,
 
   EXPECT_EQ(template_url_service().GetDefaultSearchProvider(), override_turl);
   EXPECT_EQ(template_url_service().GetDefaultSearchProvider()->prepopulate_id(),
-            9999);
+            duckduckgo.id);
 }
 
 IN_PROC_BROWSER_TEST_F(PrepopulatedEnginesOverridesBrowserTest,
@@ -1113,10 +1146,10 @@ IN_PROC_BROWSER_TEST_F(PrepopulatedEnginesOverridesBrowserTest,
   // should have failed reconciliation and fell back to a default.
   const TemplateURL* dse = template_url_service().GetDefaultSearchProvider();
   ASSERT_TRUE(dse);
-  EXPECT_NE(dse->keyword(), u"foo")
+  EXPECT_NE(dse->keyword(), u"override")
       << "DSE should not be the overridden engine. Current DSE: "
       << dse->keyword() << " (ID: " << dse->prepopulate_id() << ")";
-  EXPECT_NE(dse->prepopulate_id(), 9999);
+  EXPECT_EQ(dse->keyword(), duckduckgo.keyword);
 }
 
 }  // namespace

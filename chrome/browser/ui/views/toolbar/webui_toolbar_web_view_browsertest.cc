@@ -3947,8 +3947,9 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewBrowserTest,
                            ->GetLastCommittedURL();
 
   EXPECT_TRUE(committed_url.SchemeIs(url::kHttpsScheme));
-  EXPECT_EQ("www.google.com", committed_url.host());
-  EXPECT_EQ("/search", committed_url.path());
+  // Phantom searches with DuckDuckGo by default.
+  EXPECT_EQ("duckduckgo.com", committed_url.host());
+  EXPECT_EQ("/", committed_url.path());
   // The query should contain "q=hello+world" (spaces are URL-encoded as + or
   // %20).
   EXPECT_TRUE(
