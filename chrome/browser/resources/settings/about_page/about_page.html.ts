@@ -35,6 +35,10 @@ export function getHtml(this: SettingsAboutPageElement) {
 <settings-section>
   <div class="info-sections">
     <div class="info-section">
+      <div class="secondary">$i18n{aboutChromiumTitle}</div>
+      <div class="secondary">$i18n{aboutChromiumCopyright}</div>
+    </div>
+    <div class="info-section">
       <div class="secondary">$i18n{aboutProductTitle}</div>
       <div class="secondary">$i18n{aboutProductCopyright}</div>
     </div>

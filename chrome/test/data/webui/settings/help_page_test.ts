@@ -6,7 +6,7 @@
 
 import 'chrome://settings/settings.js';
 
-import {assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 
 suite('SettingsHelpPage', function() {
@@ -26,5 +26,29 @@ suite('SettingsHelpPage', function() {
     const aboutPage =
         settingsMain.shadowRoot!.querySelector('settings-about-page');
     assertTrue(!!aboutPage);
+  });
+
+  test('credits Chromium above Phantom Browser', async () => {
+    const settingsUi = document.createElement('settings-ui');
+    document.body.appendChild(settingsUi);
+    const settingsMain = settingsUi.shadowRoot!.querySelector('settings-main');
+    assertTrue(!!settingsMain);
+    await flushTasks();
+    const aboutPage =
+        settingsMain.shadowRoot!.querySelector('settings-about-page');
+    assertTrue(!!aboutPage);
+    const lines = Array.from(
+        aboutPage.shadowRoot.querySelectorAll('.info-section'),
+        section => Array.from(
+            section.querySelectorAll('.secondary'),
+            line => line.textContent.trim()));
+    assertEquals(2, lines.length);
+    assertEquals('Chromium', lines[0]![0]);
+    assertTrue(
+        /^Copyright \d{4} The Chromium Authors\. All rights reserved\.$/.test(
+            lines[0]![1]!));
+    assertEquals('Phantom Browser', lines[1]![0]);
+    assertTrue(/^Copyright \d{4} R\. Emre ARAS\. All rights reserved\.$/.test(
+        lines[1]![1]!));
   });
 });

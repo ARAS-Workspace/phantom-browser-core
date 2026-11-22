@@ -218,6 +218,14 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
       base::i18n::MessageFormatter::FormatWithNumberedArgs(
           l10n_util::GetStringUTF16(IDS_ABOUT_VERSION_COPYRIGHT),
           base::Time::Now()));
+  // Phantom Browser is built on Chromium; the About page credits the
+  // Chromium Authors above the Phantom Browser copyright.
+  html_source->AddString("aboutChromiumTitle", u"Chromium");
+  html_source->AddString(
+      "aboutChromiumCopyright",
+      base::i18n::MessageFormatter::FormatWithNumberedArgs(
+          u"Copyright {0,date,y} The Chromium Authors. All rights reserved.",
+          base::Time::Now()));
 
   html_source->AddBoolean("aboutObsoleteNowOrSoon",
                           ObsoleteSystem::IsObsoleteNowOrSoon());
