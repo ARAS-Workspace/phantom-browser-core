@@ -1,0 +1,40 @@
+name: Phantom Linux test
+
+# Called by phantom-linux-build.yml after the build. core-ci-test.sh runs the CI
+# suites (ci-filter-unit.json, ci-filter-browser.json), each against the last
+# green run of that suite on this machine (/srv/phantom/ci/taban-<suite>). A
+# suite fails on a test that is red now, was not red in its base, and is red
+# again when it runs once more on its own. A green suite becomes the base of
+# the next run. The summaries stay on the machine under /srv/phantom/ci/runs;
+# the job summary carries the verdicts.
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        description: full id of the commit the tree was built at
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: [self-hosted, Linux, X64, phantom-browser-linux]
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+        working-directory: /srv/phantom/core
+    env:
+      SHA: ${{ inputs.sha }}
+      RUN_NAME: ${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Check that the tree is at the commit under test
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          [ "$head" = "$SHA" ] || { echo "::error::the tree is at $head, not $SHA"; exit 1; }
+
+      - name: Run the test suites
+        run: phantom_tools/core-ci-test.sh "$RUN_NAME"

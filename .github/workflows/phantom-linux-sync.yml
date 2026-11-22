@@ -1,0 +1,50 @@
+name: Phantom Linux sync
+
+# Called by phantom-linux-build.yml. Moves the tree at /srv/phantom/core to the
+# commit under test, then brings its dependencies and the out/ci build files in
+# line with core-sync-linux.sh.
+#
+# The tree is a shallow clone of the phantom branch. The commit is fetched by
+# its id with depth 1 and checked out detached; a merge does not apply to a
+# shallow clone. A change to a tracked file stops the job and is left for a
+# person to look at. An untracked file in the way of the checkout stops git
+# checkout the same way.
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        description: full id of the commit to check out
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  sync:
+    runs-on: [self-hosted, Linux, X64, phantom-browser-linux]
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+        working-directory: /srv/phantom/core
+    env:
+      SHA: ${{ inputs.sha }}
+    steps:
+      - name: Check out the commit
+        run: |
+          set -euo pipefail
+          case "$SHA" in ''|*[!0-9a-f]*) echo "::error::not a commit id: $SHA"; exit 1 ;; esac
+          [ "${#SHA}" -eq 40 ] || { echo "::error::not a full commit id: $SHA"; exit 1; }
+          changed="$(git status --porcelain --untracked-files=no)"
+          if [ -n "$changed" ]; then
+            printf '%s\n' "$changed"
+            echo "::error::tracked files in /srv/phantom/core carry local changes"
+            exit 1
+          fi
+          git fetch --depth=1 origin "$SHA"
+          git checkout --detach "$SHA"
+          git log -1 --format='checked out %h %s'
+
+      - name: Sync the dependencies and generate the build files
+        run: phantom_tools/core-sync-linux.sh verify deps configure

@@ -1,0 +1,63 @@
+name: Phantom Linux CI
+
+# Linux CI of this tree on the self-hosted linux x64 runner: the sync workflow
+# moves the tree at /srv/phantom/core to the pushed commit, this file builds
+# chrome and the test targets in out/ci, and the test workflow runs the test
+# suites against the last green run.
+#
+# The runner is self-hosted and the repository is public, so no pull request
+# event starts this file; a run starts only from a push. workflow_dispatch looks
+# the file up on the default branch (main), which does not carry it. A push to
+# ci/build runs the file from the pushed commit:
+#
+#   git push --force origin phantom:refs/heads/ci/build
+#
+# The machine is started and stopped by hand; a run waits in the queue until
+# the runner is online.
+
+on:
+  push:
+    branches:
+      - ci/build
+
+# The jobs work in /srv/phantom/core with git and the tree's own tools; none of
+# them uses the job token.
+permissions: {}
+
+# One machine, one run at a time; a newer push waits for the running one. The
+# called workflows run inside this run, so this group holds them too.
+concurrency:
+  group: phantom-linux-ci
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    uses: ./.github/workflows/phantom-linux-sync.yml
+    with:
+      sha: ${{ github.sha }}
+
+  build:
+    needs: sync
+    runs-on: [self-hosted, Linux, X64, phantom-browser-linux]
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash
+        working-directory: /srv/phantom/core
+    env:
+      SHA: ${{ github.sha }}
+    steps:
+      - name: Check that the tree is at the pushed commit
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          [ "$head" = "$SHA" ] || { echo "::error::the tree is at $head, not $SHA"; exit 1; }
+
+      - name: Build chrome and the test targets
+        run: phantom_tools/core-build-linux.sh chrome unit_tests components_unittests browser_tests
+
+  test:
+    needs: build
+    uses: ./.github/workflows/phantom-linux-test.yml
+    with:
+      sha: ${{ github.sha }}
