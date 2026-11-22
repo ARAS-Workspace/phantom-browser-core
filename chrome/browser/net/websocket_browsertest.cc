@@ -996,7 +996,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
   SetBlockThirdPartyCookies(false);
 
   ASSERT_TRUE(content::SetCookie(browser()->GetProfile(),
-                                 server().GetURL(kHostA, "/"),
+                                 wss_server_.GetURL(kHostA, "/"),
                                  "cookie=1; SameSite=None; Secure"));
 
   content::DOMMessageQueue message_queue(
@@ -1018,7 +1018,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
   SetBlockThirdPartyCookies(true);
 
   ASSERT_TRUE(content::SetCookie(browser()->GetProfile(),
-                                 server().GetURL(kHostA, "/"),
+                                 wss_server_.GetURL(kHostA, "/"),
                                  "cookie=1; SameSite=None; Secure"));
 
   content::DOMMessageQueue message_queue(
@@ -1072,7 +1072,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
   }
 
   ASSERT_TRUE(content::SetCookie(browser()->GetProfile(),
-                                 server().GetURL(kHostA, "/"),
+                                 wss_server_.GetURL(kHostA, "/"),
                                  "cookie=1; SameSite=None; Secure"));
 
   content::DOMMessageQueue message_queue(
@@ -1098,7 +1098,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
       net::CookiePartitionKey::FromURLForTesting(GURL("https://b.test"));
 
   ASSERT_TRUE(content::SetCookie(
-      browser()->GetProfile(), server().GetURL(kHostA, "/"),
+      browser()->GetProfile(), wss_server_.GetURL(kHostA, "/"),
       "cookie=1; SameSite=None; Secure; Partitioned",
       net::CookieOptions::SameSiteCookieContext::MakeInclusive(),
       cookie_partition_key));
@@ -1126,7 +1126,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
       net::CookiePartitionKey::AncestorChainBit::kSameSite);
 
   ASSERT_TRUE(content::SetCookie(
-      browser()->GetProfile(), server().GetURL(kHostA, "/"),
+      browser()->GetProfile(), wss_server_.GetURL(kHostA, "/"),
       "cookie=1; SameSite=None; Secure; Partitioned",
       net::CookieOptions::SameSiteCookieContext::MakeInclusive(),
       cookie_partition_key));
@@ -1154,7 +1154,7 @@ IN_PROC_BROWSER_TEST_F(WebSocketBrowserHTTPSConnectToTest,
       net::CookiePartitionKey::FromURLForTesting(GURL("https://b.test"));
 
   ASSERT_TRUE(content::SetCookie(
-      browser()->GetProfile(), server().GetURL(kHostA, "/"),
+      browser()->GetProfile(), wss_server_.GetURL(kHostA, "/"),
       "cookie=1; SameSite=None; Secure; Partitioned",
       net::CookieOptions::SameSiteCookieContext::MakeInclusive(),
       cookie_partition_key));

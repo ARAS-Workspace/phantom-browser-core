@@ -59,6 +59,7 @@
 #include "content/public/test/prerender_test_util.h"
 #include "content/public/test/test_frame_navigation_observer.h"
 #include "content/public/test/test_utils.h"
+#include "net/base/features.h"
 #include "net/cookies/canonical_cookie_test_helpers.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/default_handlers.h"
@@ -183,6 +184,13 @@ class CookieSettingsTest
     : public ContentSettingsTest,
       public testing::WithParamInterface<std::pair<CookieMode, CookieMode>> {
  public:
+  CookieSettingsTest() {
+    // The PRE_ tests restart the browser and the test servers come back on
+    // new ports; Phantom binds cookies to the port that set them by default.
+    scoped_feature_list_.InitAndDisableFeature(
+        net::features::kEnablePortBoundCookies);
+  }
+
   CookieMode ReadMode() const { return GetParam().first; }
   CookieMode WriteMode() const { return GetParam().second; }
 

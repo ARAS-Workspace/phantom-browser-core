@@ -6,6 +6,7 @@
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/test/bind.h"
+#include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/extensions/api/cookies/cookies_api.h"
 #include "chrome/browser/extensions/extension_apitest.h"
@@ -24,6 +25,7 @@
 #include "extensions/test/extension_test_message_listener.h"
 #include "extensions/test/test_extension_dir.h"
 #include "mojo/public/cpp/bindings/remote.h"
+#include "net/base/features.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/default_handlers.h"
 #include "services/network/public/mojom/cookie_manager.mojom.h"
@@ -54,7 +56,15 @@ class CookiesApiTest
     : public ExtensionApiTest,
       public testing::WithParamInterface<SameSiteCookieSemantics> {
  public:
-  CookiesApiTest() = default;
+  CookiesApiTest() {
+    // Phantom binds cookies to the scheme and port that set them by default;
+    // the legacy semantics tests expect unbound cookies.
+    if (!AreSameSiteCookieSemanticsModern()) {
+      cookie_binding_feature_list_.InitWithFeatures(
+          {}, {net::features::kEnablePortBoundCookies,
+               net::features::kEnableSchemeBoundCookies});
+    }
+  }
   ~CookiesApiTest() override = default;
   CookiesApiTest(const CookiesApiTest&) = delete;
   CookiesApiTest& operator=(const CookiesApiTest&) = delete;
@@ -101,6 +111,7 @@ class CookiesApiTest
 
  private:
   mojo::Remote<network::mojom::CookieManager> cookie_manager_remote_;
+  base::test::ScopedFeatureList cookie_binding_feature_list_;
 };
 
 INSTANTIATE_TEST_SUITE_P(All,
