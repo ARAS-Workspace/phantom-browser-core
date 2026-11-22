@@ -1,0 +1,30 @@
+# Linux CI flags. core-sync-linux.sh runs gn gen with these on the x86-64 CI
+# host, and the tree is built and tested from them. They follow flags-dev.gn
+# wherever the two agree; the differences are named here.
+#
+# symbol_level = 1 instead of 2: no debugger is attached on the CI machine.
+# Line tables keep the function names and line numbers in the stack traces a
+# failing test prints, while the linker needs less memory and the output
+# directory is smaller. blink_symbol_level is left unset, so it follows.
+#
+# use_system_xcode is not here. It is declared for mac only, and on a linux
+# host gn gen --fail-on-unused-args stops on it.
+#
+# use_sysroot = true: the tree compiles against the debian sysroot that
+# core-sync-linux.sh brings (build/linux/debian_bullseye_amd64-sysroot), not
+# against the host's /usr, so a host package update cannot move the build.
+#
+# target_os and target_cpu are left to the host: linux, x64.
+is_debug = false
+dcheck_always_on = true
+is_official_build = false
+is_clang = true
+enable_rust = true
+use_thin_lto = false
+chrome_pgo_phase = 0
+symbol_level = 1
+enable_iterator_debugging = false
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+enable_swiftshader = true
+use_sysroot = true

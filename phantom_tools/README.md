@@ -75,3 +75,33 @@ that the mac gates had stayed silent about: a `//media/gpu/chromeos` label with
 no BUILD.gn behind it any more, and an unconditional sources row in `ui/aura`,
 a file the mac configuration does not load at all because `use_aura` is false
 there.
+
+## Linux CI
+
+A push to `ci/build` builds and tests this tree on the self-hosted linux x64
+runner (`.github/workflows/phantom-linux-build.yml`). The machine keeps the tree
+at `/srv/phantom/core` and the test runs under `/srv/phantom/ci`.
+
+    phantom_tools/core-sync-linux.sh [verify deps configure]
+    phantom_tools/core-build-linux.sh [-j N] [target...]
+    phantom_tools/core-test.sh [-j N] [-b N] [-r N] [-R N] [-C N] [--base DIR] FILTER_JSON RESULT_DIR
+    phantom_tools/core-ci-test.sh RUN_NAME
+
+- `core-sync-linux.sh` does for `out/ci` what `core-sync.sh` does for `out/dev`,
+  with `flags-ci-linux.gn` and a gclient checkout limited to linux x64.
+- `core-test.sh` runs the binaries of a filter file under `testing/xvfb.py` and
+  keeps the launcher's summaries. A test counts by its last run. With `--base`
+  the run fails only on tests that are red now and were not red in the earlier
+  run. `-R` runs the failed tests once more with N jobs; `-C` runs the new red
+  tests once more, one per process and one at a time, before the verdict.
+- `core-ci-test.sh` runs the two CI suites, `ci-filter-unit.json` (`-b 10`) and
+  `ci-filter-browser.json` (`-R 8`), each against the last green run of that
+  suite (`/srv/phantom/ci/taban-<suite>`), and moves the base of a green suite
+  to the new run.
+
+browser_tests runs 32 browsers on one virtual display, and some tests fail only
+there. A test that fails beside the others and passes on its own is listed as
+flaky and does not fail the run.
+
+The machine's AppArmor profile allows the namespace sandbox to the binaries in
+`out/ci` and to no other output directory.

@@ -77,3 +77,34 @@ okur ve her etiketi çözer; mac kapılarının sessiz kaldığı iki defekt tam
 göründü: artık arkasında BUILD.gn olmayan bir `//media/gpu/chromeos` etiketi ve
 `ui/aura` içindeki koşulsuz bir sources satırı — o dosyayı mac yapılandırması
 `use_aura` false olduğu için hiç yüklemiyor.
+
+## Linux CI
+
+`ci/build` dalına yapılan bir push, bu ağacı kendi barındırdığımız linux x64
+runner'ında derler ve test eder (`.github/workflows/phantom-linux-build.yml`).
+Makine ağacı `/srv/phantom/core`'da, test koşularını `/srv/phantom/ci` altında tutar.
+
+    phantom_tools/core-sync-linux.sh [verify deps configure]
+    phantom_tools/core-build-linux.sh [-j N] [hedef...]
+    phantom_tools/core-test.sh [-j N] [-b N] [-r N] [-R N] [-C N] [--base DIZIN] FILTRE_JSON SONUC_DIZINI
+    phantom_tools/core-ci-test.sh KOSU_ADI
+
+- `core-sync-linux.sh`, `core-sync.sh`'ın `out/dev` için yaptığını `out/ci` için
+  yapar; bayrakları `flags-ci-linux.gn` taşır, gclient yalnız linux x64 getirir.
+- `core-test.sh` bir filtre dosyasındaki ikilileri `testing/xvfb.py` altında koşar
+  ve test başlatıcının özetlerini saklar. Bir test son koşusuna göre sayılır.
+  `--base` verilirse koşu yalnız şimdi kırmızı olup önceki koşuda kırmızı
+  olmayan testlerde kırmızı yanar. `-R` başarısız testleri N işçiyle bir kez daha,
+  `-C` yeni kırmızı testleri karardan önce her biri kendi sürecinde, tek tek bir
+  kez daha koşar.
+- `core-ci-test.sh` iki CI grubunu, `ci-filter-unit.json` (`-b 10`) ve
+  `ci-filter-browser.json` (`-R 8`), her birini kendi son yeşil koşusuna
+  (`/srv/phantom/ci/taban-<grup>`) göre koşar; yeşil grubun tabanını yeni koşuya
+  taşır.
+
+browser_tests 32 tarayıcıyı tek sanal ekranda koşar ve bazı testler yalnız
+orada kırmızı yanar. Diğerlerinin yanında kırmızı yanıp tek başına geçen test
+kararsız (flaky) diye listelenir, koşuyu kırmızıya çevirmez.
+
+Makinedeki AppArmor profili ad alanı sandbox'ına yalnız `out/ci` içindeki
+ikililer için izin verir, başka çıktı dizinine vermez.
