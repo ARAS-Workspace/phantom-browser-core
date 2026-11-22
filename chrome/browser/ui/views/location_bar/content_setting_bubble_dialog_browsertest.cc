@@ -24,12 +24,15 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/blocked_content/popup_blocker_tab_helper.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/content_settings/core/browser/website_settings_registry.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/features.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/content_settings/core/test/content_settings_mock_provider.h"
 #include "components/content_settings/core/test/content_settings_test_utils.h"
+#include "components/prefs/pref_service.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -227,6 +230,13 @@ void ContentSettingBubbleDialogTest::ShowDialogBubble(
 }
 
 void ContentSettingBubbleDialogTest::ShowUi(const std::string& name) {
+  if (name == "cookies") {
+    // The cookies page action only shows while third-party cookies are
+    // allowed; Phantom blocks them by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
+  }
   // Open a tab for which we will invoke the dialog bubble.
   NavigateToContentTab();
   auto scoped_display_url =

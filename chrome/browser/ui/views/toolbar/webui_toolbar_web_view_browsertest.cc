@@ -106,7 +106,9 @@
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom.h"
 #include "components/collaboration/public/features.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/data_sharing/public/features.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
@@ -417,6 +419,11 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
     InProcessBrowserTest::SetUpOnMainThread();
     host_resolver()->AddRule("*", "127.0.0.1");
     ASSERT_TRUE(embedded_test_server()->Start());
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
 
     // Force the color mode to light to avoid flakiness.
     ThemeServiceFactory::GetForProfile(browser()->GetProfile())
@@ -5249,6 +5256,11 @@ class WebUIToolbarWebViewContentSettingsBrowserTest
     WebUIToolbarWebViewBrowserTest::SetUpOnMainThread();
     host_resolver()->AddRule("*", "127.0.0.1");
     ASSERT_TRUE(embedded_test_server()->Start());
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   }
 
  protected:

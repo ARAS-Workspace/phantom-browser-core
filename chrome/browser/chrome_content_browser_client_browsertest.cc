@@ -920,6 +920,11 @@ class DevToolsOverridesThirdPartyCookiesBrowserTest
     https_server_.SetSSLConfig(net::EmbeddedTestServer::CERT_TEST_NAMES);
     https_server_.AddDefaultHandlers(GetChromeTestDataDir());
     ASSERT_TRUE(https_server_.Start());
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
 
     // Open DevTools and enable network agent.
     AttachToWebContents(web_contents());

@@ -11,6 +11,7 @@
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
+#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -34,6 +35,9 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
+#include "components/prefs/pref_service.h"
 #include "components/tabs/public/tab_interface.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/common/content_features.h"
@@ -241,6 +245,11 @@ IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, PageActionNavigation) {
 
 // Display all available page actions and check that a button is rendered.
 IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, AllPageActionsPresent) {
+  // These tests expect the upstream cookie controls mode; Phantom blocks
+  // third-party cookies by default.
+  browser()->GetProfile()->GetPrefs()->SetInteger(
+      prefs::kCookieControlsMode,
+      static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   WaitForInitialWebUIToolbar(browser());
   auto* location_bar = static_cast<WebUILocationBar*>(GetLocationBar());
   auto& control = location_bar->page_action_control();

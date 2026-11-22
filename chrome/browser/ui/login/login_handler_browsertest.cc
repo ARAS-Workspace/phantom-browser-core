@@ -40,6 +40,8 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/omnibox/browser/location_bar_model.h"
 #include "components/prefs/pref_service.h"
@@ -434,6 +436,15 @@ class LoginPromptBrowserTestThirdPartyCookiesUnblocked
     scoped_feature_list_.InitWithFeatureStates(
         {{network::features::kSplitAuthCacheByNetworkIsolationKey,
           (GetParam() == SplitAuthCacheByNetworkIsolationKey::kTrue)}});
+  }
+
+  void SetUpOnMainThread() override {
+    LoginPromptBrowserTest::SetUpOnMainThread();
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   }
 
  private:

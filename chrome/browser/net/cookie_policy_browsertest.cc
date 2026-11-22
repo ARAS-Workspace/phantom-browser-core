@@ -93,6 +93,11 @@ class CookiePolicyBrowserTest : public InProcessBrowserTest {
     https_server_.ServeFilesFromDirectory(path);
     https_server_.AddDefaultHandlers(GetChromeTestDataDir());
     ASSERT_TRUE(https_server_.Start());
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   }
 
   GURL GetURL(const std::string& host) {

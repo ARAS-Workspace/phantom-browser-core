@@ -9,6 +9,9 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
+#include "components/prefs/pref_service.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "content/public/common/content_paths.h"
 #include "content/public/test/browser_test.h"
@@ -42,6 +45,11 @@ class CookieUseCounterBrowserTest : public InProcessBrowserTest {
     embedded_https_test_server().ServeFilesFromDirectory(path);
     embedded_https_test_server().AddDefaultHandlers(GetChromeTestDataDir());
     ASSERT_TRUE(embedded_https_test_server().Start());
+    // These tests expect the upstream cookie controls mode; Phantom blocks
+    // third-party cookies by default.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   }
 
   content::WebContents* web_contents() {

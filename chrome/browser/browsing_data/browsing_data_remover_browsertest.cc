@@ -44,8 +44,10 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/browsing_data/content/browsing_data_model.h"
 #include "components/browsing_data/core/features.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_utils.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/download/public/common/download_features.h"
 #include "components/history/core/browser/features.h"
 #include "components/history/core/common/pref_names.h"
@@ -406,6 +408,11 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverDeferredDownloadHistoryBrowserTest,
 
 // Test that the salt for media device IDs is reset when cookies are cleared.
 IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverBrowserTest, MediaDeviceIdSalt) {
+  // The test expects the upstream cookie controls mode; Phantom blocks
+  // third-party cookies by default.
+  GetProfile()->GetPrefs()->SetInteger(
+      prefs::kCookieControlsMode,
+      static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
   content::RenderFrameHost* frame_host = GetBrowser()
                                              ->tab_strip_model()
                                              ->GetActiveWebContents()

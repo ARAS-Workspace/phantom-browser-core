@@ -525,7 +525,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, ThirdPartyCookiesAllowed) {
   VerifyPrefValueAndControlledState(
       prefs::kCookieControlsMode,
       base::Value(static_cast<int>(
-          content_settings::CookieControlsMode::kIncognitoOnly)),
+          content_settings::CookieControlsMode::kBlockThirdParty)),
       /* expected_controlled */ false);
 
   const base::FilePath extension_path =
@@ -547,7 +547,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, ThirdPartyCookiesAllowed) {
   VerifyPrefValueAndControlledState(
       prefs::kCookieControlsMode,
       base::Value(static_cast<int>(
-          content_settings::CookieControlsMode::kIncognitoOnly)),
+          content_settings::CookieControlsMode::kBlockThirdParty)),
       /* expected_controlled */ false);
   listener_clear.Reply("ok");
 
@@ -566,7 +566,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, ThirdPartyCookiesAllowed) {
   VerifyPrefValueAndControlledState(
       prefs::kCookieControlsMode,
       base::Value(static_cast<int>(
-          content_settings::CookieControlsMode::kIncognitoOnly)),
+          content_settings::CookieControlsMode::kBlockThirdParty)),
       /* expected_controlled */ false);
 }
 
