@@ -114,13 +114,13 @@ class WasmExtensionCachingBrowserTest
   base::HistogramTester histogram_tester_;
 };
 
-// The `large.wasm` file is very large: 2.5MB. To avoid increasing the git
-// repository, we prefer borrowing it from web_tests.
+// The `large.wasm` file is a copy of the upstream web_tests file under
+// chrome/test/data/web_tests.
 base::FilePath LargeWasmPath() {
   base::FilePath root_path;
   CHECK(base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &root_path));
   return root_path.Append(FILE_PATH_LITERAL(
-      "third_party/blink/web_tests/http/tests/wasm/resources/large.wasm"));
+      "chrome/test/data/web_tests/http/tests/wasm/resources/large.wasm"));
 }
 
 // Test that we cache streaming compiled/instantiated Wasm modules in

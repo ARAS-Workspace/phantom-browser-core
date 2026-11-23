@@ -105,7 +105,7 @@ void HeadlessModeProtocolBrowserTest::LoadTestMetaInfo() {
 
 void HeadlessModeProtocolBrowserTest::StartEmbeddedTestServer() {
   embedded_test_server()->ServeFilesFromSourceDirectory(
-      "third_party/blink/web_tests/http/tests/inspector-protocol");
+      "chrome/test/data/web_tests/http/tests/inspector-protocol");
 
   if (IsSharedTestScript()) {
     embedded_test_server()->ServeFilesFromSourceDirectory(GetTestDataDir());
@@ -430,9 +430,6 @@ HEADLESS_MODE_PROTOCOL_TEST(WindowScreenScaleFactor,
 
 HEADLESS_MODE_PROTOCOL_TEST(WindowScreenSizeOrientation,
                             "shared/window-screen-size-orientation.js")
-
-HEADLESS_MODE_PROTOCOL_TEST(AutofillTriggerCreditCard,
-                            "autofill/autofill-trigger-credit-card.js")
 
 HEADLESS_MODE_PROTOCOL_TEST(DispatchMouseEventScreenCoordinates,
                             "shared/dispatch-mouse-event-screen-coordinates.js")

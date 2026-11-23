@@ -53,7 +53,7 @@ void MetricIntegrationTest::SetUpOnMainThread() {
   embedded_test_server()->ServeFilesFromSourceDirectory(
       "chrome/browser/page_load_metrics/integration_tests/data");
   embedded_test_server()->ServeFilesFromSourceDirectory(
-      "third_party/blink/web_tests/external/wpt");
+      "chrome/test/data/web_tests/external/wpt");
   content::SetupCrossSiteRedirector(embedded_test_server());
 
   ukm_recorder_.emplace();

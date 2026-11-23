@@ -2045,8 +2045,8 @@ source_set("browser_tests") {
     data += [
       "//chrome/test/data/extensions/",
       "//extensions/test/data/",
-      "//third_party/blink/web_tests/external/wpt/resources/testharness.js",
-      "//third_party/blink/web_tests/http/tests/wasm/resources/large.wasm",
+      "//chrome/test/data/web_tests/external/wpt/resources/testharness.js",
+      "//chrome/test/data/web_tests/http/tests/wasm/resources/large.wasm",
       "//third_party/wpt_tools/wpt/resources/testdriver.js",
     ]
   }  # enable_extensions

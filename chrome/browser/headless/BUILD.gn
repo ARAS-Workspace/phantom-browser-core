@@ -178,9 +178,9 @@ source_set("browser_tests") {
   data = [
     "test/data/",
     "//components/headless/test/data",
-    "//third_party/blink/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test.js",
-    "//third_party/blink/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test-subtarget.html",
-    "//third_party/blink/web_tests/http/tests/inspector-protocol/resources/http-interceptor.js",
+    "//chrome/test/data/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test.js",
+    "//chrome/test/data/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test-subtarget.html",
+    "//chrome/test/data/web_tests/http/tests/inspector-protocol/resources/http-interceptor.js",
   ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
