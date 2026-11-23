@@ -20,7 +20,6 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
   constexpr auto kAllowed = base::MakeFixedFlatSet<std::string_view>({
       extension_misc::kInAppPaymentsSupportAppId,
       extension_misc::kPdfExtensionId,
-      extension_misc::kDictationConnectorExtensionId,
   });
 
   if (kAllowed.contains(extension_id)) {

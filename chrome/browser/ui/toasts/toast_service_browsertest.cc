@@ -6,7 +6,6 @@
 
 #include "base/containers/enum_set.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/dictation/features.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
@@ -48,6 +47,8 @@ constexpr auto kDeprecatedToastIds =
          /*kIndigoInvokeError=*/42,
          /*kEnterpriseCopyAudit=*/46,
          /*kEnterpriseCopyKeptInManagedChrome=*/47,
+         /*kDictationError=*/48,
+         /*kDictationStopped=*/49,
          /*kGlicSelectionHiddenForSite=*/50,
          /*kEnterpriseCopyWarning=*/51,
          /*kEnterpriseCopyBlocked=*/52,
@@ -70,8 +71,7 @@ class ToastServiceBrowserTest : public InProcessBrowserTest {
          {data_sharing::features::kDataSharingFeature, {}},
          {multistep_filter::kMultistepFilter, {}},
          {autofill::features::kAutofillAmbientAutofill, {}},
-         {autofill::features::kAutofillAtMemory, {}},
-         {dictation::kDictation, {}}},
+         {autofill::features::kAutofillAtMemory, {}}},
         /*disabled_features*/ {});
     InProcessBrowserTest::SetUp();
   }

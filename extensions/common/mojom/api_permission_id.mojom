@@ -293,7 +293,7 @@ enum APIPermissionID {
   kDeleted_GlicPrivateInvoke = 266,
   kIndigoPrivate = 267,
   kContextualTasksPrivate = 268,
-  kDictationPrivate = 269,
+  kDeleted_DictationPrivate = 269,
   kBluetoothSocket = 270,
   kBluetoothLowEnergy = 271,
   kBluetoothPeripheral = 272,

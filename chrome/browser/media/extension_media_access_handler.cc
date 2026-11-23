@@ -52,8 +52,7 @@ bool IsMediaRequestHandledByManifestForExtension(
          extension->id() == "nbpagnldghgfoolbancepceaanlmhfmd" ||
          extension->id() == "jkghodnilhceideoidjikpgommlajknk" ||
          extension->id() == "gjaehgfemfahhmlgpdfknkhdnemmolop" ||
-         extension->id() == "egfdjlfmgnehecnclamagfafdccgfndp" ||
-         extension->id() == extension_misc::kDictationConnectorExtensionId;
+         extension->id() == "egfdjlfmgnehecnclamagfafdccgfndp";
 }
 
 }  // namespace

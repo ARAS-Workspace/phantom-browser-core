@@ -10,7 +10,6 @@
 #include "base/functional/bind.h"
 #include "build/branding_buildflags.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/dictation/features.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service_factory.h"
@@ -400,25 +399,6 @@ void ToastService::RegisterToasts(
                                         : kTextAnalysisOldIcon,
                                     IDS_AUTOFILL_AI_PRE_FETCH_ERROR_MESSAGE)
             .AddGlobalScoped()
-            .Build());
-  }
-
-  if (base::FeatureList::IsEnabled(dictation::kDictation)) {
-    toast_registry_->RegisterToast(
-        ToastId::kDictationError,
-        ToastSpecification::Builder(features::IsRoundedIconsEnabled()
-                                        ? vector_icons::kErrorIcon
-                                        : vector_icons::kErrorOldIcon,
-                                    IDS_DICTATION_ERROR_TOAST)
-            .Build());
-    toast_registry_->RegisterToast(
-        ToastId::kDictationStopped,
-        ToastSpecification::Builder(
-            features::IsRoundedIconsEnabled()
-                ? vector_icons::kMicIcon
-                : vector_icons::kMicChromeRefreshOldIcon,
-            IDS_DICTATION_STOPPED_TOAST)
-            .SetPersistOnNavigation()
             .Build());
   }
 }  // RegisterToasts() end.

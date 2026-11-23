@@ -71,10 +71,6 @@ class MediaPlayerAction;
 }
 }  // namespace blink
 
-namespace dictation {
-class DictationMenuObserver;
-}
-
 namespace ui {
 class DataTransferEndpoint;
 }
@@ -266,7 +262,6 @@ class RenderViewContextMenu
   void AppendSpellingAndSearchSuggestionItems();
   void AppendOtherEditableItems();
   void AppendLanguageSettings();
-  void AppendDictationItems();
   void AppendSearchProvider();
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   void AppendCurrentExtensionItems();
@@ -404,8 +399,6 @@ class RenderViewContextMenu
 #endif
 
   std::unique_ptr<LinkToTextMenuObserver> link_to_text_menu_observer_;
-
-  std::unique_ptr<dictation::DictationMenuObserver> dictation_menu_observer_;
 
   // In the case of a MimeHandlerView this will point to the WebContents that
   // embeds the MimeHandlerViewGuest. Otherwise this will be the same as

@@ -97,10 +97,6 @@ std::string_view GetToastName(ToastId toast_id) {
       return "EnterpriseCopyAudit";
     case ToastId::kEnterpriseCopyKeptInManagedChrome:
       return "EnterpriseCopyKeptInManagedChrome";
-    case ToastId::kDictationError:
-      return "DictationError";
-    case ToastId::kDictationStopped:
-      return "DictationStopped";
     case ToastId::kEnterpriseCopyWarning:
       return "EnterpriseCopyWarning";
     case ToastId::kEnterpriseCopyBlocked:

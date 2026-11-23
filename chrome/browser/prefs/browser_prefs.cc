@@ -1119,14 +1119,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   RegisterBrowserUserPrefs(registry);
   registry->RegisterBooleanPref(prefs::kRestrictYouTubeCookiesDeletion, false);
   RegisterGeminiSettingsPrefs(registry);
-  registry->RegisterIntegerPref(prefs::kVoiceTypingSettings, 0);
-  registry->RegisterBooleanPref(prefs::kPrefDictationOnboardingCompleted,
-                                false);
-#if BUILDFLAG(IS_LINUX)
-  registry->RegisterStringPref(prefs::kVoiceTypingHotkey, "Ctrl+Space");
-#else
-  registry->RegisterStringPref(prefs::kVoiceTypingHotkey, "Alt+Space");
-#endif
 
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
   safety_check::prefs::RegisterProfilePrefs(registry);

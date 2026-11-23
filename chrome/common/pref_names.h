@@ -412,17 +412,6 @@ inline constexpr char kSplitViewDragAndDropNudgeUsedCount[] =
 // recently used tabs.
 inline constexpr char kCtrlTabMru[] = "browser.ctrl_tab_mru";
 
-// An int pref that controls the voice typing feature. This is managed by
-// enterprise policy.
-inline constexpr char kVoiceTypingSettings[] = "browser.voice_typing_settings";
-
-// Boolean indicating completion of the Dictation onboarding.
-inline constexpr char kPrefDictationOnboardingCompleted[] =
-    "browser.dictation_onboarding_completed";
-
-// String pref storing the accelerator for the Dictation hotkey.
-inline constexpr char kVoiceTypingHotkey[] = "browser.voice_typing_hotkey";
-
 // Comma separated list of domain names (e.g. "google.com,school.edu").
 // When this pref is set, the user will be able to access Google Apps
 // only using an account that belongs to one of the domains from this pref.

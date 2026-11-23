@@ -73,13 +73,9 @@ source_set("impl") {
     "//extensions/buildflags",
   ]
 
-  public += [
-    "dictation_menu_observer.h",
-    "link_to_text_menu_observer.h",
-  ]
+  public += [ "link_to_text_menu_observer.h" ]
 
   sources += [
-    "dictation_menu_observer.cc",
     "link_to_text_menu_observer.cc",
     "render_view_context_menu.cc",
   ]
@@ -97,7 +93,6 @@ source_set("impl") {
     "//chrome/browser/context_hub",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/devtools",
-    "//chrome/browser/dictation",
     "//chrome/browser/language",
     "//chrome/browser/pdf",
     "//chrome/browser/predictors",

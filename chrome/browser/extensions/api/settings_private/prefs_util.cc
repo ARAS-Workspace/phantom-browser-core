@@ -462,9 +462,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[optimization_guide::prefs::kGeminiSettings] =
       settings_api::PrefType::kNumber;
 
-  // Dictation / Voice typing prefs
-  (*s_allowlist)[prefs::kVoiceTypingHotkey] = settings_api::PrefType::kString;
-
   return *s_allowlist;
 }
 

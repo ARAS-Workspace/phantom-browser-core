@@ -54,7 +54,6 @@
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/dictation/features.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
@@ -75,7 +74,6 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/renderer_context_menu/context_menu_content_type_factory.h"
-#include "chrome/browser/renderer_context_menu/dictation_menu_observer.h"
 #include "chrome/browser/renderer_context_menu/link_to_text_menu_observer.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -500,7 +498,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        // Removed: {IDC_CONTENT_CONTEXT_GLIC, 162},
        {IDC_CONTENT_CONTEXT_VIDEO_FRAME, 163},
        {IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE, 164},
-       {IDC_CONTENT_CONTEXT_DICTATION, 165},
+       // Removed: {IDC_CONTENT_CONTEXT_DICTATION, 165},
        // Removed: {IDC_CONTENT_CONTEXT_ADD_LINK_TO_READING_LIST, 166},
        {IDC_SPELLCHECK_REMOVE_FROM_DICTIONARY, 167},
        {IDC_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS, 168},
@@ -2207,19 +2205,6 @@ void RenderViewContextMenu::AppendLanguageSettings() {
 
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS,
                                   IDS_CONTENT_CONTEXT_LANGUAGE_SETTINGS);
-}
-
-void RenderViewContextMenu::AppendDictationItems() {
-  if (!base::FeatureList::IsEnabled(dictation::kDictation)) {
-    return;
-  }
-
-  if (!dictation_menu_observer_) {
-    dictation_menu_observer_ =
-        std::make_unique<dictation::DictationMenuObserver>(this);
-  }
-  observers_.AddObserver(dictation_menu_observer_.get());
-  dictation_menu_observer_->InitMenu(params_);
 }
 
 void RenderViewContextMenu::AppendProtocolHandlerSubMenu() {

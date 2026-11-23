@@ -38,10 +38,6 @@ inline constexpr char kCalendarAppId[] = "ejjicmeblgpmajnghnpcppodonldlgfn";
 inline constexpr char kDataSaverExtensionId[] =
     "pfmgfdlgomnbgkofeojodiodmgpgmkac";
 
-// The extension id of the Dictation Connector component extension.
-inline constexpr char kDictationConnectorExtensionId[] =
-    "kbglekiebdohdafflpmiejhbfdmjdbbe";
-
 // The extension id of the Google Maps application.
 inline constexpr char kGoogleMapsAppId[] = "lneaknkopdijkpnocmklfnjbeapigfbh";
 

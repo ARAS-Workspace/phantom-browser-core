@@ -69,7 +69,6 @@ if (enable_extensions) {
     "bookmark_manager_private.json",
     "braille_display_private.webidl",
     "command_line_private.json",
-    "dictation_private.webidl",
     "experimental_ai_data.webidl",
     "image_writer_private.webidl",
     "language_settings_private.webidl",

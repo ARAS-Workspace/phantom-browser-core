@@ -304,9 +304,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kGeminiSettings,
     optimization_guide::prefs::kGeminiSettings,
     base::Value::Type::INTEGER },
-  { key::kVoiceTypingSettings,
-    prefs::kVoiceTypingSettings,
-    base::Value::Type::INTEGER },
   { key::kAllowDeletingBrowserHistory,
     prefs::kAllowDeletingBrowserHistory,
     base::Value::Type::BOOLEAN },
@@ -1531,8 +1528,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       key::kGeminiSettings, optimization_guide::prefs::kGeminiSettings,
       GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
           {{0, 0}, {1, 0}, {2, 1}}));
-  gen_ai_default_policies.emplace_back(key::kVoiceTypingSettings,
-                                       prefs::kVoiceTypingSettings);
   gen_ai_default_policies.emplace_back(
       key::kFindAndFillWithGeminiSettings,
       optimization_guide::prefs::kFindAndFillWithGeminiSettings);

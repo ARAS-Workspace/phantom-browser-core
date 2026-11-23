@@ -32,10 +32,7 @@ source_set("component_updater") {
     "//third_party/protobuf:protobuf_lite",
   ]
 
-  public += [
-    "dictation_connector_component_installer.h",
-    "iwa_key_distribution_component_installer.h",
-  ]
+  public += [ "iwa_key_distribution_component_installer.h" ]
   public_deps += []
 
   if (chrome_root_store_supported) {
@@ -86,14 +83,8 @@ source_set("impl") {
     "//services/network/public/cpp",
   ]
 
-  sources += [
-    "dictation_connector_component_installer.cc",
-    "iwa_key_distribution_component_installer.cc",
-  ]
-  deps += [
-    "//chrome/browser/dictation",
-    "//components/webapps/isolated_web_apps",
-  ]
+  sources += [ "iwa_key_distribution_component_installer.cc" ]
+  deps += [ "//components/webapps/isolated_web_apps" ]
 
   if (chrome_root_store_supported) {
     sources += [ "pki_metadata_fastpush_component_installer_policy.cc" ]
