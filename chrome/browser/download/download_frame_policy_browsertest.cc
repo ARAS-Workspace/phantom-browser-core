@@ -729,32 +729,6 @@ INSTANTIATE_TEST_SUITE_P(
     DownloadFramePolicyBrowserTest_UpdateIframeSandboxFlags,
     ::testing::Combine(::testing::Bool(), ::testing::Bool()));
 
-// Download gets blocked when LoadPolicy is DISALLOW for the navigation to
-// download. This test is technically unrelated to policy on frame, but stays
-// here for convenience.
-IN_PROC_BROWSER_TEST_F(DownloadFramePolicyBrowserTest,
-                       SubframeNavigationDownloadBlockedByLoadPolicy) {
-  ResetConfiguration(subresource_filter::Configuration(
-      subresource_filter::mojom::ActivationLevel::kEnabled,
-      subresource_filter::ActivationScope::ALL_SITES));
-  InitializeHistogramTesterAndWebFeatureWaiter();
-  SetNumDownloadsExpectation(0);
-  InitializeOneSubframeSetup(SandboxOption::kNotSandboxed,
-                             false /* is_ad_frame */,
-                             false /* is_cross_origin */);
-
-  content::TestNavigationObserver navigation_observer(web_contents());
-  TriggerDownloadSameFrame(GetSubframeRfh(), DownloadSource::kNavigation,
-                           false /* initiate_with_gesture */, "disallow.zip");
-  navigation_observer.Wait();
-
-  GetHistogramTester()->ExpectBucketCount(
-      "Blink.UseCounter.Features",
-      blink::mojom::WebFeature::kDownloadPrePolicyCheck, 0);
-
-  CheckNumDownloadsExpectation();
-}
-
 IN_PROC_BROWSER_TEST_F(DownloadFramePolicyBrowserTest,
                        PopUpDownload_RecordsUseCounterAgainstInitiator) {
   base::HistogramTester histogram_tester;

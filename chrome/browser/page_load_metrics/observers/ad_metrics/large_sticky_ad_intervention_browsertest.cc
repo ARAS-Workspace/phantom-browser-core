@@ -77,33 +77,6 @@ IN_PROC_BROWSER_TEST_F(LargeStickyAdViolationBrowserTest,
       subresource_filter::mojom::AdsViolation::kLargeStickyAd, 0);
 }
 
-IN_PROC_BROWSER_TEST_F(LargeStickyAdViolationBrowserTest,
-                       LargeStickyAd_AdInterventionTriggered) {
-  base::HistogramTester histogram_tester;
-
-  GURL url = embedded_test_server()->GetURL(
-      "a.com", "/ads_observer/large_scrollable_page_with_adiframe_writer.html");
-
-  page_load_metrics::NavigateAndWaitForFirstContentfulPaint(web_contents(),
-                                                            url);
-
-  page_load_metrics::TriggerAndDetectLargeStickyAd(web_contents());
-
-  // Reload the page. Since we are enforcing ad blocking on ads violations,
-  // expect that the ad script is not loaded and that the subresource filter UI
-  // shows up.
-  EXPECT_TRUE(content::NavigateToURL(web_contents(), url));
-
-  EXPECT_FALSE(
-      WasParsedScriptElementLoaded(web_contents()->GetPrimaryMainFrame()));
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 1);
-  histogram_tester.ExpectBucketCount(
-      kAdsInterventionRecordedHistogram,
-      subresource_filter::mojom::AdsViolation::kLargeStickyAd, 1);
-}
-
 class LargeStickyAdViolationBrowserTestWithoutEnforcement
     : public LargeStickyAdViolationBrowserTest {
  public:

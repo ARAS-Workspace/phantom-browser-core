@@ -45,37 +45,8 @@ class WebContents;
 
 namespace subresource_filter {
 
-class AdsInterventionManager;
 class SubresourceFilterContentSettingsManager;
 class RulesetService;
-
-// Small helper mock to allow tests to set expectations about observations on
-// the subresource filter. Automatically registers and unregisters itself as an
-// observer for its lifetime.
-class MockSubresourceFilterObserver : public SubresourceFilterObserver {
- public:
-  explicit MockSubresourceFilterObserver(content::WebContents* web_contents);
-  ~MockSubresourceFilterObserver() override;
-
-  MOCK_METHOD2(OnPageActivationComputed,
-               void(content::NavigationHandle*, const mojom::ActivationState&));
-
- private:
-  base::ScopedObservation<SubresourceFilterObserverManager,
-                          SubresourceFilterObserver>
-      scoped_observation_{this};
-};
-
-// Matchers for mojom::ActivationState arguments.
-MATCHER(HasActivationLevelDisabled, "") {
-  return arg.activation_level == mojom::ActivationLevel::kDisabled;
-}
-MATCHER(HasActivationLevelDryRun, "") {
-  return arg.activation_level == mojom::ActivationLevel::kDryRun;
-}
-MATCHER(HasActivationLevelEnabled, "") {
-  return arg.activation_level == mojom::ActivationLevel::kEnabled;
-}
 
 // Class for shared test harness functionality to be used for both safe browsing
 // and fingerprinting protection browser tests.
@@ -98,18 +69,7 @@ class SubresourceFilterSharedBrowserTest : public PlatformBrowserTest {
 
   content::WebContents* web_contents();
 
-  content::RenderFrameHost* FindFrameByName(const std::string& name);
-
   bool WasParsedScriptElementLoaded(content::RenderFrameHost* rfh);
-
-  void ExpectParsedScriptElementLoadedStatusInFrames(
-      const std::vector<const char*>& frame_names,
-      const std::vector<bool>& expect_loaded);
-
-  void ExpectFramesIncludedInLayout(const std::vector<const char*>& frame_names,
-                                    const std::vector<bool>& expect_displayed);
-
-  void NavigateFrame(const char* frame_name, const GURL& url);
 };
 
 class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
@@ -143,23 +103,9 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
   static constexpr const char kEvaluationCPUDuration[] =
       "SubresourceFilter.SubresourceLoad.Evaluation.CPUDuration";
 
-  static constexpr const char kActivationDecision[] =
-      "SubresourceFilter.PageLoad.ActivationDecision";
-
-  // Names of navigation chain patterns histogram.
-  static constexpr const char kActivationListHistogram[] =
-      "SubresourceFilter.PageLoad.ActivationList";
-
-  static constexpr const char kPageLoadActivationStateHistogram[] =
-      "SubresourceFilter.PageLoad.ActivationState";
-  static constexpr const char kPageLoadActivationStateDidInheritHistogram[] =
-      "SubresourceFilter.PageLoad.ActivationState.DidInherit";
-
   // Other histograms.
   static constexpr const char kSubresourceFilterActionsHistogram[] =
       "SubresourceFilter.Actions2";
-
-  bool AdsBlockedInContentSettings(content::RenderFrameHost* frame_host);
 
  protected:
   // InProcessBrowserTest:
@@ -169,20 +115,7 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
     return profile_context_->settings_manager();
   }
 
-  AdsInterventionManager* ads_intervention_manager() {
-    return profile_context_->ads_intervention_manager();
-  }
-
-  bool IsDynamicScriptElementLoaded(content::RenderFrameHost* rfh);
-
-  void InsertDynamicFrameWithScript();
-
-  void NavigateFromRendererSide(const GURL& url);
-
   void SetRulesetToDisallowURLsWithPathSuffix(const std::string& suffix);
-
-  void SetRulesetToDisallowURLsWithSubstrings(
-      std::vector<std::string_view> substrings);
 
   void SetRulesetWithRules(const std::vector<proto::UrlRule>& rules);
 

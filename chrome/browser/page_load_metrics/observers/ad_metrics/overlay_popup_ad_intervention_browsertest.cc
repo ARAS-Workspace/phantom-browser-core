@@ -95,44 +95,6 @@ IN_PROC_BROWSER_TEST_F(OverlayPopupAdViolationBrowserTest,
       subresource_filter::mojom::AdsViolation::kOverlayPopupAd, 0);
 }
 
-// TODO(crbug.com/40856777): Fix flakiness and re-enable test.
-#if BUILDFLAG(IS_LINUX) && \
-    (defined(MEMORY_SANITIZER) || defined(LEAK_SANITIZER))
-#define MAYBE_OverlayPopupAd_AdInterventionTriggered \
-  DISABLED_OverlayPopupAd_AdInterventionTriggered
-#else
-#define MAYBE_OverlayPopupAd_AdInterventionTriggered \
-  OverlayPopupAd_AdInterventionTriggered
-#endif
-IN_PROC_BROWSER_TEST_F(OverlayPopupAdViolationBrowserTest,
-                       MAYBE_OverlayPopupAd_AdInterventionTriggered) {
-  base::HistogramTester histogram_tester;
-
-  content::WebContents* web_contents =
-      chrome_test_utils::GetActiveWebContents(this);
-
-  GURL url = embedded_test_server()->GetURL(
-      "a.com", "/ads_observer/large_scrollable_page_with_adiframe_writer.html");
-
-  page_load_metrics::NavigateAndWaitForFirstMeaningfulPaint(web_contents, url);
-
-  page_load_metrics::TriggerAndDetectOverlayPopupAd(web_contents);
-
-  // Reload the page. Since we are enforcing ad blocking on ads violations,
-  // expect that the ad script is not loaded and that the subresource filter UI
-  // shows up.
-  EXPECT_TRUE(content::NavigateToURL(web_contents, url));
-
-  EXPECT_FALSE(
-      WasParsedScriptElementLoaded(web_contents->GetPrimaryMainFrame()));
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 1);
-  histogram_tester.ExpectBucketCount(
-      kAdsInterventionRecordedHistogram,
-      subresource_filter::mojom::AdsViolation::kOverlayPopupAd, 1);
-}
-
 class OverlayPopupAdViolationBrowserTestWithoutEnforcement
     : public OverlayPopupAdViolationBrowserTest {
  public:

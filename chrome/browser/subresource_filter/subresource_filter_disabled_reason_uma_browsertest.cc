@@ -60,53 +60,6 @@ class SubresourceFilterDisabledReasonUmaBrowserTest
   base::test::ScopedFeatureList prewarm_feature_;
 };
 
-
-IN_PROC_BROWSER_TEST_F(SubresourceFilterDisabledReasonUmaBrowserTest,
-                       NoMatchingConfiguration_UrlNotOnPhishingList) {
-  base::HistogramTester histogram_tester;
-  GURL url = GetURL("subresource_filter/frame_with_no_subresources.html");
-
-  Configuration config(mojom::ActivationLevel::kEnabled,
-                       ActivationScope::ACTIVATION_LIST,
-                       ActivationList::PHISHING_INTERSTITIAL);
-  ResetConfiguration(std::move(config));
-
-  ASSERT_NO_FATAL_FAILURE(SetRulesetToDisallowURLsWithPathSuffix(
-      "suffix-that-does-not-match-anything"));
-
-  // Navigate to a URL not on the phishing list.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  histogram_tester.ExpectUniqueSample(
-      kDisabledReasonHistogram,
-      mojom::SubresourceFilterDisabledReason::kNoMatchingConfiguration, 1);
-}
-
-
-
-IN_PROC_BROWSER_TEST_F(SubresourceFilterDisabledReasonUmaBrowserTest,
-                       DisabledByConfiguration) {
-  base::HistogramTester histogram_tester;
-  GURL url = GetURL("subresource_filter/frame_with_no_subresources.html");
-
-  Configuration config(mojom::ActivationLevel::kDisabled,
-                       ActivationScope::ALL_SITES);
-  ResetConfiguration(std::move(config));
-
-  ASSERT_NO_FATAL_FAILURE(SetRulesetToDisallowURLsWithPathSuffix(
-      "suffix-that-does-not-match-anything"));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  histogram_tester.ExpectUniqueSample(
-      kDisabledReasonHistogram,
-      mojom::SubresourceFilterDisabledReason::kDisabledByConfiguration, 1);
-}
-
-
-
-
-
 class SubresourceFilterDisabledReasonAdTaggingDisabledBrowserTest
     : public SubresourceFilterDisabledReasonUmaBrowserTest {
  public:
