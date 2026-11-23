@@ -1129,7 +1129,6 @@ test("browser_tests") {
     "//chrome/browser/ui/webui:log_web_ui_url",
     "//chrome/browser/ui/webui:theme_source",
     "//chrome/browser/ui/webui:webui_util",
-    "//chrome/browser/ui/webui/autofill_and_password_manager_internals:browser_tests",
     "//chrome/browser/ui/webui/autofill_ml_internals:browser_tests",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/bookmarks:browser_tests",

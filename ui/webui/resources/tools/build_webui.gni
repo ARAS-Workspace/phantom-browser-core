@@ -569,7 +569,6 @@ template("build_webui") {
         "//chrome/browser/resources/signin/profile_picker",
         "//chrome/browser/resources/tab_search",
         "//chrome/browser/resources/webui_toolbar",
-        "//components/autofill/core/browser/autofill_and_password_manager_internals",
         "//components/crash/core/browser/resources",
         "//components/download/resources/download_internals",
         "//components/ntp_tiles/webui/resources",

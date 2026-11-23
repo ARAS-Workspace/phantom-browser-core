@@ -186,7 +186,6 @@ def validateJavaScriptAllowed(source_dir, out_dir, platform):
     'chrome/browser/resources/inspect',
     'chrome/browser/resources/net_internals',
     'chrome/test/data/webui',
-    'components/autofill/core/browser/autofill_and_password_manager_internals',
     'components/net_log/resources',
     'content/browser/webrtc/resources',
     'ui/webui/resources/js',

@@ -17,8 +17,6 @@
 #include "base/test/test_mock_time_task_runner.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "chrome/browser/autofill/autofill_uitest_util.h"
-#include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/browsing_data/browsing_data_remover_browsertest_base.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager_factory.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.h"
@@ -27,10 +25,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
-#include "components/autofill/core/browser/data_manager/personal_data_manager.h"
-#include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"
-#include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
 #include "components/browsing_data/core/browsing_data_policies_utils.h"
 #include "components/browsing_data/core/pref_names.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
@@ -479,56 +473,6 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   ApplyBrowsingDataLifetimeDeletion(kPref);
   ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(), url));
   CheckSiteData(GetActiveWebContents(), /*has_site_data=*/false);
-}
-
-// Disabled because "autofill::AddTestProfile" times out when sync is disabled.
-// TODO(crbug.com/40909863): Re-enable this test
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_Autofill DISABLED_Autofill
-#else
-#define MAYBE_Autofill Autofill
-#endif
-IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
-                       MAYBE_Autofill) {
-  // No autofill data saved in incognito mode.
-  if (IsIncognito()) {
-    return;
-  }
-  static constexpr char kPref[] =
-      R"([{"time_to_live_in_hours": 1, "data_types":["autofill"]}])";
-
-  autofill::AutofillProfile profile(
-      "01234567-89ab-cdef-fedc-ba9876543210",
-      autofill::AutofillProfile::RecordType::kLocalOrSyncable,
-      autofill::AddressCountryCode("US"));
-  autofill::test::SetProfileInfo(&profile,
-                                 autofill::test::SetProfileInfoOptionsBuilder()
-                                     .with_first_name("Marion")
-                                     .with_middle_name("Mitchell")
-                                     .with_last_name("Morrison")
-                                     .with_email("johnwayne@me.xyz")
-                                     .with_company("Fox")
-                                     .with_address1("123 Zoo St.")
-                                     .with_address2("unit 5")
-                                     .with_city("Hollywood")
-                                     .with_state("CA")
-                                     .with_zipcode("91601")
-                                     .with_country("US")
-                                     .with_phone("12345678910")
-                                     .Build());
-  autofill::AddTestProfile(GetProfile(), profile);
-  auto* personal_data_manager =
-      autofill::PersonalDataManagerFactory::GetForBrowserContext(GetProfile());
-  EXPECT_EQ(profile.Compare(
-                *personal_data_manager->address_data_manager().GetProfileByGUID(
-                    profile.guid())),
-            0);
-
-  ApplyBrowsingDataLifetimeDeletion(kPref);
-
-  EXPECT_EQ(nullptr,
-            personal_data_manager->address_data_manager().GetProfileByGUID(
-                profile.guid()));
 }
 
 class ChromeBrowsingDataLifetimeManagerShutdownTest

@@ -1013,10 +1013,6 @@
   "components/resources/dev_ui_components_resources.grd": {
     "includes": [7260],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/components/autofill/core/browser/autofill_and_password_manager_internals/resources.grd": {
-    "META": {"sizes": {"includes": [5]}},
-    "includes": [7270],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/autofill_ml_internals/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [7280],

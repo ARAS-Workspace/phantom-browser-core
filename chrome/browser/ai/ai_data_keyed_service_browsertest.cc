@@ -21,15 +21,9 @@
 #include "chrome/common/buildflags.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/autofill/content/browser/content_autofill_driver.h"
-#include "components/autofill/core/browser/foundations/autofill_manager.h"
-#include "components/autofill/core/browser/foundations/autofill_manager_test_api.h"
-#include "components/autofill/core/browser/foundations/test_autofill_manager_waiter.h"
-#include "components/autofill/core/browser/test_utils/autofill_form_test_utils.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
-#include "components/autofill/core/common/form_data.h"
 #include "components/network_session_configurator/common/network_switches.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/proto/features/actions_data.pb.h"
@@ -366,47 +360,6 @@ IN_PROC_BROWSER_TEST_F(AiDataKeyedServiceBrowserTest, SpecifierOff) {
   EXPECT_EQ(ai_data->page_context().inner_text(), "");
   EXPECT_EQ(ai_data->site_engagement().entries().size(), 0);
   EXPECT_TRUE(ai_data->history_query_result().empty());
-}
-
-IN_PROC_BROWSER_TEST_F(AiDataKeyedServiceBrowserTest,
-                       GetFormDataByFieldGlobalIdForModelPrototyping) {
-  // Simulate loading `expected_form`.
-  LoadSimplePage();
-  autofill::ContentAutofillDriver* driver =
-      autofill::ContentAutofillDriver::GetForRenderFrameHost(
-          web_contents()->GetPrimaryMainFrame());
-  const autofill::FormData expected_form = autofill::test::GetFormData(
-      {.fields = {{.label = u"Field 1"}, {.label = u"Field 2"}}});
-  ASSERT_TRUE(driver);
-  autofill::TestAutofillManagerSingleEventWaiter wait_for_forms_seen(
-      driver->GetAutofillManager(),
-      &autofill::AutofillManager::Observer::OnAfterFormsSeen,
-      testing::ElementsAre(expected_form.global_id()), testing::IsEmpty());
-  driver->GetAutofillManager().OnFormsSeen(
-      /*updated_forms=*/{expected_form},
-      /*removed_forms=*/{}, autofill::AutofillManagerTestApi::pass_key());
-  ASSERT_TRUE(std::move(wait_for_forms_seen).Wait());
-
-  // Query the API for `expected_form`'s first field.
-  AiDataKeyedService::AiDataSpecifier specifier;
-  auto* global_id = specifier.mutable_browser_data_collection_specifier()
-                        ->mutable_foreground_tab_page_context_specifier()
-                        ->mutable_field_global_id();
-  global_id->set_frame_token(
-      expected_form.fields()[0].global_id().frame_token->ToString());
-  global_id->set_renderer_id(
-      expected_form.fields()[0].global_id().renderer_id.value());
-  AiData ai_data = QueryAiDataWithSpecifier(std::move(specifier));
-
-  // Expect that the result matches `expected_form`.
-  ASSERT_TRUE(ai_data.has_value());
-  ASSERT_TRUE(ai_data->has_form_data());
-  const optimization_guide::proto::FormData& actual_form = ai_data->form_data();
-  ASSERT_EQ(actual_form.fields_size(), 2);
-  EXPECT_EQ(actual_form.fields(0).field_label(),
-            base::UTF16ToUTF8(expected_form.fields()[0].label()));
-  EXPECT_EQ(actual_form.fields(1).field_label(),
-            base::UTF16ToUTF8(expected_form.fields()[1].label()));
 }
 
 class AiDataKeyedServiceBrowserTestWithBlocklistedExtensions
