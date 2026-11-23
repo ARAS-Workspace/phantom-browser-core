@@ -590,6 +590,14 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
 
   NotifyProfileInitializationComplete();
 
+  // The download manager depends on other download services, so it is
+  // created once the profile initialization completes. The download
+  // history, the download UI controller and the toolbar download button
+  // then load their state at startup.
+  if (IsRegularProfile()) {
+    GetDownloadManager();
+  }
+
   HttpsFirstModeServiceFactory::GetForProfile(this);
 
   // The Privacy Metrics service should start alongside each profile session.
