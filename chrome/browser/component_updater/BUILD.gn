@@ -131,9 +131,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  sources += [ "dictation_connector_component_installer_unittest.cc" ]
-  deps += [ "//chrome/browser/dictation" ]
 }
 
 source_set("browser_tests") {

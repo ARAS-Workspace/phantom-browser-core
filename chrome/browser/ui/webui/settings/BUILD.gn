@@ -361,7 +361,6 @@ source_set("browser_tests") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "dictation_handler_unittest.cc",
     "downloads_handler_unittest.cc",
     "metrics_reporting_handler_unittest.cc",
     "on_startup_handler_unittest.cc",

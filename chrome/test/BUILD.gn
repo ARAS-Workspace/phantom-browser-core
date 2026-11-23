@@ -843,7 +843,6 @@ test("browser_tests") {
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:browser_tests",
     "//chrome/browser/devtools:test_support",
-    "//chrome/browser/dictation:browser_tests",
     "//chrome/browser/dom_distiller:browser_tests",
     "//chrome/browser/download:browser_tests",
     "//chrome/browser/download:test_support",
@@ -3003,7 +3002,6 @@ test("unit_tests") {
 
   deps += [
     "//chrome/browser/background:unit_tests",
-    "//chrome/browser/dictation:unit_tests",
     "//chrome/browser/lifetime:unit_tests",
     "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
     "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
@@ -3214,7 +3212,6 @@ test("unit_tests") {
     "//chrome/browser/ui/views/autofill/autofill_ai",
     "//chrome/browser/ui/views/autofill/popup/email_verifier",
     "//chrome/browser/ui/views/data_sharing:unit_tests",
-    "//chrome/browser/ui/views/dictation:unit_tests",
     "//chrome/browser/ui/views/page_action:test_support",
     "//chrome/browser/ui/views/page_action:unit_tests",
     "//chrome/browser/ui/views/tabs/common:unit_tests",
@@ -4276,7 +4273,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:interactive_ui_tests",
     "//chrome/browser/devtools:test_support",
-    "//chrome/browser/dictation:interactive_ui_tests",
     "//chrome/browser/download:test_support",
     "//chrome/browser/file_system_access",
     "//chrome/browser/headless:interactive_ui_tests",

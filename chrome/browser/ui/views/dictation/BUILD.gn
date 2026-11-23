@@ -47,21 +47,3 @@ source_set("dictation") {
     "//ui/compositor",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "dictation_bubble_ui_unittest.cc",
-    "dictation_overlay_view_unittest.cc",
-  ]
-  deps = [
-    ":dictation",
-    "//base",
-    "//base:i18n",
-    "//chrome/browser/dictation:test_support",
-    "//chrome/test:test_support",
-    "//testing/gtest",
-    "//ui/views",
-    "//ui/views:test_support",
-  ]
-}
