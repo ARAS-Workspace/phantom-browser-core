@@ -1217,7 +1217,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/waap:manager",
     "//chrome/browser/ui/webui/data_sharing",
-    "//chrome/browser/ui/webui/multistep_filter_internals",
     "//chrome/browser/ui/webui/on_device_internals",
     "//chrome/browser/ui/webui/side_panel/bookmarks",
     "//chrome/browser/ui/webui/side_panel/comments",

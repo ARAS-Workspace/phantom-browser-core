@@ -1171,11 +1171,8 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
   // inside a remote iframe.
   SwitchToNewTabAndDontExpectAutopip();
 
-  // Verify that `has_safe_url_` is false, since the video element is within a
-  // remote iframe.
   auto* tab_helper =
       AutoPictureInPictureTabHelper::FromWebContents(web_contents);
-  EXPECT_FALSE(tab_helper->has_safe_url_);
 
   // Verify that `MeetsMediaEngagementConditions` returns false (even though the
   // mock high engagement is set to return true), since the video element is

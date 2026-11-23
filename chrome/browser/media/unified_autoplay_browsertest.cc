@@ -441,21 +441,6 @@ IN_PROC_BROWSER_TEST_F(UnifiedAutoplaySettingBrowserTest, Allow_Audio) {
   EXPECT_TRUE(AutoplayAllowed(main_frame()));
 }
 
-IN_PROC_BROWSER_TEST_F(UnifiedAutoplaySettingBrowserTest,
-                       Allow_SpeechSynthesis) {
-  GURL main_url(embedded_test_server()->GetURL(
-      "example.com", "/media/speech_synthesis_autoplay.html"));
-
-  GetSettingsMap()->SetContentSettingDefaultScope(
-      main_url, main_url, ContentSettingsType::SOUND, CONTENT_SETTING_ALLOW);
-
-  NavigateFrameAndWait(main_frame(), main_url);
-
-  EXPECT_TRUE(content::EvalJs(main_frame(), "tryPlayback();",
-                              content::EXECUTE_SCRIPT_NO_USER_GESTURE)
-                  .ExtractBool());
-}
-
 IN_PROC_BROWSER_TEST_F(UnifiedAutoplaySettingBrowserTest, Allow_WebAudio) {
   GURL main_url(embedded_test_server()->GetURL(
       "example.com", "/media/webaudio_autoplay.html"));

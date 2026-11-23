@@ -87,7 +87,6 @@ inline constexpr char kChromeUIDataSharingInternalsHost[] =
     "data-sharing-internals";
 inline constexpr char kChromeUIDefaultHost[] = "version";
 inline constexpr char kChromeUIDelayedHangUIHost[] = "delayeduithreadhang";
-inline constexpr char kChromeUIDeviceLogHost[] = "device-log";
 inline constexpr char kChromeUIDevToolsBlankPath[] = "blank";
 inline constexpr char kChromeUIDevToolsBundledPath[] = "bundled";
 inline constexpr char kChromeUIDevToolsCustomPath[] = "custom";
@@ -273,8 +272,6 @@ inline constexpr char kChromeUIHistoryClustersSidePanelHost[] =
     "history-clusters-side-panel.top-chrome";
 inline constexpr char kChromeUIHistoryClustersSidePanelURL[] =
     "chrome://history-clusters-side-panel.top-chrome/";
-inline constexpr char kChromeUIMultistepFilterInternalsHost[] =
-    "multistep-filter-internals";
 inline constexpr char kChromeUINearbyInternalsHost[] = "nearby-internals";
 inline constexpr char kChromeUINearbyShareHost[] = "nearby";
 inline constexpr char kChromeUINearbyShareURL[] = "chrome://nearby/";

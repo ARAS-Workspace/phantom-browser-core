@@ -3036,10 +3036,7 @@ test("unit_tests") {
   }
 
   if (is_mac || is_linux) {
-    deps += [
-      "//chrome/browser/multistep_filter:unit_tests",
-      "//chrome/browser/ui/webui/multistep_filter_internals:unit_tests",
-    ]
+    deps += [ "//chrome/browser/multistep_filter:unit_tests" ]
   }
 
   if (is_internal_chrome_branded) {

@@ -146,7 +146,6 @@ def CheckWebDevStyle(input_api, output_api):
 def CheckNoNewJs(input_api, output_api):
   EXCLUDED_PATHS = [
     'chrome/browser/resources/chromeos/',
-    'chrome/browser/resources/device_log/',
     'chrome/browser/resources/gaia_auth_host/',
     'chrome/browser/resources/inspect/',
     'chrome/browser/resources/net_internals/',

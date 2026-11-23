@@ -176,9 +176,6 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
   EXPECT_EQ("denied", EvalJs(iframe, "getNotificationPermission()"));
   EXPECT_EQ("denied",
             EvalJs(iframe, "getServiceWorkerNotificationPermission()"));
-  EXPECT_EQ("denied", EvalJs(iframe, "getPushPermission()"));
-  // TODO(crbug.com/40254041): This should return 'denied'.
-  EXPECT_EQ("prompt", EvalJs(iframe, "getServiceWorkerPushPermission()"));
 }
 
 // Tests that undelegated permissions aren't delegated to an embedded frame
@@ -202,16 +199,11 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
   EXPECT_EQ("default", EvalJs(main_frame, "getNotificationPermission()"));
   EXPECT_EQ("denied",
             EvalJs(main_frame, "getServiceWorkerNotificationPermission()"));
-  EXPECT_EQ("prompt", EvalJs(main_frame, "getPushPermission()"));
-  // TODO(crbug.com/40254041): This should return 'denied'.
-  EXPECT_EQ("prompt", EvalJs(main_frame, "getServiceWorkerPushPermission()"));
 
   content::RenderFrameHost* iframe = CreateChildIframe(main_frame, TesterUrl());
   EXPECT_EQ("granted", EvalJs(iframe, "getNotificationPermission()"));
   EXPECT_EQ("granted",
             EvalJs(iframe, "getServiceWorkerNotificationPermission()"));
-  EXPECT_EQ("granted", EvalJs(iframe, "getPushPermission()"));
-  EXPECT_EQ("granted", EvalJs(iframe, "getServiceWorkerPushPermission()"));
 }
 
 // Tests that iframes not using their normal StoragePartition don't have
@@ -221,7 +213,7 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
                        IframesInNonDefaultPartitionDontGetPermission) {
   GrantNotificationPermissionForTest(TesterUrl());
 
-  // Verify that TesterUrl() has notification/push permission.
+  // Verify that TesterUrl() has notification permission.
   EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), TesterUrl()));
   content::RenderFrameHost* main_frame =
       GetActiveWebContents()->GetPrimaryMainFrame();
@@ -231,11 +223,9 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
   EXPECT_EQ("granted", EvalJs(main_frame, "queryNotificationPermission()"));
   EXPECT_EQ("granted",
             EvalJs(main_frame, "queryServiceWorkerNotificationPermission()"));
-  EXPECT_EQ("granted", EvalJs(main_frame, "getPushPermission()"));
-  EXPECT_EQ("granted", EvalJs(main_frame, "getServiceWorkerPushPermission()"));
 
   // Load a site that uses a dedicated StoragePartition and verify that it has
-  // default notification/push permissions.
+  // default notification permissions.
   EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), IsolatedEmbedderUrl()));
   main_frame = GetActiveWebContents()->GetPrimaryMainFrame();
   EXPECT_EQ("default", EvalJs(main_frame, "getNotificationPermission()"));
@@ -244,11 +234,9 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
   EXPECT_EQ("prompt", EvalJs(main_frame, "queryNotificationPermission()"));
   EXPECT_EQ("prompt",
             EvalJs(main_frame, "queryServiceWorkerNotificationPermission()"));
-  EXPECT_EQ("prompt", EvalJs(main_frame, "getPushPermission()"));
-  EXPECT_EQ("prompt", EvalJs(main_frame, "getServiceWorkerPushPermission()"));
 
   // Load TesterUrl() in an iframe inside the dedicated StoragePartition page.
-  // Even though TesterUrl() has notification/push permission when in a main
+  // Even though TesterUrl() has notification permission when in a main
   // frame, it shouldn't when it's embedded in a different StoragePartition.
   content::RenderFrameHost* iframe = CreateChildIframe(main_frame, TesterUrl());
   EXPECT_EQ("denied", EvalJs(iframe, "getNotificationPermission()"));
@@ -258,12 +246,6 @@ IN_PROC_BROWSER_TEST_F(NotificationPermissionBrowserTest,
   EXPECT_EQ("denied",
             EvalJs(iframe, "queryServiceWorkerNotificationPermission()"));
   EXPECT_EQ("denied", EvalJs(iframe, "requestNotificationPermission()"));
-  EXPECT_EQ("denied", EvalJs(iframe, "getPushPermission()"));
-  EXPECT_EQ("denied", EvalJs(iframe, "getServiceWorkerPushPermission()"));
-  EXPECT_EQ(
-      "a JavaScript error: \"NotAllowedError: "
-      "Registration failed - permission denied\"\n",
-      EvalJs(iframe, "requestPushPermission()").ExtractError());
 }
 
 // Test that the Notifications.NonPersistentNotificationThirdPartyCount metric

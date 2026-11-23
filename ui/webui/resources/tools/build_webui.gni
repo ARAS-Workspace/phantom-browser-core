@@ -552,7 +552,6 @@ template("build_webui") {
         "//chrome/browser/resources/certificate_manager",
         "//chrome/browser/resources/certificate_viewer",
         "//chrome/browser/resources/components",
-        "//chrome/browser/resources/device_log",
         "//chrome/browser/resources/downloads",
         "//chrome/browser/resources/history",
         "//chrome/browser/resources/media",

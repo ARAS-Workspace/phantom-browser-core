@@ -229,7 +229,7 @@ IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, PageActionNavigation) {
   tabs::TabInterface* tab = tabs::TabInterface::GetFromContents(web_contents);
   auto* controller = tab->GetTabFeatures()->page_action_controller();
 
-  controller->Show(kActionAiMode);
+  controller->Show(kActionFind);
   EXPECT_FALSE(control.GetPageActionStates().empty());
 
   ASSERT_TRUE(
@@ -239,7 +239,7 @@ IN_PROC_BROWSER_TEST_F(WebUILocationBarBrowserTest, PageActionNavigation) {
   tab = tabs::TabInterface::GetFromContents(web_contents);
   controller = tab->GetTabFeatures()->page_action_controller();
 
-  controller->Show(kActionAiMode);
+  controller->Show(kActionFind);
   EXPECT_FALSE(control.GetPageActionStates().empty());
 }
 

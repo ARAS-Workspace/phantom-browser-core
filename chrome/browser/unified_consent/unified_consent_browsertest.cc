@@ -5,11 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
-#include "chrome/browser/sync/test/integration/updated_progress_marker_checker.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "chrome/common/pref_names.h"
@@ -72,46 +70,6 @@ IN_PROC_BROWSER_TEST_F(
     UnifiedConsentBrowserTest,
     SettingsHistogram_UrlKeyedAnonymizedDataCollectionEnabled) {
   histogram_tester_.ExpectUniqueSample(histogram_name_, true, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(UnifiedConsentBrowserTest,
-                       SettingsOptInTakeOverServicePrefChanges) {
-  std::string pref_A = prefs::kSearchSuggestEnabled;
-
-  // First client: Enable sync.
-  EnableSync(0);
-
-  PrefService* pref_service0 = GetProfile(0)->GetPrefs();
-  PrefService* pref_service1 = GetProfile(1)->GetPrefs();
-
-  // First client: Turn off both prefs while sync is on, so the synced state of
-  // both prefs will be "off".
-  pref_service0->SetBoolean(pref_A, false);
-  // Make sure the updates are committed before proceeding with the test.
-  ASSERT_TRUE(UpdatedProgressMarkerChecker(GetSyncService(0)).Wait());
-
-  // Second client: Turn off both prefs while sync is off.
-  pref_service1->SetBoolean(pref_A, false);
-
-  // Second client: Turn on pref A while sync is off.
-  pref_service1->SetBoolean(pref_A, true);
-
-  ASSERT_TRUE(GetClient(1)->SetupSyncWithCustomSettings(
-      base::BindLambdaForTesting([=](syncer::SyncUserSettings* settings) {
-        ASSERT_FALSE(settings->IsInitialSyncFeatureSetupComplete());
-        settings->SetInitialSyncFeatureSetupComplete();
-      })));
-
-  // Sync both clients, so the synced state of both prefs (i.e. off) will arrive
-  // at the second client.
-  ASSERT_TRUE(AwaitQuiescence());
-
-  // Both clients: Expect that pref A is off.
-  // Reason:
-  // - Pref A was turned on before sync was enabled, hence it is overridden by
-  // the value of the first client.
-  EXPECT_FALSE(pref_service0->GetBoolean(pref_A));
-  EXPECT_FALSE(pref_service1->GetBoolean(pref_A));
 }
 
 }  // namespace

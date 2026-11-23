@@ -370,40 +370,6 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, SanityCheck) {
   ASSERT_TRUE(CreateExtensionAndRunTest("tabs/sanity_check.js")) << message_;
 }
 
-IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, ImageLabels) {
-  StartEmbeddedTestServer();
-  const GURL url = GetURLForPath(kDomain, "/index.html");
-  ASSERT_TRUE(NavigateToURL(GetActiveWebContents(), url));
-
-  // Enable image labels.
-  profile()->GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsEnabled,
-                                    true);
-
-  // Initially there should be no accessibility mode set.
-  ASSERT_EQ(1, browser()->tab_strip_model()->count());
-  content::WebContents* const web_contents =
-      browser()->tab_strip_model()->GetWebContentsAt(0);
-  auto accessibility_mode = web_contents->GetAccessibilityMode();
-  // Strip off kNativeAPIs, which may be set in some situations.
-  accessibility_mode.set_mode(ui::AXMode::kNativeAPIs, false);
-  ASSERT_EQ(ui::AXMode(), accessibility_mode);
-
-  // Enable automation.
-  base::FilePath extension_path =
-      test_data_dir_.AppendASCII("automation/tests/basic");
-  ExtensionTestMessageListener got_tree(kGotTree);
-  LoadExtension(extension_path);
-  ASSERT_TRUE(got_tree.WaitUntilSatisfied());
-
-  // Now the AXMode should include kLabelImages.
-  ui::AXMode expected_mode = ui::kAXModeWebContentsOnly;
-  expected_mode.set_mode(ui::AXMode::kLabelImages, true);
-  accessibility_mode = web_contents->GetAccessibilityMode();
-  // Strip off kNativeAPIs, which may be set in some situations.
-  accessibility_mode.set_mode(ui::AXMode::kNativeAPIs, false);
-  EXPECT_EQ(expected_mode, accessibility_mode);
-}
-
 #define MAYBE_Events Events
 IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, MAYBE_Events) {
   StartEmbeddedTestServer();

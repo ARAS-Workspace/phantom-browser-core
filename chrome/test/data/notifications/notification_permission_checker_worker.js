@@ -22,12 +22,5 @@ addEventListener('message', async event => {
       messagePort.postMessage(message + ':' + result.state);
       break;
     }
-
-    case 'getServiceWorkerPushPermission': {
-      let pushManager = self.registration.pushManager;
-      let result = await pushManager.permissionState({userVisibleOnly:true});
-      messagePort.postMessage(message + ':' + result);
-      break;
-    }
   }
 });

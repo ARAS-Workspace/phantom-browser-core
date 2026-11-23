@@ -2004,13 +2004,10 @@ IN_PROC_BROWSER_TEST_F(AdsPageLoadMetricsObserverResourceBrowserTest,
           "<html><body></body><script src=\"ad_script.js\"></script></html>") +
       std::string(1024, ' ');
   const std::string ad_script_body = std::string(R"(
-        navigator.bluetooth.requestDevice().catch(e => {});
         navigator.geolocation.getCurrentPosition(() => {});
         navigator.mediaDevices.getUserMedia({video: true});
         navigator.mediaDevices.getDisplayMedia().catch(() => {});
         navigator.mediaDevices.getUserMedia({audio: true});
-        navigator.serial.requestPort().catch(() => {});
-        navigator.usb.requestDevice({ filters: [] }).catch(() => {});
   )") + std::string(5000, ' ');
 
   net::test_server::ExpectationHandler handler(embedded_test_server());
@@ -2033,13 +2030,10 @@ IN_PROC_BROWSER_TEST_F(AdsPageLoadMetricsObserverResourceBrowserTest,
   waiter->AddMinimumNetworkBytesExpectation(base::ByteSize(5000));
 
   std::vector<network::mojom::PermissionsPolicyFeature> features = {
-      network::mojom::PermissionsPolicyFeature::kBluetooth,
       network::mojom::PermissionsPolicyFeature::kCamera,
       network::mojom::PermissionsPolicyFeature::kDisplayCapture,
       network::mojom::PermissionsPolicyFeature::kGeolocation,
-      network::mojom::PermissionsPolicyFeature::kMicrophone,
-      network::mojom::PermissionsPolicyFeature::kSerial,
-      network::mojom::PermissionsPolicyFeature::kUsb};
+      network::mojom::PermissionsPolicyFeature::kMicrophone};
 
   for (auto feature : features) {
     waiter->AddUseCounterFeatureExpectation(

@@ -19,31 +19,8 @@ async function queryServiceWorkerNotificationPermission() {
   return sendMessage('queryServiceWorkerNotificationPermission');
 }
 
-async function getPushPermission() {
-  let sw = await getServiceWorkerRegistration();
-  return sw.pushManager.permissionState({userVisibleOnly:true});
-}
-
-async function getServiceWorkerPushPermission() {
-  return sendMessage('getServiceWorkerPushPermission');
-}
-
 async function requestNotificationPermission() {
   return Notification.requestPermission();
-}
-
-async function requestPushPermission() {
-  let sw = await getServiceWorkerRegistration();
-  let dummy_application_server_key = new Array(65);
-  dummy_application_server_key[0] = 0x04;
-  let options = {
-    userVisibleOnly: true,
-    applicationServerKey: 
-      new TextEncoder().encode(
-        String.fromCharCode(...dummy_application_server_key)),
-  };
-
-  return sw.pushManager.subscribe(options);
 }
 
 // Sends a message to the service worker and returns a promise that resolves

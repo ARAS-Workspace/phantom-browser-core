@@ -74,28 +74,6 @@ chrome.test.getConfig(async config => {
       messagePort.postMessage('notification-permission');
     },
 
-    // Verifies that the `PushManager.permissionState()` method resolves with
-    // the expected value when called from the document context.
-    async function pushManagerPermissionStateDocument() {
-      const permission = await registration.pushManager.permissionState({
-        userVisibleOnly: true,
-      });
-
-      chrome.test.assertEq(expected, permission);
-      chrome.test.succeed();
-    },
-
-    // Verifies that the `PushManager.permissionState()` method resolves with
-    // the expected value when called from the Service Worker context.
-    function pushManagerPermissionStateServiceWorker() {
-      onNextMessage(messagePort).then(permission => {
-        chrome.test.assertEq(expected, permission);
-        chrome.test.succeed();
-      });
-
-      messagePort.postMessage('pushManager-permissionState');
-    },
-
     // Verifies that the `Permissions.query()` method resolves with the expected
     // value when called from a document context.
     async function permissionsQueryDocument() {

@@ -39,7 +39,6 @@ enum class LogEventType {
 };
 
 // Represents a single log entry for the Multistep Filter feature.
-// LINT.IfChange(LogEntry)
 struct LogEntry {
   // The time when the logged event occurred.
   base::Time timestamp = base::Time::Now();
@@ -72,7 +71,6 @@ struct LogEntry {
            LogEventType type,
            std::string_view host);
 };
-// LINT.ThenChange(//chrome/browser/ui/webui/multistep_filter_internals/multistep_filter_internals.mojom:LogEntry)
 
 }  // namespace multistep_filter
 

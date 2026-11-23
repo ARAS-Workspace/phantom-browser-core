@@ -192,7 +192,6 @@ group("dev_ui_resources") {
     "components:resources",
     "content_settings:resources",
     "context_hub:resources",
-    "device_log:resources",
     "engagement:resources",
     "media:resources",
     "memory_internals:resources",
@@ -228,7 +227,6 @@ group("dev_ui_resources") {
   public_deps += [
     "color_pipeline_internals:resources",
     "infobar_internals:resources",
-    "multistep_filter_internals:resources",
     "on_device_internals:resources",
     "user_education_internals:resources",
   ]
@@ -255,7 +253,6 @@ repack("dev_ui_paks") {
     "$root_gen_dir/chrome/components_resources.pak",
     "$root_gen_dir/chrome/content_settings_resources.pak",
     "$root_gen_dir/chrome/context_hub_resources.pak",
-    "$root_gen_dir/chrome/device_log_resources.pak",
     "$root_gen_dir/chrome/engagement_resources.pak",
     "$root_gen_dir/chrome/media_resources.pak",
     "$root_gen_dir/chrome/memory_internals_resources.pak",
@@ -291,7 +288,6 @@ repack("dev_ui_paks") {
   sources += [
     "$root_gen_dir/chrome/color_pipeline_internals_resources.pak",
     "$root_gen_dir/chrome/infobar_internals_resources.pak",
-    "$root_gen_dir/chrome/multistep_filter_internals_resources.pak",
     "$root_gen_dir/chrome/on_device_internals_resources.pak",
     "$root_gen_dir/chrome/user_education_internals_resources.pak",
   ]

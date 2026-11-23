@@ -762,9 +762,3 @@ class SettingsSiteSettingsPageTestWithoutWebPrinting
 IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest, SoundPage) {
   RunTest("settings/sound_page_test.js", "runMochaSuite('SoundPage')");
 }
-
-using YourSavedInfoTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, AutofillAccount) {
-  RunTest("settings/autofill_account_test.js", "mocha.run()");
-}

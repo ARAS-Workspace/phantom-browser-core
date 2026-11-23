@@ -21,11 +21,6 @@ addEventListener('message', event => {
       case 'notification-permission':
         messagePort.postMessage(Notification.permission);
         break;
-      case 'pushManager-permissionState':
-        messagePort.postMessage(await registration.pushManager.permissionState({
-          userVisibleOnly: true,
-        }));
-        break;
       case 'permissions-query':
         const permissionState = await navigator.permissions.query({
           name: 'notifications',

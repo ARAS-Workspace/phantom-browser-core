@@ -627,14 +627,14 @@ IN_PROC_BROWSER_TEST_F(GenericMimeHandlerBrowserTest,
   content::RenderFrameHost* extension_frame = LoadHandlerAndGetExtensionFrame();
   ASSERT_TRUE(extension_frame);
 
-  // `local-fonts` is EnableForSelf-by-default; without delegation a
+  // `camera` is EnableForSelf-by-default; without delegation a
   // cross-origin child would not receive it.
   GURL child_url = embedded_test_server()->GetURL("cdn.example", "/echo");
   content::TestNavigationObserver iframe_observer(GetActiveWebContents());
   ASSERT_TRUE(content::ExecJs(
       extension_frame,
       content::JsReplace("const f = document.createElement('iframe');"
-                         "f.allow = 'local-fonts';"
+                         "f.allow = 'camera';"
                          "f.src = $1;"
                          "document.body.appendChild(f);",
                          child_url)));
@@ -644,7 +644,7 @@ IN_PROC_BROWSER_TEST_F(GenericMimeHandlerBrowserTest,
       content::ChildFrameAt(extension_frame, 0);
   ASSERT_TRUE(child_frame);
   EXPECT_TRUE(child_frame->IsFeatureEnabled(
-      network::mojom::PermissionsPolicyFeature::kLocalFonts));
+      network::mojom::PermissionsPolicyFeature::kCamera));
 }
 
 // Verifies that a user permission granted to the embedder origin does
