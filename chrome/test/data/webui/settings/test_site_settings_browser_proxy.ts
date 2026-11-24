@@ -90,7 +90,6 @@ export class TestSiteSettingsBrowserProxy extends TestBrowserProxy implements
 
 
     this.categoryList_ = [
-      ContentSettingsTypes.ADS,
       ContentSettingsTypes.AR,
       ContentSettingsTypes.AUTO_PICTURE_IN_PICTURE,
       ContentSettingsTypes.AUTOMATIC_DOWNLOADS,
