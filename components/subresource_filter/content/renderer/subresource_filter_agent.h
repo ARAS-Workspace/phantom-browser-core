@@ -138,8 +138,6 @@ class SubresourceFilterAgent
   void DidFailProvisionalLoad() override;
   void DidFinishLoad() override;
   void WillCreateWorkerFetchContext(blink::WebWorkerFetchContext*) override;
-  void OnOverlayPopupAdDetected() override;
-  void OnLargeStickyAdDetected() override;
   void DidCreateFencedFrame(
       const blink::RemoteFrameToken& placeholder_token) override;
 

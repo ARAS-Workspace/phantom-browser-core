@@ -600,13 +600,6 @@ void ContentSubresourceFilterThrottleManager::OnReloadRequested() {
   profile_interaction_manager_->OnReloadRequested();
 }
 
-void ContentSubresourceFilterThrottleManager::OnAdsViolationTriggered(
-    content::RenderFrameHost* rfh,
-    mojom::AdsViolation triggered_violation) {
-  profile_interaction_manager_->OnAdsViolationTriggered(rfh,
-                                                        triggered_violation);
-}
-
 // static
 void ContentSubresourceFilterThrottleManager::LogAction(
     SubresourceFilterAction action) {
@@ -838,16 +831,6 @@ void ContentSubresourceFilterThrottleManager::SetDocumentLoadStatistics(
   if (statistics_) {
     statistics_->OnDocumentLoadStatistics(*statistics);
   }
-}
-
-void ContentSubresourceFilterThrottleManager::OnAdsViolationTriggered(
-    mojom::AdsViolation violation) {
-  CHECK(page_);
-  CHECK_EQ(&GetSubresourceFilterRootPage(&receiver_.CurrentTargetFrame()),
-           page_);
-  // TODO(bokan) How should we deal with violations coming from a fenced frame?
-  // Should we pass in the fenced frame root instead? crbug.com/1263541.
-  OnAdsViolationTriggered(&page_->GetMainDocument(), violation);
 }
 
 void ContentSubresourceFilterThrottleManager::FrameWasCreatedByAdScript() {

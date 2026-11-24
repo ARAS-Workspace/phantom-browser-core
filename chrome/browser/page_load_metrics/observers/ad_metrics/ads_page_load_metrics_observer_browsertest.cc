@@ -82,9 +82,6 @@ using OriginStatus = page_load_metrics::OriginStatus;
 using OriginStatusWithThrottling =
     page_load_metrics::OriginStatusWithThrottling;
 
-const char kAdsInterventionRecordedHistogram[] =
-    "SubresourceFilter.PageLoad.AdsInterventionTriggered";
-
 const char kCrossOriginHistogramId[] =
     "PageLoad.Clients.Ads.FrameCounts.AdFrames.PerFrame."
     "OriginStatus";
@@ -1869,7 +1866,6 @@ class AdsPageLoadMetricsObserverResourceBrowserTest
       const {
     std::vector<base::test::FeatureRefAndParams> enabled{
         {subresource_filter::kAdTagging, {}},
-        {subresource_filter::kAdsInterventionsEnforced, {}},
         {heavy_ad_intervention::features::kHeavyAdIntervention, {}},
         {heavy_ad_intervention::features::
              kHeavyAdInterventionSendReportToEmbedder,
@@ -2606,108 +2602,6 @@ IN_PROC_BROWSER_TEST_F(AdsPageLoadMetricsObserverResourceBrowserTest,
       base::FeatureList::GetFieldTrial(
           heavy_ad_intervention::features::kHeavyAdIntervention)
           ->trial_name()));
-}
-
-// Check that the Heavy Ad Intervention fires the correct number of times to
-// protect privacy, and that after that limit is hit, the Ads Intervention
-// Framework takes over for future navigations.
-
-// TODO(crbug.com/361671258): Flaky on multiple platforms
-IN_PROC_BROWSER_TEST_F(
-    AdsPageLoadMetricsObserverResourceBrowserTest,
-    DISABLED_HeavyAdInterventionBlocklistFull_InterventionBlocked) {
-  std::vector<std::unique_ptr<net::test_server::ControllableHttpResponse>>
-      http_responses(4);
-  for (auto& http_response : http_responses) {
-    http_response =
-        std::make_unique<net::test_server::ControllableHttpResponse>(
-            embedded_test_server(), "/ads_observer/incomplete_resource.js",
-            false /*relative_url_is_prefix*/);
-  }
-  base::HistogramTester histogram_tester;
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Create a waiter for the navigation and navigate.
-  auto waiter = CreateAdsPageLoadMetricsTestWaiter();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL(
-                     "foo.com", "/ad_tagging/frame_factory.html")));
-
-  // Load and block the resource. The ads intervention framework should not
-  // be triggered at this point.
-  LoadHeavyAdResourceAndWaitOrError(http_responses[0].get(), waiter.get(),
-                                    /*will_block=*/true);
-  histogram_tester.ExpectUniqueSample(
-      kHeavyAdInterventionTypeHistogramId,
-      page_load_metrics::HeavyAdStatus::kNetwork, 1);
-  histogram_tester.ExpectTotalCount(kAdsInterventionRecordedHistogram, 0);
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 0);
-
-  // Block a second resource on the page. The ads intervention framework should
-  // not be triggered at this point.
-  LoadHeavyAdResourceAndWaitOrError(http_responses[1].get(), waiter.get(),
-                                    /*will_block=*/true);
-  histogram_tester.ExpectUniqueSample(
-      kHeavyAdInterventionTypeHistogramId,
-      page_load_metrics::HeavyAdStatus::kNetwork, 2);
-  histogram_tester.ExpectTotalCount(kAdsInterventionRecordedHistogram, 0);
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 0);
-
-  // Create a new waiter for the next navigation and navigate.
-  waiter = CreateAdsPageLoadMetricsTestWaiter();
-  // Set query to ensure that it's not treated as a reload as preview metrics
-  // are not recorded for reloads.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(),
-      embedded_test_server()->GetURL(
-          "foo.com", "/ad_tagging/frame_factory.html?avoid_reload")));
-
-  // Load and block the resource. The ads intervention framework should
-  // be triggered at this point.
-  LoadHeavyAdResourceAndWaitOrError(http_responses[2].get(), waiter.get(),
-                                    /*will_block=*/true);
-  histogram_tester.ExpectUniqueSample(
-      kHeavyAdInterventionTypeHistogramId,
-      page_load_metrics::HeavyAdStatus::kNetwork, 3);
-  histogram_tester.ExpectUniqueSample(
-      kAdsInterventionRecordedHistogram,
-      subresource_filter::mojom::AdsViolation::kHeavyAdsInterventionAtHostLimit,
-      1);
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 0);
-
-  // Allow a second resource on the page. The ads intervention shouldn't fire a
-  // second time.
-  LoadHeavyAdResourceAndWaitOrError(http_responses[3].get(), waiter.get(),
-                                    /*will_block=*/false);
-  histogram_tester.ExpectUniqueSample(
-      kHeavyAdInterventionTypeHistogramId,
-      page_load_metrics::HeavyAdStatus::kNetwork, 3);
-  histogram_tester.ExpectUniqueSample(
-      kAdsInterventionRecordedHistogram,
-      subresource_filter::mojom::AdsViolation::kHeavyAdsInterventionAtHostLimit,
-      1);
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 0);
-
-  // Reset the waiter and navigate again. Check we show the Ads Intervention UI.
-  waiter.reset();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL(
-                     "foo.com", "/ad_tagging/frame_factory.html")));
-  histogram_tester.ExpectUniqueSample(
-      kAdsInterventionRecordedHistogram,
-      subresource_filter::mojom::AdsViolation::kHeavyAdsInterventionAtHostLimit,
-      1);
-  histogram_tester.ExpectBucketCount(
-      "SubresourceFilter.Actions2",
-      subresource_filter::SubresourceFilterAction::kUIShown, 1);
 }
 
 // Verifies that the blocklist is setup correctly and the intervention triggers

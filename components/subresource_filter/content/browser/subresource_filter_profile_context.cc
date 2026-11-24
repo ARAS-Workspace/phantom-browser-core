@@ -11,7 +11,6 @@
 #include "base/check_deref.h"
 #include "base/memory/scoped_refptr.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
-#include "components/subresource_filter/content/browser/ads_intervention_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
 
 namespace subresource_filter {
@@ -26,7 +25,6 @@ class SubresourceFilterProfileContext::Storage {
   Storage(HostContentSettingsMap* settings_map,
           scoped_refptr<content_settings::CookieSettings> cookie_settings)
       : settings_manager_(settings_map),
-        ads_intervention_manager_(&settings_manager_),
         cookie_settings_(std::move(cookie_settings)) {}
 
   Storage(const Storage&) = delete;
@@ -36,10 +34,6 @@ class SubresourceFilterProfileContext::Storage {
 
   SubresourceFilterContentSettingsManager* settings_manager() {
     return &settings_manager_;
-  }
-
-  AdsInterventionManager* ads_intervention_manager() {
-    return &ads_intervention_manager_;
   }
 
   content_settings::CookieSettings* cookie_settings() {
@@ -54,13 +48,9 @@ class SubresourceFilterProfileContext::Storage {
 
  private:
   // The declaration order of those objects ensure the raw_ptr<T>
-  // are destroyed before the objects they point to (e.g. in particular
-  // `ads_intervention_manager_` has a pointer to `settings_manager_`).
+  // are destroyed before the objects they point to.
 
   SubresourceFilterContentSettingsManager settings_manager_;
-  // Manages ads interventions that have been triggered on previous
-  // navigations.
-  AdsInterventionManager ads_intervention_manager_;
   scoped_refptr<content_settings::CookieSettings> cookie_settings_;
   std::unique_ptr<EmbedderData> embedder_data_;
 };
@@ -76,11 +66,6 @@ SubresourceFilterProfileContext::~SubresourceFilterProfileContext() = default;
 SubresourceFilterContentSettingsManager*
 SubresourceFilterProfileContext::settings_manager() {
   return CHECK_DEREF(storage_).settings_manager();
-}
-
-AdsInterventionManager*
-SubresourceFilterProfileContext::ads_intervention_manager() {
-  return CHECK_DEREF(storage_).ads_intervention_manager();
 }
 
 content_settings::CookieSettings*

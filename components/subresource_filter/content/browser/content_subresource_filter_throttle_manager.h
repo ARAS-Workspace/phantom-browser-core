@@ -203,10 +203,6 @@ class ContentSubresourceFilterThrottleManager
   // blocked ads (e.g., via an infobar).
   void OnReloadRequested();
 
-  // Invoked when an ads violation is detected in `rfh`.
-  void OnAdsViolationTriggered(content::RenderFrameHost* rfh,
-                               mojom::AdsViolation triggered_violation);
-
   static void LogAction(SubresourceFilterAction action);
 
   void SetIsAdFrameForTesting(content::RenderFrameHost* render_frame_host,
@@ -320,7 +316,6 @@ class ContentSubresourceFilterThrottleManager
       const blink::RemoteFrameToken& placeholder_token) override;
   void SetDocumentLoadStatistics(
       mojom::DocumentLoadStatisticsPtr statistics) override;
-  void OnAdsViolationTriggered(mojom::AdsViolation violation) override;
 
   // Gets a filter for the navigation from `throttle`, creates and returns a new
   // filter, or returns `nullptr`. Also updates `frame_host_filter_map_` as

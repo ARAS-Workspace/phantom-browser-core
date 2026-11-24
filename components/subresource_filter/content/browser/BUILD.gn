@@ -10,8 +10,6 @@ static_library("browser") {
     "activation_state_computing_navigation_throttle.h",
     "ad_tagging_utils.cc",
     "ad_tagging_utils.h",
-    "ads_intervention_manager.cc",
-    "ads_intervention_manager.h",
     "child_frame_navigation_filtering_throttle.cc",
     "child_frame_navigation_filtering_throttle.h",
     "content_subresource_filter_throttle_manager.cc",
@@ -123,7 +121,6 @@ source_set("unit_tests") {
   testonly = true
   sources = [
     "activation_state_computing_navigation_throttle_unittest.cc",
-    "ads_intervention_manager_unittest.cc",
     "child_frame_navigation_filtering_throttle_unittest.cc",
     "content_subresource_filter_throttle_manager_unittest.cc",
     "navigation_console_logger_unittest.cc",

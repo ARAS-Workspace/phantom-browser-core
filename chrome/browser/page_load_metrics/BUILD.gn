@@ -214,10 +214,7 @@ source_set("browser_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
   sources = [
-    "observers/ad_metrics/ad_density_intervention_browsertest.cc",
     "observers/ad_metrics/ads_page_load_metrics_observer_browsertest.cc",
-    "observers/ad_metrics/large_sticky_ad_intervention_browsertest.cc",
-    "observers/ad_metrics/overlay_popup_ad_intervention_browsertest.cc",
     "observers/bookmark_bar_page_load_metrics_observer_browsertest.cc",
     "observers/core/amp_page_load_metrics_observer_browsertest.cc",
     "observers/core/ukm_page_load_metrics_observer_browsertest.cc",

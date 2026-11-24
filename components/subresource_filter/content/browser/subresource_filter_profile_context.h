@@ -20,7 +20,6 @@ class CookieSettings;
 namespace subresource_filter {
 
 class SubresourceFilterContentSettingsManager;
-class AdsInterventionManager;
 
 // This class holds BrowserContext-scoped context for subresource filtering. The
 // embedder should use KeyedServiceFactory to associate instances of this class
@@ -50,7 +49,6 @@ class SubresourceFilterProfileContext : public KeyedService {
   // Shutdown() is called and it is invalid to call the methods after
   // the call to Shutdown().
   SubresourceFilterContentSettingsManager* settings_manager();
-  AdsInterventionManager* ads_intervention_manager();
   content_settings::CookieSettings* cookie_settings();
 
   // Can be used to attach an embedder-level object to this object. Can only be

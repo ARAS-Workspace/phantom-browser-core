@@ -279,10 +279,6 @@ class AdsPageLoadMetricsObserver
   // |ad_frames_data_storage_|.
   FrameTreeData* FindFrameData(content::FrameTreeNodeId id);
 
-  // When a page has reached its limit of heavy ads interventions, will trigger
-  // ads interventions for all ads on the page if appropriate.
-  void MaybeTriggerStrictHeavyAdIntervention();
-
   // Triggers the heavy ad intervention page in the target frame if it is safe
   // to do so on this origin, and the frame meets the criteria to be considered
   // a heavy ad. This first sends an intervention report to every affected

@@ -48,10 +48,6 @@ class ProfileInteractionManager {
   // (e.g., via an infobar).
   void OnReloadRequested();
 
-  // Invoked when an ads violation is triggered.
-  void OnAdsViolationTriggered(content::RenderFrameHost* rfh,
-                               mojom::AdsViolation triggered_violation);
-
   // Invoked when a notification should potentially be shown to the user that
   // ads are being blocked on this page. Will make the final determination as to
   // whether the notification should be shown. On Android this will show an
@@ -73,8 +69,6 @@ class ProfileInteractionManager {
   // Unowned and must outlive this object.
   raw_ptr<SubresourceFilterProfileContext, DanglingUntriaged> profile_context_ =
       nullptr;
-
-  bool ads_violation_triggered_for_last_committed_navigation_ = false;
 
   base::WeakPtrFactory<ProfileInteractionManager> weak_ptr_factory_{this};
 };

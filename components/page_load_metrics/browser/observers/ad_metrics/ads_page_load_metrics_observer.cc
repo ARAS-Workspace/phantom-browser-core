@@ -1290,32 +1290,6 @@ FrameTreeData* AdsPageLoadMetricsObserver::FindFrameData(
   return id_and_data->second.Get();
 }
 
-void AdsPageLoadMetricsObserver::MaybeTriggerStrictHeavyAdIntervention() {
-  DCHECK(heavy_ads_blocklist_reason_.has_value());
-  if (heavy_ads_blocklist_reason_ !=
-      blocklist::BlocklistReason::kUserOptedOutOfHost) {
-    return;
-  }
-
-  // TODO(bokan): ContentSubresourceFilterThrottleManager is now associated
-  // with a FrameTree. When AdsPageLoadMetricsObserver becomes aware of MPArch
-  // this should use the associated page rather than the primary page.
-  auto* throttle_manager =
-      subresource_filter::ContentSubresourceFilterThrottleManager::FromPage(
-          GetDelegate().GetWebContents()->GetPrimaryPage());
-  // AdsPageLoadMetricsObserver is not created unless there is a
-  // throttle manager.
-  DCHECK(throttle_manager);
-
-  // Violations can be triggered multiple times for the same page as
-  // violations after the first are ignored. Ad frame violations are
-  // attributed to the main frame url.
-  throttle_manager->OnAdsViolationTriggered(
-      GetDelegate().GetWebContents()->GetPrimaryMainFrame(),
-      subresource_filter::mojom::AdsViolation::
-          kHeavyAdsInterventionAtHostLimit);
-}
-
 void AdsPageLoadMetricsObserver::MaybeTriggerHeavyAdIntervention(
     content::RenderFrameHost* render_frame_host,
     FrameTreeData* frame_data) {
@@ -1426,14 +1400,6 @@ void AdsPageLoadMetricsObserver::MaybeTriggerHeavyAdIntervention(
         true /* opt_out */,
         static_cast<int>(
             heavy_ad_intervention::HeavyAdBlocklistType::kHeavyAdOnlyType));
-    // Once we report, we need to check and see if we are now blocklisted.
-    // If we are, then we might trigger stricter interventions.
-    // TODO(ericrobinson): This does a couple fetches of the blocklist.  It
-    // might be simpler to fetch it once at the start of this function and use
-    // it throughout.
-    if (IsBlocklisted(false)) {
-      MaybeTriggerStrictHeavyAdIntervention();
-    }
   }
 
   // Record this UMA regardless of if we actually unload or not, as sending

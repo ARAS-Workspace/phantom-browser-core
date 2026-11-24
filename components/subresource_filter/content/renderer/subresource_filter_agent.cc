@@ -398,16 +398,6 @@ void SubresourceFilterAgent::WillCreateWorkerFetchContext(
                          weak_ptr_factory_.GetWeakPtr())));
 }
 
-void SubresourceFilterAgent::OnOverlayPopupAdDetected() {
-  GetSubresourceFilterHost()->OnAdsViolationTriggered(
-      subresource_filter::mojom::AdsViolation::kOverlayPopupAd);
-}
-
-void SubresourceFilterAgent::OnLargeStickyAdDetected() {
-  GetSubresourceFilterHost()->OnAdsViolationTriggered(
-      subresource_filter::mojom::AdsViolation::kLargeStickyAd);
-}
-
 void SubresourceFilterAgent::DidCreateFencedFrame(
     const blink::RemoteFrameToken& placeholder_token) {
   if (render_frame()->GetWebFrame()->IsAdScriptInStack()) {
