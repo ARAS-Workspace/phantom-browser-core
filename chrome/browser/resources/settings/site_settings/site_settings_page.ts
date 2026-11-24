@@ -45,16 +45,6 @@ function getCategoryItemMap(): Map<ContentSettingsTypes, CategoryListItem> {
   // these appear in the UI is determined elsewhere in this file.
   const categoryList: CategoryListItem[] = [
     {
-      route: routes.SITE_SETTINGS_ADS,
-      id: Id.ADS,
-      label: 'siteSettingsAds',
-      icon: 'privacy:web-asset',
-      enabledLabel: 'siteSettingsAdsAllowed',
-      disabledLabel: 'siteSettingsAdsBlocked',
-      shouldShow: () =>
-          loadTimeData.getBoolean('enableSafeBrowsingSubresourceFilter'),
-    },
-    {
       route: routes.SITE_SETTINGS_AUTO_VERIFY,
       id: Id.ANTI_ABUSE,
       label: 'siteSettingsAntiAbuse',
@@ -495,7 +485,6 @@ export class SettingsSiteSettingsPageElement extends
             ]),
             contentAdvanced: buildItemListFromIds([
               Id.SOUND,
-              Id.ADS,
               Id.ZOOM_LEVELS,
               Id.PDF_DOCUMENTS,
               Id.PROTECTED_CONTENT,

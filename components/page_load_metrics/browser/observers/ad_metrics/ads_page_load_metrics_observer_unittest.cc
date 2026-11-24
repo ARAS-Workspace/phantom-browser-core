@@ -488,13 +488,6 @@ class AdsPageLoadMetricsObserverTest
         web_contents(), this,
         base::BindRepeating(&AdsPageLoadMetricsObserverTest::RegisterObservers,
                             base::Unretained(this)));
-
-    // Run all sites in dry run mode, so that AdTagging works as expected. In
-    // browser environments, all sites activate with dry run by default.
-    scoped_configuration().ResetConfiguration(subresource_filter::Configuration(
-        subresource_filter::mojom::ActivationLevel::kDryRun,
-        subresource_filter::ActivationScope::ALL_SITES,
-        subresource_filter::ActivationList::SUBRESOURCE_FILTER));
   }
 
   // Returns the final RenderFrameHost after navigation commits.

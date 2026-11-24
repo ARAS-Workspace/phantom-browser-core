@@ -178,7 +178,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
         triggerId = 'securityLinkRow';
         break;
       case 'siteSettings':
-      case 'siteSettingsAds':
       case 'siteSettingsAll':
       case 'siteSettingsAr':
       case 'siteSettingsAutomaticDownloads':

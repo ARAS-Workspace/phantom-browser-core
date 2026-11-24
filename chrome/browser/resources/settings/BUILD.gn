@@ -62,7 +62,6 @@ build_webui("build") {
     "simple_confirmation_dialog.ts",
     "site_favicon.ts",
     "site_settings/add_site_dialog.ts",
-    "site_settings/ads_page.ts",
     "site_settings/all_sites.ts",
     "site_settings/anti_abuse_page.ts",
     "site_settings/ar_page.ts",

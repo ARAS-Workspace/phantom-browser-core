@@ -45,9 +45,6 @@ disk. These rules come from the `RulesetServiceDelegate` as an `UnindexedRuleset
 which will be downloaded via the [Component Updater](/components/component_updater/README.md).
 It also performs other tasks like deleting obsolete rulesets.
 
-The code in this component also maintains a global `ConfigurationList`, which
-defines how the entire subresource_filter component behaves.
-
 #### [core/common](/components/subresource_filter/core/common)
 The code in core/common deals with logic involved in filtering subresources that
 is used in both browser and renderer processes. The most important class is the

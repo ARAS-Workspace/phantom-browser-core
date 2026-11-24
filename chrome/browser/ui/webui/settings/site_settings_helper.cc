@@ -29,7 +29,6 @@
 #include "chrome/browser/file_system_access/file_system_access_features.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/url_identity.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
@@ -53,9 +52,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/strings/grit/privacy_sandbox_strings.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
-#include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/url_formatter/elide_url.h"
 #include "components/url_formatter/url_formatter.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
@@ -322,19 +318,6 @@ SiteSettingSource CalculateSiteSettingSource(
     return SiteSettingSource::kExtension;  // Source #5.
   }
 
-  if (content_type == ContentSettingsType::ADS &&
-      base::FeatureList::IsEnabled(
-          subresource_filter::kSafeBrowsingSubresourceFilter)) {
-    subresource_filter::SubresourceFilterContentSettingsManager*
-        settings_manager =
-            SubresourceFilterProfileContextFactory::GetForProfile(profile)
-                ->settings_manager();
-
-    if (settings_manager->GetSiteActivationFromMetadata(origin)) {
-      return SiteSettingSource::kAdsFilterBlocklist;  // Source #6.
-    }
-  }
-
   DCHECK_NE(SettingSource::kNone, info.source);
   if (info.source == SettingSource::kUser) {
     if (result.source == content::PermissionStatusSource::MULTIPLE_DISMISSALS ||
@@ -525,11 +508,6 @@ std::vector<ContentSettingsType> GetVisiblePermissionCategories(
       base_types->push_back(ContentSettingsType::FEDERATED_IDENTITY_API);
     }
 
-    if (base::FeatureList::IsEnabled(
-            subresource_filter::kSafeBrowsingSubresourceFilter)) {
-      base_types->push_back(ContentSettingsType::ADS);
-    }
-
     if (base::FeatureList::IsEnabled(blink::features::kSpeakerSelection)) {
       base_types->push_back(ContentSettingsType::SPEAKER_SELECTION);
     }
@@ -573,8 +551,6 @@ std::string SiteSettingSourceToString(const SiteSettingSource source) {
   switch (source) {
     case SiteSettingSource::kAllowlist:
       return "allowlist";
-    case SiteSettingSource::kAdsFilterBlocklist:
-      return "ads-filter-blacklist";
     case SiteSettingSource::kDefault:
       return "default";
     case SiteSettingSource::kEmbargo:

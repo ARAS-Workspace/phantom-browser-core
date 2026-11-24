@@ -269,64 +269,6 @@ suite('SiteDetailsPermission', function() {
     assertFalse(testElement.$.permission.disabled);
   });
 
-  test('info string correct for ads', function() {
-    const origin = 'https://www.example.com';
-    testElement.category = ContentSettingsTypes.ADS;
-    testElement.site = createRawSiteException(origin, {
-      origin: origin,
-      embeddingOrigin: origin,
-      setting: ContentSetting.BLOCK,
-      source: SiteSettingSource.ADS_FILTER_BLACKLIST,
-    });
-    assertEquals(
-        'Site shows intrusive or misleading ads' +
-            '\nAllow\nBlock\nAsk',
-        testElement.$.permissionItem.innerText.trim());
-    assertTrue(testElement.$.permissionItem.classList.contains('two-line'));
-    assertFalse(testElement.$.permission.disabled);
-
-    // Check the string that shows when ads is blocked but not blacklisted.
-    testElement.site = createRawSiteException(origin, {
-      origin: origin,
-      embeddingOrigin: origin,
-      setting: ContentSetting.BLOCK,
-      source: SiteSettingSource.PREFERENCE,
-    });
-    assertEquals(
-        'Block if site shows intrusive or misleading ads' +
-            '\nAllow\nBlock\nAsk',
-        testElement.$.permissionItem.innerText.trim());
-    assertTrue(testElement.$.permissionItem.classList.contains('two-line'));
-    assertFalse(testElement.$.permission.disabled);
-
-    // Ditto for default block settings.
-    testElement.site = createRawSiteException(origin, {
-      origin: origin,
-      embeddingOrigin: origin,
-      setting: ContentSetting.BLOCK,
-      source: SiteSettingSource.DEFAULT,
-    });
-    assertEquals(
-        'Block if site shows intrusive or misleading ads' +
-            '\nBlock (default)\nAllow\nBlock\nAsk',
-        testElement.$.permissionItem.innerText.trim());
-    assertTrue(testElement.$.permissionItem.classList.contains('two-line'));
-    assertFalse(testElement.$.permission.disabled);
-
-    // Allowing ads for unblacklisted sites shows nothing.
-    testElement.site = createRawSiteException(origin, {
-      origin: origin,
-      embeddingOrigin: origin,
-      setting: ContentSetting.ALLOW,
-      source: SiteSettingSource.PREFERENCE,
-    });
-    assertEquals(
-        'Block (default)\nAllow\nBlock\nAsk',
-        testElement.$.permissionItem.innerText.trim());
-    assertFalse(testElement.$.permissionItem.classList.contains('two-line'));
-    assertFalse(testElement.$.permission.disabled);
-  });
-
   test('info string correct for allowlisted source', function() {
     const origin = 'chrome://test';
     testElement.category = ContentSettingsTypes.NOTIFICATIONS;

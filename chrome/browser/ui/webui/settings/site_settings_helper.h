@@ -52,7 +52,6 @@ struct StorageAccessEmbeddingException {
 // Note: this should not be used for default content setting sources, which
 // instead use `ProviderToDefaultSettingSourceString`.
 enum class SiteSettingSource {
-  kAdsFilterBlocklist,
   kEmbargo,
   kInsecureOrigin,
   kKillSwitch,

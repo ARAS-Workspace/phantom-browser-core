@@ -10,7 +10,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
-#include "components/subresource_filter/content/browser/devtools_interaction_tracker.h"
 
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "components/printing/browser/print_to_pdf/pdf_print_utils.h"
@@ -45,41 +44,17 @@ PageHandler::~PageHandler() {
   Disable();
 }
 
-void PageHandler::ToggleAdBlocking(bool enabled) {
-  if (!web_contents_)
-    return;
-
-  // Create the DevtoolsInteractionTracker lazily (note that this call is a
-  // no-op if the object was already created).
-  subresource_filter::DevtoolsInteractionTracker::CreateForWebContents(
-      web_contents_.get());
-
-  subresource_filter::DevtoolsInteractionTracker::FromWebContents(
-      web_contents_.get())
-      ->ToggleForceActivation(enabled);
-}
-
 protocol::Response PageHandler::Enable(
     std::optional<bool> enable_file_chooser_opened_event) {
-  enabled_ = true;
   // Do not mark the command as handled. Let it fall through instead, so that
   // the handler in content gets a chance to process the command.
   return protocol::Response::FallThrough();
 }
 
 protocol::Response PageHandler::Disable() {
-  enabled_ = false;
-  ToggleAdBlocking(false /* enable */);
   // Do not mark the command as handled. Let it fall through instead, so that
   // the handler in content gets a chance to process the command.
   return protocol::Response::FallThrough();
-}
-
-protocol::Response PageHandler::SetAdBlockingEnabled(bool enabled) {
-  if (!enabled_)
-    return protocol::Response::ServerError("Page domain is disabled.");
-  ToggleAdBlocking(enabled);
-  return protocol::Response::Success();
 }
 
 protocol::Response PageHandler::SetRPHRegistrationMode(

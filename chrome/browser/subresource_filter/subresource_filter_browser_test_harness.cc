@@ -146,16 +146,4 @@ void SubresourceFilterBrowserTest::OpenAndPublishRuleset(
   ruleset_service->OnRulesetSet(std::move(index_file));
 }
 
-void SubresourceFilterBrowserTest::ResetConfiguration(Configuration config) {
-  scoped_configuration_.ResetConfiguration(std::move(config));
-}
-
-void SubresourceFilterBrowserTest::ResetConfigurationToEnableOnPhishingSites(
-    bool measure_performance) {
-  Configuration config = Configuration::MakePresetForLiveRunOnPhishingSites();
-  config.activation_options.performance_measurement_rate =
-      measure_performance ? 1.0 : 0.0;
-  ResetConfiguration(std::move(config));
-}
-
 }  // namespace subresource_filter

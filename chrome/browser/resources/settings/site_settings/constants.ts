@@ -111,7 +111,6 @@ export enum CookieControlsMode {
  * chrome/browser/ui/webui/settings/site_settings_helper.h
  */
 export enum SiteSettingSource {
-  ADS_FILTER_BLACKLIST = 'ads-filter-blacklist',
   ALLOWLIST = 'allowlist',
   DEFAULT = 'default',
   EMBARGO = 'embargo',

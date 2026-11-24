@@ -23,7 +23,6 @@
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
 #include "components/subresource_filter/core/common/activation_decision.h"
-#include "components/subresource_filter/core/common/activation_list.h"
 #include "components/subresource_filter/core/common/constants.h"
 #include "components/subresource_filter/core/common/test_ruleset_creator.h"
 #include "components/subresource_filter/core/common/test_ruleset_utils.h"
@@ -54,11 +53,6 @@ void SubresourceFilterTestHarness::SetUp() {
 
   // Set up prefs-related state needed by various tests.
   user_prefs::UserPrefs::Set(browser_context(), &pref_service_);
-
-  // Ensure correct features.
-  scoped_configuration_.ResetConfiguration(Configuration(
-      mojom::ActivationLevel::kEnabled, ActivationScope::ACTIVATION_LIST,
-      ActivationList::SUBRESOURCE_FILTER));
 
   // Set up the ruleset service.
   ASSERT_TRUE(ruleset_service_dir_.CreateUniqueTempDir());

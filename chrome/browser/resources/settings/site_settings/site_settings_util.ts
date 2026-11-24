@@ -13,8 +13,6 @@ import {ContentSetting, ContentSettingsTypes} from './constants.js';
 export function getLocalizationStringForContentType(
     contentSettingsType: ContentSettingsTypes): string|null {
   switch (contentSettingsType) {
-    case ContentSettingsTypes.ADS:
-      return 'siteSettingsAdsMidSentence';
     case ContentSettingsTypes.AR:
       return 'siteSettingsArMidSentence';
     case ContentSettingsTypes.AUTO_PICTURE_IN_PICTURE:

@@ -73,7 +73,6 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/strings/grit/components_branded_strings.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/sync/base/features.h"
 #include "components/sync/service/sync_service.h"
@@ -1536,11 +1535,7 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
       {"siteSettingsSourcePolicyBlock",
        IDS_PAGE_INFO_PERMISSION_BLOCKED_BY_POLICY},
       {"siteSettingsSourcePolicyAsk", IDS_PAGE_INFO_PERMISSION_ASK_BY_POLICY},
-      {"siteSettingsAdsBlockNotBlocklistedSingular",
-       IDS_SETTINGS_SITE_SETTINGS_ADS_BLOCK_NOT_BLOCKLISTED_SINGULAR},
       {"siteSettingsAllowlisted", IDS_SETTINGS_SITE_SETTINGS_ALLOWLISTED},
-      {"siteSettingsAdsBlockBlocklistedSingular",
-       IDS_SETTINGS_SITE_SETTINGS_ADS_BLOCK_BLOCKLISTED_SINGULAR},
       {"siteSettingsSourceEmbargo",
        IDS_PAGE_INFO_PERMISSION_AUTOMATICALLY_BLOCKED},
       {"siteSettingsSourceInsecureOrigin",
@@ -1651,14 +1646,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SITE_SETTINGS_CUSTOMIZED_BEHAVIORS_DESCRIPTION},
       {"siteSettingsCustomizedBehaviorsDescriptionShort",
        IDS_SETTINGS_SITE_SETTINGS_CUSTOMIZED_BEHAVIORS_DESCRIPTION_SHORT},
-      {"siteSettingsAdsDescription",
-       IDS_SETTINGS_SITE_SETTINGS_ADS_DESCRIPTION},
-      {"siteSettingsAdsAllowed", IDS_SETTINGS_SITE_SETTINGS_ADS_ALLOWED},
-      {"siteSettingsAdsBlocked", IDS_SETTINGS_SITE_SETTINGS_ADS_BLOCKED},
-      {"siteSettingsAdsAllowedExceptions",
-       IDS_SETTINGS_SITE_SETTINGS_ADS_ALLOWED_EXCEPTIONS},
-      {"siteSettingsAdsBlockedExceptions",
-       IDS_SETTINGS_SITE_SETTINGS_ADS_BLOCKED_EXCEPTIONS},
       {"siteSettingsArDescription", IDS_SETTINGS_SITE_SETTINGS_AR_DESCRIPTION},
       {"siteSettingsArAllowed", IDS_SETTINGS_SITE_SETTINGS_AR_ALLOWED},
       {"siteSettingsArBlocked", IDS_SETTINGS_SITE_SETTINGS_AR_BLOCKED},
@@ -1977,8 +1964,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SITE_SETTINGS_VR_BLOCKED_EXCEPTIONS},
       {"siteSettingsZoomLevelsDescription",
        IDS_SETTINGS_SITE_SETTINGS_ZOOM_LEVELS_DESCRIPTION},
-      {"siteSettingsAds", IDS_SITE_SETTINGS_TYPE_ADS},
-      {"siteSettingsAdsMidSentence", IDS_SITE_SETTINGS_TYPE_ADS_MID_SENTENCE},
       {"siteSettingsPaymentHandler", IDS_SITE_SETTINGS_TYPE_PAYMENT_HANDLER},
       {"siteSettingsPaymentHandlerMidSentence",
        IDS_SITE_SETTINGS_TYPE_PAYMENT_HANDLER_MID_SENTENCE},
@@ -2146,11 +2131,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
            : IDS_SITE_SETTINGS_TYPE_MOTION_SENSORS_MID_SENTENCE},
   };
   html_source->AddLocalizedStrings(kSensorsLocalizedStrings);
-
-  html_source->AddBoolean(
-      "enableSafeBrowsingSubresourceFilter",
-      base::FeatureList::IsEnabled(
-          subresource_filter::kSafeBrowsingSubresourceFilter));
 
   html_source->AddBoolean(
       "enableBlockAutoplayContentSetting",

@@ -35,7 +35,6 @@ suite('PrivacyPageIndex', function() {
           enableLocalNetworkAccessSetting: false,
           enablePaymentHandlerContentSetting: false,
           enablePersistentPermissions: false,
-          enableSafeBrowsingSubresourceFilter: false,
           // <if expr="is_chromeos">
           enableSmartCardReadersContentSetting: false,
           enableWebPrintingContentSetting: false,
@@ -322,15 +321,6 @@ suite('PrivacyPageIndex', function() {
         await testViewsForRoute(
             routeInfo.route, [routeInfo.viewId], routeInfo.parentViewId);
       }
-    });
-
-    test('RoutingAds', async function() {
-      assertFalse(
-          loadTimeData.getBoolean('enableSafeBrowsingSubresourceFilter'));
-      await createPrivacyPageIndex({enableSafeBrowsingSubresourceFilter: true});
-
-      return testViewsForRoute(
-          routes.SITE_SETTINGS_ADS, ['siteSettingsAds'], 'privacy');
     });
 
     // TODO(https://crbug.com/530054694): Flaky on Linux.

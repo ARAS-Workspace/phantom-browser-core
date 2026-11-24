@@ -362,7 +362,7 @@ export class SiteDetailsPermissionElement extends
                // Set all permission info string arguments as null. This is OK
                // because there is no need to know what the information string
                // will be, just whether there is one or not.
-               null, null, null, null, null, null,
+               null, null, null, null,
                // <if expr="is_win and _google_chrome">
                null,
                // </if>
@@ -577,17 +577,12 @@ export class SiteDetailsPermissionElement extends
    * @param setting The permission setting.
    * @param  allowlistString The string to show if the permission is
    *     allowlisted.
-   * @param adsBlocklistString The string to show if the site is
-   *     blocklisted for showing bad ads.
-   * @param adsBlockString The string to show if ads are blocked, but
-   *     the site is not blocklisted.
    * @return The permission information string to display in the HTML.
    */
   private permissionInfoString_(
       source: SiteSettingSource, category: ContentSettingsTypes,
       setting: ContentSetting,
-      allowlistString: string|null, adsBlocklistString: string|null,
-      adsBlockString: string|null, embargoString: string|null,
+      allowlistString: string|null, embargoString: string|null,
       insecureOriginString: string|null, killSwitchString: string|null,
       // <if expr="is_win and _google_chrome">
       protectedContentIdentifierAllowedString: string|null,
@@ -617,15 +612,6 @@ export class SiteDetailsPermissionElement extends
 
     if (source === SiteSettingSource.ALLOWLIST) {
       return htmlOrNull(allowlistString);
-    } else if (source === SiteSettingSource.ADS_FILTER_BLACKLIST) {
-      assert(
-          ContentSettingsTypes.ADS === category,
-          'The ads filter blocklist only applies to Ads.');
-      return htmlOrNull(adsBlocklistString);
-    } else if (
-        category === ContentSettingsTypes.ADS &&
-        setting === ContentSetting.BLOCK) {
-      return htmlOrNull(adsBlockString);
     } else if (source === SiteSettingSource.EMBARGO) {
       assert(
           ContentSetting.BLOCK === setting,

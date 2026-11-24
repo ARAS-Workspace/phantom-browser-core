@@ -124,13 +124,6 @@ export class SettingsPrivacyPageIndexElement extends
       },
       // </if>
 
-      enableSafeBrowsingSubresourceFilter_: {
-        type: Boolean,
-        value: () => {
-          return loadTimeData.getBoolean('enableSafeBrowsingSubresourceFilter');
-        },
-      },
-
       enableKeyboardLockPrompt_: {
         type: Boolean,
         value: () => loadTimeData.getBoolean('enableKeyboardLockPrompt'),
@@ -159,7 +152,6 @@ export class SettingsPrivacyPageIndexElement extends
   declare private enableSmartCardReadersContentSetting_: boolean;
   declare private enableWebPrintingContentSetting_: boolean;
   // </if>
-  declare private enableSafeBrowsingSubresourceFilter_: boolean;
   declare private enableKeyboardLockPrompt_: boolean;
   declare private enableLocalNetworkAccessSetting_: boolean;
   declare private enablePaymentHandlerContentSetting_: boolean;

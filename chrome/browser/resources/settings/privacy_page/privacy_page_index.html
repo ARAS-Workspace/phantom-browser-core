@@ -49,17 +49,6 @@
     </settings-site-settings-page>
   </template>
 
-  <template is="dom-if" if="[[enableSafeBrowsingSubresourceFilter_]]">
-    <template is="dom-if" if="[[renderView_(
-        routes_.SITE_SETTINGS_ADS, currentRoute, inSearchMode)]]"
-        update-when-false>
-      <settings-ads-page slot="view" id="siteSettingsAds"
-          data-parent-view-id="privacy"
-          route-path$="[[routes_.SITE_SETTINGS_ADS.path]]">
-      </settings-ads-page>
-    </template>
-  </template>
-
   <template is="dom-if" if="[[renderView_(
       routes_.SITE_SETTINGS_ALL, currentRoute, inSearchMode)]]"
       update-when-false>

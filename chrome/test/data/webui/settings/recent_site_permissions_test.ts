@@ -55,10 +55,11 @@ suite('CrSettingsRecentSitePermissionsTest', function() {
     for (const contentSettingType of Object.values(ContentSettingsTypes)) {
       if (contentSettingType === ContentSettingsTypes.STORAGE_ACCESS ||
           contentSettingType ===
-              ContentSettingsTypes.TOP_LEVEL_STORAGE_ACCESS) {
+              ContentSettingsTypes.TOP_LEVEL_STORAGE_ACCESS ||
+          contentSettingType === ContentSettingsTypes.ADS) {
         // Skip permission types that are not single origin; in the actual
         // implementation, getRecentSitePermissions only lists single origin
-        // permissions.
+        // permissions. ADS is not listed as a visible permission category.
         continue;
       }
       Router.getInstance().navigateTo(routes.BASIC);
@@ -109,7 +110,7 @@ suite('CrSettingsRecentSitePermissionsTest', function() {
           }),
           createRawSiteException(origin1, {
             setting: ContentSetting.ALLOW,
-            type: ContentSettingsTypes.ADS,
+            type: ContentSettingsTypes.AR,
           }),
           createRawSiteException(origin1, {
             setting: ContentSetting.BLOCK,
@@ -168,7 +169,7 @@ suite('CrSettingsRecentSitePermissionsTest', function() {
     let allowed = i18n(
         'recentPermissionAllowedTwoItems',
         i18n('siteSettingsCameraMidSentence'),
-        i18n('siteSettingsAdsMidSentence'));
+        i18n('siteSettingsArMidSentence'));
     const autoBlocked = i18n(
         'recentPermissionAutoBlockedOneItem',
         i18n('siteSettingsMidiDevicesMidSentence'));

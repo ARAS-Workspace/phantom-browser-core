@@ -34,13 +34,10 @@ class PageHandler : public protocol::Page::Backend {
 
   ~PageHandler() override;
 
-  void ToggleAdBlocking(bool enabled);
-
   // Page::Backend:
   protocol::Response Enable(
       std::optional<bool> enable_file_chooser_opened_event) override;
   protocol::Response Disable() override;
-  protocol::Response SetAdBlockingEnabled(bool enabled) override;
   protocol::Response SetRPHRegistrationMode(
       const protocol::String& mode) override;
   void PrintToPDF(std::optional<bool> landscape,
@@ -73,7 +70,6 @@ class PageHandler : public protocol::Page::Backend {
   scoped_refptr<content::DevToolsAgentHost> agent_host_;
   base::WeakPtr<content::WebContents> web_contents_;
 
-  bool enabled_ = false;
   const bool is_trusted_;
 
   base::WeakPtrFactory<PageHandler> weak_ptr_factory_{this};

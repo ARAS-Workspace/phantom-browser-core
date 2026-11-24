@@ -13,7 +13,6 @@ import './privacy_page/cookies_page.js';
 import './privacy_page/security/security_page_v2.js';
 import './search_page/search_engines_page.js';
 import './simple_confirmation_dialog.js';
-import './site_settings/ads_page.js';
 import './site_settings/all_sites.js';
 import './site_settings/anti_abuse_page.js';
 import './site_settings/ar_page.js';

@@ -120,9 +120,6 @@ suite('SiteDetails', function() {
               ContentSettingsTypes.PROTECTED_CONTENT,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
-              ContentSettingsTypes.ADS,
-              [createRawSiteException('https://foo.com:443')]),
-          createContentSettingTypeToValuePair(
               ContentSettingsTypes.CLIPBOARD,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(

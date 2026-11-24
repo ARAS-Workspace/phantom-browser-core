@@ -21,7 +21,6 @@
 #include "components/subresource_filter/content/browser/subresource_filter_observer_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
-#include "components/subresource_filter/core/browser/subresource_filter_features_test_support.h"
 #include "components/subresource_filter/core/common/test_ruleset_creator.h"
 #include "components/url_pattern_index/proto/rules.pb.h"
 #include "content/public/test/fenced_frame_test_util.h"
@@ -31,7 +30,6 @@
 
 namespace proto = url_pattern_index::proto;
 
-using subresource_filter::testing::ScopedSubresourceFilterConfigurator;
 using subresource_filter::testing::TestRulesetPublisher;
 using subresource_filter::testing::TestRulesetCreator;
 using subresource_filter::testing::TestRulesetPair;
@@ -124,16 +122,10 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
   void OpenAndPublishRuleset(RulesetService* ruleset_service,
                              const base::FilePath& indexed_ruleset_path);
 
-  void ResetConfiguration(Configuration config);
-
-  void ResetConfigurationToEnableOnPhishingSites(
-      bool measure_performance = false);
-
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 
   TestRulesetCreator ruleset_creator_;
-  ScopedSubresourceFilterConfigurator scoped_configuration_;
 
   // Owned by the profile.
   raw_ptr<SubresourceFilterProfileContext, AcrossTasksDanglingUntriaged>
