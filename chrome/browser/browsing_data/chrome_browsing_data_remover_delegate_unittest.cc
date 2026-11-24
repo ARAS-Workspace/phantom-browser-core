@@ -66,7 +66,6 @@
 
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/storage/persistent_storage_permission_context.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
 #include "chrome/browser/ui/find_bar/find_bar_state.h"
@@ -2469,7 +2468,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateWithNELServiceTest,
 // value for each of them and removing data.
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, AllTypesAreGettingDeleted) {
   TestingProfile* profile = GetProfile();
-  ASSERT_TRUE(SubresourceFilterProfileContextFactory::GetForProfile(profile));
 
   auto* map = HostContentSettingsMapFactory::GetForProfile(profile);
   auto* registry = content_settings::WebsiteSettingsRegistry::GetInstance();
@@ -2486,6 +2484,7 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, AllTypesAreGettingDeleted) {
       ContentSettingsType::IMPORTANT_SITE_INFO,
 
       // No remaining code writes or clears this type.
+      ContentSettingsType::ADS_DATA,
       ContentSettingsType::PASSWORD_PROTECTION,
       ContentSettingsType::SAFE_BROWSING_URL_CHECK_DATA,
   };
@@ -2693,7 +2692,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateOriginTrialsTest,
   url::Origin origin = url::Origin::Create(GURL("https://example.com"));
 
   TestingProfile* profile = GetProfile();
-  ASSERT_TRUE(SubresourceFilterProfileContextFactory::GetForProfile(profile));
 
   std::vector<std::string> tokens{kPersistentOriginTrialToken};
   content::OriginTrialsControllerDelegate* delegate =

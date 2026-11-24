@@ -2686,7 +2686,6 @@ test("unit_tests") {
     "//chrome/browser/storage_access_api:unit_tests",
     "//chrome/browser/strike_database",
     "//chrome/browser/subresource_filter",
-    "//chrome/browser/subresource_filter:unit_tests",
     "//chrome/browser/sync",
     "//chrome/browser/sync:unit_tests",
     "//chrome/browser/tab_group_sync",

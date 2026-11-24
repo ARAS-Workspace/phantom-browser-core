@@ -14,14 +14,11 @@
 #include "base/strings/string_util.h"
 #include "base/test/bind.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
 #include "components/subresource_filter/core/browser/verified_ruleset_dealer.h"
 #include "components/subresource_filter/core/common/common_features.h"
@@ -43,7 +40,6 @@ const char SubresourceFilterBrowserTest::kEvaluationTotalWallDurationForPage[];
 const char SubresourceFilterBrowserTest::kEvaluationTotalCPUDurationForPage[];
 const char SubresourceFilterBrowserTest::kEvaluationWallDuration[];
 const char SubresourceFilterBrowserTest::kEvaluationCPUDuration[];
-const char SubresourceFilterBrowserTest::kSubresourceFilterActionsHistogram[];
 
 // ================= SubresourceFilterSharedBrowserTest =======================
 
@@ -97,10 +93,6 @@ void SubresourceFilterBrowserTest::SetUpOnMainThread() {
   embedded_test_server()->ServeFilesFromDirectory(test_data_dir);
 
   ASSERT_TRUE(embedded_test_server()->Start());
-
-  auto* web_contents = chrome_test_utils::GetActiveWebContents(this);
-  profile_context_ = SubresourceFilterProfileContextFactory::GetForProfile(
-      Profile::FromBrowserContext(web_contents->GetBrowserContext()));
 }
 
 void SubresourceFilterBrowserTest::SetRulesetToDisallowURLsWithPathSuffix(

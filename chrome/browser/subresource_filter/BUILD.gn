@@ -3,17 +3,10 @@
 # found in the LICENSE file.
 
 source_set("subresource_filter") {
-  public = [
-    "chrome_content_subresource_filter_web_contents_helper_factory.h",
-    "subresource_filter_history_observer.h",
-    "subresource_filter_profile_context_factory.h",
-  ]
+  public = [ "chrome_content_subresource_filter_web_contents_helper_factory.h" ]
 
-  sources = [
-    "chrome_content_subresource_filter_web_contents_helper_factory.cc",
-    "subresource_filter_history_observer.cc",
-    "subresource_filter_profile_context_factory.cc",
-  ]
+  sources =
+      [ "chrome_content_subresource_filter_web_contents_helper_factory.cc" ]
 
   public_deps = [
     "//base",
@@ -31,24 +24,6 @@ source_set("subresource_filter") {
     "//components/subresource_filter/content/browser",
     "//components/subresource_filter/core/browser",
     "//url",
-  ]
-}
-
-source_set("unit_tests") {
-  testonly = true
-
-  sources = [ "subresource_filter_history_observer_unittest.cc" ]
-
-  deps = [
-    ":subresource_filter",
-    "//base",
-    "//chrome/browser/history",
-    "//chrome/test:test_support",
-    "//components/history/core/browser",
-    "//components/history/core/test",
-    "//components/subresource_filter/content/browser",
-    "//content/test:test_support",
-    "//testing/gtest",
   ]
 }
 

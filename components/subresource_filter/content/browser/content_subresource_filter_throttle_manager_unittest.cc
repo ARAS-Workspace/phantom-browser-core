@@ -21,13 +21,9 @@
 #include "base/test/test_simple_task_runner.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/content_settings/browser/page_specific_content_settings.h"
-#include "components/content_settings/core/common/content_settings_types.h"
 #include "components/subresource_filter/content/browser/child_frame_navigation_test_utils.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
-#include "components/subresource_filter/content/browser/profile_interaction_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_observer_manager.h"
-#include "components/subresource_filter/content/browser/throttle_manager_test_support.h"
 #include "components/subresource_filter/content/mojom/subresource_filter.mojom.h"
 #include "components/subresource_filter/core/browser/async_document_subresource_filter.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
@@ -224,16 +220,8 @@ class ContentSubresourceFilterThrottleManagerTest
                                              /*expected_checksum=*/0,
                                              base::DoNothing());
 
-    throttle_manager_test_support_ =
-        std::make_unique<ThrottleManagerTestSupport>(web_contents);
-
-    // Turn off smart UI to make it easier to reason about expectations on
-    // ShowNotification() being invoked.
-    throttle_manager_test_support_->SetShouldUseSmartUI(false);
-
     ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-        web_contents, throttle_manager_test_support_->profile_context(),
-        dealer_handle_.get());
+        web_contents, dealer_handle_.get());
 
     Observe(web_contents);
 
@@ -252,7 +240,6 @@ class ContentSubresourceFilterThrottleManagerTest
     DeleteContents();
     dealer_handle_.reset();
 
-    throttle_manager_test_support_.reset();
     base::RunLoop().RunUntilIdle();
     content::RenderViewHostTestHarness::TearDown();
   }
@@ -318,15 +305,6 @@ class ContentSubresourceFilterThrottleManagerTest
     return throttle_manager()->ruleset_handle_for_testing();
   }
 
-  bool ads_blocked_in_content_settings() {
-    auto* content_settings =
-        content_settings::PageSpecificContentSettings::GetForFrame(
-            content::RenderViewHostTestHarness::web_contents()
-                ->GetPrimaryMainFrame());
-
-    return content_settings->IsContentBlocked(ContentSettingsType::ADS);
-  }
-
  protected:
   // content::WebContentsObserver
   void RenderFrameCreated(content::RenderFrameHost* new_host) override {
@@ -379,7 +357,6 @@ class ContentSubresourceFilterThrottleManagerTest
 
   testing::TestRulesetCreator test_ruleset_creator_;
   testing::TestRulesetPair test_ruleset_pair_;
-  std::unique_ptr<ThrottleManagerTestSupport> throttle_manager_test_support_;
 
   std::unique_ptr<VerifiedRulesetDealer::Handle> dealer_handle_;
 
@@ -406,8 +383,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest, NoPageActivation) {
@@ -425,7 +400,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, NoPageActivation) {
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
             SimulateCommitAndGetResult(navigation_simulator()));
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -446,8 +420,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   // But it should still be activated.
   ExpectActivationSignalForFrame(child, true /* expect_activation */,
                                  true /* is_ad_frame */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -466,7 +438,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
             SimulateRedirectAndGetResult(
                 navigation_simulator(),
                 GURL("https://www.example.com/disallowed.html")));
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -489,8 +460,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   content::RenderFrameHost* child =
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(child, true /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 // This should fail if the throttle manager notifies the delegate twice of a
@@ -507,14 +476,10 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
-  EXPECT_TRUE(ads_blocked_in_content_settings());
-
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/2/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -529,20 +494,14 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
-  EXPECT_TRUE(ads_blocked_in_content_settings());
-
   // Commit another navigation that triggers page level activation.
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation2));
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/2/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -564,8 +523,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   content::RenderFrameHost* child =
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 // Once there are no activated frames, the manager drops its ruleset handle. If
@@ -579,8 +536,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, RulesetHandleRegeneration) {
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
-  EXPECT_TRUE(ads_blocked_in_content_settings());
-
   // Simulate a renderer crash which should delete the frame.
   EXPECT_TRUE(ManagerHasRulesetHandle());
   process()->SimulateCrash();
@@ -590,14 +545,10 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, RulesetHandleRegeneration) {
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
-  EXPECT_FALSE(ads_blocked_in_content_settings());
-
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -633,8 +584,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   content::RenderFrameHost* child =
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -661,8 +610,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -687,8 +634,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   content::RenderFrameHost* child =
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 // Ensure activation propagates into great-grandchild frames, including cross
@@ -726,8 +671,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, ActivationPropagation) {
                                    subframe2);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 // Ensure activation propagates through allowlisted documents.
@@ -759,8 +702,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(subframe2, true /* expect_activation */);
 
-  EXPECT_FALSE(ads_blocked_in_content_settings());
-
   // An identical series of events that don't match allowlist rules cause
   // filtering.
   CreateSubframeWithTestNavigation(GURL("https://average-joe.com"), main_rfh());
@@ -777,8 +718,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       GURL("https://www.example.com/disallowed.html"), subframe3);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 // Same-site navigations within a single RFH do not persist activation.
@@ -806,8 +745,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   content::RenderFrameHost* child =
       navigation_simulator()->GetFinalRenderFrameHost();
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -818,10 +755,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
                 web_contents.get()),
             nullptr);
 
-  ThrottleManagerTestSupport throttle_manager_test_support(web_contents.get());
-  SubresourceFilterProfileContext* profile_context =
-      throttle_manager_test_support.profile_context();
-
   {
     base::test::ScopedFeatureList scoped_feature;
     scoped_feature.InitAndDisableFeature(kSafeBrowsingSubresourceFilter);
@@ -829,8 +762,7 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
     // CreateForWebContents() should not do anything if the subresource filter
     // feature is not enabled.
     ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-        web_contents.get(), profile_context,
-        dealer_handle());
+        web_contents.get(), dealer_handle());
     EXPECT_EQ(ContentSubresourceFilterWebContentsHelper::FromWebContents(
                   web_contents.get()),
               nullptr);
@@ -839,16 +771,14 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   // If the subresource filter feature is enabled (as it is by default),
   // CreateForWebContents() should create and attach an instance.
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-      web_contents.get(), profile_context,
-      dealer_handle());
+      web_contents.get(), dealer_handle());
   auto* helper = ContentSubresourceFilterWebContentsHelper::FromWebContents(
       web_contents.get());
   EXPECT_NE(helper, nullptr);
 
   // A second call should not attach a different instance.
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-      web_contents.get(), profile_context,
-      dealer_handle());
+      web_contents.get(), dealer_handle());
   EXPECT_EQ(ContentSubresourceFilterWebContentsHelper::FromWebContents(
                 web_contents.get()),
             helper);
@@ -868,8 +798,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
 }
 
 // If the RenderFrame determines that the frame is an ad due to creation by ad
@@ -1055,8 +983,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(greatGrandchild, true /* expect_activation */,
                                  true /* is_ad_frame */);
   EXPECT_TRUE(throttle_manager()->IsRenderFrameHostTaggedAsAd(greatGrandchild));
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -1091,36 +1017,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(grandchild, true /* expect_activation */,
                                  false /* is_ad_frame */);
   EXPECT_FALSE(throttle_manager()->IsRenderFrameHostTaggedAsAd(grandchild));
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
-}
-
-TEST_P(ContentSubresourceFilterThrottleManagerTest,
-       FirstDisallowedLoadCalledOutOfOrder) {
-  NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));
-
-  auto* web_contents = RenderViewHostTestHarness::web_contents();
-  mojo::AssociatedRemote<mojom::SubresourceFilterHost> remote;
-  ContentSubresourceFilterThrottleManager::BindReceiver(
-      remote.BindNewEndpointAndPassDedicatedReceiver(),
-      &web_contents->GetPrimaryPage().GetMainDocument());
-  ASSERT_TRUE(remote.is_bound());
-  ASSERT_TRUE(remote.is_connected());
-
-  NavigateAndCommitMainFrame(GURL(kTestURLWithNoActivation));
-
-  // Simulate the previous navigation sending an IPC that a load was
-  // disallowed.  This could happen e.g. for cross-process navigations, which
-  // have no ordering guarantees. Navigating to a new page will usually dispose
-  // the remote end of the mojo binding so the mojo call will be a no-op,
-  // though in some cases the binding may survive (e.g. page is put into
-  // BFCache). Ensure that even if it does survive, a stale call doesn't show
-  // UI.
-  remote.FlushForTesting();
-  remote->DidDisallowFirstSubresource();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(ads_blocked_in_content_settings());
 }
 
 // Basic test of throttle manager lifetime and getter methods. Ensure a new

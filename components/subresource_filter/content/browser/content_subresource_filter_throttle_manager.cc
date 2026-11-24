@@ -21,7 +21,6 @@
 #include "components/subresource_filter/content/browser/ad_tagging_utils.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
 #include "components/subresource_filter/content/browser/page_load_statistics.h"
-#include "components/subresource_filter/content/browser/profile_interaction_manager.h"
 #include "components/subresource_filter/content/browser/safe_browsing_child_navigation_throttle.h"
 #include "components/subresource_filter/content/browser/utils.h"
 #include "components/subresource_filter/content/common/utils.h"
@@ -68,7 +67,6 @@ void ContentSubresourceFilterThrottleManager::BindReceiver(
 // static
 std::unique_ptr<ContentSubresourceFilterThrottleManager>
 ContentSubresourceFilterThrottleManager::CreateForNewPage(
-    SubresourceFilterProfileContext* profile_context,
     VerifiedRulesetDealer::Handle* dealer_handle,
     ContentSubresourceFilterWebContentsHelper& web_contents_helper,
     content::NavigationHandle& initiating_navigation_handle) {
@@ -79,8 +77,7 @@ ContentSubresourceFilterThrottleManager::CreateForNewPage(
   }
 
   return std::make_unique<ContentSubresourceFilterThrottleManager>(
-      profile_context, dealer_handle, web_contents_helper,
-      initiating_navigation_handle);
+      dealer_handle, web_contents_helper, initiating_navigation_handle);
 }
 
 // static
@@ -99,15 +96,11 @@ ContentSubresourceFilterThrottleManager::FromNavigationHandle(
 
 ContentSubresourceFilterThrottleManager::
     ContentSubresourceFilterThrottleManager(
-        SubresourceFilterProfileContext* profile_context,
         VerifiedRulesetDealer::Handle* dealer_handle,
         ContentSubresourceFilterWebContentsHelper& web_contents_helper,
         content::NavigationHandle& initiating_navigation_handle)
     : receiver_(initiating_navigation_handle.GetWebContents(), this),
       dealer_handle_(dealer_handle),
-      profile_interaction_manager_(
-          std::make_unique<subresource_filter::ProfileInteractionManager>(
-              profile_context)),
       web_contents_helper_(web_contents_helper) {}
 
 ContentSubresourceFilterThrottleManager::
@@ -337,7 +330,6 @@ void ContentSubresourceFilterThrottleManager::DidFinishInFrameNavigation(
       navigation_handle, throttle, frame_host, did_inherit_opener_activation);
 
   if (IsInSubresourceFilterRoot(navigation_handle)) {
-    current_committed_load_has_notified_disallowed_load_ = false;
     statistics_.reset();
     if (filter) {
       statistics_ = std::make_unique<PageLoadStatistics>(
@@ -420,14 +412,6 @@ ContentSubresourceFilterThrottleManager::FilterForFinishedNavigation(
     return nullptr;
   }
 
-  // Safe to pass unowned |frame_host| pointer since the filter that owns this
-  // callback is owned in the frame_host_filter_map_ which will be removed when
-  // the RenderFrameHost is deleted.
-  base::OnceClosure disallowed_callback(base::BindOnce(
-      &ContentSubresourceFilterThrottleManager::MaybeShowNotification,
-      weak_ptr_factory_.GetWeakPtr(), frame_host));
-  filter->set_first_disallowed_load_callback(std::move(disallowed_callback));
-
   AsyncDocumentSubresourceFilter* filter_ptr = filter.get();
   frame_host_filter_map_[frame_host] = std::move(filter);
 
@@ -467,23 +451,11 @@ void ContentSubresourceFilterThrottleManager::DidFinishLoad(
   statistics_->OnDidFinishLoad();
 }
 
-void ContentSubresourceFilterThrottleManager::DidBecomePrimaryPage() {
-  CHECK(page_);
-  CHECK(page_->IsPrimary());
-  // If we tried to notify while non-primary, we didn't show UI so do that now
-  // that the page became primary. This also leads to reattempting notification
-  // if a page transitioned from primary to non-primary and back (BFCache).
-  if (current_committed_load_has_notified_disallowed_load_) {
-    profile_interaction_manager_->MaybeShowNotification();
-  }
-}
-
 void ContentSubresourceFilterThrottleManager::OnPageCreated(
     content::Page& page) {
   CHECK(!page.GetMainDocument().IsFencedFrameRoot());
   CHECK(!page_);
   page_ = &page;
-  profile_interaction_manager_->DidCreatePage(*page_);
 }
 
 // Sets the desired page-level |activation_state| for the currently ongoing
@@ -594,18 +566,6 @@ ContentSubresourceFilterThrottleManager::LoadPolicyForLastCommittedNavigation(
   return it->second;
 }
 
-void ContentSubresourceFilterThrottleManager::OnReloadRequested() {
-  CHECK(page_);
-  CHECK(page_->IsPrimary());
-  profile_interaction_manager_->OnReloadRequested();
-}
-
-// static
-void ContentSubresourceFilterThrottleManager::LogAction(
-    SubresourceFilterAction action) {
-  UMA_HISTOGRAM_ENUMERATION("SubresourceFilter.Actions2", action);
-}
-
 void ContentSubresourceFilterThrottleManager::
     MaybeCreateAndAddChildNavigationThrottle(
         content::NavigationThrottleRegistry& registry) {
@@ -686,32 +646,6 @@ ContentSubresourceFilterThrottleManager::GetFrameFilter(
 
   CHECK(it->second);
   return it->second.get();
-}
-
-void ContentSubresourceFilterThrottleManager::MaybeShowNotification(
-    content::RenderFrameHost* frame_host) {
-  CHECK(page_);
-  CHECK_EQ(&GetSubresourceFilterRootPage(frame_host), page_);
-
-  if (current_committed_load_has_notified_disallowed_load_) {
-    return;
-  }
-
-  auto it = frame_host_filter_map_.find(&page_->GetMainDocument());
-  if (it == frame_host_filter_map_.end() ||
-      it->second->activation_state().activation_level !=
-          mojom::ActivationLevel::kEnabled) {
-    return;
-  }
-
-  current_committed_load_has_notified_disallowed_load_ = true;
-
-  // Non-primary pages shouldn't affect UI. When the page becomes primary we'll
-  // check |current_committed_load_has_notified_disallowed_load_| and try
-  // again.
-  if (page_->IsPrimary()) {
-    profile_interaction_manager_->MaybeShowNotification();
-  }
 }
 
 VerifiedRuleset::Handle*
@@ -805,10 +739,6 @@ ContentSubresourceFilterThrottleManager::GetAdEvidenceForFrame(
     return std::nullopt;
   }
   return tracked_ad_evidence_it->second;
-}
-
-void ContentSubresourceFilterThrottleManager::DidDisallowFirstSubresource() {
-  MaybeShowNotification(&receiver_.CurrentTargetFrame());
 }
 
 void ContentSubresourceFilterThrottleManager::FrameIsAd() {

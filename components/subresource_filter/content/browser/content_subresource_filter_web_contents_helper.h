@@ -28,7 +28,6 @@ class WebContents;
 namespace subresource_filter {
 
 class ContentSubresourceFilterThrottleManager;
-class SubresourceFilterProfileContext;
 
 // This class manages the lifetime and storage of
 // ContentSubresourceFilterThrottleManager instances. This helper is attached
@@ -54,7 +53,6 @@ class ContentSubresourceFilterWebContentsHelper
  public:
   static void CreateForWebContents(
       content::WebContents* web_contents,
-      SubresourceFilterProfileContext* profile_context,
       VerifiedRulesetDealer::Handle* dealer_handle);
 
   // Will get the helper from the given `page`'s WebContents.
@@ -63,7 +61,6 @@ class ContentSubresourceFilterWebContentsHelper
 
   explicit ContentSubresourceFilterWebContentsHelper(
       content::WebContents* web_contents,
-      SubresourceFilterProfileContext* profile_context,
       VerifiedRulesetDealer::Handle* dealer_handle);
   ~ContentSubresourceFilterWebContentsHelper() override;
 
@@ -102,8 +99,6 @@ class ContentSubresourceFilterWebContentsHelper
       LoadPolicy load_policy) override;
 
  private:
-  raw_ptr<SubresourceFilterProfileContext, DanglingUntriaged> profile_context_;
-
   raw_ptr<VerifiedRulesetDealer::Handle, DanglingUntriaged> dealer_handle_;
 
   // Set of frames across all pages in this WebContents that have had at least

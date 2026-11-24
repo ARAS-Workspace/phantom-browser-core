@@ -23,8 +23,6 @@
 
 namespace subresource_filter {
 
-class ProfileInteractionManager;
-
 class SafeBrowsingChildNavigationThrottleTest
     : public ChildFrameNavigationFilteringThrottleTestHarness {
  public:

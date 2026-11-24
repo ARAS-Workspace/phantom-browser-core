@@ -19,7 +19,6 @@
 #include "components/infobars/core/infobar.h"
 #include "components/subresource_filter/content/browser/subresource_filter_observer.h"
 #include "components/subresource_filter/content/browser/subresource_filter_observer_manager.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
 #include "components/subresource_filter/core/common/test_ruleset_creator.h"
 #include "components/url_pattern_index/proto/rules.pb.h"
@@ -43,7 +42,6 @@ class WebContents;
 
 namespace subresource_filter {
 
-class SubresourceFilterContentSettingsManager;
 class RulesetService;
 
 // Class for shared test harness functionality to be used for both safe browsing
@@ -101,17 +99,9 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
   static constexpr const char kEvaluationCPUDuration[] =
       "SubresourceFilter.SubresourceLoad.Evaluation.CPUDuration";
 
-  // Other histograms.
-  static constexpr const char kSubresourceFilterActionsHistogram[] =
-      "SubresourceFilter.Actions2";
-
  protected:
   // InProcessBrowserTest:
   void SetUpOnMainThread() override;
-
-  SubresourceFilterContentSettingsManager* settings_manager() const {
-    return profile_context_->settings_manager();
-  }
 
   void SetRulesetToDisallowURLsWithPathSuffix(const std::string& suffix);
 
@@ -126,10 +116,6 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 
   TestRulesetCreator ruleset_creator_;
-
-  // Owned by the profile.
-  raw_ptr<SubresourceFilterProfileContext, AcrossTasksDanglingUntriaged>
-      profile_context_;
 };
 
 }  // namespace subresource_filter

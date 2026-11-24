@@ -10,17 +10,11 @@
 #include "base/feature_list.h"
 #include "base/run_loop.h"
 #include "base/task/single_thread_task_runner.h"
-#include "components/content_settings/browser/page_specific_content_settings.h"
-#include "components/infobars/content/content_infobar_manager.h"
-#include "components/infobars/core/confirm_infobar_delegate.h"
-#include "components/infobars/core/infobar.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 #include "components/subresource_filter/content/browser/safe_browsing_ruleset_publisher.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_observer_test_utils.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
 #include "components/subresource_filter/core/common/activation_decision.h"
 #include "components/subresource_filter/core/common/constants.h"
@@ -88,12 +82,8 @@ void SubresourceFilterTestHarness::SetUp() {
 
   VerifiedRulesetDealer::Handle* dealer =
       ruleset_service_.get()->GetRulesetDealer();
-  throttle_manager_test_support_ =
-      std::make_unique<ThrottleManagerTestSupport>(web_contents());
-  infobars::ContentInfoBarManager::CreateForWebContents(web_contents());
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-      web_contents(), throttle_manager_test_support_->profile_context(),
-      dealer);
+      web_contents(), dealer);
 
   // Setup the inserter to add subresource filter navigation throttles at the
   // start of navigations.
@@ -152,11 +142,6 @@ SubresourceFilterTestHarness::CreateAndNavigateDisallowedSubframe(
   auto* subframe =
       content::RenderFrameHostTester::For(parent)->AppendChild("subframe");
   return SimulateNavigateAndCommit(GURL(kDefaultDisallowedUrl), subframe);
-}
-
-SubresourceFilterContentSettingsManager*
-SubresourceFilterTestHarness::GetSettingsManager() {
-  return throttle_manager_test_support_->profile_context()->settings_manager();
 }
 
 void SubresourceFilterTestHarness::SetIsAdFrame(

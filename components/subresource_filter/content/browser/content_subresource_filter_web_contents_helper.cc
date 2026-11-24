@@ -74,7 +74,6 @@ WEB_CONTENTS_USER_DATA_KEY_IMPL(ContentSubresourceFilterWebContentsHelper);
 //  static
 void ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
     content::WebContents* web_contents,
-    SubresourceFilterProfileContext* profile_context,
     VerifiedRulesetDealer::Handle* dealer_handle) {
   if (!base::FeatureList::IsEnabled(kSafeBrowsingSubresourceFilter)) {
     return;
@@ -85,8 +84,7 @@ void ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
   }
 
   content::WebContentsUserData<ContentSubresourceFilterWebContentsHelper>::
-      CreateForWebContents(web_contents, profile_context,
-                           dealer_handle);
+      CreateForWebContents(web_contents, dealer_handle);
 }
 
 //  static
@@ -99,12 +97,10 @@ ContentSubresourceFilterWebContentsHelper::FromPage(content::Page& page) {
 ContentSubresourceFilterWebContentsHelper::
     ContentSubresourceFilterWebContentsHelper(
         content::WebContents* web_contents,
-        SubresourceFilterProfileContext* profile_context,
         VerifiedRulesetDealer::Handle* dealer_handle)
     : content::WebContentsUserData<ContentSubresourceFilterWebContentsHelper>(
           *web_contents),
       content::WebContentsObserver(web_contents),
-      profile_context_(profile_context),
       dealer_handle_(dealer_handle) {
   SubresourceFilterObserverManager::CreateForWebContents(web_contents);
   scoped_observation_.Observe(
@@ -207,8 +203,7 @@ void ContentSubresourceFilterWebContentsHelper::DidStartNavigation(
 
   std::unique_ptr<ContentSubresourceFilterThrottleManager> new_manager =
       ContentSubresourceFilterThrottleManager::CreateForNewPage(
-          profile_context_, dealer_handle_, *this,
-          *navigation_handle);
+          dealer_handle_, *this, *navigation_handle);
 
   throttle_managers_.insert(new_manager.get());
 
@@ -242,19 +237,6 @@ void ContentSubresourceFilterWebContentsHelper::DidFinishNavigation(
 
     CHECK(navigation_handle->HasCommitted());
     CHECK(navigation_handle->GetRenderFrameHost());
-
-    ContentSubresourceFilterThrottleManager* throttle_manager =
-        GetThrottleManager(navigation_handle->GetRenderFrameHost()->GetPage());
-
-    // TODO(crbug.com/40781366): This shouldn't be possible but, from
-    // the investigation in https://crbug.com/1264667, this is likely a symptom
-    // of navigating a detached WebContents so (very rarely) was causing
-    // crashes.
-    if (!throttle_manager) {
-      return;
-    }
-
-    throttle_manager->DidBecomePrimaryPage();
 
     return;
   }

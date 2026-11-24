@@ -73,11 +73,6 @@ class SubresourceFilterAgent
   virtual void SetSubresourceFilterForCurrentDocument(
       std::unique_ptr<blink::WebDocumentSubresourceFilter> filter);
 
-  // Informs the browser that the first subresource load has been disallowed for
-  // the most recently created document. Not called if all resources are
-  // allowed.
-  virtual void SignalFirstSubresourceDisallowedForCurrentDocument();
-
   // Sends statistics about the DocumentSubresourceFilter's work to the browser.
   virtual void SendDocumentLoadStatistics(
       const mojom::DocumentLoadStatistics& statistics);
@@ -154,7 +149,6 @@ class SubresourceFilterAgent
 
   base::WeakPtr<WebDocumentSubresourceFilterImpl>
       filter_for_last_created_document_;
-  base::WeakPtrFactory<SubresourceFilterAgent> weak_ptr_factory_{this};
 };
 
 }  // namespace subresource_filter

@@ -39,36 +39,6 @@ class ActivationStateComputingNavigationThrottle;
 class ContentSubresourceFilterThrottleManager;
 class ContentSubresourceFilterWebContentsHelper;
 class PageLoadStatistics;
-class ProfileInteractionManager;
-class SubresourceFilterProfileContext;
-
-// This enum backs a histogram. Make sure new elements are only added to the
-// end. Keep histograms.xml up to date with any changes.
-enum class SubresourceFilterAction {
-  // Standard UI shown. On Desktop this is in the omnibox,
-  // On Android, it is an infobar.
-  kUIShown = 0,
-
-  // The UI was suppressed due to "smart" logic which tries not to spam the UI
-  // on navigations on the same origin within a certain time.
-  kUISuppressed = 1,
-
-  // On Desktop, this is a bubble. On Android it is an
-  // expanded infobar.
-  kDetailsShown = 2,
-
-  kClickedLearnMore = 3,
-
-  // Logged when the user presses "Always allow ads" scoped to a particular
-  // site. Does not count manual changes to content settings.
-  kAllowlistedSite = 4,
-
-  // Logged when a devtools message arrives notifying us to force activation in
-  // this web contents.
-  kForcedActivationEnabled = 5,
-
-  kMaxValue = kForcedActivationEnabled
-};
 
 // The ContentSubresourceFilterThrottleManager manages NavigationThrottles in
 // order to calculate frame activation states and child frame navigation
@@ -122,7 +92,6 @@ class ContentSubresourceFilterThrottleManager
   // not enabled.
   static std::unique_ptr<ContentSubresourceFilterThrottleManager>
   CreateForNewPage(
-      SubresourceFilterProfileContext* profile_context,
       VerifiedRulesetDealer::Handle* dealer_handle,
       ContentSubresourceFilterWebContentsHelper& web_contents_helper,
       content::NavigationHandle& initiating_navigation_handle);
@@ -151,7 +120,6 @@ class ContentSubresourceFilterThrottleManager
       content::NavigationHandle& navigation_handle);
 
   ContentSubresourceFilterThrottleManager(
-      SubresourceFilterProfileContext* profile_context,
       VerifiedRulesetDealer::Handle* dealer_handle,
       ContentSubresourceFilterWebContentsHelper& web_contents_helper,
       content::NavigationHandle& initiating_navigation_handle);
@@ -178,10 +146,6 @@ class ContentSubresourceFilterThrottleManager
 
   PageLoadStatistics* page_load_statistics() const { return statistics_.get(); }
 
-  ProfileInteractionManager* profile_interaction_manager_for_testing() {
-    return profile_interaction_manager_.get();
-  }
-
   VerifiedRuleset::Handle* ruleset_handle_for_testing() {
     return ruleset_handle_.get();
   }
@@ -198,12 +162,6 @@ class ContentSubresourceFilterThrottleManager
   // filter list.
   std::optional<LoadPolicy> LoadPolicyForLastCommittedNavigation(
       content::FrameTreeNodeId frame_tree_node_id) const;
-
-  // Called when the user has requested a reload of a page with
-  // blocked ads (e.g., via an infobar).
-  void OnReloadRequested();
-
-  static void LogAction(SubresourceFilterAction action);
 
   void SetIsAdFrameForTesting(content::RenderFrameHost* render_frame_host,
                               bool is_ad_frame);
@@ -229,7 +187,6 @@ class ContentSubresourceFilterThrottleManager
                                   bool is_initial_navigation);
   void DidFinishLoad(content::RenderFrameHost* render_frame_host,
                      const GURL& validated_url);
-  void DidBecomePrimaryPage();
 
   // Called when this manager is moved from a NavigationHandle to a Page. In
   // most cases this will be the Page of the RenderFrameHost the main-frame
@@ -257,8 +214,6 @@ class ContentSubresourceFilterThrottleManager
   FRIEND_TEST_ALL_PREFIXES(
       SitePerProcessContentSubresourceFilterThrottleManagerTest,
       AdTagCarriesAcrossProcesses);
-  FRIEND_TEST_ALL_PREFIXES(ContentSubresourceFilterThrottleManagerTest,
-                           FirstDisallowedLoadCalledOutOfOrder);
   void MaybeCreateAndAddChildNavigationThrottle(
       content::NavigationThrottleRegistry& registry);
   std::unique_ptr<ActivationStateComputingNavigationThrottle>
@@ -279,11 +234,6 @@ class ContentSubresourceFilterThrottleManager
   // activated (and therefore has no subresource filter), returns std::nullopt.
   const std::optional<subresource_filter::mojom::ActivationState>
   GetFrameActivationState(content::RenderFrameHost* frame_host);
-
-  // Calls MaybeShowNotification on `profile_interaction_manager_` at most once
-  // per committed, non-same-page navigation in the main frame. `frame_host`
-  // specifies the frame that blocked the subresource.
-  void MaybeShowNotification(content::RenderFrameHost* frame_host);
 
   VerifiedRuleset::Handle* EnsureRulesetHandle();
   void DestroyRulesetHandleIfNoLongerUsed();
@@ -309,7 +259,6 @@ class ContentSubresourceFilterThrottleManager
   void OnChildFrameWasCreatedByAdScript(content::RenderFrameHost* frame_host);
 
   // mojom::SubresourceFilterHost:
-  void DidDisallowFirstSubresource() override;
   void FrameIsAd() override;
   void FrameWasCreatedByAdScript() override;
   void AdScriptDidCreateFencedFrame(
@@ -388,15 +337,8 @@ class ContentSubresourceFilterThrottleManager
 
   std::unique_ptr<PageLoadStatistics> statistics_;
 
-  // True if the current committed main frame load in this WebContents has
-  // notified the delegate that a subresource was disallowed. The callback
-  // should only be called at most once per main frame load.
-  bool current_committed_load_has_notified_disallowed_load_ = false;
-
   // This member outlives this class.
   raw_ptr<VerifiedRulesetDealer::Handle> dealer_handle_;
-
-  std::unique_ptr<ProfileInteractionManager> profile_interaction_manager_;
 
   // Unowned since the throttle manager cannot outlive the Page that owns it.
   // The throttle manager is held as user data first on NavigationHandle, then
@@ -409,9 +351,6 @@ class ContentSubresourceFilterThrottleManager
   // outlive this class which is owned by either a Page or NavigationHandle in
   // the WebContents.
   const raw_ref<ContentSubresourceFilterWebContentsHelper> web_contents_helper_;
-
-  base::WeakPtrFactory<ContentSubresourceFilterThrottleManager>
-      weak_ptr_factory_{this};
 };
 
 }  // namespace subresource_filter

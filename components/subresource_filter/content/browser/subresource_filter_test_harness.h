@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "base/files/scoped_temp_dir.h"
-#include "components/subresource_filter/content/browser/throttle_manager_test_support.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/browser/navigation_throttle_registry.h"
@@ -23,14 +22,9 @@ class RenderFrameHost;
 class TestNavigationThrottleInserter;
 }  // namespace content
 
-namespace infobars {
-class ContentInfoBarManager;
-}
-
 namespace subresource_filter {
 
 class RulesetService;
-class SubresourceFilterContentSettingsManager;
 
 // Unit test harness for the subresource filtering component.
 class SubresourceFilterTestHarness : public content::RenderViewHostTestHarness {
@@ -64,8 +58,6 @@ class SubresourceFilterTestHarness : public content::RenderViewHostTestHarness {
   content::RenderFrameHost* CreateAndNavigateDisallowedSubframe(
       content::RenderFrameHost* parent);
 
-  SubresourceFilterContentSettingsManager* GetSettingsManager();
-
   void SetIsAdFrame(content::RenderFrameHost* render_frame_host,
                     bool is_ad_frame);
 
@@ -87,8 +79,6 @@ class SubresourceFilterTestHarness : public content::RenderViewHostTestHarness {
 
   base::ScopedTempDir ruleset_service_dir_;
   sync_preferences::TestingPrefServiceSyncable pref_service_;
-  std::unique_ptr<ThrottleManagerTestSupport> throttle_manager_test_support_;
-  std::unique_ptr<infobars::ContentInfoBarManager> infobar_manager_;
   std::unique_ptr<RulesetService> ruleset_service_;
   std::unique_ptr<content::TestNavigationThrottleInserter> throttle_inserter_;
 };

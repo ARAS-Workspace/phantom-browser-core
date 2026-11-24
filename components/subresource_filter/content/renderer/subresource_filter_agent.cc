@@ -9,6 +9,7 @@
 #include "base/check.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
+#include "base/functional/callback_helpers.h"
 #include "base/memory/ref_counted.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/time/time.h"
@@ -153,11 +154,6 @@ void SubresourceFilterAgent::SetSubresourceFilterForCurrentDocument(
   blink::WebLocalFrame* web_frame = render_frame()->GetWebFrame();
   CHECK(web_frame->GetDocumentLoader());
   web_frame->GetDocumentLoader()->SetSubresourceFilter(filter.release());
-}
-
-void SubresourceFilterAgent::
-    SignalFirstSubresourceDisallowedForCurrentDocument() {
-  GetSubresourceFilterHost()->DidDisallowFirstSubresource();
 }
 
 void SubresourceFilterAgent::SendDocumentLoadStatistics(
@@ -350,13 +346,9 @@ void SubresourceFilterAgent::ConstructFilter(
     return;
   }
 
-  base::OnceClosure first_disallowed_load_callback(
-      base::BindOnce(&SubresourceFilterAgent::
-                         SignalFirstSubresourceDisallowedForCurrentDocument,
-                     weak_ptr_factory_.GetWeakPtr()));
   auto filter = std::make_unique<WebDocumentSubresourceFilterImpl>(
       url::Origin::Create(url), activation_state, std::move(ruleset),
-      std::move(first_disallowed_load_callback));
+      /*first_disallowed_load_callback=*/base::DoNothing());
   filter_for_last_created_document_ = filter->AsWeakPtr();
   SetSubresourceFilterForCurrentDocument(std::move(filter));
 }
@@ -393,9 +385,7 @@ void SubresourceFilterAgent::WillCreateWorkerFetchContext(
           url::Origin::Create(GetDocumentURL()),
           filter_for_last_created_document_->filter().activation_state(),
           std::move(ruleset_file),
-          base::BindOnce(&SubresourceFilterAgent::
-                             SignalFirstSubresourceDisallowedForCurrentDocument,
-                         weak_ptr_factory_.GetWeakPtr())));
+          /*first_disallowed_load_callback=*/base::DoNothing()));
 }
 
 void SubresourceFilterAgent::DidCreateFencedFrame(

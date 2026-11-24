@@ -391,7 +391,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "PermissionManagerFactory",
     "StatefulSSLHostStateDelegate",
     "StorageAccessAPIService",
-    "SubresourceFilterProfileContext",
     "ThemeSourceService",
     "WebRequestProxyingURLLoaderFactory",
 
