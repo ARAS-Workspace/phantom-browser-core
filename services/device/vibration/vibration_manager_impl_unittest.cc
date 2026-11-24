@@ -6,6 +6,7 @@
 
 #include "base/run_loop.h"
 #include "base/test/gmock_callback_support.h"
+#include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "services/device/device_service_test_base.h"
 #include "services/device/public/mojom/vibration_manager.mojom.h"

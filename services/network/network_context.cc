@@ -2398,7 +2398,13 @@ void NetworkContext::PreconnectSockets(
   switch (credentials_mode) {
     case mojom::CredentialsMode::kOmit:
       request_info.load_flags = net::LOAD_DO_NOT_SAVE_COOKIES;
-      request_info.privacy_mode = net::PRIVACY_MODE_ENABLED;
+      // With kOmitCorsClientCert, requests in this mode do not send client
+      // certificates (ShouldSendClientCertificates()), so the preconnected
+      // socket uses the matching privacy mode.
+      request_info.privacy_mode =
+          base::FeatureList::IsEnabled(features::kOmitCorsClientCert)
+              ? net::PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS
+              : net::PRIVACY_MODE_ENABLED;
       break;
 
     case mojom::CredentialsMode::kSameOrigin:

@@ -6578,9 +6578,11 @@ TEST_F(NetworkContextTest, PreconnectDifferentCredentialsMode) {
       net::MutableNetworkTrafficAnnotationTag(TRAFFIC_ANNOTATION_FOR_TESTS),
       std::nullopt, mojo::NullRemote());
 
-  // The requests above should each trigger the connection of a different
-  // socket, since they specify a different credentials mode.
-  connection_listener.WaitForAcceptedConnections(3u);
+  // The requests above use different credentials modes. With
+  // kOmitCorsClientCert, kOmit and kOmitBug_775438_Workaround both omit client
+  // certificates and share a socket; otherwise each request connects its own.
+  connection_listener.WaitForAcceptedConnections(
+      base::FeatureList::IsEnabled(features::kOmitCorsClientCert) ? 2u : 3u);
 }
 
 TEST_F(NetworkContextTest, PreconnectHSTS) {
@@ -6611,7 +6613,7 @@ TEST_F(NetworkContextTest, PreconnectHSTS) {
     ASSERT_TRUE(test_server.base_url().SchemeIs(url::kHttpsScheme));
     net::ClientSocketPool::GroupId ssl_group(
         url::SchemeHostPort(test_server.base_url()),
-        net::PrivacyMode::PRIVACY_MODE_ENABLED,
+        net::PrivacyMode::PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS,
         partition_connections ? network_anonymization_key
                               : net::NetworkAnonymizationKey(),
         net::SecureDnsPolicy::kAllow, /*disable_cert_network_fetches=*/false,
@@ -6621,7 +6623,7 @@ TEST_F(NetworkContextTest, PreconnectHSTS) {
     ASSERT_TRUE(server_http_url.SchemeIs(url::kHttpScheme));
     net::ClientSocketPool::GroupId group(
         url::SchemeHostPort(server_http_url),
-        net::PrivacyMode::PRIVACY_MODE_ENABLED,
+        net::PrivacyMode::PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS,
         partition_connections ? network_anonymization_key
                               : net::NetworkAnonymizationKey(),
         net::SecureDnsPolicy::kAllow, /*disable_cert_network_fetches=*/false,
@@ -6787,13 +6789,15 @@ TEST_F(NetworkContextTest, PreconnectNetworkIsolationKey) {
 
   url::SchemeHostPort destination(test_server.base_url());
   net::ClientSocketPool::GroupId group_id1(
-      destination, net::PrivacyMode::PRIVACY_MODE_ENABLED, kNak1,
-      net::SecureDnsPolicy::kAllow, /*disable_cert_network_fetches=*/false,
+      destination, net::PrivacyMode::PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS,
+      kNak1, net::SecureDnsPolicy::kAllow,
+      /*disable_cert_network_fetches=*/false,
       net::handles::kInvalidNetworkHandle);
   EXPECT_EQ(1, GetSocketCountForGroup(network_context.get(), group_id1));
   net::ClientSocketPool::GroupId group_id2(
-      destination, net::PrivacyMode::PRIVACY_MODE_ENABLED, kNak2,
-      net::SecureDnsPolicy::kAllow, /*disable_cert_network_fetches=*/false,
+      destination, net::PrivacyMode::PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS,
+      kNak2, net::SecureDnsPolicy::kAllow,
+      /*disable_cert_network_fetches=*/false,
       net::handles::kInvalidNetworkHandle);
   EXPECT_EQ(2, GetSocketCountForGroup(network_context.get(), group_id2));
 }
