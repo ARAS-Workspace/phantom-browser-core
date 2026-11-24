@@ -10,7 +10,6 @@
 
 #include "base/hash/hash.h"
 #include "base/strings/strcat.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/unguessable_token.h"
 #include "chrome/browser/profiles/profile.h"
@@ -89,8 +88,8 @@ IN_PROC_BROWSER_TEST_F(LogWebUIUrlTest, TestSettingsPage) {
 IN_PROC_BROWSER_TEST_F(LogWebUIUrlTest, TestDinoPage) {
   GURL url = content::GetWebUIURL(content::kChromeUIDinoHost);
   // When a page does not have a dedicated title the URL with a trailing slash
-  // is displayed as the title.
-  RunTest(base::UTF8ToUTF16(url.GetWithEmptyPath().spec()), url);
+  // is displayed as the title, with the chrome scheme shown as phantom.
+  RunTest(u"phantom://dino/", url);
 }
 
 IN_PROC_BROWSER_TEST_F(LogWebUIUrlTest, TestChromeUntrustedPage) {

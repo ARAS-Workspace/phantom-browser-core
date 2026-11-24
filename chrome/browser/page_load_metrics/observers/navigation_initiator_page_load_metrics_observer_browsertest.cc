@@ -7,6 +7,7 @@
 #include "chrome/browser/page_load_metrics/chrome_initiator_location.h"
 #include "chrome/browser/preloading/chrome_preloading.h"
 #include "chrome/browser/preloading/prerender/prerender_manager.h"
+#include "chrome/browser/preloading/search_preload/search_preload_features.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -64,7 +65,10 @@ class NavigationInitiatorPageLoadMetricsBrowserTest
                                     GetActiveWebContents,
                                 base::Unretained(this))) {
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{},
+        /*enabled_features=*/
+        // PrerenderSRPActivation starts its search result prerender on the
+        // DsePreload2 path.
+        {features::kDsePreload2},
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove these two Features.

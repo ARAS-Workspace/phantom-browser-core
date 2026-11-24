@@ -38,7 +38,6 @@ const preferencesToTest = [
       autofillAddressEnabled: false,
       autofillCreditCardEnabled: false,
       searchSuggestEnabled: false,
-      spellingServiceEnabled: false,
       translationServiceEnabled: false,
     },
   },

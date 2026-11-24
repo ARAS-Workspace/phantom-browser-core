@@ -1999,6 +1999,16 @@ class SidePanelCoordinatorLoadingContentTest : public SidePanelCoordinatorTest {
     AddTabToBrowser(GURL("http://foo1.com"));
     AddTabToBrowser(GURL("http://foo2.com"));
 
+    // The customize chrome side panel controller registers a contextual
+    // kCustomizeChrome entry on the tabs; deregister it so the global entry
+    // added below is the one shown.
+    TabStripModel* const tab_strip_model = browser()->tab_strip_model();
+    for (int i = 0; i < tab_strip_model->count(); ++i) {
+      SidePanelRegistry::From(tab_strip_model->GetTabAtIndex(i))
+          ->Deregister(
+              SidePanelEntry::Key(SidePanelEntry::Id::kCustomizeChrome));
+    }
+
     // Add a kMerchantTrust entry to the global registry with loading content
     // not available.
     std::unique_ptr<SidePanelEntry> entry1 = std::make_unique<SidePanelEntry>(
@@ -2013,8 +2023,8 @@ class SidePanelCoordinatorLoadingContentTest : public SidePanelCoordinatorTest {
     loading_content_entry1_ = entry1.get();
     EXPECT_TRUE(global_registry()->Register(std::move(entry1)));
 
-    // Add a kLens entry to the global registry with loading content not
-    // available.
+    // Add a kCustomizeChrome entry to the global registry with loading
+    // content not available.
     std::unique_ptr<SidePanelEntry> entry2 = std::make_unique<SidePanelEntry>(
         SidePanelEntry::Key(SidePanelEntry::Id::kCustomizeChrome),
         base::BindRepeating([](SidePanelEntryScope&) {

@@ -20,6 +20,7 @@ source_set("browser_tests") {
     "//chrome/browser/page_load_metrics/integration_tests:test_support",
     "//chrome/browser/preloading",
     "//chrome/browser/preloading/prerender",
+    "//chrome/browser/preloading/search_preload:feature",
     "//chrome/browser/search_engines",
     "//chrome/browser/ui",
     "//chrome/test:test_support",
