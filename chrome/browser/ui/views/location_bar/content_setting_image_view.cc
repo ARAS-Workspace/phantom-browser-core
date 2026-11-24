@@ -54,7 +54,6 @@ std::optional<ViewID> GetViewID(
     case ImageType::kMixedScript:
     case ImageType::kProtocolHandlers:
     case ImageType::kMediaStream:
-    case ImageType::kAds:
     case ImageType::kAutomaticDownloads:
     case ImageType::kMidiSysex:
     case ImageType::kSound:

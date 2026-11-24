@@ -27,7 +27,6 @@
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_delegate.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_ui_delegate.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
@@ -55,8 +54,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "content/public/browser/ssl_host_state_delegate.h"
 #include "content/public/browser/ssl_status.h"
 #include "content/public/common/content_switches.h"
@@ -1832,41 +1829,6 @@ TEST_F(PageInfoTest, SafetyTipTimeOpenMetrics) {
   ResetMockUI();
   SetDefaultUIExpectations(mock_ui());
   page_info();
-}
-
-// Tests that the SubresourceFilter setting is omitted correctly.
-TEST_F(PageInfoTest, SubresourceFilterSetting_MatchesActivation) {
-  auto showing_setting = [](const PermissionInfoList& permissions) {
-    return std::ranges::contains(
-        permissions, ContentSettingsType::ADS,
-        [](const auto& permission) { return permission.type; });
-  };
-
-  // By default, the setting should not appear at all.
-  SetURL("https://example.test/");
-  SetDefaultUIExpectations(mock_ui());
-  page_info();
-  EXPECT_FALSE(showing_setting(last_permission_info_list()));
-
-  // Reset state.
-  ClearPageInfo();
-  ResetMockUI();
-  SetDefaultUIExpectations(mock_ui());
-
-  // Now, explicitly set site activation metadata to simulate activation on
-  // that origin, which is encoded by the existence of the website setting. The
-  // setting should then appear in page_info.
-  subresource_filter::SubresourceFilterContentSettingsManager*
-      settings_manager =
-          SubresourceFilterProfileContextFactory::GetForProfile(profile())
-              ->settings_manager();
-  settings_manager->SetSiteMetadataBasedOnActivation(
-      url(), true,
-      subresource_filter::SubresourceFilterContentSettingsManager::
-          ActivationSource::kSafeBrowsing);
-
-  page_info();
-  EXPECT_TRUE(showing_setting(last_permission_info_list()));
 }
 
 // Tests that permissions substring is empty if permission is blocked.

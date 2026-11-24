@@ -77,8 +77,6 @@ base::span<const PageInfoUI::PermissionUIInfo> GetContentSettingsUIInfo() {
       {ContentSettingsType::BACKGROUND_SYNC,
        IDS_SITE_SETTINGS_TYPE_BACKGROUND_SYNC,
        IDS_SITE_SETTINGS_TYPE_BACKGROUND_SYNC_MID_SENTENCE},
-      {ContentSettingsType::ADS, IDS_SITE_SETTINGS_TYPE_ADS,
-       IDS_SITE_SETTINGS_TYPE_ADS_MID_SENTENCE},
       {ContentSettingsType::SOUND, IDS_SITE_SETTINGS_TYPE_SOUND,
        IDS_SITE_SETTINGS_TYPE_SOUND_MID_SENTENCE},
       {ContentSettingsType::CLIPBOARD_READ_WRITE,

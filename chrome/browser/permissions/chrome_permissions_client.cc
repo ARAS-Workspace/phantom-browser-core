@@ -32,7 +32,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profiles_state.h"
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/page_info/page_info_infobar_delegate.h"
 #include "chrome/common/pref_names.h"
@@ -57,8 +56,6 @@
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "components/prefs/pref_service.h"
 #include "components/site_engagement/content/site_engagement_service.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -176,15 +173,6 @@ ChromePermissionsClient::GetCookieSettings(
     content::BrowserContext* browser_context) {
   return CookieSettingsFactory::GetForProfile(
       Profile::FromBrowserContext(browser_context));
-}
-
-bool ChromePermissionsClient::IsSubresourceFilterActivated(
-    content::BrowserContext* browser_context,
-    const GURL& url) {
-  return SubresourceFilterProfileContextFactory::GetForProfile(
-             Profile::FromBrowserContext(browser_context))
-      ->settings_manager()
-      ->GetSiteActivationFromMetadata(url);
 }
 
 permissions::OriginKeyedPermissionActionService*

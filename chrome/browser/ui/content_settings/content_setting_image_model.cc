@@ -87,8 +87,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kMediaStreamIconElementId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
-                                      kAdsIconElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kAutomaticDownloadsIconElementId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kMidiSysexIconElementId);
@@ -307,8 +305,6 @@ constexpr ContentSettingsImageDetails kImageDetails[] = {
     {ContentSettingsType::MIXEDSCRIPT, IDS_BLOCKED_DISPLAYING_INSECURE_CONTENT,
      0, 0},
     {ContentSettingsType::SOUND, IDS_BLOCKED_SOUND_TITLE, 0, 0},
-    {ContentSettingsType::ADS, IDS_BLOCKED_ADS_PROMPT_TOOLTIP,
-     IDS_BLOCKED_ADS_PROMPT_TITLE, 0},
 };
 
 const ContentSettingsImageDetails* GetImageDetails(ContentSettingsType type) {
@@ -365,14 +361,6 @@ void GetIconChromeRefresh(ContentSettingsType type,
                       : &(features::IsRoundedIconsEnabled()
                               ? vector_icons::kVolumeUpIcon
                               : vector_icons::kVolumeUpChromeRefreshOldIcon);
-      return;
-    case ContentSettingsType::ADS:
-      *icon = blocked ? &(features::IsRoundedIconsEnabled()
-                              ? vector_icons::kAdOffIcon
-                              : vector_icons::kAdsOffChromeRefreshOldIcon)
-                      : &(features::IsRoundedIconsEnabled()
-                              ? vector_icons::kAdIcon
-                              : vector_icons::kAdsChromeRefreshOldIcon);
       return;
     case ContentSettingsType::GEOLOCATION:
       *icon = blocked ? &(features::IsRoundedIconsEnabled()
@@ -528,9 +516,6 @@ ContentSettingImageModel::CreateForContentType(ImageType image_type) {
       return std::make_unique<ContentSettingRPHImageModel>();
     case ImageType::kMediaStream:
       return std::make_unique<ContentSettingMediaImageModel>();
-    case ImageType::kAds:
-      return std::make_unique<ContentSettingBlockedImageModel>(
-          ImageType::kAds, ContentSettingsType::ADS);
     case ImageType::kAutomaticDownloads:
       return std::make_unique<ContentSettingDownloadsImageModel>();
     case ImageType::kMidiSysex:
@@ -1349,8 +1334,6 @@ ui::ElementIdentifier ContentSettingImageModel::GetElementIdentifier() const {
       return kProtocolHandlersIconElementId;
     case ImageType::kMediaStream:
       return kMediaStreamIconElementId;
-    case ImageType::kAds:
-      return kAdsIconElementId;
     case ImageType::kAutomaticDownloads:
       return kAutomaticDownloadsIconElementId;
     case ImageType::kMidiSysex:
@@ -1410,7 +1393,6 @@ ContentSettingImageModel::GenerateContentSettingImageModels() {
       ImageType::kProtocolHandlers,
       ImageType::kMediaStream,
       ImageType::kSensors,
-      ImageType::kAds,
       ImageType::kAutomaticDownloads,
       ImageType::kMidiSysex,
       ImageType::kSound,

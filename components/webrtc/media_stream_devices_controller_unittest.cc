@@ -112,11 +112,6 @@ class TestPermissionsClient : public permissions::PermissionsClient {
     return nullptr;
   }
 
-  bool IsSubresourceFilterActivated(content::BrowserContext* browser_context,
-                                    const GURL& url) override {
-    return false;
-  }
-
   scoped_refptr<content_settings::CookieSettings> GetCookieSettings(
       content::BrowserContext* browser_context) override {
     return nullptr;

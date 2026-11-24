@@ -66,11 +66,6 @@
 #include "components/permissions/permission_util.h"
 #include "components/permissions/permissions_client.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
-#include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
-#include "components/subresource_filter/core/browser/subresource_filter_constants.h"
-#include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/url_formatter/elide_url.h"
 #include "components/url_formatter/url_formatter.h"
 #include "components/vector_icons/vector_icons.h"
@@ -1466,62 +1461,6 @@ void ContentSettingNotificationsBubbleModel::OnDoneButtonClicked() {
 }
 #endif
 
-// ContentSettingSubresourceFilterBubbleModel ----------------------------------
-
-ContentSettingSubresourceFilterBubbleModel::
-    ContentSettingSubresourceFilterBubbleModel(Delegate* delegate,
-                                               content::Page& page)
-    : ContentSettingBubbleModel(delegate, page) {
-  SetTitle();
-  SetMessage();
-  SetManageText();
-  set_done_button_text(l10n_util::GetStringUTF16(IDS_OK));
-  subresource_filter::ContentSubresourceFilterThrottleManager::LogAction(
-      subresource_filter::SubresourceFilterAction::kDetailsShown);
-}
-
-ContentSettingSubresourceFilterBubbleModel::
-    ~ContentSettingSubresourceFilterBubbleModel() = default;
-
-void ContentSettingSubresourceFilterBubbleModel::SetTitle() {
-  set_title(l10n_util::GetStringUTF16(IDS_BLOCKED_ADS_PROMPT_TITLE));
-}
-
-void ContentSettingSubresourceFilterBubbleModel::SetManageText() {
-  set_manage_text(l10n_util::GetStringUTF16(IDS_ALWAYS_ALLOW_ADS));
-  set_manage_text_style(ContentSettingBubbleModel::ManageTextStyle::kCheckbox);
-}
-
-void ContentSettingSubresourceFilterBubbleModel::SetMessage() {
-  set_message(l10n_util::GetStringUTF16(IDS_BLOCKED_ADS_PROMPT_EXPLANATION));
-}
-
-void ContentSettingSubresourceFilterBubbleModel::OnManageCheckboxChecked(
-    bool is_checked) {
-  set_done_button_text(
-      l10n_util::GetStringUTF16(is_checked ? IDS_APP_MENU_RELOAD : IDS_OK));
-  is_checked_ = is_checked;
-}
-
-void ContentSettingSubresourceFilterBubbleModel::CommitChanges() {
-  if (is_checked_) {
-    if (GetPage().IsPrimary()) {
-      subresource_filter::ContentSubresourceFilterThrottleManager::FromPage(
-          GetPage())
-          ->OnReloadRequested();
-    } else {
-      subresource_filter::SubresourceFilterContentSettingsManager(
-          HostContentSettingsMapFactory::GetForProfile(GetProfile()))
-          .AllowlistSite(GetPage().GetMainDocument().GetLastCommittedURL());
-    }
-  }
-}
-
-ContentSettingSubresourceFilterBubbleModel*
-ContentSettingSubresourceFilterBubbleModel::AsSubresourceFilterBubbleModel() {
-  return this;
-}
-
 // ContentSettingDownloadsBubbleModel ------------------------------------------
 
 ContentSettingDownloadsBubbleModel::ContentSettingDownloadsBubbleModel(
@@ -1836,9 +1775,6 @@ ContentSettingBubbleModel::CreateContentSettingBubbleModel(
     case ContentSettingsType::AUTOMATIC_DOWNLOADS:
       return std::make_unique<ContentSettingDownloadsBubbleModel>(delegate,
                                                                   page);
-    case ContentSettingsType::ADS:
-      return std::make_unique<ContentSettingSubresourceFilterBubbleModel>(
-          delegate, page);
     case ContentSettingsType::IMAGES:
     case ContentSettingsType::JAVASCRIPT:
     case ContentSettingsType::SOUND:
@@ -1899,11 +1835,6 @@ ContentSettingBubbleModel::AsMediaStreamBubbleModel() {
 
 ContentSettingQuietRequestBubbleModel*
 ContentSettingBubbleModel::AsQuietRequestBubbleModel() {
-  return nullptr;
-}
-
-ContentSettingSubresourceFilterBubbleModel*
-ContentSettingBubbleModel::AsSubresourceFilterBubbleModel() {
   return nullptr;
 }
 

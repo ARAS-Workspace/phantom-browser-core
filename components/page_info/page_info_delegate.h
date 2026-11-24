@@ -92,10 +92,6 @@ class PageInfoDelegate {
   // content settings (aka. site permissions).
   virtual HostContentSettingsMap* GetContentSettings() = 0;
 
-  // The subresource filter service determines whether ads should be blocked on
-  // the site and relevant permission prompts should be shown respectively.
-  virtual bool IsSubresourceFilterActivated(const GURL& site_url) = 0;
-
   // True if the site has registered for auto picture-in-picture.
   virtual bool HasAutoPictureInPictureBeenRegistered() = 0;
 

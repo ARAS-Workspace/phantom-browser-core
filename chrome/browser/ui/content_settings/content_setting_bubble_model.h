@@ -60,7 +60,6 @@ class Event;
 //       ContentSettingPopupBubbleModel              - popups
 //       ContentSettingFramebustBlockBubbleModel     - blocked frame busting
 //   ContentSettingMediaStreamBubbleModel        - media (camera and mic)
-//   ContentSettingSubresourceFilterBubbleModel  - filtered subresources
 //   ContentSettingDownloadsBubbleModel          - automatic downloads
 //   ContentSettingQuietRequestBubbleModel       - quiet ui prompts
 //   ContentSettingStorageAccessBubbleModel      - saa prompts
@@ -68,7 +67,6 @@ class Event;
 // Forward declaration necessary for downcasts.
 class ContentSettingSimpleBubbleModel;
 class ContentSettingMediaStreamBubbleModel;
-class ContentSettingSubresourceFilterBubbleModel;
 class ContentSettingDownloadsBubbleModel;
 class ContentSettingFramebustBlockBubbleModel;
 class ContentSettingQuietRequestBubbleModel;
@@ -226,11 +224,6 @@ class ContentSettingBubbleModel {
 
   // Cast this bubble into ContentSettingMediaStreamBubbleModel if possible.
   virtual ContentSettingMediaStreamBubbleModel* AsMediaStreamBubbleModel();
-
-  // Cast this bubble into ContentSettingSubresourceFilterBubbleModel
-  // if possible.
-  virtual ContentSettingSubresourceFilterBubbleModel*
-  AsSubresourceFilterBubbleModel();
 
   // Cast this bubble into ContentSettingDownloadsBubbleModel if possible.
   virtual ContentSettingDownloadsBubbleModel* AsDownloadsBubbleModel();
@@ -460,34 +453,6 @@ class ContentSettingQuietRequestBubbleModel : public ContentSettingBubbleModel {
   void OnManageButtonClicked() override;
   void OnDoneButtonClicked() override;
   ContentSettingQuietRequestBubbleModel* AsQuietRequestBubbleModel() override;
-};
-
-// The model for the deceptive content bubble.
-class ContentSettingSubresourceFilterBubbleModel
-    : public ContentSettingBubbleModel {
- public:
-  ContentSettingSubresourceFilterBubbleModel(Delegate* delegate,
-                                             content::Page& page);
-
-  ContentSettingSubresourceFilterBubbleModel(
-      const ContentSettingSubresourceFilterBubbleModel&) = delete;
-  ContentSettingSubresourceFilterBubbleModel& operator=(
-      const ContentSettingSubresourceFilterBubbleModel&) = delete;
-
-  ~ContentSettingSubresourceFilterBubbleModel() override;
-
- private:
-  void SetMessage();
-  void SetTitle();
-  void SetManageText();
-
-  // ContentSettingBubbleModel:
-  void OnManageCheckboxChecked(bool is_checked) override;
-  ContentSettingSubresourceFilterBubbleModel* AsSubresourceFilterBubbleModel()
-      override;
-  void CommitChanges() override;
-
-  bool is_checked_ = false;
 };
 
 // The model for automatic downloads setting.

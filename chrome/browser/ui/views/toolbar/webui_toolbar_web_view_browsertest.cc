@@ -5349,16 +5349,16 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewContentSettingsBrowserTest,
   content::WebContents* active_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
 
-  // Block ads, which has explanatory text.
-  TriggerContentBlocked(active_contents, ContentSettingsType::ADS);
+  // Block popups, which has explanatory text.
+  TriggerContentBlocked(active_contents, ContentSettingsType::POPUPS);
 
-  auto type = toolbar_ui_api::mojom::ContentSettingImageType::kAds;
+  auto type = toolbar_ui_api::mojom::ContentSettingImageType::kPopups;
   ASSERT_TRUE(base::test::RunUntil(
       [&]() { return IsIconVisible(web_ui_contents, type); }));
 
   // Verify state property has correct explanatory text.
   std::string expected_text =
-      l10n_util::GetStringUTF8(IDS_BLOCKED_ADS_PROMPT_TITLE);
+      l10n_util::GetStringUTF8(IDS_BLOCKED_POPUPS_EXPLANATORY_TEXT);
 
   ASSERT_TRUE(base::test::RunUntil([&web_ui_contents, &expected_text, type] {
     return content::EvalJs(web_ui_contents,

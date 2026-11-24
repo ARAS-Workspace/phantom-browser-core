@@ -58,7 +58,6 @@
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/ssl_errors/error_info.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/url_formatter/elide_url.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -107,7 +106,6 @@ ContentSettingsType kPermissionType[] = {
     ContentSettingsType::IMAGES,
     ContentSettingsType::POPUPS,
     ContentSettingsType::WINDOW_MANAGEMENT,
-    ContentSettingsType::ADS,
     ContentSettingsType::BACKGROUND_SYNC,
     ContentSettingsType::SOUND,
     ContentSettingsType::AUTOMATIC_DOWNLOADS,
@@ -1078,17 +1076,6 @@ void PageInfo::PopulatePermissionInfo(PermissionInfo& permission_info,
 // second section, the default behavior used when no per-type exception applies.
 bool PageInfo::ShouldShowPermission(
     const PageInfo::PermissionInfo& info) const {
-  // Note |ContentSettingsType::ADS| will show up regardless of its default
-  // value when it has been activated on the current origin.
-  if (info.type == ContentSettingsType::ADS) {
-    if (!base::FeatureList::IsEnabled(
-            subresource_filter::kSafeBrowsingSubresourceFilter)) {
-      return false;
-    }
-
-    return delegate_->IsSubresourceFilterActivated(site_url_);
-  }
-
   if (info.type == ContentSettingsType::GEOLOCATION) {
     if (base::FeatureList::IsEnabled(
             content_settings::features::kApproximateGeolocationPermission)) {

@@ -501,25 +501,6 @@ TEST_F(ContentSettingImageModelTest, NULLPageSpecificContentSettings) {
       ->Update(web_contents());
 }
 
-TEST_F(ContentSettingImageModelTest, SubresourceFilter) {
-  PageSpecificContentSettings::CreateForWebContents(
-      web_contents(),
-      std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents()->GetPrimaryMainFrame());
-  auto content_setting_image_model =
-      ContentSettingImageModel::CreateForContentType(
-          ContentSettingImageModel::ImageType::kAds);
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_TRUE(content_setting_image_model->get_tooltip().empty());
-
-  content_settings->OnContentBlocked(ContentSettingsType::ADS);
-  UpdateModelAndVerifyStates(content_setting_image_model.get(),
-                             /* is_visible = */ true,
-                             /* tooltip_empty = */ false);
-}
-
 TEST_F(ContentSettingImageModelTest, NotificationsIconVisibility) {
   PageSpecificContentSettings::CreateForWebContents(
       web_contents(),

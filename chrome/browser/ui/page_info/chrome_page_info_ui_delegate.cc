@@ -192,13 +192,7 @@ void ChromePageInfoUiDelegate::ShowPrivacySandboxSettings() {
 
 std::u16string ChromePageInfoUiDelegate::GetPermissionDetail(
     ContentSettingsType type) {
-  switch (type) {
-    // TODO(crbug.com/40777580): Reconcile with SiteDetailsPermissionElement.
-    case ContentSettingsType::ADS:
-      return l10n_util::GetStringUTF16(IDS_PAGE_INFO_PERMISSION_ADS_SUBTITLE);
-    default:
-      return {};
-  }
+  return {};
 }
 
 bool ChromePageInfoUiDelegate::ShouldShowSettingsLinkForPermission(

@@ -44,12 +44,6 @@ TestPermissionsClient::GetCookieSettings(
   return nullptr;
 }
 
-bool TestPermissionsClient::IsSubresourceFilterActivated(
-    content::BrowserContext* browser_context,
-    const GURL& url) {
-  return false;
-}
-
 OriginKeyedPermissionActionService*
 TestPermissionsClient::GetOriginKeyedPermissionActionService(
     content::BrowserContext* browser_context) {

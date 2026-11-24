@@ -80,9 +80,6 @@ export class ContentSettingIconElement extends CrLitElement {
         iconName =
             blocked ? 'volume_off_chrome_refresh' : 'volume_up_chrome_refresh';
         break;
-      case ContentSettingImageType.kAds:
-        iconName = blocked ? 'ads_off_chrome_refresh' : 'ads_chrome_refresh';
-        break;
       case ContentSettingImageType.kGeolocation:
         iconName = blocked ? 'location_off_chrome_refresh' :
                              'location_on_chrome_refresh';

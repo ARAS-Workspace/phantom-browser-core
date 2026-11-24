@@ -399,15 +399,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                          ? vector_icons::kSyncIcon
                          : vector_icons::kSyncChromeRefreshOldIcon);
       break;
-    case ContentSettingsType::ADS:
-      icon = show_blocked_badge
-                 ? &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kAdOffIcon
-                         : vector_icons::kAdsOffChromeRefreshOldIcon)
-                 : &(features::IsRoundedIconsEnabled()
-                         ? vector_icons::kAdIcon
-                         : vector_icons::kAdsChromeRefreshOldIcon);
-      break;
     case ContentSettingsType::SOUND:
       icon = show_blocked_badge
                  ? &(features::IsRoundedIconsEnabled()
@@ -642,10 +633,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
     case ContentSettingsType::BACKGROUND_SYNC:
       icon = &(features::IsRoundedIconsEnabled() ? vector_icons::kSyncIcon
                                                  : vector_icons::kSyncOldIcon);
-      break;
-    case ContentSettingsType::ADS:
-      icon = &(features::IsRoundedIconsEnabled() ? vector_icons::kAdIcon
-                                                 : vector_icons::kAdsOldIcon);
       break;
     case ContentSettingsType::SOUND:
       icon = &(features::IsRoundedIconsEnabled()

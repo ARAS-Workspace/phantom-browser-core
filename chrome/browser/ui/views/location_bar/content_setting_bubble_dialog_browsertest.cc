@@ -276,7 +276,6 @@ void ContentSettingBubbleDialogTest::ShowUi(const std::string& name) {
       {"automatic_downloads", ContentSettingsType::AUTOMATIC_DOWNLOADS,
        ImageType::kAutomaticDownloads},
       {"midi_sysex", ContentSettingsType::MIDI_SYSEX, ImageType::kMidiSysex},
-      {"ads", ContentSettingsType::ADS, ImageType::kAds},
       {"storage_access", ContentSettingsType::STORAGE_ACCESS,
        ImageType::kStorageAccess},
   };
@@ -341,10 +340,6 @@ IN_PROC_BROWSER_TEST_P(ContentSettingBubbleDialogTest,
 }
 
 IN_PROC_BROWSER_TEST_P(ContentSettingBubbleDialogTest, InvokeUi_midi_sysex) {
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_P(ContentSettingBubbleDialogTest, InvokeUi_ads) {
   ShowAndVerifyUi();
 }
 

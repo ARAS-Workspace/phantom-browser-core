@@ -23,7 +23,6 @@
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
-#include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/ui/url_identity.h"
 #include "chrome/browser/vr/vr_tab_helper.h"
 #include "chrome/common/chrome_features.h"
@@ -37,8 +36,6 @@
 #include "components/permissions/permission_manager.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
-#include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
-#include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/permission_controller.h"
@@ -337,16 +334,6 @@ ChromePageInfoDelegate::GetStatefulSSLHostStateDelegate() {
 
 HostContentSettingsMap* ChromePageInfoDelegate::GetContentSettings() {
   return HostContentSettingsMapFactory::GetForProfile(GetProfile());
-}
-
-bool ChromePageInfoDelegate::IsSubresourceFilterActivated(
-    const GURL& site_url) {
-  subresource_filter::SubresourceFilterContentSettingsManager*
-      settings_manager =
-          SubresourceFilterProfileContextFactory::GetForProfile(GetProfile())
-              ->settings_manager();
-
-  return settings_manager->GetSiteActivationFromMetadata(site_url);
 }
 
 bool ChromePageInfoDelegate::HasAutoPictureInPictureBeenRegistered() {

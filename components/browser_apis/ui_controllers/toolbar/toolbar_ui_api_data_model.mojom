@@ -313,7 +313,7 @@ enum ContentSettingImageType {
   kMixedScript = 7,
   kProtocolHandlers = 8,
   kMediaStream = 9,
-  kAds = 10,
+  // kAds = 10, // Deprecated.
   kAutomaticDownloads = 11,
   kMidiSysex = 12,
   kSound = 13,
