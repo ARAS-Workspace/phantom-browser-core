@@ -1433,6 +1433,45 @@ TEST_P(
                            EXCLUDE_INVALID_PREFIX}))));
 }
 
+// A cookie that an origin without a port component sets through
+// document.cookie is read back while port bound cookies are enabled.
+TEST_P(RestrictedCookieManagerTest, SetCookieFromStringPortlessScheme) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(net::features::kEnablePortBoundCookies);
+  url::ScopedSchemeRegistryForTests scoped_registry;
+  url::AddStandardScheme("chrome-extension", url::SchemeType::SCHEME_WITH_HOST);
+  base::test::TestFuture<bool> schemes_set;
+  cookie_monster_.SetCookieableSchemes({"chrome-extension"},
+                                       schemes_set.GetCallback());
+  ASSERT_TRUE(schemes_set.Get());
+
+  const GURL extension_url("chrome-extension://abcdefghijklmnop/bg.html");
+  const url::Origin extension_origin = url::Origin::Create(extension_url);
+  const net::SiteForCookies extension_site_for_cookies =
+      net::SiteForCookies::FromUrl(extension_url);
+  service_->OverrideIsolationInfoForTesting(net::IsolationInfo::Create(
+      net::IsolationInfo::RequestType::kOther, extension_origin,
+      extension_origin, extension_site_for_cookies));
+  service_->OverrideOriginForTesting(extension_origin);
+
+  backend()->SetCookieFromString(
+      extension_url, extension_site_for_cookies, extension_origin,
+      net::StorageAccessApiStatus::kNone,
+      /*is_ad_tagged=*/false, /*apply_devtools_overrides=*/false,
+      "extension-cookie=1;path=/");
+  service_remote_.FlushForTesting();
+  ASSERT_FALSE(received_bad_message());
+
+  auto options = mojom::CookieManagerGetOptions::New();
+  options->name = "extension-cookie";
+  options->match_type = mojom::CookieMatchType::EQUALS;
+  EXPECT_THAT(
+      sync_service_->GetAllForUrl(
+          extension_url, extension_site_for_cookies, extension_origin,
+          net::StorageAccessApiStatus::kNone, std::move(options)),
+      ElementsAre(net::MatchesCookieNameValue("extension-cookie", "1")));
+}
+
 TEST_P(RestrictedCookieManagerTest, SetCanonicalCookieFromOpaqueOrigin) {
   url::Origin opaque_origin;
   ASSERT_TRUE(opaque_origin.opaque());

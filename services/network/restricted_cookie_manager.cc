@@ -828,12 +828,17 @@ void RestrictedCookieManager::SetCanonicalCookie(
         cookie.IsPartitioned());
   }
 
+  // url::Origin keeps port 0 for schemes without a port component, while the
+  // cookie is matched against GURL::EffectiveIntPort(), which is
+  // url::PORT_UNSPECIFIED for them; use the same value as the source port.
+  const int source_port = origin_url.EffectiveIntPort();
+
   std::unique_ptr<net::CanonicalCookie> sanitized_cookie =
       net::CanonicalCookie::FromStorage(
           cookie.Name(), cookie.Value(), cookie.Domain(), cookie.Path(), now,
           cookie.ExpiryDate(), now, now, cookie.SecureAttribute(),
           cookie.IsHttpOnly(), cookie.SameSite(), cookie.Priority(),
-          cookie.PartitionKey(), source_scheme, origin_.port(),
+          cookie.PartitionKey(), source_scheme, source_port,
           cookie.SourceType(),
           net::CanonicalCookieFromStorageCallSite::kRestrictedCookieManager);
   DCHECK(sanitized_cookie);
