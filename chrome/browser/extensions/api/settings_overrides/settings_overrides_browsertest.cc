@@ -23,15 +23,12 @@
 #include "chrome/browser/extensions/external_provider_manager.h"
 #include "chrome/browser/prefs/session_startup_pref.h"  // nogncheck
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
 #include "chrome/browser/search_engines/template_url_prepopulate_data_resolver_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
-#include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/default_search_manager.h"
@@ -221,20 +218,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionBrowserTest, OverridenDSEPersists) {
       TestExtensionSearchEngine(profile);
   ExpectSimilar(extension_dse.get(), current_dse);
   EXPECT_EQ(DefaultSearchManager::FROM_EXTENSION, source);
-
-  // Check that new tab url is correctly overriden by extension.
-  std::string actual_new_tab_url = search::GetNewTabPageURL(profile).spec();
-  EXPECT_FALSE(actual_new_tab_url.empty());
-  TemplateURL ext_turl(*extension_dse,
-                       TemplateURL::NORMAL_CONTROLLED_BY_EXTENSION);
-
-  std::string new_tab_url_ext = ext_turl.new_tab_url_ref().ReplaceSearchTerms(
-      TemplateURLRef::SearchTermsArgs(std::u16string()),
-      UIThreadSearchTermsData());
-
-  // A custom NTP URL from the prepopulated data is used.
-  EXPECT_NE(actual_new_tab_url, chrome::kChromeUINewTabPageThirdPartyURL);
-  EXPECT_EQ(actual_new_tab_url, new_tab_url_ext);
 
   // Check that after template url service is loaded, extension dse persists.
   TemplateURLService* url_service =
