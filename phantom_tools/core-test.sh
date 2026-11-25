@@ -112,10 +112,17 @@ EOF
 # install-build-deps.py puts those packages in place. Its default backing is
 # Xorg, which also needs a dummy video driver set up; --use-xvfb keeps the plain
 # Xvfb server, so every run gets the same display.
+# The binary runs with CHROME_CONFIG_HOME set to a new empty directory next to
+# SUMMARY_PATH. Chrome puts its default user data directory there instead of
+# ~/.config (chrome/common/chrome_paths_linux.cc), so what one launch writes
+# there, the profiles of crashed tests included, stays in RESULT_DIR.
 launch() {
     local binary="$1" filter="$2" summary_path="$3" log="$4"
     shift 4
-    ( cd "$OUT" && python3 "$ROOT/testing/xvfb.py" "./$binary" --use-xvfb \
+    local config_home="$summary_path.config"
+    mkdir "$config_home"
+    ( cd "$OUT" && CHROME_CONFIG_HOME="$config_home" \
+        python3 "$ROOT/testing/xvfb.py" "./$binary" --use-xvfb \
         --gtest_filter="$filter" "$@" \
         --test-launcher-summary-output="$summary_path" ) > "$log" 2>&1
 }
