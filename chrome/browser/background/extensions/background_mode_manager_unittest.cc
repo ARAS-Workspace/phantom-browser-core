@@ -19,6 +19,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/test_simple_task_runner.h"
 #include "build/build_config.h"
+#include "build/config/linux/dbus/buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/test_extension_system.h"
@@ -49,6 +50,10 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/image/image.h"
 #include "ui/message_center/public/cpp/notifier_id.h"
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+#include "components/dbus/thread_linux/dbus_thread_linux.h"
+#endif
 
 using auto_launch_util::StartupLaunchMode;
 using extensions::mojom::ManifestLocation;
@@ -291,6 +296,13 @@ class BackgroundModeManagerWithExtensionsTest : public testing::Test {
 
     // Clear the shutdown flag to isolate the remaining effect of this test.
     browser_shutdown::SetTryingToQuit(false);
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+    // Shut down the shared D-Bus connection while the thread pool of the
+    // task environment runs; a later test in the process shuts it down
+    // otherwise, after that thread pool is gone.
+    dbus_thread_linux::ShutdownOnDBusThreadAndBlock();
+#endif
   }
 
   void ExpectStartupRegistration(bool launch_enabled) {

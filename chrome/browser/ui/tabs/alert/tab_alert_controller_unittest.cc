@@ -16,6 +16,8 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/time/time.h"
+#include "build/build_config.h"
+#include "build/config/linux/dbus/buildflags.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/media_stream_capture_indicator.h"
@@ -37,6 +39,10 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+#include "components/dbus/thread_linux/dbus_thread_linux.h"
+#endif
 
 namespace tabs {
 
@@ -92,6 +98,13 @@ class TabAlertControllerTest : public testing::Test {
     profile_ = nullptr;
 
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+    // Shut down the shared D-Bus connection while the thread pool of the
+    // task environment runs; a later test in the process shuts it down
+    // otherwise, after that thread pool is gone.
+    dbus_thread_linux::ShutdownOnDBusThreadAndBlock();
+#endif
   }
 
   TabAlertController* tab_alert_controller() {

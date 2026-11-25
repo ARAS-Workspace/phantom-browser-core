@@ -83,6 +83,7 @@ source_set("unit_tests") {
   deps = [
     ":extensions",
     "//base",
+    "//build/config/linux/dbus:buildflags",
     "//chrome/browser:browser_process",
     "//chrome/browser/background",
     "//chrome/browser/lifetime",
@@ -97,4 +98,8 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//ui/message_center/public/cpp",
   ]
+
+  if (use_dbus) {
+    deps += [ "//components/dbus" ]
+  }
 }

@@ -53,6 +53,7 @@ source_set("unit_tests") {
   deps = [
     ":impl",
     ":tab_alert",
+    "//build/config/linux/dbus:buildflags",
     "//chrome/browser/permissions/system",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/tabs:test_support",
@@ -62,6 +63,10 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
+
+  if (use_dbus) {
+    deps += [ "//components/dbus" ]
+  }
 }
 
 source_set("interactive_ui_tests") {

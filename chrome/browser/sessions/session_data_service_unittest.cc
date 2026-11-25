@@ -9,6 +9,8 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/time/time.h"
+#include "build/build_config.h"
+#include "build/config/linux/dbus/buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/defaults.h"
@@ -27,6 +29,10 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+#include "components/dbus/thread_linux/dbus_thread_linux.h"
+#endif
 
 using testing::_;
 using testing::Mock;
@@ -88,6 +94,13 @@ class SessionDataServiceTest : public testing::Test {
     profile_ = nullptr;
     profile_manager_ = nullptr;
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+    // Shut down the shared D-Bus connection while the thread pool of the
+    // task environment runs; a later test in the process shuts it down
+    // otherwise, after that thread pool is gone.
+    dbus_thread_linux::ShutdownOnDBusThreadAndBlock();
+#endif
   }
 
   std::unique_ptr<StrictMock<MockBrowserWindowInterface>> CreateMockBrowser(
