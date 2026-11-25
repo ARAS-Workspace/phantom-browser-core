@@ -116,9 +116,6 @@ RelaunchRequiredDialogViewDialogTest.*
 ReopenTabPromoControllerDialogBrowserTest.*
 SafetyTipPageInfoBubbleViewDialogTest.*
 ScreenCaptureNotificationUiBrowserTest.*
-*SendTabToSelfBubbleTest.*
-SendTabToSelfInteractiveUiTest.*
-SendTabToSelfToolbarIconControllerInteractiveUiTest.*
 SessionCrashedBubbleViewTest.*
 SettingsOverriddenExplicitChoiceDialogInteractiveUiTest.*
 SharedTabGroupInteractiveUiTest.SharedTabGroupIn*

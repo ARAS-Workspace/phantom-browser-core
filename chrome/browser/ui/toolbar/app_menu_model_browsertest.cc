@@ -22,7 +22,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error.h"
 #include "chrome/browser/ui/global_error/global_error_service.h"
@@ -41,8 +40,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
-#include "components/send_tab_to_self/features.h"
-#include "components/send_tab_to_self/stub_send_tab_to_self_sync_service.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
@@ -686,128 +683,3 @@ IN_PROC_BROWSER_TEST_P(AppMenuModelBookmarkBarTest, BookmarkBarSubmenu) {
 }
 
 INSTANTIATE_TEST_SUITE_P(All, AppMenuModelBookmarkBarTest, testing::Bool());
-
-namespace {
-
-using send_tab_to_self::EntryPointDisplayReason;
-using send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2;
-using send_tab_to_self::StubSendTabToSelfSyncService;
-
-class AppMenuModelSendTabToSelfTest : public AppMenuModelTest {
- public:
-  AppMenuModelSendTabToSelfTest() = default;
-  ~AppMenuModelSendTabToSelfTest() override = default;
-
-  void SetUpBrowserContextKeyedServices(
-      content::BrowserContext* context) override {
-    AppMenuModelTest::SetUpBrowserContextKeyedServices(context);
-    SendTabToSelfSyncServiceFactory::GetInstance()->SetTestingFactory(
-        context, base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-          return std::make_unique<StubSendTabToSelfSyncService>();
-        }));
-  }
-};
-
-class AppMenuModelSendTabToSelfEnhancedEnabledTest
-    : public AppMenuModelSendTabToSelfTest {
- public:
-  AppMenuModelSendTabToSelfEnhancedEnabledTest() {
-    feature_list_.InitAndEnableFeature(kSendTabToSelfEnhancedDesktopUIv2);
-  }
-};
-
-class AppMenuModelSendTabToSelfEnhancedDisabledTest
-    : public AppMenuModelSendTabToSelfTest {
- public:
-  AppMenuModelSendTabToSelfEnhancedDisabledTest() {
-    feature_list_.InitAndDisableFeature(kSendTabToSelfEnhancedDesktopUIv2);
-  }
-};
-
-// Tests that when kSendTabToSelfEnhancedDesktopUIv2 feature is enabled, the
-// "Send to Your Devices" item in the Save and Share submenu is a submenu model.
-IN_PROC_BROWSER_TEST_F(AppMenuModelSendTabToSelfEnhancedEnabledTest,
-                       SendTabToSelfSaveAndShareSubmenuEnabled) {
-  auto* sync_service = static_cast<StubSendTabToSelfSyncService*>(
-      SendTabToSelfSyncServiceFactory::GetForProfile(profile()));
-  sync_service->SetEntryPointDisplayReason(
-      EntryPointDisplayReason::kOfferFeature);
-
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("https://example.com")));
-
-  AppMenuModel model(this, browser());
-  model.Init();
-
-  const size_t save_and_share_index =
-      model.GetIndexOfCommandId(AppMenuModel::kSaveAndShareMenuPlaceholder)
-          .value();
-  ui::SimpleMenuModel* save_and_share_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(save_and_share_index));
-
-  const size_t send_tab_index =
-      save_and_share_menu->GetIndexOfCommandId(IDC_SEND_TAB_TO_SELF).value();
-  EXPECT_EQ(ui::MenuModel::TYPE_SUBMENU,
-            save_and_share_menu->GetTypeAt(send_tab_index));
-  EXPECT_NE(nullptr, save_and_share_menu->GetSubmenuModelAt(send_tab_index));
-}
-
-// Tests that when kSendTabToSelfEnhancedDesktopUIv2 feature is disabled, the
-// "Send to Your Devices" item in the Save and Share submenu remains a simple
-// command.
-IN_PROC_BROWSER_TEST_F(AppMenuModelSendTabToSelfEnhancedDisabledTest,
-                       SendTabToSelfSaveAndShareSubmenuDisabled) {
-  auto* sync_service = static_cast<StubSendTabToSelfSyncService*>(
-      SendTabToSelfSyncServiceFactory::GetForProfile(profile()));
-  sync_service->SetEntryPointDisplayReason(
-      EntryPointDisplayReason::kOfferFeature);
-
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("https://example.com")));
-
-  AppMenuModel model(this, browser());
-  model.Init();
-
-  const size_t save_and_share_index =
-      model.GetIndexOfCommandId(AppMenuModel::kSaveAndShareMenuPlaceholder)
-          .value();
-  ui::SimpleMenuModel* save_and_share_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(save_and_share_index));
-
-  const size_t send_tab_index =
-      save_and_share_menu->GetIndexOfCommandId(IDC_SEND_TAB_TO_SELF).value();
-  EXPECT_EQ(ui::MenuModel::TYPE_COMMAND,
-            save_and_share_menu->GetTypeAt(send_tab_index));
-}
-
-// Tests that when Send Tab to Self is not offered for the active page,
-// the item is still present in the Save and Share submenu as a fallback command
-// item.
-IN_PROC_BROWSER_TEST_F(AppMenuModelSendTabToSelfEnhancedEnabledTest,
-                       SendTabToSelfSaveAndShareNotOffered) {
-  auto* sync_service = static_cast<StubSendTabToSelfSyncService*>(
-      SendTabToSelfSyncServiceFactory::GetForProfile(profile()));
-  sync_service->SetEntryPointDisplayReason(std::nullopt);
-
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("https://example.com")));
-
-  AppMenuModel model(this, browser());
-  model.Init();
-
-  const size_t save_and_share_index =
-      model.GetIndexOfCommandId(AppMenuModel::kSaveAndShareMenuPlaceholder)
-          .value();
-  ui::SimpleMenuModel* save_and_share_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(save_and_share_index));
-
-  const std::optional<size_t> send_tab_index =
-      save_and_share_menu->GetIndexOfCommandId(IDC_SEND_TAB_TO_SELF);
-  ASSERT_TRUE(send_tab_index.has_value());
-  EXPECT_EQ(ui::MenuModel::TYPE_COMMAND,
-            save_and_share_menu->GetTypeAt(send_tab_index.value()));
-  EXPECT_FALSE(save_and_share_menu->IsEnabledAt(send_tab_index.value()));
-}
-
-}  // namespace

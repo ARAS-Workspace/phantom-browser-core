@@ -169,10 +169,6 @@ TEST_F(SigninPromoUrlTest, SigninURLForDiceMagiChromeExperiments) {
 TEST(SigninPromoTest, IsSignInPromo_AutofillTypes) {
   EXPECT_TRUE(IsSignInPromo(signin_metrics::AccessPoint::kAddressBubble));
 }
-
-TEST(SigninPromoTest, IsSignInPromo_SendTabToSelf) {
-  EXPECT_TRUE(IsSignInPromo(signin_metrics::AccessPoint::kSendTabToSelfPromo));
-}
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 TEST(SigninPromoTest, IsSignInPromo_ExtensionsWithExplicitSignin) {
@@ -190,9 +186,6 @@ TEST(SigninPromoTest, GetSignInPromoTypeFromAccessPoint) {
   EXPECT_EQ(SignInPromoType::kExtension,
             GetSignInPromoTypeFromAccessPoint(
                 signin_metrics::AccessPoint::kExtensionInstallBubble));
-  EXPECT_EQ(SignInPromoType::kSendTabToSelf,
-            GetSignInPromoTypeFromAccessPoint(
-                signin_metrics::AccessPoint::kSendTabToSelfPromo));
 }
 
 class ShowPromoTest : public testing::Test {

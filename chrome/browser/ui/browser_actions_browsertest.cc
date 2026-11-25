@@ -119,8 +119,6 @@ IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest,
   EXPECT_EQ(action_manager.FindAction(kActionDevTools)->GetEnabled(), true);
   EXPECT_EQ(action_manager.FindAction(kActionPrint)->GetEnabled(),
             CanPrint(browser()));
-  EXPECT_EQ(action_manager.FindAction(kActionSendTabToSelf)->GetEnabled(),
-            CanSendTabToSelf(browser()));
   EXPECT_EQ(action_manager.FindAction(kActionQrCodeGenerator)->GetEnabled(),
             false);
 }

@@ -145,7 +145,6 @@ BrowserRootViewBrowserTest.*
 -SingleClientSearchEnginesSyncTest.*
 -SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled.*
 -SingleClientSecondaryAccountSyncTest.*
--SingleClientSendTabToSelfSyncTest.*
 -SingleClientSessionsSyncTest.*
 -SingleClientSessionsSyncTestWithFaviconTestServer.*
 -SingleClientSharedTabGroupDataSyncTest.*
@@ -183,7 +182,6 @@ BrowserRootViewBrowserTest.*
 -TwoClientGeneratedIconFixSyncTest.*
 -TwoClientPreferencesSyncTest.*
 -TwoClientSearchEnginesSyncTest.*
--TwoClientSendTabToSelfSyncTest.*
 -TwoClientSessionsSyncTest.*
 -TwoClientSharedTabGroupDataSyncTest.*
 -TwoClientThemesSyncTest.*
