@@ -3,14 +3,12 @@
 // found in the LICENSE file.
 
 #include "base/strings/utf_string_conversions.h"
-#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/devtools_window_testing.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/prefs/pref_service.h"
@@ -26,11 +24,6 @@ class InterstitialUITest : public InProcessBrowserTest {
  public:
   InterstitialUITest() = default;
   ~InterstitialUITest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpCommandLine(command_line);
-
-  }
 
   void SetUpOnMainThread() override {
     g_browser_process->local_state()->SetBoolean(
@@ -54,29 +47,29 @@ class InterstitialUITest : public InProcessBrowserTest {
     EXPECT_EQ(base::ASCIIToUTF16(page_title),
               browser()->tab_strip_model()->GetActiveWebContents()->GetTitle());
 
-    // Should also be able to open and close devtools.
+    if (!body_text.empty()) {
+      content::WebContents* contents =
+          browser()->tab_strip_model()->GetActiveWebContents();
+
+      if (expand_details) {
+        EXPECT_EQ(true,
+                  content::EvalJs(contents,
+                                  "document.querySelector('#details-button')"
+                                  ".click(); true"));
+      }
+
+      EXPECT_GE(ui_test_utils::FindInPage(contents, body_text, true, true,
+                                          nullptr, nullptr),
+                1);
+    }
+
+    // Should also be able to open and close devtools. Docked devtools resize
+    // the page, which can switch the interstitial to its mobile layout, so
+    // this runs after the content checks.
     DevToolsWindow* window =
         DevToolsWindowTesting::OpenDevToolsWindowSync(browser(), true);
     EXPECT_TRUE(window);
     DevToolsWindowTesting::CloseDevToolsWindowSync(window);
-
-    if (body_text.empty()) {
-      return;
-    }
-
-    content::WebContents* contents =
-        browser()->tab_strip_model()->GetActiveWebContents();
-
-    if (expand_details) {
-      EXPECT_EQ(true,
-                content::EvalJs(
-                    contents,
-                    "document.querySelector('#details-button').click(); true"));
-    }
-
-    EXPECT_GE(ui_test_utils::FindInPage(contents, body_text, true, true,
-                                        nullptr, nullptr),
-              1);
   }
 
   // Convenience function to test interstitial pages without provided body_text.
@@ -188,11 +181,7 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, InterstitialViewSource) {
 
 // Tests that view-source: works correctly on a subpage of
 // chrome://interstitials (using chrome://interstitials/ssl).
-
-#define MAYBE_InterstitialWithPathViewSource InterstitialWithPathViewSource
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest,
-                       MAYBE_InterstitialWithPathViewSource) {
+IN_PROC_BROWSER_TEST_F(InterstitialUITest, InterstitialWithPathViewSource) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
       browser(), GURL("view-source:chrome://interstitials/ssl")));
   int found;
