@@ -76,7 +76,6 @@
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/saved_tab_groups/public/features.h"
-#include "components/send_tab_to_self/features.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/strings/grit/privacy_sandbox_strings.h"
@@ -1440,18 +1439,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
                                "Show the new badge in the system context menu "
                                "to toggle the horizontal tab strip "
                                "to be a vertical tab strip")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      send_tab_to_self::kSendTabToSelfEnhancedDesktopUI,
-      user_education::Metadata(
-          151, "mtatarski@google.com",
-          "Show the new badge on Send to Your Devices context menu items.")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2,
-      user_education::Metadata(
-          153, "mtatarski@google.com",
-          "Show the new badge on Send to Your Devices context menu items.")));
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   registry.RegisterFeature(user_education::NewBadgeSpecification(

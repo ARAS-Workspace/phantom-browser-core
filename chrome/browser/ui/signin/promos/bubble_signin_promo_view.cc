@@ -30,7 +30,6 @@
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/prefs/pref_service.h"
-#include "components/send_tab_to_self/features.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/base/signin_prefs.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -107,22 +106,6 @@ int GetSubtitleID(bool is_signin_promo,
         case SignedInState::kSignedIn:
         case SignedInState::kSyncing:
         case SignedInState::kSyncPaused:
-          break;
-      }
-    } break;
-    case signin::SignInPromoType::kSendTabToSelf: {
-      switch (signed_in_state) {
-        case SignedInState::kSignedOut:
-        case SignedInState::kWebOnlySignedIn:
-          return base::FeatureList::IsEnabled(
-                     send_tab_to_self::kSendTabToSelfEnhancedDesktopUI)
-                     ? IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_BODY
-                     : IDS_SEND_TAB_TO_SELF_SIGN_IN_PROMO_LABEL;
-        case SignedInState::kSignInPending:
-        case SignedInState::kSyncPaused:
-          return IDS_SEND_TAB_TO_SELF_VERIFY_ITS_YOU_PROMO_LABEL;
-        case SignedInState::kSignedIn:
-        case SignedInState::kSyncing:
           break;
       }
     } break;
@@ -224,7 +207,6 @@ void IncrementContextualPromoDismissCountPerSignedOutProfile(
                   kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment) +
               1);
     case signin::SignInPromoType::kExtension:
-    case signin::SignInPromoType::kSendTabToSelf:
       NOTREACHED();
   }
 }
@@ -252,7 +234,6 @@ void IncrementContextualPromoDismissCountPerAccount(
           .IncrementBookmarkSigninPromoDismissCount(account.gaia);
       break;
     case signin::SignInPromoType::kExtension:
-    case signin::SignInPromoType::kSendTabToSelf:
       NOTREACHED();
   }
 }

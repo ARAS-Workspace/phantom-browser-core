@@ -62,10 +62,6 @@ namespace history {
 class HistoryService;
 }  // namespace history
 
-namespace send_tab_to_self {
-class SendTabToSelfSyncService;
-}  // namespace send_tab_to_self
-
 namespace signin {
 class IdentityManager;
 }  // namespace signin
@@ -154,8 +150,6 @@ class CommonControllerBuilder {
   void SetPrefService(PrefService* pref_service);
   void SetPrefServiceSyncable(
       sync_preferences::PrefServiceSyncable* pref_service_syncable);
-  void SetSendTabToSelfSyncService(send_tab_to_self::SendTabToSelfSyncService*
-                                       send_tab_to_self_sync_service);
   void SetSessionSyncService(
       sync_sessions::SessionSyncService* session_sync_service);
 
@@ -216,8 +210,6 @@ class CommonControllerBuilder {
   CreateSearchEnginesDataTypeController(version_info::Channel channel);
   std::unique_ptr<syncer::DataTypeController>
   CreateUserEventsDataTypeController(syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateSendTabToSelfDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateUserConsentsDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
@@ -296,8 +288,6 @@ class CommonControllerBuilder {
       pref_service_syncable_;
   SafeOptional<raw_ptr<sync_sessions::SessionSyncService>>
       session_sync_service_;
-  SafeOptional<raw_ptr<send_tab_to_self::SendTabToSelfSyncService>>
-      send_tab_to_self_sync_service_;
   SafeOptional<raw_ptr<syncer::UserEventService>> user_event_service_;
   SafeOptional<scoped_refptr<base::SequencedTaskRunner>>
       autofill_web_data_ui_thread_;

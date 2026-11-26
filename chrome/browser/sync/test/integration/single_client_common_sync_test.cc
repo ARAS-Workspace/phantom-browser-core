@@ -21,10 +21,8 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
-#include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/committed_all_nudged_changes_checker.h"
-#include "chrome/browser/sync/test/integration/send_tab_to_self_helper.h"
 #include "chrome/browser/sync/test/integration/sync_integration_test_util.h"
 #include "chrome/browser/sync/test/integration/sync_service_impl_harness.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
@@ -669,7 +667,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
   ASSERT_TRUE(SetupSync());
 
   ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(
-      syncer::DataType::SEND_TAB_TO_SELF));
+      syncer::DataType::DEVICE_INFO));
   ASSERT_TRUE(
       GetSyncService(0)->GetActiveDataTypes().Has(syncer::DataType::BOOKMARKS));
 
@@ -694,9 +692,10 @@ IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
       GetSyncService(0)->GetActiveDataTypes().Has(syncer::DataType::BOOKMARKS));
 
   // Wait for some other data type to become active again.
-  ASSERT_TRUE(send_tab_to_self_helper::SendTabToSelfActiveChecker(
-                  SendTabToSelfSyncServiceFactory::GetForProfile(GetProfile(0)))
-                  .Wait());
+  ASSERT_TRUE(base::test::RunUntil([&]() {
+    return GetSyncService(0)->GetActiveDataTypes().Has(
+        syncer::DataType::DEVICE_INFO);
+  }));
   // The policy-disabled type should still be inactive.
   EXPECT_FALSE(
       GetSyncService(0)->GetActiveDataTypes().Has(syncer::DataType::BOOKMARKS));

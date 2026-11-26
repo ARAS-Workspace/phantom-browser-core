@@ -112,7 +112,6 @@ source_set("impl") {
     "//chrome/browser/user_education",
     "//chrome/browser/web_applications",
     "//components/feature_engagement/public",
-    "//components/send_tab_to_self:features",
     "//components/user_education/views",
     "//components/user_education/webui",
     "//content/public/browser",

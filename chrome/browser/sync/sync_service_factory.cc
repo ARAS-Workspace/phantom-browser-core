@@ -40,7 +40,6 @@
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
 #include "chrome/browser/sync/glue/extensions_activity_monitor.h"
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
-#include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/session_sync_service_factory.h"
 #include "chrome/browser/sync/user_event_service_factory.h"
 #include "chrome/browser/tab_group_sync/feature_utils.h"
@@ -61,7 +60,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
-#include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 #include "components/sync/base/command_line_switches.h"
 #include "components/sync/base/features.h"
 #include "components/sync/engine/net/http_bridge.h"
@@ -179,8 +177,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
   builder.SetPrefServiceSyncable(PrefServiceSyncableFromProfile(profile));
   builder.SetTabGroupSyncService(GetTabGroupSyncService(profile));
   builder.SetTemplateURLService(GetTemplateURLService(profile));
-  builder.SetSendTabToSelfSyncService(
-      SendTabToSelfSyncServiceFactory::GetForProfile(profile));
   builder.SetSessionSyncService(
       SessionSyncServiceFactory::GetForProfile(profile));
   builder.SetUserEventService(
@@ -299,9 +295,6 @@ std::unique_ptr<KeyedService> BuildSyncService(
       std::make_unique<syncer::SyncServiceImpl>(std::move(init_params));
   sync_service->Initialize(CreateControllers(profile, sync_service.get()));
 
-  SendTabToSelfSyncServiceFactory::GetForProfile(profile)
-      ->OnSyncServiceInitialized(sync_service.get());
-
   collaboration::CollaborationServiceFactory::GetForProfile(profile)
       ->OnSyncServiceInitialized(sync_service.get());
 
@@ -372,7 +365,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(LocalOrSyncableBookmarkSyncServiceFactory::GetInstance());
   DependsOn(SecurityEventRecorderFactory::GetInstance());
-  DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());
   DependsOn(TemplateURLServiceFactory::GetInstance());
   DependsOn(ThemeServiceFactory::GetInstance());

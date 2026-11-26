@@ -1882,15 +1882,6 @@
     'select_to_speak': {
       'filepath': 'select_to_speak',
     },
-    'send_tab_to_self': {
-      'filepath': 'components/send_tab_to_self'\
-                  '|chrome/android/java/src/org/chromium/chrome/browser/send_tab_to_self/'\
-                  '|chrome/android/junit/src/org/chromium/chrome/browser/send_tab_to_self/'\
-                  '|chrome/browser/android/send_tab_to_self/'\
-                  '|chrome/browser/send_tab_to_self/'\
-                  '|chrome/browser/ui/send_tab_to_self'\
-                  '|ios/chrome/browser/send_tab_to_self/',
-    },
     'service_worker': {
       'filepath': 'content/(browser|renderer|child|common)/service_worker/',
     },
@@ -3011,8 +3002,6 @@
     'security': ['security-watchlist@chromium.org'],
     'select_to_speak': ['katie+watch@chromium.org',
                         'anastasi+watch@google.com'],
-    'send_tab_to_self': ['jeffreycohen+watch-send_tab_to_self@chromium.org',
-                         'tgupta+watch@chromium.org'],
     'service_worker': ['horo+watch@chromium.org',
                        'kinuko+serviceworker@chromium.org',
                        'nhiroki@chromium.org',

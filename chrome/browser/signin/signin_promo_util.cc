@@ -70,8 +70,6 @@ syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
       return syncer::BOOKMARKS;
     case SignInPromoType::kExtension:
       return syncer::EXTENSIONS;
-    case SignInPromoType::kSendTabToSelf:
-      return syncer::SEND_TAB_TO_SELF;
   }
 }
 
@@ -80,7 +78,6 @@ bool PromoTypeHasSyncableData(SignInPromoType type) {
     case SignInPromoType::kAddress:
     case SignInPromoType::kBookmark:
     case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
       return true;
   }
   NOTREACHED();
@@ -125,7 +122,6 @@ int GetContextualPromoDismissCountPerSignedOutProfile(Profile& profile,
       return profile.GetPrefs()->GetInteger(
           prefs::kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment);
     case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
       NOTREACHED();
   }
 }
@@ -146,7 +142,6 @@ int GetContextualPromoDismissCountPerAccount(Profile& profile,
       return SigninPrefs(*profile.GetPrefs())
           .GetBookmarkSigninPromoDismissCount(gaia_id);
     case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
       NOTREACHED();
   }
 }
@@ -155,7 +150,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
                                                       SignInPromoType type) {
   // Footer sign in promos are always shown.
   if (type == signin::SignInPromoType::kExtension ||
-      type == signin::SignInPromoType::kSendTabToSelf ||
       (type == signin::SignInPromoType::kBookmark &&
        !base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp))) {
     return true;
@@ -177,7 +171,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
       show_count = GetBookmarkPromoShownCount(profile, account.gaia);
       break;
     case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
       NOTREACHED();
   }
 
@@ -410,12 +403,6 @@ bool IsSignInPromo(signin_metrics::AccessPoint access_point) {
     return true;
   }
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  if (access_point == signin_metrics::AccessPoint::kSendTabToSelfPromo) {
-    return true;
-  }
-#endif
-
   return false;
 }
 
@@ -428,8 +415,6 @@ SignInPromoType GetSignInPromoTypeFromAccessPoint(
       return SignInPromoType::kBookmark;
     case signin_metrics::AccessPoint::kExtensionInstallBubble:
       return SignInPromoType::kExtension;
-    case signin_metrics::AccessPoint::kSendTabToSelfPromo:
-      return SignInPromoType::kSendTabToSelf;
     default:
       NOTREACHED();
   }
@@ -468,7 +453,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
                 : prefs::kBookmarkSignInPromoShownCountPerProfile;
         break;
       case SignInPromoType::kExtension:
-      case SignInPromoType::kSendTabToSelf:
         return;
     }
 
@@ -491,7 +475,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
       }
       return;
     case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
       return;
   }
 }

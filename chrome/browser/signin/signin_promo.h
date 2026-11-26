@@ -70,7 +70,6 @@ enum class SignInPromoType {
   kAddress,
   kBookmark,
   kExtension,
-  kSendTabToSelf,
   // Add other types here if other access points will show a signin promo.
 };
 

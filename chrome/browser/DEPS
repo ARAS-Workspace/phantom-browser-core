@@ -259,7 +259,6 @@ include_rules = [
   "+components/security_interstitials/core",
   "+components/security_state/content",
   "+components/security_state/core",
-  "+components/send_tab_to_self",
   "+components/sensitive_content",
   "+components/services/app_service/public",
   "+components/services/filesystem/public/mojom",

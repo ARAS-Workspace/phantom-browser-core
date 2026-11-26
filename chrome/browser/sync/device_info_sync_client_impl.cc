@@ -41,7 +41,7 @@ std::string DeviceInfoSyncClientImpl::GetSigninScopedDeviceId() const {
 
 // syncer::DeviceInfoSyncClient:
 bool DeviceInfoSyncClientImpl::GetSendTabToSelfReceivingEnabled() const {
-  return true;
+  return false;
 }
 
 // syncer::DeviceInfoSyncClient:

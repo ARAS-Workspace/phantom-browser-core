@@ -83,7 +83,6 @@ source_set("sync_integration_tests_impl") {
   data = [
     "//chrome/test/data/empty.html",
     "//chrome/test/data/autofill/",
-    "//chrome/test/data/send_tab_to_self/",
     "//chrome/test/data/sync/",
   ]
 
@@ -165,7 +164,6 @@ source_set("sync_integration_tests_impl") {
     "//components/history/content/browser",
     "//components/history/core/common",
     "//components/saved_tab_groups/internal:tab_group_sync_bridge",
-    "//components/send_tab_to_self",
     "//components/sync",
     "//components/trusted_vault",
     "//components/trusted_vault:test_support",
@@ -246,8 +244,6 @@ source_set("sync_integration_test_support") {
     "saved_tab_groups_helper.h",
     "search_engines_helper.cc",
     "search_engines_helper.h",
-    "send_tab_to_self_helper.cc",
-    "send_tab_to_self_helper.h",
     "session_hierarchy_match_checker.cc",
     "session_hierarchy_match_checker.h",
     "single_client_status_change_checker.cc",
@@ -304,7 +300,6 @@ source_set("sync_integration_test_support") {
     "//components/browser_sync",
     "//components/favicon/core",
     "//components/saved_tab_groups/public",
-    "//components/send_tab_to_self",
     "//components/signin/public/identity_manager:test_support",
     "//components/sync",
     "//components/sync:test_support",
@@ -345,7 +340,6 @@ source_set("sync_integration_test_support") {
     "//chrome/browser/ui/webui/signin:login_ui_service",
     "//chrome/browser/ui/webui/signin:test_support_ui",
     "//chrome/browser/webauthn",
-    "//components/send_tab_to_self",
     "//components/trusted_vault",
     "//components/webauthn/core/browser",
     "//components/webauthn/core/browser:passkey_model",

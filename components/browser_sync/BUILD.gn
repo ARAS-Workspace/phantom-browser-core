@@ -37,7 +37,6 @@ static_library("browser_sync") {
     "//components/prefs",
     "//components/saved_tab_groups/public",
     "//components/search_engines",
-    "//components/send_tab_to_self",
     "//components/sync_bookmarks",
     "//components/sync_preferences",
     "//components/sync_sessions",

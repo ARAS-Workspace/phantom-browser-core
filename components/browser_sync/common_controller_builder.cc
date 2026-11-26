@@ -44,12 +44,11 @@
 #include "components/prefs/pref_service.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/search_engines/template_url_service.h"
-#include "components/send_tab_to_self/send_tab_to_self_data_type_controller.h"
-#include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/report_unrecoverable_error.h"
+#include "components/sync/model/data_type_store_service.h"
 #include "components/sync/model/forwarding_data_type_controller_delegate.h"
 #include "components/sync/model/proxy_data_type_controller_delegate.h"
 #include "components/sync/service/data_type_controller.h"
@@ -281,11 +280,6 @@ void CommonControllerBuilder::SetPrefServiceSyncable(
   pref_service_syncable_.Set(pref_service_syncable);
 }
 
-void CommonControllerBuilder::SetSendTabToSelfSyncService(
-    send_tab_to_self::SendTabToSelfSyncService* send_tab_to_self_sync_service) {
-  send_tab_to_self_sync_service_.Set(send_tab_to_self_sync_service);
-}
-
 void CommonControllerBuilder::SetSessionSyncService(
     sync_sessions::SessionSyncService* session_sync_service) {
   session_sync_service_.Set(session_sync_service);
@@ -397,10 +391,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::USER_EVENTS)) {
     add_controller(CreateUserEventsDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::SEND_TAB_TO_SELF)) {
-    add_controller(CreateSendTabToSelfDataTypeController());
   }
 
   if (!disabled_types.Has(syncer::USER_CONSENTS)) {
@@ -735,17 +725,6 @@ CommonControllerBuilder::CreateUserEventsDataTypeController(
           ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
                 delegate)
           : nullptr);
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateSendTabToSelfDataTypeController() {
-  syncer::DataTypeControllerDelegate* delegate =
-      send_tab_to_self_sync_service_.value()->GetControllerDelegate().get();
-  return std::make_unique<send_tab_to_self::SendTabToSelfDataTypeController>(
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
 }
 
 std::unique_ptr<syncer::DataTypeController>

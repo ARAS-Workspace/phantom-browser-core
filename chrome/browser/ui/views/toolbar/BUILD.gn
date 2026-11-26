@@ -230,7 +230,6 @@ source_set("impl") {
     "//components/feature_engagement/public",
     "//components/omnibox/browser",
     "//components/performance_manager",
-    "//components/send_tab_to_self",
     "//components/sessions",
     "//components/signin/public/base:signin_buildflags",
     "//components/signin/public/base:signin_switches",

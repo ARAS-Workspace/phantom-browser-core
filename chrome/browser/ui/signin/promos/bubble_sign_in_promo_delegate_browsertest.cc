@@ -170,7 +170,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
 
   DefaultBubbleSignInPromoDelegate delegate(
       *browser()->tab_strip_model()->GetActiveWebContents(),
-      signin_metrics::AccessPoint::kSendTabToSelfPromo, future.GetCallback());
+      signin_metrics::AccessPoint::kExtensionInstallBubble,
+      future.GetCallback());
 
   delegate.OnSignIn(info);
 
@@ -185,7 +186,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
 
   DefaultBubbleSignInPromoDelegate delegate(
       *browser()->tab_strip_model()->GetActiveWebContents(),
-      signin_metrics::AccessPoint::kSendTabToSelfPromo, future.GetCallback());
+      signin_metrics::AccessPoint::kExtensionInstallBubble,
+      future.GetCallback());
 
   delegate.OnSignIn(AccountInfo());
 
@@ -193,7 +195,7 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
   // helper.
   content::WebContents* sign_in_tab =
       signin_ui_util::GetSignInTabWithAccessPoint(
-          browser(), signin_metrics::AccessPoint::kSendTabToSelfPromo);
+          browser(), signin_metrics::AccessPoint::kExtensionInstallBubble);
   ASSERT_TRUE(sign_in_tab);
 
   EXPECT_FALSE(future.IsReady());
@@ -203,7 +205,7 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
       identity_manager(),
       signin::AccountAvailabilityOptionsBuilder()
           .AsPrimary(signin::ConsentLevel::kSignin)
-          .WithAccessPoint(signin_metrics::AccessPoint::kSendTabToSelfPromo)
+          .WithAccessPoint(signin_metrics::AccessPoint::kExtensionInstallBubble)
           .Build("test@gmail.com"));
 
   EXPECT_TRUE(future.Wait());
@@ -226,7 +228,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
 
   DefaultBubbleSignInPromoDelegate delegate(
       *browser()->tab_strip_model()->GetActiveWebContents(),
-      signin_metrics::AccessPoint::kSendTabToSelfPromo, future.GetCallback());
+      signin_metrics::AccessPoint::kExtensionInstallBubble,
+      future.GetCallback());
 
   // 2. Trigger OnSignIn. This should open the reauth tab.
   delegate.OnSignIn(info);
@@ -238,7 +241,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
   // 3. Now successfully reauthenticate.
   // We need to simulate the reauth event with the correct access point.
   AccountInfo extended_info = identity_manager()->FindExtendedAccountInfo(info);
-  extended_info.access_point = signin_metrics::AccessPoint::kSendTabToSelfPromo;
+  extended_info.access_point =
+      signin_metrics::AccessPoint::kExtensionInstallBubble;
   signin::UpdateAccountInfoForAccount(identity_manager(), extended_info);
 
   signin::UpdatePersistentErrorOfRefreshTokenForAccount(
@@ -256,14 +260,15 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
 
   DefaultBubbleSignInPromoDelegate delegate(
       *browser()->tab_strip_model()->GetActiveWebContents(),
-      signin_metrics::AccessPoint::kSendTabToSelfPromo, future.GetCallback());
+      signin_metrics::AccessPoint::kExtensionInstallBubble,
+      future.GetCallback());
 
   delegate.OnSignIn(AccountInfo());
 
   // Find and close the newly opened sign-in tab.
   content::WebContents* sign_in_tab =
       signin_ui_util::GetSignInTabWithAccessPoint(
-          browser(), signin_metrics::AccessPoint::kSendTabToSelfPromo);
+          browser(), signin_metrics::AccessPoint::kExtensionInstallBubble);
   ASSERT_TRUE(sign_in_tab);
 
   content::WebContentsDestroyedWatcher watcher(sign_in_tab);
@@ -281,7 +286,7 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoDelegateTest,
       identity_manager(),
       signin::AccountAvailabilityOptionsBuilder()
           .AsPrimary(signin::ConsentLevel::kSignin)
-          .WithAccessPoint(signin_metrics::AccessPoint::kSendTabToSelfPromo)
+          .WithAccessPoint(signin_metrics::AccessPoint::kExtensionInstallBubble)
           .Build("another@gmail.com"));
 
   base::RunLoop().RunUntilIdle();
