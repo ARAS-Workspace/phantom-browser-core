@@ -860,9 +860,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_VIRTUAL_CARD_ENROLL:
       ShowVirtualCardEnrollBubble(browser_);
       break;
-    case IDC_SEND_TAB_TO_SELF:
-      SendTabToSelf(browser_);
-      break;
     case IDC_QRCODE_GENERATOR:
       GenerateQRCode(browser_);
       break;
@@ -1509,7 +1506,6 @@ void BrowserCommandController::InitCommandState() {
                                          true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_CUSTOMIZE_CHROME_TOOLBAR,
                                          true);
-  command_updater_->UpdateCommandEnabled(IDC_SEND_TAB_TO_SELF, false);
   command_updater_->UpdateCommandEnabled(IDC_QRCODE_GENERATOR, false);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_PAYMENT_METHODS,
                                          !guest_session);
@@ -1756,9 +1752,6 @@ void BrowserCommandController::UpdateCommandsForTabState() {
   command_updater_->UpdateCommandEnabled(IDC_CREATE_SHORTCUT,
                                          can_create_web_app);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-  UpdateCommandAndActionEnabled(IDC_SEND_TAB_TO_SELF, kActionSendTabToSelf,
-                                CanSendTabToSelf(browser_));
 
   UpdateCommandAndActionEnabled(IDC_QRCODE_GENERATOR, kActionQrCodeGenerator,
                                 CanGenerateQrCode(browser_));

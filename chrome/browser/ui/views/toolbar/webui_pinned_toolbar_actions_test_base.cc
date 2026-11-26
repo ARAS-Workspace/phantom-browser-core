@@ -67,8 +67,6 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
            toolbar_ui_api::mojom::PinnedToolbarAction::kQrCodeGenerator},
           {kActionCopyUrl,
            toolbar_ui_api::mojom::PinnedToolbarAction::kCopyUrl},
-          {kActionSendTabToSelf,
-           toolbar_ui_api::mojom::PinnedToolbarAction::kSendTabToSelf},
           {kActionTaskManager,
            toolbar_ui_api::mojom::PinnedToolbarAction::kTaskManager},
           {kActionDevTools,

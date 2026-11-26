@@ -133,8 +133,6 @@ export class PinnedToolbarActionElement extends PinnedToolbarActionElementBase {
         return ContextMenuType.kPinnedActionSidePanelShowReadAnything;
       case PinnedToolbarAction.kCopyUrl:
         return ContextMenuType.kPinnedActionCopyUrl;
-      case PinnedToolbarAction.kSendTabToSelf:
-        return ContextMenuType.kPinnedActionSendTabToSelf;
       case PinnedToolbarAction.kTaskManager:
         return ContextMenuType.kPinnedActionTaskManager;
       case PinnedToolbarAction.kDevTools:

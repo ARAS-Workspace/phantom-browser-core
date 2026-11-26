@@ -17,7 +17,6 @@
 #include "base/test/run_until.h"
 #include "base/test/scoped_run_loop_timeout.h"
 #include "base/time/time.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/content/browser/content_autofill_driver.h"
 #include "components/autofill/core/browser/foundations/autofill_manager.h"

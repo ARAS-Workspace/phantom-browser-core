@@ -45,7 +45,6 @@
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/resource_coordinator/tab_helper.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -53,7 +52,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
 #include "chrome/browser/ui/tab_ui_helper.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
@@ -2574,9 +2572,6 @@ bool TabStripModel::IsContextMenuCommandEnabled(
     case CommandToggleGrouped:
       return SupportsTabGroups();
 
-    case CommandSendTabToSelf:
-      return true;
-
     case CommandAddToNewGroup:
     case CommandAddToNewGroupFromMenuItem:
     case CommandAddToExistingGroup:
@@ -2733,15 +2728,6 @@ void TabStripModel::ExecuteContextMenuCommand(int context_index,
                               base::Unretained(this), context_index,
                               command_id),
           /*delete_groups=*/false);
-      break;
-    }
-
-    case CommandSendTabToSelf: {
-      base::UmaHistogramCounts1000(
-          "Tab.ContextMenu.SendTabToSelf.SelectedTabsCount",
-          selection_model_.size());
-      send_tab_to_self::ShowBubble(GetWebContentsAt(context_index),
-                                   send_tab_to_self::ShareEntryPoint::kTabMenu);
       break;
     }
 
@@ -3304,9 +3290,6 @@ bool TabStripModel::ContextMenuCommandToBrowserCommand(int cmd_id,
       break;
     case CommandDuplicate:
       *browser_cmd = IDC_DUPLICATE_TAB;
-      break;
-    case CommandSendTabToSelf:
-      *browser_cmd = IDC_SEND_TAB_TO_SELF;
       break;
     case CommandCloseTab:
       *browser_cmd = IDC_CLOSE_TAB;

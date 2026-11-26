@@ -622,7 +622,6 @@ void WebUIToolbarWebView::HandleContextMenu(
     case toolbar_ui_api::mojom::ContextMenuType::
         kPinnedActionSidePanelShowReadAnything:
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionCopyUrl:
-    case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionSendTabToSelf:
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionTaskManager:
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionDevTools:
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionTabSearch:

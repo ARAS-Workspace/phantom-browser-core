@@ -57,7 +57,6 @@ void BrowserActionPrefsListener::UpdateActionsForSharingHubPolicy() {
         }
       };
   update_action_visibility(kActionQrCodeGenerator);
-  update_action_visibility(kActionSendTabToSelf);
   update_action_visibility(kActionCopyUrl);
 }
 

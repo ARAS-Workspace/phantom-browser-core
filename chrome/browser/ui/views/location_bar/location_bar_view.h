@@ -423,10 +423,6 @@ class LocationBarView
   // Updates the visibility of the QR Code Generator icon.
   void UpdateQRCodeGeneratorIcon();
 
-  // Updates the visibility of the send tab to self icon.
-  // Returns true if visibility changed.
-  bool UpdateSendTabToSelfIcon();
-
   // Updates the visibility of the permission chip and merchant trust chip when
   // omnibox is in the edit mode.
   void UpdateChipVisibility();

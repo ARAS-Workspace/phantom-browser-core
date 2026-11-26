@@ -175,10 +175,6 @@ namespace qrcode_generator {
 class QRCodeWindowController;
 }  // namespace qrcode_generator
 
-namespace send_tab_to_self {
-class SendTabToSelfToolbarBubbleController;
-}  // namespace send_tab_to_self
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace session_restore_infobar {
 class SessionRestoreInfobarController;
@@ -567,8 +563,6 @@ class BrowserWindowFeatures {
       qrcode_window_controller_;
   std::unique_ptr<RecentActivityBubbleCoordinator>
       recent_activity_bubble_coordinator_;
-  std::unique_ptr<send_tab_to_self::SendTabToSelfToolbarBubbleController>
-      send_tab_to_self_toolbar_bubble_controller_;
   std::unique_ptr<SessionServiceBrowserHelper> session_service_browser_helper_;
   std::unique_ptr<tab_groups::SessionServiceTabGroupSyncObserver>
       session_service_tab_group_sync_observer_;

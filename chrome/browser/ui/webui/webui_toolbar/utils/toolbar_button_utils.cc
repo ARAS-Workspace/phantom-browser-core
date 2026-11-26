@@ -268,11 +268,6 @@ ActionItemToPinnedToolbarAction(actions::ActionItem* item) {
                            ? vector_icons::kLinkIcon
                            : kLinkChromeRefreshOldIcon));
       return toolbar_ui_api::mojom::PinnedToolbarAction::kCopyUrl;
-    case kActionSendTabToSelf:
-      CHECK_EQ(icon, &(features::IsRoundedIconsEnabled()
-                           ? kDevicesIcon
-                           : kDevicesChromeRefreshOldIcon));
-      return toolbar_ui_api::mojom::PinnedToolbarAction::kSendTabToSelf;
     case kActionTaskManager:
       CHECK_EQ(icon,
                &(features::IsRoundedIconsEnabled() ? kTableChartIcon
@@ -376,8 +371,6 @@ std::optional<actions::ActionId> PinnedToolbarActionToActionId(
       return kActionSidePanelShowReadAnything;
     case toolbar_ui_api::mojom::PinnedToolbarAction::kCopyUrl:
       return kActionCopyUrl;
-    case toolbar_ui_api::mojom::PinnedToolbarAction::kSendTabToSelf:
-      return kActionSendTabToSelf;
     case toolbar_ui_api::mojom::PinnedToolbarAction::kTaskManager:
       return kActionTaskManager;
     case toolbar_ui_api::mojom::PinnedToolbarAction::kDevTools:

@@ -92,8 +92,6 @@
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_toolbar_icon_controller.h"
 #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
 #include "chrome/browser/ui/side_panel/side_panel_entry_id.h"
 #include "chrome/browser/ui/side_panel/side_panel_entry_key.h"
@@ -117,7 +115,6 @@
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
-#include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_toolbar_bubble_controller.h"
 #include "chrome/browser/ui/views/side_panel/comments/comments_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/history/history_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/history_clusters/history_clusters_side_panel_utils.h"
@@ -914,33 +911,6 @@ void BrowserActions::InitializeChromeMenuActions() {
           features::IsRoundedIconsEnabled() ? kCodeIcon
                                             : kDeveloperToolsOldIcon)
           .Build());
-
-  if (send_tab_to_self::SendTabToSelfToolbarIconController::CanShowOnBrowser(
-          bwi)) {
-    root_action_item_->AddChild(
-        ChromeMenuAction(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, TabStripModel* tab_strip_model,
-                   actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  auto* const bubble_controller = send_tab_to_self::
-                      SendTabToSelfToolbarBubbleController::From(bwi);
-                  if (bubble_controller->IsBubbleShowing()) {
-                    bubble_controller->HideBubble();
-                  } else {
-                    send_tab_to_self::ShowBubble(
-                        tab_strip_model->GetActiveWebContents(),
-                        send_tab_to_self::ShareEntryPoint::kToolbarIcon);
-                  }
-                },
-                bwi, tab_strip_model),
-            kActionSendTabToSelf, IDS_SEND_TAB_TO_SELF, IDS_SEND_TAB_TO_SELF,
-            features::IsRoundedIconsEnabled() ? kDevicesIcon
-                                              : kDevicesChromeRefreshOldIcon)
-            .SetEnabled(chrome::CanSendTabToSelf(bwi))
-            .SetVisible(!sharing_hub::SharingIsDisabledByPolicy(profile))
-            .Build());
-  }
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(

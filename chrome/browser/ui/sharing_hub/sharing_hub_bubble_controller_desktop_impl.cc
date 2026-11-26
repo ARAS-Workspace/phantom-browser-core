@@ -20,7 +20,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
 #include "chrome/browser/ui/sharing_hub/sharing_hub_bubble_view.h"
 #include "chrome/browser/ui/sharing_hub/sharing_hub_window_controller.h"
 #include "chrome/grit/generated_resources.h"
@@ -128,10 +127,6 @@ void SharingHubBubbleControllerDesktopImpl::OnActionSelected(
         qrcode_generator::QRCodeGeneratorBubbleController::Get(
             &GetWebContents());
     qrcode_controller->ShowBubble(GetWebContents().GetLastCommittedURL(), true);
-  } else if (action.command_id == IDC_SEND_TAB_TO_SELF) {
-    send_tab_to_self::ShowBubble(
-        &GetWebContents(), send_tab_to_self::ShareEntryPoint::kToolbarIcon,
-        /*show_back_button=*/true);
   } else {
     chrome::ExecuteCommand(browser, action.command_id);
   }

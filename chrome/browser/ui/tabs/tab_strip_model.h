@@ -760,7 +760,6 @@ class TabStripModel {
     CommandTogglePinned,
     CommandToggleGrouped,
     CommandToggleSiteMuted,
-    CommandSendTabToSelf,
     CommandAddNote,
     CommandAddToReadLater,
     CommandAddToNewGroup,

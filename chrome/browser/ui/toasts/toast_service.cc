@@ -11,13 +11,10 @@
 #include "build/branding_buildflags.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_client_service_factory.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_toolbar_icon_controller.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer_factory.h"
@@ -270,79 +267,6 @@ void ToastService::RegisterToasts(
             .AddGlobalScoped()
             .Build());
   }
-
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfTabOpened,
-      // TODO(crbug.com/488072250): Update the strings.
-      ToastSpecification::Builder(
-          features::IsRoundedIconsEnabled() ? kDevicesIcon
-                                            : vector_icons::kDevicesOldIcon,
-          IDS_SEND_TAB_PUSH_NOTIFICATION_TITLE_USER_GIVEN_DEVICE_NAME)
-          .AddGlobalScoped()
-          .Build());
-
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfTabsOpenedInBackground,
-      // TODO(crbug.com/488072250): Update the strings.
-      ToastSpecification::Builder(
-          features::IsRoundedIconsEnabled() ? kDevicesIcon
-                                            : vector_icons::kDevicesOldIcon,
-          IDS_SEND_TAB_PUSH_NOTIFICATION_TITLE_USER_GIVEN_DEVICE_NAME)
-          .AddCloseButton()
-          .AddActionButton(
-              IDS_SEND_TAB_RECEIVE_TOAST_BACKGROUND_ACTION_BUTTON,
-              base::BindRepeating(
-                  [](BrowserWindowInterface* window) {
-                    send_tab_to_self::ReceivingUiHandler* handler =
-                        send_tab_to_self::SendTabToSelfClientServiceFactory::
-                            GetForProfile(window->GetProfile())
-                                ->GetReceivingUiHandler();
-                    send_tab_to_self::SendTabToSelfToolbarIconController::
-                        FromReceivingUiHandlerInstance(handler)
-                            ->SwitchToLatestTabsOpenedInBackground(window);
-                  },
-                  base::Unretained(browser_window_interface)))
-          .AddGlobalScoped()
-          .Build());
-
-  // Note: The registered icon here is a fallback default required by the
-  // interface. The icon is always overridden dynamically in UI code based on
-  // the target device's form factor.
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfSuccess,
-      ToastSpecification::Builder(features::IsRoundedIconsEnabled()
-                                      ? kDevicesIcon
-                                      : vector_icons::kDevicesOldIcon,
-                                  IDS_SEND_TAB_TO_SELF_POST_SEND_SUCCESS_TOAST)
-          .AddCloseButton()
-          .Build());
-
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfSuccessThrottled,
-      ToastSpecification::Builder(
-          features::IsRoundedIconsEnabled() ? kDevicesIcon
-                                            : vector_icons::kDevicesOldIcon,
-          IDS_SEND_TAB_TO_SELF_POST_SEND_THROTTLED_TOAST)
-          .AddCloseButton()
-          .Build());
-
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfFailure,
-      ToastSpecification::Builder(features::IsRoundedIconsEnabled()
-                                      ? vector_icons::kErrorIcon
-                                      : vector_icons::kErrorOldIcon,
-                                  IDS_SEND_TAB_TO_SELF_POST_SEND_FAILURE_TOAST)
-          .AddCloseButton()
-          .Build());
-
-  toast_registry_->RegisterToast(
-      ToastId::kSendTabToSelfNoInternetConnection,
-      ToastSpecification::Builder(
-          features::IsRoundedIconsEnabled() ? vector_icons::kErrorIcon
-                                            : vector_icons::kErrorOldIcon,
-          IDS_SEND_TAB_TO_SELF_POST_SEND_NO_INTERNET_TOAST)
-          .AddCloseButton()
-          .Build());
 
   // Global-scoped: on the visual guide path this is triggered as the guide tab
   // navigates to the New Tab Page, and a tab-scoped toast would be dismissed

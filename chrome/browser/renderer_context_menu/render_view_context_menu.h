@@ -48,10 +48,6 @@ class ReadWriteCardObserver;
 class TemplateURL;
 class ToastController;
 
-namespace send_tab_to_self {
-class SendTabToSelfContextMenuDelegate;
-}
-
 namespace content {
 class RenderFrameHost;
 class WebContents;
@@ -271,7 +267,6 @@ class RenderViewContextMenu
   void AppendRevisedTextSelectionSection();
   void AppendProtocolHandlerSubMenu();
   void AppendSharingItems();
-  void AppendSendTabToSelfItem(bool add_separator);
   bool AppendQRCodeGeneratorItem(bool for_image,
                                  bool draw_icon,
                                  bool add_separator,
@@ -421,10 +416,6 @@ class RenderViewContextMenu
 
   // Whether the "Paste and Match Style" menu item should be enabled.
   const bool is_paste_and_match_style_enabled_;
-
-  std::unique_ptr<ui::SimpleMenuModel> send_tab_to_self_submenu_;
-  std::unique_ptr<send_tab_to_self::SendTabToSelfContextMenuDelegate>
-      send_tab_to_self_submenu_delegate_;
 
   std::unique_ptr<ui::SimpleMenuModel> split_layout_submenu_;
 };

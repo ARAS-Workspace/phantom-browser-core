@@ -14,14 +14,12 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/command_updater.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/omnibox/clipboard_utils.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_bubble_controller.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -31,6 +29,7 @@
 #include "components/url_formatter/elide_url.h"
 #include "content/public/browser/context_menu_params.h"
 #include "content/public/browser/render_widget_host_view.h"
+#include "content/public/browser/web_contents.h"
 #include "third_party/blink/public/common/context_menu_data/edit_flags.h"
 #include "ui/base/clipboard/clipboard.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -279,14 +278,6 @@ bool OmniboxContextMenuMixinBase::HandleExecuteCommand(int command_id,
       }
       return true;
 
-    case IDC_SEND_TAB_TO_SELF:
-      if (location_bar_ && location_bar_->GetWebContents()) {
-        send_tab_to_self::SendTabToSelfBubbleController::
-            GetOrCreateForWebContents(location_bar_->GetWebContents())
-                ->ShowBubble(send_tab_to_self::ShareEntryPoint::kOmniboxMenu);
-      }
-      return true;
-
     default:
       return false;
   }
@@ -395,8 +386,6 @@ void OmniboxContextMenuMixinBase::AddTextfieldItems(
 
 void OmniboxContextMenuMixinBase::AddOmniboxSpecificItems(
     ui::SimpleMenuModel* menu_contents) {
-  MaybeAddSendTabToSelfItem(menu_contents);
-
   const std::optional<size_t> paste_position =
       menu_contents->GetIndexOfCommandId(
           std::to_underlying(ui::TouchEditable::MenuCommands::kPaste));
@@ -455,35 +444,4 @@ bool OmniboxContextMenuMixinBase::HandleIsCommandIdChecked(int id) const {
         omnibox::kShowSearchTools);
   }
   return false;
-}
-
-void OmniboxContextMenuMixinBase::MaybeAddSendTabToSelfItem(
-    ui::SimpleMenuModel* menu_contents) {
-  // Only add this menu entry if SendTabToSelf feature is enabled.
-  if (!send_tab_to_self::ShouldDisplayEntryPoint(
-          location_bar_->GetWebContents())) {
-    return;
-  }
-
-  if (features::IsMenuSimplificationEnabled()) {
-    return;
-  }
-
-  size_t index =
-      menu_contents->GetIndexOfCommandId(views::Textfield::kUndo).value();
-  // Add a separator if this is not the first item.
-  if (index) {
-    menu_contents->InsertSeparatorAt(index++, ui::NORMAL_SEPARATOR);
-  }
-
-  menu_contents->InsertItemAt(
-      index, IDC_SEND_TAB_TO_SELF,
-      l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF));
-#if !BUILDFLAG(IS_MAC)
-  menu_contents->SetIcon(
-      index, ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                                ? kDevicesIcon
-                                                : kDevicesOldIcon));
-#endif
-  menu_contents->InsertSeparatorAt(++index, ui::NORMAL_SEPARATOR);
 }

@@ -457,7 +457,6 @@
   E(kActionClearBrowsingData, IDC_CLEAR_BROWSING_DATA) \
   E(kActionPrint, IDC_PRINT) \
   E(kActionShowTranslate, IDC_SHOW_TRANSLATE) \
-  E(kActionSendTabToSelf, IDC_SEND_TAB_TO_SELF) \
   E(kActionQrCodeGenerator, IDC_QRCODE_GENERATOR) \
   E(kActionRouteMedia, IDC_ROUTE_MEDIA) \
   E(kActionTaskManager, IDC_TASK_MANAGER) \

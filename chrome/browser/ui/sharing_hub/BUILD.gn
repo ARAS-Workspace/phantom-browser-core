@@ -51,7 +51,6 @@ source_set("impl") {
     "//chrome/browser/favicon",
     "//chrome/browser/ui/color:color_headers",
     "//chrome/browser/ui/qrcode_generator",
-    "//chrome/browser/ui/send_tab_to_self",
     "//ui/base",
     "//ui/color:color_headers",
     "//ui/native_theme",

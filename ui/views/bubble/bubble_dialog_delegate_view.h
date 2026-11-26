@@ -150,10 +150,6 @@ class LensPreselectionBubble;
 class LensRegionSearchInstructionsView;
 }  // namespace lens
 
-namespace send_tab_to_self {
-class SendTabToSelfToolbarBubbleView;
-}
-
 namespace toasts {
 class ToastView;
 }
@@ -899,7 +895,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   friend class ::autofill::LocalCardMigrationErrorDialogView;
   friend class ::captions::CaptionBubble;
   friend class ::chromeos::MultitaskMenu;
-  friend class ::send_tab_to_self::SendTabToSelfToolbarBubbleView;
   friend class ::toasts::ToastView;
   friend class ::ui::ime::AnnouncementView;
   friend class ::ui::ime::CandidateWindowView;

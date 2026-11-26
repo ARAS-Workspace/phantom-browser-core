@@ -108,10 +108,6 @@ class OmniboxContextMenuMixinBase {
  private:
   void OnGotClipboardText(base::OnceClosure closure, std::u16string text);
 
-  // Helper that adds a menu entry to send current tab to other devices if
-  // appropriate.
-  void MaybeAddSendTabToSelfItem(ui::SimpleMenuModel* menu_contents);
-
   raw_ptr<LocationBar> location_bar_;
   raw_ptr<OmniboxController> controller_;
 

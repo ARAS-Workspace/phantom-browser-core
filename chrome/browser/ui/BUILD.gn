@@ -130,7 +130,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/profiles",
     "//chrome/browser/ui/qrcode_generator",
     "//chrome/browser/ui/search",
-    "//chrome/browser/ui/send_tab_to_self",
     "//chrome/browser/ui/side_panel",
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
     "//chrome/browser/ui/tabs/organizer",
@@ -143,7 +142,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/views/frame:toolbar_button_provider",
     "//chrome/browser/ui/views/location_bar/cookie_controls",
     "//chrome/browser/ui/views/page_info",
-    "//chrome/browser/ui/views/send_tab_to_self",
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/views/tabs/organizer",
     "//chrome/browser/ui/views/toolbar",
@@ -1067,7 +1065,6 @@ static_library("ui") {
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/record_replay",
     "//chrome/browser/record_replay:impl",
-    "//chrome/browser/send_tab_to_self",
     "//chrome/browser/speech",
     "//chrome/browser/subscription_eligibility",
     "//chrome/browser/ui/browser_ui_controller",
@@ -1998,8 +1995,6 @@ static_library("ui") {
       "//chrome/browser/ui/dialogs",
       "//chrome/browser/ui/qrcode_generator",
       "//chrome/browser/ui/qrcode_generator:impl",
-      "//chrome/browser/ui/send_tab_to_self",
-      "//chrome/browser/ui/send_tab_to_self:impl",
       "//chrome/browser/ui/sharing_hub",
       "//chrome/browser/ui/sharing_hub:impl",
       "//chrome/browser/ui/tabs/organizer:impl",
@@ -2097,7 +2092,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/qrcode_generator",
       "//chrome/browser/ui/views/select_audio_output",
       "//chrome/browser/ui/views/select_audio_output:impl",
-      "//chrome/browser/ui/views/send_tab_to_self",
       "//chrome/browser/ui/views/sharing_hub",
       "//chrome/browser/ui/views/sharing_hub:impl",
       "//chrome/browser/ui/views/storage",
@@ -2161,12 +2155,6 @@ static_library("ui") {
       # following headers get componentized:
       # c/b/ui/views/frame/browser_view.h, contents_web_view.h
       "//chrome/browser/ui:sad_tab_impl",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when the
-      # following headers get componentized:
-      # c/b/ui/browser.h
-      # c/b/ui/views/frame/browser_view.h
-      "//chrome/browser/ui/send_tab_to_self:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following header gets componentized:

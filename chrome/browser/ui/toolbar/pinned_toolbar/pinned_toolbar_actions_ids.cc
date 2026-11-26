@@ -17,8 +17,6 @@ ui::ElementIdentifier GetElementIdentifierForAction(actions::ActionId id) {
       return kPinnedToolbarActionShowSidePanelLensOverlayResultsElementId;
     case kActionSidePanelShowBookmarks:
       return kPinnedToolbarActionShowSidePanelBookmarksElementId;
-    case kActionSendTabToSelf:
-      return kPinnedToolbarActionSendTabToSelfElementId;
     case kActionSidePanelShowContextualTasks:
       return kPinnedToolbarActionShowSidePanelContextualTasksElementId;
     default:

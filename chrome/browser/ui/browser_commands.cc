@@ -41,7 +41,6 @@
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit_external.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/sessions/session_service.h"
 #include "chrome/browser/sessions/session_service_base.h"
 #include "chrome/browser/sessions/session_service_factory.h"
@@ -84,7 +83,6 @@
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
 #include "chrome/browser/ui/sharing_hub/screenshot/screenshot_captured_bubble_controller.h"
 #include "chrome/browser/ui/sharing_hub/sharing_hub_bubble_controller.h"
 #include "chrome/browser/ui/startup/startup_tab.h"
@@ -2051,18 +2049,6 @@ void ShowVirtualCardEnrollBubble(BrowserWindowInterface* browser) {
   if (controller) {
     controller->ReshowBubble();
   }
-}
-
-bool CanSendTabToSelf(BrowserWindowInterface* browser) {
-  return send_tab_to_self::ShouldDisplayEntryPoint(
-      browser->GetTabStripModel()->GetActiveWebContents());
-}
-
-void SendTabToSelf(BrowserWindowInterface* browser) {
-  WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  send_tab_to_self::ShowBubble(web_contents,
-                               send_tab_to_self::ShareEntryPoint::kShareMenu);
 }
 
 bool CanGenerateQrCode(BrowserWindowInterface* browser) {

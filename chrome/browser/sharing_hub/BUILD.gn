@@ -35,7 +35,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser:shell_integration",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/send_tab_to_self",
     "//chrome/browser/ui",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/navigator",

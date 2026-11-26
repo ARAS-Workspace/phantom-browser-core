@@ -470,7 +470,6 @@ WebUIToolbarUI::GetKnownElementIdentifiers() {
        kPinnedToolbarActionShowSidePanelLensOverlayResultsElementId,
        kPinnedToolbarActionShowSidePanelBookmarksElementId,
        kPinnedToolbarActionShowSidePanelContextualTasksElementId,
-       kPinnedToolbarActionSendTabToSelfElementId,
        kToolbarAvatarButtonElementId,
        kToolbarPerformanceInterventionButtonElementId,
        PermissionChipView::kPermissionRequestChipElementId,

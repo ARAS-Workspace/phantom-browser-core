@@ -121,8 +121,6 @@ IN_PROC_BROWSER_TEST_F(CustomizeToolbarHandlerBrowserTest, ListActions) {
   EXPECT_TRUE(
       contains_action(side_panel::customize_chrome::mojom::ActionId::kPrint));
   EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kSendTabToSelf));
-  EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kQrCodeGenerator));
   EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kTaskManager));

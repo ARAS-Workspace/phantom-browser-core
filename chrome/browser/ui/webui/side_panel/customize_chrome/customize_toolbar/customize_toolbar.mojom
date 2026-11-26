@@ -24,7 +24,6 @@ enum ActionId {
   kClearBrowsingData,
   kPrint,
   kShowTranslate,
-  kSendTabToSelf,
   kQrCodeGenerator,
   kRouteMedia,
   kTaskManager,

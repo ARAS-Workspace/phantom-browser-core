@@ -258,8 +258,6 @@ void ShowMandatoryReauthOptInPrompt(BrowserWindowInterface* browser);
 void SaveAutofillAddress(BrowserWindowInterface* browser);
 void ShowFilledCardInformationBubble(BrowserWindowInterface* browser);
 void ShowVirtualCardEnrollBubble(BrowserWindowInterface* browser);
-bool CanSendTabToSelf(BrowserWindowInterface* browser);
-void SendTabToSelf(BrowserWindowInterface* browser);
 bool CanGenerateQrCode(BrowserWindowInterface* browser);
 void GenerateQRCode(BrowserWindowInterface* browser);
 void SharingHub(BrowserWindowInterface* browser);

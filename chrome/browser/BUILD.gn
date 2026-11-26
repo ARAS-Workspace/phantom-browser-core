@@ -1378,8 +1378,6 @@ source_set("browser") {
     "//chrome/browser/search_engine_choice:impl",
     "//chrome/browser/search_engines",
     "//chrome/browser/security_events",
-    "//chrome/browser/send_tab_to_self",
-    "//chrome/browser/send_tab_to_self:impl",
     "//chrome/browser/sessions",
     "//chrome/browser/sessions:impl",
     "//chrome/browser/share:impl",

@@ -77,9 +77,7 @@
 #include "chrome/browser/renderer_context_menu/link_to_text_menu_observer.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
-#include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -96,8 +94,6 @@
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
-#include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_context_menu_delegate.h"
 #include "chrome/browser/ui/tab_contents/core_tab_helper.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/page_context_eligibility_helper.h"
@@ -149,8 +145,6 @@
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
-#include "components/send_tab_to_self/features.h"
-#include "components/send_tab_to_self/metrics_util.h"
 #include "components/services/app_service/public/cpp/app_launch_params.h"
 #include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "components/split_tabs/split_tab_visual_data.h"
@@ -439,7 +433,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_TOGGLE, 99},
        {IDC_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_TOGGLE_ONCE, 100},
        {kAccessibilityLabelsMenuId, 101},
-       {IDC_SEND_TAB_TO_SELF, 102},
+       // Removed: {IDC_SEND_TAB_TO_SELF, 102},
        // Removed: {IDC_CONTENT_CONTEXT_SHARING_SHARED_CLIPBOARD_SINGLE_DEVICE, 108},
        // Removed: {IDC_CONTENT_CONTEXT_SHARING_SHARED_CLIPBOARD_MULTIPLE_DEVICES, 109},
        {IDC_CONTENT_CONTEXT_GENERATE_QR_CODE, 110},
@@ -1621,12 +1615,6 @@ void RenderViewContextMenu::AppendLinkItems() {
 
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 
-    // Send-Tab-To-Self (user's other devices), link level.
-    if (GetBrowser() && send_tab_to_self::ShouldDisplayEntryPoint(
-                            embedder_web_contents_, params_.link_url)) {
-      AppendSendTabToSelfItem(/*add_separator=*/false);
-    }
-
     // Place QR Generator close to send-tab-to-self feature for link images.
     if (params_.has_image_contents) {
       AppendQRCodeGeneratorItem(/*for_image=*/true, /*draw_icon=*/true,
@@ -1896,12 +1884,6 @@ void RenderViewContextMenu::AppendPageItems() {
     // Save to Memory Banks
     AppendSaveToMemoryBanksItem();
 
-    // Send to your devices
-    if (GetBrowser() &&
-        send_tab_to_self::ShouldDisplayEntryPoint(embedder_web_contents_)) {
-      AppendSendTabToSelfItem(/*add_separator=*/false);
-    }
-
     // Create QR code for this page
     AppendQRCodeGeneratorItem(/*for_image=*/false, /*draw_icon=*/true,
                               /*add_separator=*/false,
@@ -1924,12 +1906,6 @@ void RenderViewContextMenu::AppendPageItems() {
   // Note: `has_sharing_menu_items = true` also implies a separator was added
   // for sharing section.
   bool has_sharing_menu_items = false;
-  // Send-Tab-To-Self (user's other devices), page level.
-  if (GetBrowser() &&
-      send_tab_to_self::ShouldDisplayEntryPoint(embedder_web_contents_)) {
-    AppendSendTabToSelfItem(/*add_separator=*/!has_sharing_menu_items);
-    has_sharing_menu_items = true;
-  }
 
   // Context menu item for QR Code Generator.
   has_sharing_menu_items |=
@@ -2454,7 +2430,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
              IsOpenLinkAllowedByDlp(selection_navigation_url_);
 
     case IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS:
-    case IDC_SEND_TAB_TO_SELF:
       return true;
 
     case IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH:
@@ -2773,14 +2748,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       }
 #endif  // BUILDFLAG(ENABLE_PDF)
       embedder_web_contents_->OnSavePage();
-      break;
-
-    case IDC_SEND_TAB_TO_SELF:
-      send_tab_to_self::ShowBubble(
-          embedder_web_contents_,
-          params_.link_url.is_valid()
-              ? send_tab_to_self::ShareEntryPoint::kLinkMenu
-              : send_tab_to_self::ShareEntryPoint::kContentMenu);
       break;
 
     case IDC_CONTENT_CONTEXT_GENERATE_QR_CODE: {
@@ -3255,120 +3222,6 @@ bool RenderViewContextMenu::AppendQRCodeGeneratorItem(
   }
 
   return true;
-}
-
-void RenderViewContextMenu::AppendSendTabToSelfItem(bool add_separator) {
-  if (!embedder_web_contents_) {
-    return;
-  }
-
-  // Determine the target URL to share based on what element was right-clicked:
-  // if the context menu was triggered on a valid link, offer to share the
-  // link destination URL; otherwise, offer to share the active page URL.
-  const bool is_link = params_.link_url.is_valid();
-  if (is_link && !base::FeatureList::IsEnabled(
-                     send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2)) {
-    return;
-  }
-  const GURL target_url = is_link
-                              ? params_.link_url
-                              : embedder_web_contents_->GetLastCommittedURL();
-
-  // Only returns nullopt when unshareable (e.g., incognito, invalid scheme,
-  // policy disabled). Signed-out or zero-device states still return a valid
-  // display reason (`kOfferSignIn` or `kInformNoTargetDevice`) to show promos.
-  std::optional<send_tab_to_self::EntryPointDisplayReason> display_reason =
-      send_tab_to_self::GetEntryPointDisplayReason(embedder_web_contents_,
-                                                   target_url);
-  if (!display_reason.has_value()) {
-    return;
-  }
-
-  if (add_separator) {
-    menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-
-  const bool should_offer_submenu =
-      (base::FeatureList::IsEnabled(
-           send_tab_to_self::kSendTabToSelfEnhancedDesktopUI) ||
-       base::FeatureList::IsEnabled(
-           send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2)) &&
-      (*display_reason ==
-       send_tab_to_self::EntryPointDisplayReason::kOfferFeature);
-
-  if (should_offer_submenu) {
-    // TODO(crbug.com/530097533): Investigate improved title handling when the
-    // user interacts with the right-click flow on a hyperlink (e.g., fetching
-    // the destination page title or using a domain fallback if anchor text is
-    // empty).
-    send_tab_to_self_submenu_delegate_ =
-        std::make_unique<send_tab_to_self::SendTabToSelfContextMenuDelegate>(
-            embedder_web_contents_,
-            is_link ? send_tab_to_self::ShareEntryPoint::kLinkMenu
-                    : send_tab_to_self::ShareEntryPoint::kContentMenu,
-            target_url,
-            is_link ? base::UTF16ToUTF8(params_.link_text) : std::string());
-    send_tab_to_self_submenu_ = std::make_unique<ui::SimpleMenuModel>(
-        send_tab_to_self_submenu_delegate_.get());
-    send_tab_to_self_submenu_delegate_->PopulateSubmenu(
-        send_tab_to_self_submenu_.get());
-
-#if BUILDFLAG(IS_MAC)
-    if (features::IsMenuSimplificationEnabled()) {
-      menu_model_.AddSubMenuWithStringIdAndIcon(
-          IDC_SEND_TAB_TO_SELF, IDS_MENU_SEND_TAB_TO_SELF,
-          send_tab_to_self_submenu_.get(),
-          ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                             ? kDevicesIcon
-                                             : kDevicesOldIcon));
-    } else {
-      menu_model_.AddSubMenu(
-          IDC_SEND_TAB_TO_SELF,
-          l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF),
-          send_tab_to_self_submenu_.get());
-    }
-#else
-    menu_model_.AddSubMenuWithStringIdAndIcon(
-        IDC_SEND_TAB_TO_SELF, IDS_MENU_SEND_TAB_TO_SELF,
-        send_tab_to_self_submenu_.get(),
-        ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                           ? kDevicesIcon
-                                           : kDevicesOldIcon));
-#endif
-
-    const base::Feature& stts_feature =
-        (is_link || base::FeatureList::IsEnabled(
-                        send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2))
-            ? send_tab_to_self::kSendTabToSelfEnhancedDesktopUIv2
-            : send_tab_to_self::kSendTabToSelfEnhancedDesktopUI;
-
-    // TODO(crbug.com/516708776): Remove new feature tag when no longer new.
-    menu_model_.SetIsNewFeatureAt(
-        menu_model_.GetItemCount() - 1,
-        UserEducationService::MaybeShowNewBadge(GetBrowserContext(),
-                                                stts_feature));
-    return;
-  }
-
-#if BUILDFLAG(IS_MAC)
-  if (features::IsMenuSimplificationEnabled()) {
-    menu_model_.AddItemWithIcon(
-        IDC_SEND_TAB_TO_SELF,
-        l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF),
-        ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                           ? kDevicesIcon
-                                           : kDevicesOldIcon));
-  } else {
-    menu_model_.AddItem(IDC_SEND_TAB_TO_SELF,
-                        l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF));
-  }
-#else
-  menu_model_.AddItemWithIcon(
-      IDC_SEND_TAB_TO_SELF,
-      l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF),
-      ui::ImageModel::FromVectorIcon(
-          features::IsRoundedIconsEnabled() ? kDevicesIcon : kDevicesOldIcon));
-#endif
 }
 
 std::unique_ptr<ui::DataTransferEndpoint>

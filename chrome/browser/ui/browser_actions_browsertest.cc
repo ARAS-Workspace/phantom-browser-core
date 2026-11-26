@@ -79,8 +79,8 @@ IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest, DidCreateBrowserActions) {
 
   std::vector<actions::ActionId> browser_action_ids = {
       kActionNewIncognitoWindow, kActionPrint,      kActionClearBrowsingData,
-      kActionTaskManager,        kActionDevTools,   kActionSendTabToSelf,
-      kActionQrCodeGenerator,    kActionFederation, kActionCycleToNextTab,
+      kActionTaskManager,        kActionDevTools,   kActionQrCodeGenerator,
+      kActionFederation,         kActionCycleToNextTab,
       kActionCycleToPrevTab};
 
   ASSERT_NE(browser_actions->root_action_item(), nullptr);

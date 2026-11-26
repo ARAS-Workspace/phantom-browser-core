@@ -488,9 +488,6 @@ void WebUIPinnedToolbarActions::HandleContextMenu(
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionCopyUrl:
       action_id = kActionCopyUrl;
       break;
-    case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionSendTabToSelf:
-      action_id = kActionSendTabToSelf;
-      break;
     case toolbar_ui_api::mojom::ContextMenuType::kPinnedActionTaskManager:
       action_id = kActionTaskManager;
       break;
