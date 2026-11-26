@@ -116,12 +116,14 @@ EOF
 # SUMMARY_PATH. Chrome puts its default user data directory there instead of
 # ~/.config (chrome/common/chrome_paths_linux.cc), so what one launch writes
 # there, the profiles of crashed tests included, stays in RESULT_DIR.
+# PATH starts with vpython_shim, the vpython3 shim directory of the run.
 launch() {
     local binary="$1" filter="$2" summary_path="$3" log="$4"
     shift 4
     local config_home="$summary_path.config"
     mkdir "$config_home"
     ( cd "$OUT" && CHROME_CONFIG_HOME="$config_home" \
+        PATH="$vpython_shim:$PATH" \
         python3 "$ROOT/testing/xvfb.py" "./$binary" --use-xvfb \
         --gtest_filter="$filter" "$@" \
         --test-launcher-summary-output="$summary_path" ) > "$log" 2>&1
@@ -219,6 +221,15 @@ mkdir -p "$result"
 # The binary runs from out/ci, so a relative RESULT_DIR would put its summary
 # json there instead of here.
 result="$(cd "$result" && pwd)"
+# Chrome tests start vpython3 by name; media_engagement_autoplay_browsertest.cc
+# runs make_dafsa.py with it. The CI host has no vpython3 on PATH, and the test
+# process sets XDG_CACHE_HOME to its own new user data directory
+# (chrome/test/base/test_launcher_utils.cc), where a depot_tools vpython3 would
+# set up its environment from nothing in each test. The binaries find a
+# vpython3 here that is the python3 of this script.
+vpython_shim="$result/vpython3-shim"
+mkdir "$vpython_shim"
+ln -s "$(command -v python3)" "$vpython_shim/vpython3"
 summary="$result/ozet.txt"
 head="$(git -C "$ROOT" rev-parse --short=10 HEAD 2>/dev/null || echo unknown)"
 {
