@@ -32,6 +32,14 @@ browser_tests BookmarksTest.List
 browser_tests TabSearchTest.Item
 browser_tests WebUiToolbarJsTest.ToolbarApp
 browser_tests CrComponentsSearchboxTest.SearchboxIconTest
+browser_tests VerticalTabStripRegionViewTest.ExpandOnHoverEnabledChanged
+browser_tests VerticalTabStripRegionViewTest.ExpandOnHoverLockBehavior
+browser_tests VerticalTabStripRegionViewTest.ModeChanged
+browser_tests VerticalTabStripRegionViewTest.GetFocusedTabIndexReturnsCorrectIndex
+browser_tests VerticalTabStripRegionViewTest.ResizeAreaNotVisibleInExpandOnHoverState
+browser_tests VerticalTabStripRegionViewTest.ExpandOnHoverDisabledWhenWindowInactive
+browser_tests VerticalTabStripRegionViewTest.LogExpandOnHoverShowDurationMetrics
+browser_tests VerticalTabStripRegionViewTest.CanFocusVerticalTabView
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
