@@ -221,6 +221,13 @@ class BackgroundModeManagerTest : public testing::Test {
     profile_ = nullptr;
     profile_manager_ = nullptr;
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
+
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
+    // Shut down the shared D-Bus connection while the thread pool of the
+    // task environment runs; a later test in the process shuts it down
+    // otherwise, after that thread pool is gone.
+    dbus_thread_linux::ShutdownOnDBusThreadAndBlock();
+#endif
   }
 
   void ExpectStartupRegistration(bool launch_enabled, int count = 1) {
