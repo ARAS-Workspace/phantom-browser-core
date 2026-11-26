@@ -9,6 +9,7 @@
 #include "base/byte_size.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
+#include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/performance_manager/test_support/page_discarding_utils.h"
@@ -29,6 +30,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "content/public/browser/web_contents.h"
+#include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -56,6 +58,14 @@ class StubMemorySaverBubbleObserver : public MemorySaverBubbleObserver {
 class MemorySaverBubbleViewTest
     : public MemorySaverBrowserTestMixin<InProcessBrowserTest> {
  public:
+  MemorySaverBubbleViewTest() {
+    // Discarded tabs keep their WebContents. With the legacy discard path,
+    // activating a browser reloads and focuses its discarded tab
+    // (TabLifecycleUnit::SetFocused), which on aura reenters the focus
+    // controller while the bubble widget activates.
+    scoped_feature_list_.InitAndEnableFeature(features::kWebContentsDiscard);
+  }
+
   void SetUpOnMainThread() override {
     MemorySaverBrowserTestMixin::SetUpOnMainThread();
 
@@ -177,6 +187,7 @@ class MemorySaverBubbleViewTest
   base::HistogramTester histogram_tester_;
 
  private:
+  base::test::ScopedFeatureList scoped_feature_list_;
   std::unique_ptr<
       performance_manager::testing::ScopedSetAllPagesDiscardableForTesting>
       unconditionally_discard_pages_;
