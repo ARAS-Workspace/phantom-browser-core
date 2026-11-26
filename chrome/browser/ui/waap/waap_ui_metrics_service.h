@@ -33,6 +33,9 @@ class WaapUIMetricsService : public KeyedService {
   // May return nullptr.
   static WaapUIMetricsService* Get(Profile* profile);
 
+  // Resets the once-per-process state of the startup paint metrics.
+  static void ResetForTesting();
+
   // Called when the browser window is created.
   void OnBrowserWindowCreated();
 

@@ -3386,7 +3386,7 @@ IN_PROC_BROWSER_TEST_F(WebUIReloadButtonBrowserTest, FrameCacheUsage) {
 #define MAYBE_EndToEndTabSwitchMitigation EndToEndTabSwitchMitigation
 #endif
 IN_PROC_BROWSER_TEST_F(WebUIReloadButtonBrowserTest,
-                       EndToEndTabSwitchMitigation) {
+                       MAYBE_EndToEndTabSwitchMitigation) {
   // Set max saved frames to 2 (1 for the active tab + 1 for 1 background tab).
   content::SetMaxUnlockedCompositorFramesForTesting(2);
 

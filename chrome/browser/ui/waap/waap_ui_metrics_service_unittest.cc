@@ -29,6 +29,9 @@ class WaapUIMetricsServiceTest : public testing::Test {
   void SetUp() override {
     // WaapUIMetricsService is only available when the feature is enabled.
     feature_list_.InitAndEnableFeature(features::kInitialWebUIMetrics);
+    // The startup paint metrics record once per process, and another test
+    // in the same process may have recorded them already.
+    WaapUIMetricsService::ResetForTesting();
   }
 
  protected:

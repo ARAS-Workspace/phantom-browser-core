@@ -21,6 +21,11 @@
 
 namespace {
 
+// The startup paint metrics record once per browser process.
+bool g_browser_window_first_presentation_recorded = false;
+bool g_first_paint_recorded = false;
+bool g_first_contentful_paint_recorded = false;
+
 std::string_view CreationSourceToString(waap::NewWindowCreationSource source) {
   switch (source) {
     case waap::NewWindowCreationSource::kSessionRestore:
@@ -172,6 +177,13 @@ WaapUIMetricsService* WaapUIMetricsService::Get(Profile* profile) {
   return WaapUIMetricsServiceFactory::GetForProfile(profile);
 }
 
+// static
+void WaapUIMetricsService::ResetForTesting() {
+  g_browser_window_first_presentation_recorded = false;
+  g_first_paint_recorded = false;
+  g_first_contentful_paint_recorded = false;
+}
+
 void WaapUIMetricsService::OnBrowserWindowCreated() {
   base::UmaHistogramEnumeration("InitialWebUI.View.Creation",
                                 InitialWebUIView::kBrowserWindow);
@@ -204,7 +216,6 @@ void WaapUIMetricsService::OnReloadButtonRendererProcessCreatedAndLaunched(
 
 void WaapUIMetricsService::OnBrowserWindowFirstPresentation(
     base::TimeTicks time) {
-  static bool is_first_call = true;
   // It is possible for the presentation feedback to have a null timestamp even
   // if the presentation was considered successful (e.g. if the OS/driver
   // confirmed the swap but didn't provide a timestamp). In this case, we simply
@@ -215,8 +226,8 @@ void WaapUIMetricsService::OnBrowserWindowFirstPresentation(
   if (time.is_null()) {
     return;
   }
-  CHECK(is_first_call);
-  is_first_call = false;
+  CHECK(!g_browser_window_first_presentation_recorded);
+  g_browser_window_first_presentation_recorded = true;
 
   base::TimeTicks time_origin =
       startup_metric_utils::GetBrowser().GetApplicationStartTicksForStartup();
@@ -224,15 +235,14 @@ void WaapUIMetricsService::OnBrowserWindowFirstPresentation(
 }
 
 void WaapUIMetricsService::OnFirstPaint(base::TimeTicks time) {
-  static bool is_first_call = true;
   // See https://crbug.com/464980749#comment10 for why we skip for null.
   if (time.is_null()) {
     return;
   }
-  if (!is_first_call) {
+  if (g_first_paint_recorded) {
     return;
   }
-  is_first_call = false;
+  g_first_paint_recorded = true;
 
   // For early experiment, this is ReloadButton only.
   // TODO(crbug.com/448794588): Switch to general name after initial phase.
@@ -242,15 +252,14 @@ void WaapUIMetricsService::OnFirstPaint(base::TimeTicks time) {
 }
 
 void WaapUIMetricsService::OnFirstContentfulPaint(base::TimeTicks time) {
-  static bool is_first_call = true;
   // See https://crbug.com/464980749#comment10 for why we skip for null.
   if (time.is_null()) {
     return;
   }
-  if (!is_first_call) {
+  if (g_first_contentful_paint_recorded) {
     return;
   }
-  is_first_call = false;
+  g_first_contentful_paint_recorded = true;
 
   // For early experiment, this is ReloadButton only.
   // TODO(crbug.com/448794588): Switch to general name after initial phase.
