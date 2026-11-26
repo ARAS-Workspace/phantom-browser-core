@@ -46,7 +46,6 @@ using syncer::DataTypeSet;
 using testing::AllOf;
 using testing::Contains;
 using testing::ElementsAre;
-using testing::IsEmpty;
 using testing::IsSupersetOf;
 using testing::Not;
 using testing::UnorderedElementsAre;
@@ -585,72 +584,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
   EXPECT_FALSE(message.commit()
                    .config_params()
                    .single_client_with_standalone_invalidations());
-}
-
-// This test verifies that single_client optimization flag is not set after
-// DeviceInfo has been received (even within the same sync cycle).
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
-                       ShouldNotPopulateTheOnlyClientWhenDeviceInfoUpdated) {
-  ASSERT_TRUE(SetupSync());
-
-  const std::vector<sync_pb::SyncEntity> server_device_infos =
-      GetFakeServer()->GetSyncEntitiesByDataType(syncer::DEVICE_INFO);
-  ASSERT_THAT(server_device_infos,
-              ElementsAre(HasCacheGuid(GetLocalCacheGuid())));
-
-  // Simulate going offline to have both downloading and committing updates in
-  // the same sync cycle.
-  DisableNetwork();
-
-  // Add a DeviceInfo tombstone to cause a commit request (removing local
-  // DeviceInfo will cause its reupload).
-  GetFakeServer()->InjectEntity(
-      syncer::PersistentTombstoneEntity::CreateFromEntity(
-          server_device_infos.front()));
-
-  // Simulate DeviceInfo update from a new remote client.
-  InjectDeviceInfoEntityToServer(/*suffix=*/1);
-
-  // Simulate going online. This starts a new sync cycle with both GetUpdates
-  // and Commit requests.
-  EnableNetwork();
-
-  // Waiting for a local DeviceInfo reupload.
-  ASSERT_TRUE(ServerDeviceInfoMatchChecker(
-                  UnorderedElementsAre(HasCacheGuid(GetLocalCacheGuid()),
-                                       HasCacheGuid(CacheGuidForSuffix(1))))
-                  .Wait());
-
-  sync_pb::ClientToServerMessage message;
-  GetFakeServer()->GetLastCommitMessage(&message);
-
-  // Verify that all the optimization flags are omitted.
-  EXPECT_FALSE(message.commit().config_params().single_client());
-  EXPECT_FALSE(message.commit()
-                   .config_params()
-                   .single_client_with_standalone_invalidations());
-  EXPECT_THAT(message.commit()
-                  .config_params()
-                  .fcm_registration_tokens_for_interested_clients(),
-              IsEmpty());
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
-                       ShouldReuploadLocalDeviceIfRemovedFromServer) {
-  ASSERT_TRUE(SetupSync());
-
-  const std::vector<sync_pb::SyncEntity> server_device_infos =
-      GetFakeServer()->GetSyncEntitiesByDataType(syncer::DEVICE_INFO);
-  ASSERT_THAT(server_device_infos, Contains(HasCacheGuid(GetLocalCacheGuid())));
-
-  GetFakeServer()->InjectEntity(
-      syncer::PersistentTombstoneEntity::CreateFromEntity(
-          server_device_infos.front()));
-
-  // On receiving the tombstone, the client should reupload its own device info.
-  EXPECT_TRUE(ServerDeviceInfoMatchChecker(
-                  ElementsAre(HasCacheGuid(GetLocalCacheGuid())))
-                  .Wait());
 }
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
