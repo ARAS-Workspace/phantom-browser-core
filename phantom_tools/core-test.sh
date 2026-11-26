@@ -18,6 +18,21 @@ DEFAULT_RERUN_JOBS=0
 DEFAULT_CONFIRM_MAX=0
 # These need the window focus to themselves, so the launcher runs them one by one.
 SINGLE_JOB_BINARIES=" interactive_ui_tests "
+# Tests of a binary that need the window focus to themselves as well: in a
+# parallel run the window of another test takes the focus and their focus
+# checks fail, while each passes run alone. The launcher runs the ones that
+# the filter selects one by one after the parallel run of their binary, which
+# leaves them out.
+SINGLE_JOB_TESTS="
+browser_tests DocumentPictureInPictureWindowControllerBrowserTest.CreateTwice
+browser_tests FlagsUiBrowserTest.App
+browser_tests TabViewTest.IconDataChanged
+browser_tests CrElementsTest.CrToast
+browser_tests BookmarksTest.List
+browser_tests TabSearchTest.Item
+browser_tests WebUiToolbarJsTest.ToolbarApp
+browser_tests CrComponentsSearchboxTest.SearchboxIconTest
+"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/out/$OUT_NAME"
@@ -211,9 +226,29 @@ else:
     print("=== verdict without a base: red %d" % len(red_now))
     failed = bool(red_now)
 if missing:
-    print("=== a binary, its rerun or its confirm run left no summary json")
+    print("=== a binary, its rerun, its one-at-a-time run or its confirm run left no summary json")
 print("=== %s" % ("RED" if failed or missing else "GREEN"))
 sys.exit(1 if failed or missing else 0)
+PY
+}
+
+# Prints, joined with ":", the SINGLE_JOB_TESTS of BINARY that FILTER selects.
+single_job_tests() {
+    python3 - "$1" "$2" "$SINGLE_JOB_TESTS" <<'PY'
+import fnmatch, sys
+binary, flt, tests = sys.argv[1:4]
+positive, _, negative = flt.partition("-")
+positive = [p for p in positive.split(":") if p] or ["*"]
+negative = [p for p in negative.split(":") if p]
+names = []
+for line in tests.split("\n"):
+    fields = line.split()
+    if len(fields) != 2 or fields[0] != binary:
+        continue
+    if any(fnmatch.fnmatchcase(fields[1], p) for p in positive) and not any(
+            fnmatch.fnmatchcase(fields[1], p) for p in negative):
+        names.append(fields[1])
+print(":".join(names))
 PY
 }
 
@@ -244,9 +279,17 @@ while IFS="$(printf '\t')" read -r binary filter; do
     started=$SECONDS
     say "$binary, filter ${#filter} characters, -j $j" | tee -a "$summary"
     rc=0
+    single="$(single_job_tests "$binary" "$filter")"
+    main_filter="$filter"
+    if [ -n "$single" ]; then
+        case "$filter" in
+            *-*) main_filter="$filter:$single" ;;
+            *) main_filter="$filter-$single" ;;
+        esac
+    fi
     # The launcher's own summaries keep a .summary name so that the verdict,
     # which reads every *.json here, only sees the merged one.
-    launch "$binary" "$filter" "$result/$binary.main.summary" "$result/$binary.log" \
+    launch "$binary" "$main_filter" "$result/$binary.main.summary" "$result/$binary.log" \
         --test-launcher-retry-limit="$retry" \
         --test-launcher-batch-limit="$batch" \
         --test-launcher-jobs="$j" || rc=$?
@@ -271,7 +314,18 @@ PY
                 || { say "$binary, the rerun left no summary" | tee -a "$summary"; missing=1; }
         fi
     fi
-    merge "$result/$binary.json" "$result/$binary.main.summary" "$result/$binary.rerun.summary" || true
+    if [ -n "$single" ]; then
+        say "$binary, $(printf '%s\n' "$single" | tr ':' '\n' | grep -c .) tests that need the window focus, one at a time" \
+            | tee -a "$summary"
+        launch "$binary" "$single" "$result/$binary.single.summary" "$result/$binary.single.log" \
+            --test-launcher-retry-limit="$retry" \
+            --test-launcher-batch-limit=1 \
+            --test-launcher-jobs=1 || true
+        [ -f "$result/$binary.single.summary" ] \
+            || { say "$binary, the one-at-a-time run left no summary" | tee -a "$summary"; missing=1; }
+    fi
+    merge "$result/$binary.json" "$result/$binary.main.summary" "$result/$binary.rerun.summary" \
+        "$result/$binary.single.summary" || true
     python3 - "$result/$binary.json" "$binary" "$rc" "$(( SECONDS - started ))" <<'PY' | tee -a "$summary" || missing=1
 import collections, json, os, sys
 path, binary, rc, secs = sys.argv[1:5]
