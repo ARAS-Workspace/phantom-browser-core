@@ -64,6 +64,10 @@ browser_tests AdsPageLoadMetricsObserverBrowserTest.SubframeNavigate_CpuTimesCum
 browser_tests CreativeOriginAdsPageLoadMetricsObserverBrowserTest.CreativeOriginStatusCrossNested
 browser_tests CreativeOriginAdsPageLoadMetricsObserverBrowserTest.CreativeOriginStatusCrossDoubleNested
 browser_tests CreativeOriginAdsPageLoadMetricsObserverBrowserTest.CreativeOriginStatusNoCreativeDesignated
+browser_tests AdsPageLoadMetricsObserverPrerenderingBrowserTest.NoMetricsInPrerendering
+browser_tests DevToolsAdsTest.GetAdMetrics
+browser_tests DevToolsAdsTest.GetAdMetrics_AdFrames
+browser_tests DevToolsAdsTest.GetAdMetrics_PageNavigated
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
