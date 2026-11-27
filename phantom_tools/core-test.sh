@@ -73,6 +73,9 @@ browser_tests All/GetDisplayMediaHiDpiBrowserTest.Capture/640x480
 browser_tests All/GetDisplayMediaHiDpiBrowserTest.Capture/3840x2160
 browser_tests TabSearchPageHandlerTest.GetTabs
 browser_tests TabSearchPageHandlerTest.RemoveSplit_NTP
+browser_tests All/PDFExtensionJSTest.ViewerThumbnailBar/1
+browser_tests All/PDFExtensionJSInk2Test.Ink2BottomToolbarDropdown/1
+browser_tests All/PDFExtensionJSInk2Test.Ink2SizeSelector/1
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
