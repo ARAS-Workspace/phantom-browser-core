@@ -68,6 +68,7 @@ browser_tests AdsPageLoadMetricsObserverPrerenderingBrowserTest.NoMetricsInPrere
 browser_tests DevToolsAdsTest.GetAdMetrics
 browser_tests DevToolsAdsTest.GetAdMetrics_AdFrames
 browser_tests DevToolsAdsTest.GetAdMetrics_PageNavigated
+browser_tests CaptureHandleBrowserTestPrerender.EmptyConfigForCrossDocumentNavigations
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
