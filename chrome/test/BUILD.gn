@@ -5172,7 +5172,7 @@ source_set("xr_browser_tests_common") {
 
   data = [
     "//chrome/test/data/xr/e2e_test_files/",
-    "//third_party/blink/web_tests/resources/testharness.js",
+    "//chrome/test/data/web_tests/resources/testharness.js",
   ]
 
   if (enable_vr) {

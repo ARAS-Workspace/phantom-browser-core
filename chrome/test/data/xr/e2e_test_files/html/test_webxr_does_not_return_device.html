@@ -8,7 +8,7 @@ Tests that WebXR does not report immersive-vr support when runtimes are disabled
   </head>
   <body>
     <canvas id="webgl-canvas"></canvas>
-    <script src="../../../../../../third_party/blink/web_tests/resources/testharness.js"></script>
+    <script src="../../../web_tests/resources/testharness.js"></script>
     <script src="../resources/webxr_e2e.js"></script>
     <script>
       navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
