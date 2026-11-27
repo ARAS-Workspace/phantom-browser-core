@@ -120,6 +120,12 @@ TEST_F(PerformanceInterventionButtonControllerUnitTest,
 
 TEST_F(PerformanceInterventionButtonControllerUnitTest,
        FluctuatingDailyAcceptance) {
+  // The tracker counts days from the Unix epoch, and the mock clock starts at
+  // the epoch plus the current TimeTicks, at any hour of the day. Start at the
+  // next day boundary so that the reshow below stays in the same day.
+  task_environment().FastForwardBy(
+      base::Days(1) -
+      (base::Time::Now() - base::Time::UnixEpoch()) % base::Days(1));
   // Pre-populate the accept history to 20% so that the intervention should
   // only show at most once per day.
   PopulateAcceptHistory(2);
