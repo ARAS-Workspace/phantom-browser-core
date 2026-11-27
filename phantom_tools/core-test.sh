@@ -76,6 +76,8 @@ browser_tests TabSearchPageHandlerTest.RemoveSplit_NTP
 browser_tests All/PDFExtensionJSTest.ViewerThumbnailBar/1
 browser_tests All/PDFExtensionJSInk2Test.Ink2BottomToolbarDropdown/1
 browser_tests All/PDFExtensionJSInk2Test.Ink2SizeSelector/1
+browser_tests ContentCapabilitiesTest.ClipboardRead
+browser_tests ContentCapabilitiesTest.ClipboardReadWrite
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
