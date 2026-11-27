@@ -69,6 +69,10 @@ browser_tests DevToolsAdsTest.GetAdMetrics
 browser_tests DevToolsAdsTest.GetAdMetrics_AdFrames
 browser_tests DevToolsAdsTest.GetAdMetrics_PageNavigated
 browser_tests CaptureHandleBrowserTestPrerender.EmptyConfigForCrossDocumentNavigations
+browser_tests All/GetDisplayMediaHiDpiBrowserTest.Capture/640x480
+browser_tests All/GetDisplayMediaHiDpiBrowserTest.Capture/3840x2160
+browser_tests TabSearchPageHandlerTest.GetTabs
+browser_tests TabSearchPageHandlerTest.RemoveSplit_NTP
 "
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
