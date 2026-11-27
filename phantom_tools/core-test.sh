@@ -434,6 +434,24 @@ for iteration in json.load(open(path)).get("per_iteration_data", []):
 for name in flt.split(":"):
     print("CONFIRM %s %s %s" % (binary, last.get(name, "NOT RUN"), name))
 PY
+                # The count line of the binary above came before this run; this
+                # one counts the merged summary that the verdict reads.
+                python3 - "$result/$binary.json" "$binary" <<'PY' | tee -a "$summary" || missing=1
+import collections, json, sys
+path, binary = sys.argv[1:3]
+count = collections.Counter()
+flaky = 0
+for iteration in json.load(open(path)).get("per_iteration_data", []):
+    for name, runs in iteration.items():
+        status = runs[-1]["status"] if runs else "UNKNOWN"
+        count[status] += 1
+        if status in ("SUCCESS", "SKIPPED") and any(
+                r["status"] not in ("SUCCESS", "SKIPPED") for r in runs[:-1]):
+            flaky += 1
+print("--- %s after the confirm run: %s%s" % (binary,
+      ", ".join("%s %d" % kv for kv in sorted(count.items())) or "no tests",
+      ", flaky %d" % flaky if flaky else ""))
+PY
             else
                 say "confirm: $binary left no summary" | tee -a "$summary"
                 missing=1
