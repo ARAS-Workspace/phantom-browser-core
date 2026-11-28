@@ -6,7 +6,7 @@
     "allowJs": true,
     "outDir": "ignored-for-vscode",
     "paths": {
-      "test_runner": ["../../../../../third_party/blink/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test.js"]
+      "test_runner": ["../../../../../chrome/test/data/web_tests/http/tests/inspector-protocol/resources/inspector-protocol-test.js"]
     },
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

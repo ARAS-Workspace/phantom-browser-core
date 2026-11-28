@@ -617,7 +617,7 @@ test("headless_browsertests") {
     "$root_out_dir/headless_lib_strings.pak",
     "//components/headless/test/data",
     "//net/tools/testserver/",
-    "//third_party/blink/web_tests/http/tests/inspector-protocol/",
+    "//chrome/test/data/web_tests/http/tests/inspector-protocol/",
     "//third_party/pywebsocket3/",
   ]
 

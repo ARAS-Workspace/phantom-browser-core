@@ -104,7 +104,7 @@ void HeadlessProtocolBrowserTest::LoadTestMetaInfo() {
 
 void HeadlessProtocolBrowserTest::StartEmbeddedTestServer() {
   embedded_test_server()->ServeFilesFromSourceDirectory(
-      "third_party/blink/web_tests/http/tests/inspector-protocol");
+      "chrome/test/data/web_tests/http/tests/inspector-protocol");
 
   if (IsSharedTestScript()) {
     embedded_test_server()->ServeFilesFromSourceDirectory(GetTestDataDir());
